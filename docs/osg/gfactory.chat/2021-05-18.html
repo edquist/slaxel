@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue May 18, 2021 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Tue May 18, 2021 : #gfactory (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(10:58:05)</span> <b>blin:</b></span> @jpeterson TCNJ doesn't look like it's recovered =/ <a href="http://gfactory-2.opensciencegrid.org/factory/monitor/factoryStatus.html?entry=OSG_US_TCNJ-ELSA&amp;frontend=total&amp;infoGroup=running&amp;elements=StatusRunningCores,ClientCoresTotal,ClientCoresRunning,ClientCoresIdle,&amp;rra=0&amp;window_min=0&amp;window_max=0&amp;timezone=-5">http://gfactory-2.opensciencegrid.org/factory/monitor/factoryStatus.html?entry=OSG_US_TCNJ-[…]oresIdle,&amp;rra=0&amp;window_min=0&amp;window_max=0&amp;timezone=-5</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:58:27)</span> <b>blin:</b></span> we rsync the OSG pilot logs somewhere to a host in madison, right?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:59:11)</span> <b>jpeterson:</b></span> nope. :disappointed:.    going through all of them shortly-ish for the weekly spreadsheet as well to check on the rest.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:59:47)</span> <b>jpeterson:</b></span> I don’t know about any syncing personally<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:00:11)</span> <b>blin:</b></span> @matyas do you know where they go?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:02:12)</span> <b>matyas:</b></span> chicago<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:02:50)</span> <b>blin:</b></span> what's the host?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:03:03)</span> <b>matyas:</b></span> they go to <a href="http://xd-login.opensciencegrid.org">xd-login.opensciencegrid.org</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(11:03:35)</span> <b>matyas:</b></span> it doesn't use your regular OSG account so you may have to ask @rynge for access<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:03:43)</span> <b>blin:</b></span> ah ok<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:03:45)</span> <b>matyas:</b></span> I can get the logs for you<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:04:13)</span> <b>blin:</b></span> @rynge can i have an account? :pleading_face:<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:07:16)</span> <b>matyas:</b></span> uh there's like a gig of logs<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:07:36)</span> <b>matyas:</b></span> newest one's from may 13 though<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:08:03)</span> <b>matyas:</b></span> you don't get any logs transferred if they fail to ... connect to the factory I think<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:08:14)</span> <b>matyas:</b></span> try logging into their submit host<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:08:30)</span> <b>blin:</b></span> ah that helps, thanks<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:09:35)</span> <b>matyas:</b></span> which I usually do by exec'ing into the CE, becoming the pilot user and using ssh; (if you can't remember the hostname, look in .ssh/config)<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:11:36)</span> <b>blin:</b></span> yup. i've been doing that so much lately that it feels like we should script it<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:14:15)</span> <b>matyas:</b></span> I have this one-liner (that I always mistype)<br/><pre>ssh $(awk '/^Host/ { print $2; exit }' ~/.ssh/config)</pre><br/><br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(11:15:13)</span> <b>blin:</b></span> gotta su into the user if we add in your separate SSH keys<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:15:30)</span> <b>matyas:</b></span> well yeah, that's just for remembering the hostname<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:17:52)</span> <b>matyas:</b></span> actually I wonder if ssh lets root use someone else's hostkey... you might be able to do <tt>ssh -F ~osg01/.ssh/config</tt>  ...<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:18:40)</span> <b>matyas:</b></span> <tt>-i ~osg01/.ssh/id_bosco_key</tt> (or whatever the key's called)<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:18:47)</span> <b>blin:</b></span> oh yeah, probably<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:45:34)</span> <b>jpeterson:</b></span> -i  is what I mostly do. lots of tab completing to make sure username is right.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:45:59)</span> <b>jpeterson:</b></span> so I don’t have to su first<br/>
+</blockquote>
+<span style="color: #674b1b"><span style="font-size: small">(11:14:38)</span> <b>rynge:</b></span> @blin <a href="mailto:ux22@xd-login.opensciencegrid.org">ux22@xd-login.opensciencegrid.org</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:16:04)</span> <b>rynge:</b></span> Give me a ssh key please<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:16:11)</span> <b>matyas:</b></span> and the log files are in <tt>/local-scratch/gfaclogs/sdsc/entry_$FACTORY_ENTRY</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(11:16:37)</span> <b>matyas:</b></span> (replace <tt>sdsc</tt> with <tt>itb</tt> for the ITB factory)<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:17:05)</span> <b>blin:</b></span> uhhh the TCNJ Bosco sandbox has over 3k dirs<br/>
+<span style="color: #385a86"><span style="font-size: small">(11:17:07)</span> <b>jdost321:</b></span> Jeff Peterson has login to the factories he can check also the logs directly<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(11:17:51)</span> <b>blin:</b></span> you guys are busy enough as is, i was hoping to figure out a way to poke at logs without having to harass factory ops all the time!<br/>
+<span style="color: #385a86"><span style="font-size: small">(11:18:27)</span> <b>jdost321:</b></span> gotcha i thought you were suggesting he get an account as well to access the logs<br/>
+</blockquote>
+<span style="color: #674b1b"><span style="font-size: small">(11:17:09)</span> <b>rynge:</b></span> (maybe we should just put these on osg connect instead?)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:17:50)</span> <b>rynge:</b></span> Ok, I will make a request to factory ops<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:41:14)</span> <b>blin:</b></span> @jpeterson the TCNJ GPU entry looks "fine" on the other hand <a href="http://gfactory-2.opensciencegrid.org/factory/monitor/factoryStatus.html?entry=OSG_US_TCNJ-ELSA_gpu&amp;frontend=total&amp;infoGroup=running&amp;elements=StatusRunningCores,ClientCoresTotal,ClientCoresRunning,ClientCoresIdle,&amp;rra=0&amp;window_min=0&amp;window_max=0&amp;timezone=-5">http://gfactory-2.opensciencegrid.org/factory/monitor/factoryStatus.html?entry=OSG_US_TCNJ-[…]oresIdle,&amp;rra=0&amp;window_min=0&amp;window_max=0&amp;timezone=-5</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(11:41:25)</span> <b>blin:</b></span> at least pilots appear to be reporting<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:42:13)</span> <b>jpeterson:</b></span> still not matching though<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:42:34)</span> <b>blin:</b></span> one problem at a time! :smile:<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:42:47)</span> <b>jpeterson:</b></span> how does that work?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:43:11)</span> <b>blin:</b></span> dropping all the other problems on the floor? :disappointed:<br/>
+</body>
+</html>

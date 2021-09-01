@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Sep 10, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Tue Sep 10, 2019 : #xcache (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(16:15:45)</span> <b>matyas:</b></span> I'm wracking my brain trying to figure out why I can't get a specific file from a cache<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:17:17)</span> <b>matyas:</b></span> <pre>% xrdfs <a href="http://sc-origin.chtc.wisc.edu">sc-origin.chtc.wisc.edu</a> stat /chtc/PUBLIC/tjanicki/sim603.tar.gz<br/>Path:   /chtc/PUBLIC/tjanicki/sim603.tar.gz<br/>Id:     22518161345674513<br/>Size:   5540296360<br/>MTime:  2019-09-10 15:49:47<br/>Flags:  16 (IsReadable)<br/></pre><br/>ok, file is there<br/><pre>% xrdfs <a href="http://sc-cache.chtc.wisc.edu">sc-cache.chtc.wisc.edu</a> stat /chtc/PUBLIC/tjanicki/sim603.tar.gz<br/>[ERROR] Server responded with an error: [3011] Unable to locate /chtc/PUBLIC/tjanicki/sim603.tar.gz; no such file or directory<br/></pre><br/>same result for every other cache in caches.json<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:17:34)</span> <b>matyas:</b></span> I don't see any of them try to access it in the origin's xrootd log<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:18:17)</span> <b>matyas:</b></span> and I don't think it can be firewall because I just created a test file /chtc/PUBLIC/matyas/testfiles/2019-09-10 and was able to stat it immediately<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:18:42)</span> <b>matyas:</b></span> what gives?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:19:52)</span> <b>matyas:</b></span> note that sim603.tar.gz is 5gb while my test file is &lt;1kb<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:21:30)</span> <b>isfiligoi:</b></span> If you first fetch the file through a cache, can you then stat it?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:21:59)</span> <b>matyas:</b></span> I can't fetch it either; xrdcp fails with the same error<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:01:58)</span> <b>matyas:</b></span> Do 'file not found's get cached?<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:02:30)</span> <b>matyas:</b></span> The user had previously tried to stashcp them before they existed<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:05:46)</span> <b>rynge:</b></span> @dweitzel ^^^<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:05:55)</span> <b>rynge:</b></span> I think failures do get cached<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:11:58)</span> <b>dweitzel:</b></span> Yes. Failures are cached. <br/>
+<span style="color: #c386df"><span style="font-size: small">(17:12:20)</span> <b>matyas:</b></span> For how long?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:12:22)</span> <b>dweitzel:</b></span> Maybe ~15 min to an hour. <br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:12:42)</span> <b>dweitzel:</b></span> I forget what setting we have. <br/>
+<span style="color: #c386df"><span style="font-size: small">(17:13:53)</span> <b>matyas:</b></span> hmm. Her first run was at around 10 am and the files are still "missing"<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:15:00)</span> <b>matyas:</b></span> Where is the setting? The individual caches?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:15:19)</span> <b>dweitzel:</b></span> Redirector<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:15:35)</span> <b>dweitzel:</b></span> Maybe the caches. But for sure the redirector. <br/>
+<span style="color: #e06b56"><span style="font-size: small">(17:17:49)</span> <b>jthiltges:</b></span> Is this <tt>cms.fxhold noloc</tt>? If I'm understanding the docs, appears the "non-existence" timer defaults to 8 hours.<br/><a href="https://xrootd.slac.stanford.edu/doc/dev410/cms_config.htm#_Toc8247278">https://xrootd.slac.stanford.edu/doc/dev410/cms_config.htm#_Toc8247278</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(17:23:58)</span> <b>matyas:</b></span> Can someone check? 8 hours would be super annoying<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:50:09)</span> <b>dweitzel:</b></span> It's not set.  So I suppose it's the default of 8 hours.  That does seem long.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:54:12)</span> <b>dweitzel:</b></span> I wanna run any change to the redirectors by Marian.  I opened a ticket, hopefully we can get this set quickly and easily.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:54:35)</span> <b>dweitzel:</b></span> I suggested 15-30 min.  Max 1 hour.  But I'm open to suggestions.<br/>
+<span style="color: #53b759"><span style="font-size: small">(23:32:21)</span> <b>marian:</b></span> Yeah, it’s default 8hrs right now. I take a look tomorrow and suggest something that we have for CMS on global redirectors for example.<br/>
+</body>
+</html>

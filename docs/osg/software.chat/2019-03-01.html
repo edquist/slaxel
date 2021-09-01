@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Mar 1, 2019 : #software (osg)</title>
+</head>
+<body>
+<h3>Fri Mar 1, 2019 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(15:40:30)</span> <b>blin:</b></span> @matyas the oasis-vo-updater failed this morning with:<br/><pre><br/>Output: Repository osg is listed more than once in the configuration<br/>Cleaning repos: base duosecurity epel extras goc hcc osg puppet5 updates<br/>Cleaning up everything<br/>Maybe you want: rm -rf /var/tmp/yum-ouser.mis-QiCg_w, to also free up space taken by orphaned data from disabled or removed repos<br/>Repository osg is listed more than once in the configuration<br/><a href="http://hcc-mirror.unl.edu/epel/7/x86_64/repodata/da59c81562d5c05271e7136d2751222c0221be07ed29df14ae16cca932d2b2e0-primary.sqlite.bz2">http://hcc-mirror.unl.edu/epel/7/x86_64/repodata/da59c81562d5c05271e7136d2751222c0221be07ed29df14ae16cca932d2b2e0-primary.sqlite.bz2</a>: [Errno 14] HTTP Error 404 - Not Found<br/>Trying other mirror.<br/></pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(15:40:45)</span> <b>matyas:</b></span> yeah looks like a mirror issue with unl<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:40:47)</span> <b>blin:</b></span> and @marco.mascheroni is seeing issues at tacc and he's using CRLs out of CVMFS<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:45:51)</span> <b>marco.mascheroni:</b></span> Yes, in the master log I am seeing this:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:46:23)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:46:48)</span> <b>marco.mascheroni:</b></span> The ca certdir is set to:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:47:14)</span> <b>marco.mascheroni:</b></span> which I just synched from cvmfs a couple of days ago<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:47:18)</span> <b>marco.mascheroni:</b></span> X509_CERT_DIR=/cvmfs/oasis.opensciencegrid.org/osg-software/osg-wn-client/certificates<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:47:44)</span> <b>marco.mascheroni:</b></span> (synched because at TACC I am doing rsynch copies from chicago)<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:48:03)</span> <b>marco.mascheroni:</b></span> See the dates here:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:48:22)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #c386df"><span style="font-size: small">(15:49:19)</span> <b>matyas:</b></span> what do you mean 'synched a couple of days ago'?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:49:41)</span> <b>matyas:</b></span> i'm on oasis-login right now and almost all of the crls are up to date<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:50:56)</span> <b>marco.mascheroni:</b></span> at TACC they can't run a cvmfs client. So what we have to do is to run an rsynch from a place that has a client...<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:51:40)</span> <b>marco.mascheroni:</b></span> Basicalli I rsynch cvmfs into a their scratch area<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:51:41)</span> <b>matyas:</b></span> CRLs expire every 72 hours so you'll need to rsync frequently<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:52:10)</span> <b>matyas:</b></span> check to see if the place that has the client has been updating?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:52:35)</span> <b>matyas:</b></span> I just ran osg-oasis-update in case that helps though it will take a while to complete<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:53:27)</span> <b>marco.mascheroni:</b></span> ok, I was seeing this error even right after the rsynch completed, but I'll check this again<br/>
+</body>
+</html>

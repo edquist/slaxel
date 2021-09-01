@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Dec 11, 2018 : #general (osg)</title>
+</head>
+<body>
+<h3>Tue Dec 11, 2018 : #general (osg)</h3>
+<span style="color: #a72f79"><span style="font-size: small">(09:22:11)</span> <b>andrew.melo:</b></span> Is this where I want to start generating a downtime for Vanderbilt? <a href="https://topology.opensciencegrid.org/generate_downtime">https://topology.opensciencegrid.org/generate_downtime</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(09:22:46)</span> <b>blin:</b></span> yup<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:24:03)</span> <b>andrew.melo:</b></span> I don't know if it's set in stone, but it would be really nice to be able to just say "site will be busted" instead of having to go through each resource individually<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:24:48)</span> <b>blin:</b></span> were you able to do that with OIM?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:24:52)</span> <b>andrew.melo:</b></span> no<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:25:22)</span> <b>andrew.melo:</b></span> Which I also didn't like, but when I brought it up, the dev had already moved on<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:28:33)</span> <b>andrew.melo:</b></span> I'm stripping some old stuff in our topology first -- If I have a gridftp host registered (gridftp.accre.v.e), the SE host is superfluous, right? That's where our bestman server is, which I'll be shutting down at some point<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:29:51)</span> <b>blin:</b></span> yeah, if they're the same host they should just be added as multiple services on a single resource<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:31:12)</span> <b>andrew.melo:</b></span> different hosts. se1 ran (still runs, maybe, I should check) phedex and bestman. When I set the LB up on gridftp.a.v.e, I removed the round-robin from se1 and pointed it to the gridftp LB, I changed the CMS configs to only write to gridftp.a.v.e, so I presume I don't need SE1 listed anymore<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:32:40)</span> <b>blin:</b></span> yeah, if no one's actually using it, i think you can remove it<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:33:55)</span> <b>andrew.melo:</b></span> cool. I guess the mantra for like a decade was "a site is CEs and SEs", so I didn't wanna run foul of that...<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:34:24)</span> <b>andrew.melo:</b></span> anyway, I guess for the downtime topology generator, changing the select box to a multiple checkbox would do the trick, so you could just hit them all instead of one by one<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:39:49)</span> <b>blin:</b></span> which select box? the one for a resource?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:39:52)</span> <b>blin:</b></span> @matyas ^^<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:40:25)</span> <b>andrew.melo:</b></span> yeah, so you can just click them all<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:41:35)</span> <b>andrew.melo:</b></span> We've gotta do some firmware upgrades for our core switches, and unfortunately the upgrades are to fix some weirdass glitches in LACP, so there's a non-zero chance we're going to have whole racks blip out :disappointed:<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:43:49)</span> <b>blin:</b></span> i think a checkbox there would make the service selection confusing<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:44:31)</span> <b>matyas:</b></span> yeah I don't know how I'd do service selection with multiple checkboxes<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:45:17)</span> <b>matyas:</b></span> maybe I'd have to make a special "all" service for that case and have the webapp do the appropriate translation<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:46:50)</span> <b>andrew.melo:</b></span> I was thinking "checked" would mean "downtime"<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:49:01)</span> <b>blin:</b></span> yeah, i guess i'd be curious how many resources with multiple services have had registered downtimes where only a subset of those services were down<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:49:05)</span> <b>blin:</b></span> (and it wasn't a mistake)<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:54:18)</span> <b>andrew.melo:</b></span> I guess that's fair. IIUC, the only thing that keys off the downtime is the site availablility stuff who doesn't give "partial credit" (i.e. the site is either On or Off) - I never even bother putting in a downtime unless everything's down<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:55:07)</span> <b>andrew.melo:</b></span> I got ina very very very long thread where Vanderbilt had a weeklong downtime that wasn't counted because I mistakenly left up one of the resources in OIM (annoyingly, the resource was down and had been unracked, it was just still in the information system)<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:56:49)</span> <b>blin:</b></span> interesting<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:56:56)</span> <b>blin:</b></span> was that thread with the WLCG?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(10:05:24)</span> <b>andrew.melo:</b></span> CMS site support<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:06:12)</span> <b>blin:</b></span> hrm ok<br/>
+<span style="color: #5a4592"><span style="font-size: small">(10:08:08)</span> <b>lmichael:</b></span> Who should this belong to? <a href="https://support.opensciencegrid.org/a/tickets/8085">https://support.opensciencegrid.org/a/tickets/8085</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:11:28)</span> <b>blin:</b></span> factory ops<br/>
+<span style="color: #5a4592"><span style="font-size: small">(10:29:03)</span> <b>lmichael:</b></span> Thanks!<br/>Which group do I own to if someone writes in with the issue that their local cluster is no longer receiving OSG backfill jobs?  (see: <a href="https://support.opensciencegrid.org/a/tickets/8093">https://support.opensciencegrid.org/a/tickets/8093</a>)<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:31:11)</span> <b>blin:</b></span> i think that's more or less the same question as the previous ticket<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:31:16)</span> <b>blin:</b></span> not getting OSG jobs = factory ops<br/>
+</body>
+</html>

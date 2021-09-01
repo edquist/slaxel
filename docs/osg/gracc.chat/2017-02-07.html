@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Feb 7, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Tue Feb 7, 2017 : #gracc (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(13:25:06)</span> <b>dweitzel:</b></span> @kretzke what's the proper index for raw now adays?   <tt>gracc.osg.raw*</tt>?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:25:41)</span> <b>kretzke:</b></span> <tt>gracc.osg.raw-*</tt> (the dash is important)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:25:45)</span> <b>dweitzel:</b></span> ok<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:37:30)</span> <b>dweitzel:</b></span> @kretzke another question.  For the ResourceType=Storage (transfers) records, they appear to be tagged with <tt>_type=JobUsageRecord</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:38:42)</span> <b>dweitzel:</b></span> I change change my query to ResourceType, no problem.  Just wanted to make sure this was on purpose.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:39:04)</span> <b>kretzke:</b></span> yep, that’s right. or at least, it’s consistent with Gratia<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:39:10)</span> <b>dweitzel:</b></span> Ok.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:39:40)</span> <b>dweitzel:</b></span> I'm not sure it's right, but consistent with Gratia is good enough for me.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:39:41)</span> <b>kretzke:</b></span> there’s also StorageElement and StorageElementRecord records, but we haven’t started forwarding them yet<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:39:57)</span> <b>dweitzel:</b></span> Will those have ResourceType = Storage?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:41:58)</span> <b>kretzke:</b></span> no ResourceType. Looks like they have SpaceType and StorageType instead, respectively<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:48:46)</span> <b>kretzke:</b></span> here’s how Gratia summarizes transfer records (MasterTransferSummary table)<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:48:58)</span> <b>kretzke:</b></span> @kretzke uploaded a file: <a href="https://opensciencegrid.slack.com/files/kretzke/F41GWPT8Q/-.sql">Untitled</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:58:41)</span> <b>dweitzel:</b></span> Ok, I'll have to read into that.  I cannot find a record in the raw index with Njobs attribute.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:58:49)</span> <b>dweitzel:</b></span> does it exist?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:01:21)</span> <b>kretzke:</b></span> there’s a couple, but if you’re working on transfers you need to be looking at <tt>gracc.osg-transfer.raw-*</tt>, which has a lot<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:02:43)</span> <b>kretzke:</b></span> or, try summarizing records from <tt>gratia.osg.summary1</tt><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:04:16)</span> <b>kretzke:</b></span> … except there it’s Count… :cry:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:05:53)</span> <b>dweitzel:</b></span> hum...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:05:55)</span> <b>dweitzel:</b></span> um...<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:12:36)</span> <b>kretzke:</b></span> here’s a few <a href="https://gracc.opensciencegrid.org/kibana/app/kibana#/discover?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:'2015-03-16T01:44:25.246Z',mode:absolute,to:'2015-03-30T00:31:02.699Z'))&amp;_a=(columns:!(Njobs),index:'gracc.osg.raw-*',interval:auto,query:(query_string:(analyze_wildcard:!f,query:'_exists_:Njobs')),sort:!(EndTime,desc))">https://gracc.opensciencegrid.org/kibana/app/kibana#/discover?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:'2015-03-16T01:44:25.246Z',mode:absolute,to:'2015-03-30T00:31:02.699Z'))&amp;_a=(columns:!(Njobs),index:'gracc.osg.raw-*',interval:auto,query:(query_string:(analyze_wildcard:!f,query:'_exists_:Njobs')),sort:!(EndTime,desc))</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:14:11)</span> <b>dweitzel:</b></span> ok, so what index should I use?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:14:57)</span> <b>kretzke:</b></span> for what exactly?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:15:06)</span> <b>dweitzel:</b></span> transfer record summarization.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:15:18)</span> <b>kretzke:</b></span> <tt>gracc.osg-transfer.raw-*</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:15:23)</span> <b>dweitzel:</b></span> ok.<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:26:27)</span> <b>marian:</b></span> @kretzke: I saw you assigned me some GRACC tickets ... what's the criticality of resolution? I'm afraid I can't look at any of those in detail before Thursday ... unless you tell me it need immediate attention<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:29:08)</span> <b>kretzke:</b></span> @marian thought I’d start passing a little work your way :slightly_smiling_face: no rush, we won’t be ready to transition until sometime in March.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:30:32)</span> <b>kretzke:</b></span> note that they’re ordered subtasks under GRACC-68<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:31:04)</span> <b>marian:</b></span> sure, please, do pass things ... alright, just wanted to know if there is something must to do right now ... I get to it eventually ... without looking at those tickets wanted to say why I don't react on them yet<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:32:40)</span> <b>marian:</b></span> and march will be tough, so better I start sort out things ahead of time ... I plan on full week of vacation after AHM, just fyi<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:33:50)</span> <b>kretzke:</b></span> ok, no problem.<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(15:44:27)</span> <b>B167BCLN5:</b></span> <br/>
+</body>
+</html>

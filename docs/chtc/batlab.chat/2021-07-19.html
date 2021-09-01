@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jul 19, 2021 : #batlab (chtc)</title>
+</head>
+<body>
+<h3>Mon Jul 19, 2021 : #batlab (chtc)</h3>
+<span style="color: #9b3b45"><span style="font-size: small">(16:51:38)</span> <b>jfrey:</b></span> Wow, the tokens test is borked.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:52:00)</span> <b>jfrey:</b></span> It uses the default host-based auth configuration used by all tests.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:52:39)</span> <b>jfrey:</b></span> It then requires authentication and changes a few of the ALLOW settings to accept some made-up identities.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:53:06)</span> <b>jfrey:</b></span> But it doesn’t restrict the authentication methods. So if ID_TOKENS fails, it’ll fail back to FS.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:53:35)</span> <b>jfrey:</b></span> And it leaves most of the ALLOW settings at the default of $(FULL_HOSTNAME) $(IPV4_ADDRESS) $(IPV6_ADDRESS) or similar<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:54:43)</span> <b>jfrey:</b></span> Also, one of the made-up identities isn’t explicitly allowed, but the host-based ALLOWs let it in anyway, which the test depends on.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(17:18:19)</span> <b>jfrey:</b></span> Maybe the test isn’t so borked after all, given the default test suite config (old 8.9 host-based security). But it fails hard when 9.0 user-based security is used.<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:20:07)</span> <b>gthain:</b></span> Are these the tests the grep through the debugging logs to determine which security was actually used?  That's always bugged me<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:20:30)</span> <b>tlmiller:</b></span> The tokens test being borked does not surprise me in the slightest, sadly.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(18:51:15)</span> <b>jfrey:</b></span> The tokens test doesn’t grovel around in the logs. It looks at the output of condor_ping.<br/>
+</body>
+</html>

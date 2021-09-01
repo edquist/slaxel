@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jun 5, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Wed Jun 5, 2019 : #xcache (osg)</h3>
+<span style="color: #53b759"><span style="font-size: small">(01:36:45)</span> <b>isfiligoi:</b></span> For cms-xcache docker image, my student is really close to something working;<br/>we are just stuck with testing right now, due to problems on our UCSD HW :disappointed:<br/>The link to the current Dockerfile is<br/><a href="https://github.com/vsastray/docker-xcache/tree/cms-xcache/cms-xcache">https://github.com/vsastray/docker-xcache/tree/cms-xcache/cms-xcache</a><br/>(it is a branch of the osg base git repo)<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:21:18)</span> <b>blin:</b></span> great!<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:21:46)</span> <b>blin:</b></span> @isfiligoi could you have them submit a work-in-progress PR just so we could glance over it quickly?<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:22:26)</span> <b>isfiligoi:</b></span> Everything should be in that branch… but will ask him<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:04:13)</span> <b>efajardo:</b></span> I ran into Igor’s student yesterday just by chance on campus. I am a little busy this week with the SDX OSG integration workshop<br/>
+<span style="color: #7d414c"><span style="font-size: small">(12:00:14)</span> <b>bockjoo:</b></span> @tim.theisen 1 I have upgraded one of my xrootd servers to xrootd-scitokens-1.0.0-1.osg34.el7.x86_64<br/>
+<span style="color: #7d414c"><span style="font-size: small">(12:15:58)</span> <b>bockjoo:</b></span> 2 x509-scitoken-init <a href="https://scitokens.org/cms">https://scitokens.org/cms</a><br/>
+<span style="color: #7d414c"><span style="font-size: small">(12:17:11)</span> <b>bockjoo:</b></span> 3 curl --capath /etc/grid-security/certificates -H 'Authorization: Bearer _output_from_step_2' <a href="https://cmsio3.rc.ufl.edu:1094//store/user/bockjoo/hello_world.txt">https://cmsio3.rc.ufl.edu:1094//store/user/bockjoo/hello_world.txt</a><br/>
+<span style="color: #7d414c"><span style="font-size: small">(12:17:29)</span> <b>bockjoo:</b></span> hello world!<br/>
+<span style="color: #7d414c"><span style="font-size: small">(12:40:19)</span> <b>bockjoo:</b></span> 4 However, xrootd would not start<br/>
+<span style="color: #7d414c"><span style="font-size: small">(12:40:40)</span> <b>bockjoo:</b></span> 5 During the xrootd-scitokens update, there were these messages:<br/>
+<span style="color: #7d414c"><span style="font-size: small">(12:41:25)</span> <b>bockjoo:</b></span> /sbin/ldconfig: /lib64/libXrdMacaroons-4.so is not a symbolic link<br/> /lib64/libXrdMultiuser-4.so is not a symbolic link<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:43:15)</span> <b>dweitzel:</b></span> if xrootd wouldn't start, how was the test successful?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:03:38)</span> <b>bockjoo:</b></span> I think xrootd was running and I was testing scitoken.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:04:14)</span> <b>bockjoo:</b></span> And then I restarted xrootd. At that point, xrootd wouldn't start because of a missing symbole in the xrootd server lib. I will need to upgrade xrootd to 4.10.0-0.rc2 as well. There are missing symbols in 4.9.1-1.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:13:41)</span> <b>bockjoo:</b></span> Please remove "because of a missing symbole in the xrootd server lib. I will need to upgrade xrootd to 4.10.0-0.rc2 as well. There are missing symbols in 4.9.1-1" from your memory. I screwed 4.9.1-1 with a file name *.original.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:14:29)</span> <b>dweitzel:</b></span> removed.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:15:00)</span> <b>dweitzel:</b></span> can you check who owns that libXrdMacaroons-4.so?  <tt>rpm qf /lib64/libXrdMacaroons-4.so</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:15:27)</span> <b>dweitzel:</b></span> It should be owned by xrootd.  Macaroons is upstreamed.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:18:47)</span> <b>bockjoo:</b></span> I downgraded everything so it looks like:<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:18:57)</span> <b>bockjoo:</b></span> [root@cmsio3 lib64]# rpm -qf /lib64/libXrdMacaroons-4.so<br/>xrootd-server-libs-4.9.1-1.osg34.el7.x86_64<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:21:03)</span> <b>bockjoo:</b></span> Now, I upgraded xrootd-scitoken to xrootd-scitokens.x86_64 0:1.0.0-1.osg34.el7 and xrootd is restarted fine.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:29:23)</span> <b>bockjoo:</b></span> Now curl --capath /etc/grid-security/certificates -H 'Authorization: Bearer _token_' <a href="https://cmsio3.rc.ufl.edu:1094//store/user/bockjoo/hello_world.txt">https://cmsio3.rc.ufl.edu:1094//store/user/bockjoo/hello_world.txt</a> fails with Unable to open /store/user/bockjoo/hello_world.txt; permission denied<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:31:36)</span> <b>dweitzel:</b></span> is that unable to open from the xrootd log?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:32:32)</span> <b>bockjoo:</b></span> Nope. There is this message from the xrootd log: 190605 14:31:02 87861 scitokens_GenerateAcls: Failed to deserialize SciToken: syntax error at line 1 near: hS-KrTSLTN0UOHMy8gaLc_4xH9wGvAoVe_bJI67ldeOft5XJ9g3v6YBhp7rcbnTZ2ksYMNLA4eX8qE0DWAj4ew==",<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:33:19)</span> <b>dweitzel:</b></span> Is that the token from your curl command?  That token is not correct.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:33:42)</span> <b>bockjoo:</b></span> Token-like string above is not part of my token in the curl command, by the way.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:36:02)</span> <b>dweitzel:</b></span> Bit mystified at that error.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:36:15)</span> <b>dweitzel:</b></span> could you take a look at the /etc/xrootd/scitokens.cfg<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:36:18)</span> <b>dweitzel:</b></span> make sure it looks ok.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:38:26)</span> <b>bockjoo:</b></span> Well as I mentioned, pre-1.0.0 xrootd-scitoken worked just fine and scitoken.cfg looks fine to me. I will downgrade xrootd-scitoken for now.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:40:35)</span> <b>bockjoo:</b></span> Yup, xrootd-scitoken works fine after downgrading it to xrootd-scitokens.x86_64 0:0.6.0-3.osg34.el7.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:40:37)</span> <b>dweitzel:</b></span> could you send me your full token, in a private chat.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:42:52)</span> <b>bockjoo:</b></span> Got the token? Let me know if you want me to upgrade xrootd-scitoken to 1.0.0, the one in testing.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:43:08)</span> <b>dweitzel:</b></span> yes, got the token.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:44:37)</span> <b>dweitzel:</b></span> go ahead and upgrade.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:48:22)</span> <b>bockjoo:</b></span> Upgraded it and xrootd restarted<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:55:22)</span> <b>dweitzel:</b></span> I found where that error may come from.  Seems to be if the token is not properly base64 encoded.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(15:02:48)</span> <b>bockjoo:</b></span> Can I downgrade it now?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:37:06)</span> <b>dweitzel:</b></span> sure, downgrade.  We can pick up debugging tomorrow.  I've never seen that error before.  It could happen if the full token wasn't copied in, or if unicode characters sneaked into the token.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:37:23)</span> <b>dweitzel:</b></span> basically, if the token is not fully base64 encoded.<br/>
+</body>
+</html>

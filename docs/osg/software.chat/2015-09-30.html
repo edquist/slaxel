@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Sep 30, 2015 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Sep 30, 2015 : #software (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(14:58:29)</span> <b>bbockelm:</b></span> @lincoln: did you restart the ‘cmsd’ service also?<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:58:36)</span> <b>lincoln:</b></span> yes<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:58:41)</span> <b>lincoln:</b></span> i can try ago tho<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:58:43)</span> <b>lincoln:</b></span> again*<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:00:07)</span> <b>bbockelm:</b></span> so, it appears the cmsd @ <a href="http://data.ci-connect.net">data.ci-connect.net</a> is telling redirector (<a href="http://stash-itb2.grid.iu.edu">stash-itb2.grid.iu.edu</a>) that it’s not hosting /user/test.1M<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:00:19)</span> <b>bbockelm:</b></span> (which it obviously is, as you can access it via xrdcp directly<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:00:36)</span> <b>lincoln:</b></span> hm<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:01:01)</span> <b>lincoln:</b></span> i am apparently running some bizarro version of xrootd on the origin. maybe i should give that a bump to the standard version<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:01:14)</span> <b>lincoln:</b></span> good to do regardless<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:01:17)</span> <b>bbockelm:</b></span> $ xrdmapc --list all <a href="http://stash-itb2.grid.iu.edu:1094">stash-itb2.grid.iu.edu:1094</a> /<br/>0*r** <a href="http://stash-itb2.grid.iu.edu:1094">stash-itb2.grid.iu.edu:1094</a><br/>  &gt;   Srv <a href="http://stashcache.fnal.gov:1094">stashcache.fnal.gov:1094</a> <br/>      Srv <a href="http://hcc-stashtest.unl.edu:1094">hcc-stashtest.unl.edu:1094</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:01:36)</span> <b>bbockelm:</b></span> that indicates <a href="http://data.ci-connect.net">data.ci-connect.net</a> isn’t logged in to stash-itb2.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:21:39)</span> <b>bbockelm:</b></span> @lincoln: any findings?<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:22:09)</span> <b>lincoln:</b></span> just updated to the OSG-provided release, sec<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:23:51)</span> <b>lincoln:</b></span> ok done<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:24:19)</span> <b>lincoln:</b></span> so when I xrdcp from the origin directly, i see<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:24:22)</span> <b>lincoln:</b></span> 150930 20:20:32 10641 XrdSched: running main accept inq=0<br/>150930 20:20:32 10769 XrdInet: Accepted connection from <a href="mailto:7@login01.osgconnect.mwt2.org">7@login01.osgconnect.mwt2.org</a><br/>150930 20:20:32 10769 XrdProtocol: matched protocol xrootd<br/>150930 20:20:32 10769 ?:7@login01.osgconnect.mwt2.org XrdPoll: FD 7 attached to poller 0; num=1<br/>150930 20:20:32 10769 XrootdXeq: lincolnb.3205752:7@login01.osgconnect.mwt2.org pub IPv4 login<br/>150930 20:20:32 10769 lincolnb.3205752:7@login01.osgconnect.mwt2.org ofs_open: 0-600 fn=/user/test.1M<br/>150930 20:20:32 10769 lincolnb.3205752:7@login01.osgconnect.mwt2.org ofs_fstat:  fn=/user/test.1M<br/>150930 20:20:32 10769 lincolnb.3205752:7@login01.osgconnect.mwt2.org ofs_close: use=1 fn=/user/test.1M<br/>150930 20:20:32 10769 lincolnb.3205752:7@login01.osgconnect.mwt2.org ofs_close: use=0 fn=dummy<br/>150930 20:20:32 10769 XrootdXeq: lincolnb.3205752:7@login01.osgconnect.mwt2.org disc 0:00:00<br/>150930 20:20:32 10769 lincolnb.3205752:7@login01.osgconnect.mwt2.org XrdPoll: FD 7 detached from poller 0; num=0<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:24:42)</span> <b>lincoln:</b></span> when I xrdcp from my local cache server, I see squat.<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:24:52)</span> <b>lincoln:</b></span> in either xrootd.log or cmsd.log<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:24:58)</span> <b>lincoln:</b></span> on my origin server, anyhow<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:25:54)</span> <b>lincoln:</b></span> just restarted &amp; tried another xrdcp from the cache..<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:26:05)</span> <b>lincoln:</b></span> <br/>
+<span style="color: #e96699"><span style="font-size: small">(15:26:49)</span> <b>lincoln:</b></span> i don’t see any evidence that the cache is talking to the redirector.<br/>
+</body>
+</html>

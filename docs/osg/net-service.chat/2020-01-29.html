@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jan 29, 2020 : #net-service (osg)</title>
+</head>
+<body>
+<h3>Wed Jan 29, 2020 : #net-service (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(13:18:14)</span> <b>dweitzel:</b></span> @smckee Looking back at the parsing of new meshconfig.  Looking at the example json: <a href="https://psconfig.opensciencegrid.org/pub/config/ps-testbed?format=psconfig">https://psconfig.opensciencegrid.org/pub/config/ps-testbed?format=psconfig</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:18:36)</span> <b>dweitzel:</b></span> Is it enough to just look at all of the archive hosts, and query all of them?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:19:25)</span> <b>dweitzel:</b></span> In theory, just loop through the json structure like "archives" -&gt; (loop) "host-archiveX" -&gt; "data" -&gt; "url"<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:19:46)</span> <b>dweitzel:</b></span> In my small amount of testing, that URL works to get some information.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:22:46)</span> <b>smckee:</b></span> I guess it depends upon which client is seeking info using the new pSConfig format.   We have the perfsonar-collector needing to get the list of hosts to query (and then querying them).<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:23:03)</span> <b>smckee:</b></span> We have psetf getting similar info.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:24:38)</span> <b>dweitzel:</b></span> I'm starting with the perfsonar-collector<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:25:50)</span> <b>smckee:</b></span> OK, so turning the question around, what pieces of information is that collector currently using from MeshConfig?   Then we just need to find the equivalent information in the pSConfig format, right?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:26:36)</span> <b>smckee:</b></span> Right now you query *every* host in each mesh, right?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:27:01)</span> <b>smckee:</b></span> In the future we need to exclude hosts which are configured to write directly to the RabbitMQ bus.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:27:38)</span> <b>smckee:</b></span> I guess your top level process is to get all the hosts from all the mesh URLs we configure.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:27:41)</span> <b>dweitzel:</b></span> Yes. Every host in each mesh. <br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:28:33)</span> <b>smckee:</b></span> Once we start configuring hosts to write to the bus, that will show up on the pSConfig information you can get from <a href="http://psconfig.opensciencegrid.org">psconfig.opensciencegrid.org</a><br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:28:58)</span> <b>smckee:</b></span> Those hosts that are configured that way should be skipped by the collector.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:32:09)</span> <b>smckee:</b></span> Derek, I don't know if this is helpful but here is the code the perfSONAR team uses to parse pSConfig format:  <a href="https://github.com/perfsonar/perl-shared/tree/master/lib/perfSONAR_PS/Client/PSConfig">https://github.com/perfsonar/perl-shared/tree/master/lib/perfSONAR_PS/Client/PSConfig</a><br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:32:18)</span> <b>smckee:</b></span> (It is Perl)<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:36:42)</span> <b>smckee:</b></span> Regarding your original question above, the format of pSConfig for a specific mesh is:<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:36:45)</span> <b>smckee:</b></span> {<br/>• *archives*: {},<br/>• *addresses*: {},<br/>• *groups*: {},<br/>• *tests*: {},<br/>• *schedules*: {},<br/>• *tasks*: {},<br/>• *_meta*: {},<br/>• *hosts*: {}<br/>}<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:37:17)</span> <b>smckee:</b></span> I think you can loop through the "hosts" (which point to the archive config they each use in "archives"<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:41:25)</span> <b>smckee:</b></span> So you end up with:  "hosts (loop)" -&gt; archives{hosts-&gt;archives} -&gt; data -&gt; url   (basically the same as what you showed).<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:47:29)</span> <b>dweitzel:</b></span> is there any case where a host will be in the archives, but not in the hosts?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:47:59)</span> <b>smckee:</b></span> The top level item seems to be "tasks".  Tasks contain a set of meshes of various types: 'ps Testbed Traceroute', 'ps Bandwidth Testing' and 'ps Latency Testing'.  In turn, these each contain a "group" (the list of hostname participating), the test (type: "latencybg" for example), schedule and tools<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:48:43)</span> <b>smckee:</b></span> There may be such a case, where someone defined a "central archiver" that is not participating in any testing.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:50:54)</span> <b>dweitzel:</b></span> on a slightly separate topic, the downturn in backup sizes for perfsonar data.  Could that be related to the PS update, and not as many tests?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:52:48)</span> <b>dweitzel:</b></span> when we query the archivers, we don't filter on hosts at all.  We basically go to the archiver and say: "Give me all the data you have, for this time period".  In that case, is there any downside to contacting every archiver we can find?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:59:54)</span> <b>smckee:</b></span> Just the load on the toolkits, collector and RabbitMQ bus.   If we actually continue to "pull" the same data we are "pushing", I am not sure how the bus responds.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:00:12)</span> <b>dweitzel:</b></span> Ah, separate conversation from the push / pull.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:00:32)</span> <b>dweitzel:</b></span> If we just look at all the archives, do we care if it's in different task groups, and hosts?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(14:00:35)</span> <b>smckee:</b></span> We shouldn't have changed the amount of testing we are doing.  If anything, we completed adding traceroute to all latency instances<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:01:28)</span> <b>dweitzel:</b></span> I thought I saw something in your slides about decreases in tests with the new PS.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(14:02:15)</span> <b>smckee:</b></span> There was a problem that disappeared (some hosts updating to 4.2.2 were initially not making measurements)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:02:18)</span> <b>dweitzel:</b></span> If we just look at all the archives, do we care if it's in different task groups, and hosts?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(18:06:39)</span> <b>smckee:</b></span> No, we can gather whatever metrics it has...too complicated to try to only select our measurements<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:42:43)</span> <b>dweitzel:</b></span> ok, then I have a pull request that adds support for the new syntax.  Also adds multiple mesh support: <a href="https://github.com/sand-ci/ps-collector/pull/2">https://github.com/sand-ci/ps-collector/pull/2</a><br/>
+</body>
+</html>

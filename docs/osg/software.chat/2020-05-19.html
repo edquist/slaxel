@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue May 19, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue May 19, 2020 : #software (osg)</h3>
+<span style="color: #674b1b"><span style="font-size: small">(12:05:45)</span> <b>rynge:</b></span> @blin @matyas Possibly a problem in the HTCondor RPMs:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:05:48)</span> <b>rynge:</b></span> <pre>05/19/20 10:19:32 spawnJobHandlerRaw: CreateProcess(/usr/sbin/condor_shadow, condor_shadow -f <a href="tel:22951084259">2295108.4259</a> --schedd=&lt;192.170.227.166:9618?addrs=192.170.227.166-9618&amp;alias=<a href="http://login04.osgconnect.net">login04.osgconnect.net</a>&amp;noUDP&amp;sock=schedd_5659_2e89_3&gt; --xfer-queue=limit=upload,download;addr=&lt;192.170.227.166:20153?alias=<a href="http://login04.osgconnect.net">login04.osgconnect.net</a>&gt; &lt;192.170.227.166:20153?alias=<a href="http://login04.osgconnect.net">login04.osgconnect.net</a>&gt; -) failed<br/>05/19/20 10:19:32 Starting add_shadow_birthdate(2326317.10609)<br/>05/19/20 10:19:32 Create Process: fork() for '/usr/sbin/condor_shadow' failed: Resource temporarily unavailable (11)</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:06:02)</span> <b>rynge:</b></span> Seems to come from the systemd unit file<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:06:31)</span> <b>rynge:</b></span> <pre>[Service]<br/>EnvironmentFile=-/etc/sysconfig/condor<br/>ExecStart=/usr/sbin/condor_master -f<br/>Delegate=true<br/># In the future, we will use ExecStop with a synchronous condor_off<br/>KillMode=mixed<br/>ExecReload=/bin/kill -HUP $MAINPID<br/>Restart=on-failure<br/>RestartSec=1minute<br/>WatchdogSec=20minutes<br/>TimeoutStopSec=150seconds<br/>StandardOutput=syslog<br/>NotifyAccess=main<br/>KillSignal=SIGQUIT<br/>LimitNOFILE=32767<br/>TasksMax=32767</pre><br/><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:06:41)</span> <b>blin:</b></span> hrm, i think we just use what upstream gives us there so maybe @tim.theisen has seen something similar?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:06:58)</span> <b>rynge:</b></span> we maxed out at 32k jobs<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:07:20)</span> <b>matyas:</b></span> ah the LimitNOFILE?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:07:26)</span> <b>rynge:</b></span> @lincoln has changed the values and we are testing now<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:07:34)</span> <b>rynge:</b></span> Or TasksMax<br/>
+<span style="color: #73769d"><span style="font-size: small">(12:08:52)</span> <b>tim.theisen:</b></span> We wanted to make those both unlimited. However, older systemd implementations couldn't handle that. Perhaps, we can make it unlimited in the development series. I'll make a ticket for that.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:10:14)</span> <b>rynge:</b></span> Or something higher at least<br/>
+<span style="color: #73769d"><span style="font-size: small">(12:12:52)</span> <b>tim.theisen:</b></span> We were limited to unsigned short on older systems. So, we made it as big as possible for those systems. I believe that we can go to unlimited for all systems now.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:11:58)</span> <b>andrew.melo:</b></span> Which OSG repo wouuld have condor 8.9.6?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:13:08)</span> <b>matyas:</b></span> upcoming<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:13:21)</span> <b>andrew.melo:</b></span> thanks<br/>
+</body>
+</html>

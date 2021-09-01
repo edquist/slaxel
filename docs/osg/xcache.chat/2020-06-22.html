@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jun 22, 2020 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Mon Jun 22, 2020 : #xcache (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(12:59:25)</span> <b>blin:</b></span> what's the tool to get xrootd tell you the config that it's using?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:00:29)</span> <b>matyas:</b></span> cconfig<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:00:42)</span> <b>matyas:</b></span> e.g. <tt>cconfig -c /etc/xrootd/xrootd-stash-cache.cfg</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:09:25)</span> <b>blin:</b></span> perfect, thanks<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:16:15)</span> <b>blin:</b></span> so i'm toying around with the stash origin container and this config seems to work:<br/><pre>oss.localroot /origin<br/>all.export /</pre><br/>but this config fails<br/><pre>oss.localroot /<br/>all.export /origin</pre><br/><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:17:12)</span> <b>blin:</b></span> and i see these errors in the log:<br/><pre>Config continuing with file /etc/xrootd/config.d/50-stash-origin-paths.cfg ...<br/>Config warning: ignoring unknown directive 'export'.<br/>...<br/>200622 18:13:37 546 unknown.1:123@localhost XrootdResponse: sending err 3010: Stating path '/test_file' is disallowed.<br/>200622 18:13:37 546 unknown.1:123@localhost XrootdResponse: sending err 3010: Opening path '/test_file' is disallowed.</pre><br/>any ideas?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:21:31)</span> <b>matyas:</b></span> ignore the warning<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:24:49)</span> <b>matyas:</b></span> technically export is only used by oss and cms (as in <tt>oss.export</tt>  and <tt>cms.export</tt>)  so other subsystems like <tt>pfc</tt> will complain about it if you do it with <tt>all</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(13:24:58)</span> <b>matyas:</b></span> I think. I could be full of it.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:25:47)</span> <b>matyas:</b></span> also if you're exporting <tt>/origin</tt> then you want to copy <tt>/origin/testfile</tt> instead of <tt>/testfile</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(13:26:34)</span> <b>matyas:</b></span> That's the difference between the two configs. The second one makes <tt>/origin</tt> part of the path, and the first one doesn't.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:28:19)</span> <b>blin:</b></span> ah ok<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:28:34)</span> <b>blin:</b></span> i thought i tried that but i suppose not<br/>
+</body>
+</html>

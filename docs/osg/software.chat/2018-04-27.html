@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Apr 27, 2018 : #software (osg)</title>
+</head>
+<body>
+<h3>Fri Apr 27, 2018 : #software (osg)</h3>
+<span style="color: #d1707d"><span style="font-size: small">(10:48:40)</span> <b>gattebury:</b></span> didn’t <a href="http://repo.opensciencegrid.org">repo.opensciencegrid.org</a> get switched completely in DNS already? Google’s DNS has it back at IU again. What’s worse, the IU server isn’t listening on IPv6 so it flat breaks it for us overachievers<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:50:06)</span> <b>blin:</b></span> repo doesn't switch over until tuesday<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:50:09)</span> <b>dweitzel:</b></span> nope.  According to the announcement:<br/>&gt; - <a href="http://repo.opensciencegrid.org">repo.opensciencegrid.org</a> will migrate Tuesday, 1 May 2018 starting at 10AM EST.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:50:35)</span> <b>dweitzel:</b></span> does repo-itb listen on IPv6?  Do we have IPv6 to those nodes?<br/>
+<span style="color: #d1707d"><span style="font-size: small">(10:51:46)</span> <b>gattebury:</b></span> ahh, fair enough — in that case, the broken IPv6 comment still stands — can’t reach 2001:18e8:2:6::110 on port 80. ICMP is fine, so probably a firewall issue on that host ?<br/>
+<span style="color: #d1707d"><span style="font-size: small">(10:53:25)</span> <b>gattebury:</b></span> No IPv6 on repo-itb, so no — and there’s no AAAA record, so all is fine there. Other than not having IPv6 of course, which is sad, but ¯\_(ツ)_/¯<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:19:12)</span> <b>lincoln:</b></span> aw i missed the systemd fight? :disappointed:<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:38:10)</span> <b>edquist:</b></span> Lincoln, it's not too late<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:40:11)</span> <b>edquist:</b></span> @dweitzel, @bbockelm said you might have a handy example of a systemd timer based on the last run time and offset it by 5-10 random minutes each time - any chance you do?  (I wasn't able to find anything that seemed to do that in the *.service files in projects under the opensciencegrid org on github)<br/>
+<span style="color: #a72f79"><span style="font-size: small">(11:42:02)</span> <b>andrew.melo:</b></span> I always cheat with a <tt>sleep rand</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(11:43:32)</span> <b>blin:</b></span> <b>@edquist</b> <a href="https://github.com/holzman/glideinWMS/blob/352f7d4bbb40ce81e22ecb6046ee8a9b7f708d9f/creation/templates/gwms-renew-proxies.timer">https://github.com/holzman/glideinWMS/blob/352f7d4bbb40ce81e22ecb6046ee8a9b7f708d9f/creation/templates/gwms-renew-proxies.timer</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(11:43:58)</span> <b>blin:</b></span> and accompanying service file <a href="https://github.com/holzman/glideinWMS/blob/352f7d4bbb40ce81e22ecb6046ee8a9b7f708d9f/creation/templates/gwms-renew-proxies.service">https://github.com/holzman/glideinWMS/blob/352f7d4bbb40ce81e22ecb6046ee8a9b7f708d9f/creation/templates/gwms-renew-proxies.service</a><br/>
+<span style="color: #16569E"><span style="font-size: small">(11:44:42)</span> <b>edquist:</b></span> ah, *.timer files, d'oh<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:44:45)</span> <b>edquist:</b></span> thanks..!<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:04:50)</span> <b>edquist:</b></span> for <tt>WantedBy</tt> in the <tt>[Install]</tt> section, i sometimes see <tt>multi-user.target</tt> and sometimes <tt>timers.target</tt> ... does it matter here?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:06:32)</span> <b>blin:</b></span> huh, didn't know about <tt>timers.target</tt>:<br/><pre><br/>       timers.target<br/>           A special target unit that sets up all timer units (see systemd.timer(5) for details) that shall be active after<br/>           boot.<br/><br/>           It is recommended that timer units installed by applications get pulled in via Wants= dependencies from this unit.<br/>           This is best configured via WantedBy=timers.target in the timer unit's "[Install]" section.<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:06:38)</span> <b>blin:</b></span> from <tt>man systemd.special</tt><br/>
+<span style="color: #16569E"><span style="font-size: small">(12:19:41)</span> <b>edquist:</b></span> So, maybe we want <tt>timers.target</tt> ?<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:20:00)</span> <b>edquist:</b></span> we use that in a lot of our timers in osg repos<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:20:05)</span> <b>edquist:</b></span> (apparently)<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:31:20)</span> <b>blin:</b></span> yea, it sounds reasonable<br/>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Aug 29, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Thu Aug 29, 2019 : #xcache (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(08:49:30)</span> <b>bbockelm:</b></span> @isfiligoi - for the thing about <tt>aria2c</tt> and digests (<tt>Want-Digest: SHA-512;q=1, SHA-256;q=1, SHA;q=0.1</tt>).  Xrootd supports that header, but I suspect it doesn't support any of those digests.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(08:55:50)</span> <b>bbockelm:</b></span> actually, I take that back (<a href="https://github.com/xrootd/xrootd/blob/master/src/XrdHttp/XrdHttpReq.cc#L80-L89">https://github.com/xrootd/xrootd/blob/master/src/XrdHttp/XrdHttpReq.cc#L80-L89</a>).  It understands the header name.  Maybe the checksum library isn't enabled in the config?<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:13:56)</span> <b>isfiligoi:</b></span> xrootd replied with “405 Not supported”, that was the problem.<br/>Anyway, aria2 by default ignores the returned digest, so disabling the request is not really an issue (just an annoyance)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:41:32)</span> <b>bbockelm:</b></span> ah, I'll have to look at the RFC.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:47:27)</span> <b>matyas:</b></span> you said that if a cache is down then CVMFS tries a different cache instead of going back to the origin?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:48:46)</span> <b>matyas:</b></span> in that case, it might be useful for the admin at a site to set "preferred" caches to try first, disregarding GeoIP<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:49:39)</span> <b>matyas:</b></span> for example, if you have caches in multiple buildings within the same campus, and you want to prefer the cache in the same building as your exec node<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:52:56)</span> <b>bbockelm:</b></span> Yes, you can disable GeoIP sorting in CVMFS and provide a hardcoded list.<br/>
+<span style="color: #e85d72"><span style="font-size: small">(17:46:33)</span> <b>cnweaver:</b></span> @bbockelm How is that done? This is something @paschos and I were also interested in for testing purposes.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:36:34)</span> <b>bbockelm:</b></span> Erm, don’t recall the exact param name - suspect it is in the CVMFS upstream docs.  Basically just turn off GeoIP and set the server list manually<br/>
+</body>
+</html>

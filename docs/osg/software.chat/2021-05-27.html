@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu May 27, 2021 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu May 27, 2021 : #software (osg)</h3>
+<span style="color: #dd8527"><span style="font-size: small">(12:25:17)</span> <b>mtadel:</b></span> is there any chance osg ould ship openssl-1.1 for centos-7? or would this wreak havoc on mostly everything using ssl?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:26:15)</span> <b>matyas:</b></span> it probably would<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:27:02)</span> <b>bbockelm:</b></span> OSG will not ship OpenSSL as we wouldn't be willing to take responsibility for security patches for OpenSSL...<br/>
+<span style="color: #dd8527"><span style="font-size: small">(12:27:32)</span> <b>mtadel:</b></span> well, nobody seems to be anyway :wink:<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:27:42)</span> <b>matyas:</b></span> fwiw you can download openssl 1.1 as the "openssl11" package in EPEL<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:27:55)</span> <b>matyas:</b></span> <a href="https://koji.fedoraproject.org/koji/buildinfo?buildID=1729681">https://koji.fedoraproject.org/koji/buildinfo?buildID=1729681</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:28:17)</span> <b>bbockelm:</b></span> Yup, was going to point out that OpenSSL 1.1 is available -- but the question is why you want it, I guess.<br/>
+<span style="color: #dd8527"><span style="font-size: small">(12:28:22)</span> <b>mtadel:</b></span> interesting, thank you ... but I'd need it installed on UNL's gridftps :slightly_smiling_face:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:29:45)</span> <b>bbockelm:</b></span> (e.g., what are you trying to do with OpenSSL 1.1 that you can't do with 1.0... in my experience, the APIs are better / cleaned up in 1.1 but haven't hit much in terms of functionality differences)<br/>
+<span style="color: #dd8527"><span style="font-size: small">(12:29:48)</span> <b>mtadel:</b></span> xrootd-lcmaps apparently gets into trouble via GetKey, there is a thread non-safe static variable at the bottom of the digestive tract ... and comments from the develoeprs was (in 2017) that nobody is willing to fix things in 1.0.2<br/>
+<blockquote>
+<span style="color: #e06b56"><span style="font-size: small">(12:35:11)</span> <b>jthiltges:</b></span> The <tt>added</tt> static variable is still unprotected. <a href="https://github.com/openssl/openssl/blob/master/crypto/objects/obj_dat.c#L39">https://github.com/openssl/openssl/blob/master/crypto/objects/obj_dat.c#L39</a><br/><br/>Also note the backtrace was from <a href="http://red-xcache1.unl.edu">red-xcache1.unl.edu</a>. So if this turns out to be a trigger for the TLS errors, I believe it'll need to be applied to the xcache servers?<br/>
+<span style="color: #dd8527"><span style="font-size: small">(12:37:35)</span> <b>mtadel:</b></span> we don't have auth enabled on caches at all<br/>the thing is that we get the TLS error on cache after a new connection is authenticating to the remote (UNL) ... and at that time an unexpected message arrives freaking out TLS and causing an unrelated socket to fail<br/>
+<span style="color: #dd8527"><span style="font-size: small">(12:38:13)</span> <b>mtadel:</b></span> so, I believe, there is a problem between authenticatio(GSI) and TLS both at the server and at the cache<br/>
+<span style="color: #dd8527"><span style="font-size: small">(12:39:24)</span> <b>mtadel:</b></span> but Andy keeps insisting lcmaps is the only guilty party so I'm trying to figure out how to fix / bypass this potential issue<br/>
+</blockquote>
+<span style="color: #e06b56"><span style="font-size: small">(12:31:46)</span> <b>jthiltges:</b></span> At least for the issue I was seeing--which I have no idea if it's connected to the TLS errors--I don't believe it's corrected in openssl's master branch either.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:39:15)</span> <b>bbockelm:</b></span> Where's the <tt>added</tt> variable getting used from?  Feels like there's an email chain I'm missing...<br/>
+<span style="color: #dd8527"><span style="font-size: small">(12:39:51)</span> <b>mtadel:</b></span> :slightly_smiling_face: many of them and you should be thankful<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:41:39)</span> <b>bbockelm:</b></span> feel free to shoot me the relevant ones - I know the xrootd-lcmaps pieces pretty well.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:42:09)</span> <b>jthiltges:</b></span> I forwarded things your way, @bbockelm. (The beginning of the thread, maybe with some slightly cleaner formatting, and the end.)<br/>
+<blockquote>
+<span style="color: #9e3997"><span style="font-size: small">(12:45:07)</span> <b>bbockelm:</b></span> Can you resend to my CERN address?  I'm in rural Nebraska today and there are "fun" connectivity issues back to Morgridge.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:46:10)</span> <b>jthiltges:</b></span> Done!<br/>
+<span style="color: #dd8527"><span style="font-size: small">(12:52:11)</span> <b>mtadel:</b></span> I also sent you the desc of what happens on the cache side ... oh, will send it you, too, John -- sorry<br/>
+</blockquote>
+<span style="color: #9e3997"><span style="font-size: small">(12:56:17)</span> <b>bbockelm:</b></span> John, I suspect i know the problem.  OpenSSL maintains a mapping of OID to NIDs; when LCMAPS loads, I believe it adds new entries there and, when unloaded, removes them.  Looks like OpenSSL doesn't protect these as part of its multithreading guarantee because<br/>
+<blockquote>
+<span style="color: #e06b56"><span style="font-size: small">(13:01:47)</span> <b>jthiltges:</b></span> I've looked at recent OpenSSL and LibreSSL, and neither appears to protect it properly. BoringSSL _does_, but that would be a challenge to use.<br/>Maybe Open- or Libre- has added protections at a higher layer, but only Boring- has a mutex in obj_dat.c<br/>
+<span style="color: #dd8527"><span style="font-size: small">(13:19:16)</span> <b>mtadel:</b></span> John, would you be able to get a backtrace / or backtraces if it indeed gets called multiple times from your setup?<br/>
+</blockquote>
+<span style="color: #9e3997"><span style="font-size: small">(12:56:20)</span> <b>bbockelm:</b></span> &gt;  Doing that after threading has started is not going to give good results with or without locking.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:57:20)</span> <b>bbockelm:</b></span> One could get lucky and do a read-write lock around GetKey but I'd expect one could reasonably hit the issue in XrdTls as well.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:05:55)</span> <b>bbockelm:</b></span> That said, this should only be relevant on the first invocation of LCMAPS -- not clear why this would occur in the middle of things.<br/>
+<span style="color: #dd8527"><span style="font-size: small">(13:11:32)</span> <b>mtadel:</b></span> ok, so this should not be an issue at all ... unless some joker calls this init multiple times :slightly_smiling_face:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:12:45)</span> <b>bbockelm:</b></span> suggestion (since I'm in a review right now) -&gt; can you use GDB to get a backtrace where LCMAPS is tickling this structure?  That'll tell us what's initializing multiple times.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:14:08)</span> <b>bbockelm:</b></span> My money is that it's the <tt>verify_init_library</tt> in _verify_x509.c inside lcmaps-plugins-verify-proxy.<br/>
+<span style="color: #dd8527"><span style="font-size: small">(13:27:09)</span> <b>mtadel:</b></span> But wait ... GetKey() is called from XrdSecgsiAuthzKey() ... and this is called for every new conection to see if result has been hashed<br/>
+<span style="color: #dd8527"><span style="font-size: small">(13:27:22)</span> <b>mtadel:</b></span> or is there part of GetKey() that should be immutable?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:28:36)</span> <b>bbockelm:</b></span> <tt>GetKey</tt> is triggering read-only obj2nid lookups.  <tt>verify_init_library</tt> is writing to the underlying data structure.  The OpenSSL devs indicate that they're assuming all the writes are done to that data structure _before_ any threading occurs.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:29:21)</span> <b>bbockelm:</b></span> So, for example, if <tt>lcmaps</tt> unloads <tt>lcmaps_voms.mod</tt> after it is invoked, on the next invocation <tt>lcmaps_voms.mod</tt> is going to be re-loaded and <tt>verify_init_library</tt> is going to be invoked while xrootd is running in multi-threaded mode.<br/>
+<span style="color: #dd8527"><span style="font-size: small">(13:31:14)</span> <b>mtadel:</b></span> yuck :slightly_smiling_face: how about reload of crls?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:31:28)</span> <b>bbockelm:</b></span> (so one solution would be to <tt>dlopen</tt> the <tt>lcmaps_voms.mod</tt> in xrootd-lcmaps itself, preventing the library from initializing multiple times)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:32:49)</span> <b>bbockelm:</b></span> Problem is not reloading CRLs in itself but the fact it's doing a lookup into a data structure while reloading:<br/><pre>#1  0x00007f1a65922ada in lh_retrieve (lh=0x7f1a629d1a80, data=data@entry=0x7f1a611f87d0) at lhash.c:248<br/>#2  0x00007f1a6586e212 in OBJ_obj2nid (a=0x7f1a5428b1e0) at obj_dat.c:426<br/>#3  0x00007f1a6596ac44 in X509V3_get_d2i (x=0x7f1a54289080, nid=nid@entry=771, crit=crit@entry=0x7f1a611f8864, idx=idx@entry=0x0) at v3_lib.c:251<br/>#4  0x00007f1a659643b9 in X509_REVOKED_get_ext_d2i (x=x@entry=0x7f1a5428b1b0, nid=nid@entry=771, crit=crit@entry=0x7f1a611f8864, idx=idx@entry=0x0) at x509_ext.c:200</pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:35:16)</span> <b>bbockelm:</b></span> For example, <tt>OBJ_obj2nid</tt> is looking up hash table entries in a hash table that I suspect LCMAPS is touching concurrently.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:38:04)</span> <b>bbockelm:</b></span> @jthiltges - if you take the core you had sent the backtrace from in the email and do a backtrace of all threads, I would be curious if one thread was deep in LCMAPS (and particularly <tt>verify_init_library</tt>).<br/>
+<blockquote>
+<span style="color: #e06b56"><span style="font-size: small">(13:38:28)</span> <b>jthiltges:</b></span> Already heading there. :slightly_smiling_face:<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:39:17)</span> <b>jthiltges:</b></span> Oops... that was two inside the same getrn function. Let me get the full thing linked.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:39:48)</span> <b>bbockelm:</b></span> Yeah - that's the 'read' side. Good money suggests some other thread is writing at the same time...<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:43:44)</span> <b>jthiltges:</b></span> Here's the full thread backtrace: <a href="https://paste.centos.org/view/raw/ecfa6f80">https://paste.centos.org/view/raw/ecfa6f80</a><br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:45:48)</span> <b>jthiltges:</b></span> Thread 27 is in <tt>OBJ_create</tt><br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:46:43)</span> <b>bbockelm:</b></span> oh, surprise!  It's maybe libvoms...<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:51:14)</span> <b>bbockelm:</b></span> Ok, that's strange.  It's a non-threadsafe initializer _but_ it should only be invoked on the first time it hits a VOMS proxy.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:51:23)</span> <b>bbockelm:</b></span> Did this occur immediately after startup?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:52:29)</span> <b>jthiltges:</b></span> Quite possibly, yes. Also possible that systemd was kicking in and restarting the service while test requests were flying by.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:55:36)</span> <b>bbockelm:</b></span> For this particular problem, Andy hit the same problem with the built-in module awhile back and solved it with this: <a href="https://github.com/xrootd/xrootd/commit/d9e9820b329ffb6e33ac8837bf8a6cadc1beee25">https://github.com/xrootd/xrootd/commit/d9e9820b329ffb6e33ac8837bf8a6cadc1beee25</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:56:27)</span> <b>bbockelm:</b></span> <a href="https://github.com/opensciencegrid/xrootd-lcmaps/blob/master/src/XrdLcmapsConfig.cc#L191">https://github.com/opensciencegrid/xrootd-lcmaps/blob/master/src/XrdLcmapsConfig.cc#L191</a> you could do the same thing here.<br/>
+</blockquote>
+<span style="color: #9e3997"><span style="font-size: small">(13:58:44)</span> <b>bbockelm:</b></span> @mtadel - to bring things out of the thread, the crash that John reported is the same VOMS initialization issue that Andy solved in the native XrdVoms plugin in April.  That can be solved in the same way as Andy did (<a href="https://github.com/xrootd/xrootd/commit/d9e9820b329ffb6e33ac8837bf8a6cadc1beee25">https://github.com/xrootd/xrootd/commit/d9e9820b329ffb6e33ac8837bf8a6cadc1beee25</a>).<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:59:28)</span> <b>bbockelm:</b></span> I remain suspicious about LCMAPS, however.<br/>
+<span style="color: #dd8527"><span style="font-size: small">(14:25:10)</span> <b>mtadel:</b></span> yes, rightfully so  ... and I remain suspicious about TLS GSI interferences in XrdCl in face of unexpected errors/messgaes from remote servers. could also be an openssl thing. I can try installing 1.1 from EPEL on my test cache, now that I know it's there :slightly_smiling_face:<br/>
+<span style="color: #dd8527"><span style="font-size: small">(14:25:19)</span> <b>mtadel:</b></span> and THANK YOU! :slightly_smiling_face:<br/>
+<span style="color: #dd8527"><span style="font-size: small">(14:25:46)</span> <b>mtadel:</b></span> both, Brian and John<br/>
+<span style="color: #dd8527"><span style="font-size: small">(16:18:11)</span> <b>marcom:</b></span> @blin I thought there was a knob added in the condor submit file to  request a whole node but I'm unable to find it.  Any suggestion? finally we are submitting to   Cobalt (a PBS dialect if I remember correctly) via grid universe/batch.<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:18:42)</span> <b>blin:</b></span> <tt>+WantWholeNode</tt> for CEs only work for htcondor batch<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:18:59)</span> <b>blin:</b></span> there may be some whole node support in PBS, one sec<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:21:07)</span> <b>blin:</b></span> you can try setting <tt>+WholeNodes = True</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:21:25)</span> <b>blin:</b></span> that was just from a quick source dive, i don't have much experience with it but Jaime would otherwise<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:21:29)</span> <b>blin:</b></span> i have to run now, have a good weekend!<br/>
+</body>
+</html>

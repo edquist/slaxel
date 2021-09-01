@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Dec 1, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue Dec 1, 2020 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(10:52:43)</span> <b>blin:</b></span> FYI <a href="https://www.githubstatus.com/incidents/sxthxvdlljk4">https://www.githubstatus.com/incidents/sxthxvdlljk4</a><br/>&gt; We are investigating reports of degraded performance for GitHub Actions.<br/>&gt; Posted 12 minutes ago. Dec 01, 2020 - 16:40 UTC<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(12:08:51)</span> <b>kherner:</b></span> Got the following from TIFR where they're setting up a new Condor CE for DUNE:<br/><br/>Hi,<br/>I am working on installing htcondor-ce from scratch. I have three issues:<br/>1. yum install of htcondor-bdii-ce depends on much older version of htcondor-ce than what got installed . yum error output is pasted below. How to resolve this cleanly?<br/>[root@simclu-ce certificates]# yum install htcondor-ce-bdii<br/>&lt;snip&gt;<br/>Error: Package: htcondor-ce-3.4.3-1.el7.noarch (htcondor-stable)<br/>          Requires: htcondor-ce-client = 3.4.3-1.el7<br/>          Installed: htcondor-ce-client-4.4.1-1.osg35.el7.noarch (@vince_osg)<br/><br/>2. Even after reading the htcondor-ce documentation, I am not getting the content and correct syntax of files in /etc/osg/config.d/ . For example I have added this one line to 30-gip.ini<br/>allowed_vos="DUNE"<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(12:09:09)</span> <b>kherner:</b></span> Any ideas? It's ticket 66345<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:12:07)</span> <b>blin:</b></span> OSG doesn't ship htcondor-ce-bdii so they'll need to install the CHTC yum repos<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:12:24)</span> <b>blin:</b></span> <a href="https://htcondor-ce.readthedocs.io/en/latest/installation/htcondor-ce/#before-starting">https://htcondor-ce.readthedocs.io/en/latest/installation/htcondor-ce/#before-starting</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(12:12:34)</span> <b>matyas:</b></span> looks like they have it enabled but they already installed htcondor-ce-client from osg<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:12:41)</span> <b>blin:</b></span> "Prepare the EPEL and HTCondor Yum repos"<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:14:39)</span> <b>matyas:</b></span> the "stable" htcondor repo only has htcondor-ce v3<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:15:39)</span> <b>blin:</b></span> they'll need the "dev" repo<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(12:15:54)</span> <b>kherner:</b></span> Any reason not to use stable?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:16:24)</span> <b>blin:</b></span> they'd have to downgrade the rest of their htcondor-ce packages<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:16:37)</span> <b>blin:</b></span> which would probably be pretty nightmarish<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:18:15)</span> <b>matyas:</b></span> wouldn't using the devel repo for htcondor-ce also give them the devel version of condor?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:20:08)</span> <b>blin:</b></span> potentially yes, not sure what yum will do<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:20:27)</span> <b>blin:</b></span> the CE doesn't have hard requirements on particular versions of condor in the RPM<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:21:37)</span> <b>matyas:</b></span> sure but next time they run yum update<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:23:38)</span> <b>blin:</b></span> @kherner is their local batch condor?<br/>
+<blockquote>
+<span style="color: #8d4b84"><span style="font-size: small">(12:25:32)</span> <b>kherner:</b></span> It is<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:26:07)</span> <b>blin:</b></span> hrm ok<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:53:26)</span> <b>matyas:</b></span> when are we moving htcondor-ce 4 into stable? when condor 9.0 comes out?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:54:18)</span> <b>blin:</b></span> yeah if we do it, we'd do it then<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(12:54:49)</span> <b>kherner:</b></span> The full background is that since TIFR is already a Tier 2, they were going to set this cluster up to look more or less like a WLCG site, at least initially. But it sounds like they might have hit a few bumps in the road with that and are trying to pivot a bit.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:00:43)</span> <b>blin:</b></span> pivot to what?<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(13:10:37)</span> <b>kherner:</b></span> More OSG-like, I guess? I<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:10:59)</span> <b>blin:</b></span> well they can't get BDII with anything OSG-like<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:12:00)</span> <b>blin:</b></span> or native APEL accounting. Though if they're just an OSG site, they can report hours to the GRACC and with a proper Topology regisstration, we'd pass records up to APEL monthly (?)<br/>
+</blockquote>
+</body>
+</html>

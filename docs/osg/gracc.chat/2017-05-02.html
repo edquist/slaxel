@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue May 2, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Tue May 2, 2017 : #gracc (osg)</h3>
+<span style="color: #16569E"><span style="font-size: small">(11:06:53)</span> <b>edquist:</b></span> the report should be fine now even before re-summarizing, since it filters out the 0 NF values and uses the other one for the resource group, but we should still re-summarize to get the updated NF values from OIM<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:06:16)</span> <b>rynge:</b></span> @kretzke What happened to active users in this graph? <a href="https://gracc.opensciencegrid.org/dashboard/db/osg-connect-summary">https://gracc.opensciencegrid.org/dashboard/db/osg-connect-summary</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:06:35)</span> <b>rynge:</b></span> It went flat the 26th<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:08:39)</span> <b>kretzke:</b></span> ah shoot… yeah, turns out CommonName was being added by the Gratia collector. I’ve switched the graphs to use DN instead<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:09:36)</span> <b>edquist:</b></span> Dan Bradley is saying the Grid = Local jobs on their submit nodes (for GLOW/cms) are showing up as Payload ... is this a configuration problem?<br/><a href="https://ticket.opensciencegrid.org/33618">https://ticket.opensciencegrid.org/33618</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:11:35)</span> <b>rynge:</b></span> Ok, and that will work even though most of our users do not run with x509 certs?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:16:28)</span> <b>kretzke:</b></span> it appears to give the same results before the 25th (CommonName was just derived from DN). note that this also affects the “User” dropdown on those dashboards… we’ve been mulling over what to do about CommonName for the last couple days<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:18:40)</span> <b>rynge:</b></span> Ok, the "User" in probably good enough for us<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:24:57)</span> <b>kretzke:</b></span> <b>@edquist</b> if they’re non-payload jobs then why do they have <tt>MATCH_EXP_JOBGLIDEIN_ResourceName</tt> set?<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:25:17)</span> <b>edquist:</b></span> derp i dunno<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:25:33)</span> <b>edquist:</b></span> (what am i an admin?  :wink: )<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:25:39)</span> <b>kretzke:</b></span> @sbhat is that ^ related to what you were working on with Brian Lin?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:26:58)</span> <b>kretzke:</b></span> or @blin ^^<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:27:00)</span> <b>edquist:</b></span> (i'm asking tho)<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:27:43)</span> <b>blin:</b></span> yea, that is the thing we were working on<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:28:43)</span> <b>blin:</b></span> <tt>grid = local</tt> jobs are definitely showing up as payload jobs<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:29:07)</span> <b>dweitzel:</b></span> They are showing up as payload because they have <tt>MATCH_EXP_JOBGLIDEIN_ResourceName</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:29:26)</span> <b>blin:</b></span> this is because they're user jobs that are submitted on their chtc submit hosts<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:30:00)</span> <b>blin:</b></span> these jobs can either go out to the OSG or run here at the CHTC<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:30:00)</span> <b>rynge:</b></span> SuppressGridLocalRecords="1"<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:30:03)</span> <b>rynge:</b></span> No?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:30:21)</span> <b>blin:</b></span> they don't want to suppress them, though<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:30:28)</span> <b>rynge:</b></span> Ah<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:30:54)</span> <b>dweitzel:</b></span> Should that be accounted in APEL then?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:31:10)</span> <b>dweitzel:</b></span> APEL is a measurement of a site's contribution to the collaboration.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:31:12)</span> <b>blin:</b></span> apparently they think so?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:31:52)</span> <b>blin:</b></span> i can see why they do<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:32:19)</span> <b>blin:</b></span> these jobs that run locally are running at the wisc cms t2<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:32:46)</span> <b>blin:</b></span> so basically if we don't count them, we're not accounting for cms jobs that are submitted from wisc that run at wisc<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:34:15)</span> <b>dweitzel:</b></span> True, I see why they want them accounted.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:34:44)</span> <b>kretzke:</b></span> sounds like the probe should be patched to set ResourceType=Pilot if Grid==Local<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:34:46)</span> <b>dweitzel:</b></span> As usual, Wisc is a special case.  Only site I know that submits directly to the Tier 2, and not through Crab.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:35:12)</span> <b>blin:</b></span> lol, i hate gratia so much<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:35:52)</span> <b>kretzke:</b></span> Fermilab will soon be in a similar situation, since Fifebatch will be merged with GPGrid<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:36:13)</span> <b>kretzke:</b></span> I think I heard something about the Tier1 getting thrown in the mix too or something<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:36:31)</span> <b>kretzke:</b></span> @blin It’s like the tax code, special interests make something that should be simple very complex<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:37:34)</span> <b>kretzke:</b></span> the other answer is “tough, you’re running jobs from a glidein submit node”<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:38:34)</span> <b>blin:</b></span> well i think we should fix it<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:38:48)</span> <b>kretzke:</b></span> <b>@edquist</b> works for you, right? it’s his probe :wink:<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:39:26)</span> <b>blin:</b></span> if you're running <tt>SuppressGridLocalJobs=1</tt>, you want those local jobs reported and what use is the reporting other than reporting up to APEL?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:39:44)</span> <b>kretzke:</b></span> of course there may be another special snowflake that will get broken by doing what I proposed<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:40:44)</span> <b>dweitzel:</b></span> I think the fundamental problem is that CMS users that want to see their jobs accounted to APEL are not going in the front door (CE's), instead, they are going in through the side (flocking).<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:41:14)</span> <b>dweitzel:</b></span> Along with that, the CMS users are submitting from general purpose submission nodes that also send jobs out to the OSG.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:41:37)</span> <b>dweitzel:</b></span> so... you only want some of the usage accounted, when it runs on the Tier 2, but not when it runs on the OSG, and only for CMS users, not for all others...<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:46:21)</span> <b>blin:</b></span> well at least they only have CMS users submitting to their hosts so we only have to worry if it's run locally or not<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:52:49)</span> <b>blin:</b></span> but yes, uw t2 submission doesn't reflect standard osg practices so either we accommodate them or...not<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:53:00)</span> <b>blin:</b></span> and i think we really only have one option<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:03:57)</span> <b>bbockelm:</b></span> So, what's the set of jobs where <tt>Grid == Local &amp;&amp; ResourceType == Payload</tt>?  Just these from UW?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:06:52)</span> <b>edquist:</b></span> looks like it's just GLOW<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:06:53)</span> <b>edquist:</b></span> <a href="https://gracc.opensciencegrid.org/kibana/app/kibana#/visualize/create?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-1M%2FM,mode:quick,to:now-1M%2FM))&amp;_a=(filters:!(('$$hashKey':'object:7005','$state':(store:appState),meta:(alias:!n,disabled:!f,index:gracc.osg.summary,key:Grid,negate:!f,value:Local),query:(match:(Grid:(query:Local,type:phrase)))),('$$hashKey':'object:7572','$state':(store:appState),meta:(alias:!n,disabled:!f,index:gracc.osg.summary,key:ResourceType,negate:!f,value:Payload),query:(match:(ResourceType:(query:Payload,type:phrase))))),linked:!f,query:(query_string:(analyze_wildcard:!f,query:'*')),uiState:(),vis:(aggs:!((id:'3',params:(field:OIM_ResourceGroup,orderBy:'2',size:20),schema:segment,type:terms),(id:'2',schema:metric,type:count)),type:histogram))&amp;indexPattern=gracc.osg.summary&amp;type=histogram">https://gracc.opensciencegrid.org/kibana/app/kibana#/visualize/create?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-1M%2FM,mode:quick,to:now-1M%2FM))&amp;_a=(filters:!(('$$hashKey':'object:7005','$state':(store:appState),meta:(alias:!n,disabled:!f,index:gracc.osg.summary,key:Grid,negate:!f,value:Local),query:(match:(Grid:(query:Local,type:phrase)))),('$$hashKey':'object:7572','$state':(store:appState),meta:(alias:!n,disabled:!f,index:gracc.osg.summary,key:ResourceType,negate:!f,value:Payload),query:(match:(ResourceType:(query:Payload,type:phrase))))),linked:!f,query:(query_string:(analyze_wildcard:!f,query:'*')),uiState:(),vis:(aggs:!((id:'3',params:(field:OIM_ResourceGroup,orderBy:'2',size:20),schema:segment,type:terms),(id:'2',schema:metric,type:count)),type:histogram))&amp;indexPattern=gracc.osg.summary&amp;type=histogram</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:23:35)</span> <b>bbockelm:</b></span> ah, so that's one expedient approach.  Everything else is <tt>Grid = OSG</tt>, right?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:28:08)</span> <b>edquist:</b></span> it's all <tt>Grid = OSG</tt> or <tt>Grid = Local</tt>, yeah<br/>
+</body>
+</html>

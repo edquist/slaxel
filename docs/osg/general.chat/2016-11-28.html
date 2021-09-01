@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Nov 28, 2016 : #general (osg)</title>
+</head>
+<body>
+<h3>Mon Nov 28, 2016 : #general (osg)</h3>
+<span style="color: #e96699"><span style="font-size: small">(11:59:44)</span> <b>lincoln:</b></span> I have a cluster that we directly flock to from OSG Connect. does anyone have any idea how to set up gratia for such a cluster? I would like it to be accounted under MWT2<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:06:13)</span> <b>bbockelm:</b></span> @dweitzel ^^^<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:06:50)</span> <b>bbockelm:</b></span> Alright, get this - CMS has detected that one core on one CPU on one worker node in France corrupts the output of zlib streams if zlib is compiled with SSE3.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:08:25)</span> <b>bbockelm:</b></span> (Now, think what this means for physics results that are run on that core.)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:10:41)</span> <b>dweitzel:</b></span> @lincoln Hum... and have it accounted as MWT2?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:10:51)</span> <b>dweitzel:</b></span> Probably doable if you set the SiteName<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:13:20)</span> <b>lincoln:</b></span> alright cool<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:21:57)</span> <b>dweitzel:</b></span> <a href="https://twiki.grid.iu.edu/bin/view/Accounting/ProbeConfigGlideinWMS">https://twiki.grid.iu.edu/bin/view/Accounting/ProbeConfigGlideinWMS</a><br/>
+<span style="color: #e96699"><span style="font-size: small">(12:21:59)</span> <b>lincoln:</b></span> @dweitzel do you have a pointer to the relevant gratia docs ? is it just {{yum install …} and starting the servies after editing the ProbeConfig?<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:21:59)</span> <b>lincoln:</b></span> oh<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:22:01)</span> <b>lincoln:</b></span> good timing<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:22:03)</span> <b>lincoln:</b></span> :slightly_smiling_face:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:23:00)</span> <b>dweitzel:</b></span> I think that will help.  Set the SiteName to something MWT2.  This will come in as Glidein (Payload) jobs, so it won't count as the normal MWT2<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:38:45)</span> <b>lincoln:</b></span> ok i made it MWT2_OSG_CONNECT<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:38:59)</span> <b>lincoln:</b></span> then it should get aggregated into the MWT2_* stuff hopefully<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:39:04)</span> <b>lincoln:</b></span> QuarantineUnknownVORecords=”1"<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:39:08)</span> <b>lincoln:</b></span> do i need to mess with this at all?<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:39:13)</span> <b>lincoln:</b></span> or do some kind of VOOVerride?<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:39:26)</span> <b>lincoln:</b></span> probably need a MapIUnknownToGroup i guess<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:39:31)</span> <b>***lincoln:</b></span> reads docs<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:39:32)</span> <b>dweitzel:</b></span> Set VOOverride to OSG, probably.<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:40:05)</span> <b>lincoln:</b></span> <pre><br/>    ProbeName="condor:<a href="http://condor.grid.uchicago.edu">condor.grid.uchicago.edu</a>"<br/>    SiteName="MWT2_OSG_CONNECT"<br/>    Grid="OSG"<br/>    SuppressUnknownVORecords="0"<br/>    SuppressNoDNRecords="0"<br/>    SuppressGridLocalRecords="0"<br/>    QuarantineUnknownVORecords="1"<br/>    EnableProbe="1"<br/>    MapUnknownToGroup="1"<br/>    MapGroupToRole="1"<br/>    VOOverride="OSG"<br/></pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(12:40:08)</span> <b>lincoln:</b></span> thats what I’ve got set<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:40:34)</span> <b>dweitzel:</b></span> looks ok, I think.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:41:35)</span> <b>dweitzel:</b></span> I'm not sure what you mean by aggregate to MWT2_*<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:41:49)</span> <b>dweitzel:</b></span> It won't aggregate with the stuff from your CE's<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:42:57)</span> <b>kretzke:</b></span> is the cluster registered in OIM?<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:43:00)</span> <b>lincoln:</b></span> at the end of the day I want to have the data reported somewhere and listed as a MWT2 contribution in the accounting reports<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:43:07)</span> <b>dweitzel:</b></span> yup, it will.<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:43:12)</span> <b>lincoln:</b></span> :thumbsup:<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:43:24)</span> <b>lincoln:</b></span> @kretzke no, it’s not. I can do that.<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:00:48)</span> <b>lincoln:</b></span> @dweitzel @bbockelm how do you feel about your OSG WN docker image being the “supported” OSG WN docker image? :slightly_smiling_face:<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:01:07)</span> <b>lincoln:</b></span> because i wanna piggyback off of it so our dockery cluster things are all the same.<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:01:54)</span> <b>lincoln:</b></span> (this one: <a href="https://github.com/unlhcc/docker-osg-wn-el6/blob/master/Dockerfile">https://github.com/unlhcc/docker-osg-wn-el6/blob/master/Dockerfile</a>)<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:11:23)</span> <b>lincoln:</b></span> ah, so one thing about this gratia configuration. the schedd is just the <a href="http://login01.osgconnect.net">login01.osgconnect.net</a> schedd and we’re flocking directly. so the probe has nothing to collect locally.<br/><br/>i think what i actually want to do is set the GLDIEIN_ResourceType or GLIDEIN_Site on the WN’s startd.. or no?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:26:45)</span> <b>kretzke:</b></span> @lincoln  <tt>GLIDEIN_ResourceName</tt> should do it. The submit node probe should pick that up and report that as the <tt>Host_description</tt> for the payload jobs<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:29:29)</span> <b>lincoln:</b></span> alright<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:29:55)</span> <b>lincoln:</b></span> thanks @kretzke . i’ll crank out a new image with that attribute<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:03:47)</span> <b>bbockelm:</b></span> @dweitzel @lincoln - Don't we control the <tt>opensciencegrid</tt> account on docker hub?  Why not upload the UNL image to there, then use it at MWT2?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:04:40)</span> <b>dweitzel:</b></span> @lincoln sorry, I thought the jobs were going the other way.  MWT2 -&gt; OSG.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:04:57)</span> <b>dweitzel:</b></span> @bbockelm Yes, I am an 'owner' of the opensciencegrid account.  Along with Soichi.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:05:50)</span> <b>dweitzel:</b></span> Actually, Lincoln is also an owner of the opensciencegrid account.<br/>
+<span style="color: #e0a729"><span style="font-size: small">(14:06:40)</span> <b>kylegross:</b></span> Should someone other than Soichi be an owner at operations, since Soichi isn’t at operations anymore?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:09:37)</span> <b>dweitzel:</b></span> sure.  Kyle, do you have a docker hub account?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:09:40)</span> <b>dweitzel:</b></span> I can add you.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:10:15)</span> <b>lincoln:</b></span> well<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:10:31)</span> <b>lincoln:</b></span> as long as there is some synchronization between dockerhub and github i’m good with it<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:11:06)</span> <b>lincoln:</b></span> dockerhub seems to stupidly not include the dockerfile sources or guarantee that the image there is the one you have the dockerfile hosted for in github<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:12:29)</span> <b>lincoln:</b></span> but yeah, :thumbsup: if OSG is willing to have a supported docker WN image on dockerhub — even if that’s just "best-effort and PR’s welcome” support<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:17:47)</span> <b>bbockelm:</b></span> Derek - wouldn't it be possible to extract out the UNL-specific bits and inherit the UNL image from the OSG's?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:17:59)</span> <b>dweitzel:</b></span> @jthiltges !<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:19:20)</span> <b>bbockelm:</b></span> (I assume that Lincoln would then want to put nasty WLCG bits into the image and we can tell him to separately inherit for that...)<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:23:35)</span> <b>lincoln:</b></span> exactly<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:36:38)</span> <b>jthiltges:</b></span> @bbockelm @dweitzel Sure, we could start "FROM opensciencegrid:..." rather than "centos:centos6". I think we'd still need to trigger a rebuild of the UNL image to include upstream changes. (but I could be totally wrong)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:49:56)</span> <b>bbockelm:</b></span> yeah - but the OSG changes would hopefully be relatively few.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:50:10)</span> <b>bbockelm:</b></span> I've even been more and more tempted to rely on the CVMFS version of the worker node client.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:53:51)</span> <b>tiradani:</b></span> be careful of CVMFS in the context of HPC sites.  NERSC for example does not support it.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:56:45)</span> <b>bbockelm:</b></span> yeah - but NERSC is its own beautiful butterfly.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:59:01)</span> <b>tiradani:</b></span> so does Argonne or Oak Ridge support CVMFS?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:03:20)</span> <b>bbockelm:</b></span> No, but SDSC and TACC have good enough support.  And the NERSC work Dirk is doing should also push it over to the "good enough" category.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:03:45)</span> <b>bbockelm:</b></span> One could always have a "fully loaded" and a "lightweight" variant.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:04:48)</span> <b>bbockelm:</b></span> (although the "fully loaded" would only be for the OSG VO -- you'd still need to solve CVMFS separately for the VO, and by time you solve that, I suppose you could have also used the lightweight variant)<br/>
+<span style="color: #de5f24"><span style="font-size: small">(16:07:17)</span> <b>tiradani:</b></span> thanks for the info on which sites do support CVMFS<br/>
+</body>
+</html>

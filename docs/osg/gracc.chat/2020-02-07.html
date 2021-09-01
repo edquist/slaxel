@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Feb 7, 2020 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Fri Feb 7, 2020 : #gracc (osg)</h3>
+<span style="color: #16569E"><span style="font-size: small">(11:48:15)</span> <b>edquist:</b></span> Greetings!  Does anybody <b>@here</b> know where the sources live for gracc home page dashboard?<br/><br/><a href="http://gracc.opensciencegrid.org">gracc.opensciencegrid.org</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:49:13)</span> <b>dweitzel:</b></span> it's a grafana interface: <a href="https://grafana.com/grafana/">https://grafana.com/grafana/</a><br/>
+<span style="color: #16569E"><span style="font-size: small">(12:13:17)</span> <b>edquist:</b></span> thanks - what i'm actually after are the sources for the gracc queries that generate the numbers on the lower part of the dashboard<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:13:33)</span> <b>edquist:</b></span> any idea where those live?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:15:04)</span> <b>kretzke:</b></span> they’re in the dashboard, which is saved as a JSON document in Grafana’s sqlite database<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:15:31)</span> <b>dweitzel:</b></span> I can get you the query in ugly json if you would like :slightly_smiling_face:<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:15:54)</span> <b>edquist:</b></span> lol what<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:16:08)</span> <b>edquist:</b></span> the way of the future i guess<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:16:34)</span> <b>kretzke:</b></span> even without logging in you can see them by clicking on a panel title->hamburger->“Panel JSON”<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:17:30)</span> <b>edquist:</b></span> you know i've tried clicking those but i guess i didn't find what i thought i was looking for<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:17:32)</span> <b>edquist:</b></span> let's see...<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:17:59)</span> <b>edquist:</b></span> yeah -<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:18:14)</span> <b>edquist:</b></span> is something supposed to happen when i click <tt>[Panel JSON]</tt> ?<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:18:25)</span> <b>edquist:</b></span> because nothing seems to happen for me<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:18:33)</span> <b>kretzke:</b></span> yeah, you may have to scroll up to see it<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:18:36)</span> <b>dweitzel:</b></span> scroll up<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:18:52)</span> <b>edquist:</b></span> oh hey<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:18:55)</span> <b>edquist:</b></span> there it is<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:18:59)</span> <b>edquist:</b></span> thanks!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:19:08)</span> <b>dweitzel:</b></span> that's not quite a ES query though.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:19:12)</span> <b>dweitzel:</b></span> looks grafana'ized<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:19:18)</span> <b>edquist:</b></span> i see...<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:19:27)</span> <b>edquist:</b></span> do these json queries really not live at all in any of our git repos?<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:19:39)</span> <b>edquist:</b></span> no judgment, just curious<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:19:40)</span> <b>dweitzel:</b></span> This is more or less the query<br/><pre>{"query":{"bool":{"filter":[{"range":{"EndTime":{"gte":"1136073600000","lte":"1581099332104","format":"epoch_millis"}}},{"query_string":{"analyze_wildcard":true,"query":"type:JobUsageRecordSummary AND ResourceType:Payload AND ReportableVOName:osg AND OIM_Site:* AND CommonName:* AND Resource_ExitCode:* AND ProbeName:* AND ProjectName:* AND OIM_Organization:* AND EndTime:[now-2d TO now-1d]"}}]}},"aggs":{"2":{"date_histogram":{"interval":"1y","field":"EndTime","min_doc_count":0,"extended_bounds":{"min":"1136073600000","max":"1581099332104"},"format":"epoch_millis"},"aggs":{"1":{"sum":{"field":"CoreHours"}}}}}}</pre><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:20:05)</span> <b>kretzke:</b></span> I use the browser inspector when I want to see raw queries<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:20:18)</span> <b>dweitzel:</b></span> I looked at the panel's query inspector.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:20:34)</span> <b>dweitzel:</b></span> probably about the same thing @kretzke<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:21:25)</span> <b>dweitzel:</b></span> The queries are not stored in git.  Grafana doesn't really lend to that architecture.  We aren't entering raw queries when creating the panel.  The interface looks like this:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:21:54)</span> <b>dweitzel:</b></span> <br/>
+<span style="color: #16569E"><span style="font-size: small">(12:22:07)</span> <b>edquist:</b></span> that's fine, i just had no idea<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:22:56)</span> <b>edquist:</b></span> so, i am in inspector mode in my browser looking for the es json <br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:22:58)</span> <b>dweitzel:</b></span> it wouldn't be hard to transform this query to something using python's elasticsearch_dsl or just elasticsearch and some json.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:23:39)</span> <b>dweitzel:</b></span> there's a lot of queries on that page, probably going to be difficult to differentiate.<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:23:40)</span> <b>edquist:</b></span> yeah i just want to understand the query parameters for the items on this page<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:23:50)</span> <b>dweitzel:</b></span> but look for _msearch names<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:23:59)</span> <b>dweitzel:</b></span> then the request payload<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:24:11)</span> <b>dweitzel:</b></span> the "query" part is the ES part.<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:33:40)</span> <b>edquist:</b></span> thanks - i am having a little trouble finding this _msearch thing <br/>
+<span style="color: #16569E"><span style="font-size: small">(12:34:03)</span> <b>edquist:</b></span> trying to inspect elements surrounding the panels<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:35:02)</span> <b>edquist:</b></span> i don't suppose there are any urls that i could wget that would contain the ES query json?  is this all just js magic that gets dynamically loaded?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:41:35)</span> <b>dweitzel:</b></span> mostly grafana magic.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:42:05)</span> <b>dweitzel:</b></span> also, queries are usually in the data portion of a query, not in the URL.<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:44:55)</span> <b>edquist:</b></span> i think i see what you mean<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:45:57)</span> <b>edquist:</b></span> so, how did you guys go about finding this again in the inspector?  did you start by inspecting a panel, or start somewhere else in the inspector html?  ... or something else?  :)<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:48:50)</span> <b>edquist:</b></span> anyway the items i'm interested in are, what are the query parameters for the "OSG Connect Communities", "Multi-Institutional Projects", "Campus Organizations", and "GPU Utilization" panels<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:49:20)</span> <b>edquist:</b></span> not sure what the criteria are for limiting the searches for each of these<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:51:19)</span> <b>dweitzel:</b></span> I can give you the queries that filter for those communities.  The aggregations and time periods are all the same for all of them.<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:57:40)</span> <b>edquist:</b></span> makes sense about the time periods.  yeah if you get a chance, that would be great if you could give the filters for those communities (in one form or another)<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:58:37)</span> <b>edquist:</b></span> although i guess now that i am seeing the graphana json's "query" parameter, maybe that explains everything<br/><br/><pre><br/>      "query": "type:JobUsageRecordSummary AND ResourceType:Batch  AND VOName:(hcc OR glow OR suragrid) AND OIM_Site:* AND Resource_ExitCode:* AND ProbeName:* AND EndTime:[now-2d TO now-1d]",<br/></pre><br/>
+<span style="color: #16569E"><span style="font-size: small">(12:58:51)</span> <b>edquist:</b></span> (even though it's not ES)<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:59:14)</span> <b>edquist:</b></span> the last question i had is whether these are against the summary tables or the raw tables<br/>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Aug 4, 2021 : #operations (chtc)</title>
+</head>
+<body>
+<h3>Wed Aug 4, 2021 : #operations (chtc)</h3>
+<span style="color: #2b6836"><span style="font-size: small">(11:04:34)</span> <b>jcpatton:</b></span> Any idea why someone would be getting DNS resolution errors in Docker jobs? <a href="https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=103662#txn-1534028">https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=103662#txn-1534028</a> cc @gthain<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:30:15)</span> <b>wiscmoate:</b></span> I'd find out which execute node he was running on, shell in and run a shell using the same docker image<br/>
+<span style="color: #2b6836"><span style="font-size: small">(11:30:34)</span> <b>jcpatton:</b></span> I’ll give it a shot, it’s almost certainly coba2000<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:31:00)</span> <b>wiscmoate:</b></span> What's the image?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(11:33:21)</span> <b>jcpatton:</b></span> according to condor_history, <tt>michaelbornholdt/deep_profiler:tf15_v1</tt><br/>
+<span style="color: #2b6836"><span style="font-size: small">(11:34:59)</span> <b>jcpatton:</b></span> <br/>
+<span style="color: #2b6836"><span style="font-size: small">(11:35:17)</span> <b>jcpatton:</b></span> this seems to be going nowhere fast<br/>
+<span style="color: #2b6836"><span style="font-size: small">(11:35:28)</span> <b>jcpatton:</b></span> <pre>Resolving <a href="http://google.com">google.com</a> (<a href="http://google.com">google.com</a>)... failed: Temporary failure in name resolution.<br/>wget: unable to resolve host address '<a href="http://google.com">google.com</a>'</pre><br/>
+<span style="color: #2b6836"><span style="font-size: small">(11:36:19)</span> <b>jcpatton:</b></span> nothing fishy in <tt>/etc/hosts</tt><br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:38:43)</span> <b>wiscmoate:</b></span> I'll take a look<br/>
+<span style="color: #d58247"><span style="font-size: small">(11:51:10)</span> <b>gthain:</b></span> in that container, what does<br/>
+<span style="color: #d58247"><span style="font-size: small">(11:51:15)</span> <b>gthain:</b></span> $ nslookup <a href="http://google.com">google.com</a><br/>
+<span style="color: #d58247"><span style="font-size: small">(11:51:17)</span> <b>gthain:</b></span> emit?<br/>
+<span style="color: #d58247"><span style="font-size: small">(11:55:18)</span> <b>gthain:</b></span> Does it work if the submit file has<br/>
+<span style="color: #d58247"><span style="font-size: small">(11:55:22)</span> <b>gthain:</b></span> <tt>docker_network_type = host</tt><br/>
+<span style="color: #d58247"><span style="font-size: small">(11:55:23)</span> <b>gthain:</b></span> ?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:55:31)</span> <b>wiscmoate:</b></span> It doesn't have nslookup installed, it's very bare bones.  tcpdump on <a href="http://coba2000.chtc.wisc.edu">coba2000.chtc.wisc.edu</a>'s eth0 and docker0 interfaces shows that packets aren't getting forwarded<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:57:58)</span> <b>wiscmoate:</b></span> The firewall is in a bad state - this looks like an artifact from my firewall configuration change of months ago -&gt;<br/><pre>[moate@coba2000 ~]$ sudo iptables -L FORWARD -v -n<br/>Chain FORWARD (policy DROP 0 packets, 0 bytes)<br/> pkts bytes target     prot opt in     out     source               destination         <br/>  873 58509 DROP       all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* 41001099_all_drp */<br/>    0     0 ACCEPT     all  --  *      virbr0  0.0.0.0/0            192.168.122.0/24     ctstate RELATED,ESTABLISHED<br/>    0     0 ACCEPT     all  --  virbr0 *       192.168.122.0/24     0.0.0.0/0           <br/>    0     0 ACCEPT     all  --  virbr0 virbr0  0.0.0.0/0            0.0.0.0/0           <br/>    0     0 REJECT     all  --  *      virbr0  0.0.0.0/0            0.0.0.0/0            reject-with icmp-port-unreachable<br/>    0     0 REJECT     all  --  virbr0 *       0.0.0.0/0            0.0.0.0/0            reject-with icmp-port-unreachable<br/>    0     0 DOCKER-USER  all  --  *      *       0.0.0.0/0            0.0.0.0/0           <br/>    0     0 DOCKER-ISOLATION-STAGE-1  all  --  *      *       0.0.0.0/0            0.0.0.0/0           <br/>    0     0 ACCEPT     all  --  *      docker0  0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED<br/>    0     0 DOCKER     all  --  *      docker0  0.0.0.0/0            0.0.0.0/0           <br/>    0     0 ACCEPT     all  --  docker0 !docker0  0.0.0.0/0            0.0.0.0/0           <br/>    0     0 ACCEPT     all  --  docker0 docker0  0.0.0.0/0            0.0.0.0/0           </pre><br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:58:24)</span> <b>wiscmoate:</b></span> First rule in the <tt>filter</tt> table <tt>FORWARD</tt> chain is universal <tt>DROP</tt><br/>
+<span style="color: #16569E"><span style="font-size: small">(11:59:11)</span> <b>edquist:</b></span> first rule of iptables is don't talk about iptables<br/>
+<span style="color: #3c989f"><span style="font-size: small">(12:03:14)</span> <b>wiscmoate:</b></span> <pre>[moate@coba2000 ~]$ uptime<br/> 12:02:49 up 165 days, 14:19,  2 users,  load average: 1.06, 0.92, 1.00</pre><br/>
+<span style="color: #3c989f"><span style="font-size: small">(12:03:17)</span> <b>wiscmoate:</b></span> dem uptimes<br/>
+<span style="color: #3c989f"><span style="font-size: small">(12:03:29)</span> <b>wiscmoate:</b></span> @jcpatton sorry about that, it's working now<br/>
+<span style="color: #2b6836"><span style="font-size: small">(12:04:07)</span> <b>jcpatton:</b></span> Thank you!<br/>
+<span style="color: #3c989f"><span style="font-size: small">(12:05:29)</span> <b>wiscmoate:</b></span> I'm very pleased to see that the GPUs are working after 165 day uptime....<br/>
+<span style="color: #3c989f"><span style="font-size: small">(12:05:35)</span> <b>wiscmoate:</b></span> That didn't used to be a thing<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:21:11)</span> <b>johnkn:</b></span> have any gone offline?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:22:15)</span> <b>johnkn:</b></span> we went to a lot of effort to make offline-ing GPU possible, are you saying that now that code has never been used ? :slightly_smiling_face:<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:05:45)</span> <b>wiscmoate:</b></span> @johnkn no, I was saying that in the olden days before we started locking down CUDA and nvidia driver versions the two used to get out of sync during system updates and cause the GPUs to be unreachable<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:06:38)</span> <b>wiscmoate:</b></span> GPUs are less and less a headache these days<br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:37:46)</span> <b>wiscmoate:</b></span> @ckoch5 @jcpatton lnell mystery solved;  you might need to update the research drive docs to take SSH "publickey" authentication into account.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:38:00)</span> <b>ckoch5:</b></span> AHHHHHH<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:38:32)</span> <b>jcpatton:</b></span> Wait what does pubkey do differently? No krb ticket?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:38:37)</span> <b>wiscmoate:</b></span> Exactly<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:40:06)</span> <b>jcpatton:</b></span> Running <tt>kinit</tt> manually works though?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:40:13)</span> <b>wiscmoate:</b></span> Yes<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:40:14)</span> <b>tlmiller:</b></span> (Is it only the CSL's versions of ssh that pass along the ticket?  I though there was an option to do that in modern SSHs... something about GSSAPI?)<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:40:16)</span> <b>ckoch5:</b></span> Lewis seems to be getting quota errors but isn’t near space or file quotas (right now!) on the cluster. <a href="https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=103827">https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=103827</a> @tjslauson can you take a look<br/>
+<blockquote>
+<span style="color: #e7392d"><span style="font-size: small">(16:06:37)</span> <b>ckoch5:</b></span> oop, now Lewis is getting a transport endpoint error? :grimacing:<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(17:07:56)</span> <b>tjslauson:</b></span> @ckoch5 looks like the /home mount needs fixing.  I'll do that tonight.  In the meantime, hpclogin2 should be available.  I'll take a closer look at the ticket tonight.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(17:08:17)</span> <b>ckoch5:</b></span> kkk<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(19:44:38)</span> <b>tjslauson:</b></span> hpclogin1 should be happier now.  Fixing the mount in-place probably would have required killing nearly everyone's login shells (they nearly all have <tt>/home/$USER</tt> as their cwd), so I opted to reboot instead.  It sends a better message, and offers free cleanup! :slightly_smiling_face:<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(19:51:29)</span> <b>tjslauson:</b></span> re: the quota issue, I can confirm what Lewis replied to you with<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(19:52:16)</span> <b>tjslauson:</b></span> this is what Robinhood recorded in /home this morning for Lewis (2321 + 7679 = 10000)<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(20:03:09)</span> <b>tjslauson:</b></span> incidentally, one consequence of switching over to FUSE mounts seems to be that Robinhood isn't reporting accurate dir sizes now.  That reported volume is way higher than it should be, likely due to ceph-fuse responding to requests for dir size (usually 4K or less for small dirs) with _recursive_ dir size including all files under it.  We don't need to care about this yet, because AFAIK nobody's parsing Robinhood reports here.<br/>
+</blockquote>
+<span style="color: #3c989f"><span style="font-size: small">(15:40:33)</span> <b>wiscmoate:</b></span> @tlmiller only if you have a ticket in the first place<br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:40:45)</span> <b>wiscmoate:</b></span> They probably didn't do a "kinit" on their personal laptop<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:40:54)</span> <b>tlmiller:</b></span> Ah, gotcha.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:41:47)</span> <b>wiscmoate:</b></span> @tlmiller We don't use <tt>GSSAPI</tt>, that would require us "joining"  all of our hosts to the <a href="http://AD.WISC.EDU">AD.WISC.EDU</a> domain, a manual step<br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:41:54)</span> <b>wiscmoate:</b></span> We use <tt>pam_krb5</tt><br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:42:51)</span> <b>wiscmoate:</b></span> Also, our users would have to do a <tt>kinit</tt> before logging in<br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:43:51)</span> <b>wiscmoate:</b></span> <tt>pam_krb5</tt> is sort of a hack;  The server fetches a TGT on behalf of the client;  if the TGT is successfully fetched, authentication succeeds<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:43:55)</span> <b>tlmiller:</b></span> (Is <tt>pam_krb5</tt> the one that grabs the password as it passes through the chain and sees if it happens to work for Kerberos?)<br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:44:08)</span> <b>wiscmoate:</b></span> :arrow_up:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:44:40)</span> <b>tlmiller:</b></span> I didn't think impersonation was a thing in AFS, but it's been a _long_ time since I dealt with it.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:45:14)</span> <b>wiscmoate:</b></span> If the TGT fetching succeeds then they can use the resulting ticket cache to fetch an AFS token<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:45:31)</span> <b>tlmiller:</b></span> (What I recall doing still required the user to enter their password, because AFS didn't trust my server.)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:46:03)</span> <b>tlmiller:</b></span> (Well, whatever.  Hopefully I won't have to know how this works ever again. :))<br/>
+</body>
+</html>

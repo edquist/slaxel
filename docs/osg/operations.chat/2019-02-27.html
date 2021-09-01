@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Feb 27, 2019 : #operations (osg)</title>
+</head>
+<body>
+<h3>Wed Feb 27, 2019 : #operations (osg)</h3>
+<span style="color: #674b1b"><span style="font-size: small">(10:39:08)</span> <b>rynge:</b></span> @lincoln @blin Just one more comment when it comes to the flock host cert. Note that most of the host flocking to us needs to either get a new osg-flock package installed, or update the gridmap file. This is ~35 hosts so that will also take time.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:40:00)</span> <b>blin:</b></span> is the gridmapfile shipped in the osg-flock package?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:40:21)</span> <b>rynge:</b></span> No, but it adds to GSI_DAEMON_NAME<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:40:34)</span> <b>rynge:</b></span> <pre><br/># OSG VO flocking host<br/>OSG_FLOCK = <a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a><br/>OSG_FLOCK_DN = /DC=org/DC=incommon/C=US/postalCode=53706/ST=WI/L=Madison/street=1210 West Dayton Street/O=University of Wisconsin-Madison/OU=OCIS/CN=<a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a><br/><br/># submitters/campus factories to flock to<br/>FLOCK_TO = $(FLOCK_TO) $(OSG_FLOCK)<br/><br/># Who to trust?  Inlucde the &lt;VO&gt;_DN to trust the submitter<br/>GSI_DAEMON_NAME = $(GSI_DAEMON_NAME), $(OSG_FLOCK_DN)<br/></pre><br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:40:53)</span> <b>rynge:</b></span> We should still be able to do the CE testing you want<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:40:56)</span> <b>dweitzel:</b></span> The current flock Cert is from wisconsin?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:41:14)</span> <b>rynge:</b></span> Yes, that is what we could get when we moved it from IU<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:41:59)</span> <b>blin:</b></span> do you know where lincoln's at for getting the new flock host cert?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:42:18)</span> <b>rynge:</b></span> No<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:43:03)</span> <b>rynge:</b></span> So I think we as soon as we get that cert, we can start submitting glideins with it, but we will not change out the cert for the condor daemons until last moment<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:43:12)</span> <b>blin:</b></span> agreed<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:43:37)</span> <b>blin:</b></span> we're expecting an OSG software release next week so we can sneak in an osg-flock update<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:44:03)</span> <b>rynge:</b></span> That would be great. Just a , newdn<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:44:14)</span> <b>rynge:</b></span> so we can auth against both old and new<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:53:50)</span> <b>blin:</b></span> something like this, then?<br/><pre><br/># OSG VO flocking host<br/>OSG_FLOCK = <a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a><br/>OSG_FLOCK_AUTH = /DC=org/DC=incommon/C=US/postalCode=53706/ST=WI/L=Madison/street=1210 West Dayton Street/O=University of Wisconsin-Madison/OU=OCIS/CN=<a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a>, &lt;NEW DN&gt;<br/><br/># submitters/campus factories to flock to<br/>FLOCK_TO = $(FLOCK_TO) $(OSG_FLOCK)<br/><br/># Who to trust?  Inlucde the &lt;VO&gt;_DN to trust the submitter<br/>GSI_DAEMON_NAME = $(GSI_DAEMON_NAME), $(OSG_FLOCK_AUTH)<br/></pre><br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:54:39)</span> <b>rynge:</b></span> Yes, that should work<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:55:49)</span> <b>lincoln:</b></span> hi sorry so should I try to push UChicago to approve the InCommon certs for <a href="http://opensciencegrid.org">opensciencegrid.org</a>? It's going to be annoying and a whole thing with excuses and so forth but I can ask :wink:<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:56:03)</span> <b>lincoln:</b></span> I'd really prefer if it was just issued via UNL or something<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:56:17)</span> <b>blin:</b></span> unfortunately that could get us in trouble with incommon<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:56:35)</span> <b>lincoln:</b></span> oh ffs<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:56:41)</span> <b>blin:</b></span> if the physical host is at UChicago, it really should have a UChicago InCommon cert<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:56:48)</span> <b>blin:</b></span> yeah, i know<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:57:10)</span> <b>lincoln:</b></span> OK, I will try.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:57:13)</span> <b>blin:</b></span> i have a huge bone to pick with incommon after this year<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:57:14)</span> <b>blin:</b></span> thanks<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:57:24)</span> <b>lincoln:</b></span> CAs are a joke<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:57:25)</span> <b>lincoln:</b></span> :wink:<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:57:32)</span> <b>lincoln:</b></span> I only trust people I've drank beer with<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:57:38)</span> <b>lincoln:</b></span> but I digress.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:57:59)</span> <b>rynge:</b></span> We can just switch again - seems like we are getting used to update everything every year anyways<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:02:32)</span> <b>dweitzel:</b></span> @lincoln can you view this: <a href="https://docs.google.com/document/d/1hsFW-Tu5eq7hrrlaRZVorp_Xp11m6L4q-jMqPo-I8tY/edit?usp=sharing">https://docs.google.com/document/d/1hsFW-Tu5eq7hrrlaRZVorp_Xp11m6L4q-jMqPo-I8tY/edit?usp=sharing</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:03:01)</span> <b>dweitzel:</b></span> This is a draft document on how to acquire InCommon certs for <a href="http://opensciencegrid.org">opensciencegrid.org</a> domain.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:03:05)</span> <b>dweitzel:</b></span> it's what UNL did to be able to issue <a href="http://opensciencegrid.org">opensciencegrid.org</a> domain certs.<br/>
+</body>
+</html>

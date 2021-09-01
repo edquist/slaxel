@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jul 2, 2021 : #flightworthy (chtc)</title>
+</head>
+<body>
+<h3>Fri Jul 2, 2021 : #flightworthy (chtc)</h3>
+<span style="color: #d58247"><span style="font-size: small">(08:43:49)</span> <b>gthain:</b></span> I do like the suffix to indicate a predicate<br/>
+<span style="color: #4cc091"><span style="font-size: small">(09:21:10)</span> <b>blin:</b></span> hey @tim, we noticed an issue with a 9.0.1 release tarball in a Bosco setup because a site didn't have <tt>libtool-ltdl</tt> installed on their login host and we link the <tt>blahpd</tt> against the system lib<br/><pre>[osgvopilot@hpclogin1 ~]$ ldd bosco_slate/glite/bin/blahpd | grep libltdl<br/>	libltdl.so.7 =&gt; /lib64/libltdl.so.7 (0x00007f7700f97000)</pre><br/>but it appears that we ship the lib ourselves<br/><pre>[osg07@dawe condor]$ ls -l libltdl.so.7<br/>-rwxr-xr-x 1 osg07 osg 41272 Dec 29  2020 libltdl.so.7<br/>[osg07@dawe condor]$ pwd<br/>/home/osg07/bosco/glite/lib/condor</pre><br/>should we just link against the lib in the tarball?<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(09:23:06)</span> <b>tim:</b></span> @blin: I can add that as a package to be included in the tarball. (Much like libgomp). It's small. I'll make sure it gets into the 9.0.2 release.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(09:24:29)</span> <b>blin:</b></span> i can make a ticket but it looks like we already include it?<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(09:27:55)</span> <b>tim:</b></span> I made a ticket. I'll have to look at the tarball. I didn't think it was included.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(09:28:41)</span> <b>blin:</b></span> oh yeah, interesting. it's not in the tarball but is somehow in the bosco install?? got a link for the ticket? i can drop what i find in there<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(09:29:10)</span> <b>tim:</b></span> <a href="https://opensciencegrid.atlassian.net/browse/HTCONDOR-576">https://opensciencegrid.atlassian.net/browse/HTCONDOR-576</a><br/>
+<span style="color: #bb86b7"><span style="font-size: small">(09:29:44)</span> <b>tim:</b></span> I don't know how it could be in the bosco install if it is not in the tarball.<br/>
+<blockquote>
+<span style="color: #4cc091"><span style="font-size: small">(09:41:19)</span> <b>blin:</b></span> yeah, that's pretty bizarre but it is def in the bosco install in the <tt>glite/lib/condor/</tt> dir<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(09:49:33)</span> <b>tim:</b></span> What OS? I see lib in the path and for EL systems, I expect lib64.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(09:52:03)</span> <b>blin:</b></span> EL7<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(09:56:56)</span> <b>tim:</b></span> Having libltdl in the tarball is consistent with bosco-1.3. Are you sure you are getting the right tarball?<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(09:57:30)</span> <b>tim:</b></span> In any case, I will compare the library list for the 9.0.2 tarballs and make sure that it is complete.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(10:05:31)</span> <b>blin:</b></span> ahhh, i wonder if that's the problem<br/>
+<span style="color: #4cc091"><span style="font-size: small">(10:06:02)</span> <b>blin:</b></span> one complaint about bosco_cluster is that it just rsyncs on top of the existing install<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(10:34:05)</span> <b>tim:</b></span> Maybe it should include --delete?? I would ask Jaime.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(10:36:30)</span> <b>blin:</b></span> ya, i just created a ticket <a href="https://opensciencegrid.atlassian.net/browse/HTCONDOR-577">https://opensciencegrid.atlassian.net/browse/HTCONDOR-577</a><br/>
+<span style="color: #bb86b7"><span style="font-size: small">(10:37:54)</span> <b>tim:</b></span> Thank you.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(10:56:12)</span> <b>jfrey:</b></span> Globus needs libltdl. We package these system libraries in the tarball for one of two reasons:<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(10:56:21)</span> <b>jfrey:</b></span> 1. They aren’t in the base OS installation.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(10:57:34)</span> <b>jfrey:</b></span> 2) In the olden days, we tried to make our rhel tarball a sort of universal donor platform. By including some of the system libs where the SO version varies between distros, the binaries were more likely to run on alternate distros we didn’t support.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(10:58:45)</span> <b>jfrey:</b></span> I think we should forget about reason 2 as a justification for packaging extra libraries.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(10:59:08)</span> <b>jfrey:</b></span> So if libltdl is in the base OS install, we shouldn’t include it in the tarball.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(10:59:17)</span> <b>jfrey:</b></span> It looks like we don’t in 9.0.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(10:59:37)</span> <b>jfrey:</b></span> And I agree with the --delete thing.<br/>
+</blockquote>
+<span style="color: #2b6836"><span style="font-size: small">(09:51:06)</span> <b>jcpatton:</b></span> The collector only stores “recent” accounting ads, but the negotiator keeps them forever (unless told otherwise)? Though I get the same number of entries (<tt>grep '^Name'</tt>) whether or not I add <tt>-negotiator</tt> to <tt>condor_userprio -allusers -usage -l -pool <a href="http://cm.chtc.wisc.edu">cm.chtc.wisc.edu</a> -name <a href="http://cm3000.chtc.wisc.edu">cm3000.chtc.wisc.edu</a></tt><br/>
+<span style="color: #2b6836"><span style="font-size: small">(09:51:50)</span> <b>jcpatton:</b></span> but if I query the collector for accounting ads (using the Python bindings) I only get 93 entries<br/>
+<span style="color: #d58247"><span style="font-size: small">(09:52:05)</span> <b>gthain:</b></span> -allusers implies -negotiator<br/>
+<span style="color: #2b6836"><span style="font-size: small">(09:52:25)</span> <b>jcpatton:</b></span> ah<br/>
+<span style="color: #2b6836"><span style="font-size: small">(09:53:45)</span> <b>jcpatton:</b></span> How does the collector decide how long to keep an accounting ad around? Is there a knob I should look at?<br/>
+<span style="color: #d58247"><span style="font-size: small">(09:55:23)</span> <b>gthain:</b></span> I believe all ads in the collector have the same lifetime, if not refreshed<br/>
+<span style="color: #2b6836"><span style="font-size: small">(09:55:37)</span> <b>jcpatton:</b></span> Put another way… Suppose we want to add accounting ad information to condor_adstash. How often do I need to poll to make sure that I don’t miss someone’s usage dropping out of the collector after they stop running jobs?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(09:57:12)</span> <b>jcpatton:</b></span> is the lifetime based on time since <tt>LastUsageTime</tt>?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(09:59:24)</span> <b>jcpatton:</b></span> here’s an ad if it helps jog anyone’s memory<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:01:50)</span> <b>jcpatton:</b></span> (Or should we add a binding to query the negotiator and we have <tt>adstash</tt> do what the old usage scripts do and poll <tt>-allusers</tt> once a day)<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:56:22)</span> <b>gthain:</b></span> I would poll the negotiator once a day -- it has the defininitive values<br/>
+<span style="color: #684b6c"><span style="font-size: small">(12:12:22)</span> <b>bbockelman:</b></span> @blin - that dependency is there for Globus support.  Can't hurt to check and see if it's removed from the non-Globus builds.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(12:39:32)</span> <b>blin:</b></span> we're still requiring it in the RPM in our globus-free builds so we should probably have someone (@jfrey?) review the libs we're pulling in<br/>
+<span style="color: #2b6836"><span style="font-size: small">(12:43:03)</span> <b>jcpatton:</b></span> any ideas how to work around the lack of a <tt>Negotiator.getUsage(user_constraint=None)</tt> python binding? I tried the dirty “treat the daemon as a collector and call query on it” hack but I just got a failed communication error<br/>
+<blockquote>
+<span style="color: #2b6836"><span style="font-size: small">(12:47:46)</span> <b>jcpatton:</b></span> fwiw the negotiator spits out <tt>07/02/21 12:46:37 (D_ALWAYS) Received TCP command (48) (UNREGISTERED COMMAND!) from  &lt;128.105.244.60:32974&gt;</tt> when I try to query it<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:53:57)</span> <b>johnkn:</b></span> The negotiator does not respond to collector query commands, unlike the schedd and startd, which do.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:55:08)</span> <b>johnkn:</b></span> we should probably fix this, but there has not been a compelling reason so far<br/>
+<span style="color: #2b6836"><span style="font-size: small">(12:57:13)</span> <b>jcpatton:</b></span> is there a good way to sniff out the value of this command in <tt>condor_userprio</tt> for the command line options I have set?<br/><pre>if (!(sock = negotiator.startCommand((GroupRollup) ? GET_PRIORITY_ROLLUP : GET_PRIORITY, Stream::reli_sock, 0)) ||</pre><br/>
+<span style="color: #2b6836"><span style="font-size: small">(12:57:50)</span> <b>jcpatton:</b></span> I suppose I could always try using <tt>htcondor.send_command</tt> and seeing what happens<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:57:55)</span> <b>johnkn:</b></span> I don't think so.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:58:40)</span> <b>johnkn:</b></span> but I'm pretty sure that the getPriorities() binding sends that command.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:59:07)</span> <b>johnkn:</b></span> checking...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:59:35)</span> <b>johnkn:</b></span> yep.<br/><pre>    boost::python::list<br/>    getPriorities(bool rollup=false)<br/>    {<br/>        boost::shared_ptr&lt;Sock&gt; sock = getSocket(rollup ? GET_PRIORITY_ROLLUP : GET_PRIORITY);</pre><br/>
+<span style="color: #2b6836"><span style="font-size: small">(12:59:57)</span> <b>jcpatton:</b></span> ah, ok, so I need to figure out what userprio is doing differently for <tt>-usage</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:00:31)</span> <b>johnkn:</b></span> just formatting I would expect.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(13:01:47)</span> <b>jcpatton:</b></span> ok, so sending that command sends back “a lot of stuff” and <tt>getPriorities()</tt> just parses out the priority information?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(13:03:06)</span> <b>jcpatton:</b></span> yeah that’s what it looks like <tt>condor_userprio</tt> is doing as well, <tt>-usage</tt> just gets turned into turning on bits in <tt>DetailFlag</tt> which affects output<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:03:45)</span> <b>johnkn:</b></span> yeah, that's what I remember<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:05:44)</span> <b>johnkn:</b></span> There isn't really any point in doing projected queries to the negotiator because of the way it returns the data - historically it's not really a list of a ads<br/>
+<span style="color: #2b6836"><span style="font-size: small">(13:05:51)</span> <b>jcpatton:</b></span> aha, ok, so this whole time <tt>getPriorities()</tt> _also_ sends back usage information<br/>
+<span style="color: #2b6836"><span style="font-size: small">(13:05:56)</span> <b>jcpatton:</b></span> who knew<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:06:08)</span> <b>johnkn:</b></span> yes, it's everthing<br/>
+<span style="color: #2b6836"><span style="font-size: small">(13:06:29)</span> <b>jcpatton:</b></span> so just bad at naming as usual :slightly_smiling_face:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:06:36)</span> <b>johnkn:</b></span> yeah<br/>
+<span style="color: #2b6836"><span style="font-size: small">(13:06:52)</span> <b>jcpatton:</b></span> thanks!<br/>
+</blockquote>
+<span style="color: #2b6836"><span style="font-size: small">(12:43:10)</span> <b>jcpatton:</b></span> shell out to <tt>condor_userprio</tt>? :confused:<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(12:44:17)</span> <b>jfrey:</b></span> It looks like we still have run-time dependencies on gsi and voms in the rpm. I thought we had removed those, because we dlopen them.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(12:48:20)</span> <b>blin:</b></span> err, if we dlopen them, we expect them to be installed on the system, no?<br/>
+<span style="color: #4cc091"><span style="font-size: small">(12:48:47)</span> <b>blin:</b></span> just above those install time deps in the RPM, there's this comment<br/>&gt;  # Require libraries that we dlopen<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(12:52:04)</span> <b>jfrey:</b></span> We only dlopen them if GSI is configured (which is no longer the default).<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(12:52:47)</span> <b>jfrey:</b></span> And if the dlopen fails, we just don’t do GSI auth.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(13:00:37)</span> <b>blin:</b></span> oh cool. what about for voms? say if the GSI libs are there but the VOMS lib isn't. Does that just skip VOMS auth?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(13:24:24)</span> <b>jcpatton:</b></span> tl;dr from negotiator binding thread above, I didn’t realize <tt>Negotiator.getPriorities()</tt> sent back usage information as well, looks like everything that <tt>condor_userprio -usage -allusers</tt> provides (in a much easier to handle format to boot)<br/>
+<span style="color: #2b6836"><span style="font-size: small">(13:24:50)</span> <b>jcpatton:</b></span> should we consider having a better named alias for this method?<br/>
+<span style="color: #d58247"><span style="font-size: small">(13:29:21)</span> <b>gthain:</b></span> What's the thing we are worst at?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(13:32:40)</span> <b>jcpatton:</b></span> HTCSS/CHTC religion bullet point 1<br/>
+<blockquote>
+<span style="color: #9e3997"><span style="font-size: small">(13:43:02)</span> <b>tlmiller:</b></span> • "Twenty seconds of careful research will always result in the best possible name."<br/>?<br/>
+</blockquote>
+<span style="color: #9b3b45"><span style="font-size: small">(13:42:24)</span> <b>jfrey:</b></span> If the GSI libs are present but VOMS are absent, then we act as if the GSI libs are absent as well. That’s uglier than I thought.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(13:42:45)</span> <b>jfrey:</b></span> That’s in 9.0. In 9.1, GSI and VOMS are decoupled, as part of getting rid of GSI.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(17:02:49)</span> <b>blin:</b></span> Oof ok. I guess we're generally safe from that in RPM land since the packages ensure we bring in the libs<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(17:25:20)</span> <b>jfrey:</b></span> And the tarballs include both.<br/>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Sep 7, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Thu Sep 7, 2017 : #gracc (osg)</h3>
+<span style="color: #3c8c69"><span style="font-size: small">(12:04:24)</span> <b>kretzke:</b></span> @sbhat can you point @marian in the right direction for <a href="https://jira.grid.iu.edu/browse/GRACC-123">https://jira.grid.iu.edu/browse/GRACC-123</a> It’s this report? <a href="https://github.com/opensciencegrid/gracc-reporting/blob/master/src/graccreports/osg_reports/ProbeReport.py">https://github.com/opensciencegrid/gracc-reporting/blob/master/src/graccreports/osg_reports/ProbeReport.py</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:05:06)</span> <b>dweitzel:</b></span> Also, I noticed there are some docker containers on gracc in the <tt>ps -a</tt> output from some reporting.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:05:11)</span> <b>dweitzel:</b></span> shouldn't those be cleaned up?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:05:15)</span> <b>dweitzel:</b></span> <tt>docker ps -a</tt><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:11:53)</span> <b>kretzke:</b></span> “high_torvalds” hehe… yeah, I think old containers can be deleted. @sbhat I forget if you have the reports running in new containers every time or re-running old ones?<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:14:05)</span> <b>sbhat:</b></span> @kretzke - sure. @dweitzel - I've stepped out for a little bit, so I'll take a look when I come back. <br/>
+<span style="color: #aba727"><span style="font-size: small">(12:16:31)</span> <b>sbhat:</b></span> It should reuse the old ones, I think. I'll check <br/>
+<span style="color: #aba727"><span style="font-size: small">(12:31:01)</span> <b>sbhat:</b></span> alright - so looking at <tt>docker ps -a</tt>, I believe i only see the containers that are getting reused<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:31:41)</span> <b>sbhat:</b></span> just these guys, right?<br/><pre><br/>[sbhat@gratiav2-1 ~]$ docker ps -a | grep gracc-reporting<br/>639a30a00f92        shreyb/gracc-reporting:osgflocking-report_0.11.4b          "osgflockingreport -s"   3 days ago          Exited (0) 3 days ago                                                                             osgflockingreport_osgflockingreport_1<br/>540e6d309998        shreyb/gracc-reporting:osgmissingprojects-report_0.11.4b   "osgmissingprojects -"   3 days ago          Exited (0) 3 days ago                                                                             osgmissingprojectsreport_osgmissingprojectsreport_1<br/>2f154f685d75        shreyb/gracc-reporting:osg-report_0.11.4b                  "osgreport -s '2017-0"   3 days ago          Exited (0) 3 days ago                                                                             osgreport_osgreport_1<br/>94fdcb096e81        shreyb/gracc-reporting:osgtopoppusage-report_0.11.4b       "osgtopoppusagereport"   6 days ago          Exited (0) 6 days ago                                                                             osgtopoppusagereport_osgtopoppusagereport_1<br/>b195dbf374ab        shreyb/gracc-reporting:osgpersite-report_0.11.4b           "osgpersitereport -s "   6 days ago          Exited (0) 6 days ago                                                                             osgpersitereport_osgpersitereport_1<br/>73030fc819f0        shreyb/gracc-reporting:osgprobe-report_0.11.4b             "osgprobereport -c /t"   2 weeks ago         Exited (0) 5 hours ago                                                                            osgprobereport_osgprobereport_1<br/></pre><br/>
+<span style="color: #aba727"><span style="font-size: small">(12:31:56)</span> <b>sbhat:</b></span> I assume they don't need to be cleaned up?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:34:24)</span> <b>dweitzel:</b></span> Yup, those are fine, I believe.<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:34:31)</span> <b>sbhat:</b></span> @kretzke as far as the ticket, @marian and I discussed this a while ago.  The assertion that "most or all of the emails the GOC receives are false positives" isn't quite true.  They're emails that GOC receives because we haven't received any records from probes installed on those FQANs (for the past two days), which is the condition for a report to send an email<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:34:46)</span> <b>sbhat:</b></span> I believe most of the ones they're calling "false positives" are the result of special setups<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:34:53)</span> <b>sbhat:</b></span> esp. at Florida and NERSC<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:35:43)</span> <b>sbhat:</b></span> There was discussion of adding an exception list to the report, but a)  Tanya basically said, "not our problem if you guys don't follow the rules", and b) we ran out of money before I could look at adding that<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:36:49)</span> <b>sbhat:</b></span> tl;dr:  It's working as designed.  if they want to change the design, someone will have to do that<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:43:22)</span> <b>marian:</b></span> I think we can at minimum change email recipient to <a href="mailto:gracc-support@listserv.unl.edu">gracc-support@listserv.unl.edu</a> and that way GOC stuff is out of the loop for such alarms?<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:43:33)</span> <b>marian:</b></span> GOC staff<br/>
+<span style="color: #aba727"><span style="font-size: small">(13:21:21)</span> <b>sbhat:</b></span> sure - that's perfectly fine<br/>
+<span style="color: #aba727"><span style="font-size: small">(13:21:38)</span> <b>sbhat:</b></span> but then whoever receives that (that's mostly in this channel, right?) would have to know to forward on the correct alarms<br/>
+<span style="color: #aba727"><span style="font-size: small">(13:21:45)</span> <b>sbhat:</b></span> is that OK with you?<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:48:28)</span> <b>marian:</b></span> I think yes, it's me, Derek and (Kevin) on that mailing list<br/>
+<span style="color: #aba727"><span style="font-size: small">(14:51:40)</span> <b>sbhat:</b></span> okay<br/>
+<span style="color: #aba727"><span style="font-size: small">(14:51:46)</span> <b>sbhat:</b></span> I'll make that change now<br/>
+<span style="color: #aba727"><span style="font-size: small">(14:57:19)</span> <b>sbhat:</b></span> done<br/>
+<span style="color: #53b759"><span style="font-size: small">(18:44:01)</span> <b>marian:</b></span> Thanks, @sbhat!<br/>
+</body>
+</html>

@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Mar 11, 2021 : #collaboration-support (osg)</title>
+</head>
+<body>
+<h3>Thu Mar 11, 2021 : #collaboration-support (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(08:56:35)</span> <b>ruben.lara:</b></span> @marian: can you please check if there are still errors on the connection to GaTech’s resources? We are seeing a lot of jobs running!<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:29:43)</span> <b>marian:</b></span> I'll have a look now<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:31:52)</span> <b>marian:</b></span> same error:<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:31:55)</span> <b>marian:</b></span> <pre>012 (4721113.005.000) 03/11 08:28:53 Job was held.<br/>        Error connecting to schedd <a href="http://osg-sched2.pace.gatech.edu">osg-sched2.pace.gatech.edu</a>: SECMAN:2007:Failed to received post-auth ClassAd|AUTHENTICATE:1004:Failed to authenticate using FS<br/>        Code 0 Subcode 0</pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:56:40)</span> <b>bbockelm:</b></span> @marian - is that from the factory logs?<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:57:12)</span> <b>marian:</b></span> yes<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:57:17)</span> <b>marian:</b></span> condor_activity log<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:57:25)</span> <b>marian:</b></span> for a particular entry<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:58:04)</span> <b>marian:</b></span> follow up on the submission of pilots requested by LIGO FE<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:59:34)</span> <b>bbockelm:</b></span> Ok.  There should be a log that @ruben.lara has which should have a corresponding error message (<tt>/var/log/condor-ce/ScheddLog</tt>)<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:00:00)</span> <b>ruben.lara:</b></span> One moment…<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:00:57)</span> <b>bbockelm:</b></span> (I think that's Pacific time - so ~11:28:53 Eastern time)<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:01:34)</span> <b>ruben.lara:</b></span> The container is on UTC.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:02:02)</span> <b>bbockelm:</b></span> Ah, timezones...<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:02:11)</span> <b>ruben.lara:</b></span> the file is <tt>/var/log/condor-ce/SchedLog</tt>. Looking for the messages…<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:02:46)</span> <b>bbockelm:</b></span> If you want to post a snippet and have us do the digging, I'm happy to help.<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:04:24)</span> <b>marian:</b></span> that'll be helpful, agreed<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:05:04)</span> <b>ruben.lara:</b></span> I think this is it:<br/><pre>03/11/21 16:28:53 (D_ALWAYS) DC_AUTHENTICATE: authentication of &lt;169.228.38.43:13231&gt; did not result in a valid mapped user name, which is required for this command (1112 QMGMT_WRITE_CMD), so aborting.</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(11:09:02)</span> <b>ruben.lara:</b></span> I’m attaching the last 10,000 lines in a zip file, in case you want to comb through them.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:13:37)</span> <b>ruben.lara:</b></span> <br/>
+<span style="color: #c386df"><span style="font-size: small">(11:14:11)</span> <b>ruben.lara:</b></span> A couple of additional lines, right before the one I posted above:<br/><pre>03/11/21 16:28:53 (D_ALWAYS) WARNING! X.509 certificate '/DC=org/DC=incommon/C=US/ST=California/L=La<br/> Jolla/O=University of California, San Diego/OU=UCSD/CN=<a href="http://osg-ligo-1.t2.ucsd.edu">osg-ligo-1.t2.ucsd.edu</a>' has VOMS extensions<br/>that can't be verified. Ignoring them. (To silence this warning, set USE_VOMS_ATTRIBUTES=False)<br/>03/11/21 16:28:53 (D_ALWAYS:2) Finishing authenticate_server_gss_post with status=1</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(11:21:48)</span> <b>ruben.lara:</b></span> @bbockelm, @marian ^^^<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:31:02)</span> <b>marian:</b></span> hmm... what do to about that one? Isn't it just WARNING?<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:31:16)</span> <b>marian:</b></span> @bbockelm ^<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:31:28)</span> <b>marian:</b></span> ah, ok, uploaded schedd log<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:32:01)</span> <b>marian:</b></span> jumping in to meeting... be right back<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:45:55)</span> <b>bbockelm:</b></span> This looks like a missing VOMS package.  What does <tt>rpm -q vo-client</tt> say?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:47:47)</span> <b>ruben.lara:</b></span> <pre>sh-4.2# rpm -q vo-client<br/>vo-client-109-1.osg35.el7.noarch</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(11:50:37)</span> <b>ruben.lara:</b></span> <pre>sh-4.2# rpm -qa | grep voms<br/>voms-2.0.14-1.6.osg35.el7.x86_64<br/>lcmaps-plugins-voms-1.7.1-1.6.osg35.el7.x86_64<br/>vo-client-lcmaps-voms-109-1.osg35.el7.noarch<br/>voms-clients-cpp-2.0.14-1.6.osg35.el7.x86_64</pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:50:45)</span> <b>bbockelm:</b></span> Hm.  That looks reasonable.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:51:11)</span> <b>ruben.lara:</b></span> The mapfile has this:<br/><pre>sh-4.2# cat condor_mapfile<br/>GSI (.*) GSS_ASSIST_GRIDMAP<br/>SSL "[-.A-Za-z0-9/= ]*/CN=([-.A-Za-z0-9/= ]+)" \1@unmapped.htcondor.org<br/>CLAIMTOBE .* anonymous@claimtobe<br/>FS "^(root|condor)$" \1@daemon.htcondor.org<br/>FS "(.*)" \1</pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:54:50)</span> <b>bbockelm:</b></span> what's the contents of this file:<br/><pre># cat /etc/grid-security/vomsdir/osg/voms.opensciencegrid.org.lsc <br/>/DC=org/DC=incommon/C=US/ST=Wisconsin/L=Madison/O=University of Wisconsin-Madison/OU=OCIS/CN=<a href="http://voms.opensciencegrid.org">voms.opensciencegrid.org</a><br/>/C=US/O=Internet2/OU=InCommon/CN=InCommon IGTF Server CA</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(11:57:08)</span> <b>ruben.lara:</b></span> <pre>sh-4.2# cat /etc/grid-security/vomsdir/osg/voms.opensciencegrid.org.lsc<br/>/DC=org/DC=incommon/C=US/ST=Wisconsin/L=Madison/O=University of Wisconsin-Madison/OU=OCIS/CN=<a href="http://voms.opensciencegrid.org">voms.opensciencegrid.org</a><br/>/C=US/O=Internet2/OU=InCommon/CN=InCommon IGTF Server CA</pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:58:46)</span> <b>bbockelm:</b></span> @blin ^^^ penny for your thoughts?  What could cause VOMS validation to fail if the <tt>vo-client</tt> package is up-to-date and looks sane?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:59:09)</span> <b>bbockelm:</b></span> Basically, the validation is failing, which results in the connection not mapping to the right user, which then causes the error that Marian reports.<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:00:23)</span> <b>blin:</b></span> curious. i just noticed something similar with wenmr and the open science CE<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:01:04)</span> <b>blin:</b></span> if we could see the <tt>voms-proxy-info -all</tt> of the proxy being used that could provide some hints<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:01:24)</span> <b>blin:</b></span> we did recently renew that VOMS cert, maybe we missed a DN change?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:01:34)</span> <b>ruben.lara:</b></span> One moment.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:01:44)</span> <b>rynge:</b></span> We got a new voms cert Feb 4, and a new host hostcert Mar 1<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:01:55)</span> <b>rynge:</b></span> But it seems like it is working everywhere else<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:02:04)</span> <b>ruben.lara:</b></span> <pre>sh-4.2# voms-proxy-info -all<br/><br/>Couldn't find a valid proxy.</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:02:21)</span> <b>blin:</b></span> yeah it would be the incoming cert, so the VO would have access to that<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:02:45)</span> <b>blin:</b></span> @rynge could you grab us the subj/issuer of the voms cert?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:02:46)</span> <b>rynge:</b></span> <pre># voms-proxy-info -all --file frontend.proxy <br/>subject   : /DC=org/DC=incommon/C=US/ST=Wisconsin/L=Madison/O=University of Wisconsin-Madison/OU=OCIS/CN=<a href="http://flock.opensciencegrid.org/CN=2037711041">flock.opensciencegrid.org/CN=2037711041</a><br/>issuer    : /DC=org/DC=incommon/C=US/ST=Wisconsin/L=Madison/O=University of Wisconsin-Madison/OU=OCIS/CN=<a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a><br/>identity  : /DC=org/DC=incommon/C=US/ST=Wisconsin/L=Madison/O=University of Wisconsin-Madison/OU=OCIS/CN=<a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a><br/>type      : RFC compliant proxy<br/>strength  : 1024 bits<br/>path      : frontend.proxy<br/>timeleft  : 23:20:36<br/>key usage : Digital Signature, Key Encipherment, Data Encipherment</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:03:03)</span> <b>rynge:</b></span> Sorry, hang on<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:03:23)</span> <b>rynge:</b></span> <pre># voms-proxy-info -all --file osg-pilot.proxy <br/>subject   : /DC=org/DC=incommon/C=US/ST=Wisconsin/L=Madison/O=University of Wisconsin-Madison/OU=OCIS/CN=<a href="http://flock.opensciencegrid.org/CN=1056762434">flock.opensciencegrid.org/CN=1056762434</a><br/>issuer    : /DC=org/DC=incommon/C=US/ST=Wisconsin/L=Madison/O=University of Wisconsin-Madison/OU=OCIS/CN=<a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a><br/>identity  : /DC=org/DC=incommon/C=US/ST=Wisconsin/L=Madison/O=University of Wisconsin-Madison/OU=OCIS/CN=<a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a><br/>type      : RFC compliant proxy<br/>strength  : 2048 bits<br/>path      : osg-pilot.proxy<br/>timeleft  : 167:19:47<br/>key usage : Digital Signature, Key Encipherment, Data Encipherment<br/>=== VO osg extension information ===<br/>VO        : osg<br/>subject   : /DC=org/DC=incommon/C=US/ST=Wisconsin/L=Madison/O=University of Wisconsin-Madison/OU=OCIS/CN=<a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a><br/>issuer    : /DC=org/DC=incommon/C=US/ST=Wisconsin/L=Madison/O=University of Wisconsin-Madison/OU=OCIS/CN=<a href="http://voms.opensciencegrid.org">voms.opensciencegrid.org</a><br/>attribute : /osg/Role=NULL/Capability=NULL<br/>timeleft  : 167:19:47<br/>uri       : <a href="http://voms.opensciencegrid.org:15027">voms.opensciencegrid.org:15027</a></pre><br/><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:04:28)</span> <b>blin:</b></span> subject looks good. what about the issuer of the voms cert?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:05:13)</span> <b>rynge:</b></span> <pre># grid-cert-info --issuer --file vomscert.pem<br/>/C=US/O=Internet2/OU=InCommon/CN=InCommon IGTF Server CA</pre><br/><br/>
+<span style="color: #c386df"><span style="font-size: small">(12:06:24)</span> <b>ruben.lara:</b></span> Please note that we are getting jobs from that source. We are NOT getting jobs from<br/><pre>/DC=org/DC=incommon/C=US/ST=California/L=La<br/> Jolla/O=University of California, San Diego/OU=UCSD/CN=<a href="http://osg-ligo-1.t2.ucsd.edu">osg-ligo-1.t2.ucsd.edu</a></pre><br/><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:08:19)</span> <b>blin:</b></span> oh, good catch!<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:08:52)</span> <b>paschos:</b></span> yeah--- the issue is pilots. from ligo and what. could cause the. lack of jobs. from there<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:09:23)</span> <b>blin:</b></span> @marian do you own <a href="http://osg-ligo-1.t2.ucsd.edu">osg-ligo-1.t2.ucsd.edu</a>?<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:09:46)</span> <b>paschos:</b></span> he has access there but i think. he is in the standup meeting<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:10:55)</span> <b>bbockelm:</b></span> It is a reasonable looking proxy:<br/><pre>[root@vo-frontend-igwn-fc5bf499d-fc2tx /]# voms-proxy-info --file /etc/grid-security/pilot_ligo_proxy.proxy -all -acissuer                                                                                                                                                                                                    <br/>subject   : /DC=org/DC=incommon/C=US/ST=California/L=La Jolla/O=University of California, San Diego/OU=UCSD/CN=<a href="http://osg-ligo-1.t2.ucsd.edu/CN=1818707261">osg-ligo-1.t2.ucsd.edu/CN=1818707261</a><br/>issuer    : /DC=org/DC=incommon/C=US/ST=California/L=La Jolla/O=University of California, San Diego/OU=UCSD/CN=<a href="http://osg-ligo-1.t2.ucsd.edu">osg-ligo-1.t2.ucsd.edu</a><br/>identity  : /DC=org/DC=incommon/C=US/ST=California/L=La Jolla/O=University of California, San Diego/OU=UCSD/CN=<a href="http://osg-ligo-1.t2.ucsd.edu">osg-ligo-1.t2.ucsd.edu</a><br/>type      : RFC compliant proxy<br/>strength  : 2048 bits<br/>path      : /etc/grid-security/pilot_ligo_proxy.proxy<br/>timeleft  : 23:09:22<br/>key usage : Digital Signature, Key Encipherment, Data Encipherment<br/>=== VO osg extension information ===<br/>VO        : osg<br/>subject   : /DC=org/DC=incommon/C=US/ST=California/L=La Jolla/O=University of California, San Diego/OU=UCSD/CN=<a href="http://osg-ligo-1.t2.ucsd.edu">osg-ligo-1.t2.ucsd.edu</a><br/>issuer    : /DC=org/DC=incommon/C=US/ST=Wisconsin/L=Madison/O=University of Wisconsin-Madison/OU=OCIS/CN=<a href="http://voms.opensciencegrid.org">voms.opensciencegrid.org</a><br/>attribute : /osg/ligo/Role=NULL/Capability=NULL<br/>timeleft  : 23:09:22<br/>uri       : <a href="http://voms.opensciencegrid.org:15027">voms.opensciencegrid.org:15027</a></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:11:50)</span> <b>blin:</b></span> has the voms cert on that host been updated, though? we renewed it last month<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:11:55)</span> <b>ruben.lara:</b></span> Does that need to be added to our <tt>grid-security</tt> directory?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:15:12)</span> <b>blin:</b></span> nope, as long as you have the OSG lsc files and a voms mapping in <tt>/etc/grid-security/voms-mapfile</tt> or the default in <tt>/usr/share/osg/voms-mapfile-default</tt>  for <tt>/osg</tt> and <tt>/osg/ligo</tt> you should be all set<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:15:40)</span> <b>blin:</b></span> i suspect that the <a href="http://osg-ligo-1.t2.ucsd.edu">osg-ligo-1.t2.ucsd.edu</a> host has old credentials<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:16:27)</span> <b>ruben.lara:</b></span> <pre>sh-4.2# cat voms-mapfile<br/>"/osg/Role=NULL/Capability=NULL" osg<br/>"/osg/ligo/Role=NULL/Capability=NULL" ligo<br/>"/virgo/ligo/Role=NULL/Capability=NULL" ligo<br/>"/icecube/Role=pilot/Capability=NULL" icecube</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(12:16:55)</span> <b>ruben.lara:</b></span> the LSC file seems to be missing…<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(12:17:45)</span> <b>blin:</b></span> really? you dumped its contents above <a href="https://opensciencegrid.slack.com/archives/C01QDTJPFFB/p1615485428267900">https://opensciencegrid.slack.com/archives/C01QDTJPFFB/p1615485428267900</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(12:19:24)</span> <b>ruben.lara:</b></span> Ah. That source is working. The source from California is the one that doesn’t work, and no matching LSC file.<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:20:06)</span> <b>blin:</b></span> yeah it's confusing but the voms cert and the host certs are separate<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:20:40)</span> <b>ruben.lara:</b></span> Ok. thanks for the explanation. I’m still trying to find something that’s NOT confusing on the way all this works together.<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:20:42)</span> <b>blin:</b></span> proxies will come in with certs from their frontend (<a href="http://osg-ligo-1.td.ucsd.edu">osg-ligo-1.td.ucsd.edu</a> or <a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a>) but the VOMS attributes of the proxy will be signed by the same VO certificate<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:20:47)</span> <b>blin:</b></span> (the one in the lsc file)<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:21:59)</span> <b>blin:</b></span> the idea being that site admins don't need to add credential lines for every host. instead, you can just accept all proxies from submission hosts that have signed VOMS attributes from a VO that you accept<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:23:25)</span> <b>blin:</b></span> i hope that makes sense. there's a lot of jargon to parse through<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:23:53)</span> <b>ruben.lara:</b></span> Got it<br/>
+</blockquote>
+<span style="color: #9e3997"><span style="font-size: small">(12:17:09)</span> <b>bbockelm:</b></span> <pre># openssl x509 -in /etc/grid-security/voms/vomscert.pem -noout -enddate<br/>notAfter=Feb 23 23:59:59 2021 GMT</pre><br/>Bingo!<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:18:42)</span> <b>blin:</b></span> boy, i think edgar complained about this sorta thing ages ago :flushed:<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:22:49)</span> <b>blin:</b></span> <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-3244">https://opensciencegrid.atlassian.net/browse/SOFTWARE-3244</a> =/<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:24:06)</span> <b>ruben.lara:</b></span> Now, we wait for the new cert to be in place?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:25:09)</span> <b>blin:</b></span> yup. once that's done they should percolate through the infrastructure quickly<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:27:37)</span> <b>bbockelm:</b></span> @blin - I don't have a copy of the new one.  <a href="https://github.com/opensciencegrid/tiger-osg-config/blob/master/manifests/production/vo-frontend-igwn/vomscertsecret.yaml">https://github.com/opensciencegrid/tiger-osg-config/blob/master/manifests/production/vo-frontend-igwn/vomscertsecret.yaml</a> here's the object, can you uppdate?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:28:16)</span> <b>blin:</b></span> hrmmm, let me see if i can remember where mat puts all of these<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:38:32)</span> <b>paschos:</b></span> the expired creds were on <a href="http://osg-ligo-1.t2.ucsd.edu">osg-ligo-1.t2.ucsd.edu</a> ?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:38:53)</span> <b>bbockelm:</b></span> Nope, they were in the frontend.<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:38:59)</span> <b>paschos:</b></span> ah---<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:39:11)</span> <b>paschos:</b></span> cause otherwise nothing would work<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:39:31)</span> <b>bbockelm:</b></span> and they were extremely subtle - the proxy wasn't expired, the VOMS certificate that signed the proxy was expired.<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:39:47)</span> <b>paschos:</b></span> lol--- thatt’s tough to catch<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:40:05)</span> <b>bbockelm:</b></span> so, you end up with a valid identity but an invalid extension.<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:40:14)</span> <b>paschos:</b></span> i’ve seen this on xenon machines…<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:40:35)</span> <b>blin:</b></span> new voms cert pushed to git<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:40:55)</span> <b>bbockelm:</b></span> Honestly, I'm not sure how to monitor this.<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:42:25)</span> <b>blin:</b></span> if we fix <tt>voms-proxy-direct</tt> to check the voms cert then the service would fail and we could monitor that<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:45:01)</span> <b>bbockelm:</b></span> We can use <tt>openssl x509</tt> before invoking <tt>voms-proxy-direct</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:46:14)</span> <b>blin:</b></span> yeah, we could do that if you prefer that over patching VOMS directly<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:47:05)</span> <b>bbockelm:</b></span> yup - VOMS patch is tricky C++ code.  I feel much better about scripting a call to <tt>openssl</tt><br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:50:38)</span> <b>bbockelm:</b></span> @blin -- you made the sealed secrets gods angry:<br/><pre>2021/03/11 18:39:58 Updating osg/voms-vo-frontend-igwn<br/>2021/03/11 18:39:58 Error updating osg/voms-vo-frontend-igwn, giving up: no key could decrypt secret (vomscert.pem, vomskey.pem)<br/>E0311 18:39:58.786294       1 controller.go:200] no key could decrypt secret (vomscert.pem, vomskey.pem)<br/>2021/03/11 18:39:58 Event(v1.ObjectReference{Kind:"SealedSecret", Namespace:"osg", Name:"voms-vo-frontend-igwn", UID:"acdccbbd-6788-4e7e-8360-9f2864a89aff", APIVersion:"<a href="http://bitnami.com/v1alpha1">bitnami.com/v1alpha1</a>", ResourceVersion:"185040127", FieldPath:""}): type: 'Warning' reason: 'ErrUnsealFailed' Failed to unseal: no key could decrypt secret (vomscert.pem, vomskey.pem)</pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:50:54)</span> <b>bbockelm:</b></span> If I had to guess... encrypted with the <tt>osgdev</tt> key maybe?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:51:26)</span> <b>blin:</b></span> hrmmm...i don't think so. i've got the <tt>osg</tt> namespace context loaded<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:52:28)</span> <b>blin:</b></span> let me try again<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:58:43)</span> <b>bbockelm:</b></span> (I'm also going to give the service a swift kick to double-check)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:00:40)</span> <b>bbockelm:</b></span> @blin - I also see:<br/><pre>2021/03/11 18:59:13 Event(v1.ObjectReference{Kind:"SealedSecret", Namespace:"osg", Name:"os-registry-oidc", UID:"8ac7e270-9a57-45dc-90fb-995fb35edc99", APIVersion:"<a href="http://bitnami.com/v1alpha1">bitnami.com/v1alpha1</a>", ResourceVersion:"183692241", FieldPath:""}): type: 'Warning' reason: 'ErrUnsealFailed' Failed to unseal: no key could decrypt secret (passphrase, secret, id)</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:00:59)</span> <b>blin:</b></span> i just pushed a new secret<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:01:10)</span> <b>blin:</b></span> ugh, i wonder if i have to update kubectl<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:02:36)</span> <b>blin:</b></span> err, though that one may be because i forgot to create it for prod<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:07:41)</span> <b>bbockelm:</b></span> What exact command line did you execute?  Still is angry.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:09:11)</span> <b>blin:</b></span> <pre>kubectl create --namespace osg secret generic voms-vo-frontend --dry-run --from-file=vomscert.pem=voms.cert --from-file=vomskey.pem=voms.key -o json &gt; osgsecret.json<br/>kubeseal -o yaml --cert tiger-cert.pem &lt; osgsecret.json &gt; manifests/production/vo-frontend-igwn/vomscertsecret.yaml</pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:09:40)</span> <b>bbockelm:</b></span> Hm -&gt; <tt>--cert tiger-cert.pem</tt>.  Try dropping that<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:10:43)</span> <b>bbockelm:</b></span> Looks like the hostcert might have rolled over?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:11:20)</span> <b>bbockelm:</b></span> <pre>$ ~/kubeseal --fetch-cert -n chtc | openssl x509 -noout -startdate<br/>notBefore=Feb 13 00:19:35 2021 GMT<br/>$ openssl x509 -in tiger-cert.pem -noout -startdate<br/>notBefore=Aug 17 00:19:19 2020 GMT</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:12:19)</span> <b>blin:</b></span> heh, i didn't have the option the first time around but i can try again<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:14:02)</span> <b>bbockelm:</b></span> if that works, we can update <tt>tiger-cert.pem</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(13:41:43)</span> <b>ruben.lara:</b></span> Any news?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:45:43)</span> <b>bbockelm:</b></span> Just coming off my meeting - @blin if you want to drop the cert somewhere I can reach, I can take a whack at it.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:50:13)</span> <b>blin:</b></span> yeah i was thinking the same thing, they're in afs<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:11:00)</span> <b>marian:</b></span> &gt; @marian do you own <a href="http://osg-ligo-1.t2.ucsd.edu">osg-ligo-1.t2.ucsd.edu</a>?<br/>@blin, yes I have full access to that node<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:11:24)</span> <b>marian:</b></span> (sorry, catching up just now after the meeting)<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:12:28)</span> <b>marian:</b></span> if there is anything I could help to investigate on <a href="http://osg-ligo-1.t2.ucsd.edu">osg-ligo-1.t2.ucsd.edu</a> let me know ...<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:14:36)</span> <b>blin:</b></span> nope, that host is good. we tracked the problem down to the IGWN FE: it's got an expired VOMS cert<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(14:15:35)</span> <b>james.clark:</b></span> Is that certificate installed now @marian?  i can go ahead and register it with Virgo any time<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:15:53)</span> <b>marian:</b></span> ?<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:16:02)</span> <b>marian:</b></span> moment, Virgo is different one<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:16:20)</span> <b>marian:</b></span> please, register it ... haven't tested that cert yet<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:16:35)</span> <b>marian:</b></span> @blin is pointing to another certificate<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(14:16:40)</span> <b>james.clark:</b></span> ah, sorry, was just catching up and saw VOMS<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:16:49)</span> <b>marian:</b></span> sure, no worries<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:17:50)</span> <b>marian:</b></span> @blin @bbockelm, IGWN Frontend is requesting pilots just fine to a few entries ... if there is something totally wrong with current cert should it all go belly up?<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:18:19)</span> <b>marian:</b></span> and <tt>notBefore=Feb 13 00:19:35 2021 GMT</tt> would mean things don't work since then<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:18:25)</span> <b>marian:</b></span> no?<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:18:42)</span> <b>marian:</b></span> or maybe I'm not fully in the picture<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:18:44)</span> <b>marian:</b></span> :disappointed:<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:18:48)</span> <b>blin:</b></span> yeah, i'm really curious about various RPM versions at working sites but the certificate is definitely expired<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:19:23)</span> <b>marian:</b></span> so what/how to rebuild this FE on/for tiger?<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:20:50)</span> <b>marian:</b></span> and, as we're at it we can inject also new VIRGO cert<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:21:03)</span> <b>marian:</b></span> for proxy pilot renewals ...<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:21:45)</span> <b>blin:</b></span> i've been working on it but ran into issues with my kubectl setup. I believe @bbockelm’s going to try to get to it<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:22:01)</span> <b>blin:</b></span> we can always deal with the VIRGO stuff separately<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:22:08)</span> <b>marian:</b></span> ok, sounds good<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:22:20)</span> <b>marian:</b></span> let's try if this first fixes, agreed<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:22:49)</span> <b>marian:</b></span> we also know which sites "work" with this old<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:23:04)</span> <b>blin:</b></span> we should probably have you copy the prod igwn FE into osgdev so we can get this into the dev/prod pipeline<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:23:07)</span> <b>marian:</b></span> there were quite some issues to summary all of this!<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:23:09)</span> <b>blin:</b></span> then you can test out virgo changes in dev<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:23:15)</span> <b>paschos:</b></span> if you guys need  to move parts of this to the frontend do so just give us some updates here. when available<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:24:01)</span> <b>marian:</b></span> ok, how to move it to osgdev?<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:24:27)</span> <b>marian:</b></span> I'd think some quite edits are needed, too<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:24:35)</span> <b>marian:</b></span> in .yaml files<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:24:48)</span> <b>marian:</b></span> ah, ok ... probably I know<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:26:59)</span> <b>marian:</b></span> for the record, what FE thinks that jobs fly in and runs are into these entries towards factory:<br/><pre>LIGO_US_Caltech_ldas-grid<br/>LIGO_US_Caltech_ldas-grid-wa<br/>LIGO_KR_KISTI</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:29:54)</span> <b>blin:</b></span> so those are working? i suppose it's possible that the CEs have the proxy DN mapped so they don't care about the VOMS attrs<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:32:05)</span> <b>marian:</b></span> yes, those should work according to info from the logs<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:32:18)</span> <b>bbockelm:</b></span> Ok, I just fixed the proxy<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:32:29)</span> <b>marian:</b></span> so no move to osgdev?<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(14:35:23)</span> <b>blin:</b></span> i wasn't thinking of a move to osgdev but rather a copy to it (with changes to files necessary for a dev instance)<br/>
+<span style="color: #53b759"><span style="font-size: small">(2021-03-12 09:57:35)</span> <b>marian:</b></span> ok, I understood, just used wrong wording in my question<br/>
+</blockquote>
+<span style="color: #9e3997"><span style="font-size: small">(14:32:31)</span> <b>bbockelm:</b></span> @blin - you know, we had the exact solution in the <tt>README.md</tt> :slightly_smiling_face:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:32:46)</span> <b>bbockelm:</b></span> <a href="https://github.com/opensciencegrid/tiger-osg-config#secrets-when-namesuffix-or-nameprefix-are-used">https://github.com/opensciencegrid/tiger-osg-config#secrets-when-namesuffix-or-nameprefix-are-used</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:32:57)</span> <b>bbockelm:</b></span> :man-facepalming: I'm pretty sure I even wrote them.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:33:48)</span> <b>blin:</b></span> d'oh. that's tunnel vision for ya<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:34:23)</span> <b>blin:</b></span> *sees commands for versions that apply to me*<br/>*proceeds to ignore all other text*<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:34:25)</span> <b>marian:</b></span> restart the frontend?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:34:35)</span> <b>bbockelm:</b></span> nope<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:34:47)</span> <b>marian:</b></span> ok<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:35:46)</span> <b>bbockelm:</b></span> I think we just need to wait about 30 minutes for the "bad proxy" to flush through.<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:36:21)</span> <b>ruben.lara:</b></span> Excellent. I’ll keep watching our logs.<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:37:20)</span> <b>marian:</b></span> if success, all other entry points should start getting pilot requests, I assume<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:37:27)</span> <b>marian:</b></span> for LIGO<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:40:24)</span> <b>marian:</b></span> so let me try to understand context here ... the hostcert with voms was outdated? the one which is used as input for the proxy renewal?<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(14:42:19)</span> <b>blin:</b></span> not the host cert or pilot cert, the voms cert, which is also used in the pilot proxy renewal<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:45:34)</span> <b>marian:</b></span> where was that? voms cert?<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:46:30)</span> <b>paschos:</b></span> from BB: the proxy wasn’t expired, the VOMS certificate that signed the proxy was expired.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:47:16)</span> <b>blin:</b></span> the VOMS cert lives on the FE since we use it to directly sign the pilot proxy<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:47:26)</span> <b>blin:</b></span> instead of reaching out to a VOMS admin server to sign it<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:48:16)</span> <b>marian:</b></span> but how come the proxy it self got a proper voms extension attributes?<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:48:21)</span> <b>marian:</b></span> in the renewal process<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:48:37)</span> <b>marian:</b></span> or I'm still confusing something here<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:49:05)</span> <b>marian:</b></span> I've checked files in /etc/grid-security but don't see any certificates<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:49:14)</span> <b>marian:</b></span> maybe there are shipped somewhere else...<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:49:47)</span> <b>marian:</b></span> aaaaaahaaa, <tt>/etc/grid-security/voms</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:50:27)</span> <b>blin:</b></span> yup and <tt>/etc/vomses</tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(14:50:42)</span> <b>marian:</b></span> but it was dead from Feb 13 then?<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:50:52)</span> <b>marian:</b></span> or was just slowly draining everything?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:51:10)</span> <b>blin:</b></span> but those files are what the CEs use to verify the VOMS attrs of an incoming proxy<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:51:13)</span> <b>marian:</b></span> I'm still trying to make a full picture<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:51:36)</span> <b>marian:</b></span> ah, those in <tt>/etc/voms</tt>, gotcha<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:51:59)</span> <b>blin:</b></span> on the FE, the VO cert/key live here <a href="https://github.com/opensciencegrid/tiger-osg-config/blob/master/manifests/production/vo-frontend-igwn/proxies.ini#L17-L18">https://github.com/opensciencegrid/tiger-osg-config/blob/master/manifests/production/vo-frontend-igwn/proxies.ini#L17-L18</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:52:49)</span> <b>blin:</b></span> and idk why other places were getting ligo jobs. that would need further investigation. I suspect that other sites were mapping the proxy DN instead of using the VOMS attr for authentication<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:53:23)</span> <b>marian:</b></span> that is, suspicious<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:53:42)</span> <b>blin:</b></span> potentially, yeah<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:53:45)</span> <b>marian:</b></span> really great find, guys, thanks @bbockelm and @blin<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:54:19)</span> <b>marian:</b></span> for the proxies.ini I actually was disabling VIRGO that needs replacement, too<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:54:57)</span> <b>marian:</b></span> we have new cert now<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:55:05)</span> <b>marian:</b></span> just need to "inject" it<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:17:55)</span> <b>marian:</b></span> so to wrap up here, culprit was this voms cert, to my knowledge:<br/><pre>[root@vo-frontend-igwn-fc5bf499d-fc2tx voms]# openssl x509 -in /etc/grid-security/voms/vomscert.pem -noout -enddate -subject<br/>notAfter=Mar  6 23:59:59 2022 GMT<br/>subject= /DC=org/DC=incommon/C=US/ST=Wisconsin/L=Madison/O=University of Wisconsin-Madison/OU=OCIS/CN=<a href="http://voms.opensciencegrid.org">voms.opensciencegrid.org</a></pre><br/><br/>
+<span style="color: #53b759"><span style="font-size: small">(15:18:09)</span> <b>marian:</b></span> I better check it on other frontends!<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:19:06)</span> <b>marian:</b></span> I still don't get this wasn't so much visible problem since <tt>notBefore=Feb 13 00:19:35 2021 GMT</tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(15:19:26)</span> <b>marian:</b></span> ah, because it was Edgar's problem hiding it back then :)<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:32:02)</span> <b>marian:</b></span> @blin, @bbockelm, that voms cert is not present at all in the voms dir on another frontend, e.g. gluex one<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:32:28)</span> <b>blin:</b></span> probably because gluex runs their own voms admin server<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:32:28)</span> <b>marian:</b></span> I'm trying to understand why we don't need it on all frontends, if you know...<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:32:48)</span> <b>marian:</b></span> ah<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:33:05)</span> <b>blin:</b></span> <pre>[PILOT gluex]<br/>...<br/>vo = Gluex<br/>use_voms_server = true</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:33:09)</span> <b>blin:</b></span> in proxies.ini<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:33:52)</span> <b>marian:</b></span> was starring at it<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:33:58)</span> <b>marian:</b></span> yep, that explains<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:04:08)</span> <b>marian:</b></span> @blin, so this vomscert from Wisconsin, this is for authenticating with condor-ce? while it's called vomscert it doesn't have to do anything with voms extension like the proxy does, right? and, it's not used for generating proxy, correct?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:07:10)</span> <b>blin:</b></span> 1. yeah, it's ultimately for authN vs a CE because it's used to sign the pilot proxy<br/>2. yes, it's used to sign the proxy's voms extensions (<tt>voms-proxy-info -all -file &lt;path to proxy&gt;</tt> will show the VOMS AC with the issuer = subject DN of the voms cert<br/>3. i'm not sure about the underlying code but I imagine <tt>voms-proxy-direct</tt> generates the proxy then signs the voms AC<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:22:13)</span> <b>marian:</b></span> much clear! thanks!<br/>
+</blockquote>
+<span style="color: #c386df"><span style="font-size: small">(14:41:54)</span> <b>ruben.lara:</b></span> And…. we have jobs from LIGO!<br/><pre>[root@osg-login2 ~]# condor_q -l | grep ST=California<br/>x509UserProxyFQAN = "/DC=org/DC=incommon/C=US/ST=California/L=La Jolla/O=University of California&amp;comma; San Diego/OU=UCSD/CN=<a href="http://osg-ligo-1.t2.ucsd.edu">osg-ligo-1.t2.ucsd.edu</a>,/osg/ligo/Role=NULL/Capability=NULL"<br/>x509userproxysubject = "/DC=org/DC=incommon/C=US/ST=California/L=La Jolla/O=University of California, San Diego/OU=UCSD/CN=<a href="http://osg-ligo-1.t2.ucsd.edu">osg-ligo-1.t2.ucsd.edu</a>"<br/>x509UserProxyFQAN = "/DC=org/DC=incommon/C=US/ST=California/L=La Jolla/O=University of California&amp;comma; San Diego/OU=UCSD/CN=<a href="http://osg-ligo-1.t2.ucsd.edu">osg-ligo-1.t2.ucsd.edu</a>,/osg/ligo/Role=NULL/Capability=NULL"<br/>x509userproxysubject = "/DC=org/DC=incommon/C=US/ST=California/L=La Jolla/O=University of California, San Diego/OU=UCSD/CN=<a href="http://osg-ligo-1.t2.ucsd.edu">osg-ligo-1.t2.ucsd.edu</a>"<br/>x509UserProxyFQAN = "/DC=org/DC=incommon/C=US/ST=California/L=La Jolla/O=University of California&amp;comma; San Diego/OU=UCSD/CN=<a href="http://osg-ligo-1.t2.ucsd.edu">osg-ligo-1.t2.ucsd.edu</a>,/osg/ligo/Role=NULL/Capability=NULL"<br/>x509userproxysubject = "/DC=org/DC=incommon/C=US/ST=California/L=La Jolla/O=University of California, San Diego/OU=UCSD/CN=<a href="http://osg-ligo-1.t2.ucsd.edu">osg-ligo-1.t2.ucsd.edu</a>"</pre><br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(14:43:53)</span> <b>james.clark:</b></span> ooh:<br/><pre>$ condor_status -af GLIDEIN_Site -pool $IGWN_POOL | sort | uniq -c<br/>     25 GATech<br/>    133 KISTI<br/>    582 LIGO-CIT<br/>    327 LIGO-WA<br/>      1 Michigan<br/>     11 MWT2<br/>     24 SU-ITS<br/>    119 UChicago<br/>      2 undefined<br/>     54 Vanderbilt<br/>     17 Wisconsin</pre><br/>
+<blockquote>
+<span style="color: #a63024"><span style="font-size: small">(14:49:22)</span> <b>paschos:</b></span> which GATech?<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:56:24)</span> <b>marian:</b></span> 027 (4722769.005.000) 03/11 12:51:46 Job submitted to grid resource<br/>    GridResource: condor <a href="http://osg-sched2.pace.gatech.edu">osg-sched2.pace.gatech.edu</a> <a href="http://osg-sched2.pace.gatech.edu:9619">osg-sched2.pace.gatech.edu:9619</a><br/>    GridJobId: condor <a href="http://osg-sched2.pace.gatech.edu">osg-sched2.pace.gatech.edu</a> <a href="http://osg-sched2.pace.gatech.edu:9619">osg-sched2.pace.gatech.edu:9619</a> 4533.0<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:56:49)</span> <b>marian:</b></span> so the one we had issues with<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:57:47)</span> <b>paschos:</b></span> there were issues with both gatech CEs… but the focus was on sched2… so. good<br/>
+</blockquote>
+<span style="color: #53b759"><span style="font-size: small">(14:45:59)</span> <b>marian:</b></span> nice!<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:46:35)</span> <b>marian:</b></span> I can confirm frontend log looks much nicer<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:46:58)</span> <b>paschos:</b></span> any errors/warning for PACE?<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:47:33)</span> <b>paschos:</b></span> @ruben.lara do you see also ligo jobs in the rich cluster?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:56:00)</span> <b>ruben.lara:</b></span> @paschos: no. I only see locally submitted jobs. Keep in mind that we are trying to decommission that. We don’t want to spend a lot of time making it work.<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:56:57)</span> <b>paschos:</b></span> agreed<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(14:57:42)</span> <b>james.clark:</b></span> So which cluster does the <tt>GATech</tt> label now represent?<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:58:07)</span> <b>paschos:</b></span> yeah--- it should be the new one<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:58:24)</span> <b>paschos:</b></span> but i am not sure when. i look at condor<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(14:59:02)</span> <b>james.clark:</b></span> cool - i see 109 user jobs (and climbing) running there, so just wondering<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:59:23)</span> <b>ruben.lara:</b></span> I don’t think anything is reaching the old cluster.<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:59:57)</span> <b>ruben.lara:</b></span> I’d prefer to keep it that way, since we are trying to pull the plug on it, and only allow your local jobs to be submitted, @james.clark<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(15:00:12)</span> <b>james.clark:</b></span> sure, that's fine with me<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:00:41)</span> <b>paschos:</b></span> <a href="http://gfactory-2.opensciencegrid.org/factory/monitor/factoryEntryStatusNow.html?entry=LIGO_US_GATech_condor">http://gfactory-2.opensciencegrid.org/factory/monitor/factoryEntryStatusNow.html?entry=LIGO_US_GATech_condor</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(15:00:49)</span> <b>paschos:</b></span> which one is this?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:01:42)</span> <b>ruben.lara:</b></span> GLIDEIN_ResourceName	Georgia_Tech_PACE_CE_1<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:04:46)</span> <b>paschos:</b></span> old one<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:05:27)</span> <b>ruben.lara:</b></span> this is the new: *OSG_US_GATech_osg-sched2*<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:08:48)</span> <b>paschos:</b></span> <a href="http://gfactory-2.opensciencegrid.org/factory/monitor/factoryRRDBrowse.html?entry=OSG_US_GATech_osg-sched2&amp;frontend=total&amp;rrd=Status_Attributes">http://gfactory-2.opensciencegrid.org/factory/monitor/factoryRRDBrowse.html?entry=OSG_US_GATech_osg-sched2&amp;frontend=total&amp;rrd=Status_Attributes</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(15:09:12)</span> <b>paschos:</b></span> @james.clark ^<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(15:10:11)</span> <b>james.clark:</b></span> i see slots on CE1 and 2<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:12:10)</span> <b>paschos:</b></span> yeah … i see jobs both from ligo and  the OSG_frontend<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:13:41)</span> <b>paschos:</b></span> drinks<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:15:22)</span> <b>ruben.lara:</b></span> @james.clark: would you mind doing a few more tests?<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(15:15:44)</span> <b>james.clark:</b></span> sure - from / to osg-login2 ?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:15:52)</span> <b>ruben.lara:</b></span> Yes, please.<br/>
+<blockquote>
+<span style="color: #a2a5dc"><span style="font-size: small">(15:29:57)</span> <b>james.clark:</b></span> So, i do see OSG slots from osg-login2 but the job which requests IS_GLIDEIN fails to match but it's not clear to me why not:  if i pick a random OSG machine and do a reverse query:<br/><pre>slot1@glidein_84203_61059808@uct2-c550.mwt2.org: Run analysis summary of 2 jobs.<br/>    1 (50.00 %) match both slot and job requirements.<br/>    1 match the requirements of this slot.<br/>    1 have job requirements that match this slot</pre><br/>looks like it should be ok<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:35:59)</span> <b>ruben.lara:</b></span> The IS_GLIDEIN, none of our nodes have that property set.<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:36:18)</span> <b>ruben.lara:</b></span> <pre>[root@osg-login2 ~]# condor_status -const '(HAS_SINGULARITY=?=TRUE) &amp;&amp; (HAS_LIGO_FRAMES=?=TRUE) &amp;&amp; (IS_GLIDEIN=?=True)'</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(15:36:27)</span> <b>ruben.lara:</b></span> The answer is blank, BTW.<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(15:36:50)</span> <b>james.clark:</b></span> right.  i'm not trying to run on the local nodes with that job.<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:37:17)</span> <b>ruben.lara:</b></span> They do have this property:<br/><pre>GLIDEIN_ResourceName = "Georgia_Tech_PACE_CE_2"</pre><br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(15:37:22)</span> <b>james.clark:</b></span> it should be finding slots on the grid<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:38:06)</span> <b>ruben.lara:</b></span> mmmm… So that would indicate that jobs you submit on osg-login2 are not going out to the grid?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:38:19)</span> <b>ruben.lara:</b></span> They are coming back to the local scheduler.<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(15:38:34)</span> <b>james.clark:</b></span> exactly.  they run absolutely fine in the local pool. .   but they're never leaving gatech in the first place<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(15:38:46)</span> <b>james.clark:</b></span> i have jobs coming *in* from caltech just fine<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(15:39:10)</span> <b>james.clark:</b></span> we just cannot currently submit anything to the grid from gatech.<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:39:26)</span> <b>ruben.lara:</b></span> Ok. good. We have a meeting with Pascal in a few minutes. So far, we are getting jobs from OSG and LIGO, but we are not sending local jobs out.<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(15:40:36)</span> <b>james.clark:</b></span> exactly<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:44:32)</span> <b>ruben.lara:</b></span> And local jobs are running.<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:51:11)</span> <b>ruben.lara:</b></span> @james.clark: can you join a meeting with Pascal to try to figure out what’s left to solve?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:51:36)</span> <b>ruben.lara:</b></span> At 5pm eastern; 10 minutes from now.<br/>
+</blockquote>
+<span style="color: #a2a5dc"><span style="font-size: small">(15:16:04)</span> <b>james.clark:</b></span> can do<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:21:51)</span> <b>marian:</b></span> hmm, something is going downhill?<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:21:53)</span> <b>marian:</b></span> <a href="https://graph.t2.ucsd.edu:3000/d/000000020/igwn-osg-pool?viewPanel=59&amp;orgId=1&amp;refresh=15m&amp;from=now-15m&amp;to=now">https://graph.t2.ucsd.edu:3000/d/000000020/igwn-osg-pool?viewPanel=59&amp;orgId=1&amp;refresh=15m&amp;from=now-15m&amp;to=now</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(15:27:40)</span> <b>paschos:</b></span> i just see 154-&gt;152 glideins last 15 min ---<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:28:06)</span> <b>paschos:</b></span> probably due to some local jobs from james?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:31:13)</span> <b>ruben.lara:</b></span> One job is idling. I’m seeing this in the SchedLog file:<br/><pre>03/11/21 16:31:04 (D_ALWAYS) Finished negotiating for jclark308 in local pool: 0 matched, 1 rejected</pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(15:35:06)</span> <b>marian:</b></span> there is some uptic in the plots again ...<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:35:23)</span> <b>marian:</b></span> I'd probably give it still some time to settle everything<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:35:46)</span> <b>marian:</b></span> +/- 30mins and see?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:43:55)</span> <b>bbockelm:</b></span> Hey, I went off to a meeting and came back and everything works!<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:46:36)</span> <b>paschos:</b></span> in as far as glideins yes<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:19:39)</span> <b>marian:</b></span> this looks much nicer:<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:20:32)</span> <b>marian:</b></span> <a href="https://graph.t2.ucsd.edu:3000/d/000000020/igwn-osg-pool?viewPanel=59&amp;orgId=1&amp;refresh=15m&amp;from=now-12h&amp;to=now">https://graph.t2.ucsd.edu:3000/d/000000020/igwn-osg-pool?viewPanel=59&amp;orgId=1&amp;refresh=15m&amp;from=now-12h&amp;to=now</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(16:27:14)</span> <b>marian:</b></span> so, for the GATech resources behind CE <a href="http://osg-sched2.pace.gatech.edu">osg-sched2.pace.gatech.edu</a>, pilots land, get submitted but fail on the node validation with error:<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:27:38)</span> <b>marian:</b></span> <pre>INFO:    Checking disk space - 3 GB free is required<br/>INFO:       ...  1 GB space available<br/>FATAL ERROR: The workdir does not have enough available diskspace</pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(16:27:53)</span> <b>marian:</b></span> example for the node: <a href="http://atl1-1-01-002-19.pace.gatech.edu">atl1-1-01-002-19.pace.gatech.edu</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(16:28:26)</span> <b>marian:</b></span> that's why they won't claim any job<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:28:45)</span> <b>marian:</b></span> I can try to list all the nodes where it fails so far<br/>
+<blockquote>
+<span style="color: #c386df"><span style="font-size: small">(17:19:39)</span> <b>ruben.lara:</b></span> @marian: can you send me the list of nodes that are failing?<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:39:37)</span> <b>marian:</b></span> actually I'm getting these two nodes only that fail validation:<br/><a href="http://atl1-1-01-002-19.pace.gatech.edu">atl1-1-01-002-19.pace.gatech.edu</a><br/><a href="http://atl1-1-01-002-31.pace.gatech.edu">atl1-1-01-002-31.pace.gatech.edu</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(17:39:59)</span> <b>marian:</b></span> ^ @ruben.lara<br/>
+<span style="color: #c386df"><span style="font-size: small">(2021-03-12 07:33:45)</span> <b>ruben.lara:</b></span> I don’t see anything wrong with them. File system is free, memory is free. Do you have more details about what the validation looks for?<br/>
+<span style="color: #c386df"><span style="font-size: small">(2021-03-12 07:33:56)</span> <b>ruben.lara:</b></span> @marian ^^<br/>
+<span style="color: #c386df"><span style="font-size: small">(2021-03-12 10:45:14)</span> <b>ruben.lara:</b></span> It’s odd. For one server, <tt>002-19</tt>, it has 24 jobs currently running; the other, <tt>002-31</tt>, it has 6. All running without complains.<br/>
+</blockquote>
+<span style="color: #674b1b"><span style="font-size: small">(16:30:26)</span> <b>rynge:</b></span> Ah, that is my check<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:30:29)</span> <b>rynge:</b></span> :slightly_smiling_face:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:30:51)</span> <b>rynge:</b></span> But yeah, 1 GB is not enough to do real work<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:21:42)</span> <b>paschos:</b></span> yeah--- isn’t 2GB the bare minimum<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:52:06)</span> <b>rynge:</b></span> The OSG VO glideins has the limit at 3, but the check is not very smart. It does it per glidein, when the real check should be per core<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:53:25)</span> <b>rynge:</b></span> The check is really there to catch full filesystems and misconfigured sites<br/>
+</body>
+</html>

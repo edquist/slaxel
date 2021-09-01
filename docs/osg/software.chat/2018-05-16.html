@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed May 16, 2018 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed May 16, 2018 : #software (osg)</h3>
+<span style="color: #e96699"><span style="font-size: small">(12:45:18)</span> <b>lincoln:</b></span> is there a magic classad to prevent my condor jobs from being rescheduled once preempted?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:46:01)</span> <b>bbockelm:</b></span> There’s a “NumJobStarts” attribute you could key in on<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:48:39)</span> <b>lincoln:</b></span> perhaps something like <pre>PeriodicRemove = (NumJobStarts &gt;= 1 &amp;&amp; JobStatus == 1)</pre>?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:49:06)</span> <b>bbockelm:</b></span> I was thinking about adding it to the REQUIREMENTS?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:49:22)</span> <b>bbockelm:</b></span> Could still start with PeriodicRemove<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:51:14)</span> <b>lincoln:</b></span> yeah, both might be helpful. im not sure how often the PeriodicRemove thing kicks in.. i could imagine a job getting evicted and restarted before whatever ~cron~ timer checks for those conditions?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:22:46)</span> <b>andrew.melo:</b></span> Is there a way to reference values from other queues in the job router?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:23:25)</span> <b>andrew.melo:</b></span> I'd like to have two entries, where an incoming job will match the entry with the least number of idle jobs<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:24:48)</span> <b>blin:</b></span> i believe that's the behavior of the round robin?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:24:55)</span> <b>blin:</b></span> that or overall number of jobs<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:25:10)</span> <b>blin:</b></span> i don't think you can reference other queues, though<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:28:04)</span> <b>andrew.melo:</b></span> Basically, we have multiple partitions I want to divide jobs into, but the current RR logic makes it so if partition A is empty and running a lot of jobs while partition B is full and not running anything, 1/2 of any new jobs end up in partition B's queue and eventually A starves<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:28:55)</span> <b>andrew.melo:</b></span> Eventually the factory hits the idle job limit and doesn't send any thing<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:29:58)</span> <b>bbockelm:</b></span> Yeah - since it’s based on back pressure, you will need to get two factory entries<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:32:50)</span> <b>andrew.melo:</b></span> Damn. I was hoping there was some magic condor variable like queues.otherqueue.idle or something I could use to do this<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:58:02)</span> <b>dweitzel:</b></span> Well jira looks different, not bad though.  Were we that behind on versions, or is the hosted a different 'type'?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:00:55)</span> <b>blin:</b></span> both?<br/>
+</body>
+</html>

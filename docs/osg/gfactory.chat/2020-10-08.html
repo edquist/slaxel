@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Oct 8, 2020 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Thu Oct 8, 2020 : #gfactory (osg)</h3>
+<span style="color: #674b1b"><span style="font-size: small">(12:33:16)</span> <b>rynge:</b></span> What's the current support for limiting diskspace on glideins? Can you set that in the factory config?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:33:42)</span> <b>rynge:</b></span> <pre>I took those nodes out of the queue that OSG uses. I think part of the issue is that those nodes have 32 core so even if each single core job uses just 10GB that may exhaust available scratch if they all do that. I'm not seeing the issue on nodes with just 8 cores. </pre><br/><br/>
+<span style="color: #385a86"><span style="font-size: small">(12:40:14)</span> <b>jdost321:</b></span> @rynge in my recen memory I don't think we've ever tried, and I highly doubt there's a knob for it, unless there's some magic condor vars we can set in the startd<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:44:02)</span> <b>matyas:</b></span> It's not documented but you can set DISK in the startd config to control how much disk space gets advertised (similar to NUM_CPUS and MEMORY)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:44:41)</span> <b>rynge:</b></span> Great! Can we try that on this site?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:45:04)</span> <b>rynge:</b></span> TCNJ<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:48:00)</span> <b>jdost321:</b></span> Mat I see someone tried a sligtly different var, whats different between DISK and RESERVED_DISK ?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:48:21)</span> <b>matyas:</b></span> DISK sets an absolute value; RESERVED_DISK subtracts from the available space<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:48:29)</span> <b>jdost321:</b></span> ah i see<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:49:53)</span> <b>jdost321:</b></span> Mats we have 2 entries for TCNJ<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:49:57)</span> <b>jdost321:</b></span> one is single core<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:50:07)</span> <b>jdost321:</b></span> and one is just 2 core GPU entry<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:50:16)</span> <b>rynge:</b></span> The single core for sure<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:50:16)</span> <b>jdost321:</b></span> what do you suggest we limit DISK to<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:50:24)</span> <b>rynge:</b></span> Lets set it to 4 GB<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:50:31)</span> <b>jdost321:</b></span> ok, i'll give it a try<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:50:34)</span> <b>rynge:</b></span> Thanks!<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:59:06)</span> <b>jdost321:</b></span> ok, i capped the normal single core entry to 4gb on TCNJ, it's reconfigured<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:00:20)</span> <b>rynge:</b></span> Thanks!<br/>
+</body>
+</html>

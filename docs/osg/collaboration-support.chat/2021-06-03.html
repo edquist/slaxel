@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jun 3, 2021 : #collaboration-support (osg)</title>
+</head>
+<body>
+<h3>Thu Jun 3, 2021 : #collaboration-support (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(07:21:19)</span> <b>ruben.lara:</b></span> Looking at it now. The current file has this:<br/><pre>GSI "^\/DC=org\/DC=incommon\/C=US\/ST=California\/L=La\ Jolla\/O=University\ of\ California,\ San\ Diego\/OU=UCSD\/CN=osg-ligo-1\.t2\.ucsd\.edu$" pilot</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(07:21:57)</span> <b>ruben.lara:</b></span> Do I need to treat it as a pattern match? Should I use <tt>condor</tt> instead of <tt>pilot</tt>?<br/>
+<span style="color: #c386df"><span style="font-size: small">(07:38:42)</span> <b>ruben.lara:</b></span> Found this message in <tt>SchedLog</tt>, which would suggest the new entry is working:<br/><pre>06/03/21 08:28:00 (D_SECURITY) valid GSS connection established to /DC=org/DC=incommon/C=US/ST=California/L=La Jolla/O=University of California, San Diego/CN=<a href="http://osg-ligo-1.t2.ucsd.edu">osg-ligo-1.t2.ucsd.edu</a></pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(10:12:06)</span> <b>marian:</b></span> hey @ruben.lara<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:12:15)</span> <b>marian:</b></span> please, update condor_mapfile with this line:<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:12:29)</span> <b>marian:</b></span> on the <a href="http://osg-login2.pace.gatech.edu">osg-login2.pace.gatech.edu</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:12:36)</span> <b>ruben.lara:</b></span> ok.<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:12:50)</span> <b>marian:</b></span> <pre>$ condor_config_val CERTIFICATE_MAPFILE<br/>/etc/condor/certs/condor_mapfile</pre><br/><br/>
+<span style="color: #53b759"><span style="font-size: small">(10:13:05)</span> <b>marian:</b></span> <pre>GSI "/DC=org/DC=incommon/C=US/ST=California/L=La Jolla/O=University of California, San Diego/CN=<a href="http://osg-ligo-1.t2.ucsd.edu">osg-ligo-1.t2.ucsd.edu</a>" pilot</pre><br/><br/>
+<span style="color: #53b759"><span style="font-size: small">(10:13:09)</span> <b>marian:</b></span> and restart condor there<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:14:23)</span> <b>ruben.lara:</b></span> Is there any need for the escape sequences? I actually added this line:<br/><pre>GSI "^\/DC=org\/DC=incommon\/C=US\/ST=California\/L=La\ Jolla\/O=University\ of\ California,\ San\ Diego\/CN=osg-ligo-1\.t2\.ucsd\.edu$" pilot</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:15:07)</span> <b>ruben.lara:</b></span> If I remember correctly, the parameter is actually a pattern match. That’s the reason, I think, for escaping the spaces, slashes and dots.<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:15:49)</span> <b>ruben.lara:</b></span> As mentioned, the pattern seems to match, based on the log event I found.<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:16:30)</span> <b>ruben.lara:</b></span> <pre>06/03/21 08:28:00 (D_SECURITY) valid GSS connection established to /DC=org/DC=incommon/C=US/ST=California/L=La Jolla/O=University of California, San Diego/CN=<a href="http://osg-ligo-1.t2.ucsd.edu">osg-ligo-1.t2.ucsd.edu</a></pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(10:19:52)</span> <b>marian:</b></span> nope, you don't need them in newer condor version<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:29:20)</span> <b>ruben.lara:</b></span> Cool. I’ll try that now.<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:29:37)</span> <b>ruben.lara:</b></span> will <tt>condor_reconfigure</tt> be enough, or do I need to restart condor?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:43:12)</span> <b>ruben.lara:</b></span> The updated entry is in place now.<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:16:44)</span> <b>marian:</b></span> great! also, do you have Caltech's collector in the mapfile, too?<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:17:14)</span> <b>marian:</b></span> look for <a href="http://condor-osg.ligo.caltech.edu">condor-osg.ligo.caltech.edu</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(13:17:51)</span> <b>marian:</b></span> we see this schedd only in UCSD collector so there might be missing Caltech in your mapfile, I think<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:19:43)</span> <b>marian:</b></span> <pre>GSI "/DC=org/DC=incommon/C=US/ST=California/L=Pasadena/O=California Institute of Technology/OU=Laser Interferometer Gravitational-Wave Observatory/CN=<a href="http://condor-osg.ligo.caltech.edu">condor-osg.ligo.caltech.edu</a>" pilot</pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(13:20:18)</span> <b>marian:</b></span> <tt>condor_reconfigure</tt> should suffice<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:22:59)</span> <b>ruben.lara:</b></span> I don’t need to keep the old lines, right?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:23:26)</span> <b>ruben.lara:</b></span> This is what our file has:<br/><pre>GSI "^\/DC=org\/DC=opensciencegrid\/O=Open\ Science\ Grid\/OU=Services\/CN=osg-ligo-1\.t2\.ucsd\.edu$" condor<br/>GSI "^\/DC=org\/DC=opensciencegrid\/O=Open\ Science\ Grid\/OU=Services\/CN=pilot\/osg-ligo-1\.t2\.ucsd\.edu$" pilot<br/>GSI "^\/DC=org\/DC=incommon\/C=US\/ST=California\/L=La\ Jolla\/O=University\ of\ California,\ San\ Diego\/OU=UCSD\/CN=osg-ligo-1\.t2\.ucsd\.edu$" pilot<br/>GSI "/DC=org/DC=incommon/C=US/ST=California/L=La Jolla/O=University of California, San Diego/CN=<a href="http://osg-ligo-1.t2.ucsd.edu">osg-ligo-1.t2.ucsd.edu</a>" pilot</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(14:23:45)</span> <b>ruben.lara:</b></span> We can remove the first 3 lines, correct?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:32:47)</span> <b>ruben.lara:</b></span> the additional line is in place, BTW. Please let me know if there’s anything else to change.<br/>
+</body>
+</html>

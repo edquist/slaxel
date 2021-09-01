@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Mar 8, 2021 : #gfrontend (osg)</title>
+</head>
+<body>
+<h3>Mon Mar 8, 2021 : #gfrontend (osg)</h3>
+<span style="color: #bd9336"><span style="font-size: small">(17:25:43)</span> <b>joshua.willis:</b></span> Hi all,<br/><br/>I wanted to raise here an issue we’re seeing with LIGO/Virgo analysis jobs on OSG that run under singularity, when the version of Singularity is new enough (we know that 3.7.1 is “new enough”; we’re not sure how far back it goes, just somewhere between 3.5.3 and 3.7.1. Probably 3.6.0). Since we have switched to having HTCondor (rather than the osg-flock user-job-wrapper.sh script) start Singularity, the only environment variables that should be making it inside the container are those that the user job sets itself in its submit file, some private condor environment variables, and whatever is set in <tt>STARTER_JOB_ENVIRONMENT</tt>. Our question is: how is the latter determined, for glidein jobs? Our immediate concern was raised by <tt>LD_LIBRARY_PATH</tt> being set in <tt>STARTER_JOB_ENVIRONMENT</tt>, but we’re interested more generally. In particular, on at least two sites (CIT and NIKHEF) sysadmins were not aware of that being set for Singularity jobs at their request, and yet it is not set to the *same* thing at those two sites.<br/><br/>I may well have missed it, but I did not readily find documentation about how <tt>STARTER_JOB_ENVIRONMENT</tt> is constructed for glidein jobs, nor how we might be able to adjust it, or what causes it to vary at different sites. Any help appreciated, thanks!<br/>
+<span style="color: #53b759"><span style="font-size: small">(18:25:24)</span> <b>marian:</b></span> just to cross-reference what is Josh up to, there is long thread of discussion about it if anybody wants to see full story: <a href="https://github.com/lscsoft/osg-igwn/issues/252#issuecomment-790935218">https://github.com/lscsoft/osg-igwn/issues/252#issuecomment-790935218</a> ... I'll be happy to assist with it, of course, but still need to better understand full context by reading it and probably questioning, too ... any ideas from others in the meantime are very welcome!<br/>
+<span style="color: #53b759"><span style="font-size: small">(18:26:14)</span> <b>marian:</b></span> (probably not all people are able see the content of the github ticket, though)<br/>
+</body>
+</html>

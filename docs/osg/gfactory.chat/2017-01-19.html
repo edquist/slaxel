@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jan 19, 2017 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Thu Jan 19, 2017 : #gfactory (osg)</h3>
+<span style="color: #53b759"><span style="font-size: small">(11:56:20)</span> <b>marian:</b></span> @mkandes: re GLIDEIN_CPUS=0 that just for Hyak entry right?<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:57:45)</span> <b>marian:</b></span> (in reference to the ticket: <a href="https://ticket.opensciencegrid.org/32263">https://ticket.opensciencegrid.org/32263</a>)<br/>
+<span style="color: #bd9336"><span style="font-size: small">(11:59:53)</span> <b>mkandes:</b></span> Yes, give it a try. Then, if glideins start running again, check how many CPUS are reported in a StartdLog<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:00:46)</span> <b>marian:</b></span> will do after lunch and one other meeting along pushing also IITCE2 into production<br/>
+<span style="color: #bd9336"><span style="font-size: small">(12:01:25)</span> <b>mkandes:</b></span> Ah, okay. Well, here, let me take care of Hyak now then since that is more pressing. I'll leave IIT_CE2 for you after lunch.<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:01:34)</span> <b>marian:</b></span> ah ok<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:01:55)</span> <b>marian:</b></span> so go ahead with Hayak<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:02:16)</span> <b>marian:</b></span> you don't have to push things into git, I will do then with IIT_CE2<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:02:45)</span> <b>marian:</b></span> so I assume you'll do at SDSC only<br/>
+<span style="color: #bd9336"><span style="font-size: small">(12:03:22)</span> <b>mkandes:</b></span> I just push this change to git. Easier for me to keep track of what we've tried.<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:03:41)</span> <b>marian:</b></span> ok sounds good<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:03:55)</span> <b>marian:</b></span> ttyl, off for lunch<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(12:29:46)</span> <b>sthapa:</b></span> Wait, is hyak still reporting cpus  = 0 ?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(12:34:15)</span> <b>mkandes:</b></span> No, the problem is they are only running 1 CPU per node. glideinWMS may have broken their auto-discovery mechanism we previously used to find how many CPUs per node there were when a glidein landed at Hyak.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(12:36:59)</span> <b>mkandes:</b></span> GLIDEIN_CPUS = 0 may be correct setting we're looking for in changes made to glidenWMS 3.2.16<br/>
+<span style="color: #bd9336"><span style="font-size: small">(12:37:02)</span> <b>mkandes:</b></span> "# 3.2.16 Meaning of "auto" chenged from "node" to "slot"<br/># node and 0 mean the same thing - detect the hardware resources<br/># auto, slot and -1 mean the same thing - detect the slot resources"<br/>
+<span style="color: #bd9336"><span style="font-size: small">(13:19:10)</span> <b>mkandes:</b></span> @marian: I don't think it's working. Let's work with Stephen to explicitly set a +xcount and GLIDEIN_CPU to number that will suffice until we work this out.  e.g., one other override we might try is a custom script as in Stampede entry.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(13:21:05)</span> <b>mkandes:</b></span> I'll work with Edgar on that. We've been using his Comet entry to test this as well. I'll also contact Parag with observations on this problem to see if they can provide a temporary patch for us until the defaults switch back in next glideinWMS release.<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:40:16)</span> <b>marian:</b></span> ok, so I don't have to do anything at this stage afaiu<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:40:43)</span> <b>marian:</b></span> for this particular ticket...<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:47:48)</span> <b>marian:</b></span> @mkandes: Marty, did you submit some jobs with particular condor version and should I check on that or leave it to you...?<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:48:03)</span> <b>marian:</b></span> =&gt; <a href="https://ticket.opensciencegrid.org/32147">https://ticket.opensciencegrid.org/32147</a><br/>
+<span style="color: #bd9336"><span style="font-size: small">(13:50:40)</span> <b>mkandes:</b></span> Yes, you should be able to see if changing the test frontend had any affect on my jobs submitted at the end of the day yesterday.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(13:50:58)</span> <b>mkandes:</b></span> I'll check status of my jobs if you check glideins on GOC-ITB.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(13:55:14)</span> <b>mkandes:</b></span> Okay, it looks like my CMS test jobs ran fine. MIS are still in queue ... maybe they don't have MIS authorized at site.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(13:55:50)</span> <b>mkandes:</b></span> Do you see any set faults in most recent glidein *.err logs at Colorado in GOC-ITB?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(13:56:00)</span> <b>mkandes:</b></span> *seg faults<br/>
+<span style="color: #bd9336"><span style="font-size: small">(14:06:25)</span> <b>mkandes:</b></span> I took a quick look. Doesn't look like changing CONDOR_VERSON at factory or frontend had an affect. I still see set faults in glideins. I'm not sure where to look next on this ticket. Very strange.<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(14:06:49)</span> <b>kherner:</b></span> @mkandes Marty, when you get a chance, can you turn JINR_Tier2 back on for Nova in the production factory? We can try testing again.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(14:08:03)</span> <b>mkandes:</b></span> Hi Ken, Marian is actually on shift today. He'll help you out with that.<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:08:46)</span> <b>marian:</b></span> OK, I can do that ... on a GRACC meeting now, can do afterwards...<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:39:43)</span> <b>marian:</b></span> @kherner: just re-enabled and did reconfig (<a href="https://ticket.opensciencegrid.org/32299">https://ticket.opensciencegrid.org/32299</a>)<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(14:40:02)</span> <b>kherner:</b></span> great, thanks. I'll send new test jobs right away<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:46:52)</span> <b>marian:</b></span> @mkandes: one thing I noticed when moving IIT_CE2 into production .... for rhel6 entry we have work_dir="TMPDIR" ... on all other IIT entries is work_dir="OSG" ... not sure it this is intended or just something we overlooked?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:38:19)</span> <b>mkandes:</b></span> @marian: I think this was something changed while debugging. You should (hopefully) be able to change it back to OSG.<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:41:00)</span> <b>marian:</b></span> well Gregoryi is writing all is running just fine ... so I'm not sure if we wanna intervene here now or later when we realize TMPDIR is not a good thing to be set ... also maybe there is something which overrides it in the end? but I guess we override here then ... so I'm curious that all worked for tests whith TMPDIR, might not with real jobs, huh ... so any suggestions?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:42:38)</span> <b>mkandes:</b></span> Well, this work_dir is where the glidein files are when running. So I guess just leave as TMPDIR for now since its working. We can revisit another time once it breaks.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:43:14)</span> <b>mkandes:</b></span> Just push entry to production and if we see problems we can change then<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:59:45)</span> <b>marian:</b></span> yep, that's what I did actually<br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:03:37)</span> <b>mkandes:</b></span> cool<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:03:40)</span> <b>marian:</b></span> looking at OSG_US_Hyak_osg entry (<a href="https://ticket.opensciencegrid.org/32263">https://ticket.opensciencegrid.org/32263</a>) ... what's the history here we've changed also GLIDEIN_MaxMemMBs="0" ... I see discussion about GLIDEIN_CPUS="0" but I wonder we set also GLIDEIN_MaxMemMBs="0" ... I'm starring at it since I was about add +xcount=8 and GLIDEIN_CPUS=8 per Stephen reponse<br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:04:24)</span> <b>mkandes:</b></span> Leave GLIDEIN_MaxMemMBs="0". That still works, I think. It's like GLIDEIN_CPUS = 'auto'<br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:05:12)</span> <b>mkandes:</b></span> But if you want to try to set something explicit, feel free.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:05:50)</span> <b>mkandes:</b></span> Just need to find out from Stephen how much memory per core on these 8 core machines<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:08:07)</span> <b>marian:</b></span> I just wanted to know if that's nothing like wrong line edited before<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:08:11)</span> <b>marian:</b></span> so I leave it<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:08:54)</span> <b>marian:</b></span> yes, that was my next qeustion, we need to increase then GLIDEIN_Max_Walltime I believ<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:11:40)</span> <b>marian:</b></span> nevermind ... I ask him anyway and make comment for us in JIRA at least ... that we know what to set if we decide to change from 0 there<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:13:43)</span> <b>marian:</b></span> hmm, btw walltime here is pretty low no? 13800 only<br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:14:43)</span> <b>mkandes:</b></span> I think they wanted it low originally. But you can double check if that still sounds right to them<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:14:51)</span> <b>marian:</b></span> I have to leave now ... if the change for _CPUS is high prio for this entry today, please do ... otherwise I'll do in the morning<br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:19:55)</span> <b>mkandes:</b></span> okay, I'll take care of it.<br/>
+</body>
+</html>

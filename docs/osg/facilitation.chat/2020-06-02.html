@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jun 2, 2020 : #facilitation (osg)</title>
+</head>
+<body>
+<h3>Tue Jun 2, 2020 : #facilitation (osg)</h3>
+<span style="color: #4d5e26"><span style="font-size: small">(11:03:05)</span> <b>jmvera:</b></span> @dweitzel I made the suggested mod to <tt>LD_LIBRARY_PATH</tt> but got another error about <tt>libmwmclmcrrt.so.9.5</tt> not being found, seems to me like the matlab module file is not getting loaded, maybe something with this module file specifically or the more broadly with modules<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:04:51)</span> <b>dweitzel:</b></span> I looked briefly at the lmod file for matlab.  It is not altering the LD_LIBRARY_PATH at all.  It only sets the CMake modules path.  Seems like it's missing something.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:20:54)</span> <b>dweitzel:</b></span> matlab file: <tt>/cvmfs/connect.opensciencegrid.org/modules/modulefiles/linux-rhel7-x86_64/Core/matlab/R2018b.lua</tt><br/>
+<span style="color: #4d5e26"><span style="font-size: small">(11:35:21)</span> <b>jmvera:</b></span> i noticed this too<br/>
+<span style="color: #5a4592"><span style="font-size: small">(13:14:38)</span> <b>lmichael:</b></span> (the above might be better in #osg-connect, since it has implications beyond facilitation. @rynge can probably help with the module stuff, unless @dweitzel knows how to do it, too.)<br/>
+<span style="color: #5a4592"><span style="font-size: small">(13:15:09)</span> <b>lmichael:</b></span> Separately for Facilitators, a hopefully helpful FYI for large batch submission:<br/><a href="https://support.opensciencegrid.org/a/tickets/65076">https://support.opensciencegrid.org/a/tickets/65076</a><br/>
+<span style="color: #5a4592"><span style="font-size: small">(13:15:50)</span> <b>lmichael:</b></span> (We’ve been using ‘max_idle’ in CHTC for some time, but it’s not yet documented in the HTCondor manual. I’m comfortable instructing OSG Connect users to use it, though, since we have sufficient oversight from the FW team and UW-Madison-based Facilitators)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:18:43)</span> <b>rynge:</b></span> @dweitzel @jmvera So what was the finding? LD_LIBRARY_PATH set to what?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:22:33)</span> <b>dweitzel:</b></span> @jmvera looks like you will also need to add also to the LD_LIBRARY_PATH: <tt>/cvmfs/connect.opensciencegrid.org/modules/packages/linux-rhel7-x86_64/gcc-6.4.0spack/matlab-R2018b-cg5ysgn5gb2waoe73lv5ooteg4ntah46/v95/runtime/glnxa64/</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:23:05)</span> <b>dweitzel:</b></span> I'm just <tt>find</tt>ing the libraries under that directory.  @rynge should the module be setting these?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:23:08)</span> <b>dweitzel:</b></span> how did this ever work?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:23:20)</span> <b>dweitzel:</b></span> (also, where is the github for these modules)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:23:28)</span> <b>rynge:</b></span> Hmm, I can't find our internal docs anymore. @lmichael did we move them on the <a href="http://opensciencegrid.org">opensciencegrid.org</a> site?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:24:01)</span> <b>rynge:</b></span> <a href="https://github.com/OSGConnect/spack">https://github.com/OSGConnect/spack</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:24:21)</span> <b>dweitzel:</b></span> last commit to that was last april.  Surely there was a stashcp update since then?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:25:06)</span> <b>rynge:</b></span> I'm not committing every time I changed it :slightly_smiling_face: I keep all my important stuff on CVMFS<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:25:21)</span> <b>rynge:</b></span> (it is a mess to keep in sync)<br/>
+</body>
+</html>

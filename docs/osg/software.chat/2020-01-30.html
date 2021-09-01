@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jan 30, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu Jan 30, 2020 : #software (osg)</h3>
+<span style="color: #a72f79"><span style="font-size: small">(01:04:24)</span> <b>andrew.melo:</b></span> Y'all did a lot of work while I was asleep<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(09:39:22)</span> <b>burt:</b></span> The local FTS server picked up the new release and the spice is flowing. Thanks.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:49:34)</span> <b>andrew.melo:</b></span> Aww yeah<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:49:54)</span> <b>andrew.melo:</b></span> Now I just have to con someone into fixing the site readiness<br/>
+<span style="color: #bc3663"><span style="font-size: small">(09:56:03)</span> <b>dmason:</b></span> Shouldn’t be a hard argument — Wisc and Purdue also in that boat<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(10:07:33)</span> <b>tmartin:</b></span> @jthiltges The only thing that is different as far as binaries looks to be initramfs, and some httpd libs, but that is because Matevz rebuilt them for xrootd I think. I suppose I could just re-install this host. The rest work...<br/><pre>S.5....T.    /usr/lib64/libXrdHttp-4.so<br/>....L....    /usr/lib64/libXrdHttpUtils.so.1<br/>S.5....T.    /usr/lib64/libXrdHttpUtils.so.1.0.0</pre><br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:12:44)</span> <b>jthiltges:</b></span> @tmartin Huh, and that's xrootd rather than gridftp. I'm out of ideas, outside of diving into valgrind or similar. Re-install sounds reasonable.<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(10:13:42)</span> <b>tmartin:</b></span> Yup, it is just super weird...<br/>
+<span style="color: #a72f79"><span style="font-size: small">(10:18:52)</span> <b>andrew.melo:</b></span> @dmason what DN does the FNAL xrootd redirector use in its certs (the one behind cms <a href="http://xrootd.fnal.gov">xrootd.fnal.gov</a>)<br/>
+<span style="color: #bc3663"><span style="font-size: small">(10:31:32)</span> <b>dmason:</b></span> there’s one at FNAL and UNL BTW — you talking host cert?  Which will be InCommon…  Can go look at it<br/>
+<span style="color: #a72f79"><span style="font-size: small">(10:43:20)</span> <b>andrew.melo:</b></span> Yeah, host cert. I’m just curious about the redundant redirector and trying to figure out what permutation of host names/certificates keeps cmsd from complaining<br/>
+<span style="color: #bc3663"><span style="font-size: small">(10:46:42)</span> <b>dmason:</b></span> So this is behind a DNS alias at FNAL — the FNAL host is <a href="http://cmsxrootd2.fnal.gov">cmsxrootd2.fnal.gov</a> — DN: Subject: DC=org, DC=incommon, C=US, ST=IL, L=Batavia, O=Fermi Research Alliance, OU=Fermilab, CN=<a href="http://cmsxrootd2.fnal.gov">cmsxrootd2.fnal.gov</a><br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:36:24)</span> <b>andrew.melo:</b></span> Huh<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:36:44)</span> <b>andrew.melo:</b></span> I'm a little surprised it's not <a href="http://cmsxrootd.fnal.gov">cmsxrootd.fnal.gov</a><br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:36:56)</span> <b>andrew.melo:</b></span> (In the CN)<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:37:27)</span> <b>andrew.melo:</b></span> I've been flailing trying to get the GSI auth stuff lined up for xrootd @ vanderbilt<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:01:24)</span> <b>jthiltges:</b></span> My understanding is that the xrootd client trusts reverse DNS (by default).<br/>E.g. <a href="http://cmsxrootd.fnal.gov">cmsxrootd.fnal.gov</a> =&gt; 131.225.184.17 =&gt; <a href="http://cmsxrootd2.fnal.gov">cmsxrootd2.fnal.gov</a> =&gt; CN match<br/>A few comments here: <a href="https://github.com/xrootd/xrootd/issues/841#issuecomment-430573045">https://github.com/xrootd/xrootd/issues/841#issuecomment-430573045</a><br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:09:35)</span> <b>andrew.melo:</b></span> I thought to too? But The behavior seems to be weird<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:10:35)</span> <b>andrew.melo:</b></span> <a href="http://Xrootd.accre.vanderbilt.edu">Xrootd.accre.vanderbilt.edu</a> is two hosts who have xrootd.a.v.e as their DN<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:11:00)</span> <b>andrew.melo:</b></span> Cloents seem to like it, but the cmsd complains on startup<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:25:33)</span> <b>jthiltges:</b></span> Huh. Does cmsd look up its hostname, find multiple IPs, and get confused? I dunno. I'm a little curious about the error message.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:28:53)</span> <b>andrew.melo:</b></span> Yeah, it's algorithm appears to be quite dumb. <br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:30:06)</span> <b>andrew.melo:</b></span> It looks up it's hostname, sees multiple IPs, then randomly throws one away with a message "discarding extra public interface" (from memory, could be worded different)<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(13:49:10)</span> <b>didavila:</b></span> does anybody know why I get this error in fermicloud from time to time:<br/><pre>-bash-4.1$ onetemplate list<br/>[TemplatePoolInfo] User couldn't be authenticated, aborting call.</pre><br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(13:50:42)</span> <b>didavila:</b></span> I tried destroying my kerberos token and recreating it again but I get the same error<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:51:11)</span> <b>blin:</b></span> we were getting that error yesterday<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:51:38)</span> <b>blin:</b></span> there's an issue that steve timm knows about. send an email to <a href="mailto:fermicloud-help@fnal.gov">fermicloud-help@fnal.gov</a><br/>
+</body>
+</html>

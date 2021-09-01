@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Aug 4, 2021 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Aug 4, 2021 : #software (osg)</h3>
+<span style="color: #99a949"><span style="font-size: small">(12:59:25)</span> <b>dwd:</b></span> <a href="http://moria.cs.wisc.edu">moria.cs.wisc.edu</a> is not accepting my password.  Is there a general problem with authentication there?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:02:15)</span> <b>blin:</b></span> i haven't heard anything but my SSH is just completely hanging<br/>
+<span style="color: #73769d"><span style="font-size: small">(13:02:28)</span> <b>tim.theisen:</b></span> Mine too.<br/>
+<span style="color: #73769d"><span style="font-size: small">(13:03:20)</span> <b>tim.theisen:</b></span> This is usually an indication the your home volume from AFS is inaccessible.<br/>
+<span style="color: #73769d"><span style="font-size: small">(13:10:23)</span> <b>tim.theisen:</b></span> I'll contact our systems lab.<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:10:52)</span> <b>dwd:</b></span> Thanks<br/>
+<span style="color: #73769d"><span style="font-size: small">(13:43:44)</span> <b>tim.theisen:</b></span> @dwd It's working for me. Give it a try and let me know.<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:44:01)</span> <b>dwd:</b></span> Yep, it’s working for me too now<br/>
+<span style="color: #73769d"><span style="font-size: small">(13:45:14)</span> <b>tim.theisen:</b></span> Cool<br/>
+<blockquote>
+<span style="color: #8d4b84"><span style="font-size: small">(14:24:13)</span> <b>kherner:</b></span> You just ~speak~ type, "friend", and enter, right?<br/>
+</blockquote>
+<span style="color: #73769d"><span style="font-size: small">(14:31:18)</span> <b>tim.theisen:</b></span> @matyas I am trying to tag packages into pre-release and I get the follow message from koji<br/><pre>--- Tagging builds<br/>Koji error: Error of type ActionNotAllowed while tagging: tag is locked</pre><br/>
+<span style="color: #73769d"><span style="font-size: small">(14:31:44)</span> <b>tim.theisen:</b></span> I recently renewed my CILogon certificate. Does that have any bearing?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:32:04)</span> <b>blin:</b></span> i may have locked it by accident when untagging the condor builds<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:32:23)</span> <b>blin:</b></span> have you tried unlocking it? iirc, we only keep the release tags locked<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:33:00)</span> <b>tim.theisen:</b></span> Yes, that is what I thought. However koji didn't want to tell me which tag is locked.<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:34:03)</span> <b>matyas:</b></span> yeah that's kinda annoying.<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:34:23)</span> <b>matyas:</b></span> you can do <tt>osg-koji taginfo $TAG</tt> and it will have "LOCKED" in the output if it's locked<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:35:02)</span> <b>matyas:</b></span> or just loop through all the prerelease tags and do <tt>osg-koji unlock-tag $tag</tt> and it's not like it's gonna hurt anything if you unlock something that's already unlocked<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:35:20)</span> <b>matyas:</b></span> but yes that koji error has nothing to do with your cert<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:38:07)</span> <b>tim.theisen:</b></span> It seems to be happy now<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:45:27)</span> <b>dwd:</b></span> I am upgrading the oasis itb machines to osg3.6 (while I’m doing other things, thought I might as well) but it uses some things from “devops” and they are marked with .osg35 (even though I built with --repo=devops).  There is no separate devops for each osg release, right?  If so it’s kind of weird that we give it an osg35 dist.  Maybe it should be osgdevops or something instead?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:47:10)</span> <b>matyas:</b></span> the devops build environment inherits from the osg 3.5 build environment<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:47:44)</span> <b>dwd:</b></span> Sure, but does that make sense?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:50:21)</span> <b>matyas:</b></span> I could add a new dist tag I suppose<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:51:56)</span> <b>dwd:</b></span> If there’s not going to be a devops per osg release then I think it would make more sense for it to have its own dist tag<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:52:33)</span> <b>matyas:</b></span> sure<br/>
+<span style="color: #7d414c"><span style="font-size: small">(17:03:55)</span> <b>bockjoo:</b></span> I just upgraded to htcondor-ce 5.1.1, but I am seeing this error:  4401468.0   lcg             8/4  17:56 the gridmanager can't handle this job type<br/>
+<span style="color: #7d414c"><span style="font-size: small">(17:06:22)</span> <b>bockjoo:</b></span> I am not sure what I screwed up. I think I followed the htcondor-ce guide.<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:13:14)</span> <b>blin:</b></span> curious. could you send the output of <tt>condor_config_val -dump</tt> to <a href="mailto:help@opensciencegrid.org">help@opensciencegrid.org</a>?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:27:39)</span> <b>blin:</b></span> @dwd another capability question: I'm running the backfill containers with docker + the following capabilities + a bind mounted CVMFS:<br/><pre>                 --cap-add=DAC_OVERRIDE --cap-add=SETUID --cap-add=SETGID \<br/>                 --cap-add=DAC_READ_SEARCH \<br/>                 --cap-add=SYS_ADMIN --cap-add=SYS_CHROOT --cap-add=SYS_PTRACE \</pre><br/>and it looks like priv singularity is failing with<br/><pre>Failed to set mount propagation: Permission denied</pre><br/>but works if I run the docker container with <tt>--privileged</tt>...any idea what that's about?<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:32:39)</span> <b>dwd:</b></span> Hmm, that’s the documented set of capabilities, it should work.  I did a test yesterday with that and it worked for me.  What’s the full command line?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:33:12)</span> <b>blin:</b></span> <a href="https://github.com/brianhlin/osgvo-docker-pilot/runs/3246528182?check_suite_focus=true#step:5:284">https://github.com/brianhlin/osgvo-docker-pilot/runs/3246528182?check_suite_focus=true#step:5:284</a><br/>
+<span style="color: #99a949"><span style="font-size: small">(17:33:17)</span> <b>dwd:</b></span> Well no, I guess I used --privileged yesterday<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:37:40)</span> <b>dwd:</b></span> Ok I just ran that exact same command except with “-it” and “bash” instead of osgvo-node-advertise, and singularity worked for me in it<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:39:25)</span> <b>dwd:</b></span> The docker host there was ubuntu, right?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:39:56)</span> <b>blin:</b></span> yup -- does <tt>osgvo-node-advertise</tt> work for you?<br/>
+<span style="color: #99a949"><span style="font-size: small">(18:08:15)</span> <b>dwd:</b></span> Yes.  So it seems to be something different about the ubuntu host vs the centos7 host<br/>
+<span style="color: #99a949"><span style="font-size: small">(18:09:04)</span> <b>dwd:</b></span> Here’s the singularity parts of the output<br/><pre>INFO   Checking for singularity...<br/>INFO   Singularity binary appears present in /usr/bin/singularity and claims to be version 3.8.0<br/>INFO   Using /cvmfs/singularity.opensciencegrid.org/opensciencegrid/osgvo-el7:latest as the default Singularity image<br/>INFO   /usr/bin/singularity exec --bind /tmp/osgvo-node-advertise.work:/srv --bind /cvmfs --no-home --contain --ipc --pid /cvmfs/singularity.opensciencegrid.org/opensciencegrid/osgvo-el7:latest echo Hello World | grep Hello World<br/>Hello World<br/>INFO   /usr/bin/singularity exec --bind /tmp/osgvo-node-advertise.work:/srv --bind /cvmfs --no-home --contain --ipc --pid /cvmfs/singularity.opensciencegrid.org/opensciencegrid/osgvo-el7:latest touch test-singularity-create<br/>INFO   /usr/bin/singularity exec --bind /tmp/osgvo-node-advertise.work:/srv --bind /cvmfs --no-home --contain --ipc --pid /cvmfs/singularity.opensciencegrid.org/opensciencegrid/osgvo-el7:latest env | grep OSG_SINGULARITY_IMAGE_DEFAULT<br/>OSG_SINGULARITY_IMAGE_DEFAULT=/cvmfs/singularity.opensciencegrid.org/opensciencegrid/osgvo-el7:latest<br/>INFO   /usr/bin/singularity exec --bind /tmp/osgvo-node-advertise.work:/srv --bind /cvmfs --no-home --contain --ipc --pid /cvmfs/singularity.opensciencegrid.org/opensciencegrid/osgvo-el7:latest /srv/.osgvo-node-advertise<br/>INFO   Now running inside a singularity container<br/>INFO   No arguments provided - assuming HTCondor startd cron mode<br/>INFO   Value of GLIDEIN_Singularity_Use is set to<br/>INFO   Testing singularity cause GLIDEIN_Singularity_Use is set to<br/>HAS_SINGULARITY = True<br/>OSG_SINGULARITY_VERSION = "3.8.0"<br/>OSG_SINGULARITY_PATH = "/usr/bin/singularity"<br/>OSG_SINGULARITY_IMAGE_DEFAULT = "/cvmfs/singularity.opensciencegrid.org/opensciencegrid/osgvo-el7:latest"<br/>OSG_SINGULARITY_EXTRA_OPTS = "--bind /cvmfs --no-home --contain --ipc --pid"<br/>HAS_TIMEOUT = True</pre><br/><br/>
+<span style="color: #e06b56"><span style="font-size: small">(18:14:39)</span> <b>jthiltges:</b></span> Ubuntu uses AppArmor? (Perhaps in addition to capabilities and seccomp? I'm really hazy on this since everything for me is EL-based.)<br/>
+<span style="color: #e06b56"><span style="font-size: small">(18:15:46)</span> <b>jthiltges:</b></span> Gaah. I'm thinking docker here, sorry.<br/>
+<blockquote>
+<span style="color: #99a949"><span style="font-size: small">(20:27:53)</span> <b>dwd:</b></span> Oh but docker is used in this case, so it is very much a possibility.  It may be a different version of docker.<br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-08-05 15:43:59)</span> <b>blin:</b></span> that did it, thanks guys!<br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-08-05 15:44:29)</span> <b>blin:</b></span> errr, rather your suggestions RE: AppArmor<br/>
+</blockquote>
+<span style="color: #7d414c"><span style="font-size: small">(18:15:49)</span> <b>bockjoo:</b></span> @blin I sent the output to the help.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(18:16:01)</span> <b>bockjoo:</b></span> condor_ce_run -lr <a href="http://osg.rc.ufl.edu:9619">osg.rc.ufl.edu:9619</a> whoami<br/>
+<span style="color: #7d414c"><span style="font-size: small">(18:16:05)</span> <b>bockjoo:</b></span> works, though.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(18:16:21)</span> <b>bockjoo:</b></span> It's condor-g jobs that has the error.<br/>
+<span style="color: #99a949"><span style="font-size: small">(20:27:53)</span> <b>dwd:</b></span> Oh but docker is used in this case, so it is very much a possibility.  It may be a different version of docker.<br/>
+<blockquote>
+<span style="color: #99a949"><span style="font-size: small">(20:27:53)</span> <b>dwd:</b></span> Oh but docker is used in this case, so it is very much a possibility.  It may be a different version of docker.<br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-08-05 15:43:59)</span> <b>blin:</b></span> that did it, thanks guys!<br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-08-05 15:44:29)</span> <b>blin:</b></span> errr, rather your suggestions RE: AppArmor<br/>
+</blockquote>
+<span style="color: #99a949"><span style="font-size: small">(20:29:49)</span> <b>dwd:</b></span> Brian could try adding <tt>--security-opt apparmor=unconfined</tt><br/>
+</body>
+</html>

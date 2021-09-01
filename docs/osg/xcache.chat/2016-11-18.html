@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Nov 18, 2016 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Fri Nov 18, 2016 : #xcache (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(10:20:03)</span> <b>bbockelm:</b></span> @bala - @dweitzel and I are staring at the timeout code and looking at how xrdcp actually functions.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:20:49)</span> <b>bbockelm:</b></span> Our best guess is that none of the timeout stuff actually works (python or shell client) because of how xrdcp performs its downloads.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:21:10)</span> <b>bbockelm:</b></span> So, we're going to mimic the logic from CVMFS as best we can<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:22:30)</span> <b>bbockelm:</b></span> summary of the problem: xrdcp keeps X requests in flight of Y MB each.  The responses can all intermix so you can only reasonably check the output file is growing at a granularity of (X*Y) MB.  By default, this is 64MB.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:23:01)</span> <b>bbockelm:</b></span> I figure mimicking the CVMFS logic is reasonable as CVMFS had a high success rate.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:23:02)</span> <b>bala:</b></span> Sounds great. I will wait for the new code to continue the test calculations<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:24:47)</span> <b>bala:</b></span> Because I don’t think it is logical to keep testing the old buggy code. If you differ, let me know, I will run the tests with the additional parameters we discussed yesterday on the current stashcp.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:25:36)</span> <b>bbockelm:</b></span> Well, I think it's a bit of both.  We can't cast all the stones at the code.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:26:21)</span> <b>bala:</b></span> Ah, okay, then I will keep testing and probe the failure reasons.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:30:07)</span> <b>bbockelm:</b></span> For reference, here's what we are going set for the <tt>xrdcp</tt> client:<br/><pre><br/>-DIRequestTimeout 30 -DICPChunkSize 8388608 -DICPParallelChunks 4 -DITimeoutResolution 5 -DIConnectionWindow 30 -DIConnectionRetry 2 -DIStreamTimeout 30<br/></pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:30:37)</span> <b>bbockelm:</b></span> Some of these were pretty large - defaults to 30 minutes for a 16MB request.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:30:50)</span> <b>dweitzel:</b></span> (the above is mostly for me, while working on stashcp client)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:30:51)</span> <b>bbockelm:</b></span> And waiting up to 10 minutes to connect to the server before failing.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:31:25)</span> <b>bbockelm:</b></span> (for reference, the "old" client defaulted to something like 7 days of retries...)<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:31:40)</span> <b>bala:</b></span> Is there a maximum limit for -DICPParallelChunks 4<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:32:01)</span> <b>bbockelm:</b></span> no - but this is number of requests in-flight in the single TCP stream, not the number of parallel streams.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:32:42)</span> <b>bala:</b></span> ah, ok. I thought parallel stream, X in the above formula<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:03:00)</span> <b>bbockelm:</b></span> @lincoln - how confident are you about your GeoIP service?  Pretty reliable?<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:36:24)</span> <b>lincoln:</b></span> the opposite of that<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:36:37)</span> <b>lincoln:</b></span> i dont trust geoip to work at all because it was set up in a completely ad-hoc way as i recall<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:37:32)</span> <b>lincoln:</b></span> i dont even remember where it is<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:37:38)</span> <b>lincoln:</b></span> we have a GeoIP service?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:38:25)</span> <b>bbockelm:</b></span> <a href="http://geoip.mwt2.org:4288/json">http://geoip.mwt2.org:4288/json</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:38:45)</span> <b>bbockelm:</b></span> well, erm, that answers my question.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:38:57)</span> <b>bbockelm:</b></span> I guess we might switch to the CVMFS GeoIP service<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:39:13)</span> <b>lincoln:</b></span> :thumbsup:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:35:47)</span> <b>bbockelm:</b></span> @dweitzel ^^^ another thing to do.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:36:19)</span> <b>bbockelm:</b></span> Also, we shouldn't download configuration files from github.  Because.  Uh.  Yup.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:36:31)</span> <b>lincoln:</b></span> isnt it fun when github goes down and everything crashes?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:37:00)</span> <b>bbockelm:</b></span> :slightly_smiling_face: Yeah, if we only had some sort of shared, caching filesystem we could utilize to distribute things...<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:37:08)</span> <b>***lincoln:</b></span> rubs chin<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:37:42)</span> <b>bbockelm:</b></span> Ugh.  What kind of chat client is this that has a "bear" emoji but not a "beard" emoji?  :bear:<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:37:47)</span> <b>lincoln:</b></span> :neckbeard:<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:37:52)</span> <b>lincoln:</b></span> neckbeard :slightly_smiling_face:<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:38:13)</span> <b>lincoln:</b></span> FWIW, we _can_ run a GeoIP service here, and to my knowledge we haven’t had any downtime or issues in recent memory with ours .. but if there’s one already set up &amp; supported for CVMFS that would be preferable.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:40:34)</span> <b>bbockelm:</b></span> set up, supported, and even distributed across all the Stratum-1s.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:40:40)</span> <b>lincoln:</b></span> perfect<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:43:12)</span> <b>bbockelm:</b></span> also - <a href="http://stash-cvmfs.osgconnect.net">stash-cvmfs.osgconnect.net</a> has a bunch o' stuck processes on CephFS.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:43:21)</span> <b>lincoln:</b></span> hm<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:43:29)</span> <b>lincoln:</b></span> fuse mount mighta went wonky when things crashed last night<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:45:57)</span> <b>lincoln:</b></span> is your stuff setup to auto-start on reboot?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:53:47)</span> <b>bbockelm:</b></span> nope - I haven't automated much because I'm waiting for a few stable runs first.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:54:11)</span> <b>lincoln:</b></span> well if it’s stuck we can either kill it &amp; the FUSE mount and remount<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:54:15)</span> <b>lincoln:</b></span> or we cna reboot the box<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:54:23)</span> <b>lincoln:</b></span> AFAIK the ceph cluster is happy right now (knock on wood)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:54:56)</span> <b>bbockelm:</b></span> remount seems to have worked.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:55:00)</span> <b>lincoln:</b></span> alright<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:17:00)</span> <b>bbockelm:</b></span> @dweitzel - For reference, here's how to query a Stratum-1 server for GeoIP info:<br/><pre><br/>$ curl <a href="http://hcc-cvmfs.unl.edu:8000/cvmfs/config-osg.opensciencegrid.org/api/v1.0/geo/@proxy@/hcc-stash.unl.edu,xrd-1.t2.ucsd.edu,data.ci-connect.net">http://hcc-cvmfs.unl.edu:8000/cvmfs/config-osg.opensciencegrid.org/api/v1.0/geo/@proxy@/hcc-stash.unl.edu,xrd-1.t2.ucsd.edu,data.ci-connect.net</a><br/>1,3,2<br/></pre><br/>And then here's how to query the mounted CVMFS for a list of hosts that might be able to serve GeoIP:<br/><pre><br/>$ attr -qg host_list /cvmfs/oasis.opensciencegrid.org<br/><a href="http://cvmfs-s1fnal.opensciencegrid.org:8000/cvmfs/oasis.opensciencegrid.org;http://cvmfs-s1bnl.opensciencegrid.org:8000/cvmfs/oasis.opensciencegrid.org;http://cvmfs-egi.gridpp.rl.ac.uk:8000/cvmfs/oasis.opensciencegrid.org;http://klei.nikhef.nl:8000/cvmfs/oasis.opensciencegrid.org;http://cvmfsrep.grid.sinica.edu.tw:8000/cvmfs/oasis.opensciencegrid.org">http://cvmfs-s1fnal.opensciencegrid.org:8000/cvmfs/oasis.opensciencegrid.org;http://cvmfs-s1bnl.opensciencegrid.org:8000/cvmfs/oasis.opensciencegrid.org;http://cvmfs-egi.gridpp.rl.ac.uk:8000/cvmfs/oasis.opensciencegrid.org;http://klei.nikhef.nl:8000/cvmfs/oasis.opensciencegrid.org;http://cvmfsrep.grid.sinica.edu.tw:8000/cvmfs/oasis.opensciencegrid.org</a><br/></pre><br/>
+</body>
+</html>

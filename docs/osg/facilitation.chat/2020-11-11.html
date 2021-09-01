@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Nov 11, 2020 : #facilitation (osg)</title>
+</head>
+<body>
+<h3>Wed Nov 11, 2020 : #facilitation (osg)</h3>
+<span style="color: #4d5e26"><span style="font-size: small">(09:46:07)</span> <b>jmvera:</b></span> can someone review my draft email at <a href="https://support.opensciencegrid.org/a/tickets/66123">https://support.opensciencegrid.org/a/tickets/66123</a> I just want to make sure I'm not overstepping, also want to get @rynge's thoughts<br/>
+<span style="color: #3c989f"><span style="font-size: small">(09:47:23)</span> <b>emelie:</b></span> Do we allow post-docs to be P.I.s for OSG Connect projects?<br/>
+<blockquote>
+<span style="color: #4d5e26"><span style="font-size: small">(09:52:53)</span> <b>jmvera:</b></span> it shouldn't matter, I think we've even done grad students as PI before in some cases<br/>
+<span style="color: #4d5e26"><span style="font-size: small">(09:54:13)</span> <b>jmvera:</b></span> I think it's more a matter of who the PI (funding recipient) of the project is<br/>
+</blockquote>
+<span style="color: #674b1b"><span style="font-size: small">(09:50:29)</span> <b>rynge:</b></span> @jmvera Is that the right ticket number? I don't see a draft<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:50:41)</span> <b>rynge:</b></span> And it looks non-OSGVO<br/>
+<span style="color: #4d5e26"><span style="font-size: small">(09:51:05)</span> <b>jmvera:</b></span> <a href="https://support.opensciencegrid.org/a/tickets/66123">Y</a>eah, it's the right ticket, hmm can I only see my drafts?<br/>
+<span style="color: #4d5e26"><span style="font-size: small">(09:52:17)</span> <b>jmvera:</b></span> I also wasn't clear on if a reply was needed on our part<br/>
+<span style="color: #db3150"><span style="font-size: small">(09:52:19)</span> <b>christinalk:</b></span> I think I’ve done Post Docs as PIs before<br/>
+<span style="color: #3c989f"><span style="font-size: small">(09:53:05)</span> <b>emelie:</b></span> Okay, thanks @christinalk<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:53:13)</span> <b>rynge:</b></span> DUNE is a different VO (running out of FNAL) - we are usually not involved<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:53:39)</span> <b>rynge:</b></span> Operations or glideinwms are fine targets for that<br/>
+<blockquote>
+<span style="color: #4d5e26"><span style="font-size: small">(09:55:08)</span> <b>jmvera:</b></span> ok. it does seem worth conveying to Clemson that the <tt>Has_Singularity</tt> machineAd is preferred<br/>
+<span style="color: #4d5e26"><span style="font-size: small">(09:55:57)</span> <b>jmvera:</b></span> should I just assign the ticket to Ken?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:56:13)</span> <b>rynge:</b></span> It is actually missing on the user job. I think they had +SingularityImage set, but because HAS_SINGULARITY == True was missing from the job requirement it went to non-Singularity nodes<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:56:35)</span> <b>rynge:</b></span> On our glideins, HAS_SINGULARITY is only set to true after Singularity has been detected and well tested<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:56:58)</span> <b>rynge:</b></span> It is not uncommon for us to see sites with a small number of nodes failing singularity<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:57:13)</span> <b>rynge:</b></span> For example, they might have problems with cvmfs, which is a Singularity dependency<br/>
+<span style="color: #4d5e26"><span style="font-size: small">(09:57:19)</span> <b>jmvera:</b></span> but also the clemson machines are using <tt>HasSingularity</tt> is some cases instead of <tt>Has_Singularity</tt><br/>
+<span style="color: #4d5e26"><span style="font-size: small">(09:57:29)</span> <b>jmvera:</b></span> <pre>[jmvera@login04 ~]$ condor_status -compact -constraint 'GLIDEIN_Site=="Clemson"' -af HAS_SINGULARITY HASSingularity | sort | uniq -c<br/>   47 false true<br/>   63 true true</pre><br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:57:45)</span> <b>rynge:</b></span> Yeah<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:57:55)</span> <b>rynge:</b></span> I bet they have some CVMFS issues<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:58:06)</span> <b>rynge:</b></span> <a href="http://flock.opensciencegrid.org/overview/node-issues.php">http://flock.opensciencegrid.org/overview/node-issues.php</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:58:14)</span> <b>rynge:</b></span> So there are usually a set of sites like that<br/>
+<span style="color: #4d5e26"><span style="font-size: small">(10:00:02)</span> <b>jmvera:</b></span> ok, so is <tt>HasSingularty</tt> a way of saying that the machine can potentially support singularity jobs and <tt>Has_Singularity</tt> changes to confirm t if a singularity job can be run??<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:00:32)</span> <b>rynge:</b></span> HasSingularity was added later by the HTCondor team<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:00:39)</span> <b>rynge:</b></span> We are not using it currently<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:01:07)</span> <b>rynge:</b></span> But yeah, HAS_SINGULARITY means the node has been tested recently<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:01:29)</span> <b>rynge:</b></span> It does it by a periodic script<br/>
+<span style="color: #4d5e26"><span style="font-size: small">(10:02:58)</span> <b>jmvera:</b></span> :+1:<br/>
+</blockquote>
+</body>
+</html>

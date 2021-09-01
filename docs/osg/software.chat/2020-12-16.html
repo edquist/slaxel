@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Dec 16, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Dec 16, 2020 : #software (osg)</h3>
+<span style="color: #5870dd"><span style="font-size: small">(11:33:02)</span> <b>duncan.macleod:</b></span> hi OSG software experts, sorry if this isn't the best forum for this question.<br/>I am publishing LIGO software to OASIS in a gitlab-CI pipeline with the following command:<br/><pre>ssh ${OASIS_USER}@${OASIS_HOST} osg-oasis-update</pre><br/>which works great. But, it returns immediately (or at least as soon as condor submits the job). What is the best / most elegant way to have that command hang until the update is actually executed and completed?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:35:55)</span> <b>blin:</b></span> IIRC, it submits a special condor job for updating OASIS. I can't think of a great non-polling way to determine completion<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:35:59)</span> <b>blin:</b></span> @dwd is that right?<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:37:32)</span> <b>dwd:</b></span> It does run with a condor job.  So you can run condor_q to see its status.  I don’t know what condor is capable of for letting you know when a job is done.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:38:08)</span> <b>matyas:</b></span> you can <tt>condor_wait</tt> on the logfile of a job<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:38:52)</span> <b>matyas:</b></span> (or whatever you put in <tt>Log</tt> in the submit file)<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:39:21)</span> <b>dwd:</b></span> Ah well that may be an issue, since it creates the submit file on the fly<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:40:24)</span> <b>dwd:</b></span> Yep it sets Log to /dev/null<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:41:23)</span> <b>dwd:</b></span> If you want to script it I guess you could sed a copy of /usr/bin/osg-batch-update and change the setting of Log.  Or we could change the osg-batch-update script to have a wait option I guess.<br/>
+<blockquote>
+<span style="color: #5870dd"><span style="font-size: small">(11:43:23)</span> <b>duncan.macleod:</b></span> having a wait option would be very helpful, for me at least<br/>
+</blockquote>
+<span style="color: #99a949"><span style="font-size: small">(11:43:02)</span> <b>dwd:</b></span> The whole oasis repository is not really set up for power users.  I’m surprised that ligo is still using it and they haven’t set up their own <a href="http://ligo.opensciencegrid.org">ligo.opensciencegrid.org</a> repository yet.<br/>
+<blockquote>
+<span style="color: #5870dd"><span style="font-size: small">(11:43:47)</span> <b>duncan.macleod:</b></span> it works, and we don't have any spare personpower cycles at the moment, so we will keep using it until someone tells us not to<br/>
+</blockquote>
+<span style="color: #5870dd"><span style="font-size: small">(11:43:23)</span> <b>duncan.macleod:</b></span> having a wait option would be very helpful, for me at least<br/>
+<blockquote>
+<span style="color: #5870dd"><span style="font-size: small">(11:43:23)</span> <b>duncan.macleod:</b></span> having a wait option would be very helpful, for me at least<br/>
+</blockquote>
+<span style="color: #5870dd"><span style="font-size: small">(11:43:47)</span> <b>duncan.macleod:</b></span> it works, and we don't have any spare personpower cycles at the moment, so we will keep using it until someone tells us not to<br/>
+<blockquote>
+<span style="color: #5870dd"><span style="font-size: small">(11:43:47)</span> <b>duncan.macleod:</b></span> it works, and we don't have any spare personpower cycles at the moment, so we will keep using it until someone tells us not to<br/>
+</blockquote>
+<span style="color: #99a949"><span style="font-size: small">(11:50:52)</span> <b>dwd:</b></span> I don’t think anybody’s going to tell you not to unless the ligo software grows substantially, but usually it just becomes too painful to use and larger projects want more control.  I suppose for a feature request it should start with a SOFTWARE jira ticket, but I don’t know what kind of priority to put on it.  I usually am the one to make changes to the oasis packages but something this easy could be done by somebody else if they’re available.<br/>
+<span style="color: #5870dd"><span style="font-size: small">(11:59:58)</span> <b>duncan.macleod:</b></span> ok, if I get around to caring enough about this I'll open a ticket, thanks @dwd<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:07:00)</span> <b>blin:</b></span> @duncan.macleod when you do, shoot us an email at <a href="mailto:help@opensciencegrid.org">help@opensciencegrid.org</a><br/>
+<span style="color: #5870dd"><span style="font-size: small">(12:07:07)</span> <b>duncan.macleod:</b></span> will do<br/>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jul 1, 2016 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Fri Jul 1, 2016 : #gracc (osg)</h3>
+<span style="color: #3c8c69"><span style="font-size: small">(10:30:23)</span> <b>kretzke:</b></span> I’m a bit worried about -2 and -3 now, notably the JVM memory management is not looking healthy. <a href="https://gracc.opensciencegrid.org/dashboard/db/grace-elasticsearch-monitor">https://gracc.opensciencegrid.org/dashboard/db/grace-elasticsearch-monitor</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:33:53)</span> <b>dweitzel:</b></span> jigsaw!  Yeah, doesn’t look good.  Need more memory for the JVM’s?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:36:08)</span> <b>kretzke:</b></span> at this point the recommendation is more nodes, not recommended to go over 32GB heap<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:37:27)</span> <b>dweitzel:</b></span> ok, we can start up more nodes.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:40:02)</span> <b>kretzke:</b></span> I’d like to better understand what we’re seeing. I suspect we’re seeing problems now because we’re actively hitting it with large queries, while before it was mostly write-only. so ES has to load lots of historical data into memory to search it. I’d think it would be able to free that though<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:55:45)</span> <b>kretzke:</b></span> but yeah, I think the bottom line is if we want to routinely do non-trivial (say &gt; 1 week) queries against raw records the cluster will need to be bigger<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:40:37)</span> <b>bbockelm:</b></span> hi Kevin - Derek and I had a long conversation about this over lunch.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:40:52)</span> <b>bbockelm:</b></span> A few things that came up:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:41:11)</span> <b>bbockelm:</b></span> 1) We’d like to monitor the queue depths — how many requests of which type are pending for each node.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:41:54)</span> <b>bbockelm:</b></span> 2) Given that the drops come in spikes, we’d like to try increasing the ES queue sizes.  Might be that the system is doing fine, just can’t swallow queries for a large number of shared.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:42:02)</span> <b>bbockelm:</b></span> 3) We don’t understand why the query rate is 12KHz.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:47:39)</span> <b>kretzke:</b></span> well 3 is easy, it was calculating the /10s derivative :upside_down_face:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:52:06)</span> <b>bbockelm:</b></span> Derivative of what?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:53:05)</span> <b>bbockelm:</b></span> My theory is that we are getting large number of queries and are fairly close to the query queue limit.  Then, when someone loads Kibana, one of the data nodes drops one shard silently - leaving Kibana to timeout waiting on the frontend node.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:55:36)</span> <b>kretzke:</b></span> oh wait, in marvel or grafana? The search rate I had displayed on the “GRACE Elasticsearch Monitor” dashboard is calculated as the derivative of completed searches<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:57:01)</span> <b>bbockelm:</b></span> (<a href="https://gracc.opensciencegrid.org/dashboard/db/grace-system-monitoring-node-details">https://gracc.opensciencegrid.org/dashboard/db/grace-system-monitoring-node-details</a> is this page broken?)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:57:29)</span> <b>bbockelm:</b></span> Ah - @dweitzel - what pages were we looking at?  The search rate is on the dashboard Kevin references above is more like 100-300Hz.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:59:12)</span> <b>kretzke:</b></span> the host name reported by the monitor program (telegraf) changed to include the domain after the reboot<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:00:29)</span> <b>kretzke:</b></span> so gratiav2-4 changed to gratiav2-4.novalocal. haven’t had a chance to dig into why, just changed the other dashboards to match the prefix<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:09:29)</span> <b>kretzke:</b></span> ok added queue depth <a href="https://gracc.opensciencegrid.org/dashboard/db/grace-elasticsearch-monitor">https://gracc.opensciencegrid.org/dashboard/db/grace-elasticsearch-monitor</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:19:51)</span> <b>bbockelm:</b></span> <tt>EsThreadPoolExecutor[bulk, queue capacity = 50, org.elasticsearch.common.util.concurrent.EsThreadPoolExecutor@b73b5ca[Running, pool size = 8, active threads = 8, queued tasks = 57, completed tasks = 735799]]</tt>.  Do you recall how to bump up the queue size?  I’d like to try 100 or so.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:23:39)</span> <b>kretzke:</b></span> done<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:24:09)</span> <b>bbockelm:</b></span> I see a big spike in thread pool rejections right around the time <tt>gratiav2-2</tt> had a very long garbage collection.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:24:17)</span> <b>bbockelm:</b></span> 8s - that’s pretty impressive :wink:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:59:35)</span> <b>bbockelm:</b></span> @kretzke: that’s weird - on <tt>-4</tt>, I still see a queue size of 50.  How’d you change things?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:02:25)</span> <b>kretzke:</b></span> hm <tt>curl -XPUT localhost:9200/_cluster/settings -d '{"persistent": { "threadpool.bulk.queue_size": 100}}’</tt><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:32:10)</span> <b>kretzke:</b></span> looks like marvel on -1 and -2 are holding onto the old executor, -3 and -4 show 100. maybe related to <a href="https://github.com/elastic/elasticsearch/issues/2509">https://github.com/elastic/elasticsearch/issues/2509</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:33:15)</span> <b>kretzke:</b></span> does anyone look at marvel? I’m inclined to disable it<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:37:12)</span> <b>bbockelm:</b></span> I don’t really look at it.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:51:50)</span> <b>kretzke:</b></span> the only thing missing from influxdb is per-index stats, which can be nice, but it’s also a lot of data with how many indices we have. I’ll disable it, let’s see if it makes a noticable difference<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:17:36)</span> <b>bbockelm:</b></span> well, my test of “go to kibana discovery tab and see if things timeout” passes now.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:30:02)</span> <b>bbockelm:</b></span> hm, nope, there it goes again.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:33:20)</span> <b>kretzke:</b></span> -4 has slow IO, 100% util and &gt; 50% iowait. iops is low, so external?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:41:20)</span> <b>dweitzel:</b></span> @kretzke: I started a new instance to add to your ES cluster.  What do I need to do to give you access?  Put a ssh key in there?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:42:13)</span> <b>dweitzel:</b></span> well, OSG Gracc Cluster.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:42:16)</span> <b>bbockelm:</b></span> <tt>-4</tt> is the one that had filesystem problems last night.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:43:11)</span> <b>bbockelm:</b></span> looks like <tt>vdc</tt> took a nap.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:51:58)</span> <b>kretzke:</b></span> @dweitzel: yeah, we just go through -1 using its key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCwztup32VTHQMJKewoHD0iI6wekoXzt/Zjjn2y/LvHJzTY+Y/1rwTAypcguWPYb/ooohBG+v4kp8rkw17apEA/R89GM/K3bMUMug8wyN0rCq73LAWVw1NO1UKukQ86q/qOLNjut9J0szSto0YJB5L/DSkjuxkunMAYCQ/Q18uSzK2UoYdqWv3mbSahfNVHVEWP77WdjfTGd+9257jJvdPN+mcXBhGnnqf8gK9Fuf8yGI2xZY/hd13t0o1Ok51vZkfNlJ1sBFz5hp5336dYu1xyY4I6bDipx/V2SJSY+qLUUx/hDarqiBzWW4/AuFJU81+4Ri1aNMmhJUjhwmgbQy0P root@gratiav2-1<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:53:02)</span> <b>dweitzel:</b></span> @kretzke: ok, try root@10.71.102.81<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:58:52)</span> <b>kretzke:</b></span> setting up now<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:01:28)</span> <b>dweitzel:</b></span> ok, great!  it has 2 2TB volumes, same as the rest of the data nodes.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:02:01)</span> <b>kretzke:</b></span> I see two 2TB volumes… heh. the others have 2+3, but 2+2 is fine I think.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:02:14)</span> <b>dweitzel:</b></span> oh, shoot.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:02:17)</span> <b>dweitzel:</b></span> sorry :disappointed:<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:03:27)</span> <b>kretzke:</b></span> I don’t think it will be a problem<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:05:32)</span> <b>kretzke:</b></span> just FYI, I have the steps for setting up a node in the FNAL redmine, should be open: <a href="https://cdcvs.fnal.gov/redmine/projects/discompsupp/wiki/Gratia2_Elasticsearch">https://cdcvs.fnal.gov/redmine/projects/discompsupp/wiki/Gratia2_Elasticsearch</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:06:41)</span> <b>kretzke:</b></span> I’ve started using ansible for node management, I should probably set up a playbook<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:14:15)</span> <b>dweitzel:</b></span> the nodes should be 8 core, right?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:14:22)</span> <b>dweitzel:</b></span> You list them as 4 at the top.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:14:46)</span> <b>kretzke:</b></span> oops, yeah<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:54:23)</span> <b>kretzke:</b></span> looks like it’s joined successfully and is getting shards<br/>
+</body>
+</html>

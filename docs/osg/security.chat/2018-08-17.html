@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Aug 17, 2018 : #security (osg)</title>
+</head>
+<body>
+<h3>Fri Aug 17, 2018 : #security (osg)</h3>
+<span style="color: #df3dc0"><span style="font-size: small">(13:25:24)</span> <b>zalak:</b></span> I was trying to send the announcement using osg-notify and my IP got blocked by Sophos and Spamhaus. So, I made a requests to unblock it and tried to send again few times but my email logs still saws me that my email request was rejected because of poor MTA reputation. So, osg-security-team never got that announcement email.<br/><br/>But, few of the resource contacts got the announcement multiple times.<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(13:28:37)</span> <b>zalak:</b></span> And there is no way to check who gets the email and who didn't.<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(13:34:10)</span> <b>zalak:</b></span> [root@sl7-swamp-osg topology]# less /var/log/maillog | grep rejected | grep "Aug 17 13:57:" | wc -l<br/>43<br/><br/>seems like 43 out of 174 recipients's spam service(s) has blocked my email.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:47:20)</span> <b>blin:</b></span> i think you're going to want to set up a new host in that case<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:47:44)</span> <b>blin:</b></span> since your IP is blocked<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:48:49)</span> <b>blin:</b></span> then set up DNS so forward/backward resolution works and set the hostname<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:50:50)</span> <b>blin:</b></span> and i think the message this time should lead with "Apologies if you have received this email multiple times but due to a misconfigured host, previous announcements were caught in some spam filters."<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(13:51:38)</span> <b>zalak:</b></span> I have already asked Sophos and Spamhaus to remove my IP from the black list.<br/><br/>This shows that my IP is not on the blacklist anymore: <a href="https://mxtoolbox.com/SuperTool.aspx?action=blacklist%3a129.79.49.192&amp;run=toolpage">https://mxtoolbox.com/SuperTool.aspx?action=blacklist%3a129.79.49.192&amp;run=toolpage</a><br/>
+<span style="color: #df3dc0"><span style="font-size: small">(13:52:13)</span> <b>zalak:</b></span> Sending that apology text is a good idea.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:52:27)</span> <b>blin:</b></span> and before you send it out more widely, try a test to just yourself first<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:53:00)</span> <b>blin:</b></span> i don't know a ton about spam filtering so i'm not sure if that covers all spam filters. @tim.theisen?<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(13:57:55)</span> <b>zalak:</b></span> I made a list of email addresses that did reject my announcement email. Should we only send it to those people?<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(13:58:14)</span> <b>zalak:</b></span> Jeny has set up a new machine to send the announcement.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:58:42)</span> <b>blin:</b></span> you were able to link the spam rejections to specific emails?<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(13:59:21)</span> <b>zalak:</b></span> [root@sl7-swamp-osg topology]# less /var/log/maillog | grep rejected | grep "Aug 17 13:57:" | grep -E -o "\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}\b"<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(13:59:33)</span> <b>zalak:</b></span> Yes, I ran the above...<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:00:03)</span> <b>tim.theisen:</b></span> You have the list of hosts that overtly rejected your email. I think that some spam filters may silently drop the email.<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(14:01:26)</span> <b>zalak:</b></span> Oh I see. In that case, we need to send it to the entire mailing list again with the apology at the beginning. Thoughts?<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:03:35)</span> <b>tim.theisen:</b></span> Yes. that would be appropriate. Getting it to come back to the osg-security list would be a good test that you email won't be captured by spam filters. So, send to just that to start.<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:04:15)</span> <b>tim.theisen:</b></span> Is there a list at <a href="http://fnal.gov">fnal.gov</a> for just test message?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:04:20)</span> <b>jteheran:</b></span> Actually, osg-security-team was part of the recipients<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:04:29)</span> <b>jteheran:</b></span> but, we never got the email<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(14:05:35)</span> <b>zalak:</b></span> @jteheran<br/><br/>I used this command to send the announcement:<br/><br/>PYTHONPATH=src python bin/osg-notify --cert ../usercert.pem --key ../userkey.pem --sign --sign-id 7FD42669 --type production --message ../OSG-SEC-2018-08-17_CPU_speculative_execution_vulnerabilities_Foreshadow.txt --subject "OSG-SEC-2018-08-17 CPU speculative execution vulnerabilities (Foreshadow)" --recipients "<a href="mailto:osg-security-team@fnal.gov">osg-security-team@fnal.gov</a>" --oim-recipients resources --oim-contact-type security<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:06:22)</span> <b>jteheran:</b></span> My command from previous announcements is:<br/>PYTHONPATH=src python bin/osg-notify --subject “OSG-SEC-2018-07-06 Singularity Vulnerabilities” --message ../message_07_05 --type production --recipients “<a href="mailto:osg-security-team@fnal.gov">osg-security-team@fnal.gov</a>” --oim-recipients resources --from security --sign --sign-id 7FD42669 --cert ../usercert.pem --key ../userkey.pem<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:07:30)</span> <b>jteheran:</b></span> I don’t have the  --oim-contact-type security, but this announcement is for security contacts, so that should be ok<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:08:42)</span> <b>tim.theisen:</b></span> So, you test it on the just the security team before you send it to everyone.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:09:23)</span> <b>jteheran:</b></span> I’ll do that<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:12:58)</span> <b>tim.theisen:</b></span> Jeny: It should be sent out with --osg-contact-type security. Zalak: you should have had --from security<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:13:56)</span> <b>jteheran:</b></span> @tim.theisen thanks for checking<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(14:14:15)</span> <b>zalak:</b></span> Ok, will update my document. Thanks.<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:15:55)</span> <b>tim.theisen:</b></span> I am updateing the document at  <a href="https://opensciencegrid.org/operations/services/sending-announcements/">https://opensciencegrid.org/operations/services/sending-announcements/</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:16:17)</span> <b>blin:</b></span> @zalak please update the above document with notes<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:17:53)</span> <b>jteheran:</b></span> I sent it twice<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:18:02)</span> <b>jteheran:</b></span> the last time with the --from security option<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:18:06)</span> <b>jteheran:</b></span> what is the difference?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:19:14)</span> <b>jteheran:</b></span> Both emails come from Open Science Grid Helpdesk &lt;help@opensciencegrid.org&gt;<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(14:20:22)</span> <b>zalak:</b></span> No, I got one from OSG Security Team and another one from Open Science Grid.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:20:36)</span> <b>blin:</b></span> <tt>--from security</tt> should be the human friendly name <tt>OSG Security Team</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:20:48)</span> <b>blin:</b></span> the default is <tt>Open Science Grid</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:21:02)</span> <b>blin:</b></span> i wonder if you'll see <tt>Open Science Grid Helpdesk</tt> if it's already in your address book<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:22:24)</span> <b>blin:</b></span> @jteheran did you send the email to everyone or just the security team list?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:26:05)</span> <b>jteheran:</b></span> Just the security team<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:29:12)</span> <b>jteheran:</b></span> @zalak you're right, my email client only shows the email address<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:31:13)</span> <b>jteheran:</b></span> How the announcement looks? should I send the email to all contacts again?<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(14:31:30)</span> <b>zalak:</b></span> LGTM<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:31:37)</span> <b>blin:</b></span> let me double check on the apology message<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:40:16)</span> <b>blin:</b></span> alright, got some tweaks on the apology<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:40:18)</span> <b>blin:</b></span> <tt>We apologize if you have received this email multiple times, but due to a misconfigured host, previous copies of this announcement may have been rejected as spam. Our goal is to make sure that you receive this important information. Also, we have new processes in place to avoid a similar situation in the future.</tt><br/>
+<span style="color: #df3dc0"><span style="font-size: small">(14:41:02)</span> <b>zalak:</b></span> ^ looks great! Thanks @blin<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:49:56)</span> <b>jteheran:</b></span> @blin should I put it all capital letters?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:51:54)</span> <b>blin:</b></span> nope, i think it should be fine<br/>
+</body>
+</html>

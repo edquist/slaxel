@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jun 2, 2021 : #flightworthy (chtc)</title>
+</head>
+<body>
+<h3>Wed Jun 2, 2021 : #flightworthy (chtc)</h3>
+<span style="color: #4cc091"><span style="font-size: small">(10:23:52)</span> <b>blin:</b></span> @jfrey, @matyas mentioned that 9.0.x shouldn't clear out the <tt>GridJobId</tt> after job completion but it looks like we're still seeing <tt>GridJobId = undefined</tt> in the history ads<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(10:24:53)</span> <b>jfrey:</b></span> That can still happen if some things go wrong with the gridmanager’s interactions with the blahp and ft-gahp.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(10:25:07)</span> <b>jfrey:</b></span> But for a job that completes, it shouldn’t happen.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(10:26:33)</span> <b>blin:</b></span> hrmm<br/><pre>$ podman run -i -t --rm opensciencegrid/hosted-ce:testing condor_ce_history -poo <a href="http://collector.opensciencegrid.org:9619">collector.opensciencegrid.org:9619</a> -name <a href="http://cc-condor.hpc.siue.edu">cc-condor.hpc.siue.edu</a> -const 'routedjob isnt undefined &amp;&amp; jobstatus == 4' -limit 100 -af gridjobid | sort | uniq -c<br/>    100 undefined</pre><br/>
+<span style="color: #d58247"><span style="font-size: small">(10:27:53)</span> <b>gthain:</b></span> Can I get a reviewer for HTCONDOR-484?  It's straightforward to do with MOUNT_UNDER_SCRATCH<br/>
+<span style="color: #5a4592"><span style="font-size: small">(10:29:00)</span> <b>tannenba:</b></span> @gthain, I can review HTCONDOR-484, I am familiar with the MOUNT_UNDER_SCRATCH code since doing the encrypted execute directory stuff<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:29:24)</span> <b>gthain:</b></span> Thanks!<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:30:28)</span> <b>gthain:</b></span> The only tricky thing with -484 is the motivation<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:34:49)</span> <b>johnkn:</b></span> meeting<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(15:59:58)</span> <b>jfrey:</b></span> @blin @matyas The undefined <tt>GridJobId</tt> is a bug, now fixed for 9.0.2 (HTCONDOR-534). It looks like I missed the <tt>batch</tt> type when making the changes to preserve <tt>GridJobId</tt> back in 8.8.11.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(16:00:21)</span> <b>blin:</b></span> AHA!<br/>
+<span style="color: #4cc091"><span style="font-size: small">(16:00:49)</span> <b>blin:</b></span> i was absolutely losing my mind trying to figure out how our OSG accounting was working at all! does this patch apply cleanly to 8.8?<br/>
+<blockquote>
+<span style="color: #4cc091"><span style="font-size: small">(16:10:02)</span> <b>blin:</b></span> @jfrey though to clarify, before 8.8.11, we didn't save GridJobId either, right?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:12:40)</span> <b>jfrey:</b></span> We did some some grid job types, and not for others.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:13:13)</span> <b>jfrey:</b></span> It was preserved for the cloud types.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(16:13:40)</span> <b>blin:</b></span> hrm. did we save it for <tt>batch slurm</tt>?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:14:02)</span> <b>jfrey:</b></span> No.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(16:15:54)</span> <b>blin:</b></span> ok well i'm still confused but i'm glad this is being fixed!<br/>
+<span style="color: #684b6c"><span style="font-size: small">(19:50:01)</span> <b>bbockelman:</b></span> @jfrey - so the interesting thing is OSG has been relying on <tt>GridJobId</tt> being defined in the condor history file since ... 2012 according to git.<br/>
+<span style="color: #684b6c"><span style="font-size: small">(19:51:19)</span> <b>bbockelman:</b></span> Is there any way this might have changed over  the years?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(20:30:12)</span> <b>jfrey:</b></span> 2012 appears to be when we started always clearing <tt>GridJobId</tt> for completed grid-type <tt>batch</tt> jobs (gittrac #3036).<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(20:30:34)</span> <b>jfrey:</b></span> …when we adding file transfer for bosco.<br/>
+</blockquote>
+<span style="color: #9e3997"><span style="font-size: small">(16:02:31)</span> <b>tlmiller:</b></span> @jfrey Are there any more <tt>*job.cpp</tt> files that need the change from GT#6159?<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(16:02:33)</span> <b>chtc:</b></span> <a href="https://htcondor-wiki.cs.wisc.edu/index.cgi/tktview?tn=6159">GT#6159</a> | Keep GridJobId in in job ad on completion and removal [*resolved* at 2020-Oct-19 23:04]<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:03:01)</span> <b>tlmiller:</b></span> (I never even thought to check for completeness of that patch.  Grr.)<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:05:15)</span> <b>jfrey:</b></span> I will double-check that.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:05:24)</span> <b>tlmiller:</b></span> Thanks.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:10:08)</span> <b>johnkn:</b></span> so, I'm looking at the bug in <tt>condor_store_cred query-krb</tt> that was introduced by the "local issuer" patch.  If I'm reading this correctly, "local issuer" is an OAUTH cred, that you get by sending a STORE_CRED_KRB command with a bogus credential to the Credd .<br/><br/>WTF???  Why not just send a STORE_CRED_OAUTH command instead?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:13:25)</span> <b>tlmiller:</b></span> IIRC, because the "local issuer" nonsense is designed to make OAUTH creds behave like (or be operated on) as if they were Kerberos credentials?  I don't remember why, though.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:13:38)</span> <b>tlmiller:</b></span> Maybe something to do with how the are (or are not) renewed?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:19:26)</span> <b>johnkn:</b></span> For normal OAUTH, you get the cred by sending a different command than STORE_CRED_OAUTH, you do a sort of query with side effects, which is a separate command int.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:20:13)</span> <b>johnkn:</b></span> if you actually *had* an oauth cred in hand and wanted to send it to the credd, then STORE_CRED_OAUTH would be the way to do it, but we don't have any code that actually does that.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:21:01)</span> <b>tlmiller:</b></span> So it's just a hack to avoid implementing STORE_CRED_OAUTH?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:21:10)</span> <b>johnkn:</b></span> It looks to me like "local issuer" was a way to get the behavior of STORE_CRED_OAUTH, but designed before we had separate cred stores for KRB and OAUTH<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:21:32)</span> <b>tlmiller:</b></span> I'm getting some serious deja vu here, but I'm actually drawing a blank.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:22:09)</span> <b>johnkn:</b></span> More like ignorance that STORE_CRED_OAUTH was mostly already implemented (i did it for symmetry and because it thought it might be useful someday)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:23:02)</span> <b>johnkn:</b></span> but not complete ignorance, because the command arrives as a STORE_CRED_KRB, but then a hack at the top of that function intercepts it and calls the STORE_CRED_OAUTH function :disappointed:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:23:39)</span> <b>tlmiller:</b></span> ...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:23:42)</span> <b>johnkn:</b></span> and of course the hack is the bug that breaks query krb<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:23:57)</span> <b>tlmiller:</b></span> So much sadness.  So little time.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:24:42)</span> <b>johnkn:</b></span> so this is *not* old code that predates my re-factoring of the credd.  because query krb worked when I finished that rewrite.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:32:42)</span> <b>jfrey:</b></span> @tlmiller Would you be willing to code review HTCONDOR-534?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(16:44:51)</span> <b>jcpatton:</b></span> Zach would understand the guts of what’s going on better, I know more what’s going on on the credmon side<br/>
+<span style="color: #2b6836"><span style="font-size: small">(16:45:15)</span> <b>jcpatton:</b></span> in the end, all the local issuer credmon needs is a <tt>&lt;username&gt;.top</tt> file to show up<br/>
+<span style="color: #2b6836"><span style="font-size: small">(16:45:29)</span> <b>jcpatton:</b></span> but it’s looking in the oauth directory<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:46:44)</span> <b>johnkn:</b></span> it looks like the contents of that file is the authenticated username, does that matter?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(16:47:11)</span> <b>jcpatton:</b></span> don’t believe so, just the filename has to be right<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:47:50)</span> <b>tlmiller:</b></span> @jfrey Sorry, missed that.  Sure.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:48:02)</span> <b>jfrey:</b></span> Thanks.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:59:32)</span> <b>johnkn:</b></span> So it looks to me like the hack to send this as a KRB cred is just not needed.   we could just send a STORE_CRED_OAUTH command directly from condor_submit and get the same effect except the content of the .top file will be different.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:00:50)</span> <b>johnkn:</b></span> file is not <tt>&lt;username&gt;.top</tt> thought,  its <tt>&lt;username&gt;/&lt;service&gt;.top</tt> where service is under the control of submit, but username is not.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(17:31:26)</span> <b>blin:</b></span> @jcpatton do you know much about the scitoken auth handshake?<br/>
+</body>
+</html>

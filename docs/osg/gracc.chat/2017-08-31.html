@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Aug 31, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Thu Aug 31, 2017 : #gracc (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(10:18:06)</span> <b>dweitzel:</b></span> @kretzke so if I delete specific records from the summary table from 2016, that would be ok?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:18:18)</span> <b>dweitzel:</b></span> Would the new records show up in the 2016 summaries?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:18:52)</span> <b>dweitzel:</b></span> I always forget where we have that cutoff, where we can regenerate summaries from raw, and where it's more or less 'hard-coded'<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:19:39)</span> <b>kretzke:</b></span> no, right now the cutoff between gratia summaries and gracc-generated is 1/1/2017.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:20:04)</span> <b>dweitzel:</b></span> ok, boo.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:20:12)</span> <b>dweitzel:</b></span> so some of the corrections we are doing for Ligo won't show up.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:20:42)</span> <b>dweitzel:</b></span> Could we experiment with using the generated summaries for parts of 2016?  What flexibility do we have?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:22:32)</span> <b>kretzke:</b></span> yep, elasticsearch supports filtered aliases, so you could say “use gratia.osg.summary2-oim for @timestamp &lt; 2016-09-01” and vice-versa for gracc.osg.summary-2016.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:24:01)</span> <b>dweitzel:</b></span> ok, I think the vast majority of the fixes we are putting in place are after that date, 2016-09-01.  That may accidentally be the perfect cutoff date.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:24:11)</span> <b>dweitzel:</b></span> Is there an easy way to see what would change if we did that?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:25:23)</span> <b>kretzke:</b></span> here’s an example, although it’s doing the opposite, with two aliases with different “views” into one index<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:25:49)</span> <b>kretzke:</b></span> create a new alias, add as new datasource, export dashboard then re-import and select new datasource (in Grafana)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:36:51)</span> <b>dweitzel:</b></span> @marian What's the status of the snapshots?  How much do we have saved?  What indexes?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:37:16)</span> <b>dweitzel:</b></span> Before we go about deleting tons of summary data (which isn't all that important anyways, can be regenerated really fast).<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:40:32)</span> <b>marian:</b></span> we don't do snapshots periodically yet, it's scripted but I just tested manually ... this is from my TODO list notes:<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:40:34)</span> <b>marian:</b></span> ALIASes to backup:<br/>------------------<br/>gracc.osg.raw-*<br/>gracc.osg-transfer.raw-*<br/>gracc.osg.summary<br/>gracc.osg-transfer.summary<br/><br/>Testing restores on gracc-itb?<br/>- Allow IP address to access red HDFS in puppet<br/>- Install HDFS plugin and configure repo (as read-only?)<br/>- Test restores of snapshots<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:42:38)</span> <b>dweitzel:</b></span> cool, which of those Aliases have you been able to backup so far?<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:43:32)</span> <b>marian:</b></span> I'd like to move on ES update and recompile hdfs plugin for latest ES version before we set snapshots backups as automated task...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:44:25)</span> <b>dweitzel:</b></span> Sure, automated.  But I would like a snapshot of all of those aliases before we update.<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:44:58)</span> <b>marian:</b></span> let me check what I have and I can launch backup for remaining aliases<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:48:38)</span> <b>marian:</b></span> seems like I have only this one:<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:48:40)</span> <b>marian:</b></span> "snapshot" : "gracc.osg-transfer.summary_bk20170818"<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:49:10)</span> <b>marian:</b></span> can re-run and then also do other three<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:49:31)</span> <b>dweitzel:</b></span> ok, so we have a full backup of the summary?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:49:40)</span> <b>dweitzel:</b></span> That's probably relatively small.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:49:55)</span> <b>dweitzel:</b></span> The gracc.osg.raw is going to be much bigger.<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:50:15)</span> <b>marian:</b></span> it takes all indeces behind  alias, so this one has:<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:50:15)</span> <b>marian:</b></span> "indices" : [<br/>        "gracc.osg-transfer.summary3-2017",<br/>        "gratia.osg-transfer.summary0",<br/>        "gracc.osg-transfer.summary3-2016"<br/>      ],<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:52:37)</span> <b>dweitzel:</b></span> yup, that looks good to me..<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:57:49)</span> <b>dweitzel:</b></span> ok, Summer School "VO's" are deleted from the summary records.  Should take a few minutes to be reflected in GRACC.<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:44:04)</span> <b>marian:</b></span> meeting today? I'm sending reminder in a sec ...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:56:53)</span> <b>dweitzel:</b></span> Regarding the ticket here: <a href="https://ticket.grid.iu.edu/34792">https://ticket.grid.iu.edu/34792</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:56:58)</span> <b>dweitzel:</b></span> Yes, there are a bunch of duplicates.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:57:14)</span> <b>dweitzel:</b></span> I wrote a quick and dirty script to delete such duplicates.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:01:54)</span> <b>dweitzel:</b></span> Here's the ugly code: <a href="https://github.com/djw8605/gracc-tools/blob/add-fixes/gracc-oneoffs/remove-duplicates/remove-duplicates.py">https://github.com/djw8605/gracc-tools/blob/add-fixes/gracc-oneoffs/remove-duplicates/remove-duplicates.py</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:02:15)</span> <b>dweitzel:</b></span> @kretzke do you know of a way to filter after an aggregation, on the results of the aggregation?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:02:44)</span> <b>dweitzel:</b></span> That's not the terrible part, I then have to go back and grab the id of the record by searching the DB again...<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:04:25)</span> <b>kretzke:</b></span> sounds like a pipeline aggregation? haven’t used them myself <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline.html">https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline.html</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:07:28)</span> <b>dweitzel:</b></span> I tried to read about them...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:07:45)</span> <b>dweitzel:</b></span> The monitoring is all wonky: <a href="https://gracc.opensciencegrid.org/dashboard/db/grace-elasticsearch-monitor?refresh=1m&amp;orgId=1">https://gracc.opensciencegrid.org/dashboard/db/grace-elasticsearch-monitor?refresh=1m&amp;orgId=1</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:07:52)</span> <b>dweitzel:</b></span> missing data it looks like.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:09:08)</span> <b>kretzke:</b></span> high load on the nodes, monitoring queries may be timing out <a href="https://gracc.opensciencegrid.org/dashboard/db/grace-system-monitoring?refresh=1m&amp;orgId=1&amp;from=now-12h&amp;to=now">https://gracc.opensciencegrid.org/dashboard/db/grace-system-monitoring?refresh=1m&amp;orgId=1&amp;from=now-12h&amp;to=now</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:10:01)</span> <b>dweitzel:</b></span> interesting...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:10:09)</span> <b>dweitzel:</b></span> snapshotting?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:10:36)</span> <b>dweitzel:</b></span> The IO load doesn't look terrible.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:12:05)</span> <b>kretzke:</b></span> search rate jumped up too… it may be something one of our interns is doing, let me check<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:15:11)</span> <b>dweitzel:</b></span> blame the interns!<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:22:24)</span> <b>kretzke:</b></span> what else are they good for? :stuck_out_tongue_winking_eye:<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:24:41)</span> <b>kretzke:</b></span> so yeah, one of them is trying to use deep learning to develop a predictive model of job wait time and such, so he’s been mining the FIFE job data. I asked him to cut it back (he had seven instances running…)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:30:34)</span> <b>dweitzel:</b></span> darn interns :slightly_smiling_face:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:30:39)</span> <b>dweitzel:</b></span> good on them though.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:31:00)</span> <b>kretzke:</b></span> yeah, they get all the fun projects!<br/>
+</body>
+</html>

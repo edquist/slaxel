@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu May 12, 2016 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Thu May 12, 2016 : #gracc (osg)</h3>
+<span style="color: #3c8c69"><span style="font-size: small">(12:44:18)</span> <b>kretzke:</b></span> restarted es on gratiav2-3. I turned on debug and am tinkering with some settings to see if I can increase the recovery rate.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:44:49)</span> <b>kretzke:</b></span> namely cluster.routing.allocation.node_concurrent_recoveries<br/> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/shards-allocation.html">https://www.elastic.co/guide/en/elasticsearch/reference/current/shards-allocation.html</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:45:27)</span> <b>kretzke:</b></span> interesting note on the setting below that: "While the recovery of replicas happens over the network, the recovery of an unassigned primary after node restart uses data from the local disk."<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:48:28)</span> <b>kretzke:</b></span> so I guess what happens when a node goes down is the replicas of any primary shards it had get promoted to primary, so when it comes back it only gets assigned replicas, which get recovered over the network<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:51:25)</span> <b>kretzke:</b></span> yeah, /_cat/shards shows only replicas there now<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:52:49)</span> <b>dweitzel:</b></span> is there a performance or reliability hit for only having replicas on a node?  rather than primaries?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:55:38)</span> <b>kretzke:</b></span> I don’t know. I believe indexing operations happen in parallel on primary and replicas and either can be used for queries. So I don’t think so.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:57:34)</span> <b>kretzke:</b></span> I’m wondering if the pain of rolling restarts is worth it. can we tolerate a 15-minute outage for a full cluster reboot?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:59:53)</span> <b>kretzke:</b></span> BTW, I did add io_time (as a percent) to <a href="https://gracc.opensciencegrid.org/dashboard/db/grace-system-monitoring">https://gracc.opensciencegrid.org/dashboard/db/grace-system-monitoring</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:32:57)</span> <b>kretzke:</b></span> back to green. 80 minute recovery (vs 140 yesterday for gratiav2-4)<br/>
+<span style="color: #902d59"><span style="font-size: small">(14:02:36)</span> <b>tanya:</b></span> do we meet today?<br/>
+<span style="color: #902d59"><span style="font-size: small">(14:02:38)</span> <b>tanya:</b></span> at 2?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:02:52)</span> <b>dweitzel:</b></span> oh, I haven’t heard anything to that effect.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:02:54)</span> <b>dweitzel:</b></span> do we?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:03:11)</span> <b>dweitzel:</b></span> I assume Bo was traveling back from UCSD<br/>
+<span style="color: #902d59"><span style="font-size: small">(14:03:14)</span> <b>tanya:</b></span> no clue, Bo is here but somehow didn't start the meeting<br/>
+<span style="color: #902d59"><span style="font-size: small">(14:03:27)</span> <b>tanya:</b></span> i still have it in my calendar<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:04:55)</span> <b>dweitzel:</b></span> @boj:  ?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:08:58)</span> <b>dweitzel:</b></span> @kretzke: Do you have the gracc logstash configuration anywhere on github?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:10:12)</span> <b>kretzke:</b></span> from bo’s email last week: "Looking at my calendar I do have a conflict for next week's meeting slot…"<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:10:42)</span> <b>kretzke:</b></span> yeah, I need to move it: <a href="https://github.com/gracc-project/gracc-config">https://github.com/gracc-project/gracc-config</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:22:30)</span> <b>dweitzel:</b></span> Thanks<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:52:28)</span> <b>dweitzel:</b></span> @kretzke: I successfully extracted some test data that my gracc-request daemon now uses to test in CI: <a href="https://github.com/opensciencegrid/gracc-test-data">https://github.com/opensciencegrid/gracc-test-data</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:52:50)</span> <b>dweitzel:</b></span> <a href="https://travis-ci.org/djw8605/gracc-request">https://travis-ci.org/djw8605/gracc-request</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:53:00)</span> <b>dweitzel:</b></span> I quite like travis-ci<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:16:10)</span> <b>kretzke:</b></span> ah, cool. I have a small test bundle in the collector repo and a make target to run tests. I need to find some time to get that into travis-ci<br/>
+</body>
+</html>

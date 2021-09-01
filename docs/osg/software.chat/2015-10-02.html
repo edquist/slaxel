@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Oct 2, 2015 : #software (osg)</title>
+</head>
+<body>
+<h3>Fri Oct 2, 2015 : #software (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(14:47:31)</span> <b>bbockelm:</b></span> @dgc, @lincoln - at some point, have a chat with @dweitzel about our plans in <a href="http://sft.its.cern.ch/jira/browse/CVM-905">http://sft.its.cern.ch/jira/browse/CVM-905</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:48:47)</span> <b>bbockelm:</b></span> it’s an epsilon or two away from being able to publish Stash into CVMFS.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:49:33)</span> <b>lincoln:</b></span> can you remind me of the benefits of this?<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:49:38)</span> <b>lincoln:</b></span> (was that in your slides? )<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:50:10)</span> <b>bbockelm:</b></span> you’d basically have /cvmfs/stash.opensciencegrid.org available globally, powered by StashCache.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:50:53)</span> <b>bbockelm:</b></span> I think we need to run a repo server of sorts on OSG-Connect; that’s what I haven’t precisely figured out.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:50:58)</span> <b>lincoln:</b></span> assuming LD_PRELOAD hook?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:51:23)</span> <b>bbockelm:</b></span> nope.  Real, honest-to-goodness CVMFS.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:51:44)</span> <b>lincoln:</b></span> ah<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:51:47)</span> <b>bbockelm:</b></span> (as part of the default CVMFS config from OSG to boot)<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:51:51)</span> <b>lincoln:</b></span> so this is the reverse of what i was thinking.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:52:17)</span> <b>lincoln:</b></span> youre distributing stash via CVMFS rather than distributing CVMFS via xrootd, yes?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:53:19)</span> <b>bbockelm:</b></span> well, the vision is still to have the actual bits moved to the CVMFS client by the Xrootd servers.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:53:31)</span> <b>lincoln:</b></span> i see<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:54:46)</span> <b>bbockelm:</b></span> The part I struggle with is how one would expose this to OSG-Connect users.  We can give them a writable directory, /cvmfs/stash.opensciencegrid.org, where they can hit ‘cvmfs_publish’ and get their files out to the world.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:55:08)</span> <b>bbockelm:</b></span> (well, not the world - one aspect of the above set of PRs is VOMS-based authz)<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:55:48)</span> <b>lincoln:</b></span> hm<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:55:56)</span> <b>bbockelm:</b></span> The problem right now is that when you hit ‘cvmfs_publish’, the mount has to be remounted read-only and kept like that until the process is finished.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:56:24)</span> <b>bbockelm:</b></span> depending on data volume, publication can take awhile - and I’m assuming any more than 10s and someone will complain.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:56:34)</span> <b>lincoln:</b></span> so when I cvmfs_publish about 20GB of junk.. yeah<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:57:01)</span> <b>bbockelm:</b></span> Does OSG-Connect have any filesystems on it that support snapshotting?<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:57:37)</span> <b>lincoln:</b></span> hrm, not currently. but it could be done<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:57:52)</span> <b>bbockelm:</b></span> Does CephFS snapshot?<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:58:11)</span> <b>lincoln:</b></span> i think there is untested code floating about<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:58:14)</span> <b>lincoln:</b></span> but i don’t tihnk its supported<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:58:24)</span> <b>lincoln:</b></span> Ceph RBDs can be snapshotted, though i’ve not tried it. ZFS or BTRFS could be snapshotted<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:59:28)</span> <b>bbockelm:</b></span> Come on CephFS, even HDFS snapshots :wink:<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:59:37)</span> <b>lincoln:</b></span> :simple_smile:<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:02:41)</span> <b>lincoln:</b></span> are you thinking of using snapshots to get around the whole remount dance?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:03:31)</span> <b>bbockelm:</b></span> yeah.  That’s “kinda” what we do for OASIS: instead of snapshots though, we rsync and tell people to not write.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:04:01)</span> <b>bbockelm:</b></span> It’s probably fine for software installs, but the base assumption with data is the volume is too large to move.<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:04:12)</span> <b>lincoln:</b></span> ah<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:04:35)</span> <b>lincoln:</b></span> eh, just set up a FreeBSD box with ZFS and call it a day :simple_smile:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:04:51)</span> <b>bbockelm:</b></span> :simple_smile: Sure, convert Stash to FreeBSD.  I’m waiting<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:04:55)</span> <b>lincoln:</b></span> ok brb<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:08:29)</span> <b>bbockelm:</b></span> well, maybe it’s a pipe dream, but it seems that if we could figure out “something clever” for publication, Stash could really be a global file system.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:09:55)</span> <b>bbockelm:</b></span> that said, now that I’ve fooled around with CVMFS more, you definitely should have an <a href="http://connect.opensciencegrid.org">connect.opensciencegrid.org</a> repo on osg-connect.<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:10:37)</span> <b>lincoln:</b></span> well, part of it is figuring out what content we want in there.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:12:26)</span> <b>bbockelm:</b></span> What I’d do is have /cvmfs/connect.opensciencegrid.org on OSG-Connect actually be a ext4 filesystem with quotas and a per-user directory.  “connect_publish” would be setuid and rsync the user directory to /some/other/mountpoint/connect.opensciencegrid.org/user and do the publication dance.<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:12:58)</span> <b>lincoln:</b></span> hm.<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:13:42)</span> <b>lincoln:</b></span> the publication dance just seems soooo janky<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:14:16)</span> <b>bbockelm:</b></span> I have thought about putting together some sort of inotify magic to auto-publish every X minutes.<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:14:25)</span> <b>lincoln:</b></span> inotify is pretty slick, i quite like it<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:14:43)</span> <b>lincoln:</b></span> if we’re already setting up a separate filesystem, lets just build something with Z or btr on the backend and see how badly it blows up^W^W^W^W well it works<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:16:22)</span> <b>bbockelm:</b></span> So, the way CVMFS publication works is that it creates a AUFS mount - something like this:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:16:32)</span> <b>bbockelm:</b></span> /dev/fuse on /var/spool/cvmfs/test.cern.ch/rdonly type fuse (ro,nodev,allow_other,default_permissions)<br/><a href="http://aufs_test.cern.ch">aufs_test.cern.ch</a> on /cvmfs/test.cern.ch type aufs (ro,relatime,si=1b137f931dcd987,udba=none)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:17:06)</span> <b>bbockelm:</b></span> where the AUFS /etc/fstab def’n is:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:17:07)</span> <b>bbockelm:</b></span> <a href="http://aufs_test.cern.ch">aufs_test.cern.ch</a> /cvmfs/test.cern.ch aufs br=/var/spool/cvmfs/test.cern.ch/scratch=rw:/var/spool/cvmfs/test.cern.ch/rdonly=rr,udba=none,ro 0 0 # added by CernVM-FS for <a href="http://test.cern.ch">test.cern.ch</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:17:46)</span> <b>bbockelm:</b></span> Then, when you write files into /cvmfs/test.cern.ch, they actually end up in /var/spool/cvmfs/test.cern.ch/scratch<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:18:53)</span> <b>bbockelm:</b></span> Then, when you hit ‘cvmfs_publish’, the cvmfs process will spider  /var/spool/cvmfs/test.cern.ch/scratch and create new CVMFS “stuff”.  Then, /var/spool/cvmfs/test.cern.ch/rdonly is remounted (containing the information that was in scratch) and the scratch dir is emptied out.<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:20:17)</span> <b>lincoln:</b></span> ok, makes sense<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:21:05)</span> <b>bbockelm:</b></span> I wonder if we could wedge a btrfs mount into /var/spool/cvmfs/test.cern.ch/scratch and * insert magic here *.<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:21:27)</span> <b>lincoln:</b></span> hrm<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:22:52)</span> <b>lincoln:</b></span> yes well obviously the insert magic here part is the tricky one :simple_smile:<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:23:01)</span> <b>lincoln:</b></span> btw is CMVFS going to convert to OverlayFS?<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:23:20)</span> <b>lincoln:</b></span> i understand that AUFS is like a 20kloc kernel patch that is never ever going to be merged into the kernel<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:23:36)</span> <b>bbockelm:</b></span> Yeah - they have semi-working code for OverlayFS, but it triggers kernel panics.<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:23:41)</span> <b>lincoln:</b></span> NICE<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:23:47)</span> <b>bbockelm:</b></span> so they didn’t complete the project (yet).<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:24:07)</span> <b>bbockelm:</b></span> I think the plan is to pick it back up after RHEL 7.next is released to see if enough kernel panics were fixed to continue.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:24:38)</span> <b>bbockelm:</b></span> because yes, while AUFS is super necessary, everyone hates it just a little for being out-of-tree.<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:24:52)</span> <b>lincoln:</b></span> yeah<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:25:18)</span> <b>bbockelm:</b></span> (in fact, this is why <a href="http://oasis.opensciencegrid.org">oasis.opensciencegrid.org</a> is still SL5)<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:25:33)</span> <b>lincoln:</b></span> yeah. doesn’t CERN publish an EL6 AUFS-patched kernel tho?<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:25:41)</span> <b>lincoln:</b></span> coulda sworn i installed this on something<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:25:45)</span> <b>bbockelm:</b></span> yup<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:25:55)</span> <b>lincoln:</b></span> [root@uct2-cvmfs-s0 ~]# rpm -q kernel<br/>kernel-2.6.32-504.12.2.el6.x86_64<br/>kernel-2.6.32-504.16.2.el6.aufs21.x86_64<br/>kernel-2.6.32-504.23.4.el6.aufs21.x86_64<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:25:55)</span> <b>lincoln:</b></span> yeah<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:26:05)</span> <b>bbockelm:</b></span> GOC’s not particularly setup for non-standard kernels<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:26:09)</span> <b>lincoln:</b></span> ah :simple_smile:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:27:31)</span> <b>bbockelm:</b></span> <a href="https://lwn.net/Articles/581558/">https://lwn.net/Articles/581558/</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:28:37)</span> <b>bbockelm:</b></span> anyhow, I’m out - catch you guys later.<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:28:43)</span> <b>lincoln:</b></span> cya, have a nice weekend<br/>
+</body>
+</html>

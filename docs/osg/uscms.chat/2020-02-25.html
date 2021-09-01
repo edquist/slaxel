@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Feb 25, 2020 : #uscms (osg)</title>
+</head>
+<body>
+<h3>Tue Feb 25, 2020 : #uscms (osg)</h3>
+<span style="color: #a72f79"><span style="font-size: small">(10:28:09)</span> <b>andrew.melo:</b></span> Anyone know a good way to debug this: <tt>HoldReason = "Network error talking to schedd, probably an authorization failure"</tt><br/>
+<span style="color: #a72f79"><span style="font-size: small">(10:28:46)</span> <b>andrew.melo:</b></span> IT only happens intermittently, and nothing obvious umps out at the logs<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:37:22)</span> <b>blin:</b></span> is this on a CE?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(10:40:20)</span> <b>andrew.melo:</b></span> yeah<br/>
+<span style="color: #a72f79"><span style="font-size: small">(10:40:27)</span> <b>andrew.melo:</b></span> but only one of them??<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:13:13)</span> <b>blin:</b></span> @andrew.melo that's pretty strange but I would guess there's some sort of issue with the CE &lt;-&gt; factory communication<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:16:58)</span> <b>andrew.melo:</b></span> I don't know how it can be intermittant? Like, if I just had a bad cert or something, I'd expect it to constantly fail?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:19:39)</span> <b>blin:</b></span> it could be failing on the pilot proxy<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:20:44)</span> <b>blin:</b></span> there may be more info in <tt>/var/log/condor-ce/SchedLog</tt> but if not, you'll want to reach out to factory ops to check if they see anything on their end<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:18:26)</span> <b>andrew.melo:</b></span> Does this ring any bells?<br/><pre>02/25/20 13:17:43 condor_write(): Socket closed when trying to write 13 bytes to , fd is 21<br/>02/25/20 13:17:43 Buf::write(): condor_write() failed<br/>02/25/20 13:17:43 SharedPortEndpoint: failed to send final status (success) for SHARED_PORT_PASS_SOCK<br/>02/25/20 13:17:43 (cid:1460178) Command=QMGMT_WRITE_CMD, peer=&lt;169.228.38.43:22493&gt;<br/>02/25/20 13:17:43 (cid:1460178) AuthMethod=GSI, AuthId=/DC=ch/DC=cern/OU=computers/CN=cmspilot02/vocms080.cern.ch,/cms/Role=pilot/Capability=NULL,/cms/Role=NULL/Capability=NULL,/cms/dcms/Role=NULL/Capability=NULL,/cms/escms/Role=NULL/Capability=NULL,/cms/itcms/Role=NULL/Capability=NULL,/cms/local/Role=NULL/Capability=NULL,/cms/uscms/Role=NULL/Capability=NULL, <a href="mailto:CondorId=cmspilot@users.opensciencegrid.org">CondorId=cmspilot@users.opensciencegrid.org</a><br/>02/25/20 13:17:43 condor_write(): Socket closed when trying to write 13 bytes to , fd is 21<br/>02/25/20 13:17:43 Buf::write(): condor_write() failed<br/>02/25/20 13:17:43 SharedPortEndpoint: failed to send final status (success) for SHARED_PORT_PASS_SOCK<br/>02/25/20 13:17:43 (cid:1460180) Command=TRANSFER_DATA_WITH_PERMS, peer=&lt;131.225.188.62:19653&gt;</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:11:02)</span> <b>blin:</b></span> nope but i can ask the condor folks about it<br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:44:47)</span> <b>andrew.melo:</b></span> What's the magic words to delete held jobs? <tt>Total for all users: 1896 jobs; 438 completed, 34 removed, 702 idle, 102 running, 620 held, 0 suspended</tt><br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:45:04)</span> <b>andrew.melo:</b></span> <tt>condor_ce_q 'JobStatus =?= 5'</tt> gives nothing<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:46:14)</span> <b>blin:</b></span> you're looking for <tt>condor_ce_q -const 'JobStatus == 5'</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:46:35)</span> <b>blin:</b></span> and <tt>condor_ce_rm -const 'JobStatus == 5'</tt><br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:46:48)</span> <b>andrew.melo:</b></span> ahh, there it is. thanks<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:13:20)</span> <b>andrew.melo:</b></span> Well, different error after the change--<br/><pre>HoldReason = "HTCondor-CE held job due to expired user proxy."</pre><br/>[root@ce1-vanderbilt ~]# date<br/>Tue Feb 25 15:12:52 CST 2020<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:14:30)</span> <b>andrew.melo:</b></span> (change = deleting the old held jobs and seeing what showed up)<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:14:39)</span> <b>blin:</b></span> hrm, could you check for the corresponding job's proxy file in <tt>/var/lib/condor-ce/spool</tt> ?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:14:51)</span> <b>blin:</b></span> what version of condor are you running? <tt>condor_version</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:15:02)</span> <b>blin:</b></span> ATLAS did see some similar issues about proxy expiration stuff<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:15:02)</span> <b>andrew.melo:</b></span> Hmmmmm<br/><pre>[root@ce1-vanderbilt ~]# ls /mnt/ce-spool/ce3.vampire/8633/0/*<br/>/mnt/ce-spool/ce3.vampire/8633/0/cluster3748633.proc0.subproc0:<br/>_condor_stderr  _condor_stdout  glidein_startup.sh<br/><br/>/mnt/ce-spool/ce3.vampire/8633/0/cluster3748633.proc0.subproc0.tmp:</pre><br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:15:14)</span> <b>andrew.melo:</b></span> <pre>[root@ce1-vanderbilt ~]# condor_version<br/>$CondorVersion: 8.8.7 Jan 06 2020 PackageID: 8.8.7-1 $<br/>$CondorPlatform: X86_64-CentOS_7.7 $</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:24:58)</span> <b>blin:</b></span> so are these the same jobs that you removed from the hold state or are they new jobs that are being held?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:40:57)</span> <b>andrew.melo:</b></span> no jonbs<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:41:10)</span> <b>andrew.melo:</b></span> *jobs. I just deleted the old held jobs to try and get the logs to be less chatty<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:42:27)</span> <b>blin:</b></span> that's super bizarre then. are there a lot of jobs held that way?<br/>
+</body>
+</html>

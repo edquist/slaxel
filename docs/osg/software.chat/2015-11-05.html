@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Nov 5, 2015 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu Nov 5, 2015 : #software (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(09:57:54)</span> <b>bbockelm:</b></span> @marian: did you get a chance to dig up the configs and post them here?<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:58:12)</span> <b>marian:</b></span> yep, wrapping up, will send the link<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:05:23)</span> <b>marian:</b></span> <a href="http://t2.unl.edu/store/zvada/stashcache/">http://t2.unl.edu/store/zvada/stashcache/</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(10:06:06)</span> <b>marian:</b></span> I found one issue now on itb2, this line was uncommented:<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:06:20)</span> <b>marian:</b></span> XROOTD_DEFAULT_OPTIONS="-l /var/log/xrootd/xrootd.log -c /etc/xrootd/xrootd-standalone.cfg -k fifo"<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:06:49)</span> <b>marian:</b></span> though had commented out correct one:<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:06:51)</span> <b>marian:</b></span> XROOTD_DEFAULT_OPTIONS="-l /var/log/xrootd/xrootd.log -c /etc/xrootd/xrootd-clustered.cfg -k fifo"<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:07:38)</span> <b>marian:</b></span> well I can get the file now<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:07:40)</span> <b>marian:</b></span> xrdcp -d 1 -f <a href="root://stash-itb2.grid.iu.edu//user/test.1M">root://stash-itb2.grid.iu.edu//user/test.1M</a> /tmp/<br/>[1024kB/1024kB][100%][==================================================][512kB/s]<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:07:45)</span> <b>marian:</b></span> :wink:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:08:35)</span> <b>bbockelm:</b></span> when did itb2 last get restarted?<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:08:43)</span> <b>marian:</b></span> just 5mins ago<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:08:52)</span> <b>marian:</b></span> I did<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:09:08)</span> <b>bbockelm:</b></span> perhaps it hadn’t been restarted since a config update?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:09:27)</span> <b>bbockelm:</b></span> because yes, the config looks fine now — but itb2 wasn’t working prior to restart.<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:09:34)</span> <b>marian:</b></span> hmm, I wouldn't say so, I've been restarting couple of times last week and this week too<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:09:55)</span> <b>marian:</b></span> there was this config line incorrect, I think it's due that<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:10:30)</span> <b>marian:</b></span> could be I accidently swapped the lines some time ago when I was doing some clean up for puppet config for Scott<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:10:35)</span> <b>marian:</b></span> otherwise I can't explain<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:11:10)</span> <b>marian:</b></span> itb2 should be out of any automatic config pushes from puppet etc as it's dev machine for me<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:17:17)</span> <b>marian:</b></span> argh, and found out that all my test attempts with <a href="http://hcc-stash.unl.edu">hcc-stash.unl.edu</a> were using 1024 in the command line instead of 1094 ... what a waste of time, sorry guys<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:17:21)</span> <b>bbockelm:</b></span> Ok - next question, why is the RSV test failing:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:17:25)</span> <b>bbockelm:</b></span> <a href="http://myosg.grid.iu.edu/rgstatushistory/index?downtime_attrs_showpast=&amp;account_type=cumulative_hours&amp;ce_account_type=gip_vo&amp;se_account_type=vo_transfer_volume&amp;bdiitree_type=total_jobs&amp;bdii_object=service&amp;bdii_server=is-osg&amp;start_type=7daysago&amp;start_date=11%2F04%2F2015&amp;end_type=now&amp;end_date=11%2F04%2F2015&amp;all_resources=on&amp;facility_sel%5B%5D=10009&amp;gridtype=on&amp;gridtype_1=on&amp;service=on&amp;service_sel%5B%5D=146&amp;active=on&amp;active_value=1&amp;disable_value=1#detail?resource_id=754&amp;service_id=146&amp;time=1446738539">http://myosg.grid.iu.edu/rgstatushistory/index?downtime_attrs_showpast=&amp;account_type=cumulative_hours&amp;ce_account_type=gip_vo&amp;se_account_type=vo_transfer_volume&amp;bdiitree_type=total_jobs&amp;bdii_object=service&amp;bdii_server=is-osg&amp;start_type=7daysago&amp;start_date=11%2F04%2F2015&amp;end_type=now&amp;end_date=11%2F04%2F2015&amp;all_resources=on&amp;facility_sel%5B%5D=10009&amp;gridtype=on&amp;gridtype_1=on&amp;service=on&amp;service_sel%5B%5D=146&amp;active=on&amp;active_value=1&amp;disable_value=1#detail?resource_id=754&amp;service_id=146&amp;time=1446738539</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(10:17:28)</span> <b>marian:</b></span> all looks fine there to<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:17:59)</span> <b>marian:</b></span> let's check caches one by one<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:18:05)</span> <b>bbockelm:</b></span> what’s the link for the cache RSV results?<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:18:13)</span> <b>marian:</b></span> sec<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:20:00)</span> <b>marian:</b></span> look you have right links<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:20:21)</span> <b>bbockelm:</b></span> Also, can we get stash-itb1 monitored as well in addition to the various caches?<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:20:29)</span> <b>marian:</b></span> maybe something to ask Scott what we see there only Indiana cache instance<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:20:47)</span> <b>bbockelm:</b></span> but that’s not actually a cache isntance, that’s referring to <a href="http://stash-itb2.grid.iu.edu">stash-itb2.grid.iu.edu</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(10:21:13)</span> <b>marian:</b></span> when I click on details I see same ... ok, I'll ask him<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:21:25)</span> <b>bbockelm:</b></span> Also for the TODO list, I see we need to bug the origin server admins:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:21:26)</span> <b>bbockelm:</b></span> <pre><br/>$ xrdmapc <a href="http://stash-itb2.grid.iu.edu:1094">stash-itb2.grid.iu.edu:1094</a><br/>0**** <a href="http://stash-itb2.grid.iu.edu:1094">stash-itb2.grid.iu.edu:1094</a><br/>      Srv <a href="http://data.ci-connect.net:1094">data.ci-connect.net:1094</a> <br/>$ xrdmapc <a href="http://stash-itb1.grid.iu.edu:1094">stash-itb1.grid.iu.edu:1094</a><br/>0**** <a href="http://stash-itb1.grid.iu.edu:1094">stash-itb1.grid.iu.edu:1094</a><br/>      Srv <a href="http://data.ci-connect.net:1094">data.ci-connect.net:1094</a> <br/>      Srv <a href="http://stashcache.fnal.gov:1094">stashcache.fnal.gov:1094</a> <br/>      Srv <a href="http://hcc-stashtest.unl.edu:1094">hcc-stashtest.unl.edu:1094</a><br/></pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(10:22:03)</span> <b>marian:</b></span> yes, they need to switch to DNS alias<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:22:09)</span> <b>marian:</b></span> we didn't ask everyone yet<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:22:27)</span> <b>marian:</b></span> as the situation wasn't clear<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:23:01)</span> <b>marian:</b></span> let me test with @lincoln again before we spread the message<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:23:03)</span> <b>bbockelm:</b></span> yup.  Let’s go ahead and send that email out.  I’ll take care of hcc-stashtest<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:23:21)</span> <b>marian:</b></span> ok, that's Dereks hcc-stashtest ... please<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:29:27)</span> <b>lincoln:</b></span> just let me know what needs to be done<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:32:48)</span> <b>marian:</b></span> alright, on your origin<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:32:49)</span> <b>bbockelm:</b></span> Marian, I see:<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:32:56)</span> <b>marian:</b></span> yes?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:33:07)</span> <b>bbockelm:</b></span> <pre><br/>151105 10:31:37 28128 Manager: <a href="http://stash-itb1.grid.iu.edu">stash-itb1.grid.iu.edu</a> manager configuration differs from <a href="http://stash-itb.grid.iu.edu">stash-itb.grid.iu.edu</a> for site local; making file location unpredictable!<br/></pre><br/>on <a href="http://hcc-stashtest.unl.edu">hcc-stashtest.unl.edu</a>.  This indicates that <a href="http://stash-itb1.grid.iu.edu">stash-itb1.grid.iu.edu</a> likely needs to be restarted.<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:33:21)</span> <b>marian:</b></span> uhm<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:33:29)</span> <b>marian:</b></span> well, I can give a kick<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:33:45)</span> <b>marian:</b></span> is it predictable how often, though? :simple_smile:<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:34:19)</span> <b>marian:</b></span> done<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:34:51)</span> <b>marian:</b></span> @lincoln: on your origin make sure you have "all.manager <a href="http://stash-itb.grid.iu.edu">stash-itb.grid.iu.edu</a>+ 1213"<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:35:23)</span> <b>lincoln:</b></span> all.manager <a href="http://stash-itb.grid.iu.edu">stash-itb.grid.iu.edu</a>+ 1213<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:35:24)</span> <b>marian:</b></span> if you have access to cache servers, make sure they have this line: "pss.origin <a href="http://stash-itb.grid.iu.edu:1094">stash-itb.grid.iu.edu:1094</a> "<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:35:26)</span> <b>lincoln:</b></span> ok<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:36:01)</span> <b>lincoln:</b></span> pss.origin <a href="http://stash-itb.grid.iu.edu:1094">stash-itb.grid.iu.edu:1094</a><br/>
+<span style="color: #e96699"><span style="font-size: small">(10:36:04)</span> <b>lincoln:</b></span> looks good to me<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:36:14)</span> <b>marian:</b></span> sounds good<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:55:08)</span> <b>bbockelm:</b></span> what does “hostname” return on stash-itb{1,2} ?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:01:09)</span> <b>bbockelm:</b></span> Oh - dumb question, what’s the xrootd version of stash-itb{1,2}?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:06:46)</span> <b>bbockelm:</b></span> Marian, I saw a slight difference in reverse DNS configuration for v6 versus v4.  I filed a ticket <a href="https://ticket.grid.iu.edu/27358">https://ticket.grid.iu.edu/27358</a> and CC’d you.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:07:01)</span> <b>bbockelm:</b></span> did you get ahold of the FNAL origin server?<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:07:11)</span> <b>marian:</b></span> 4.2.3<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:09:41)</span> <b>marian:</b></span> oh, ok, for that I struggle quite long, I had always sort of suspect if we have all good on the network level with DNS alias registration but didn't dig deep enough as I wasn't convinced if that may be problem and not just xrootd... so I screwed my config always, bad, very bad... now it explains, thanks Brian!<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:10:39)</span> <b>marian:</b></span> I wrote Robert today switch their origin too<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:10:47)</span> <b>marian:</b></span> to the DNS<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:44:01)</span> <b>lincoln:</b></span> breaking <a href="http://data.ci-connect.net">data.ci-connect.net</a> for a bit<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:53:52)</span> <b>bbockelm:</b></span> Sounds good.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:54:13)</span> <b>bbockelm:</b></span> Marian - what’s the list of caches?  Can you contact everyone about updating to the DNS alias?<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:57:03)</span> <b>marian:</b></span> yes, did so, but one reamainig<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:17:08)</span> <b>bbockelm:</b></span> great.  Did we figure out the RSV probes for caches?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:18:43)</span> <b>bbockelm:</b></span> @lincoln: are you an admin for this slack instance?<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:18:48)</span> <b>lincoln:</b></span> dont know<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:18:50)</span> <b>lincoln:</b></span> i can find out.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:18:56)</span> <b>bbockelm:</b></span> I screwed up my saved password and I’m about to go figure out what it takes to reset things.<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:20:55)</span> <b>lincoln:</b></span> hah, ok<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:37:06)</span> <b>bbockelm:</b></span> bah.  The password link sent by Slack doesn’t work.<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:40:02)</span> <b>lincoln:</b></span> hah<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:40:04)</span> <b>lincoln:</b></span> nice<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:40:18)</span> <b>bbockelm:</b></span> bah.  And now I’m off to be distracted by other things.<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:19:29)</span> <b>marian:</b></span> @bbockelm, @lincoln, I see some problem reappeared<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:20:22)</span> <b>marian:</b></span> <br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:20:42)</span> <b>bbockelm:</b></span> seems to be a <a href="http://data.ci-connect.net">data.ci-connect.net</a> issue<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:20:50)</span> <b>bbockelm:</b></span> Ceph was acting funky last night too.<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:21:06)</span> <b>marian:</b></span> all fails, even trying to copy from caches directly<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:21:17)</span> <b>bbockelm:</b></span> yeah, that’s because <a href="http://data.ci-connect.net">data.ci-connect.net</a> is down.<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:21:30)</span> <b>marian:</b></span> alright<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:21:34)</span> <b>marian:</b></span> yeah<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:21:57)</span> <b>marian:</b></span> @lincoln: do you have any evidence what's going on there?<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:58:23)</span> <b>lincoln:</b></span> is it again<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:58:30)</span> <b>lincoln:</b></span> oh<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:58:40)</span> <b>lincoln:</b></span> sorry i took it downthen we had the meeting then i blacked out / got distracted<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:58:50)</span> <b>lincoln:</b></span> im busy in the server room now. let me put the old config back and start it back up<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:59:03)</span> <b>lincoln:</b></span> just got 22 new ceph nodes :O<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:01:23)</span> <b>lincoln:</b></span> @marian: try now<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:06:31)</span> <b>marian:</b></span> yep, all good, thanks<br/>
+<span style="color: #9e3997"><span style="font-size: small">(21:05:42)</span> <b>bbockelm:</b></span> Alright - I’m stumped as to what the GOC RSV test is actually testing.  As far as I can see, redirectors are happy and healthy.<br/>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jul 2, 2019 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Tue Jul 2, 2019 : #gfactory (osg)</h3>
+<span style="color: #965d1b"><span style="font-size: small">(11:53:52)</span> <b>briedel:</b></span> what are the default resource requests for submission from the OSG frontend<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:06:23)</span> <b>jthiltges:</b></span> Should we expect 8319/tcp on <a href="http://glidein-frontend-2.t2.ucsd.edu">glidein-frontend-2.t2.ucsd.edu</a> to be reachable from Nebraska?<br/><br/>We're seeing the following error in a pilot's _condor_stderr<br/><pre>signature.j71buy.sha1: OK<br/>Tue Jul 2 16:47:38 UTC 2019 env http_proxy=<a href="http://red-squid.unl.edu:3128">red-squid.unl.edu:3128</a> wget <a href="http://glidein-frontend-2.t2.ucsd.edu:8319/vofrontend/stage/description.j719aS.cfg">http://glidein-frontend-2.t2.ucsd.edu:8319/vofrontend/stage/description.j719aS.cfg</a> --user-agent wget/glidein/CMS_T2_US_Nebraska_Red_gw2_whole_cms/schedd_glideins4@gfactory-2.opensciencegrid.org/307965.0/UCSD-CMS-Frontend.main --quiet --output-document /var/lib/condor/execute/dir_24171/glide_DgaltE/client/description.j719aS.cfg failed. version:GNU Wget 1.14 built on linux-gnu. exit code 8 stderr:<br/>Tue Jul 2 16:47:38 UTC 2019 Failed to load file 'description.j719aS.cfg' from '<a href="http://glidein-frontend-2.t2.ucsd.edu:8319/vofrontend/stage">http://glidein-frontend-2.t2.ucsd.edu:8319/vofrontend/stage</a>'.<br/>Tue Jul 2 16:47:38 UTC 2019 No signature in description file /var/lib/condor/execute/dir_24171/glide_DgaltE/client/description.j719aS.cfg.<br/>Tue Jul 2 16:47:38 UTC 2019 Sleeping 297<br/>Tue Jul 2 16:52:35 UTC 2019 Sleeping 250<br/>...</pre><br/><br/>Manually testing with curl:<br/><pre>$ curl <a href="http://glidein-frontend-2.t2.ucsd.edu:8319/vofrontend/stage/description.j719aS.cfg">http://glidein-frontend-2.t2.ucsd.edu:8319/vofrontend/stage/description.j719aS.cfg</a><br/>curl: (7) Failed to connect to <a href="http://glidein-frontend-2.t2.ucsd.edu">glidein-frontend-2.t2.ucsd.edu</a> port 8319: No route to host</pre><br/><br/>A few job attributes:<br/><pre>SubmitterId = "<a href="mailto:schedd_glideins4@gfactory-2.opensciencegrid.org">schedd_glideins4@gfactory-2.opensciencegrid.org</a>"<br/>SubmitterGlobalJobId = "<a href="mailto:schedd_glideins4@gfactory-2.opensciencegrid.org">schedd_glideins4@gfactory-2.opensciencegrid.org</a>#307965.0#1562085903"<br/>GlideinEntryName = "CMS_T2_US_Nebraska_Red_gw2_whole_cms"</pre><br/>The full <a href="http://job.ad">job.ad</a>, in case it's helpful: <a href="https://paste.fedoraproject.org/paste/uVMGdkiO~eF5Azp7EJvnYg/raw">https://paste.fedoraproject.org/paste/uVMGdkiO~eF5Azp7EJvnYg/raw</a><br/>
+<span style="color: #d1707d"><span style="font-size: small">(12:08:37)</span> <b>gattebury:</b></span> ^ to be clear port 8319 looks firewalled, wget just says “no route” because we get an ICMP unreachable — we can ping it just fine<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:49:20)</span> <b>jdost321:</b></span> @jthiltges @gattebury it's supposed to be but i can't reach it from UCSD either. @efajardo helps run this frontend, Edgar can you check the web server on glidein-frontend-2?<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:18:29)</span> <b>efajardo:</b></span> Well @didavila handles that now<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:18:31)</span> <b>efajardo:</b></span> but I am checking<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:20:38)</span> <b>efajardo:</b></span> wow I see a weird config<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:21:09)</span> <b>efajardo:</b></span> It should be fixed now iptables problem<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:21:15)</span> <b>efajardo:</b></span> I don ot know why 8319<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:21:17)</span> <b>efajardo:</b></span> was picked<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:21:19)</span> <b>efajardo:</b></span> though<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:21:28)</span> <b>jdost321:</b></span> that's an ancient igorism<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:21:36)</span> <b>jdost321:</b></span> once upon a time no FEs used port 80<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:21:54)</span> <b>jthiltges:</b></span> Thank you, Jeff and Edgar<br/>
+</body>
+</html>

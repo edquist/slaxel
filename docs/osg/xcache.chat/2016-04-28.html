@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Apr 28, 2016 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Thu Apr 28, 2016 : #xcache (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(11:49:58)</span> <b>bbockelm:</b></span> @lincoln: I think the Xrootd origin server for stash went “pop”.  Maybe a ceph mount issue again?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:50:19)</span> <b>bbockelm:</b></span> Listings just time out with error after a few minutes.<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:00:13)</span> <b>lincoln:</b></span> no ceph issues atm but<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:00:23)</span> <b>lincoln:</b></span> it looks like the load has been climbing<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:00:25)</span> <b>lincoln:</b></span> for some reason<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:01:13)</span> <b>lincoln:</b></span> nothing hanging out in D state but droppign after an xrootd restart<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:01:17)</span> <b>lincoln:</b></span> ¯\_(ツ)_/¯<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:01:25)</span> <b>lincoln:</b></span> but load is dropping*<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:04:27)</span> <b>bbockelm:</b></span> @lincoln: also, every damn run, <tt>/user/ndh8</tt> takes like 5 minutes to list.<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:04:39)</span> <b>lincoln:</b></span> neat<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:04:43)</span> <b>lincoln:</b></span> tons o’ files?<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:05:52)</span> <b>lincoln:</b></span> is it the top level dir that takes forever?<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:05:56)</span> <b>lincoln:</b></span> or something inside?<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:06:01)</span> <b>lincoln:</b></span> i see a few somewhat large dirs, 6k files<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:06:06)</span> <b>lincoln:</b></span> but they dont take long to list for me<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:06:13)</span> <b>lincoln:</b></span> real	0m0.023s<br/>user	0m0.010s<br/>sys	0m0.004s<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:06:27)</span> <b>bbockelm:</b></span> hm.  I don’t timestamp the historical stuff, but it’s been on <tt>/user//ndh8/public/results/var_delays</tt> for at least a minute or two.<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:06:33)</span> <b>lincoln:</b></span> alright<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:06:54)</span> <b>lincoln:</b></span> ~9k files there<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:09:44)</span> <b>lincoln:</b></span> stracing the xrootd process on <a href="http://data.ci-connect.net">data.ci-connect.net</a> im seeing a lot of timed out connections<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:09:47)</span> <b>lincoln:</b></span> which is interesting..<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:13:04)</span> <b>bbockelm:</b></span> … still listing ….<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:13:16)</span> <b>lincoln:</b></span> works fine locally<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:13:18)</span> <b>lincoln:</b></span> so something is wonky.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:15:09)</span> <b>bbockelm:</b></span> <tt>xrdfs <a href="http://data.ci-connect.net">data.ci-connect.net</a> ls /user/ndh8/public/results/var_delays</tt> is basically what this is doing.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:21:52)</span> <b>bbockelm:</b></span> yeah, looking at strace, results trickle in.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:23:31)</span> <b>bbockelm:</b></span> Failed to open file <a href="root://data.ci-connect.net//user//rynge/public/tophat-1458484071/data/SRR950098/000008/reverse-000008-000236.fastq">root://data.ci-connect.net//user//rynge/public/tophat-1458484071/data/SRR950098/000008/reverse-000008-000236.fastq</a>: [ERROR] No more free SIDs<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:23:41)</span> <b>bbockelm:</b></span> erm, I don’t know what that means from the client side.  What’s the server doing?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:26:14)</span> <b>bbockelm:</b></span> So, this might be an issue for Andy to look at - certainly 9k files isn’t so excessive that the server should choke.<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:46:21)</span> <b>lincoln:</b></span> the server isnt doing much<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:46:02)</span> <b>bbockelm:</b></span> :confused: Can you kick it over again?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:46:16)</span> <b>bbockelm:</b></span> I’m just seeing errors now<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:47:05)</span> <b>lincoln:</b></span> ok<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:47:07)</span> <b>lincoln:</b></span> sec<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:47:17)</span> <b>lincoln:</b></span> done<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:03:44)</span> <b>bbockelm:</b></span> alright.  I just blacklisted the <tt>/user/ndh8</tt> directory for now.  Kicked off a minute or so ago, let’s see how happy it is.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:05:56)</span> <b>bbockelm:</b></span> (there has *got* to be a better way to process deltas…)<br/>
+</body>
+</html>

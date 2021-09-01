@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Mar 19, 2021 : #software (osg)</title>
+</head>
+<body>
+<h3>Fri Mar 19, 2021 : #software (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(10:34:32)</span> <b>dweitzel:</b></span> What's the status of GlideinWMS frontends querying remote schedd's with tokens?<br/>
+<blockquote>
+<span style="color: #dd8527"><span style="font-size: small">(14:36:27)</span> <b>marcom:</b></span> Dennis is working on a release candidate for 3.7.3 that includes that<br/>
+</blockquote>
+<span style="color: #9e3997"><span style="font-size: small">(11:50:14)</span> <b>bbockelm:</b></span> @marcom ^^^<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:32:01)</span> <b>jthiltges:</b></span> Are koji build tasks intended to be isolated from the network? I'm seeing an issue building hadoop when downloading maven artifacts.<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:32:16)</span> <b>matyas:</b></span> yes they are<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:33:09)</span> <b>matyas:</b></span> if it's a big enough deal, I can change it, but I'm pretty sure it would require patching koji and/or mock.<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:33:34)</span> <b>matyas:</b></span> (and it's nice to have reproducible builds)<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:35:13)</span> <b>jthiltges:</b></span> I agree on the reproducible builds, and I was seeing the same, apparently default, behavior with mock on my desktop.<br/>This unfortunately probably makes a hadoop build non-trivial.<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:36:39)</span> <b>edquist:</b></span> yeah<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:37:06)</span> <b>edquist:</b></span> hadoop and maven builds in general do a lot of build-time downloads<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:37:26)</span> <b>tim.theisen:</b></span> You can configure mock on your desktop to allow downloads during builds. I had to do that once upon a time.<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:37:51)</span> <b>matyas:</b></span> The problem is that the mock configs koji generates do not include the flags to enable networking.<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:38:57)</span> <b>edquist:</b></span> there is a way to cache the local maven repository of stuff that gets downloaded during a build, and in theory we could use that for future builds rather than download the maven artifacts at build time, but i think it'd be a bit of effort to get that working right<br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:40:12)</span> <b>andrew.melo:</b></span> If' it's maven, you just gotta cache <tt>~/.m2</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(14:40:59)</span> <b>matyas:</b></span> yeah that's what I'd recommend -- run the build locally, download all the deps, stick 'em in a tarball, and use the tarball as a source for the rpm.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:41:22)</span> <b>andrew.melo:</b></span> travis, et al, do something similar, but you want to make sure to exclude any -SNAPSHOT<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:41:24)</span> <b>matyas:</b></span> Unfortunately IIRC Hadoop has a nasty build script that might make it harder to do that<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:42:52)</span> <b>matyas:</b></span> I do have a ticket for it (<a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-4109">https://opensciencegrid.atlassian.net/browse/SOFTWARE-4109</a>) but it's marked as low prio because, amusingly,<br/>&gt; <a href="https://opensciencegrid.atlassian.net/secure/ViewProfile.jspa?accountId=5acbaaf5ba87e92b4b2134e8">Brian Lin</a> added a comment - 2020/10/07 6:21 PM<br/>&gt; I’m suspecting that we won’t be building Hadoop for EL8 but we can leave this open for the time being<br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:42:54)</span> <b>andrew.melo:</b></span> (speaking from experience, that's an annoying one to hunt down)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:55:27)</span> <b>bbockelm:</b></span> :slightly_smiling_face: John, or you could just file a ticket with OSG Software and have them do it.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:58:36)</span> <b>jthiltges:</b></span> I was hoping to test the change with a local build before bothering someone. =/<br/><br/>And the fun continues. Prodded mock knobs (rpmbuild_networking and use_host_resolv), and there's network access!<br/>Now it looks like the maven version doesn't support TLS SNI, so fails to download.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(16:34:01)</span> <b>jthiltges:</b></span> Ticket opened: <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-4540">https://opensciencegrid.atlassian.net/browse/SOFTWARE-4540</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:38:16)</span> <b>blin:</b></span> thanks!<br/>
+</body>
+</html>

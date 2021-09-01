@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Apr 30, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu Apr 30, 2020 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(08:57:23)</span> <b>blin:</b></span> @matyas @efajardo i'm pretty sure that the osg-build container looks at the osg build repos because it works with other packages<br/>
+<span style="color: #c386df"><span style="font-size: small">(08:57:42)</span> <b>matyas:</b></span> nope. it uses the default system mock config which is apparently epel+centos<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:58:10)</span> <b>blin:</b></span> i'm still skeptical :smile:<br/>
+<span style="color: #c386df"><span style="font-size: small">(08:58:52)</span> <b>matyas:</b></span> <a href="https://github.com/opensciencegrid/docker-osg-build/blob/master/input/build-from-github#L16">https://github.com/opensciencegrid/docker-osg-build/blob/master/input/build-from-github#L16</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(08:59:19)</span> <b>matyas:</b></span> you don't specify a mock config so unless I hardcoded something into osg-build, it's using the system default one<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:01:54)</span> <b>blin:</b></span> we do have this mock.cfg that we use:<br/><a href="https://github.com/opensciencegrid/docker-osg-build/blob/master/input/mock.cfg">https://github.com/opensciencegrid/docker-osg-build/blob/master/input/mock.cfg</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(09:02:10)</span> <b>matyas:</b></span> yeah but that doesn't say anything about the package repos<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:02:33)</span> <b>blin:</b></span> doesn't our <tt>osg-build</tt> config that we drop in specify that?<br/><a href="https://github.com/opensciencegrid/docker-osg-build/blob/master/input/config">https://github.com/opensciencegrid/docker-osg-build/blob/master/input/config</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(09:03:46)</span> <b>matyas:</b></span> doesn't say anything about 'osg-3.5-el7-build' or whatever<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:03:48)</span> <b>matyas:</b></span> also <a href="https://travis-ci.org/github/opensciencegrid/xrootd-lcmaps/builds/680722440#L309">https://travis-ci.org/github/opensciencegrid/xrootd-lcmaps/builds/680722440#L309</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(09:04:07)</span> <b>matyas:</b></span> <tt>Config(epel-7-x86_64)</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(09:05:23)</span> <b>blin:</b></span> so is osg-build somehow not respecting the config that we drop in? or are we doing it the wrong way?<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:05:51)</span> <b>matyas:</b></span> we're not dropping in a config file that says anything about which repo to use!<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:10:57)</span> <b>blin:</b></span> ah<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:10:59)</span> <b>blin:</b></span> can you fix that?<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:12:57)</span> <b>matyas:</b></span> sure<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:15:27)</span> <b>blin:</b></span> thanks<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:20:36)</span> <b>matyas:</b></span> <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-4083">https://opensciencegrid.atlassian.net/browse/SOFTWARE-4083</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:13:51)</span> <b>blin:</b></span> @matyas could you submit a PR to fix <tt>xrootd-lcmaps</tt> to use the new build tag env var that you added?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:14:08)</span> <b>matyas:</b></span> already on it<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:15:03)</span> <b>matyas:</b></span> @efajardo <a href="https://github.com/efajardo/xrootd-lcmaps/pull/1">https://github.com/efajardo/xrootd-lcmaps/pull/1</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:16:46)</span> <b>blin:</b></span> oh and the template here: <a href="https://opensciencegrid.org/technology/software/development-process/#verifying-builds-through-travis-ci">https://opensciencegrid.org/technology/software/development-process/#verifying-builds-through-travis-ci</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:17:34)</span> <b>blin:</b></span> this would actually be a really good candidate to turn into a github action<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:18:17)</span> <b>blin:</b></span> that way we'd make the fix to the action and everything using it would be updated instead of having to update every <tt>.travis.yml</tt> in each repo<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:44:07)</span> <b>efajardo:</b></span> thanks @matyas<br/>
+</body>
+</html>

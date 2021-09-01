@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jul 22, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Mon Jul 22, 2019 : #xcache (osg)</h3>
+<span style="color: #a63024"><span style="font-size: small">(10:37:34)</span> <b>efajardo:</b></span> @blin I found the problem<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:37:41)</span> <b>efajardo:</b></span> with the cron jobs in the xcaches<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:37:43)</span> <b>efajardo:</b></span> <pre>[root@stashcache xrootd]# stat --format '%a' /etc/cron.d/fetch-crl.cron <br/>664<br/>[root@stashcache xrootd]# ^C<br/>[root@stashcache xrootd]# exit<br/>exit<br/>command terminated with exit code 130<br/>[0837] efajardo@test-012 ~/prp-stashcache$ kubectl exec -it -n osg stashcache-ucsd-666d46d7d4-xz5vw  /bin/bash<br/>[root@stashcache /]# stat --format '%a' /etc/cron.d/fetch-crl<br/>fetch-crl             fetch-crl-kubernetes  <br/>[root@stashcache /]# stat --format '%a' /etc/cron.d/fetch-crl-kubernetes <br/>644</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(10:37:46)</span> <b>efajardo:</b></span> bad permissiones<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:38:01)</span> <b>efajardo:</b></span> cron.d likes 644 not 664<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:40:30)</span> <b>blin:</b></span> that's super weird that this didn't show up earlier<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:40:40)</span> <b>blin:</b></span> could you submit a PR that fixes the ownership of all the cron files?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:42:30)</span> <b>matyas:</b></span> it's also weird that cron cares about that. what does it think it is, ssh?<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:45:03)</span> <b>efajardo:</b></span> What is the github of the image?<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:45:07)</span> <b>efajardo:</b></span> or is this in the RPM<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:45:10)</span> <b>efajardo:</b></span> I already lost track<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:46:16)</span> <b>blin:</b></span> <a href="https://github.com/opensciencegrid/docker-xcache">https://github.com/opensciencegrid/docker-xcache</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:46:20)</span> <b>blin:</b></span> github's having problems though<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:46:28)</span> <b>blin:</b></span> <a href="https://www.githubstatus.com/">https://www.githubstatus.com/</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:55:06)</span> <b>blin:</b></span> does <tt><a href="http://oss.space">oss.space</a> data</tt> also default to <tt>oss.localroot</tt>?<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:26:07)</span> <b>efajardo:</b></span> yes<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:26:14)</span> <b>efajardo:</b></span> in most stashcaches<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:26:14)</span> <b>blin:</b></span> and does anyone know if it makes sense for origins to have <tt><a href="http://oss.space">oss.space</a></tt> set? it looks like it's just use for the proxy configuration (i.e. specified by <tt>pfc.spaces data meta</tt>)<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:26:18)</span> <b>efajardo:</b></span> we only setup localroot<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:26:29)</span> <b>efajardo:</b></span> I have not looked at the code<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:26:37)</span> <b>efajardo:</b></span> but It makes no snese<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:26:42)</span> <b>efajardo:</b></span> the imporant thing for the origin is<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:26:46)</span> <b>efajardo:</b></span> the export<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:26:58)</span> <b>efajardo:</b></span> they just export partitions they do not use space to store volumes<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:27:47)</span> <b>blin:</b></span> yeah, i'm thinking of moving the disks config that i just specified into the stashcache + atlas xcache packages as well<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:02:01)</span> <b>blin:</b></span> @matyas does the stash origin listen on HTTP? i only see HTTP config for the cache<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:03:02)</span> <b>matyas:</b></span> it doesn't listen on HTTP<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:03:05)</span> <b>matyas:</b></span> it only listens on xrootd<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:16:43)</span> <b>matyas:</b></span> @blin you sure <tt>pfc.spaces data meta</tt> is optional? you only asked about <tt><a href="http://oss.space">oss.space</a> data</tt> above<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:17:35)</span> <b>blin:</b></span> stash cache/origin don't use it (because they don't specify <a href="http://oss.space">oss.space</a> data or meta)<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:25:16)</span> <b>blin:</b></span> not having an <tt>||</tt> in if statements is annoying &gt;.&gt;<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:03:57)</span> <b>efajardo:</b></span> I am sure it is optional<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:04:05)</span> <b>efajardo:</b></span> you only need if you declare data and meta volumes<br/>
+</body>
+</html>

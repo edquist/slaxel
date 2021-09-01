@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jun 22, 2021 : #batlab (chtc)</title>
+</head>
+<body>
+<h3>Tue Jun 22, 2021 : #batlab (chtc)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(09:37:55)</span> <b>johnkn:</b></span> We had another completely green build and test run yesterday.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:54:26)</span> <b>tlmiller:</b></span> Clearly we need to remove the blahp more often. ;)<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:55:35)</span> <b>gthain:</b></span> So I amend my earlier suggestion to never make any more commits after the tests go fully green<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:55:45)</span> <b>gthain:</b></span> My current advice is to only remove things<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:57:45)</span> <b>johnkn:</b></span> We need to remove one thing a day, so we have a green build to be the daily "release" build.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:58:23)</span> <b>tlmiller:</b></span> I volunteer to push an obvious bug once a day..?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:59:07)</span> <b>johnkn:</b></span> Wait,  we also got a green build when I fixed a typo in the manual.  That seems easier....<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:59:28)</span> <b>tlmiller:</b></span> Oh, we have an infinite supply of those.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:59:57)</span> <b>johnkn:</b></span> Just don't fix too many all at once.  My typo fix was 1 letter....<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:00:26)</span> <b>tlmiller:</b></span> One letter for a cleaner build!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:56:32)</span> <b>johnkn:</b></span> So, I'm looking at the lib_param_completeness test.  it shells out <tt>condor_config_val -v</tt> a bit more than 1000 times which takes about 30 seconds on hardware, and roughly 20 minutes in our docker containers<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:56:46)</span> <b>johnkn:</b></span> I thought we had fixed the reaping problem?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:57:20)</span> <b>tlmiller:</b></span> Are you sure it's a reaping problem?  (Doesn't hostname resolution take forever in containers?)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:57:31)</span> <b>johnkn:</b></span> I guess not.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:58:00)</span> <b>johnkn:</b></span> each invocation of condor_config_val is initializing the lib code and loading config.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:58:42)</span> <b>johnkn:</b></span> but its literally 50 times faster on metal<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:09:55)</span> <b>gthain:</b></span> ?<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:10:46)</span> <b>gthain:</b></span> <tt>lib_param_completeness</tt> takes about 50 seconds in the containers when it passes<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:10:55)</span> <b>gthain:</b></span> sometimes it gets stuck and times out in containers<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:11:53)</span> <b>gthain:</b></span> Also, note the reaping problem only happens when the parent exits before the child, which I don't think happens when we run condor_config_val<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:33:33)</span> <b>johnkn:</b></span> that's not completely true.  it passed in 18 minutes on two platforms here<br/><a href="https://batlab.chtc.wisc.edu/results/test-details.php?runid=546557&amp;testids=546580,546589,546591,546592,546594,546598,546603,546607,546609,546610,546613,546617,546618&amp;group=condorauto:%20Auto-Test%20Suite">https://batlab.chtc.wisc.edu/results/test-details.php?runid=546557&amp;testids=546580,54658[…]546613,546617,546618&amp;group=condorauto:%20Auto-Test%20Suite</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:33:46)</span> <b>johnkn:</b></span> and failed in 20 minutes on the rest of the dockers<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:36:23)</span> <b>gthain:</b></span> I think it is hanging starting a personal condor<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:38:32)</span> <b>gthain:</b></span> This test is starting 2 personal condors because there's one define in src/condor_tests/Test_Requirements<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:38:35)</span> <b>gthain:</b></span> I'd like to just remove that file<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:42:35)</span> <b>johnkn:</b></span> it's not hanging starting a personal condor.  the condor started in 13 seconds and shut down in 3 sec in a fedora container<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:42:52)</span> <b>johnkn:</b></span> it's the test running condor_config_val 1000 times that's taking most of the 18 minutes<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:45:44)</span> <b>gthain:</b></span> But it probably isn't the condor_config_val per se, but DNS resolution or something taking forever<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:53:55)</span> <b>johnkn:</b></span> probably.  condor_config_val does little work beyond the work that *every* tool does when it starts up.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:54:25)</span> <b>johnkn:</b></span> If that's taking a second or two per invocation, then that's a problem for the test suite.<br/>
+</body>
+</html>

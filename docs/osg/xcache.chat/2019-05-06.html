@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon May 6, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Mon May 6, 2019 : #xcache (osg)</h3>
+<span style="color: #a63024"><span style="font-size: small">(17:23:47)</span> <b>efajardo:</b></span> I found another issue twith the xcache<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:23:47)</span> <b>efajardo:</b></span> image<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:23:55)</span> <b>efajardo:</b></span> the proxy is not getting renewed<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:23:58)</span> <b>efajardo:</b></span> <pre>[root@fiona-r-uva config.d]# voms-proxy-info --file /run/xcache-auth/x509_proxy<br/>subject   : /DC=org/DC=terena/DC=tcs/C=NL/L=Amsterdam/O=Universiteit van Amsterdam/CN=<a href="http://fiona-r-uva.vlan7.uvalight.net/CN=3639285976">fiona-r-uva.vlan7.uvalight.net/CN=3639285976</a><br/>issuer    : /DC=org/DC=terena/DC=tcs/C=NL/L=Amsterdam/O=Universiteit van Amsterdam/CN=<a href="http://fiona-r-uva.vlan7.uvalight.net">fiona-r-uva.vlan7.uvalight.net</a><br/>identity  : /DC=org/DC=terena/DC=tcs/C=NL/L=Amsterdam/O=Universiteit van Amsterdam/CN=<a href="http://fiona-r-uva.vlan7.uvalight.net">fiona-r-uva.vlan7.uvalight.net</a><br/>type      : RFC compliant proxy<br/>strength  : 1024 bits<br/>path      : /run/xcache-auth/x509_proxy<br/>timeleft  : 0:00:00<br/>[root@fiona-r-uva config.d]# su xrootd /usr/libexec/xcache/renew-proxy<br/>Your identity: /DC=org/DC=terena/DC=tcs/C=NL/L=Amsterdam/O=Universiteit van Amsterdam/CN=<a href="http://fiona-r-uva.vlan7.uvalight.net">fiona-r-uva.vlan7.uvalight.net</a><br/>Creating proxy .......................................... Done<br/><br/>Your proxy is valid until Wed May  8 22:21:56 2019<br/></pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(17:24:25)</span> <b>efajardo:</b></span> I had to renew it manually<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:24:53)</span> <b>efajardo:</b></span> is therea new version of the image?<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:27:01)</span> <b>efajardo:</b></span> @blin<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:27:23)</span> <b>efajardo:</b></span> The way it is written it will only run once<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:27:26)</span> <b>efajardo:</b></span> <pre>[root@fiona-r-uva config.d]# cat /usr/local/sbin/stash-cache-init.sh<br/>#!/bin/bash<br/><br/>instance="$1"<br/><br/># Generate the proxy<br/>/usr/local/sbin/fix_certs.sh<br/>su xrootd /usr/libexec/xcache/renew-proxy<br/><br/># Start the cache<br/>su xrootd -c "xrootd -c /etc/xrootd/xrootd-$instance.cfg -k fifo -n $instance -k 10 -s /var/run/xrootd/xrootd-$instance.pid -l /var/log/xrootd/xrootd.log"</pre><br/>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Dec 18, 2020 : #covid-19 (osg)</title>
+</head>
+<body>
+<h3>Fri Dec 18, 2020 : #covid-19 (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(14:58:50)</span> <b>blin:</b></span> i think i figured it out @lmichael. I see lots of running/idle jobs now (<a href="http://flock.opensciencegrid.org/overview/">http://flock.opensciencegrid.org/overview/</a>):<br/><pre><a href="http://ce1.opensciencegrid.org">ce1.opensciencegrid.org</a>:<br/>  COVID19_WeNMR.submituser               194   1262     0 <br/>  WeNMR.submituser                         0   1529     0 </pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:30:40)</span> <b>bbockelm:</b></span> :clap:<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:31:34)</span> <b>matyas:</b></span> so what was the problem?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:34:20)</span> <b>blin:</b></span> the <tt>osg-flock</tt> packaged changed its default config to use <tt>IDTOKEN</tt> without flocking <a href="https://github.com/slateci/slate-catalog/pull/393">https://github.com/slateci/slate-catalog/pull/393</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(16:36:12)</span> <b>matyas:</b></span> I don't get it...<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:39:04)</span> <b>blin:</b></span> basically we were relying on a local collector and having jobs flock to <tt><a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a></tt> but flocking got turned off in favor of having the schedd report directly to <tt><a href="http://flock.osg.org">flock.osg.org</a></tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:39:42)</span> <b>blin:</b></span> without flocking, jobs sat idle on the schedd talking to its own collector that didn't have startd's or a negotiator<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:41:20)</span> <b>matyas:</b></span> ah OK<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:42:02)</span> <b>blin:</b></span> the job router talks to the pool's collector (<tt>JOB_ROUTER_SCHEDD2_POOL</tt> ) and looks for the schedd specified by <tt>JOB_ROUTER_SCHEDD2_NAME</tt> so both of those had to be updated, too<br/>
+</body>
+</html>

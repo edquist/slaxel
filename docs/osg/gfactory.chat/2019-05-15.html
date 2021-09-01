@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed May 15, 2019 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Wed May 15, 2019 : #gfactory (osg)</h3>
+<span style="color: #e23f99"><span style="font-size: small">(01:46:18)</span> <b>marco.mascheroni:</b></span> What is insane is that we are running 40hours single core jobs in a 20core multicore pilot.<br/>
+<span style="color: #e23f99"><span style="font-size: small">(01:46:30)</span> <b>marco.mascheroni:</b></span> *48hours multicore pilots<br/>
+<span style="color: #e23f99"><span style="font-size: small">(01:48:41)</span> <b>marco.mascheroni:</b></span> But the 20 core pilot is a constraint at LSU: when I set up their CE I could not start 1core pbs jobs. They are enforcing the whole node thing (rightfully so if you ask me)<br/>
+<span style="color: #e23f99"><span style="font-size: small">(01:49:04)</span> <b>marco.mascheroni:</b></span> Not sure is the single core 40 hours user jobs is a contraint at LIGO<br/>
+<span style="color: #e23f99"><span style="font-size: small">(01:49:15)</span> <b>marco.mascheroni:</b></span> we can solve this by:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(01:49:30)</span> <b>marco.mascheroni:</b></span> 1) using multicore jobs<br/>
+<span style="color: #e23f99"><span style="font-size: small">(01:49:43)</span> <b>marco.mascheroni:</b></span> (probably not ideal)<br/>
+<span style="color: #e23f99"><span style="font-size: small">(01:50:06)</span> <b>marco.mascheroni:</b></span> 2) assuming not all the jobs run for 40 hours, having them set the running time<br/>
+<span style="color: #e23f99"><span style="font-size: small">(01:50:17)</span> <b>marco.mascheroni:</b></span> 3) longer than 48hours pilots<br/>
+<span style="color: #e23f99"><span style="font-size: small">(01:52:35)</span> <b>marco.mascheroni:</b></span> About 2), CMS has these two things in their frontend:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(01:56:42)</span> <b>marco.mascheroni:</b></span> <tt>match_expr='... and ((job.get("MaxWallTimeMins", 0)*60)&amp;gt;=glidein["attrs"].get("GLIDEIN_Job_Min_Time", 0)) and ((job.get("MaxWallTimeMins", 0)+10)&amp;lt;(glidein["attrs"]["GLIDEIN_Max_Walltime"]-glidein["attrs"]["GLIDEIN_Retire_Time_Spread"])/60)</tt><br/><tt>start_expr='... &amp;amp;&amp;amp; ifthenelse(MaxWallTimeMins=!=UNDEFINED,(MaxWallTimeMins*60)&amp;lt;(GLIDEIN_ToDie-MyCurrentTime),(16*3600)&amp;lt;(GLIDEIN_ToDie-MyCurrentTime))</tt><br/>
+<span style="color: #e23f99"><span style="font-size: small">(01:57:36)</span> <b>marco.mascheroni:</b></span> This way user cans specify the length of their jobs to better fit existing pilots<br/>
+<span style="color: #e23f99"><span style="font-size: small">(01:59:50)</span> <b>marco.mascheroni:</b></span> Notice that if a user specify 8 hours as MaxWallTimeMins and the job runs longer it is not the end of the world. Chances are the job will land on a pilot that has more than 8 hours until it dies. And even if the job is killed it is transparently rescheduled by condor with no penalty for the user (the priority stays the same, it's like a shadow disconnect)<br/>
+<span style="color: #e23f99"><span style="font-size: small">(02:03:26)</span> <b>marco.mascheroni:</b></span> Anyway @efajardo, feel free to join the factory call today at 16:15 CET (7:15 PDT ?). <a href="https://nebraskaextension.zoom.us/j/419346775">https://nebraskaextension.zoom.us/j/419346775</a><br/>
+<span style="color: #e23f99"><span style="font-size: small">(02:04:51)</span> <b>marco.mascheroni:</b></span> Or just ping me after 18 CET and we can have a skype chat (I am flaxible this week, and I am available till 22)<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:36:22)</span> <b>efajardo:</b></span> thanks @marco.mascheroni<br/>
+</body>
+</html>

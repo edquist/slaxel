@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Sep 18, 2017 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Mon Sep 18, 2017 : #xcache (osg)</h3>
+<span style="color: #e7392d"><span style="font-size: small">(10:43:52)</span> <b>bala:</b></span> <pre> 2017-08-29 20:07:52,712    INFO:  --------------------------------------------------------------------------------<br/>2017-08-29 20:07:52,712    INFO:  Starting transfers - attempt 3<br/>2017-08-29 20:07:54,716    INFO:  /cvmfs/oasis.opensciencegrid.org/osg/modules/stashcp/4.3.1/bin/stashcp '/user/irisqing/public/kinc-1503930373/00/00/tSNE-C7-kinc-log-no.txt' '/srv/pegasus.8ppxQk'<br/>2017-08-29 20:12:09,018    INFO:  Run: [ERROR] Operation expired<br/>2017-08-29T20:10:08+0000 root         WARNING  XrdCP from cache failed on <a href="root://its-condor-xrootd1.syr.edu">root://its-condor-xrootd1.syr.edu</a>, pulling from main redirector<br/>Run: [ERROR] Operation expired<br/>2017-08-29T20:12:03+0000 root         ERROR    stashcp failed after 3 attempts<br/>2017-08-29 20:12:09,019   ERROR:  Command exited with non-zero exit code (1): /cvmfs/oasis.opensciencegrid.org/osg/modules/stashcp/4.3.1/bin/stashcp ...<br/>2017-08-29 20:12:09,020    INFO:  --------------------------------------------------------------------------------<br/>2017-08-29 20:12:09,020    INFO:  Stats: Total 6 transfers, 870.4 MB transferred in 1419 seconds. Rate: 628.0 KB/s (4.9 Mb/s)<br/>2017-08-29 20:12:09,020    INFO:         Between sites osg_stash-&gt;osg_condorpool : 6 transfers, 870.4 MB transferred in 1419 seconds. Rate: 628.0 KB/s (4.9 Mb/s)<br/>2017-08-29 20:12:09,020 CRITICAL:  Some transfers failed! See above, and possibly stderr.<br/>2017-08-29 20:12:09: Last command exited with 1<br/></pre><br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:44:20)</span> <b>bala:</b></span> we see the above stashcp error for a user on osg connect. any suggestions?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:45:25)</span> <b>bala:</b></span> looks like it transferred about 1 GB and says CRITICAL: some transfer failed!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:46:56)</span> <b>dweitzel:</b></span> It sounds like the transfers were going too slow, given the operation expired, and it bailed.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:47:16)</span> <b>dweitzel:</b></span> Does is do give you the same error when you try the command directly from <a href="http://login.osgconnect.net">login.osgconnect.net</a>?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:47:31)</span> <b>bala:</b></span> let me try that<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:50:26)</span> <b>bala:</b></span> it works when I tried directly.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:50:29)</span> <b>bala:</b></span> $ ls -lh /stash//user/irisqing/public/kinc-1503930373/00/00/tSNE-C7-kinc-log-no.txt<br/>-rw-r--r-- 1 irisqing users 2.0G Aug 28 09:28 /stash//user/irisqing/public/kinc-1503930373/00/00/tSNE-C7-kinc-log-no.txt<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:51:17)</span> <b>dweitzel:</b></span> oh, I meant actually running stashcp<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:51:42)</span> <b>bala:</b></span> yes, i did and worked<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:51:44)</span> <b>bala:</b></span> $ stashcp /user/irisqing/public/kinc-1503930373/00/00/tSNE-C7-kinc-log-no.txt .<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:52:16)</span> <b>bala:</b></span> the size combined with slow transfer speed could be a problem I think as you have mentioned.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:52:35)</span> <b>dweitzel:</b></span> Yeah, 628.0 KB/s (4.9 Mb/s) is pretty slow.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:52:42)</span> <b>rynge:</b></span> I see a lot of jobs which failed at Syracuse<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:53:27)</span> <b>bala:</b></span> so I think  it transferred only half of the data<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:53:36)</span> <b>rynge:</b></span> Note the timestamps though - it was while ago<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:54:33)</span> <b>bala:</b></span> good point, I was going to ask about it. should we ask the user to resubmit the workflow to see if this happens again before getting into the details.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:54:54)</span> <b>rynge:</b></span> @bala My guess is that this was an intermittent error, and and the users is handling it correctly restarting the workflow<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:56:24)</span> <b>bala:</b></span> ok, i will ask the user to restart the workflow<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:57:36)</span> <b>bala:</b></span> good to know 6228 KB/s is slow to transfer a lot of data. thank you all. i will inform the user.<br/>
+</body>
+</html>

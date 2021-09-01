@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Aug 26, 2021 : #flightworthy (chtc)</title>
+</head>
+<body>
+<h3>Thu Aug 26, 2021 : #flightworthy (chtc)</h3>
+<span style="color: #99a949"><span style="font-size: small">(09:49:01)</span> <b>matyas:</b></span> Hey folks, I have a situation where I have pilots coming into a CE in front of a SLURM site.<br/>These pilots all have the same Owner ("osg") but were submitted by people in different projects (which you can distinguish by the ProjectName attribute in the incoming job).<br/>How do I do fair share to keep one project from starving others?<br/>
+<span style="color: #4cc091"><span style="font-size: small">(09:50:20)</span> <b>blin:</b></span> don't each of these projects have their own allocations/partitions to submit to?<br/>
+<span style="color: #4cc091"><span style="font-size: small">(09:50:45)</span> <b>blin:</b></span> normally we rely on the site to make scheduling policy decisions<br/>
+<span style="color: #99a949"><span style="font-size: small">(09:51:22)</span> <b>matyas:</b></span> I'm not sure if they have a per-user job limit or per-allocation job limit<br/>
+<span style="color: #99a949"><span style="font-size: small">(09:53:28)</span> <b>matyas:</b></span> but glideinwms definitely has a pilot limit<br/>
+<span style="color: #4cc091"><span style="font-size: small">(09:53:50)</span> <b>blin:</b></span> that should be configurable per site/entry<br/>
+<span style="color: #99a949"><span style="font-size: small">(09:53:58)</span> <b>matyas:</b></span> what do we set it to?<br/>
+<span style="color: #4cc091"><span style="font-size: small">(09:54:40)</span> <b>blin:</b></span> dunno, lots? we'd probably want to decrease the number of idle jobs, too?<br/>
+<span style="color: #99a949"><span style="font-size: small">(09:55:04)</span> <b>matyas:</b></span> well if one allocation fills up there's going to be a crapton of idle jobs<br/>
+<span style="color: #99a949"><span style="font-size: small">(09:55:53)</span> <b>matyas:</b></span> although I guess the CE making fair share decisions won't help in that case<br/>
+<span style="color: #4cc091"><span style="font-size: small">(09:56:37)</span> <b>blin:</b></span> yeah, the CE really shouldn't be making fair share decisions. its job is to just take the incoming pilots and turn them into jobs that the site is willing to eventually run<br/>
+<span style="color: #99a949"><span style="font-size: small">(09:57:28)</span> <b>matyas:</b></span> what normally makes fair share decisions? the negotiator?<br/>
+<span style="color: #99a949"><span style="font-size: small">(10:34:42)</span> <b>matyas:</b></span> I guess that wouldn't work because it would only make decisions once pilots have already joined the pool<br/>
+<span style="color: #4cc091"><span style="font-size: small">(10:47:04)</span> <b>blin:</b></span> we're talking about pilot-scheduling policy so it's the local batch<br/>
+<span style="color: #4cc091"><span style="font-size: small">(10:48:02)</span> <b>blin:</b></span> unless i'm misunderstanding the system here: i thought that the pilots that were starting were specific to a user and their allocation<br/>
+<span style="color: #99a949"><span style="font-size: small">(10:58:08)</span> <b>matyas:</b></span> on the remote site all the jobs are run by the "osg" user but with different allocations. If the remote site has per-allocation job limits _and_ the factory is OK with submitting pilots for project B even though there are ton of idle pilots for project A, then we'd be fine<br/>
+<blockquote>
+<span style="color: #4cc091"><span style="font-size: small">(11:01:47)</span> <b>blin:</b></span> threading this to avoid taking over the channel any more<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:02:05)</span> <b>matyas:</b></span> sure<br/>
+<span style="color: #4cc091"><span style="font-size: small">(11:03:16)</span> <b>blin:</b></span> i think if the site is doing user-based scheduling then we're screwed regardless<br/>
+<span style="color: #4cc091"><span style="font-size: small">(11:03:22)</span> <b>blin:</b></span> and i'd be surprised if any HPC runs that way<br/>
+<span style="color: #4cc091"><span style="font-size: small">(11:05:18)</span> <b>blin:</b></span> do the pilots look the same for project A vs project B?<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:10:19)</span> <b>matyas:</b></span> we plan to only have one factory entry per site (* per queue I guess) but ProjectName is available in the pre-routed job so the transform is our oyster :slightly_smiling_face:<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:10:41)</span> <b>matyas:</b></span> although I really want to avoid having any sort of per-project code in the JR<br/>
+<span style="color: #4cc091"><span style="font-size: small">(11:13:02)</span> <b>blin:</b></span> yeah, i think that makes sense. the problem is that you need the factory to differentiate between pilots supporting each project but it doesn't have that information<br/>
+<span style="color: #4cc091"><span style="font-size: small">(11:13:15)</span> <b>blin:</b></span> i don't think the JR would be able to solve it<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:14:45)</span> <b>matyas:</b></span> bad news: can't tell for sure but Stampede2 appears to be per-user<br/>
+<span style="color: #4cc091"><span style="font-size: small">(11:41:32)</span> <b>blin:</b></span> well then we're completely SOL<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:43:34)</span> <b>matyas:</b></span> yeah we'd have to have the factory do something fancy and that's a no-go<br/>
+<span style="color: #684b6c"><span style="font-size: small">(12:03:43)</span> <b>bbockelman:</b></span> Let's ask TACC?<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:04:53)</span> <b>matyas:</b></span> Their docs say "per user"; one of Roman's pilots was pending due to priority so I submitted a test job using Cody's allocation and it was also pending due to priority.<br/>
+<span style="color: #684b6c"><span style="font-size: small">(12:06:01)</span> <b>bbockelman:</b></span> Yes - let's ask them how to solve the problem.<br/>
+</blockquote>
+<span style="color: #674b1b"><span style="font-size: small">(11:05:42)</span> <b>coatsworth:</b></span> Hi all, I've asked a couple people already but nobody seems to have time: is anybody able to code review HTCONDOR-437 today or early tomorrow?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:06:16)</span> <b>coatsworth:</b></span> I promised this to LIGO for the v9.1.4 release which code freezes tomorrow. It's ready to go, but as per our new workflow I can't merge it to master without a review.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(12:09:45)</span> <b>jfrey:</b></span> I can do a review. I can’t promise in-depth “did you miss handling SERVICE nodes in some random corner of the code”.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:41:12)</span> <b>coatsworth:</b></span> @jfrey Thanks! That's totally fine for now. This is just an early implementation.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:53:32)</span> <b>wiscmoate:</b></span> @johnkn, @eturatsinze enabled MIG on <a href="http://gpulab2004.chtc.wisc.edu">gpulab2004.chtc.wisc.edu</a><br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:14:17)</span> <b>jfrey:</b></span> There’s an email on htcondor-users about the MSI installer not working. Is that related to the issue Todd T mentioned in the team meeting?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:15:30)</span> <b>johnkn:</b></span> yes<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:16:11)</span> <b>johnkn:</b></span> composing a reply now<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:16:36)</span> <b>jfrey:</b></span> Gotta keep those metrics up.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:16:53)</span> <b>johnkn:</b></span> I now know what *I'm* doing next week... :wink:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:18:33)</span> <b>johnkn:</b></span> Hey, if you've got the time, there's an rt ticket I'd love to foist off on someone else...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:20:00)</span> <b>johnkn:</b></span> looks like some sort of shadow/starter problem.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:20:35)</span> <b>jfrey:</b></span> I have nothing urgent, but no lack of stuff to work on. Let me take a peek.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:20:45)</span> <b>johnkn:</b></span> <a href="https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=104029">https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=104029</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:20:47)</span> <b>johnkn:</b></span> thanks<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:21:01)</span> <b>johnkn:</b></span> if not I'll look at it tomorrow.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:21:24)</span> <b>jfrey:</b></span> I’ll take that. It’s a new ticket from someone I’m already working with.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:21:36)</span> <b>johnkn:</b></span> that's what I like to hear...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:25:46)</span> <b>johnkn:</b></span> @wiscmoate thanks muchly.<br/>
+</body>
+</html>

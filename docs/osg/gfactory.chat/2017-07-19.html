@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jul 19, 2017 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Wed Jul 19, 2017 : #gfactory (osg)</h3>
+<span style="color: #e7392d"><span style="font-size: small">(10:53:54)</span> <b>klarson1:</b></span> the condor configs i get with 3.2.19 are different than what is on the cern factory with 3.2.19 installed.  are we not using the gwms provided configs anymore?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:56:37)</span> <b>klarson1:</b></span> for example, i have shared port enabled:<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:56:38)</span> <b>klarson1:</b></span> #--  Enable shared_port_daemon<br/>MASTER.USE_SHARED_PORT = True<br/>SHADOW.USE_SHARED_PORT = True<br/>SCHEDD.USE_SHARED_PORT = True<br/>SHARED_PORT_MAX_WORKERS = 1000<br/>SHARED_PORT_ARGS = -p 9615<br/>DAEMON_LIST = $(DAEMON_LIST), SHARED_PORT<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:57:01)</span> <b>klarson1:</b></span> in 02_gwms_factory_schedds.config<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:57:20)</span> <b>klarson1:</b></span> that is not in the same file on the cern factory<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(11:28:58)</span> <b>sthapa:</b></span> Is there a place where I can see the glidein logs for OSG_US_ASU_OCTILLO ?  Trying to troubleshoot glidein issues and I’m not sure if my most recent changes fixed things<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:26:32)</span> <b>rynge:</b></span> You can see some of the on xd-login<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:26:37)</span> <b>rynge:</b></span> Do you have an account there?<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(13:40:52)</span> <b>sthapa:</b></span> yes<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(13:44:38)</span> <b>sthapa:</b></span> maybe not<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:49:56)</span> <b>rynge:</b></span> @sthapa  Try now: <a href="mailto:sthapa@xd-login.opensciencegrid.org">sthapa@xd-login.opensciencegrid.org</a><br/>
+<span style="color: #5b89d5"><span style="font-size: small">(13:50:38)</span> <b>sthapa:</b></span> in<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:51:05)</span> <b>rynge:</b></span> /local-scratch/gfaclogs/sdsc/entry_OSG_US_ASU_OCTILLO<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:51:56)</span> <b>rynge:</b></span> Set your path:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:52:02)</span> <b>rynge:</b></span> export PATH=~rynge/software/glideinwms/factory/tools/:$PATH<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:52:29)</span> <b>rynge:</b></span> And then you can use things like cat_MasterLog.py on the .err file<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:53:00)</span> <b>rynge:</b></span> cat_StartdLog.py is also good<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(13:53:13)</span> <b>sthapa:</b></span> thanks<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(13:55:20)</span> <b>sthapa:</b></span> Are there more recent logs?  It looks like the last one is 6 hours old<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:56:04)</span> <b>rynge:</b></span> Factory ops might have newer ones<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(13:57:44)</span> <b>sthapa:</b></span> @marian do you have access to newer logs?<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:16:00)</span> <b>marian:</b></span> See snippet ... this would mean we have logs last updated about 5hrs ago ... do you want them analyze? e.g. <tt>job.4746106.0.err</tt> and <tt>job.4746106.0.out</tt> or which one?<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(14:22:43)</span> <b>sthapa:</b></span> Does the output indicate that the glidein couldn’t find the grid-proxy commands?<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:41:53)</span> <b>marian:</b></span> That's correct!<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:56:08)</span> <b>marian:</b></span> well, this indicates it can't find proxy itself ... let me check .err file ...<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:56:36)</span> <b>marian:</b></span> yeah, that's the consequence of missing voms-proxy-init, indeed:<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:57:12)</span> <b>marian:</b></span> @marian uploaded a file: <a href="https://opensciencegrid.slack.com/files/marian/F6AEGFR41/-.txt">Untitled</a><br/>
+<span style="color: #5b89d5"><span style="font-size: small">(15:00:57)</span> <b>sthapa:</b></span> Yeah, I updated the OSG_GRID_DIR to /home/osg/osg-wn-client but the path doesn’t seem to have updated<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(15:01:08)</span> <b>sthapa:</b></span> I checked the job env files and it’s correct there<br/>
+</body>
+</html>

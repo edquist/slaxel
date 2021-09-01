@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Oct 6, 2017 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Fri Oct 6, 2017 : #gfactory (osg)</h3>
+<span style="color: #e96699"><span style="font-size: small">(10:38:11)</span> <b>ian_cancercomputer:</b></span> Hey all - I was wondering if anyone could look up the logs from Sep.23rd and 24th to see how PCFGOSGUCSD payloads made it into OSG_Facility=CancerComputer ?  There's a whitelist that's supposed to reject all other projects...  I'd usually just ping Mats on this but iirc he's on vacation still<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:55:02)</span> <b>marian:</b></span> Hi @ian_cancercomputer... it'll be good to investigate on the Frontend part what is it requesting first (that's @rynge land) and we could check on the Factory side where are glideins created when Frontend requests find match ... factory just creates glideins, Frontend is the master here to say what it wants and where to run ... Do you know specific CEs that I can at least check matching attributes we use for your entry points configured in the Factory? Also, it could help if you can describe what are you up to and send it to the factory list and cc Mats that it doesn't fall through cracks when other operator takes over the shift, it's easier to follow then included Mats when he is back ...<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:56:37)</span> <b>marian:</b></span> (though, I saw what you in gracc channel with Derek, but not everybody from this list is following that channel too)<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:57:15)</span> <b>marian:</b></span> and I'm on the glidein shift today so I may start take a look from factory side<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:59:19)</span> <b>ian_cancercomputer:</b></span> Oh ok, I don't know enough about glideins vs frontent to know what takes care of what.. Theres just one CE ( CancerComputer_Hotel_CE ), CCHDV is the resource group iirc.  I do know there's a specific conditional that checks OSG_Facility=CancerComputer and whether the projectname is within a given list, i'd thought that was in the glideins<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:01:22)</span> <b>ian_cancercomputer:</b></span> From sep.27th on it looks like i've only had BioGraph jobs in CC's queue, i could only conjecture as to reasoning on that, so it may be unlikely that you'd see anything live today..<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:14:33)</span> <b>ian_cancercomputer:</b></span> There it is..  START=[...] &amp;&amp; ( GLIDEIN_Site =!= "CancerComputer" || stringListMember(TARGET.ProjectName,"SPLINTER,TG-MCB130135,BioGraph",",") ) &amp;&amp; [...]   &lt;-- is that on the factory side?<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:42:00)</span> <b>marian:</b></span> sure, understood, you're not suppose to know all the details there between FE and factory ... that expression you sent is FE business ... I checked on the Factory that VOs (jobs) supported by your CE should be OSGVO (Mats's FE) and SBGrid (not sure who's is this one) ... and jobs should require rhel7 OS ... nothing special than that on the Factory end<br/>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Aug 24, 2021 : #hosted-ce-ops (osg)</title>
+</head>
+<body>
+<h3>Tue Aug 24, 2021 : #hosted-ce-ops (osg)</h3>
+<span style="color: #385a86"><span style="font-size: small">(12:01:52)</span> <b>jdost321:</b></span> @colby while we wait for the Clarkson admins, here's the next CE I was thinking for you to spin up a new one with our updated naming schemes <a href="https://github.com/opensciencegrid/hosted-ce-config/tree/master/AMNH-ARES">https://github.com/opensciencegrid/hosted-ce-config/tree/master/AMNH-ARES</a><br/>
+<span style="color: #385a86"><span style="font-size: small">(12:05:46)</span> <b>jdost321:</b></span> This one I think you can keep in tiger, so ping @jpeterson when you're ready to request the IP<br/>
+<span style="color: #73769d"><span style="font-size: small">(12:08:37)</span> <b>colby:</b></span> ok will do<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:15:00)</span> <b>jdost321:</b></span> I also quickly updated the jira for Clakrson <a href="https://opensciencegrid.atlassian.net/browse/OPS-206">https://opensciencegrid.atlassian.net/browse/OPS-206</a><br/>
+<span style="color: #385a86"><span style="font-size: small">(12:15:29)</span> <b>jdost321:</b></span> here's the new one for ares <a href="https://opensciencegrid.atlassian.net/browse/OPS-210">https://opensciencegrid.atlassian.net/browse/OPS-210</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:15:33)</span> <b>jpeterson:</b></span> for these we could keep the same IPs and replace them, or do you want to do the hand-off shuffle<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:15:59)</span> <b>jdost321:</b></span> I'm thinking the 2nd option, just so we can verify the new one works before replacing the old one<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:16:17)</span> <b>jdost321:</b></span> unless that creates more headache on your end<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:16:59)</span> <b>jpeterson:</b></span> more.. yes.  actually bad?  not really.<br/>
+<span style="color: #73769d"><span style="font-size: small">(12:29:20)</span> <b>colby:</b></span> what is the link to login to opensciencegrid?<br/>
+<span style="color: #73769d"><span style="font-size: small">(12:29:38)</span> <b>colby:</b></span> trying to locate my cilogin<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:37:51)</span> <b>jdost321:</b></span> I think hat was the wrong link, try <a href="http://monitoring.opensciencegrid.org">monitoring.opensciencegrid.org</a> it will redirect to a cilogon page<br/>
+<span style="color: #73769d"><span style="font-size: small">(12:40:12)</span> <b>colby:</b></span> yep that was it. Thanks<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:39:19)</span> <b>colby:</b></span> @jpeterson can you give me an ip on tiger for the amnh-ares CE<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:41:30)</span> <b>jpeterson:</b></span> <a href="http://amnh-ares-ce1.svc.opensciencegrid.org">amnh-ares-ce1.svc.opensciencegrid.org</a>  :   128.104.103.178<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:42:02)</span> <b>colby:</b></span> oh should this be ce1? I was going to use ce2 like the other one but I guess its replacing the original so it makes sense<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:42:37)</span> <b>jpeterson:</b></span> either works, I was just thinking since there wasn’t a -ceX yet we could start with 1<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:42:57)</span> <b>colby:</b></span> yea that is fine with me<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:44:43)</span> <b>colby:</b></span> We need a new persistent volume?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:45:21)</span> <b>jpeterson:</b></span> since they will both be up at once, new PVs and new Cert with the new name.  just a sec<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:48:43)</span> <b>jpeterson:</b></span> <tt>pvc-amnh-ares-ce1-logs</tt> <tt>pvc-amnh-ares-ce1-lib</tt><br/><tt>amnh-ares-ce1-cert</tt><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:48:56)</span> <b>jpeterson:</b></span> created on tiger.  use the existing ssh key<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:54:04)</span> <b>colby:</b></span> sounds good. The ssh key does not need to be copied right?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:54:33)</span> <b>jpeterson:</b></span> correct, it is already there, so just have to reference the same secret in the hosted-ce.yaml<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:54:47)</span> <b>jpeterson:</b></span> as this one we are just renaming and not moving clusters<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:55:56)</span> <b>colby:</b></span> I need to wait for DNS before I deploy right for letsencrypt to work?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:58:14)</span> <b>jpeterson:</b></span> actually I need to properly create the cert first. ^_^<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:59:57)</span> <b>jpeterson:</b></span> okay cert is there,  so LE doesn’t need the DNS, but I think other parts of the install like it to be there.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:01:06)</span> <b>jpeterson:</b></span> PTR record should be there (for tiger that is me when I give you the IP) the A record is derek or others that have access to the cloudflare setup<br/>
+<span style="color: #73769d"><span style="font-size: small">(15:05:52)</span> <b>colby:</b></span> ok Ill wait for the DNS confirmation then to spin it up<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:07:21)</span> <b>jpeterson:</b></span> amnh-hel-ce1. can also be requested for one IP down. .177<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:10:16)</span> <b>jpeterson:</b></span> and swap ares/hel. for thepv and certs and they are there too for when you get to it.<br/>
+<span style="color: #73769d"><span style="font-size: small">(15:19:03)</span> <b>colby:</b></span> :thumbsup:<br/>
+<span style="color: #73769d"><span style="font-size: small">(15:33:39)</span> <b>colby:</b></span> So just out of curiosity do you guys have DNS managed by a single person through tickets for a particular reason? Looks like cloudflare is where you DNS is hosted and can be updated via API's if you wanted to streamline that somehow. Its probably best to have paper trail for all entries I suppose for security purposes, and the frequency of record creation/modification might be pretty low<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:34:02)</span> <b>jpeterson:</b></span> yup the latter<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:34:39)</span> <b>jpeterson:</b></span> we have some of the cloudflare things automated with some of the other k8s setups but not for the CEs at the moment<br/>
+<span style="color: #73769d"><span style="font-size: small">(15:35:06)</span> <b>colby:</b></span> gotcha<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:35:06)</span> <b>jpeterson:</b></span> or at least not with the slate setups<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:02:16)</span> <b>bbockelm:</b></span> &gt;  So just out of curiosity do you guys have DNS managed by a single person through tickets for a particular reason? Looks like cloudflare is where you DNS is hosted and can be updated via API's if you wanted to streamline that somehow. Its probably best to have paper trail for all entries I suppose for security purposes, and the frequency of record creation/modification might be pretty low<br/>Yes -- if you deploy the CEs via GitOps, DNS and certificate integration is included.  Get the YAML right and you are off scot-free.<br/>
+</body>
+</html>

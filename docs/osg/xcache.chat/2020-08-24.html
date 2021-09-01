@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Aug 24, 2020 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Mon Aug 24, 2020 : #xcache (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(13:34:54)</span> <b>blin:</b></span> @efajardo i'd like to get the fresh <tt>stash-cache</tt> images promoted to stable. i'd like to get your blessing before doing this, though, since it's caused you issues with your old setups<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:58:00)</span> <b>efajardo:</b></span> Well<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:58:15)</span> <b>efajardo:</b></span> I still need to do some cleaning before I can do that<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:52:18)</span> <b>efajardo:</b></span> That change is highly disruptive<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:52:38)</span> <b>efajardo:</b></span> cause peple have been calling the names inside their mounts in different ways so this is not backward compatible<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:52:40)</span> <b>efajardo:</b></span> I am almot done<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:52:51)</span> <b>efajardo:</b></span> fixing all my caches<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:52:57)</span> <b>efajardo:</b></span> but we probably need to tell the CNAF folks<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:55:14)</span> <b>blin:</b></span> iirc, it's backwards compatible for the multi-disk case<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:56:59)</span> <b>blin:</b></span> we should be able to make it backwards compatible for the single disk case<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:03:25)</span> <b>efajardo:</b></span> not even then<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:03:41)</span> <b>efajardo:</b></span> Well<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:03:47)</span> <b>efajardo:</b></span> to make it backward compatible<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:03:49)</span> <b>efajardo:</b></span> change to<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:03:55)</span> <b>efajardo:</b></span> <tt>XC_RESOURCE_DIR</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(16:04:01)</span> <b>efajardo:</b></span> but I am almost done<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:32:08)</span> <b>efajardo:</b></span> I think I am done migrating all the caches to use <tt>xcache</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(16:32:58)</span> <b>efajardo:</b></span> but now I have to go through the CMS ones<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:33:15)</span> <b>blin:</b></span> looking at the scripts + config, the single disk case should be backwards compatible...<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:34:44)</span> <b>blin:</b></span> ah actually, nvm but i'm not sure how to solve it<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:35:18)</span> <b>blin:</b></span> if they have a single disk but don't specify any <a href="http://oss.space">oss.space</a> directives, it'll create the default meta + data disks for them within their <tt>XC_ROOTDIR</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(16:36:52)</span> <b>efajardo:</b></span> right but this:<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:36:57)</span> <b>efajardo:</b></span> <a href="https://github.com/opensciencegrid/docker-xcache/blob/master/xcache/xrootd/50-docker-paths.cfg#L9">https://github.com/opensciencegrid/docker-xcache/blob/master/xcache/xrootd/50-docker-paths.cfg#L9</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(16:37:03)</span> <b>efajardo:</b></span> assumes <tt>/xcache</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(16:37:04)</span> <b>efajardo:</b></span> was mounted<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:37:16)</span> <b>efajardo:</b></span> if it is not mounted all the storage is wiped out between<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:37:22)</span> <b>efajardo:</b></span> pod restarts<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:37:26)</span> <b>blin:</b></span> ahhhh<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:41:51)</span> <b>blin:</b></span> do you have any other <tt><a href="http://oss.space">oss.space</a> data</tt> directives set?<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:46:52)</span> <b>efajardo:</b></span> nop<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:47:06)</span> <b>efajardo:</b></span> even in the single disk scenario<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:47:31)</span> <b>efajardo:</b></span> I am not sure if Xrootd is smart enough<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:47:43)</span> <b>efajardo:</b></span> to have some files in the cache served form localroot<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:04:06)</span> <b>blin:</b></span> i have a fix<br/>
+</body>
+</html>

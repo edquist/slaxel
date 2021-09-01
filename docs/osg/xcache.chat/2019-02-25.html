@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Feb 25, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Mon Feb 25, 2019 : #xcache (osg)</h3>
+<span style="color: #53b759"><span style="font-size: small">(10:48:49)</span> <b>isfiligoi:</b></span> @blin What is your take on Derek’s description above?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:57:11)</span> <b>blin:</b></span> i'm not sure what @dweitzel means by "not having to be anything special"<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:57:46)</span> <b>dweitzel:</b></span> since it's only used for client authentication, I'm not sure it needs to match any DNS name.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:58:24)</span> <b>blin:</b></span> but do we use it to identify the host on our end?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:58:56)</span> <b>dweitzel:</b></span> I'm not sure, does condor do that?  Or if it passes the mapfile, can it advertise any name it wants in the collector.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:59:07)</span> <b>dweitzel:</b></span> but, again, this is an Origin.  Are we doing stats collection on origins?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:00:23)</span> <b>matyas:</b></span> yeah<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:35:36)</span> <b>matyas:</b></span> I'm pretty sure we do stats collection on origins<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:40:26)</span> <b>blin:</b></span> yeah, it's part of the base xcache packaging<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:40:54)</span> <b>matyas:</b></span> you'll be able to opt out of part of it in the new version<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:42:04)</span> <b>dweitzel:</b></span> Ok, so the root question was is a host cert needed for an Origin.  Sounds like the answer is yes, but we're not sure it needs to match the DNS hostname.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:44:04)</span> <b>matyas:</b></span> well, an xrdcert, right?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:44:42)</span> <b>blin:</b></span> sure, but we just use the hostcert for xrdcert<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:44:50)</span> <b>matyas:</b></span> right<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:45:13)</span> <b>blin:</b></span> yeah, i'm not sure i know enough about the reporting to say whether or not it needs to match the DNS name<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:45:20)</span> <b>matyas:</b></span> does gracc care if it matches the DNS name?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:45:40)</span> <b>blin:</b></span> @isfiligoi even if the containers are bouncing around different hosts, do you expect the external DNS name to also change?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:45:44)</span> <b>matyas:</b></span> or whatever's receiving the stats xrootd sends?<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:46:04)</span> <b>isfiligoi:</b></span> No, the external DNS name is kept constant<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:46:26)</span> <b>blin:</b></span> then i think you'd be able to keep the same host cert<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:47:37)</span> <b>isfiligoi:</b></span> OK, as long as xrootd itself does not complain about the name mismatch (the local node name is not the same as the external DNS one)<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:48:28)</span> <b>isfiligoi:</b></span> Now I just need to figure out how to get a host cert…<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:49:36)</span> <b>blin:</b></span> <a href="https://opensciencegrid.org/docs/security/host-certs/">https://opensciencegrid.org/docs/security/host-certs/</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:50:14)</span> <b>dweitzel:</b></span> so, for a non-auth origin.  XRootD never sees the certificate.  The stats collection is an external "service" which uses the certs for client authentication<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:50:23)</span> <b>dweitzel:</b></span> The messages go to <a href="http://collector.opensciencegrid.org">collector.opensciencegrid.org</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:50:37)</span> <b>dweitzel:</b></span> The StashCache accounting does not use certs<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:51:54)</span> <b>isfiligoi:</b></span> So… Do I need a cert or not?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:54:48)</span> <b>dweitzel:</b></span> Not for the origin to be an origin.  But as an OSG person, I would like to see the stats.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:55:30)</span> <b>dweitzel:</b></span> A portion of the stats (not all of them) require the cert for client authentication.<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:55:54)</span> <b>isfiligoi:</b></span> OK, was just confused by your message above<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:58:58)</span> <b>bbockelm:</b></span> @isfiligoi @dweitzel - did we tweak the origin documentation to clarify things for the "next Igor" coming down the line?<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:59:24)</span> <b>isfiligoi:</b></span> I did not touch documentation<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:02:33)</span> <b>dweitzel:</b></span> I still don't know the answer.  Does HTCondor do DNS lookups for client authentication of host certs?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:03:16)</span> <b>dweitzel:</b></span> Do we want this particular stats on the origin?  The stats gathering was really only designed for caches.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:10:50)</span> <b>blin:</b></span> i believe the answer to the first question is yes<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:16:16)</span> <b>isfiligoi:</b></span> Then I have a problem. The source IP of my xrootd node is unlikely to be the same as the IP of the incoming traffic (which is a port-forwarding NAT)<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:17:28)</span> <b>blin:</b></span> i think that's fine. htcondor will do reverse/forward DNS lookups on the external IP/hostname<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:19:23)</span> <b>isfiligoi:</b></span> right… and discover that the packet did not get from that IP<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:22:09)</span> <b>blin:</b></span> let me check with the htcondor team<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:25:46)</span> <b>bbockelm:</b></span> &gt; Does HTCondor do DNS lookups for client authentication of host certs?<br/>No, GSI authentication doesn't do any interaction with DNS for client authentication.  Client DNs can be arbitrary.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:27:23)</span> <b>bbockelm:</b></span> That said, the relevant question is whether the collector does anything special over-and-above HTCondor.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:27:44)</span> <b>bbockelm:</b></span> I believe Matyas has worked on this, no?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:31:50)</span> <b>blin:</b></span> @matyas ^^<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:44:14)</span> <b>matyas:</b></span> The GRACC collector? I didn't work on that one...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:44:59)</span> <b>dweitzel:</b></span> We're talking about the HTCondor-ce-collector.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:45:04)</span> <b>dweitzel:</b></span> that is where the stats are sent.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:48:12)</span> <b>blin:</b></span> git blame says it's all your fault @matyas :slightly_smiling_face:<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:48:36)</span> <b>blin:</b></span> <a href="https://github.com/opensciencegrid/htcondor-ce/blob/master/config/01-ce-collector-requirements.conf">https://github.com/opensciencegrid/htcondor-ce/blob/master/config/01-ce-collector-requirements.conf</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:50:05)</span> <b>bbockelm:</b></span> Right - that's about what I was thinking about.  There's no HTCondor requirement, but there might be some sort of CE Collector-specific requirement.<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:50:21)</span> <b>matyas:</b></span> I probably just copy-pasted what BB told me to write :slightly_smiling_face:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:50:36)</span> <b>dweitzel:</b></span> I think that only forces that the DN of the cert to match what is advertised as the "name"<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:50:43)</span> <b>dweitzel:</b></span> not that DNS matches.<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:50:56)</span> <b>matyas:</b></span> btw I spotted a <a href="http://grid.iu.edu">grid.iu.edu</a> in one of the files<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:51:12)</span> <b>matyas:</b></span> <a href="https://github.com/opensciencegrid/htcondor-ce/blob/d9a8ebcf04df66b2f5d59f816e4a4c6a76188896/config/01-ce-collector.conf#L11">https://github.com/opensciencegrid/htcondor-ce/blob/d9a8ebcf04df66b2f5d59f816e4a4c6a76188896/config/01-ce-collector.conf#L11</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:52:27)</span> <b>blin:</b></span> pr incoming<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:55:04)</span> <b>isfiligoi:</b></span> So my cert DN should match whatever is in topology?<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:56:02)</span> <b>isfiligoi:</b></span> (cannot think of any other way you guys distinguish between legal and spam cert DNs)<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:57:40)</span> <b>matyas:</b></span> it looks like the hostname (whatever <tt>socket.getfqdn()</tt> returns) needs to match the DN<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:01:41)</span> <b>blin:</b></span> well, that's annoying<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:01:46)</span> <b>matyas:</b></span> ... where <tt>socket.getfqdn()</tt> uses what <tt>gethostbyaddr(3)</tt> (the C function) returns<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:02:03)</span> <b>blin:</b></span> this may all be moot<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:02:28)</span> <b>blin:</b></span> i'm looking at the origin service file overrides and they do NOT require/want the xcache-reporter<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:02:35)</span> <b>blin:</b></span> however the comment indicates that it should want it<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:02:42)</span> <b>blin:</b></span> but that may just be a copy/paste error<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:09:13)</span> <b>blin:</b></span> but we do ship it in the base xcache package so i'm really confused what the intention was here<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:11:00)</span> <b>blin:</b></span> @dweitzel does the central collector use the default condor mapfile?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:16:04)</span> <b>dweitzel:</b></span> it's been modified from the RPM, but I'm not sure what the change is.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:16:27)</span> <b>dweitzel:</b></span> it doesn't look too different.<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:17:06)</span> <b>blin:</b></span> could you send the contents?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:21:12)</span> <b>dweitzel:</b></span> <pre>GSI "^\/DC\=com\/DC\=DigiCert-Grid\/O=Open Science Grid\/OU\=Services\/CN\=(host\/)?([A-Za-z0-9.\-]*)$" \2@daemon.opensciencegrid.org<br/>GSI "^\/DC\=DigiCert-Grid\/DC\=com\/O=Open Science Grid\/OU\=Services\/CN\=(host\/)?([A-Za-z0-9.\-]*)$" \2@daemon.opensciencegrid.org<br/>GSI "^\/DC\=org\/DC\=opensciencegrid\/O=Open Science Grid\/OU\=Services\/CN\=(host\/)?([A-Za-z0-9.\-]*)$" \2@daemon.opensciencegrid.org<br/>GSI "^/DC=org/DC=incommon/.*/CN=([a-zA-Z0-9\.-]+)$" \1@daemon.opensciencegrid.org<br/>GSI "^\/C\=RU\/O\=RDIG\/OU\=hosts\/OU=.*\/CN\=(host\/)?([A-Za-z0-9.\-]*)$" \2@daemon.opensciencegrid.org<br/>GSI "^\/C\=BR\/O\=ANSP\/OU\=ANSPGrid\ CA\/OU\=Services\/CN\=(host\/)?([A-Za-z0-9.\-]*)$" \2@daemon.opensciencegrid.org<br/>GSI "^\/DC\=org\/DC\=terena\/DC\=tcs.*\/CN\=(host\/)?([A-Za-z0-9.\-]*)$" \2@daemon.opensciencegrid.org<br/>GSI "^\/DC\=ch\/DC\=cern\/OU\=computers\/CN\=(host\/)?([A-Za-z0-9.\-]*)$" \2@cern.ch<br/>GSI "^/CN=([-.A-Za-z0-9/= ]+)$" \1@daemon.opensciencegrid.org<br/>GSI (.*) GSS_ASSIST_GRIDMAP<br/>GSI "(/CN=[-.A-Za-z0-9/= ]+)" \1@unmapped.opensciencegrid.org<br/>CLAIMTOBE .* anonymous@claimtobe<br/>FS (.*) \1</pre><br/>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Nov 16, 2018 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Fri Nov 16, 2018 : #gracc (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(10:14:18)</span> <b>blin:</b></span> back to the above, it's actually a hosted-ce submitting to an htcondor cluster<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:17:54)</span> <b>blin:</b></span> @dweitzel i'm starting to think that this may be a gratia probe/blahp bug since the same query for hosted-ce19 and hosted-ce20 also have issues<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:19:04)</span> <b>dweitzel:</b></span> Yeah, might be.  Hosted CE's are difficult accounting wise because there is such a limited amount of information being propagated back up through the system.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:19:30)</span> <b>dweitzel:</b></span> With most gratia probes, we query directly the underlying HTCondor or SLURM cluster.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:23:02)</span> <b>blin:</b></span> it looks like we should always define procs in the record though <a href="https://github.com/opensciencegrid/gratia-probe/blob/master/condor/condor_meter#L653-L660">https://github.com/opensciencegrid/gratia-probe/blob/master/condor/condor_meter#L653-L660</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:23:09)</span> <b>blin:</b></span> (at least for the condor probe case)<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:24:15)</span> <b>blin:</b></span> and looking at one of the condor CE's, it looks like <tt>RequestCpus</tt> is set to 1 anyway<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:33:38)</span> <b>dweitzel:</b></span> From one of the raw records:<br/><pre>&lt;Processors urwg:metric="max"&gt;ifThenElse(WantWholeNode is true, !isUndefined(TotalCpus) ? TotalCpus : JobCpus,OriginalCpus)&lt;/Processors&gt;</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:36:31)</span> <b>blin:</b></span> huh, ok<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:36:33)</span> <b>blin:</b></span> thanks<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:37:25)</span> <b>blin:</b></span> ah ok i see that in the raw records now<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:31:55)</span> <b>blin:</b></span> i could've sworn we fixed this a few months ago<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:13:28)</span> <b>blin:</b></span> hey, so one weird thing i'm noticing while investigating this is some weirdness in the raw records of <tt><a href="http://grid1.oscer.ou.edu">grid1.oscer.ou.edu</a></tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:15:04)</span> <b>blin:</b></span> 1. the probename is <tt>slurm:<a href="http://grid1.oscer.ou.edu">grid1.oscer.ou.edu</a></tt>. I thought all probenames are prefixed with <tt>condor:</tt>. <b>@edquist</b> @dweitzel<br/>2. the raw record seems to have two entries for # of processors? The summarizer seems to pick the last entry<br/><pre><br/>&lt;Processors urwg:metric="total"&gt;1&lt;/Processors&gt;<br/>...<br/>&lt;Processors urwg:metric="total"&gt;0&lt;/Processors&gt;<br/></pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:17:25)</span> <b>dweitzel:</b></span> 1. if they are running the Slurm gratia probe, then <tt>slurm:</tt> is the correct prefix.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:17:34)</span> <b>dweitzel:</b></span> 2. do you have a link to a record or query?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:19:11)</span> <b>blin:</b></span> <a href="https://gracc.opensciencegrid.org/kibana/app/kibana#/discover?_g=()&amp;_a=(columns:!(_source),filters:!(),index:'gracc.osg.raw-*',interval:auto,query:(query_string:(query:'Processors:0%20AND%20ProbeName:%22slurm:grid1.oscer.ou.edu%22')),sort:!(EndTime,desc))">https://gracc.opensciencegrid.org/kibana/app/kibana#/discover?_g=()&amp;_a=(columns:!(_source),filters:!(),index:'gracc.osg.raw-*',interval:auto,query:(query_string:(query:'Processors:0%20AND%20ProbeName:%22slurm:grid1.oscer.ou.edu%22')),sort:!(EndTime,desc))</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:28:48)</span> <b>dweitzel:</b></span> Processors is set twice in the meter, but I'm not sure how gratia handles that:<br/><a href="https://github.com/opensciencegrid/gratia-probe/blob/master/slurm/slurm_meter">https://github.com/opensciencegrid/gratia-probe/blob/master/slurm/slurm_meter</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:29:50)</span> <b>blin:</b></span> interesting, ok<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:30:18)</span> <b>dweitzel:</b></span> indeed, it will add it twice.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:30:30)</span> <b>dweitzel:</b></span> but other slurm probes I'm looking at does not add it twice...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:30:55)</span> <b>dweitzel:</b></span> <a href="https://gracc.opensciencegrid.org/kibana/app/kibana#/doc/gracc.osg.raw-*/gracc.osg.raw3-2018.11/JobUsageRecord?id=036da01a2e50ea29fad43351d8b6f05d&amp;_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))">https://gracc.opensciencegrid.org/kibana/app/kibana#/doc/gracc.osg.raw-*/gracc.osg.raw3-2018.11/JobUsageRecord?id=036da01a2e50ea29fad43351d8b6f05d&amp;_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:31:39)</span> <b>blin:</b></span> maybe older versions of gratia probe?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:32:22)</span> <b>dweitzel:</b></span> the <tt>git blame</tt> puts those portions of the slurm probe at 5+ years old.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:32:35)</span> <b>blin:</b></span> rofl yeah<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:32:45)</span> <b>blin:</b></span> \*mind explodes\*<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:33:06)</span> <b>blin:</b></span> damn it slack<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:34:11)</span> <b>blin:</b></span> but anyway, back to the original problem<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:34:21)</span> <b>dweitzel:</b></span> good news is that wallduration on all of those records = 0<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:34:31)</span> <b>dweitzel:</b></span> so no lost usage.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:34:57)</span> <b>dweitzel:</b></span> I say, make a ticket to fix the slurm probe.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:35:06)</span> <b>dweitzel:</b></span> shouldn't call that Processors twice.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:35:15)</span> <b>dweitzel:</b></span> but, no idea why we don't have TONS of these.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:35:25)</span> <b>dweitzel:</b></span> maybe it some how condense it if they are the same.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:35:49)</span> <b>blin:</b></span> the job router config sets <tt>RequestCPUs = ifThenElse(WantWholeNode is true, !isUndefined(TotalCpus) ? TotalCpus : JobCpus,OriginalCpus)</tt> on routed jobs<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:38:17)</span> <b>blin:</b></span> so that occurs on both hosted and htcondor-ce's but we're only seeing that value come up in the gratia records of hosted CEs<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:39:27)</span> <b>dweitzel:</b></span> The probe doesn't "eval" that classad attribute: <a href="https://github.com/opensciencegrid/gratia-probe/blob/master/condor/condor_meter#L653">https://github.com/opensciencegrid/gratia-probe/blob/master/condor/condor_meter#L653</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:39:36)</span> <b>blin:</b></span> there's this case statement <a href="https://github.com/opensciencegrid/gratia-probe/blob/master/condor/condor_meter#L653-L660">https://github.com/opensciencegrid/gratia-probe/blob/master/condor/condor_meter#L653-L660</a> so my guess is that for regular condor batch systems, <tt>MachineAttrCpus0</tt> and/or <tt>MATCH_EXP_JOB_GLIDEIN_Cpus</tt> is being set<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:39:45)</span> <b>dweitzel:</b></span> yup, same thought.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:39:51)</span> <b>dweitzel:</b></span> We never used <tt>RequestCpus</tt> before<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:40:53)</span> <b>blin:</b></span> looks like it came from this ticket <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-2587">https://opensciencegrid.atlassian.net/browse/SOFTWARE-2587</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:42:53)</span> <b>blin:</b></span> yeah, we should probably just eval RequestCPUs<br/><pre><br/>blin@blin-latitude:~/gratia-probe (master)$ echo $ce<br/><a href="http://hosted-ce21.grid.uchicago.edu">hosted-ce21.grid.uchicago.edu</a><br/>blin@blin-latitude:~/gratia-probe (master)$ condor_q -name $ce -pool $ce:9619 -allusers -af requestcpus | sort | uniq -c<br/>     41 1<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:46:58)</span> <b>blin:</b></span> on a related note, are we ever going to get <a href="https://github.com/retzkek/gracc-dev">https://github.com/retzkek/gracc-dev</a> moved to the OSG org as promised in <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-2673">https://opensciencegrid.atlassian.net/browse/SOFTWARE-2673</a>?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:47:40)</span> <b>blin:</b></span> or are there docker containers for the necessary gracc bits that we can use for dev/testing?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:52:13)</span> <b>dweitzel:</b></span> That would be a @marian question. <br/>
+<span style="color: #53b759"><span style="font-size: small">(14:28:33)</span> <b>marian:</b></span> hey, good question!<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:34:08)</span> <b>marian:</b></span> I believe this is mostly replaced by our puppet setup now … however, would be nice to get components like nginx, kibana and prometheus run from docker … I said mostly, becuase other two pieces <tt>gratia-probe-condor</tt> and <tt>gratia-probe-pbs</tt> I’m not familiar where it should belong, certainly not part of the gracc service itself … something for the submit node?<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:34:42)</span> <b>marian:</b></span> so, <a href="https://github.com/retzkek/gracc-dev">https://github.com/retzkek/gracc-dev</a> refers to two things atm<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:37:07)</span> <b>blin:</b></span> the gratia probes run at a site CE, generally<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:37:59)</span> <b>marian:</b></span> yeah, correct, my blunder …<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:38:46)</span> <b>marian:</b></span> I think we can open GRACC ticket as request to continue effort on this as time permit and in the meantime move Kevin’s gracc-dev under <a href="https://github.com/opensciencegrid/gracc">https://github.com/opensciencegrid/gracc</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:40:14)</span> <b>blin:</b></span> hrm, maybe<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:40:32)</span> <b>blin:</b></span> i imagine what's there has diverged from the current puppet configs and whatnot?<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:45:40)</span> <b>marian:</b></span> well, config files are completely different for sure, and for Kibana we need to keep that in sync with elastic version updates and plugin …<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:46:14)</span> <b>marian:</b></span> nginx and prometheus could easily go under docker I believe<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:58:22)</span> <b>marian:</b></span> so, <tt>gracc-dev</tt> is development work that would be good get finished … I’d say, once we stabilize OSG Ops we could take a look a this, because currently there is zero development time dedicated to gracc besides fixing broken things when they occur<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:04:00)</span> <b>blin:</b></span> sure, i'm not sure where the responsibility for it lies, though<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:06:58)</span> <b>marian:</b></span> yeah, good point<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:18:45)</span> <b>rynge:</b></span> Is a host cert required for a condor gratia probe?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:25:24)</span> <b>dweitzel:</b></span> No<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:25:40)</span> <b>dweitzel:</b></span> No host certainly required for probes. <br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:53:58)</span> <b>rynge:</b></span> Cool<br/>
+</body>
+</html>

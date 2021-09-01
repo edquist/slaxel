@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jun 18, 2021 : #python (chtc)</title>
+</head>
+<body>
+<h3>Fri Jun 18, 2021 : #python (chtc)</h3>
+<span style="color: #674b1b"><span style="font-size: small">(13:33:56)</span> <b>coatsworth:</b></span> Can we dump the older cmd_now.run test (built on pytest_old and flaky) now that we have the test_condor_now.py Ornithology version?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:44:32)</span> <b>coatsworth:</b></span> The only reason I can think to leave it is because it runs on Windows, which Ornithology still does not, although I'm working to fix that.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:11:21)</span> <b>tlmiller:</b></span> I'll have to take a look at that.  I don't know if the two tests are fully equivalent yet, or if I still care.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:11:56)</span> <b>tlmiller:</b></span> I will try to get back to you later today.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:17:31)</span> <b>coatsworth:</b></span> Sounds good. I don't think they need to be fully equivalent right away. The bigger focus is to drop pytest_old quickly so we can also drop some of the old tests which are flaky.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:19:20)</span> <b>tlmiller:</b></span> "Right away" in this case being a period of probably more than a year now where the pytest_old conversion has been languishing?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:20:12)</span> <b>tlmiller:</b></span> If it's not fully-equivalent I would like a fairly high-priority ticket to make it so; condor_now was a colossal pain to get working the first time.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:15:19)</span> <b>tlmiller:</b></span> Well, according to <a href="https://docs.google.com/spreadsheets/d/1XYf8HSwSrILruQcXof4MoXDfiL-qR8DjbBAmFlXRTMY/edit#gid=0">https://docs.google.com/spreadsheets/d/1XYf8HSwSrILruQcXof4MoXDfiL-qR8DjbBAmFlXRTMY/edit#gid=0</a>, I'm just a moron and never got around to actually removing the pytest_old variant.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:47:43)</span> <b>coatsworth:</b></span> I think the main urgency right now is some of the pytest_old tests are flaky and causing intermittent failures in the batlab. So the sooner we can get them gone, the better.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:49:05)</span> <b>coatsworth:</b></span> On a related note, I just ran into a problem with Ornithology: it expects there to be a startd running in order to tell when Condor has reached a ready state. I'm writing a test now that only needs a negotiator so it never actually starts.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:50:34)</span> <b>johnkn:</b></span> It should be paying attention to the DAEMON_LIST<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:50:51)</span> <b>johnkn:</b></span> does it use condor_who?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:51:09)</span> <b>johnkn:</b></span> or DC_QUERY_READY?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:51:54)</span> <b>coatsworth:</b></span> In pytest_old we just used condor_who to return a <tt>IsReady = true</tt> attribute. Josh's code goes a few extra steps waiting for the startd to advertise. Does anybody know why?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:52:54)</span> <b>johnkn:</b></span> You want to wait for the startd to advertise to avoid having the first negotiation cycle be empty and then having to wait for the cycle delay<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:53:55)</span> <b>coatsworth:</b></span> This is the code in question: <a href="https://github.com/htcondor/htcondor/blob/master/src/condor_tests/ornithology/condor.py#L296-L322">https://github.com/htcondor/htcondor/blob/master/src/condor_tests/ornithology/condor.py#L296-L322</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:54:13)</span> <b>tlmiller:</b></span> It shouldn't be hard to conditionalize that on the DAEMON_LIST, I would think.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:54:18)</span> <b>coatsworth:</b></span> Could I just wrap that block with an if-statement checking if STARTD is in the DAEMON_LIST?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:54:27)</span> <b>coatsworth:</b></span> Ha!<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:54:35)</span> <b>coatsworth:</b></span> Let me give that a try.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:54:38)</span> <b>johnkn:</b></span> yeah.  you only want the STARD_State test of there is a startd<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:54:43)</span> <b>tlmiller:</b></span> Probably?  TJ, does <tt>IsReady</tt> mean anything else?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:54:58)</span> <b>johnkn:</b></span> ready otherwise means all daemons started<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:55:32)</span> <b>johnkn:</b></span> (and sent alive? IIRC)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:55:47)</span> <b>johnkn:</b></span> STARTD does alive before it puts ads in the collector<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:56:13)</span> <b>tlmiller:</b></span> So Mark shouldn't skip the <tt>condor_who</tt> invocation completely, then, it sounds like.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:56:20)</span> <b>johnkn:</b></span> yes<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:59:47)</span> <b>johnkn:</b></span> btw, I wonder if that split() isn't at least one reason why ornithology doesn't work on windows.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:00:07)</span> <b>johnkn:</b></span> or rather the '' in the command line.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:01:18)</span> <b>tlmiller:</b></span> The last time I looked at Ornithology on Windows, that would have been a nice problem to have:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:01:19)</span> <b>tlmiller:</b></span> <a href="https://docs.google.com/spreadsheets/d/1z6EdfsN_TBe5jilIANPTJ_f0QKwIniqyGBnLJ0zXXZc/edit#gid=0">https://docs.google.com/spreadsheets/d/1z6EdfsN_TBe5jilIANPTJ_f0QKwIniqyGBnLJ0zXXZc/edit#gid=0</a><br/>
+</body>
+</html>

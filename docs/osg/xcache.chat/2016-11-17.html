@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Nov 17, 2016 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Thu Nov 17, 2016 : #xcache (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(13:44:50)</span> <b>bbockelm:</b></span> @lincoln: I ran out of inodes in cvmfs-sync<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:44:56)</span> <b>lincoln:</b></span> well done<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:44:58)</span> <b>bbockelm:</b></span> I can haz more?<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:45:53)</span> <b>lincoln:</b></span> on what device did you run out of inodes?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:51:49)</span> <b>bbockelm:</b></span> root, of course<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:55:14)</span> <b>lincoln:</b></span> yeah ill work on it<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:03:01)</span> <b>bbockelm:</b></span> :+1:<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:12:54)</span> <b>lincoln:</b></span> theres a new disk mounted at /media . it’s set to the max of inodes per bytes<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:13:03)</span> <b>lincoln:</b></span> let me know if you run out again<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:13:27)</span> <b>lincoln:</b></span> @bbockelm<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:16:37)</span> <b>bbockelm:</b></span> Thanks!<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:25:47)</span> <b>rwg:</b></span> @bbockelm do you know if the Kibana StashCache is making sense? I understand that @ivukotic gave something to @dweitzel but wondering if its been scrutinized<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:26:25)</span> <b>bbockelm:</b></span> Derek had been giving a metric-of-the-week in his notes.  I didn't look this week myself<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:27:26)</span> <b>rwg:</b></span> I’m wondering about the number of open connections.  @ivukotic thinks its unreliable<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:29:09)</span> <b>dweitzel:</b></span> this? <a href="https://goo.gl/5Faep1">https://goo.gl/5Faep1</a> ?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:29:20)</span> <b>bbockelm:</b></span> I wouldn't be surprised.  They've been suspicious for AAA in the past<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:34:25)</span> <b>bbockelm:</b></span> well, number of open connections approximately matches the number of open TCP connections on the Nebraska cache server.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:35:55)</span> <b>bbockelm:</b></span> If I had to make a wild guess, I'd guess the HTTP code leaks sockets<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:37:05)</span> <b>bbockelm:</b></span> I see ~1500 TCP connections but effectively all threads are idle.  Since there's one thread per active connection, that means Xrootd likely forgot about the socket.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:37:35)</span> <b>bbockelm:</b></span> From the logs, some of these connections date back to Nov 1.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:38:02)</span> <b>bbockelm:</b></span> @dweitzel - do we have Xrootd 4.5.0 final available in OSG yet?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:40:29)</span> <b>dweitzel:</b></span> nope, looks like it's never been built in Koji.<br/>
+<span style="color: #84b22f"><span style="font-size: small">(15:05:34)</span> <b>ivukotic:</b></span> @dweitzel  would you mind pulling in Tony’s work, I would like to test a few  things with it?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:06:16)</span> <b>dweitzel:</b></span> I'm working on it now.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:06:20)</span> <b>dweitzel:</b></span> it's non-functional.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(17:38:11)</span> <b>rwg:</b></span> I understand it was working though probably needed some clean-up by someone more experienced<br/>
+<span style="color: #2b6836"><span style="font-size: small">(17:42:31)</span> <b>rwg:</b></span> @ivukotic @dweitzel can you guys agree on a version to use for testing?  I didn’t know this was an issue.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:15:05)</span> <b>bbockelm:</b></span> @lincoln - when you get a chance, can you check up on the Ceph metadata server?  Now that the inode issue is fixed, I'm starting the spider back up on <tt>stash-cvmfs</tt><br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:15:44)</span> <b>bbockelm:</b></span> just wanted to make sure I'm not crush'n it.<br/>
+<span style="color: #e96699"><span style="font-size: small">(20:16:47)</span> <b>lincoln:</b></span> Just checking grafana it looks OK but I'm out right now<br/>
+<span style="color: #e96699"><span style="font-size: small">(20:16:55)</span> <b>lincoln:</b></span> I'll keep an eye on it when I get home.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:17:08)</span> <b>bbockelm:</b></span> roger.  That's good 'nuff.  It's not showing problems from the client side, just wanted to double-check.<br/>
+</body>
+</html>

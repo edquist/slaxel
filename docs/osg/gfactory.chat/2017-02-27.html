@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Feb 27, 2017 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Mon Feb 27, 2017 : #gfactory (osg)</h3>
+<span style="color: #e7392d"><span style="font-size: small">(10:43:26)</span> <b>klarson1:</b></span> i was reviewing factory configs with farrukh and he thought this value may not be set the same on all the factories<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:43:28)</span> <b>klarson1:</b></span> +# Added per Brian on 5-4-2015.  Required for entries with longer queues<br/>+DELEGATE_JOB_GSI_CREDENTIALS_LIFETIME = 691200<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:43:54)</span> <b>klarson1:</b></span> the cern one has a diff value that was set in 2013 i think<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:44:08)</span> <b>klarson1:</b></span> do we know what this should be?<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:14:59)</span> <b>marian:</b></span> Hi Krista<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:15:45)</span> <b>marian:</b></span> I remember we're setting this line along the other lines as well, this is from my records:<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:15:49)</span> <b>marian:</b></span> GSI_SKIP_HOST_CHECK = False<br/>C_GAHP_WORKER_THREAD.GSI_DAEMON_NAME=<br/>C_GAHP_WORKER_THREAD.DENY_CLIENT=<br/>DELEGATE_JOB_GSI_CREDENTIALS_LIFETIME = 345600<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:16:24)</span> <b>marian:</b></span> if it's not set otherwise condor defaults credential lifetime to 24hrs<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:16:31)</span> <b>marian:</b></span> which was pretty short<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:18:06)</span> <b>marian:</b></span> 96hrs (345600) look pretty fair number to me ... not sure why Brian set it to 7 days ... maybe because Frontend also keep proxy valid for one week? Just wild guess about why 691200?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:21:22)</span> <b>rynge:</b></span> For what it is worth, at least OSG VO see glideins fail sometimes on sites where the glideins sit in the local queue for a while. My guess is that the 7 days is just to prevent that from happening very often.<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:22:28)</span> <b>marian:</b></span> makes sense, too<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(16:24:30)</span> <b>sthapa:</b></span> Is there an issue with stanford_proclus?  I see a lot of held jobs that were manually removed:<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(16:24:41)</span> <b>sthapa:</b></span> @sthapa uploaded a file: <a href="https://opensciencegrid.slack.com/files/sthapa/F4AF6DAJV/-.txt">Untitled</a><br/>
+<span style="color: #5b89d5"><span style="font-size: small">(16:25:43)</span> <b>sthapa:</b></span> Also, I have an another site that’s ready to go into the factory, should I email factory ops or can we handle it here?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:58:04)</span> <b>mkandes:</b></span> @rynge: Any problem seen with "New DN for OSG VO <a href="http://osg-flock.grid.iu.edu">osg-flock.grid.iu.edu</a> FE"? If not, just going to close out internal ticket for this.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:58:54)</span> <b>rynge:</b></span> It is all good. Thanks!<br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:59:17)</span> <b>mkandes:</b></span> Cool. Thanks.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(18:17:26)</span> <b>mkandes:</b></span> @sthapa: I'm not really on Ops (or officially working) today, but I can check Stanford later and get the ball rolling there. Also, if you have a new site, as long as you post the info here, I can also mock up a new entry later as well.<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(18:17:54)</span> <b>sthapa:</b></span> I sent the info in an email to gfactory-ops<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(18:18:08)</span> <b>sthapa:</b></span> I can repeat it if you can’t see it<br/>
+<span style="color: #bd9336"><span style="font-size: small">(18:20:18)</span> <b>mkandes:</b></span> Ah, no worries. I can find it there. I just haven't been monitoring today.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(18:41:37)</span> <b>mkandes:</b></span> @sthapa: I see the held glideins at Stanford. I'm just going to clear them out and see if things get going again. Let us  know if that doesn't happen.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(18:41:38)</span> <b>mkandes:</b></span> 2017-02-28 00:40:14 UTC [gfactory@glidein:~]$ entry_q OSG_US_Stanford_Proclus -held<br/><br/><br/>-- Schedd: <a href="mailto:schedd_glideins9@glidein.grid.iu.edu">schedd_glideins9@glidein.grid.iu.edu</a> : &lt;129.79.53.27:39247?...<br/> ID         OWNER          HELD_SINCE  HOLD_REASON                                <br/>4064025.0   feglow          2/27 19:58 Job removed from batch queue manually      <br/>4064025.1   feglow          2/27 19:58 Job removed from batch queue manually      <br/>4064025.2   feglow          2/27 19:18 Job removed from batch queue manually      <br/>4064026.1   feglow          2/27 19:18 Job removed from batch queue manually      <br/>4064026.2   feglow          2/27 19:58 Job removed from batch queue manually      <br/>4064047.4   feosgflock      2/27 23:55 Job removed from batch queue manually      <br/>4064079.0   feglow          2/27 16:09 Job removed from batch queue manually      <br/>4064079.1   feglow          2/27 19:18 Job removed from batch queue manually      <br/>4064079.2   feglow          2/27 19:58 Job removed from batch queue manually      <br/>4064079.3   feglow          2/27 19:58 Job removed from batch queue manually      <br/>4064079.4   feglow          2/27 16:09 Job removed from batch queue manually      <br/>4064080.0   feglow          2/27 19:18 Job removed from batch queue manually<br/>
+</body>
+</html>

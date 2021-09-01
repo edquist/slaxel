@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jul 16, 2021 : #flightworthy (chtc)</title>
+</head>
+<body>
+<h3>Fri Jul 16, 2021 : #flightworthy (chtc)</h3>
+<span style="color: #3c989f"><span style="font-size: small">(13:19:09)</span> <b>wiscmoate:</b></span> Steve Timm just submitted RUST <a href="https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=103708">ticket #103708 "Possible compatibility problems between HTCondor 9.0.1 and BOSCO"</a>;  could I get a volunteer to take it?<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(13:31:12)</span> <b>tim:</b></span> @wiscmoate Drop that one on me.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:35:02)</span> <b>wiscmoate:</b></span> Thanks Tim<br/>
+<span style="color: #e7392d"><span style="font-size: small">(13:57:39)</span> <b>ckoch5:</b></span> Question (maybe for @tlmiller): If someone is using self-checkpointing w/ a checkpoint_exit_code and has this in their submit file:<br/><pre>periodic_hold = (JobStatus == 2) &amp;&amp; ((CurrentTime - EnteredCurrentStatus) &gt; (60*60*10))</pre><br/>will this fire after 10 hours no matter what, or after 10 hours if the current checkpoint iteration has run that long.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:21:23)</span> <b>tlmiller:</b></span> More the former than the latter, but to be clear, I would expect it to fire 10 hours after the starter forks the job, completely independent of any checkpointing the job may have already or will be done.  (That is, if a job checkpoints after an hour, gets evicted, restarts, and runs for nine more hours (checkpointing nine more times), it won't go on hold for another hour yet.)<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:26:28)</span> <b>ckoch5:</b></span> right, so if the job is *evicted* the “counter” restarts, but if it has just checkpointed, it hasn’t.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:26:43)</span> <b>ckoch5:</b></span> Is there an attribute for the latest checkpoint time when using checkpoint_exit_code?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:27:01)</span> <b>ckoch5:</b></span> that could replace <tt>EnteredCurrentStatus</tt> above?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:28:01)</span> <b>tlmiller:</b></span> I don't think that there's anything explicit (the rest of HTCondor generally doesn't know about checkpointing), but if file transfer sets timestamps in the job ad, those should be for the last checkpoint taken.<br/>
+<blockquote>
+<span style="color: #2b6836"><span style="font-size: small">(14:31:12)</span> <b>jcpatton:</b></span> Looking at a job that has <tt>SuccessCheckpointExitCode</tt> set, there are file transfer timestamps for<br/><pre>JobCurrentFinishTransferInputDate<br/>JobCurrentFinishTransferOutputDate<br/>JobCurrentStartDate<br/>JobCurrentStartExecutingDate<br/>JobCurrentStartTransferInputDate<br/>JobCurrentStartTransferOutputDate</pre><br/>nothing that seems specific for checkpoints<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:31:38)</span> <b>jcpatton:</b></span> <tt>TransferCheckpoint</tt> is set to the files they want to transfer though<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:32:16)</span> <b>tlmiller:</b></span> If the job hasn't finished yet, <tt>JobCurrentFinishTransferOutputDate</tt> is probably when the checkpoint transfer to SPOOL finished.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:32:50)</span> <b>jcpatton:</b></span> I’m just looking at history so this is after it’s finished but that’s good to know, I should see if I can catch a job in flight and see if that’s happening<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:32:50)</span> <b>ckoch5:</b></span> :+1:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:37:24)</span> <b>tlmiller:</b></span> In my quick-and-dirty testing, that seems to be true.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:37:33)</span> <b>tlmiller:</b></span> It's not a good solution, but it should work.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:45:52)</span> <b>ckoch5:</b></span> Can I variablize job ads?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:46:44)</span> <b>tlmiller:</b></span> ..?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:47:17)</span> <b>ckoch5:</b></span> i.e. can I say:<br/><pre>last_checkpoint = JobCurrentFinishTransferOutputDate</pre><br/>and then use $(last_checkpoint) in an expression?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:48:15)</span> <b>tlmiller:</b></span> Yes.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:49:03)</span> <b>tlmiller:</b></span> (I think in the submit file you may need to say <tt>+last_checkpoint = JobCurrentFinishTransferOutputDate</tt>.)<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:49:53)</span> <b>ckoch5:</b></span> hmmm, okay.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:50:11)</span> <b>jcpatton:</b></span> fyi for the user in question, if I print out <tt>JobCurrentFinishTransferOutputDate &gt; JobCurrentStartDate</tt> I don’t see any ads (out of 1072 running jobs) where that’s true<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:50:22)</span> <b>tlmiller:</b></span> I don't actually know.  (The + will make sure it goes into the job ad, where it'll need to be.)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:51:05)</span> <b>tlmiller:</b></span> The actual attribute name I found was <tt>TransferOutFinished</tt>.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:51:08)</span> <b>jcpatton:</b></span> ah<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:51:40)</span> <b>tlmiller:</b></span> The <tt>JobCurrent</tt> attributes are probably copies from us (badly) dealing with the whole job-instance problem.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:52:11)</span> <b>tlmiller:</b></span> So try <tt>TransferOutFinished &gt; JobStartDate</tt>, maybe?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:52:44)</span> <b>jcpatton:</b></span> <tt>JobCurrentStartDate</tt> seems to match <tt>EnteredCurrentStatus</tt><br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:53:17)</span> <b>tlmiller:</b></span> One would expect that (only) for running jobs?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:54:50)</span> <b>jcpatton:</b></span> yeah, I’m just looking at (the schedd’s copy) of running jobs right now<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:57:11)</span> <b>jcpatton:</b></span> <br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:57:50)</span> <b>jcpatton:</b></span> looks like Slack has a “View raw” option for these snippets that might be useful<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:59:19)</span> <b>tlmiller:</b></span> Indeed.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:04:55)</span> <b>tlmiller:</b></span> Do either of you have sudo on that machine?  I'd like to confirm my analysis of a few jobs by looking at their logs.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:06:34)</span> <b>jcpatton:</b></span> I don’t remember… ok looks like I do<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:07:04)</span> <b>tlmiller:</b></span> e.g., based on the timestamps, it looks like 11530663.24 has checkpointed during its current execution, but had run previously, either transferring output at the end of that instance, or checkpointing then, as well.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:07:15)</span> <b>tlmiller:</b></span> <tt>/home/ezw/mdsims/99spikes/cond2/logfiles/job.402_99_31_2_25.11530663.24.log</tt><br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:08:56)</span> <b>jcpatton:</b></span> I’m assuming you’re <tt>tlmiller</tt> on <tt>login05</tt>, it’s in your home<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:09:38)</span> <b>tlmiller:</b></span> Thanks<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:09:43)</span> <b>jcpatton:</b></span> yeah I see a lot of transferring output file entries<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:09:47)</span> <b>jcpatton:</b></span> which seems good<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:10:23)</span> <b>tlmiller:</b></span> Yeah.  Complicated job history there.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:10:41)</span> <b>tlmiller:</b></span> Going on hold multiple times for running too long, and then getting evicted at one point.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:11:31)</span> <b>tlmiller:</b></span> Looks like <tt>TransferOutFinished</tt> does correspond to when the most recent checkpoint finished.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:12:48)</span> <b>tlmiller:</b></span> (I'm actually impressed by<br/><pre>Cpus                 :      1.00        1         1</pre><br/>... I don't often see jobs that efficient.)<br/>
+</blockquote>
+<span style="color: #9e3997"><span style="font-size: small">(14:28:11)</span> <b>tlmiller:</b></span> (While the job is running, I mean.)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:28:29)</span> <b>tlmiller:</b></span> If what you're trying to do is make sure the job doesn't go for too long between checkpoints,<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:28:53)</span> <b>tlmiller:</b></span> ... no, nevermind, that won't work.<br/>
+</body>
+</html>

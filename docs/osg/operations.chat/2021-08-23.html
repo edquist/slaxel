@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Aug 23, 2021 : #operations (osg)</title>
+</head>
+<body>
+<h3>Mon Aug 23, 2021 : #operations (osg)</h3>
+<span style="color: #aba727"><span style="font-size: small">(11:03:49)</span> <b>moate:</b></span> We've got an unassigned freshdesk <a href="https://support.opensciencegrid.org/a/tickets/67866">ticket #67866 "CRLs for CERN-GridCA expired in OSG CVMFS"</a> requesting new CRLs for existing expired CRLs that live within the OSG CVMFS repository.  Who would be the agent for that?   I'm not seeing anything in the <a href="https://docs.google.com/spreadsheets/d/1cIu0YcNAT8Kiy5u2xBz8ZzG2zImVK3pRX9iFHegIjUk/edit?usp=sharing">OSG Service Catalog</a> that looks relevant.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:06:26)</span> <b>matyas:</b></span> Assign it to me. I think we solved it in #software an hour and a half ago though.<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:10:52)</span> <b>moate:</b></span> @matyas sure, ty<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:00:35)</span> <b>lincoln:</b></span> so this is a fun one.. I am now having Gratia mail me every 20 minutes with things like this:<br/><pre>WARNING: GSI authentication is enabled by your security configuration! GSI will not work in future releases.<br/>For details, see <a href="https://htcondor-wiki.cs.wisc.edu/index.cgi/wiki?p=PlanToReplaceGridCommunityToolkit">https://htcondor-wiki.cs.wisc.edu/index.cgi/wiki?p=PlanToReplaceGridCommunityToolkit</a></pre><br/>Okay okay, I get it!<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:00:45)</span> <b>lincoln:</b></span> via<br/><pre>Cron &lt;root@login-el7&gt; /usr/share/gratia/common/cron_check /etc/gratia/condor/ProbeConfig &amp;&amp; /usr/share/gratia/condor/condor_meter -s 900</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:01:17)</span> <b>dweitzel:</b></span> It must be running a HTCondor command?  <b>@edquist</b><br/>
+<span style="color: #16569E"><span style="font-size: small">(16:01:34)</span> <b>edquist:</b></span> oooh<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:03:09)</span> <b>edquist:</b></span> i'll have to look for the message,<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:03:20)</span> <b>edquist:</b></span> for the most part condor_meter uses the python bindings<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:03:42)</span> <b>edquist:</b></span> looks like it does use condor_config_val / condor_ce_config_val though<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:05:09)</span> <b>edquist:</b></span> yeah the error presumably is coming from condor, not gratia<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:06:06)</span> <b>edquist:</b></span> the condor_ce.py module also invokes condor_q / condor_ce_q<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:06:25)</span> <b>bbockelm:</b></span> <b>@edquist</b> - this looks like the new 9.1.3 functionality where it warns you if you force condor to talk over GSI (because GSI is disabled by default).<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:06:36)</span> <b>edquist:</b></span> makes sense<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:07:55)</span> <b>bbockelm:</b></span> From release notes:<br/>&gt;  When GSI authentication is configured or used, a warning is now printed to daemon logs and the stderr of tools. These warnings can be suppressed by setting configuration parameters <tt>WARN_ON_GSI_CONFIGURATION</tt> and <tt>WARN_ON_GSI_USAGE</tt> to <tt>False</tt>. <a href="https://opensciencegrid.atlassian.net/browse/HTCONDOR-517">(HTCONDOR-517)</a><br/>Lincoln, given this is _probably_ from the condor-ce side of the house, you can set <tt>WARN_ON_GSI_CONFIGURATION=false</tt> in <tt>/etc/condor-ce/config.d</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(16:09:29)</span> <b>matyas:</b></span> lol of *course* there's a knob for that<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:10:11)</span> <b>bbockelm:</b></span> that one would get _extremely_ irritating without a config knob to shut off the warning.<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:10:42)</span> <b>lincoln:</b></span> It's the CMS Connect login node :slightly_smiling_face:<br/>
+</body>
+</html>

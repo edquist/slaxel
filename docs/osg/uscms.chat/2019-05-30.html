@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu May 30, 2019 : #uscms (osg)</title>
+</head>
+<body>
+<h3>Thu May 30, 2019 : #uscms (osg)</h3>
+<span style="color: #7d414c"><span style="font-size: small">(05:58:52)</span> <b>bockjoo:</b></span> Last week.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(07:11:29)</span> <b>andrew.melo:</b></span> damn. was hoping it was long enough ago that things might've gotten fixed :slightly_smiling_face:<br/>
+<span style="color: #7d414c"><span style="font-size: small">(07:21:57)</span> <b>bockjoo:</b></span> If you want, I can double check.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(08:03:18)</span> <b>bbockelm:</b></span> @bockjoo @andrew.melo - if you can confirm that SANs don't work, I'll be happy to file it as an HTCondor bug.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(08:03:55)</span> <b>bbockelm:</b></span> _supposedly_ the underlying Globus libraries support this.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(08:05:53)</span> <b>bockjoo:</b></span> /bin/cp igtf/osg_rc_ufl_edu_cert.cer hostcert.pem ; /bin/cp igtf/osg.rc.ufl.edu-key.pem hostkey.pem ; systemctl stop condor-ce ; systemctl start condor-ce ; openssl x509 -in /etc/grid-security/hostcert.pem -noout -subject ; openssl x509 -in /etc/grid-security/hostcert.pem -noout -text | grep -A 1 "Subject Alternative "<br/>
+<span style="color: #7d414c"><span style="font-size: small">(08:06:11)</span> <b>bockjoo:</b></span> subject= /DC=org/DC=incommon/C=US/ST=FL/L=Gainesville/O=University of Florida/OU=High Performance Computing Center/CN=<a href="http://osg.rc.ufl.edu">osg.rc.ufl.edu</a><br/>            X509v3 Subject Alternative Name:<br/>                DNS:<a href="http://osg.rc.ufl.edu">osg.rc.ufl.edu</a>, DNS:<a href="http://cms.rc.ufl.edu">cms.rc.ufl.edu</a>, DNS:<a href="http://cmsio.rc.ufl.edu">cmsio.rc.ufl.edu</a>, DNS:<a href="http://cmsio10.rc.ufl.edu">cmsio10.rc.ufl.edu</a>, DNS:<a href="http://cmsio3.rc.ufl.edu">cmsio3.rc.ufl.edu</a>, DNS:<a href="http://cmsio4.rc.ufl.edu">cmsio4.rc.ufl.edu</a>, DNS:<a href="http://cmsio5.rc.ufl.edu">cmsio5.rc.ufl.edu</a>, DNS:<a href="http://cmsio6.rc.ufl.edu">cmsio6.rc.ufl.edu</a>, DNS:<a href="http://cmsio7.rc.ufl.edu">cmsio7.rc.ufl.edu</a>, DNS:<a href="http://cmsio8.rc.ufl.edu">cmsio8.rc.ufl.edu</a>, DNS:<a href="http://cmsio9.rc.ufl.edu">cmsio9.rc.ufl.edu</a>, DNS:<a href="http://cslrm.rc.ufl.edu">cslrm.rc.ufl.edu</a><br/>
+<span style="color: #7d414c"><span style="font-size: small">(08:06:53)</span> <b>bockjoo:</b></span> So I am checking <a href="http://cms.rc.ufl.edu">cms.rc.ufl.edu</a> and put <a href="http://osg.rc.ufl.edu">osg.rc.ufl.edu</a> on it with SANs as shown above.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(08:08:36)</span> <b>bockjoo:</b></span> ${bockjoo@new:transfers} condor_ce_run -lr <a href="http://cms.rc.ufl.edu:9619">cms.rc.ufl.edu:9619</a> pwd<br/>********************************************************************************<br/>2019-05-30 09:08:26 Could not parse job cluster from condor_submit output.<br/>STDOUT:<br/> STDERR:<br/>ERROR: Can't find address of schedd <a href="http://cms.rc.ufl.edu">cms.rc.ufl.edu</a><br/><br/>********************************************************************************<br/>
+<span style="color: #7d414c"><span style="font-size: small">(08:09:52)</span> <b>bockjoo:</b></span> After putting things back to the working hostcert, I get<br/>
+<span style="color: #7d414c"><span style="font-size: small">(08:09:56)</span> <b>bockjoo:</b></span> ${bockjoo@new:transfers} condor_ce_run -lr <a href="http://cms.rc.ufl.edu:9619">cms.rc.ufl.edu:9619</a> pwd<br/>/var/lib/condor-ce/cms/spool/6537/0/cluster5576537.proc0.subproc0<br/>
+<span style="color: #7d414c"><span style="font-size: small">(08:11:39)</span> <b>bockjoo:</b></span> To triple-check it, I will put it back to the SAN host certificate and see if SAM tests fail.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:05:33)</span> <b>bbockelm:</b></span> ah - could you do <tt>condor_ce_ping</tt> with the debug flag?  That's all I need to double-check.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:09:58)</span> <b>bbockelm:</b></span> Actually, don't bother.  I think that the above is proof enough.  Here's the ticket: <a href="https://htcondor-wiki.cs.wisc.edu/index.cgi/tktview?tn=7081">https://htcondor-wiki.cs.wisc.edu/index.cgi/tktview?tn=7081</a><br/>
+<span style="color: #7d414c"><span style="font-size: small">(09:26:31)</span> <b>bockjoo:</b></span> Yeah, SAM tests are not arriving at all.<br/>
+</body>
+</html>

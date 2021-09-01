@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed May 10, 2017 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Wed May 10, 2017 : #xcache (osg)</h3>
+<span style="color: #53b759"><span style="font-size: small">(10:16:47)</span> <b>marian:</b></span> Ilija, could you turn on core file to be generated when cmsd dies again?<br/>
+<span style="color: #84b22f"><span style="font-size: small">(10:17:04)</span> <b>ivukotic:</b></span> can you tell me how?<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:58:00)</span> <b>marian:</b></span> sure<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:58:09)</span> <b>marian:</b></span> btw is it rhel6 or rhel7?<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:00:42)</span> <b>marian:</b></span> check what you have <tt>cat /proc/</tt>pidof cmsd<tt>/limits</tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(13:00:54)</span> <b>marian:</b></span> cat /proc/\<tt>pidof cmsd\</tt>/limits<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:01:29)</span> <b>marian:</b></span> well, autoformating is playing with me here ...<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:01:55)</span> <b>marian:</b></span> @marian uploaded a file: <a href="https://opensciencegrid.slack.com/files/marian/F5B1RVCQ1/-.txt">Untitled</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(13:04:02)</span> <b>marian:</b></span> set core file size to unlimited if it's not case already: <tt>ulimit -c unlimited</tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(13:04:45)</span> <b>marian:</b></span> and also set env variable upon cmsd/xrootd start <tt>DAEMON_COREFILE_LIMIT="unlimited"</tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(13:05:31)</span> <b>marian:</b></span> if rhel6 env var set in <tt>/etc/sysconfig/xrootd</tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(13:09:17)</span> <b>marian:</b></span> if rhel7 you can use <tt>/etc/sysconfif/xrootd</tt> but prepare override file <tt>/etc/systemd/system/cmsd@clustered.service.d/override.conf</tt> with content:<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:09:47)</span> <b>marian:</b></span> @marian uploaded a file: <a href="https://opensciencegrid.slack.com/files/marian/F5B1XK75X/-.txt">Untitled</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:58:46)</span> <b>bbockelm:</b></span> @marian can you include the above knowledge in the documentation?<br/>
+<span style="color: #53b759"><span style="font-size: small">(20:01:21)</span> <b>marian:</b></span> yep, can do! Shouldn’t it be in main OSG pages, though? Or part of StashCache Ops guide?<br/>
+<span style="color: #53b759"><span style="font-size: small">(20:01:34)</span> <b>marian:</b></span> main OSG xrootd pages I mean<br/>
+<span style="color: #674b1b"><span style="font-size: small">(20:08:27)</span> <b>rynge:</b></span> @dweitzel Need help with some files on osgstorage<br/>
+<span style="color: #674b1b"><span style="font-size: small">(20:08:31)</span> <b>rynge:</b></span> For example:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(20:08:34)</span> <b>rynge:</b></span> $ cp /cvmfs/stash.osgstorage.org/user/ldunwoo/public/kinc-1492724350/07/1D/clusters-sc244115.tar.gz /tmp/<br/>cp: cannot open `/cvmfs/stash.osgstorage.org/user/ldunwoo/public/kinc-1492724350/07/1D/clusters-sc244115.tar.gz' for reading: Input/output error<br/>
+<span style="color: #235e5b"><span style="font-size: small">(20:11:01)</span> <b>dweitzel:</b></span> sure<br/>
+<span style="color: #235e5b"><span style="font-size: small">(20:18:11)</span> <b>dweitzel:</b></span> ok, @rynge , a few issues.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(20:18:46)</span> <b>dweitzel:</b></span> 1. For some reason, the stash sync isn't going deep into these directories.  I need to debug why (it's complicated because it multi-threaded and multi-process)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(20:19:14)</span> <b>dweitzel:</b></span> 2. It looks like the file changed since I manually scanned that user's directory last week.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(20:19:22)</span> <b>dweitzel:</b></span> So I manually made it work now.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(20:19:30)</span> <b>dweitzel:</b></span> and I'll re-scan that user's home directory over night.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(20:19:42)</span> <b>rynge:</b></span> Hmm, the file changing sounds bad<br/>
+<span style="color: #674b1b"><span style="font-size: small">(20:19:51)</span> <b>rynge:</b></span> It should only have one write on it<br/>
+<span style="color: #235e5b"><span style="font-size: small">(20:20:00)</span> <b>dweitzel:</b></span> It could be that the file was being written while I was scanning.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(20:20:09)</span> <b>rynge:</b></span> Ok, that makes sense<br/>
+<span style="color: #235e5b"><span style="font-size: small">(20:20:10)</span> <b>dweitzel:</b></span> lots of corner cases.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(20:20:13)</span> <b>rynge:</b></span> Yeah<br/>
+<span style="color: #674b1b"><span style="font-size: small">(20:20:18)</span> <b>rynge:</b></span> Thanks for looking<br/>
+<span style="color: #235e5b"><span style="font-size: small">(20:21:50)</span> <b>dweitzel:</b></span> np<br/>
+</body>
+</html>

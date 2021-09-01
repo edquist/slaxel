@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jun 11, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Tue Jun 11, 2019 : #xcache (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(08:26:52)</span> <b>blin:</b></span> Oh cool, I didn't know that you could send monitoring info to multiple destinations<br/>
+<span style="color: #235e5b"><span style="font-size: small">(08:31:27)</span> <b>dweitzel:</b></span> you can send it to max of 2 places.<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:18:57)</span> <b>efajardo:</b></span> <b>@here</b> any instructiosn how I can debug why the caches are not reporting to the collecotr?<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:21:39)</span> <b>matyas:</b></span> <a href="http://collector.opensciencegrid.org">collector.opensciencegrid.org</a>?<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:23:40)</span> <b>matyas:</b></span> check <tt>systemctl status xcache-reporter.timer</tt> to see if the reporting has been enabled<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:24:19)</span> <b>blin:</b></span> there's no systemd in the containers<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:24:35)</span> <b>blin:</b></span> edgar, do all of your caches have host certs?<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:24:46)</span> <b>efajardo:</b></span> yes<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:24:56)</span> <b>efajardo:</b></span> all the ones in production<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:24:56)</span> <b>blin:</b></span> ok i'll take a look at the container later<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:25:01)</span> <b>blin:</b></span> it's probably something dumb i did in there<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:25:07)</span> <b>efajardo:</b></span> One thing that I see funky in the container<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:25:13)</span> <b>efajardo:</b></span> is that is not using any of the stashcache<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:25:17)</span> <b>efajardo:</b></span> rpms<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:25:24)</span> <b>blin:</b></span> ...really?<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:25:27)</span> <b>efajardo:</b></span> yea<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:25:27)</span> <b>blin:</b></span> how about stash-cache?<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:25:49)</span> <b>efajardo:</b></span> <pre>Available Packages<br/>stashcache-cache-server.noarch                                                       0.10-1.osg34.el7                                                   osg<br/>stashcache-cache-server-auth.noarch                                                  0.10-1.osg34.el7                                                   osg<br/>stashcache-client.noarch                                                             5.2.0-1.osg34.el7                                                  osg<br/>stashcache-daemon.noarch                                                             0.10-1.osg34.el7                                                   osg<br/>stashcache-origin-server.noarch                                                      0.10-1.osg34.el7                                                   osg<br/></pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(09:26:14)</span> <b>efajardo:</b></span> <pre>rpm -qv stash-cache<br/>stash-cache-1.0.5-1.osg34.el7.noarch</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(09:39:33)</span> <b>matyas:</b></span> all the 0.10 rpms are super out of date<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:40:11)</span> <b>dweitzel:</b></span> looks like edgar has the stash-cache package installed.<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:41:06)</span> <b>matyas:</b></span> how does the reporting work if there's no systemd?<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:41:19)</span> <b>matyas:</b></span> does supervisord do timers?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:45:44)</span> <b>dweitzel:</b></span> <a href="https://github.com/opensciencegrid/docker-xcache/blob/master/xcache/cron.d/xcache-reporter.cron">https://github.com/opensciencegrid/docker-xcache/blob/master/xcache/cron.d/xcache-reporter.cron</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(09:54:47)</span> <b>efajardo:</b></span> The stashcache that is on the OSG image does not bring any of that<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:54:48)</span> <b>efajardo:</b></span> <pre>rpm -ql stash-cache<br/>/etc/xrootd/Authfile-auth<br/>/etc/xrootd/config.d/40-osg-caching-plugin.cfg<br/>/etc/xrootd/config.d/40-osg-http.cfg<br/>/etc/xrootd/config.d/50-stash-cache-authz.cfg<br/>/etc/xrootd/config.d/50-stash-cache-paths.cfg<br/>/etc/xrootd/xcache-robots.txt<br/>/etc/xrootd/xrootd-stash-cache-auth.cfg<br/>/etc/xrootd/xrootd-stash-cache.cfg<br/>/run/stash-cache<br/>/run/stash-cache-auth<br/>/usr/lib/systemd/system/stash-cache-authfile.service<br/>/usr/lib/systemd/system/stash-cache-authfile.timer<br/>/usr/lib/systemd/system/xrootd@stash-cache-auth.service.d/10-stash-cache-auth-overrides.conf<br/>/usr/lib/systemd/system/xrootd@stash-cache.service.d/10-stash-cache-overrides.conf<br/>/usr/lib/tmpfiles.d/stash-cache.conf<br/>/usr/libexec/xcache/authfile-update<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(09:58:03)</span> <b>blin:</b></span> it's brought in by <tt>xcache</tt> so if you do <tt>rpm -ql xcache</tt> you should see the <tt>xcache-reporter</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(10:02:44)</span> <b>efajardo:</b></span> got it<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:02:55)</span> <b>efajardo:</b></span> <pre>[root@fiona-r-uva xrootd]# /usr/libexec/xcache/xcache-reporter --one-shot -v<br/>INFO: Advertising StashCache ads to collectors: <a href="http://collector1.opensciencegrid.org:9619,collector2.opensciencegrid.org:9619">collector1.opensciencegrid.org:9619,collector2.opensciencegrid.org:9619</a><br/>WARNING: Could not advertise to <a href="http://collector1.opensciencegrid.org:9619,collector2.opensciencegrid.org:9619">collector1.opensciencegrid.org:9619,collector2.opensciencegrid.org:9619</a>: Failed to advertise to collector</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:04:45)</span> <b>blin:</b></span> we may have to take a look at the central collector logs<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:04:49)</span> <b>blin:</b></span> to see if there are any auth issues<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:05:17)</span> <b>blin:</b></span> derek and i should be able to help after we give our xrootd workshop talks<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:07:23)</span> <b>dweitzel:</b></span> edgar, send me the hostname / ip of that node.<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:12:27)</span> <b>efajardo:</b></span> <tt>145.146.100.30    <a href="http://fiona-r-uva.vlan7.uvalight.net">fiona-r-uva.vlan7.uvalight.net</a></tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(11:54:42)</span> <b>blin:</b></span> @dweitzel did you find anything in the logs? ^^<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:57:57)</span> <b>dweitzel:</b></span> absolutely nothing on this side.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:58:14)</span> <b>dweitzel:</b></span> grepping for both of those everywhere.  I don't think it's even leaving the fiona box.<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:00:12)</span> <b>blin:</b></span> do we still have <a href="http://collector1.opensciencegrid.org">collector1.opensciencegrid.org</a> and <a href="http://collector2.opensciencegrid.org">collector2.opensciencegrid.org</a>? i thought we only had a single collector host atm<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:02:20)</span> <b>dweitzel:</b></span> we have both.<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:04:05)</span> <b>blin:</b></span> ah ok<br/>
+</body>
+</html>

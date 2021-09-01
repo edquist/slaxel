@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jun 21, 2018 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu Jun 21, 2018 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(08:45:14)</span> <b>blin:</b></span> what derek said<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:27:22)</span> <b>matyas:</b></span> we should give instructions for how to do that<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:29:05)</span> <b>blin:</b></span> you mean specifically on the submit-htcondor-ce page?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:29:21)</span> <b>matyas:</b></span> either there or somewhere else but link to it<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:30:28)</span> <b>blin:</b></span> sure<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:30:49)</span> <b>matyas:</b></span> also, for future-proofing, we should tell people how to deal with the output that openssl 1.1 generates<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:31:03)</span> <b>matyas:</b></span> e.g. <tt>subject=DC = org, DC = opensciencegrid, O = Open Science Grid, OU = People, CN = Matyas Selmeci</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:31:34)</span> <b>matyas:</b></span> I predict that will become a problem once RHEL 8 comes around<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:31:51)</span> <b>matyas:</b></span> and if we remember to deal with it now, we won't have to remember to deal with it later :slightly_smiling_face:<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:32:33)</span> <b>blin:</b></span> could you make a doc ticket for that one?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:32:38)</span> <b>matyas:</b></span> which one?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:32:52)</span> <b>blin:</b></span> the openssl 1.1 change in format<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:32:58)</span> <b>matyas:</b></span> OK<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:33:00)</span> <b>blin:</b></span> thanks<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:18:00)</span> <b>dweitzel:</b></span> <b>@edquist</b> I have a thought experiment to run with you on gratia probes, when you get back.<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:41:30)</span> <b>edquist:</b></span> @dweitzel, what's the thought experiment?<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:41:38)</span> <b>edquist:</b></span> ????????????  :slightly_smiling_face:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:03:14)</span> <b>dweitzel:</b></span> Right, so I was thinking about the gratia probe slurm.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:03:24)</span> <b>dweitzel:</b></span> it relies on the certinfo file for voms stuff..<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:03:41)</span> <b>edquist:</b></span> ok<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:04:07)</span> <b>dweitzel:</b></span> But... what if the gratia probe runs between the time that Slurm says the job is done (ie, done in the DB), and when condor thinks the job ends.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:04:13)</span> <b>dweitzel:</b></span> the certinfo file won't be created, right?<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:10:47)</span> <b>edquist:</b></span> oh, i am not sure, i'd have to take a look at the probe<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:11:12)</span> <b>edquist:</b></span> i take it you have thought a bit about this already though<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:11:20)</span> <b>edquist:</b></span> so i take your word for it<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:11:34)</span> <b>edquist:</b></span> do you have an idea how you want to handle this case?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:15:06)</span> <b>dweitzel:</b></span> I'm trying to decide if I should recommend moving to the htcondor-ce-probe<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:39:29)</span> <b>edquist:</b></span> i don't really remember exactly where the certinfo files tie into things and the specifics of the slurm probe.  I imagine for the first run of the gratia probe that's like you are describing (the probe runs after the slurm job is done in the slurm db, but before condor realizes it), the certinfo file won't be created - but will it not get picked up the next time the probe is run?  (I don't actually know off hand, is it possible to test?)<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:39:50)</span> <b>edquist:</b></span> If the certinfo file gets created the next time the probe is run, i suppose it's not a big deal<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:40:24)</span> <b>edquist:</b></span> if it gets missed completely in this case, then yeah it sounds like things would get missed<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:40:45)</span> <b>edquist:</b></span> and then the question is, is there any downside of using the htcondor-ce probe instead?<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:41:14)</span> <b>edquist:</b></span> i seem to remember there are just less attributes available or something from the ce probe vs the non-condor batch probes<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:41:30)</span> <b>edquist:</b></span> but i don't know what all of them are actually relevant<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:41:48)</span> <b>edquist:</b></span> (sorry i am probably not giving you any new/useful information here.)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:42:08)</span> <b>dweitzel:</b></span> the gratia-probe will create a timestamp, and search the slurm DB after that timestamp.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:42:21)</span> <b>dweitzel:</b></span> so it won't look at the same job twice, so if it's not picked up the first time, it will never be picked up.<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:43:34)</span> <b>edquist:</b></span> is the gratia timestamp based on the most recent slurm job found, or the time that the gratia probe is run?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:43:50)</span> <b>dweitzel:</b></span> probably most recent job found.<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:44:27)</span> <b>edquist:</b></span> so i wonder if it's possible to get out-of-sequence jobs<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:44:39)</span> <b>dweitzel:</b></span> I don't think so.<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:45:29)</span> <b>edquist:</b></span> so if the gratia timestamp always reflects the most recent slurm job, and out-of-sequence jobs do not happen, we shouldn't miss anything?<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:45:38)</span> <b>edquist:</b></span> or am i not thinking about this right<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:47:02)</span> <b>dweitzel:</b></span> if it's the most recent job.  And the certfile doesn't exist for previous jobs because condor hasn't marked the jobs as finished, then it misses files.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:47:29)</span> <b>dweitzel:</b></span> misses *jobs*<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:05:06)</span> <b>edquist:</b></span> ok.  just curious (1) whether anyone has observed this, or if it would be difficult to reproduce such a case, and (2) whether there are any downsides to moving to the htcondor-ce probe vs the slurm probe<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:05:47)</span> <b>blin:</b></span> should we think about doing that for /everyone/?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:06:18)</span> <b>blin:</b></span> it would be nice to only have to support a single probe that doesn't depend on the batch system<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:08:51)</span> <b>dweitzel:</b></span> I suspect we are seeing it at florida.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:08:58)</span> <b>dweitzel:</b></span> but I don't have a lot of evidence.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:10:22)</span> <b>dweitzel:</b></span> Also, the htcondor-ce probe is only useful if we propagate attributes from the underlying batch system to HTCondor.  I think we only do a good job of that in Slurm.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:11:27)</span> <b>dweitzel:</b></span> <a href="https://github.com/osg-bosco/BLAH/blob/1a8f6f508f0aaf3ce587dc25d8fe339aa8444cbf/src/scripts/slurm_status.py#L296">https://github.com/osg-bosco/BLAH/blob/1a8f6f508f0aaf3ce587dc25d8fe339aa8444cbf/src/scripts/slurm_status.py#L296</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:11:50)</span> <b>blin:</b></span> well hosted CEs use the htcondor-ce probe. Do we just do without the information there for non-Slurm hosted CEs?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:12:23)</span> <b>dweitzel:</b></span> Yeah, I think so.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:12:42)</span> <b>dweitzel:</b></span> We mostly don't get cpu usage and memory usage.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:12:56)</span> <b>dweitzel:</b></span> and exit code.<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:13:33)</span> <b>blin:</b></span> are there technical reasons why we can't do that for the other batch systems or does it just need to be implemented in the blahp?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:14:00)</span> <b>dweitzel:</b></span> just need to be implemented in the blahp.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:14:30)</span> <b>dweitzel:</b></span> though, slurm is better than most on this.  PBS doesn't really keep a "completed" database.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:14:42)</span> <b>dweitzel:</b></span> so it would probably be very difficult in PBS.<br/>
+</body>
+</html>

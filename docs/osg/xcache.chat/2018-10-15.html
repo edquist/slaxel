@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Oct 15, 2018 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Mon Oct 15, 2018 : #xcache (osg)</h3>
+<span style="color: #674b1b"><span style="font-size: small">(09:56:36)</span> <b>rynge:</b></span> <pre><br/>About to connect() to <a href="http://stash-xrd.osgconnect.net">stash-xrd.osgconnect.net</a> port 1094 (#0)<br/>*   Trying 192.170.231.37...<br/>* Connected to <a href="http://stash-xrd.osgconnect.net">stash-xrd.osgconnect.net</a> (192.170.231.37) port 1094 (#0)<br/>&gt; PUT /user/rheiland/staging/rheiland/pegasus/nanobio-workflow/20181012T193945-0500/00/00/output.tgz HTTP/1.1^M<br/>&gt; User-Agent: curl/7.29.0^M<br/>&gt; Host: <a href="http://stash-xrd.osgconnect.net:1094^M">stash-xrd.osgconnect.net:1094^M</a><br/>&gt; Accept: */*^M<br/>&gt; Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImU0OWIwYWMwYWNjNjE3NjMxYmQ3ZDMyNzlhMzVhNTA4NGI0ZmZkZGEzYTBjM2QzOWQ1YWU5OWUyYzE0ZjkwOGIifQ.eyJzdWIiOiJyaGVpbGFuZCIsImV4cCI6MTUzOTM5NTg5NSwiaXNzIjoiaHR0cHM6Ly9zY2l0b2tlbnMub3JnL29zZy1jb25uZWN0IiwiaWF0IjoxNTM5Mzk0Njk1LCJzY3AiOlsicmVhZDovdXNlci9yaGVpbGFuZCIsIndyaXRlOi91c2VyL3JoZWlsYW5kIl0sIm5iZiI6MTUzOTM5NDY5NX0.KUzZnSSVoXUUAIxm_Kl9fa0Ziap0tlesowmxss_-GakjB6E1Kka5dBnWSBZhLpKnI6G76NVEHtt7dL9fo3TAdK1tY99Bfh7cBBpfl6lsGDUDH62ow2FEdDbKBNd5Uho3IvmjTYy771vuTbb03-aAorEHTNX28VPhrhAN4LumknOuyFmO7O9kGtTBMZ0bzV-zxd1CjWgAlzsuvokDG2Ga4cJGP_Td8UN572hnRWPQriGo5W5O1TP4Py_yAiYD_CKIXSeqnbKvEVSbzLlZDoBbty_ZFAgu0Z7Vf2bmfLlvRhB2d0Sa4FD7bHfmSeI24XUoZGvyjON4rQttzwH5h3KZ7A^M<br/>&gt; Content-Length: 1396357^M<br/>&gt; Expect: 100-continue^M<br/>&gt; ^M<br/>* The requested URL returned error: 409 Unknown<br/></pre><br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:56:42)</span> <b>rynge:</b></span> That is a for a write<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:56:48)</span> <b>rynge:</b></span> Any ideas?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:13:09)</span> <b>rynge:</b></span> @lincoln Any hints in the logs on your side? The username is rheiland<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:13:21)</span> <b>lincoln:</b></span> lets see<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:13:53)</span> <b>lincoln:</b></span> hmm<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:13:56)</span> <b>lincoln:</b></span> <pre><br/>181015 10:13:14 27775 multiuser_UserSentry: Failed to lookup UID for username rheiland Success<br/>181015 10:13:14 27775 ofs_open: unknown.15377:27@cabinet-3-3-3.t2.ucsd.edu Unable to create /user/rheiland/staging/rheiland/pegasus/nanobio-workflow/20181015T100211-0500/00/00/output.tgz; permission denied<br/>181015 10:13:14 27775 XrootdXeq: unknown.15377:27@cabinet-3-3-3.t2.ucsd.edu disc 0:00:00 (send failure)<br/></pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(10:14:06)</span> <b>lincoln:</b></span> looks like the user isnt synced<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:14:18)</span> <b>lincoln:</b></span> <pre><br/>[root@stash-xrd stash]# grep "rheiland" /etc/passwd<br/>[root@stash-xrd stash]# <br/></pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(10:15:51)</span> <b>lincoln:</b></span> I'll let you know when it's fixed<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:16:43)</span> <b>rynge:</b></span> Thanks!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:28:29)</span> <b>bbockelm:</b></span> @lincoln - erm, might be worthwhile to file a bug to fix that log message line:<br/><pre><br/>181015 10:13:14 27775 multiuser_UserSentry: Failed to lookup UID for username rheiland Success<br/></pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(10:28:45)</span> <b>lincoln:</b></span> It successfully failed.<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:30:53)</span> <b>lincoln:</b></span> I can file a bug report if you like. Against XRootD or ..?<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:31:05)</span> <b>lincoln:</b></span> @rynge can you try again<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:31:20)</span> <b>rynge:</b></span> Yeah, hang on<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:27:35)</span> <b>bbockelm:</b></span> @lincoln - <a href="https://github.com/opensciencegrid/xrootd-multiuser">https://github.com/opensciencegrid/xrootd-multiuser</a> .  Let's not talk about how many random things are run out of my GH account.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:27:42)</span> <b>bbockelm:</b></span> ah, wait, no, we moved that one!<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:28:02)</span> <b>lincoln:</b></span> i assume most of the osg runs out of ~bbockelm<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:21:10)</span> <b>rynge:</b></span> @lincoln stashcp works now - will new users sync automatically?<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:28:18)</span> <b>lincoln:</b></span> yes<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:28:23)</span> <b>lincoln:</b></span> they should sync the same as all login nodes<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:30:53)</span> <b>rynge:</b></span> Great<br/>
+</body>
+</html>

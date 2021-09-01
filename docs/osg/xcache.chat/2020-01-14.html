@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jan 14, 2020 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Tue Jan 14, 2020 : #xcache (osg)</h3>
+<span style="color: #8d4b84"><span style="font-size: small">(11:10:57)</span> <b>kherner:</b></span> Yes, FIFE does that (cat the test file and pipe it to /dev/null, then check the exit code) in a glidein startup script to set the HAS_CVMFS_foo_osgstorage_org classads.<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:01:40)</span> <b>efajardo:</b></span> <b>@here</b> I have a problem with the new houston node<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:01:47)</span> <b>efajardo:</b></span> I cannot get the auth working on it<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:01:58)</span> <b>efajardo:</b></span> I believe this is the issue<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:02:05)</span> <b>efajardo:</b></span> <pre>[root@stashcache-houston-55fcc78d9c-xw8qv stash-cache-auth]# hostname<br/>stashcache-houston-55fcc78d9c-xw8qv</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:03:27)</span> <b>blin:</b></span> yup, that'll do it<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:04:19)</span> <b>blin:</b></span> if you set <tt>CACHE_FQDN</tt> in the environment to what's registered in topology, i believe that should work<br/>
+<span style="color: #e85d72"><span style="font-size: small">(12:05:55)</span> <b>jhicks:</b></span> Is that from the sc pod?<br/>[jhicks@osg-houston-stashcache ~]$ hostname<br/><a href="http://osg-houston-stashcache.nrp.internet2.edu">osg-houston-stashcache.nrp.internet2.edu</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:06:35)</span> <b>blin:</b></span> <pre>[root@fermicloud168 ~]# CACHE_FQDN=<a href="http://osg-houston-stashcache.nrp.internet2.edu">osg-houston-stashcache.nrp.internet2.edu</a> /usr/libexec/xcache/authfile-update --cache<br/>[root@fermicloud168 ~]# cat /run/stash-cache/Authfile <br/>u * /user/ligo -rl \<br/>    /Gluex rl \<br/>    /chtc/PUBLIC rl \<br/>    /gwdata rl \<br/>    /hcc/PUBLIC rl \<br/>    /icecube/PUBLIC rl \<br/>    /osgconnect/public rl \<br/>    /pnfs/fnal.gov rl \<br/>    /user rl </pre><br/><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:07:49)</span> <b>efajardo:</b></span> right the problem is on the fone<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:46:23)</span> <b>efajardo:</b></span> @matyas what is the way you modify the enviroment foor this to run<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:46:31)</span> <b>efajardo:</b></span> <pre>CACHE_FQDN=<a href="http://osg-houston-stashcache.nrp.internet2.edu">osg-houston-stashcache.nrp.internet2.edu</a> /usr/libexec/xcache/authfile-update --cache</pre><br/><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:46:44)</span> <b>efajardo:</b></span> I have to put osme config file somewhere in systemd right?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:48:05)</span> <b>blin:</b></span> <tt>/etc/systemd/system/xrootd@stash-cache.d/&lt;FILENAME&gt;.conf</tt> i believe<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:50:36)</span> <b>blin:</b></span> with<br/><pre>[Service]<br/>Environment="CACHE_FQDN=<a href="http://osg-hoston-stashcache.nrp.internet2.edu">osg-hoston-stashcache.nrp.internet2.edu</a>"</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:50:51)</span> <b>blin:</b></span> can you not just insert it into the k8s environment?<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:50:59)</span> <b>efajardo:</b></span> I can do it that way<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:51:11)</span> <b>efajardo:</b></span> I am actually not know what is best<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:51:19)</span> <b>efajardo:</b></span> since we told the CNAF folks to do it via file<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:51:31)</span> <b>efajardo:</b></span> so I was just wondering what you suggest<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:51:37)</span> <b>blin:</b></span> and they had a k8s install?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:51:49)</span> <b>blin:</b></span> i vote doing it in k8s<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:51:58)</span> <b>efajardo:</b></span> no they didnt<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:52:09)</span> <b>blin:</b></span> yeah, if it's k8s just do it the normal way for inserting env vars<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:52:22)</span> <b>efajardo:</b></span> well both things we done via k8s either we put a config file or through the env vars in k8s<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:52:24)</span> <b>blin:</b></span> assuming that the authfile-update will pick up what's in the env<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:52:42)</span> <b>blin:</b></span> i feel like env vars in k8s is more "native"<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:53:25)</span> <b>efajardo:</b></span> ok<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:59:44)</span> <b>matyas:</b></span> does it _work_ if you put it in env vars in k8s?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:00:09)</span> <b>matyas:</b></span> i think systemd uses its own environment<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:00:45)</span> <b>blin:</b></span> systemd isn't involved in the container<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:00:57)</span> <b>blin:</b></span> the question would be what supervisor uses<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:01:40)</span> <b>blin:</b></span> we may have to do this: <a href="http://supervisord.org/configuration.html?highlight=environment#environment-variables">http://supervisord.org/configuration.html?highlight=environment#environment-variables</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(13:04:59)</span> <b>efajardo:</b></span> I have used supervisor enviroment variables<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:05:00)</span> <b>efajardo:</b></span> before<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:05:23)</span> <b>blin:</b></span> do you just dump the vars in the k8s env or did you have to use the doc i linked?<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:10:07)</span> <b>efajardo:</b></span> both<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:10:31)</span> <b>efajardo:</b></span> I dump it to k8s and then have the supervisord use them b<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:11:10)</span> <b>efajardo:</b></span> for example<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:11:12)</span> <b>efajardo:</b></span> like this<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:11:12)</span> <b>efajardo:</b></span> <a href="https://github.com/opensciencegrid/prp-stashcache/blob/master/supervisord.conf#L61">https://github.com/opensciencegrid/prp-stashcache/blob/master/supervisord.conf#L61</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(14:11:40)</span> <b>efajardo:</b></span> `<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:12:30)</span> <b>blin:</b></span> ah, that's a little annoying<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:13:17)</span> <b>blin:</b></span> it'd be nice if you didn't have to modify the supervisord config, e.g. we'd use <tt>hostname -f</tt> unless <tt>CACHE_FQDN</tt> was specified in the container env<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:14:12)</span> <b>efajardo:</b></span> I have to do some more tests<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:14:16)</span> <b>efajardo:</b></span> but I will let you know<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:14:24)</span> <b>efajardo:</b></span> I think I can make it work just with enviroments<br/>
+</body>
+</html>

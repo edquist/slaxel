@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jan 6, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Mon Jan 6, 2020 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(11:01:38)</span> <b>blin:</b></span> @dweitzel @marian @didavila meeting?<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:02:21)</span> <b>marian:</b></span> Yeah, connecting in a few, got to restart my mac os update and seems like 2mins are &gt;5 ... /shrug<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:30:41)</span> <b>marian:</b></span> @blin @matyas: as I mentioned on the call, here is the ticket about having issues to fork topology repo: <a href="https://support.opensciencegrid.org/a/tickets/63887">https://support.opensciencegrid.org/a/tickets/63887</a> ... any idea?<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:30:53)</span> <b>marian:</b></span> (scroll down to the last comment)<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:32:40)</span> <b>blin:</b></span> the link he gave works for me. seems like maybe a transient issue?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:33:08)</span> <b>blin:</b></span> i don't think we've changed any of our settings in the repo<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:37:18)</span> <b>efajardo:</b></span> <b>@here</b> anyone else having problems accesing<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:37:19)</span> <b>efajardo:</b></span> <a href="https://bitbucket.org/opensciencegrid/contact/pull-requests/">https://bitbucket.org/opensciencegrid/contact/pull-requests/</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(11:37:20)</span> <b>efajardo:</b></span> ?<br/>
+<span style="color: #4cc091"><span style="font-size: small">(11:37:52)</span> <b>cbrown58:</b></span> The website structure loads but it hangs when loading content for me<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(11:38:08)</span> <b>didavila:</b></span> same for me<br/>
+<span style="color: #4cc091"><span style="font-size: small">(11:38:34)</span> <b>cbrown58:</b></span> I might not have the correct permissions tho.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:40:32)</span> <b>blin:</b></span> yeah, it's permission locked. @efajardo are you sure you're logged in?<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:05:00)</span> <b>efajardo:</b></span> I swear I was<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:20:53)</span> <b>efajardo:</b></span> <b>@here</b> one more questions regarding osg-xrootd-standalone for xrootd-servers. I think we should include this as default:<br/><tt>xrootd.chksum max 2 md5 adler32 crc32</tt><br/><br/>which is a reasonable thing<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:21:04)</span> <b>efajardo:</b></span> but what are your thoughcs<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:21:48)</span> <b>blin:</b></span> do you have an xrootd manual link for <tt>xrootd.chksum</tt>?<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:22:50)</span> <b>efajardo:</b></span> <a href="https://xrootd.slac.stanford.edu/doc/dev48/xrd_config.htm#_Toc496911333">https://xrootd.slac.stanford.edu/doc/dev48/xrd_config.htm#_Toc496911333</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:06:59)</span> <b>blin:</b></span> @efajardo what's the default if we don't specify the above? are checksums not calculated at all?<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:07:39)</span> <b>efajardo:</b></span> Indeed that is the case<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:07:41)</span> <b>efajardo:</b></span> *Defaults*<br/>The default *max* is 4; otherwise. If _path_ is not specified, checksums are internally performed. File check summing is not supported unless the directive is specified.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:07:41)</span> <b>blin:</b></span> and since the above sets the max to 2, what happens when there are multiple checksum queries? are they scheduled?<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:07:57)</span> <b>efajardo:</b></span> yes<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:08:16)</span> <b>efajardo:</b></span> “File check summing is not supported unless the directive is specified.”<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:08:45)</span> <b>blin:</b></span> are checksums only created when they're requested by the client?<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:09:53)</span> <b>efajardo:</b></span> yes<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:09:59)</span> <b>efajardo:</b></span> it is not that they are stored somwhere<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:10:20)</span> <b>efajardo:</b></span> <pre> When a client issues an xrootd query checksum request, the following steps are performed:<br/><br/>a.      A checksum digest is selected as follows:<br/><br/>                                                              i.      If a single algorithm is specified and chkcgi was not specified, the digest in the configuration file is used.<br/><br/>                                                           ii.      If a single algorithm is specified and chkgi is specified, a cgi scan is made for cks.type and, if specified, its argument must match the single algorithm in the configuration file or an error results. In any case, the digest in the configuration file is used.<br/><br/>                                                         iii.      If more than one algorithm has been specified, a cgi scan is made for cks.type and, if specified, its argument must match one of the specified algorithms in the configuration file or an error results. If there is a match, the cks.type argument is used as the desired digest. If cks.type is not found, then the first algorithm specified in the configuration file is used.</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:12:36)</span> <b>blin:</b></span> how does it interact with <tt>ofs.ckslib</tt>? <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-3803">https://opensciencegrid.atlassian.net/browse/SOFTWARE-3803</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:16:07)</span> <b>blin:</b></span> and who's using these checksums?<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:28:13)</span> <b>efajardo:</b></span> <tt>3)      Use the *ofs.ckslib* directive to add new digests or improve the performance of the native digests.</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(13:28:18)</span> <b>efajardo:</b></span> But that is more a question to the devs<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:30:16)</span> <b>blin:</b></span> ok, as long as they're not conflicting that's fine with me<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:30:44)</span> <b>blin:</b></span> so does CMS use these checksums?<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:01:53)</span> <b>efajardo:</b></span> yes<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:02:13)</span> <b>efajardo:</b></span> It was @bbockelm who told Terrence to use them but I just think it should be for everyone<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:03:45)</span> <b>blin:</b></span> it sounds reasonable to me. do we need this for all OSG XRootD installations or just the standalone?<br/>
+</body>
+</html>

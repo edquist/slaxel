@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Aug 10, 2020 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Mon Aug 10, 2020 : #xcache (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(12:46:02)</span> <b>blin:</b></span> @lincoln i heard that the latest <tt>stash-cache</tt> image is broken?<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:51:52)</span> <b>lincoln:</b></span> yes<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:52:02)</span> <b>lincoln:</b></span> I haven't gotten detailed logs-<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:52:14)</span> <b>lincoln:</b></span> Give me a bit and Ill spin one up, we reverted the SLATE image to the old tag.<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:50:16)</span> <b>lincoln:</b></span> @blin<br/><pre><br/>200810 18:49:44 650 acc_Config: Authorization system using configuration in /etc/xrootd/xrootd-stash-cache.cfg<br/>=====&gt; continue /etc/xrootd/config.d<br/>Config continuing with file /etc/xrootd/config.d/10-common-site-local.cfg ...<br/>Config continuing with file /etc/xrootd/config.d/10-docker-env-var.cfg ...<br/>Config continuing with file /etc/xrootd/config.d/10-xrootd-lcmaps.cfg ...<br/>Config continuing with file /etc/xrootd/config.d/40-stash-cache-plugin.cfg ...<br/>Config continuing with file /etc/xrootd/config.d/40-xcache-auth.cfg ...<br/>Config continuing with file /etc/xrootd/config.d/40-xrootd-lcmaps.cfg ...<br/>Config continuing with file /etc/xrootd/config.d/50-docker-paths.cfg ...<br/>Config continuing with file /etc/xrootd/config.d/50-osg-http.cfg ...<br/>Config continuing with file /etc/xrootd/config.d/50-osg-monitoring.cfg ...<br/>Config continuing with file /etc/xrootd/config.d/50-osg-paths.cfg ...<br/>Config continuing with file /etc/xrootd/config.d/50-stash-cache-authz.cfg ...<br/>=====&gt; acc.audit deny grant<br/>=====&gt; acc.authdb /run/stash-cache/Authfile<br/>Config continuing with file /etc/xrootd/config.d/50-stash-cache-paths.cfg ...<br/>Config continuing with file /etc/xrootd/config.d/90-stash-cache-disks.cfg ...<br/>Config continuing with file /etc/xrootd/config.d/90-xcache-logging.cfg ...<br/>Config 2 authorization directives processed in /etc/xrootd/xrootd-stash-cache.cfg<br/>Config 1 auth entries processed in /run/stash-cache/Authfile<br/>------ Authorization system initialization completed.<br/>++++++ XrdAccSciTokens: Initialized SciTokens-based authorization.<br/>200810 18:49:44 650 scitokens_Reconfig: Parsing configuration file: /run/stash-cache-auth/scitokens.conf<br/>200810 18:49:44 650 scitokens_Reconfig: Error opening config file (/run/stash-cache-auth/scitokens.conf): No such file or directory<br/>------ File system server initialization failed.<br/>200810 18:49:44 650 XrootdConfig: Unable to load file system.<br/>------ xrootd protocol initialization failed.<br/>200810 18:49:44 650 XrdProtocol: Protocol xrootd could not be loaded<br/>------ xrootd stash-cache@stashcache-6c4b4cdb7f-j6w79:1094 initialization failed.</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:51:35)</span> <b>blin:</b></span> hrm, do you have the cache registered in topology?<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:51:41)</span> <b>lincoln:</b></span> nope, I'm just trying to run the container.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:51:43)</span> <b>blin:</b></span> what's the public fqdn of the cache?<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:51:46)</span> <b>lincoln:</b></span> It's just a random cache<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:51:49)</span> <b>lincoln:</b></span> This worked until the latest build<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:51:51)</span> <b>blin:</b></span> i see<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:52:02)</span> <b>blin:</b></span> yeah, blame @dweitzel :slightly_smiling_face:<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:52:07)</span> <b>lincoln:</b></span> It's a bit of a chicken and egg .. I'd like to have a cache I can stand up + run before I register it.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:52:22)</span> <b>matyas:</b></span> just looking at the container... we normally have a default Authfile so the cache still starts up even if not registered. We should do the same for scitokens.conf<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:52:31)</span> <b>blin:</b></span> we added token auth support and we just need to add...what mat said ^^<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:52:33)</span> <b>lincoln:</b></span> :thumbsup:<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:52:56)</span> <b>blin:</b></span> that's what we get for adding new features<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:53:04)</span> <b>matyas:</b></span> lol<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:53:55)</span> <b>matyas:</b></span> this is the default Authfile we ship:<br/><pre># All users are denied  read/lookup for path /user/ligo<br/># All users are granted read/lookup for path /<br/>u * /user/ligo -rl \<br/>    /           rl</pre><br/>what's kind of the equivalent for scitokens.conf?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:54:18)</span> <b>dweitzel:</b></span> Probably just empty.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:54:38)</span> <b>matyas:</b></span> the plugin didn't allow that<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:54:45)</span> <b>dweitzel:</b></span> shoot.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:55:12)</span> <b>matyas:</b></span> I used this for the tests:<br/><pre>[Global]<br/>audience = GLOW<br/><br/>[Issuer /dummy]<br/>issuer = <a href="https://scitokens.org/dummy">https://scitokens.org/dummy</a><br/>base_path = /dummy</pre><br/><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:55:32)</span> <b>dweitzel:</b></span> Change the audience to something like <tt>unregistered_cache</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:55:40)</span> <b>dweitzel:</b></span> and don't have any issuers.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:57:29)</span> <b>matyas:</b></span> OK, let's see if the scitokens plugin accepts that<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:58:56)</span> <b>dweitzel:</b></span> what was the error on an empty file?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:04:31)</span> <b>matyas:</b></span> <pre>++++++ XrdAccSciTokens: Initialized SciTokens-based authorization.<br/><br/>200806 21:29:53 618 scitokens_Reconfig: Parsing configuration file: /run/stash-origin-auth/scitokens.conf<br/><br/>200806 21:29:53 618 scitokens_Reconfig: No issuers configured.</pre><br/><br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:05:08)</span> <b>dweitzel:</b></span> that seems fine.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:05:14)</span> <b>dweitzel:</b></span> as long as it starts.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:05:42)</span> <b>dweitzel:</b></span> shoot, it probably won't:<br/><a href="https://github.com/scitokens/xrootd-scitokens/blob/master/src/scitokens.cpp#L606">https://github.com/scitokens/xrootd-scitokens/blob/master/src/scitokens.cpp#L606</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(14:09:55)</span> <b>matyas:</b></span> this might blow up a lot of caches, even registered ones. Here's the generated scitokens config for the CNAF cache (<a href="https://topology.opensciencegrid.org/stashcache/scitokens?cache_fqdn=xcache.cr.cnaf.infn.it">https://topology.opensciencegrid.org/stashcache/scitokens?cache_fqdn=xcache.cr.cnaf.infn.it</a>):<br/><pre>[Global]<br/>audience =</pre><br/><br/>
+<span style="color: #c386df"><span style="font-size: small">(14:14:17)</span> <b>matyas:</b></span> we might need to make loading the scitokens module opt-in<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:25:09)</span> <b>dweitzel:</b></span> or... change xrootd-scitokens.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:25:26)</span> <b>dweitzel:</b></span> maybe no configured issuers is acceptable?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:26:28)</span> <b>matyas:</b></span> is a blank audience acceptable?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:28:01)</span> <b>dweitzel:</b></span> probably, yes<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:51:19)</span> <b>matyas:</b></span> there's something weird going on with the tests (<a href="https://travis-ci.com/github/opensciencegrid/docker-xcache">https://travis-ci.com/github/opensciencegrid/docker-xcache</a>) supervisord's saying stash-cache-auth is crashing immediately, but the test is still considered a success<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:52:53)</span> <b>blin:</b></span> we don't test auth in the CI<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:53:16)</span> <b>blin:</b></span> we don't set up certs for the containers<br/>
+</body>
+</html>

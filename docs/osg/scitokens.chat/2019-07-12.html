@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jul 12, 2019 : #scitokens (osg)</title>
+</head>
+<body>
+<h3>Fri Jul 12, 2019 : #scitokens (osg)</h3>
+<span style="color: #8f4a2b"><span style="font-size: small">(14:08:38)</span> <b>dabrown:</b></span> Notes from today's call:<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(14:08:39)</span> <b>dabrown:</b></span> <a href="https://www.vultr.com/docs/how-to-install-apache-tomcat-8-on-centos-7">https://www.vultr.com/docs/how-to-install-apache-tomcat-8-on-centos-7</a><br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(14:08:53)</span> <b>dabrown:</b></span> creating the token<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(14:09:02)</span> <b>dabrown:</b></span> populating the server<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(14:17:10)</span> <b>dabrown:</b></span> Note to self: tomcat runs on 8080 which is where I had the credmon running. I bumped credmon to 8888<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(14:20:29)</span> <b>dabrown:</b></span> <a href="https://www.baeldung.com/tomcat-deploy-war">https://www.baeldung.com/tomcat-deploy-war</a><br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(15:03:59)</span> <b>dabrown:</b></span> <pre><br/>cat comodo.pem incommon.pem &gt; CA-bundle.crt<br/>openssl pkcs12 -export -out /opt/tomcat/conf/scitokens-server.pfx -inkey /etc/grid-security/hostkey.pem  -in /etc/grid-security/hostcert.pem -certfile CA-bundle.crt<br/>chgrp /opt/tomcat/conf/tomcat scitokens-server.pfx<br/>chmod o-r /opt/tomcat/conf/tomcat scitokens-server.pfx<br/></pre><br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(15:04:51)</span> <b>dabrown:</b></span> <pre><br/>    &lt;Connector port="8443" protocol="org.apache.coyote.http11.Http11NioProtocol"<br/>               maxThreads="150" SSLEnabled="true" scheme="https" secure="true"<br/>               clientAuth="false" sslProtocol="TLS" <br/>               keystoreFile="/opt/tomcat/conf/scitokens-server.pfx"<br/>               keystorePass="XXX"<br/>               keystoreType="PKCS12"/&gt;<br/></pre><br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(15:05:45)</span> <b>dabrown:</b></span> I put the credmon back on 8080 since tomcat is no longer using that port<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(15:09:32)</span> <b>dabrown:</b></span> <pre><br/>wget <a href="https://github.com/scitokens/scitokens-java/releases/download/v.1.2a/scitokens-util.jar">https://github.com/scitokens/scitokens-java/releases/download/v.1.2a/scitokens-util.jar</a><br/>java -jar scitokens-util.jar -batch create_keys foo.jwk<br/></pre><br/>
+</body>
+</html>

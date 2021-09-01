@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Sep 28, 2020 : #facilitation (osg)</title>
+</head>
+<body>
+<h3>Mon Sep 28, 2020 : #facilitation (osg)</h3>
+<span style="color: #db3150"><span style="font-size: small">(13:08:41)</span> <b>christinalk:</b></span> <b>@here</b> did anyone pick up an account request from a “Ilyas Adnane” anytime in the past few days? He says he signed up today but I don’t see anything in Fresh Desk.<br/>
+<span style="color: #4d5e26"><span style="font-size: small">(13:59:13)</span> <b>jmvera:</b></span> i need help troubleshooting user <tt>syavuz</tt> jobs on login05, the jobs have *twice* tried to run and then returned to idle with the following in the log file (/home/syavuz/run_6527269.log), also the jobs remain idle for quite some time before trying to run<br/><pre>Job disconnected, attempting to reconnect <br/>Socket between submit and execute hosts closed unexpectedly</pre><br/>
+<span style="color: #4d5e26"><span style="font-size: small">(15:04:35)</span> <b>jmvera:</b></span> starting to thinks it's the jobs that are causing the connection drop, how do I troubleshoot this?<br/>
+<span style="color: #db3150"><span style="font-size: small">(15:36:10)</span> <b>christinalk:</b></span> I think you’ll need more information about what the job is doing<br/>
+<span style="color: #db3150"><span style="font-size: small">(15:36:57)</span> <b>christinalk:</b></span> First, I’d maybe look at what happens over the lifetime of a single job — when it’s submitted, how long until it starts, does it take a long time to transfer files, etc.  Maybe use condor_tail to see if anything is written to stdout or err (if that works)<br/>
+<blockquote>
+<span style="color: #4d5e26"><span style="font-size: small">(15:40:28)</span> <b>jmvera:</b></span> best I can can tell the jobs run momentarily before the disconnent... there is no "job running on ..." statement in the log file so i can't tell how long from that, but anytime i do see a running job in the queue it goes to idle in &lt;1 min<br/>
+<span style="color: #db3150"><span style="font-size: small">(15:47:06)</span> <b>christinalk:</b></span> ah, that’s a good sign in some ways - the problem is not in the exectuable.<br/>
+<span style="color: #db3150"><span style="font-size: small">(15:47:46)</span> <b>christinalk:</b></span> (I think) I would guess that HTCondor is never able to connect to the node. Are they all coming from the same site? You should (maybe) be able to tell w/ LastRemoteHost in the job ad<br/>
+<span style="color: #4d5e26"><span style="font-size: small">(15:50:14)</span> <b>jmvera:</b></span> yeah, either <a href="http://lnxfarm331.colorado.edu">lnxfarm331.colorado.edu</a> or <a href="http://d12chas560.crc.nd.edu">d12chas560.crc.nd.edu</a><br/>
+<span style="color: #4d5e26"><span style="font-size: small">(15:54:49)</span> <b>jmvera:</b></span> should i take this to osg-connect or general channels?<br/>
+<span style="color: #db3150"><span style="font-size: small">(16:03:59)</span> <b>christinalk:</b></span> osg-connect maybe<br/>
+<span style="color: #db3150"><span style="font-size: small">(16:04:04)</span> <b>christinalk:</b></span> normally I’d tag Mats but he’s out today<br/>
+</blockquote>
+<span style="color: #db3150"><span style="font-size: small">(15:37:11)</span> <b>christinalk:</b></span> and beyond that, I think looking at the executable or script?<br/>
+<span style="color: #5a4592"><span style="font-size: small">(15:38:25)</span> <b>lmichael:</b></span> Can the user get ONE job running? How long did it run, how much memory and disk did it use, where is it transferring data from, and how much data?<br/>
+<span style="color: #4d5e26"><span style="font-size: small">(15:41:31)</span> <b>jmvera:</b></span> I've looked at these details, but nothing jumps out at me<br/>
+<span style="color: #4d5e26"><span style="font-size: small">(15:42:23)</span> <b>jmvera:</b></span> previous test jobs ran ok for the user<br/>
+<span style="color: #4d5e26"><span style="font-size: small">(15:42:36)</span> <b>jmvera:</b></span> but something is up with this batch<br/>
+<span style="color: #4d5e26"><span style="font-size: small">(15:45:28)</span> <b>jmvera:</b></span> there's no "started transferring input" or "finished transferring input" info in the log file, so presumably something is happening before those steps even happen<br/>
+</body>
+</html>

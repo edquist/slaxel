@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jul 24, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Fri Jul 24, 2020 : #software (osg)</h3>
+<span style="color: #a63024"><span style="font-size: small">(10:52:16)</span> <b>efajardo:</b></span> <b>@here</b> did something broke with the OSG software base<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:52:18)</span> <b>efajardo:</b></span> <pre>docker run --rm opensciencegrid/software-base:fresh -n osg-software-base<br/>docker: Error response from daemon: OCI runtime create failed: container_linux.go:348: starting container process caused "exec: \"-n\": executable file not found in $PATH": unknown.</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(10:52:19)</span> <b>efajardo:</b></span> ?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:52:56)</span> <b>blin:</b></span> @matyas perhaps this has something to do with the EL8 changes?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:52:56)</span> <b>matyas:</b></span> hmm.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:53:07)</span> <b>blin:</b></span> otherwise it could be related to github actions <b>@edquist</b><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:55:16)</span> <b>matyas:</b></span> the el8 stuff should be in a separate tag<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:57:06)</span> <b>matyas:</b></span> no<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:57:22)</span> <b>matyas:</b></span> Edgar, you need to put the <tt>-n osg-software-base</tt> before <tt>opensciencegrid/software-base:fresh</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(10:57:31)</span> <b>efajardo:</b></span> hm<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:57:32)</span> <b>efajardo:</b></span> maybe<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:57:33)</span> <b>matyas:</b></span> otherwise it thinks <tt>-n</tt> is the command to run<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:57:40)</span> <b>efajardo:</b></span> the problem is I have an old docker<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:58:34)</span> <b>matyas:</b></span> what does <tt>-n</tt> do? I don't see it in docker run --help<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:58:39)</span> <b>blin:</b></span> i don't have docker installed but podman requires <tt>--name</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:58:42)</span> <b>blin:</b></span> so try that?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:58:49)</span> <b>matyas:</b></span> and put it before the image name<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:20:27)</span> <b>edquist:</b></span> @efajardo if you are still having issues let me know - hopefully my github actions stuff didn't break anything but who knows<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:20:47)</span> <b>efajardo:</b></span> no two issues<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:20:48)</span> <b>efajardo:</b></span> here<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:20:49)</span> <b>edquist:</b></span> @blin one detail i think we never disabled the travis stuff<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:20:52)</span> <b>efajardo:</b></span> I do have another question<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:20:59)</span> <b>efajardo:</b></span> has anybody ran condor inside a container?<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:21:06)</span> <b>edquist:</b></span> so i don't know if they are both competing to push stuff to docker<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:21:12)</span> <b>edquist:</b></span> travis ci &amp; gha<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(11:29:29)</span> <b>blin:</b></span> they both push atm but that's nbd<br/>
+</blockquote>
+<span style="color: #16569E"><span style="font-size: small">(11:21:33)</span> <b>edquist:</b></span> todd t is the master of running condor in a container<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:24:48)</span> <b>cnweaver:</b></span> Yes, it's possible to run any and all components of condor in containers.<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:25:17)</span> <b>cnweaver:</b></span> There can be some tricky points depending on where the boundaries are; all the virtual networking stuff is tricky to juggle.<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:26:14)</span> <b>cnweaver:</b></span> Putting an entire pool which talks to nothing else in Kubernetes is easy.<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:26:50)</span> <b>cnweaver:</b></span> Putting a worker inside a container which talks to a traditional central manger is also easy.<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:30:18)</span> <b>efajardo:</b></span> thanks @cnweaver I realized<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:30:20)</span> <b>efajardo:</b></span> my problem<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:30:25)</span> <b>efajardo:</b></span> I was running condor in supervisord<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:30:30)</span> <b>efajardo:</b></span> but starting it as condor not as root<br/>
+</body>
+</html>

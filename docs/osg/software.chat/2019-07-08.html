@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jul 8, 2019 : #software (osg)</title>
+</head>
+<body>
+<h3>Mon Jul 8, 2019 : #software (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(14:43:24)</span> <b>dweitzel:</b></span> <b>@edquist</b> is there a ticket for the htcondor-ce on slurm?  Make sure we can check off the important attributes that we know are correct?<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:44:25)</span> <b>edquist:</b></span> i don't think we have a software ticket for it<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:55:31)</span> <b>dweitzel:</b></span> ok, thanks.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:58:51)</span> <b>blin:</b></span> did we just have a hallway conversation about that?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:00:01)</span> <b>dweitzel:</b></span> created: <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-3748">https://opensciencegrid.atlassian.net/browse/SOFTWARE-3748</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:00:06)</span> <b>dweitzel:</b></span> (feel free to close as duplicate)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:00:55)</span> <b>dweitzel:</b></span> @blin I remember talking about it too.  We do have a SLURM gratia probe attributes ticket.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:01:06)</span> <b>dweitzel:</b></span> it resulted in a readme in the gratia-probe directory of attributes.<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:01:07)</span> <b>blin:</b></span> we did document the XML records: <a href="https://github.com/opensciencegrid/gratia-probe/blob/master/slurm/README-xml.md#raw-xml-for-slurm-probe-records">https://github.com/opensciencegrid/gratia-probe/blob/master/slurm/README-xml.md#raw-xml-for-slurm-probe-records</a><br/><a href="https://github.com/opensciencegrid/gratia-probe/blob/master/condor/README-xml.md#rawxml-for-a-htcondor-ce-probe-record">https://github.com/opensciencegrid/gratia-probe/blob/master/condor/README-xml.md#rawxml-for-a-htcondor-ce-probe-record</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:01:13)</span> <b>dweitzel:</b></span> right<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:01:25)</span> <b>dweitzel:</b></span> That gets us part of the way there.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(20:16:33)</span> <b>dweitzel:</b></span> I forget how the htcondor-ce authentication works.  I'm debugging authentication a CE which is not allowing the factory to submit jobs.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(20:17:08)</span> <b>dweitzel:</b></span> Here is the relevant log line:<br/><pre><br/>07/08/19 20:04:01 PERMISSION DENIED to <a href="mailto:flock.opensciencegrid.org@daemon.opensciencegrid.org">flock.opensciencegrid.org@daemon.opensciencegrid.org</a> from host 169.228.38.43 for command 1112 (QMGMT_WRITE_CMD), access level WRITE: reason: WRITE authorization policy contains no matching ALLOW entry for this request; identifiers used for this host: 169.228.38.43, hostname size = 0, original ip address = 169.228.38.43<br/></pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(20:17:27)</span> <b>dweitzel:</b></span> so this tells me it's mapping correctly (<tt><a href="mailto:flock.opensciencegrid.org@daemon.opensciencegrid.org">flock.opensciencegrid.org@daemon.opensciencegrid.org</a></tt> seems fine.)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(20:30:23)</span> <b>dweitzel:</b></span> ok, figured it out.  Really old vo-client RPM that didn't have the voms cert that is being used by the OSG VO.  It should have been mapping to <tt><a href="mailto:flock.opensciencegrid.org@users.opensciencegrid.org">flock.opensciencegrid.org@users.opensciencegrid.org</a></tt><br/>
+</body>
+</html>

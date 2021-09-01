@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Aug 9, 2021 : #flightworthy (chtc)</title>
+</head>
+<body>
+<h3>Mon Aug 9, 2021 : #flightworthy (chtc)</h3>
+<span style="color: #e7392d"><span style="font-size: small">(09:08:05)</span> <b>ckoch5:</b></span> Is there a job attribute that records the most recent execution time of a self-checkpointing job that’s using “checkpoint_exit_code”. As in, the job starts running at 9:00, checkpoints every hour; is there an attribute that would give me “12:00" if the current time was 12:30?<br/>
+<blockquote>
+<span style="color: #9e3997"><span style="font-size: small">(2021-08-16 10:29:55)</span> <b>tlmiller:</b></span> IIRC, nothing deliberate, but you can try looking to see if we record the time of the last file transfer, I guess.<br/>
+</blockquote>
+<span style="color: #235e5b"><span style="font-size: small">(09:19:13)</span> <b>johnkn:</b></span> That's a question for ToddM, who is out this week.  but I'd look in the ToE tag,<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:19:29)</span> <b>johnkn:</b></span> Is there a job you can conveniently check?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(09:24:55)</span> <b>jcpatton:</b></span> Another potentially ToddM question, is the spool directory always named after the last 4 digits in a cluster id? (And why isn’t it the whole cluster id… worries about filling up the spool dir with too many dirs?)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:25:11)</span> <b>johnkn:</b></span> precisely<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:25:39)</span> <b>johnkn:</b></span> the code specifically uses the last 4 digits as the first level directory to control the number of directories<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:11:41)</span> <b>coatsworth:</b></span> Hey all, we have a condor-users question from last week about <tt>condor_adstash</tt> that needs a response by EOB today. Who's the best person for this?<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:12:53)</span> <b>gthain:</b></span> @jcpatton ?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:16:15)</span> <b>coatsworth:</b></span> Oh yikes, Jason already responded! Somehow it got split into a different thread. Sorry for the confusion.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:21:03)</span> <b>jcpatton:</b></span> Not sure why it split threads, my bad if I did something wrong!<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:00:52)</span> <b>coatsworth:</b></span> Hi all, Michael Pelletier is asking on RT about a FIPS build for 8.8.15. I'm pretty sure this is the FIPS-compliant release, can someone confirm?<br/>
+<span style="color: #4cc091"><span style="font-size: small">(13:02:21)</span> <b>blin:</b></span> 8.8.15 was a security release<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:06:28)</span> <b>coatsworth:</b></span> So do we have a FIPS-compliant release in the 8.8 series? Or is that only in 9.0?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(13:10:19)</span> <b>jfrey:</b></span> For 8.8, I believe we need to do a special FIPS build that’s not wire compatible with standard 8.8.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(14:46:25)</span> <b>blin:</b></span> where should I look for more info if I see a machine with a high number of <tt>RecentJobStarts</tt> ?<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:06:14)</span> <b>gthain:</b></span> I would look at the starter logs to see if it is the same job over and over again<br/>
+<span style="color: #4cc091"><span style="font-size: small">(15:21:31)</span> <b>blin:</b></span> question #2: how long does a schedd put up with a startd that disappears? i skimmed the configs and nothing jumped out at me<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:29:15)</span> <b>gthain:</b></span> If a schedd has claimed a startd, there's a lease on the claim that I believe defaults to 20 minutes<br/>
+<span style="color: #4cc091"><span style="font-size: small">(15:38:21)</span> <b>blin:</b></span> so if the startd doesn't report back (say because it was killed), it could take 20 min for the schedd to reschedule jobs that were running on it elsewhere?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(16:01:56)</span> <b>jcpatton:</b></span> what does version <tt>current</tt> supposed to refer to in our readthedocs?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(16:02:35)</span> <b>jcpatton:</b></span> it seems to be a “symlink” to 9.1.0<br/>
+<span style="color: #2b6836"><span style="font-size: small">(16:03:25)</span> <b>jcpatton:</b></span> whereas <tt>latest</tt> is 9.1.2 (which doesn’t have a standalone version defined [yet])<br/>
+<span style="color: #2b6836"><span style="font-size: small">(16:03:39)</span> <b>jcpatton:</b></span> and <tt>V9_1</tt> also points to 9.1.2<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:10:57)</span> <b>jfrey:</b></span> The default for the schedd waiting is now 40 minutes, and is controlled by the job ad of the currently running job.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:11:17)</span> <b>jfrey:</b></span> <tt>JobLeaseDuration</tt><br/>
+</body>
+</html>

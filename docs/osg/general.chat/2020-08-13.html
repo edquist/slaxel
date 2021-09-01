@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Aug 13, 2020 : #general (osg)</title>
+</head>
+<body>
+<h3>Thu Aug 13, 2020 : #general (osg)</h3>
+<span style="color: #965d1b"><span style="font-size: small">(08:58:25)</span> <b>briedel:</b></span> depends... anywhere from 3-10 GB<br/>
+<span style="color: #965d1b"><span style="font-size: small">(09:02:21)</span> <b>briedel:</b></span> i think we can trim it down for GPU jobs<br/>
+<span style="color: #965d1b"><span style="font-size: small">(09:02:49)</span> <b>briedel:</b></span> but i dont have a good sense how much<br/>
+<span style="color: #5a4592"><span style="font-size: small">(09:04:35)</span> <b>lmichael:</b></span> Does David have a sense? (or anyone else)<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:18:50)</span> <b>lincoln:</b></span> 3-10G seems like it would be appropriate for StashCache ?<br/>
+<blockquote>
+<span style="color: #5a4592"><span style="font-size: small">(11:06:34)</span> <b>lmichael:</b></span> StashCache still depends on CVMFS, no?<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:25:47)</span> <b>lincoln:</b></span> not necessarily but as things are setup today, probably?<br/>
+<span style="color: #5a4592"><span style="font-size: small">(11:30:50)</span> <b>lmichael:</b></span> got it. might bug Derek about that, if needed next.<br/>
+</blockquote>
+<span style="color: #965d1b"><span style="font-size: small">(09:30:33)</span> <b>briedel:</b></span> well it depends on what runs there<br/>
+<span style="color: #965d1b"><span style="font-size: small">(09:31:11)</span> <b>briedel:</b></span> since user workloads are something we have limited control over<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:41:17)</span> <b>bbockelm:</b></span> @briedel - how much reuse would you posit is in the same pilot?  That is, do you think the same workflow runs repeatedly in one pilot?<br/>
+<span style="color: #965d1b"><span style="font-size: small">(09:50:37)</span> <b>briedel:</b></span> yeah it would<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(09:50:56)</span> <b>dschultz:</b></span> re tarball size: for a single workload, it's about 850MB compressed, 1.5 GB uncompressed.  but we run multiple workloads, so it's probably closer to 4 GB (not counting strange things users do)<br/>
+<span style="color: #965d1b"><span style="font-size: small">(09:50:58)</span> <b>briedel:</b></span> we submit jobs that run 20 min to few hours<br/>
+<span style="color: #965d1b"><span style="font-size: small">(09:52:26)</span> <b>briedel:</b></span> @bbockelm we also run pilots all the way down, so from the OSG perspective we are running one workload<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(09:56:41)</span> <b>dschultz:</b></span> I just want to make a note that we're very much dependent on CVMFS in IceCube.  the first cloud demo run didn't use it, so we faked it by tarring up the needed section of CVMFS and extracting that into all the worker images<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(09:57:22)</span> <b>dschultz:</b></span> there are a few hard-coded paths in there, so things are not super easily relocatable<br/>
+<span style="color: #965d1b"><span style="font-size: small">(09:57:51)</span> <b>briedel:</b></span> alternatives would be singularity containers<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:01:43)</span> <b>bbockelm:</b></span> Yeah - that's why I brought it up.  There's a hidden feature I've been working on in HTCondor that allows the startd manage a "data reuse directory".<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:02:55)</span> <b>bbockelm:</b></span> The intent is that it would be useful for things like singularity containers.  E.g., 8 jobs in a pilot would end up downloading the container once instead of 8 times.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:04:40)</span> <b>bbockelm:</b></span> So - if you have modest-length jobs (20 minutes) in a 8 hour pilot, then a 3GB singularity image doesn't look so bad.  If you have 3GB per 20 minute job ... good luck.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:09:29)</span> <b>blin:</b></span> hrm, i wonder if that solves the ATLAS use case (@lincoln) of wanting the CE to run pre-scripts for staging container images<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:10:01)</span> <b>lincoln:</b></span> it would definitely be a step in the right direction<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:10:20)</span> <b>lincoln:</b></span> I have made _many grumbles_ about running arbitrary scripts on the CE because it can and will be abused.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:19:28)</span> <b>bbockelm:</b></span> Probably wouldn't help in that case -- it's tied into condor file transfer.<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(10:32:49)</span> <b>dschultz:</b></span> would that data reuse do layers in a container?  so if you had a base container and multiple derivatives, would that cache well?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:48:45)</span> <b>bbockelm:</b></span> All it knows is condor file transfer - if you have multiple layers moved with the submit file and then you reassemble them in your job, that can be put into the cache.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(11:13:33)</span> <b>lmichael:</b></span> @dschultz can you elaborate on “850MB compressed, 1.5 GB uncompressed. but we run multiple workloads, so it’s probably closer to 4 GB (not counting strange things users do)” so we understand how 850 becomes 4GB?<br/>
+<span style="color: #5a4592"><span style="font-size: small">(11:13:59)</span> <b>lmichael:</b></span> If 850GB, then http (and squid caching) might help? right @bbockelm @dweitzel?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:25:20)</span> <b>dweitzel:</b></span> 850MB would be fine for HTTP.  A bit on the big side, but doable.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:28:58)</span> <b>dweitzel:</b></span> At least at nebraska, the HTTP will cache files up to 1GB in size.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(11:29:59)</span> <b>lmichael:</b></span> and that caching even works across pilots on the same server/site, right?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:30:26)</span> <b>dweitzel:</b></span> right, across pilots on the same site.  HTTP caches (squid) are usually site-wide.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(11:32:33)</span> <b>lmichael:</b></span> (@briedel @dschultz other context you may not have, <tt>transfer_input_files</tt> will handle HTTP addresses appropriately and leveraging squid caches, and manage the transfers like other transferred files.)<br/>
+<span style="color: #5a4592"><span style="font-size: small">(11:33:12)</span> <b>lmichael:</b></span> If we can get an answer from David about the 850-&gt;4 GB question, that might be a good route. @bbockelm care to weigh in?<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(11:41:13)</span> <b>dschultz:</b></span> so I looked at the workload we ran for the cloud burst, and it's an 850MB tarball that expands to 1.5GB<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(11:41:45)</span> <b>dschultz:</b></span> that's a single software config, so running more diverse jobs would require additional software<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(11:43:35)</span> <b>dschultz:</b></span> the tricky thing is, at pilot start we don't know exactly what the job will need, unless we tie the pilots to a specific set of jobs with a start expression<br/>
+<span style="color: #5a4592"><span style="font-size: small">(12:33:37)</span> <b>lmichael:</b></span> So the same payload job might need multiple files? As long as they’re less than ~1 GB, individually, that should still be fine for HTTP, given that caching is cross-site, not just within-pilot.<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:54:56)</span> <b>briedel:</b></span> i dont think the version of condor we right now use for our distributed infrastructure supports the HTTP-based transfers, but that is just a matter of upgrading the condor version. i think the thing we need to think about on our side is how we would make sure that only the subset of jobs that need a limited software stack would end up being matched<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(13:13:34)</span> <b>dschultz:</b></span> I'd argue that our jobs shouldn't need to know anything about this, and it should be our pilots submitted on osgconnect that do the work and handle matching acceptable jobs.  otherwise, it's going to turn into an ongoing problem to manage different job sets (an expert will need to hand-craft each job set that touches this resource)<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(13:16:13)</span> <b>dschultz:</b></span> right now our pool is homogeneous in terms of cvmfs, and breaking the appearance of that comes with a large cost<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:45:33)</span> <b>bbockelm:</b></span> &gt;  right now our pool is homogeneous in terms of cvmfs, and breaking the appearance of that comes with a large cost<br/>One goal of the data reuse directory work is that, if you use Singularity, you can specify a container and have HTCondor decide at match time whether it's moved from the submit host or uses CVMFS.<br/><br/>@dschultz - would that be a reasonable option?  Basically, make the pool homogeneous in terms of container but heterogeneous in terms of delivery method?<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(13:52:35)</span> <b>dschultz:</b></span> the problem is that we don't really use containers yet<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(13:52:53)</span> <b>dschultz:</b></span> that's a 2021 project<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:58:24)</span> <b>bbockelm:</b></span> :slightly_smiling_face: So is everything I mentioned above except for the data reuse piece...<br/>
+<span style="color: #db3150"><span style="font-size: small">(14:01:06)</span> <b>christinalk:</b></span> unrelated to the icecube thread: there’s a gracc mapping ticket in freshdesk. @dweitzel is that your area?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:01:19)</span> <b>dweitzel:</b></span> yup, assign to me.<br/>
+</body>
+</html>

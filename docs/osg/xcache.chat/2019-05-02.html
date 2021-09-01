@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu May 2, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Thu May 2, 2019 : #xcache (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(09:15:34)</span> <b>matyas:</b></span> ... wish you had told me that a few weeks ago.<br/>Welp, a few more onto the regrets pile!<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:42:47)</span> <b>marian:</b></span> Sorry! Didn’t hit my eyes so intense until playing long with configs during the tests ;)<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:46:47)</span> <b>blin:</b></span> i think we want to specify that it's OSG monitoring because other xcache implementations may have other monitoring<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:36:02)</span> <b>marian:</b></span> Moment, what other? Isn’t this related only to OSG collectors?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:36:35)</span> <b>blin:</b></span> this is specifically related to OSG collectors but ATLAS/CMS may want to report to other collectors<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:36:48)</span> <b>blin:</b></span> so the config knob should be clear that it only controls the OSG monitoring<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:38:31)</span> <b>marian:</b></span> Either report there or not ... I am not aware what other collectors do this but OSG ... and collector endpoints are configured in different place, that is independent if this variable... or maybe I’m missing your point<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:41:19)</span> <b>blin:</b></span> let's say we ship atlas-xcache and they have both OSG and ATLAS monitoring<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:41:50)</span> <b>blin:</b></span> if the knob were called <tt>disablemonitoring</tt>, it would be confusing to users<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:42:00)</span> <b>blin:</b></span> because in actuality it would only disable the osg monitoring and not the atlas monitoring<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:46:28)</span> <b>marian:</b></span> Then we have it wrong... this var should say Enable or Disable, regardless monitoring hostname<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:47:05)</span> <b>marian:</b></span> By default we enable so it means all goes to OSG collectors unless you override elsewhere... or am I wrong?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:48:13)</span> <b>blin:</b></span> i'm confused -- the config block we have only controls whether or not we report to <a href="http://osgstorage.org">osgstorage.org</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:48:28)</span> <b>blin:</b></span> the reporting hostname isn't configurable<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:49:04)</span> <b>blin:</b></span> <a href="https://github.com/opensciencegrid/xcache/blob/master/configs/xcache/config.d/40-osg-monitoring.cfg">https://github.com/opensciencegrid/xcache/blob/master/configs/xcache/config.d/40-osg-monitoring.cfg</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(11:08:55)</span> <b>marian:</b></span> So it looks this is not for the osg condor collectors as I thought but for xrootd collectors... we may revisit this part of design later, I’m not sure this is an OK unless @matyas has better insight and reasoning behind it ... (btw, I’m officially out of office for the rest of the day, stepping away from slack and computer for some time now)<br/>
+</body>
+</html>

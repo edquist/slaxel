@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Apr 29, 2019 : #software (osg)</title>
+</head>
+<body>
+<h3>Mon Apr 29, 2019 : #software (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(13:34:37)</span> <b>matyas:</b></span> hey folks, especially @dweitzel, @efajardo, and @rynge and anybody else who builds docker containers: dockerhub got compromised so as a precaution they revoked all users' github tokens and keys<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:34:57)</span> <b>dweitzel:</b></span> yeah, ok.  Ugh<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:34:58)</span> <b>matyas:</b></span> this means container autobuilds are broken; you will have to unlink and relink the github account for them to work again<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:35:14)</span> <b>dweitzel:</b></span> We have an osg-bot that will need to re-linked I believe.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:35:17)</span> <b>matyas:</b></span> yep<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:35:27)</span> <b>dweitzel:</b></span> so if that's done, then nothing else needs to be done?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:35:49)</span> <b>matyas:</b></span> i think so<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:36:06)</span> <b>matyas:</b></span> also, y'all might want to change your dockerhub passwords if you haven't already<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:37:06)</span> <b>matyas:</b></span> i took care of changing the password for the osgsoftware user<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:38:50)</span> <b>efajardo:</b></span> I thinky they onle<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:38:57)</span> <b>efajardo:</b></span> rvoked tokens<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:39:02)</span> <b>efajardo:</b></span> from affected users<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:39:07)</span> <b>efajardo:</b></span> cause I did changem y passwords<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:39:16)</span> <b>efajardo:</b></span> but didnt have to relink<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:40:10)</span> <b>matyas:</b></span> i looked at the security log for the osg-bot github user and saw a whole bunch of this:<br/><pre><br/>public_key.verification_failure<br/>– Docker Cloud Build - 81:d9:87:7b:eb:b2:d6:96:d6:64:5b:12:a4:91:60:96 <br/></pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(13:40:51)</span> <b>matyas:</b></span> all from/since the date of the breakin<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:53:09)</span> <b>matyas:</b></span> separate issue: @dwd, do you know why singularity 3 is in the upcoming repos instead of the main repos?<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:55:39)</span> <b>dwd:</b></span> Because it was a very major update and I didn’t trust it for production but I wanted it to be available to people for testing.  Now it’s about time for singularity-3 to be in EPEL so it could be moved to the main repo, but I think it’s probably best to wait for osg3.5 since that’s coming soon I believe.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:56:25)</span> <b>matyas:</b></span> afaik osg 3.5 is not coming soon and we don't actually have a schedule for it<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:57:16)</span> <b>dwd:</b></span> Oh, somebody told me it would be this summer.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:57:36)</span> <b>matyas:</b></span> nobody told me that ¯\_(ツ)_/¯<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:58:21)</span> <b>matyas:</b></span> if you think it's ready for production use and there are no manual steps that an admin would have to take in order to upgrade, then perhaps we can move it to the main repo ahead of 3.5<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:03:04)</span> <b>dwd:</b></span> It has been the announced 4 weeks, so I just requested that it be released into EPEL.  If it’s going to be a while for osg3.5, we should probably go ahead.  It should generally be upward compatible.  Still I don’t think it’s good for people to use a modified singularity.conf from 2.6 with 3.1.1.  It will probably work, but there’s been enough changes to the comments &amp; defaults.  The install instructions page recommends modifying singularity.conf but says to watch out for .rpmsave files and reapply changes.  I don’t know how many people pay attention to that though<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:04:54)</span> <b>dwd:</b></span> I would like to get @blin’s input since he has put singularity-3 on a list of packages for osg3.5<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:05:10)</span> <b>matyas:</b></span> of course<br/>
+<span style="color: #99a949"><span style="font-size: small">(21:38:13)</span> <b>dwd:</b></span> @matyas for the record, I made a mistake on the timing of singularity in EPEL, it has only been a little over 3 weeks.  I withdrew the request to promote it from epel-testing to epel, until next week<br/>
+</body>
+</html>

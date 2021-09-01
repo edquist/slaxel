@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Aug 4, 2021 : #operations (osg)</title>
+</head>
+<body>
+<h3>Wed Aug 4, 2021 : #operations (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(10:34:22)</span> <b>blin:</b></span> @jlstephen @lincoln @djordan66 are there issues on river right now? i see lots of Hosted CE pods in "Completed" state and can't start a new one<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:35:13)</span> <b>jlstephen:</b></span> there were a couple of nodes that were having problems. our new admin (@fengping) is taking a look<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:38:27)</span> <b>lincoln:</b></span> can you link one of the ones you can't start?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:43:15)</span> <b>blin:</b></span> this deploy is stuck with <tt>1 desired</tt><br/><pre>$ kubectl -n slate-group-osg-ops describe deploy/osg-hosted-ce-asu-dell-m240</pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(10:45:38)</span> <b>lincoln:</b></span> ok lookin<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:47:06)</span> <b>lincoln:</b></span> yeah, I see a few stuck terminating<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:47:41)</span> <b>lincoln:</b></span> seems to be a systemic problem with Docker, we are working on it<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:51:31)</span> <b>lincoln:</b></span> Puppet seems to have botched a docker-ce update. :thinking_face:<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:52:05)</span> <b>lincoln:</b></span> Will fix this ASAP<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:52:53)</span> <b>blin:</b></span> it's always a problem with the CE<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:53:32)</span> <b>rynge:</b></span> How is <tt>opensciencegrid</tt> project configured under Harbor? Is it a sync from docker hub, or we push to Harbor when we build?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:55:17)</span> <b>matyas:</b></span> right now we push when we build; we used to sync from docker hub but then we got rate limited<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:55:41)</span> <b>rynge:</b></span> Ah, cool!<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:56:15)</span> <b>rynge:</b></span> Ok, so I think we can get non-cvmfs images working, at least for the default one<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:56:22)</span> <b>rynge:</b></span> Need to a little bit more testing<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:57:20)</span> <b>matyas:</b></span> Cody's image comes from <a href="http://containers.ligo.org">containers.ligo.org</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:59:35)</span> <b>rynge:</b></span> Ok, I will ping you later when I have something to test<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:59:57)</span> <b>matyas:</b></span> sounds good!<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:02:40)</span> <b>lincoln:</b></span> @blin ok, things are looking better but not amazing :slightly_smiling_face:<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:02:42)</span> <b>lincoln:</b></span> <pre>[root@river-c001 ~]# kubectl get pods -n slate-group-osg-ops<br/>NAME                                                 READY   STATUS             RESTARTS   AGE<br/>osg-hosted-ce-amnh-mendel-674478d8bf-q7lkw           2/2     Running            10         162d<br/>osg-hosted-ce-computecanada-cedar-6d6997889d-xfj5v   2/2     Running            5          23d<br/>osg-hosted-ce-fsu-hnpgrid-6d8bfb4c48-7pnm2           1/1     Running            4          20d<br/>osg-hosted-ce-gsu-acore-cd965c6-jd95w                1/2     CrashLoopBackOff   16642      158d<br/>osg-hosted-ce-sdsc-ts-ce1-7d45d57f5f-kmtt6           1/2     CrashLoopBackOff   12         76d<br/>osg-hosted-ce-tacc-frontera-ce1-7f876f95db-mkrkv     1/1     Running            1          7d19h<br/>osg-hosted-ce-uci-gpatlas-679d8d46f6-l4tdr           2/2     Running            2          18d<br/>osg-hosted-ce-uconn-xanadu-5fb579b996-bqqsh          1/1     Running            2          60d<br/>osg-hosted-ce-uiuc-icc-spt-d4b4c6776-77dxt           1/1     Running            1          29d<br/>osg-hosted-ce-usf-sc-599f98687-f7dqf                 2/2     Running            10         158d<br/>osg-itb-ce1-htcondor-ce-757546b78d-52zwv             0/2     Init:0/1           0          197d</pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(12:02:55)</span> <b>lincoln:</b></span> I had seen a few of these not-running before we had trouble with Docker -<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:03:03)</span> <b>lincoln:</b></span> certainly the ITB one<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:03:08)</span> <b>matyas:</b></span> 16642 restarts dang<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:16:23)</span> <b>lincoln:</b></span> yeah that probably has been looping for a while<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:16:42)</span> <b>blin:</b></span> hrm @lincoln i kicked my deploy and it looks like my pods wont' deploy :disappointed:<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:16:50)</span> <b>lincoln:</b></span> ok<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:17:06)</span> <b>lincoln:</b></span> what is your deployment<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:21:42)</span> <b>lincoln:</b></span> ah, I see one of the control plane components crash looping, i will check it out<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:21:55)</span> <b>lincoln:</b></span> isnt kubernetes fun!! :upside_down_face:<br/>
+</body>
+</html>

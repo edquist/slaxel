@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jul 29, 2021 : #flightworthy (chtc)</title>
+</head>
+<body>
+<h3>Thu Jul 29, 2021 : #flightworthy (chtc)</h3>
+<span style="color: #5a4592"><span style="font-size: small">(09:25:09)</span> <b>tannenba:</b></span> Hi folks.  Back from vacation, but will be in meetings most of today at Morgridge.  Looks like the security release was announced in htcondor-users on Tues as scheduled, but the website news feed still makes no mention of it.  What happened?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:30:13)</span> <b>tlmiller:</b></span> TimT had a family emergency.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(09:30:19)</span> <b>tannenba:</b></span> Also, when I do <tt>curl -fsSL <a href="https://get.htcondor.org">https://get.htcondor.org</a> | /bin/bash -s -- --download --channel stable</tt>, I end up with HTCondor v9.0.2  !   (not the v9.0.3 security release)      So it seems like the security release has not been completed....<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:30:49)</span> <b>tlmiller:</b></span> Also, <tt>--channel current</tt> should be giving you 9._1_.x. :(<br/>
+<span style="color: #5a4592"><span style="font-size: small">(09:31:58)</span> <b>tannenba:</b></span> Oh no, I hope TimT is ok....  In my test I did --channel stable.   @johnkn is our backup release manager, can he complete the release punchlist if @tim is not back today?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(09:41:50)</span> <b>jfrey:</b></span> <b>@here</b> The security release is fucked. The patch file I gave to TimT included some debugging dprintf()s that shouldn’t be in the release. One of them prints the full ClaimIds in the schedd log.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(09:44:24)</span> <b>tim:</b></span> Damn what needs to be done<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(09:44:42)</span> <b>tim:</b></span> I can handle it ASAP.<br/>
+<span style="color: #99a949"><span style="font-size: small">(09:50:21)</span> <b>matyas:</b></span> I was just about to build and push container images for the security release -- should I not do that, then?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(09:50:33)</span> <b>jfrey:</b></span> Here’s a patch to remove the bad dprintf()s.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(09:51:55)</span> <b>jfrey:</b></span> The dprintf()s are D_ALWAYS, so admins can’t mitigate by adjusting the debug level.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(09:53:15)</span> <b>jfrey:</b></span> If we pull the released binaries, do we release fixed ones with the same version number?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(09:53:27)</span> <b>jfrey:</b></span> Or do we need a new release number?<br/>
+<span style="color: #4cc091"><span style="font-size: small">(09:54:06)</span> <b>blin:</b></span> in the OSG repos we'd probably just patch + bump the release number, i.e. <tt>9.0.3-1.1</tt><br/>
+<span style="color: #4cc091"><span style="font-size: small">(09:54:30)</span> <b>blin:</b></span> i guess you guys would probably consume a micro version number <tt>9.0.4</tt><br/>
+<span style="color: #99a949"><span style="font-size: small">(09:54:54)</span> <b>matyas:</b></span> I think you  guys did a bump for 8.9.12 -&gt; 8.9.13<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(09:55:08)</span> <b>tim:</b></span> It's probably better to have a new release number and tag. People get upset when teslse tags mve.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(09:55:32)</span> <b>jfrey:</b></span> Yeah, I think that’s what we’ll have to do.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(09:55:57)</span> <b>blin:</b></span> OSG will build depending on how quickly you guys can give us a git tag i think<br/>
+<span style="color: #4cc091"><span style="font-size: small">(09:56:05)</span> <b>blin:</b></span> vs a src rpm<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(09:57:15)</span> <b>jfrey:</b></span> I will double-check the rest of the security patch I made to make sure there are no other problems.<br/>
+<span style="color: #684b6c"><span style="font-size: small">(09:58:00)</span> <b>bbockelman:</b></span> Tags should be immutable, version numbers are cheap.  After so many people have upgraded, changing the tag would cause chaos.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(09:59:44)</span> <b>tim:</b></span> With parallel builds I can get you src RPMs quickly.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(10:00:50)</span> <b>tannenba:</b></span> Ugh :disappointed:<br/>
+<span style="color: #4cc091"><span style="font-size: small">(10:15:11)</span> <b>blin:</b></span> @tim do we really want to wait on src rpms for the OSG release? by the time that's done, we'll have to build all the versions again for our repos and run VMU tests etc etc<br/>
+<span style="color: #4cc091"><span style="font-size: small">(10:15:28)</span> <b>blin:</b></span> if we just need to apply Jaime's patch, then we can start the OSG builds right away<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(10:21:44)</span> <b>tim:</b></span> You can't wait 15 mintues for a src RPM?<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(10:22:11)</span> <b>tim:</b></span> Back at home base.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(10:26:47)</span> <b>blin:</b></span> ah, i didn't know that we'd get them that quickly<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:29:34)</span> <b>tlmiller:</b></span> We spent a fair amount of effort recently making our CI suck less.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:33:23)</span> <b>johnkn:</b></span> Got an ticket in the admin queue from something called *Software Informer* that says they have given us an award.  Should I treat this as spam?<br/>
+<span style="color: #4cc091"><span style="font-size: small">(11:16:13)</span> <b>blin:</b></span> @tim are SRPMs ready or should we start thinking about applying Jaime's patch above?<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(11:20:54)</span> <b>tim:</b></span> I just pushed the changes to 9.1.2 so that SRPM should be ready in 15 minutes. The 9.0.4 SRPM is ready now. The 8.8.15 will take longer since it is using the old style build.<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:21:16)</span> <b>matyas:</b></span> OK I'll get started on 9.0.4<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(11:22:02)</span> <b>tim:</b></span> Very good. I'll copy it to moria.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(11:25:12)</span> <b>tim:</b></span> On moria at /nobackup/tim/condor-9.0.4-1.el7.src.rpm<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:36:55)</span> <b>matyas:</b></span> do you have a JIRA ticket I can reference in the commit messages?<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:38:15)</span> <b>matyas:</b></span> you don't have to make a whole ticket right now, just enter "Release Condor 9.0.4", "Release Condor 9.1.2" etc. in the subject and tell me the ticket number<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:40:43)</span> <b>matyas:</b></span> more like a 'ticket reservation' than a ticket<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(11:58:44)</span> <b>tim:</b></span> I'll make one.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(11:59:09)</span> <b>tim:</b></span> Luckily it doesn't have to be private<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(12:02:09)</span> <b>tim:</b></span> @matyas: moria:/nobackup/tim/condor-9.1.2-1.el7.src.rpm<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(12:04:48)</span> <b>tim:</b></span> @matyas SOFTWARE-4727<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:05:04)</span> <b>matyas:</b></span> which one is that for? all of them?<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(12:06:05)</span> <b>tim:</b></span> We did all three under one ticket for the security release. I don't see any reason not to do the same. They all go out at the same time.<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:06:14)</span> <b>matyas:</b></span> ok that's fine<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(12:17:56)</span> <b>tim:</b></span> @matyas: /nobackup/tim/condor-8.8.15-1.el7.src.rpm<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:21:16)</span> <b>matyas:</b></span> welp, we'll see how our koji builders hold up with 3+ condor builds at a time<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:29:00)</span> <b>tlmiller:</b></span> I keep misreading that as "kaiju builders" and thinking that you have a much more interesting development cycle than we do...<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:29:53)</span> <b>matyas:</b></span> I wish<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:49:31)</span> <b>coatsworth:</b></span> So is v9.1.2 the updated security release now? Should I be adding docs to this version or should I wait for V9_1_3-branch?<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(13:51:08)</span> <b>tim:</b></span> Please wait for the 9.1.3 branch. Everything is in flux right now.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(13:52:29)</span> <b>tim:</b></span> @coatsworth I still have to deal with some merge conflicts regarding DAGMan changes on the V9_0-branch and the new 9.1.3 branch.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:53:57)</span> <b>coatsworth:</b></span> @tim Sounds good, I'll wait for the V9_1_3-branch then. Let me know if you need any help with those merge conflicts. I've already resolved them in master so you could just cherry pick those lines.<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:28:08)</span> <b>matyas:</b></span> @jfrey what operations produce those log lines? What should I look for to see if the fix is present?<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(15:48:14)</span> <b>tim:</b></span> So, the 8.8.15, 9.0.4, and 9.1.2 tarballs and packages are up.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(15:48:31)</span> <b>tim:</b></span> I have to take my mom to the rehab hospital now.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(15:59:00)</span> <b>jfrey:</b></span> @matyas Jobs being assigned to matches in the schedd produce lines like this in the SchedLog:<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(15:59:01)</span> <b>jfrey:</b></span> 07/29/21 03:20:15 (pid:125209) (D_ALWAYS) JEF SetPrivateAttributeString(14253933, 4809, ClaimId, &lt;128.105.245.210:9618?addrs=128.105.245.210-9618&amp;alias=<a href="http://e2410.chtc.wisc.edu">e2410.chtc.wisc.edu</a>&amp;noUDP&amp;sock=startd_13121_7e3c&gt;#1621469871#39348#[CryptoMethodsList=“AES.BLOWFISH.3DES”;CryptoMethods=“BLOWFISH”;Encryption=“YES”;Integrity=“YES”;]2cb5e6a1aa762cf190261848a857208abc228fc6)<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:28:24)</span> <b>matyas:</b></span> found them<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:29:02)</span> <b>matyas:</b></span> I haven't uploaded the broken versions to dockerhub but I did upload them to <a href="http://hub.opensciencegrid.org">hub.opensciencegrid.org</a><br/>
+<span style="color: #4cc091"><span style="font-size: small">(16:33:23)</span> <b>blin:</b></span> so what's the status of the release?<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(16:37:28)</span> <b>tim:</b></span> All bit announced on the HTCondor side.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(16:41:10)</span> <b>blin:</b></span> have we deployed it anywhere to make sure that things are as expected?<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:51:52)</span> <b>matyas:</b></span> Is it OK to build and push images to dockerhub?<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(16:52:43)</span> <b>tim:</b></span> You need tags righr?<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:53:17)</span> <b>matyas:</b></span> no, the script installs from RPMs<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:53:27)</span> <b>matyas:</b></span> and runs <tt>condor_version</tt> to figure out what it just installed<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(16:53:40)</span> <b>tim:</b></span> Ok, cool. Push them.<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:39:31)</span> <b>matyas:</b></span> I'm guessing claim IDs aren't useful after the claim has expired, so it's not like people have to delete their logs, right?<br/>
+</body>
+</html>

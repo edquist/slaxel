@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jul 8, 2021 : #flightworthy (chtc)</title>
+</head>
+<body>
+<h3>Thu Jul 8, 2021 : #flightworthy (chtc)</h3>
+<span style="color: #bb86b7"><span style="font-size: small">(14:59:05)</span> <b>tim:</b></span> Ugh. Having trouble building the Python wheels. When building HTCondor it claims that boost is not found. However, it is in the image. I don't recall any changes at all with respect to boost. Trying to build 9.0.1 wheels now to see if something underlying changed.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(15:13:50)</span> <b>tim:</b></span> @gthain @jfrey I am having trouble building the Python wheels for 9.0.2. It claims that it can't find boost. boost is present in the Docker image. Did we make any cmake changes that might disturb this?<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(15:14:42)</span> <b>tim:</b></span> I can built the 9.0.1 wheels.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(15:15:05)</span> <b>tim:</b></span> Darn I have to leave for a haircut appointment. Will have to check back later.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(16:23:18)</span> <b>tim:</b></span> Figured it out boost not found warning a red herring. Need to include SciTokens in the build now.<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:32:25)</span> <b>gthain:</b></span> For all platforms?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:32:40)</span> <b>jfrey:</b></span> The SciTokens native package?<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(16:33:48)</span> <b>tim:</b></span> So, the Python wheels builds without SciTokens. However, we added code that uses SciTokens and it's not protected with #ifdef<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:34:17)</span> <b>jfrey:</b></span> Ahh<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(16:34:53)</span> <b>tim:</b></span> I think the easiest course of action is to add the #ifdefs around the new code and evaluate whether we want to support that use case or not.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:35:30)</span> <b>jfrey:</b></span> That sounds appropriate.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(17:16:28)</span> <b>tim:</b></span> @jfrey, got a minimal fix and found a bug that got introduced during the 9.0.2 development.<br/>
+<span style="color: #684b6c"><span style="font-size: small">(18:55:03)</span> <b>bbockelman:</b></span> (You know, there’s always an interesting trade off between configurability and maintenance … definitely don’t want to change 9.0, but should any of our “optional” deps be required?)<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(19:56:05)</span> <b>tim:</b></span> We should really test building with and without the various options. We've had higher priorities.<br/>
+</body>
+</html>

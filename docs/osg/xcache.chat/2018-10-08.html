@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Oct 8, 2018 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Mon Oct 8, 2018 : #xcache (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(12:20:50)</span> <b>bbockelm:</b></span> @dweitzel @marian - what are your thoughts on simply eliminating this section: <a href="https://opensciencegrid.org/docs/data/stashcache/install-cache/#starting-the-service">https://opensciencegrid.org/docs/data/stashcache/install-cache/#starting-the-service</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:21:33)</span> <b>dweitzel:</b></span> Should we just have a list of services to start?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:21:40)</span> <b>bbockelm:</b></span> seems that we enable / start condor three times in the document.  Here's another location: <a href="https://opensciencegrid.org/docs/data/stashcache/install-cache/#managing-the-cache-services">https://opensciencegrid.org/docs/data/stashcache/install-cache/#managing-the-cache-services</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:22:45)</span> <b>bbockelm:</b></span> I do like the little "common service commands" table in the first section.<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:22:52)</span> <b>marian:</b></span> I think after the new rpms are out we need to revamp this ... new rpms @jthiltges built provide all of this from yum install I guess<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:23:17)</span> <b>bbockelm:</b></span> I don't think the new RPMs either set the service to start on boot or start the services?<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:23:49)</span> <b>marian:</b></span> ah, starting service ... thought of setting it up on first place<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:24:02)</span> <b>marian:</b></span> right, let's make a ticket then<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:25:23)</span> <b>jthiltges:</b></span> My understanding is that RPM installs shouldn't enable/start services. (Might be building a container or something)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:25:32)</span> <b>bbockelm:</b></span> why don't you assign the ticket to me, since I have the browser open right now to it.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:25:35)</span> <b>bbockelm:</b></span> @jthiltges - right!<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:25:49)</span> <b>marian:</b></span> yeah, I misread, sorry for confusion<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:26:04)</span> <b>marian:</b></span> (so many docs updates lately)<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:28:17)</span> <b>marian:</b></span> opening ticket for it ... @jthiltges, would you mind I assign it to you?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:28:25)</span> <b>jthiltges:</b></span> The new revision of <tt>/usr/sbin/stashcache</tt> (currently testing on hcc-stash) runs from a systemd timer, so no condor service dependency. Will get a docs PR to bring things into agreement.<br/>There's two separate services sections because one is for the optional authenticated cache.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:28:56)</span> <b>jthiltges:</b></span> I'm all in favor of simplification though!<br/>And @marian, sure.<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:29:21)</span> <b>marian:</b></span> thanks, will do task in STAS project for it...<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(12:35:24)</span> <b>sthapa:</b></span> Anyone know why I would get an invalid pki error when starting authenticated stashcache?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:35:26)</span> <b>bbockelm:</b></span> hm, somehow I don't think <tt>xrootd@stashcache-origin-server.service</tt> is the right service name for the _cache_...<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:35:54)</span> <b>marian:</b></span> @bbockelm that is for origin, I think ... for cache it is <tt>xrootd@stashcache-cache-server.service</tt><br/>
+<span style="color: #5b89d5"><span style="font-size: small">(12:36:07)</span> <b>sthapa:</b></span> crl/ca are up to date and the certs are owned by xrootd:root<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:38:01)</span> <b>dweitzel:</b></span> @sthapa can you copy / paste the full error here?  And a few lines above and below the error.<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(12:39:13)</span> <b>sthapa:</b></span> <br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:40:32)</span> <b>bbockelm:</b></span> Is it a Let's Encrypt cert?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:40:40)</span> <b>bbockelm:</b></span> If so, is the CRL set to required?<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(12:47:41)</span> <b>sthapa:</b></span> It’s a regular osg cert, got it before the goc shutdown.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:52:49)</span> <b>bbockelm:</b></span> What's the <tt>sec.protocol</tt> line?<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(12:57:02)</span> <b>sthapa:</b></span> sec.protocol /usr/lib64 gsi \<br/>      -certdir:/etc/grid-security/certificates \<br/>      -cert:/etc/grid-security/xrd/xrdcert.pem \<br/>      -key:/etc/grid-security/xrd/xrdkey.pem \<br/>      -crl:1 \<br/>      -authzfun:libXrdLcmaps.so \<br/>      -authzfunparms:--lcmapscfg,/etc/xrootd/lcmaps.cfg,--loglevel,5|useglobals \<br/>      -gmapopt:10 \<br/>      -authzto:3600<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(12:57:35)</span> <b>sthapa:</b></span> The various config files are at <a href="https://github.com/opensciencegrid/gatech-salt/tree/master/osg/files/auth-stashcache">https://github.com/opensciencegrid/gatech-salt/tree/master/osg/files/auth-stashcache</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:59:10)</span> <b>bbockelm:</b></span> does <tt>/etc/grid-security/xrd/xrdcert.pem</tt> exist and is it readable by the xrootd user<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(13:01:20)</span> <b>sthapa:</b></span> yes<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(13:01:37)</span> <b>sthapa:</b></span> the only thing that might be a problem is the perms on xrdkey.pem is 644<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(13:02:04)</span> <b>sthapa:</b></span> Not sure if xrootd is going to complain and refuse to use a key with those perms<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:07:56)</span> <b>bbockelm:</b></span> yes, that's possible<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:08:00)</span> <b>bbockelm:</b></span> I mean, it has in the past.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:08:26)</span> <b>bbockelm:</b></span> (ugh - note that the gatech setup is going to be fairly different once the newest stashcache RPM is released)<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:09:51)</span> <b>jthiltges:</b></span> The most convenient (for very shaky values of convenient) way I've run across globus debugging is strace. Usually there's a <tt>write()</tt> call with helpful info that probably goes into a log that I haven't found.<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(13:10:14)</span> <b>sthapa:</b></span> I guess we’ll try locking this version since we’re trying to get them up and running and having a massive config change is not going to help.<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(13:10:45)</span> <b>sthapa:</b></span> Ok, I’ll talk to the admin since I don’t have root access, will try the permission change first and then more if that doesn’t work<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:12:01)</span> <b>bbockelm:</b></span> the other thing to check is OpenSSL and Xrootd versions<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(13:12:44)</span> <b>sthapa:</b></span> Anything in particular there?<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(13:12:45)</span> <b>sthapa:</b></span> [sthapa9@osg-gftp log]$ rpm -qa | grep xrootd<br/>xrootd-client-libs-4.8.4-1.osg34.el7.x86_64<br/>xrootd-lcmaps-1.4.0-1.osg34.el7.x86_64<br/>xrootd-libs-4.8.4-1.osg34.el7.x86_64<br/>xrootd-server-libs-4.8.4-1.osg34.el7.x86_64<br/>xrootd-server-4.8.4-1.osg34.el7.x86_64<br/>python2-xrootd-4.8.4-1.osg34.el7.x86_64<br/>[sthapa9@osg-gftp log]$ rpm -qa | grep openssl<br/>xmlsec1-openssl-1.2.20-5.el7.x86_64<br/>globus-gsi-openssl-error-3.8-1.el7.x86_64<br/>globus-openssl-module-4.8-1.el7.x86_64<br/>openssl-libs-1.0.2k-8.el7.x86_64<br/>openssl-1.0.2k-8.el7.x86_64<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:12:58)</span> <b>bbockelm:</b></span> Marian had run into issues with old openssl and new LCMAPS<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:13:09)</span> <b>bbockelm:</b></span> nah, that's good.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:13:29)</span> <b>bbockelm:</b></span> (the OpenSSL issue was a site that was using an unpatched RHEL 7.3 OpenSSL...)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:14:02)</span> <b>bbockelm:</b></span> @dweitzel or @jthiltges - could you review <a href="https://github.com/opensciencegrid/docs/pull/452">https://github.com/opensciencegrid/docs/pull/452</a> ?  That way I don't context switch away...<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(13:14:28)</span> <b>sthapa:</b></span> I think we should update xrootd on the system for the latest http updates but that’s more a quible<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:21:16)</span> <b>bbockelm:</b></span> oh yeah, you'll definitely want that.  However, it's not causing your issue.<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(13:31:56)</span> <b>sthapa:</b></span> Okay, the permissions were the problem.  I’m seeing an error because the reference to /usr/lib64/libXrdSec.so is wrong.  I can just use /usr/lib64/libXrdSec-4.so instead?<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(13:32:33)</span> <b>sthapa:</b></span> Also, anyway to make this part of the config more friendly?  Putting the exact library names into the config file seems a bit admin unfriendly<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:38:02)</span> <b>marian:</b></span> @sthapa... for the issues I ran into with MIT it was related to this one: <a href="https://bugzilla.redhat.com/show_bug.cgi?id=1631764">https://bugzilla.redhat.com/show_bug.cgi?id=1631764</a> ... maybe it's unrelated to your current issue but check also with admins what OS update they have versus OSG release and packages installed... those auth things and package dependencies along xrootd installed are pretty sensitive and needs compatible set rpms installed (which is sometime hard to keep track due different habit of admins how they roll out updates of the system)<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(13:39:25)</span> <b>sthapa:</b></span> I think your bug  isn’t in play here since openssl 1.0.2k is being used<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(15:34:29)</span> <b>sthapa:</b></span> Hmm, initialization is still failing although there’s no obvious error being printed out anymore.  Here are the logs?  Any suggestions on what to try?<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(15:34:35)</span> <b>sthapa:</b></span> <br/>
+<span style="color: #53b759"><span style="font-size: small">(16:02:20)</span> <b>marian:</b></span> this will be nasty output, but you run something like:<br/><pre><br/>sudo -u xrootd /bin/sh -c 'LD_DEBUG=all /usr/bin/xrootd -c /etc/xrootd/xrootd-stashcache-cache-server-auth.cfg -s /var/run/xrootd/xrood-stashcache-server-auth.pid -n xrood-stashcache-server-auth -d' &gt;&amp; xrootd-lddebug.txt<br/></pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(16:03:20)</span> <b>marian:</b></span> ^ @sthapa<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(16:03:46)</span> <b>sthapa:</b></span> okay, I’ll ask the admin to do that<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:04:43)</span> <b>marian:</b></span> :thumbsup:<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(16:08:01)</span> <b>sthapa:</b></span> What should I look for?<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(16:09:55)</span> <b>sthapa:</b></span> I do see this near the end:      17275:     binding file /lib64/libXrdUtils.so.2 [0] to /lib64/libc.so.6 [0]: normal symbol `__ctype_tolower_loc’ [GLIBC_2.3]<br/>181008 17:05:45 17275 XrdOpen: Unable to bind socket to port 1094; address already in use<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(16:10:20)</span> <b>sthapa:</b></span> The server running the stashcache also has an unauthenticated stashcache process running<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:39:39)</span> <b>marian:</b></span> gotcha! so there is some obvious misconfig of xrd.port usage, probably ... can they clean up any xrootd remnant processes before they restart the things?<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:42:33)</span> <b>marian:</b></span> ehm ... those are two different things, the "bind socket" error and the one posted previously... so, running with LD_DEBUG thing make sure first none of xrootd process run at all<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(16:50:59)</span> <b>sthapa:</b></span> the unauthenticated stashcache process is running on the server<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(16:51:28)</span> <b>sthapa:</b></span> and I can retrieve files through it, it’s just the authenticated process that fails on startup<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:52:31)</span> <b>marian:</b></span> and this is from which log: <tt>181008 17:05:45 17275 XrdOpen: Unable to bind socket to port 1094; address already in use</tt><br/>
+<span style="color: #5b89d5"><span style="font-size: small">(17:17:57)</span> <b>sthapa:</b></span> the xrootd-lddebug.txt generated by the command you gave<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(17:18:08)</span> <b>sthapa:</b></span> I can provide the entire file if that’ll be helpful<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:28:39)</span> <b>marian:</b></span> yeah, @bbockelm can read from it better, please, upload it to some web space if you can ... but if the issue is <tt>address already in use</tt> there is something not configured right, so maybe give us also xrootd configs of the site for auth and non-auth they use<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(17:41:29)</span> <b>sthapa:</b></span> Just uploaded the file<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(17:42:01)</span> <b>sthapa:</b></span> The configs are at <a href="https://github.com/opensciencegrid/gatech-salt/tree/master/osg/files/auth-stashcache">https://github.com/opensciencegrid/gatech-salt/tree/master/osg/files/auth-stashcache</a> , both the auth and unauth stashcache use the same config<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(17:42:06)</span> <b>sthapa:</b></span> ld debug file<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(17:42:14)</span> <b>sthapa:</b></span> xrootd-stashcache-cache-server.cfg<br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:44:40)</span> <b>bbockelm:</b></span> @sthapa - what systemd command are they using to start the authenticated service?  I'd guess that they aren't hitting the right <tt>if named stashcache-cache-server-auth</tt> block.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:44:47)</span> <b>bbockelm:</b></span> No indication it's a linking issue<br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:45:54)</span> <b>bbockelm:</b></span> ah, I see that Marian didn't give the right command line (wrong value to <tt>-n</tt>), that explains the failure when started by hand.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:47:45)</span> <b>bbockelm:</b></span> Ah, I think the problem might be your <tt>xrootd.seclib /usr/lib64/libXrdSec.so</tt> line.  It shouldn't be <tt>xrootd.seclib /usr/lib64/libXrdSec-4.so</tt>.  Did you change that from the default?<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(21:30:18)</span> <b>sthapa:</b></span> Salt uses xrootd@stashcache-cache-server-auth and xrootd@stashcache-cache-server<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(21:30:31)</span> <b>sthapa:</b></span> I changed it to xrootd.seclib /usr/lib64/libXrdSec-4.so in the config file<br/>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Mar 26, 2019 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue Mar 26, 2019 : #software (osg)</h3>
+<span style="color: #a72f79"><span style="font-size: small">(11:58:05)</span> <b>andrew.melo:</b></span> @blin Could those docs be added anyway? It's really a game-changer (for people running spacewalk :))<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:58:42)</span> <b>blin:</b></span> yeah, sure<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:02:02)</span> <b>andrew.melo:</b></span> I just ran the gridftp-hdfs server for the first time. It is ... very CPU-consuming compared to the CPU usage I see for our other gridftp boxes. I see something like 80% usr/20%sys CPU usage, but while the CPUs are spinning, there's not a lot of bandwidth moving through the machine<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:02:28)</span> <b>bbockelm:</b></span> (a) Cost of JVM and (b) Cost of checksums.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:02:48)</span> <b>bbockelm:</b></span> (b) can be addressed by configuring which checksums you want<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:03:25)</span> <b>andrew.melo:</b></span> I turned it down to just adler32 (so fts-transfer-submit -K works right) and it's still a lot<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:03:46)</span> <b>andrew.melo:</b></span> How many boxes does UNL have to fill their pipe? It must be a whole mess of them<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:04:08)</span> <b>bbockelm:</b></span> I think we do 12 boxen to fill 100Gbps.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:04:31)</span> <b>bbockelm:</b></span> <a href="https://opensciencegrid.org/docs/data/install-hadoop/#gridftp-configuration">https://opensciencegrid.org/docs/data/install-hadoop/#gridftp-configuration</a> (note: the checksum configurations appear to not be documented?  @blin)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:05:04)</span> <b>bbockelm:</b></span> Oh nifty, but the location of the bestman2 log _is_ documented :wink:<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:05:07)</span> <b>blin:</b></span> got a link or contact who i can pester for what that looks like?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:05:33)</span> <b>bbockelm:</b></span> <a href="https://github.com/opensciencegrid/gridftp-hdfs/blob/master/conf/gridftp-hdfs#L33">https://github.com/opensciencegrid/gridftp-hdfs/blob/master/conf/gridftp-hdfs#L33</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:08:04)</span> <b>blin:</b></span> oh lol<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:08:06)</span> <b>blin:</b></span> we suck :anguished:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:09:52)</span> <b>bbockelm:</b></span> For the HDFS page - we can probably drop the storage probe and reference the gridftp gratia transfer probe to the other documentation for the same thing.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:12:01)</span> <b>bbockelm:</b></span> @andrew.melo - each of those GridFTP boxen are fairly old nodes, each equipped to fill 10Gbps.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:12:48)</span> <b>andrew.melo:</b></span> yeah, you probably did what we did and took old worker nodes, slapped some nics in them?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:13:24)</span> <b>bbockelm:</b></span> basically -- I suspect newer hosts would be able to tickle into the 10-40Gbps range, but hasn't been worth it (yet?).<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:14:18)</span> <b>bbockelm:</b></span> after all, we locally run so many checksum algorithms you're always going to be bottlenecked on other thigns.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:18:02)</span> <b>andrew.melo:</b></span> Well, we run adler32 with ours too, and a single box can get up in the 600-700MByte range but only at like 50% CPU. I took your hdfs plugin and munged it for LStore (writes can be out of order, but you want to coalesce writes so you're not doing a bazillion 1MB writes). It's not a huge issue, I'm just using it to move data in/out of the HDFS attached to my spark cluster, I was just real surprised<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:18:36)</span> <b>andrew.melo:</b></span> It was something like 100MByte/sec w/adler32, and maybe 150-200 if I disabled it<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:19:47)</span> <b>bbockelm:</b></span> 100MB/s aggregate or 100MB/s per file?<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(12:35:31)</span> <b>zalak:</b></span> <b>@here</b> We are trying to install koji on SL7 but we are getting a dependency error for python-libcomps. Any idea on how to resolve this issue?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:36:06)</span> <b>andrew.melo:</b></span> aggregate<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:36:24)</span> <b>blin:</b></span> it's a known issue, try the koji version in osg-testing: <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-3625">https://opensciencegrid.atlassian.net/browse/SOFTWARE-3625</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:36:31)</span> <b>blin:</b></span> and let us know what you find :slightly_smiling_face:<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(12:37:56)</span> <b>zalak:</b></span> Okay!<br/>
+<blockquote>
+<span style="color: #c386df"><span style="font-size: small">(2019-03-27 11:51:36)</span> <b>matyas:</b></span> Could you comment in that ticket (SOFTWARE-3625) if it works for you? Then we can put it in the next release.<br/>
+</blockquote>
+</body>
+</html>

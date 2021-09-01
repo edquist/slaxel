@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jun 28, 2021 : #flightworthy (chtc)</title>
+</head>
+<body>
+<h3>Mon Jun 28, 2021 : #flightworthy (chtc)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(10:21:05)</span> <b>tlmiller:</b></span> <b>@here</b> Don't forget to remove and add things from the monthly report before the meeting this afternoon...<br/>
+<span style="color: #5a4592"><span style="font-size: small">(12:58:50)</span> <b>tannenba:</b></span> @johnkn @tim Is it ok if I merge V9_1-HTCONDOR-554-branch into V9_1_1-branch ?  If yes, then should I merge it also into master (or TimT, do you handle merges from release branches into master) ?<br/>
+<span style="color: #5a4592"><span style="font-size: small">(12:59:33)</span> <b>tannenba:</b></span> (This branch has been code reviewed, tested on all platforms via build tag....)<br/>
+<span style="color: #5a4592"><span style="font-size: small">(13:00:00)</span> <b>tannenba:</b></span> (I just added my first ever ornithology test to this ticket! w00t!)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:00:12)</span> <b>johnkn:</b></span> Last commit on that branch is 4 days ago.  Are you saying it never got merged?<br/>
+<span style="color: #5a4592"><span style="font-size: small">(13:00:43)</span> <b>tannenba:</b></span> I did not merge it :disappointed:.  Also last commit is from a few minutes ago when I added a regression test....<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:01:03)</span> <b>johnkn:</b></span> ah.  jira has not seen that one yet.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(13:01:32)</span> <b>tim:</b></span> I am fine with you merging to V9_1_1-branch. I will handle the merge to master. Since this is currently running on the OSG Open Pool, I consider it well tested.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(13:03:58)</span> <b>tannenba:</b></span> Thanks.  The code has not changed compared to what is running in OSG - only change since the OSG release is adding an Ornithology regression test for this work.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:04:46)</span> <b>johnkn:</b></span> Chance of conflict on this merge is somewhat high.   It might be best to have ToddM handle the merge back to master<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:04:58)</span> <b>tlmiller:</b></span> Blarg?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:05:23)</span> <b>johnkn:</b></span> This is the commit that changes the hold codes, right?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:05:44)</span> <b>tlmiller:</b></span> Did you meant to say ToddT?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:05:56)</span> <b>johnkn:</b></span> Sorry, yes.  i meant ToddT<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:06:02)</span> <b>johnkn:</b></span> M is just easier to type.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:06:09)</span> <b>tlmiller:</b></span> snrk.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:04:56)</span> <b>johnkn:</b></span> To be clear, the test suite knows to run perl or python when it sees a test to run.  so that can't be the real problem with ornithology tests<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:07:00)</span> <b>tlmiller:</b></span> No, it is, or was, (part of) the real problem.  Windows doesn't think Python scripts are executable, and every Ornithology test that runs a job sets a Python script as the executable.  IIRC, there were other places with the same sort of problem; I don't remember the reasons why HTCondor didn't follow the file association or why doing so didn't work.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:07:40)</span> <b>tlmiller:</b></span> (That is, IIRC, rewriting all of the Ornithology test jobs to set the python interpreter as the executable isn't enough to fix the problem.)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:08:18)</span> <b>tlmiller:</b></span> Ah, to wit:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:08:28)</span> <b>tlmiller:</b></span> &gt; The schedd does not attempt to start scheduler-universe jobs with script executables even if they have registered extensions.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:08:40)</span> <b>tlmiller:</b></span> &gt; The starter tries to run Ornithology's sleep.py but fails because the .py extension isn't registered.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:08:48)</span> <b>tlmiller:</b></span> &gt; The startd does not attempt to start MACHINE_RESOURCE_INVENTORY_&lt;NAME&gt; scripts event if they have registered extensions.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:08:57)</span> <b>johnkn:</b></span> This is a problem we solved long ago with the perl test glue.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:09:55)</span> <b>johnkn:</b></span> we do this mostly be allowing for the possiblity that a job exeutable may need to be platform specific<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:11:28)</span> <b>tlmiller:</b></span> (Actually, I guess ToddT's most recent test doesn't run a Python script; it engages in a blatant Linuxism, instead.)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:12:13)</span> <b>tlmiller:</b></span> So I got bogged down trying to make HTCondor do what it should, rather than work around the problem.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:13:19)</span> <b>tlmiller:</b></span> So yeah, the Perl glue didn't actually solve the problem; it worked around it.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:13:39)</span> <b>tlmiller:</b></span> I consider the first and third points to be HTCondor bugs.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:13:52)</span> <b>tlmiller:</b></span> The second is clearly a machine misconfiguration.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:14:34)</span> <b>tlmiller:</b></span> But at this point, I'll let MarkC do whatever he wants, which I imagine will continue to be working around the problem.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:14:43)</span> <b>johnkn:</b></span> nonsense.  that is the solution.   scripts are not executables, and registered associations are not under our control so don't solve the problem.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:15:27)</span> <b>johnkn:</b></span> not to mention that there is only 1 .py extension that needs to cover both python2 and 3, which are mutually incompatible<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:15:32)</span> <b>tlmiller:</b></span> Registered associations _are_ under our control in the BaTLab, and they _are_ under the control of the admin who might want to configure HTCondor to Python.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:15:47)</span> <b>tlmiller:</b></span> Which we can safely ignore now because we never use Python 2 for anything.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:16:21)</span> <b>johnkn:</b></span> Not really, on Windows file assotiations a regisered per-user.  and we normally don't even load a registry hive when running jobs on windows<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:16:56)</span> <b>johnkn:</b></span> no registry, no associations.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:18:16)</span> <b>tlmiller:</b></span> Again, we control everything in the BaTLab, and my impression was that in practice everyone loaded a registry hive when running their jobs; but that's not really the point.  It's actually even worse if the user goes through the trouble of telling HTCondor to load a registry hive to run a job and HTCondor then proceeds to completely ignore it.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:18:19)</span> <b>johnkn:</b></span> the windows build machines have at least two different installed pythons,  and we need to be able to test more than one<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:18:32)</span> <b>johnkn:</b></span> associations are simply no a solution to that problem.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:18:33)</span> <b>tlmiller:</b></span> Do we?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:18:42)</span> <b>johnkn:</b></span> we build both sets of bindings, so yes<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:18:43)</span> <b>tlmiller:</b></span> We don't support anything other than Python 3 now, do we?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:18:55)</span> <b>tlmiller:</b></span> Do we _test_ both sets of bindings?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:19:17)</span> <b>johnkn:</b></span> don't be cute. we don't test either one.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:19:23)</span> <b>johnkn:</b></span> because tests are all broken<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:19:40)</span> <b>johnkn:</b></span> and no-one cares to treat windows as a problem worth solving<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:19:47)</span> <b>tlmiller:</b></span> Not least you.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:19:58)</span> <b>johnkn:</b></span> while actively making decisions that make the problem intractible<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:21:00)</span> <b>johnkn:</b></span> Not the least me, indeed.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:21:29)</span> <b>johnkn:</b></span> I'm quite hostile to the idea that my job is to clean up after the rest of you.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:22:56)</span> <b>tlmiller:</b></span> Understandably.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:23:12)</span> <b>johnkn:</b></span> But to be far, no-one seems to think that.  the just can't be bothered to take windows into account in the design phase<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(15:23:48)</span> <b>tim:</b></span> At this point, we should only be testing Python 3, we should move to ditch Python 2 as soon as practical.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:29:51)</span> <b>tlmiller:</b></span> Our disagreement as to what we consider good design is unfortunate, but I'd rather let the matter rest unless Mark has to do something unexpectedly heinous to get the tests working on Windows.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:56:27)</span> <b>tlmiller:</b></span> Now that 9.0.2 is notionally frozen, shouldn't there be a 9.0.3 section in the release notes on <tt>V9_0-branch</tt>?<br/>
+<blockquote>
+<span style="color: #bb86b7"><span style="font-size: small">(16:45:46)</span> <b>tim:</b></span> @tlmiller I usually do that when I create the release branch. I added the required updates (bump version in docs/conf.py and section in docs/versionhistory) and pushed.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(16:46:43)</span> <b>tim:</b></span> In the master and V9_0 branches of course.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:47:03)</span> <b>tlmiller:</b></span> Right-o.  I didn't quite manage to avoid the merge conflict, but that's OK.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:47:11)</span> <b>tlmiller:</b></span> Easy to resolve.<br/>
+</blockquote>
+<span style="color: #235e5b"><span style="font-size: small">(16:14:38)</span> <b>johnkn:</b></span> yes.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:15:25)</span> <b>tlmiller:</b></span> OK.  I used the template to create one on the branch that needs it.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:15:38)</span> <b>johnkn:</b></span> Thanks.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:16:43)</span> <b>tlmiller:</b></span> ... I should be more specific.  By "on the branch that needs it" I meant the HTCONDOR-476 branch whose release note I was writing.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:16:57)</span> <b>tlmiller:</b></span> This may be less useful than you were hoping.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:17:10)</span> <b>tlmiller:</b></span> ... depending on how quickly you review the last little fix. :)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:19:11)</span> <b>johnkn:</b></span> I'll review it as soon as git*hub* notices it.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:19:41)</span> <b>johnkn:</b></span> (or is it jira that has the delay?)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:20:09)</span> <b>tlmiller:</b></span> github more so than jira, usually.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:20:16)</span> <b>tlmiller:</b></span> and thanks.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:21:57)</span> <b>johnkn:</b></span> &lt;sigh&gt; saw 3 commits change to 4...<br/>but the new commit is just merging v9 branch to the work branch<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:22:06)</span> <b>tlmiller:</b></span> Hrm...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:22:13)</span> <b>johnkn:</b></span> Can I buy a 5th commit?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:22:39)</span> <b>tlmiller:</b></span> Oh, FFS.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:23:30)</span> <b>johnkn:</b></span> screw this. I'll just look at the commit in afs<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:23:33)</span> <b>tlmiller:</b></span> The actual code change I somehow mistyped the number for.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:23:47)</span> <b>tlmiller:</b></span> I included that hash and the hash of the release note that somehow hasn't been seen yet.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:26:28)</span> <b>johnkn:</b></span> I looked at the branch in afs.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:27:07)</span> <b>johnkn:</b></span> the comment on commit 92c7df8a7d1e049 indicates that you omit the error string from the classad, but the code does not.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:27:19)</span> <b>tlmiller:</b></span> Thanks.  Assuming it passed, I'll revert the commit with a typo in the messsage...<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:27:21)</span> <b>tlmiller:</b></span> ... derp?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:27:43)</span> <b>tlmiller:</b></span> <pre>+                               const char * problem = "Failed to enumerate MIG devices";<br/>+                               fprintf( stderr, "# %s (%d: %s)\n", problem, r, nvmlErrorString(r) );<br/>                                fprintf( stdout, "condor_gpu_discovery_error = \"%s\"\n", problem );</pre><br/>?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:28:29)</span> <b>tlmiller:</b></span> What did I miss?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:29:45)</span> <b>johnkn:</b></span> <pre>fprintf( stdout, "condor_gpu_discovery_error = \"%s\"\n", problem );</pre><br/>this is putting an unescaped string into the discovery classad<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:29:58)</span> <b>johnkn:</b></span> I'm assuming you meant to delete that line.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:30:01)</span> <b>tlmiller:</b></span> ... uh, <tt>problem</tt> is a constant.<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:30:57)</span> <b>gthain:</b></span> there's a cookie dough entry right there<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:31:05)</span> <b>johnkn:</b></span> ok. that's fair.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:31:15)</span> <b>coatsworth:</b></span> Sorry, I wasn't paying attention here. We only need to test Python 3, there's no point making our lives more complicated for a deprecated version.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:31:41)</span> <b>johnkn:</b></span> thought I saw that on the problem that was not a constant, but it when I diff the aggregate changes it looks ok.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:32:27)</span> <b>tlmiller:</b></span> Yeah, <tt>problem</tt> not being constant was a problem.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:32:29)</span> <b>johnkn:</b></span> jira did a shit job of showing the diffs for me to review for this one<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:32:37)</span> <b>coatsworth:</b></span> We need to use registered associations to run Perl scripts as executable, so why would we do anything different for Python?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:32:49)</span> <b>***tlmiller:</b></span> takes cover.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:32:51)</span> <b>coatsworth:</b></span> Either way, I just haven't had any time to work on this yet. It's on my agenda, just not high priority.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:32:59)</span> <b>johnkn:</b></span> finally resorted to checking out th branch and diffing 2 shas<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:33:35)</span> <b>tlmiller:</b></span> Any objection to me reverting the commit and repushing it with the correct ticket number?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:34:07)</span> <b>johnkn:</b></span> @coatsworth. 1, we don't always sometimes we run bare metal exes because associations don't work,  and 2) perl is compatible with itself, python is not.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:35:29)</span> <b>johnkn:</b></span> we make a point of running only perl code that does not require the installing of modules that we did not write ourselves<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:35:45)</span> <b>johnkn:</b></span> pytest all by itself violates that<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:36:24)</span> <b>coatsworth:</b></span> We're only going to support one version of python so I'm not worried about the incompatibility.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:36:44)</span> <b>johnkn:</b></span> then you can't assume associations will be usable<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:37:26)</span> <b>johnkn:</b></span> not unless your code works any *any* python<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:37:38)</span> <b>johnkn:</b></span> whatever random thing is associated (if any)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:38:04)</span> <b>johnkn:</b></span> bottom line.  to run on windows jobs should be exes<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:38:48)</span> <b>coatsworth:</b></span> Either way, I haven't had time to work on this yet so I don't understand why they're not working. I should do that before getting into an argument about it.<br/>
+</body>
+</html>

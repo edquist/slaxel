@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Oct 1, 2015 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu Oct 1, 2015 : #software (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(10:57:54)</span> <b>bbockelm:</b></span> @lincoln: hmm… somehow, slack isn’t sending me notifications for this channel.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:58:16)</span> <b>bbockelm:</b></span> no, you’re not going to see messages about contacting the origin at this log level.<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:58:24)</span> <b>lincoln:</b></span> tried clicking the #software at the top and going to Channel Notification Preferences?<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:59:02)</span> <b>lincoln:</b></span> gotcha. well we’re all good now. Marian figured it out.. was pointing at stash-itb1 instead of stash-itb2 on the origin, for whatever reason. maybe puppet, maybe we changed it to test, dont remember<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:00:11)</span> <b>marian:</b></span> yeah ... but in the end when we registered also cache server in there things got working<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:00:38)</span> <b>marian:</b></span> so the redirect cycle succeeded find and fetch the file from cache<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:04:22)</span> <b>marian:</b></span> there is remaining unknown to me that it conflicts using DNS alias which should point to one or the other redirector behind alias ... I suspect pss.origin &lt;redirector_behind_alias&gt; is not supported like all.manager &lt;redirector_behing_alias&gt; directive<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:04:52)</span> <b>marian:</b></span> @bbockelm: do you know something more about this or talk to Matevz/Alja?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:06:03)</span> <b>bbockelm:</b></span> Which thing broke if the host pointed at the DNS alias?<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:06:10)</span> <b>marian:</b></span> cache<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:06:24)</span> <b>bbockelm:</b></span> Gotcha.  So, Lincoln’s cmsd is pointing at the DNS alias then?<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:06:24)</span> <b>marian:</b></span> it has this in the logs:<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:06:34)</span> <b>marian:</b></span> well, not now<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:06:40)</span> <b>marian:</b></span> but yes when we were testign<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:06:54)</span> <b>bbockelm:</b></span> But you said the cache broke.  The cache has no cmsd.<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:07:03)</span> <b>marian:</b></span> sorry<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:07:05)</span> <b>marian:</b></span> right<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:07:22)</span> <b>bbockelm:</b></span> what’s the manager line in stash-itb{1,2}?<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:07:24)</span> <b>marian:</b></span> do we can't contact cache directly at this point?<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:08:14)</span> <b>marian:</b></span> aaaah, maybe this is point ... should have changed in the config on each machine point to alias as well<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:08:21)</span> <b>marian:</b></span> not to the machine itself<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:09:12)</span> <b>marian:</b></span> all.manager <a href="http://stash-itb2.grid.iu.edu:1213">stash-itb2.grid.iu.edu:1213</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(11:09:23)</span> <b>marian:</b></span> this needs to change on both redirectors too I guess<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:09:26)</span> <b>bbockelm:</b></span> yup.<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:09:35)</span> <b>marian:</b></span> to: all.manager <a href="http://stash-itb.grid.iu.edu">stash-itb.grid.iu.edu</a>+ 1213<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:09:50)</span> <b>marian:</b></span> something like this, correct?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:10:20)</span> <b>bbockelm:</b></span> correct.  Think of the manager as a “cluster name”, not a “host name”.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:10:25)</span> <b>bbockelm:</b></span> Everyone has to agree on the same cluster name.<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:11:03)</span> <b>marian:</b></span> got it<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:11:33)</span> <b>marian:</b></span> @lincoln: let's schedule another test then<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:11:39)</span> <b>lincoln:</b></span> sure<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:12:11)</span> <b>lincoln:</b></span> so there needs to be a config change on the redirector as well, yes?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:12:34)</span> <b>bbockelm:</b></span> yeah.  The redirectors have to understand they’re part of the same “cluster”.<br/>
+</body>
+</html>

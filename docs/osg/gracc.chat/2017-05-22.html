@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon May 22, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Mon May 22, 2017 : #gracc (osg)</h3>
+<span style="color: #53b759"><span style="font-size: small">(10:41:26)</span> <b>marian:</b></span> ok, I think all works good regarding gracc-apel.service and gracc-apel.timer:<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:41:39)</span> <b>marian:</b></span> @marian uploaded a file: <a href="https://opensciencegrid.slack.com/files/marian/F5FMKDS3S/-.txt">Untitled</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(10:42:47)</span> <b>marian:</b></span> I would just really reconsider interval ... every hour is unnecessary ... also see response from apel people ... they indeed gather things one time per day anyway<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:43:17)</span> <b>marian:</b></span> ^ @bbockelm<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:45:44)</span> <b>marian:</b></span> <b>@edquist</b>: gracc-apel.service and gracc-apel.timer deployed ... I tried one-time start of gracc-apel.service and all seem good ... it takes up to 5secs to create and send off repord<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:45:46)</span> <b>marian:</b></span> t<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:46:16)</span> <b>marian:</b></span> I'll document deployment to gracc docs...<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:39:35)</span> <b>edquist:</b></span> great, thanks @marian<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:26:32)</span> <b>marian:</b></span> Hi #gracc ... Do we really want to expose "GRACE" instead of "GRACC" anywhere in the docs? See "Operator Docs" menu at: <a href="https://opensciencegrid.github.io/gracc/">https://opensciencegrid.github.io/gracc/</a> ... can I remove "GRACE" from it?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:37:43)</span> <b>dweitzel:</b></span> Yeah, remove GRACE<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:57:30)</span> <b>edquist:</b></span> Hey guys, we have an ALICE user that's seeing some gaps in records showing up in GRACC<br/><a href="https://ticket.opensciencegrid.org/33788">https://ticket.opensciencegrid.org/33788</a><br/>... anyone have an idea what might be happening?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:09:45)</span> <b>kretzke:</b></span> <b>@edquist</b> looks like records are getting quarantined for having epoch start time, e.g. <a href="https://gracc.opensciencegrid.org/kibana/app/kibana#/doc/gracc.osg.raw3-quarantine/gracc.osg.raw3-quarantine/JobUsageRecord?id=e59fd2e165da406fe342cde73b0f0c3b&amp;_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-30d,mode:quick,to:now))">https://gracc.opensciencegrid.org/kibana/app/kibana#/doc/gracc.osg.raw3-quarantine/gracc.osg.raw3-quarantine/JobUsageRecord?id=e59fd2e165da406fe342cde73b0f0c3b&amp;_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-30d,mode:quick,to:now))</a><br/>
+<span style="color: #16569E"><span style="font-size: small">(16:11:34)</span> <b>edquist:</b></span> ah, excellent, thank you!<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:14:16)</span> <b>edquist:</b></span> anybody remember what might cause start time to be 1970/epoch time ?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:15:04)</span> <b>dweitzel:</b></span> So, so many things.  All boils down to the probe though.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:18:42)</span> <b>kretzke:</b></span> there’s also been a *lot* of historical records received today <a href="https://gracc.opensciencegrid.org/kibana/app/kibana#/discover?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-60d,mode:quick,to:now))&amp;_a=(columns:!('@received'),filters:!(('$$hashKey':'object:1097','$state':(store:appState),meta:(alias:!n,disabled:!f,index:gracc.osg.summary,key:ProbeName,negate:!f,value:'sge:mpdsfgrid01.nersc.gov'),query:(match:(ProbeName:(query:'sge:mpdsfgrid01.nersc.gov',type:phrase))))),index:'gracc.osg.raw-*',interval:auto,query:(query_string:(analyze_wildcard:!f,query:'@received:%3E2017-05-20')),sort:!(EndTime,desc))">https://gracc.opensciencegrid.org/kibana/app/kibana#/discover?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-60d,mode:quick,to:now))&amp;_a=(columns:!('@received'),filters:!(('$$hashKey':'object:1097','$state':(store:appState),meta:(alias:!n,disabled:!f,index:gracc.osg.summary,key:ProbeName,negate:!f,value:'sge:mpdsfgrid01.nersc.gov'),query:(match:(ProbeName:(query:'sge:mpdsfgrid01.nersc.gov',type:phrase))))),index:'gracc.osg.raw-*',interval:auto,query:(query_string:(analyze_wildcard:!f,query:'@received:%3E2017-05-20')),sort:!(EndTime,desc))</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:18:50)</span> <b>kretzke:</b></span> so maybe it’s catching up<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:40:41)</span> <b>edquist:</b></span> hm ok<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:48:08)</span> <b>dweitzel:</b></span> Carl, you could ask for the accounting log snippet for specific jobs.  It should be easy enough to grep through the SGE accounting log file.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:48:12)</span> <b>dweitzel:</b></span> for the job id.<br/>
+</body>
+</html>

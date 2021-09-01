@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Aug 4, 2021 : #flightworthy (chtc)</title>
+</head>
+<body>
+<h3>Wed Aug 4, 2021 : #flightworthy (chtc)</h3>
+<span style="color: #2b6836"><span style="font-size: small">(09:18:31)</span> <b>jcpatton:</b></span> re the condor_adstash question on htcondor-users: where is the limit set for remote history queries?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(09:21:04)</span> <b>jcpatton:</b></span> <tt>HISTORY_HELPER_MAX_HISTORY</tt>?<br/>
+<span style="color: #d58247"><span style="font-size: small">(09:22:18)</span> <b>gthain:</b></span> Yup<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:28:31)</span> <b>johnkn:</b></span> that is the limit for remote queries.  for queries that read the history files directly, the limit is the <tt>-scanlimit</tt> arg which defaults to -1<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:30:33)</span> <b>johnkn:</b></span> Note that for remote queries, it's the SCHEDD's value of <tt>HISTORY_HELPER_MAX_HISTORY</tt> that matters<br/>
+<span style="color: #5a4592"><span style="font-size: small">(13:28:44)</span> <b>tannenba:</b></span> @tlmiller @johnkn Hi ToddM and TJ, could we have a quick Zoom chat this afternoon re A100 MIG Support and the work Igor is trying to do?  Does 2:30pm work for you both?  If no, pls suggest a time.   Figure 20 min, perhaps less, thanks.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:29:25)</span> <b>johnkn:</b></span> I have GW university from 2 to 3<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:31:19)</span> <b>tlmiller:</b></span> I'm free now, but any time this afternoon should work.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(13:35:16)</span> <b>tannenba:</b></span> @johnkn @tlmiller Lets do 3pm after the GW call.  Coordinates: <a href="https://uwmadison.zoom.us/my/tannenba">https://uwmadison.zoom.us/my/tannenba</a>.   Thanks!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:36:02)</span> <b>johnkn:</b></span> Ok.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:36:17)</span> <b>tlmiller:</b></span> Works for me.<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:12:43)</span> <b>gthain:</b></span> I think I'm loosing my mind<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:13:01)</span> <b>gthain:</b></span> safefile code all of a sudden isn't building on a clean source tree:<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:13:06)</span> <b>gthain:</b></span> <pre>/nobackup/gthain/CONDOR_SRC/src/safefile/safe_is_path_trusted.c:60:51: error: unknown type name 'safe_id_range_list'<br/> static int is_mode_trusted(struct stat *stat_buf, safe_id_range_list *trusted_uids, safe_id_range_list *trusted_gids)</pre><br/>
+<span style="color: #d58247"><span style="font-size: small">(16:13:41)</span> <b>gthain:</b></span> where <tt>safe_id_range_list</tt> is defined as<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:13:44)</span> <b>gthain:</b></span> <pre>safe_is_path_trusted.h:struct safe_id_range_list;</pre><br/>
+<span style="color: #d58247"><span style="font-size: small">(16:13:57)</span> <b>gthain:</b></span> Mind you, this is C code, not C++<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:14:09)</span> <b>gthain:</b></span> doesn't C always require the "struct" for  structs?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:15:07)</span> <b>edquist:</b></span> unless they are typedefs<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:15:41)</span> <b>edquist:</b></span> <a href="https://github.com/htcondor/htcondor/blob/master/src/safefile/safe_id_range_list.h.in#L45-L50">https://github.com/htcondor/htcondor/blob/master/src/safefile/safe_id_range_list.h.in#L45-L50</a><br/>
+<span style="color: #d58247"><span style="font-size: small">(16:16:15)</span> <b>gthain:</b></span> Hrm.  Perhaps cmake isn't expanding the .in template properly<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:16:36)</span> <b>edquist:</b></span> my thoughts exactly!  :)<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:17:09)</span> <b>edquist:</b></span> <tt>find -name safe_id_range_list.h</tt> ?<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:23:06)</span> <b>gthain:</b></span> zero length.  Odd.<br/>
+<blockquote>
+<span style="color: #99a949"><span style="font-size: small">(16:24:52)</span> <b>matyas:</b></span> well, even.<br/>
+</blockquote>
+<span style="color: #16569E"><span style="font-size: small">(16:23:15)</span> <b>edquist:</b></span> well that'll do it<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(16:47:33)</span> <b>lmichael:</b></span> So, could condor_status maybe just NOT represent partitionable slots in the ‘Unclaimed’ count?<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(16:50:00)</span> <b>lmichael:</b></span> Those slots will _never_ be claimed, right?<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:59:48)</span> <b>gthain:</b></span> Correct.  ToddT is working with Miron on fixing this<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:00:04)</span> <b>tlmiller:</b></span> ... isn't that a one-clause constraint?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:01:03)</span> <b>tlmiller:</b></span> (For that matter, with match notifications being off by default, will the Matched column ever be nonzero?)<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:12:57)</span> <b>gthain:</b></span> Matched will always be zero, unless someone explicitly turn on match notifications<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:13:01)</span> <b>gthain:</b></span> which they never will<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:30:19)</span> <b>tlmiller:</b></span> Sounds like some width we can repurpose, then...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(19:42:40)</span> <b>johnkn:</b></span> This is, unfortunately a major re-write of the code that does totalization because it doesn't live in condor_status, it lives in the utils library, adn it does not now how to apply constraints to the totals.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(19:43:04)</span> <b>johnkn:</b></span> I'd love to toss that code and re-write it, like, 3 years ago....<br/>
+</body>
+</html>

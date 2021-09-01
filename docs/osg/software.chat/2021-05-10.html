@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon May 10, 2021 : #software (osg)</title>
+</head>
+<body>
+<h3>Mon May 10, 2021 : #software (osg)</h3>
+<span style="color: #dd8527"><span style="font-size: small">(13:45:06)</span> <b>marcom:</b></span> Hi, I have a packaging question:<br/>to help w/ containerization we split the httpd configuration out of the GlideinWMS Factory and Frontend (eg. glideinwms-vofrontend-standalone -&gt; glideinwms-vofrontend-core + glideinwms-vofrontend-httpd). Now yum downgrade is failing because is not removing the 2 subpackages and their dependencies are causing problems.<br/>I was thinking to add dummy/empty packages in the older versions of GlideinWMS (e.g. empty glideinwms-vofrontend-core + glideinwms-vofrontend-httpd in 3.6.5).<br/>Do you think that's a good approach, or suggest something else?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:02:56)</span> <b>blin:</b></span> @marcom what's the downgrade command and what are the dep issues?<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:19:34)</span> <b>tim.theisen:</b></span> OK Cool.<br/>
+<span style="color: #dd8527"><span style="font-size: small">(16:21:20)</span> <b>marcom:</b></span> The error happens in the yum downgrade command (used via ansible in automated tests):<br/>Error: Package: glideinwms-vofrontend-core-3.7.3-1.osg35up.el7.noarch (@osg-upcoming-development)<br/>           Requires: glideinwms-glidecondor-tools = 3.7.3-1.osg35up.el7<br/>           Removing: glideinwms-glidecondor-tools-3.7.3-1.osg35up.el7.noarch (@osg-upcoming-development)<br/>               glideinwms-glidecondor-tools = 3.7.3-1.osg35up.el7<br/>           Downgraded By: glideinwms-glidecondor-tools-3.6.5-1.osg35.el7.noarch (osg)<br/>               glideinwms-glidecondor-tools = 3.6.5-1.osg35.el7<br/>           Available: glideinwms-glidecondor-tools-3.6-1.osg35.el7.noarch (osg)<br/>               glideinwms-glidecondor-tools = 3.6-1.osg35.el7<br/>           Available: glideinwms-glidecondor-tools-3.6.1-1.osg35.el7.noarch (osg)<br/>               glideinwms-glidecondor-tools = 3.6.1-1.osg35.el7<br/>           Available: glideinwms-glidecondor-tools-3.6.2-1.osg35.el7.noarch (osg)<br/>               glideinwms-glidecondor-tools = 3.6.2-1.osg35.el7<br/> You could try running: rpm -Va --nofiles --nodigest<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:23:09)</span> <b>blin:</b></span> oh so this made it into 3.7.3?<br/>
+<span style="color: #dd8527"><span style="font-size: small">(16:41:11)</span> <b>marcom:</b></span> yes, downgrading 3.7.3 is broken. We were thinking to add empty RPMs in older releases to fix that.<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:42:28)</span> <b>blin:</b></span> hrm, i don't think that's generally the right solution. that's a lot of updates that you'd have to do<br/>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Feb 4, 2021 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu Feb 4, 2021 : #software (osg)</h3>
+<span style="color: #73769d"><span style="font-size: small">(08:13:56)</span> <b>tim.theisen:</b></span> @blin I was looking over the prerelease tests (<a href="https://osg-sw-submit.chtc.wisc.edu/tests/20210203-1724/results.html">https://osg-sw-submit.chtc.wisc.edu/tests/20210203-1724/results.html</a>) and noticed that the upgrade tests break HTCondor-CE with respect to Slurm. I don't think this is a regression, because the same thing occurs in the nightly tests. Is this a concern?<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(08:47:58)</span> <b>blin:</b></span> yup, it's a known issue with the tests due to the EPEL release of slurm 20 (<a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-4446">https://opensciencegrid.atlassian.net/browse/SOFTWARE-4446</a>?)<br/>
+</blockquote>
+<span style="color: #43761b"><span style="font-size: small">(11:29:50)</span> <b>blin:</b></span> hey mac users (@bbockelm @cat) do you guys have an <tt>/etc/os-release</tt>?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:33:57)</span> <b>blin:</b></span> also, anyone with access to a redhat host have the contents of <tt>/etc/os-release</tt> handy?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:34:00)</span> <b>dweitzel:</b></span> <pre>$ cat /etc/os-release<br/>cat: /etc/os-release: No such file or directory</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:34:20)</span> <b>dweitzel:</b></span> Mac 11.1 Big Sur<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:35:06)</span> <b>dweitzel:</b></span> For EL7:<br/><pre>$ cat /etc/os-release<br/>NAME="CentOS Linux"<br/>VERSION="7 (Core)"<br/>ID="centos"<br/>ID_LIKE="rhel fedora"<br/>VERSION_ID="7"<br/>PRETTY_NAME="CentOS Linux 7 (Core)"<br/>ANSI_COLOR="0;31"<br/>CPE_NAME="cpe:/o:centos:centos:7"<br/>HOME_URL="<a href="https://www.centos.org/">https://www.centos.org/</a>"<br/>BUG_REPORT_URL="<a href="https://bugs.centos.org/">https://bugs.centos.org/</a>"<br/><br/>CENTOS_MANTISBT_PROJECT="CentOS-7"<br/>CENTOS_MANTISBT_PROJECT_VERSION="7"<br/>REDHAT_SUPPORT_PRODUCT="centos"<br/>REDHAT_SUPPORT_PRODUCT_VERSION="7"</pre><br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(11:37:00)</span> <b>blin:</b></span> presumably that's for CentOS?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:38:37)</span> <b>dweitzel:</b></span> Yup<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:39:00)</span> <b>dweitzel:</b></span> Sorry, you wanted RedHat, I didn't interpret that.  I don't have access to RedHat<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:39:03)</span> <b>blin:</b></span> got any redhat proper hosts laying around?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:39:06)</span> <b>blin:</b></span> ah dang<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:41:25)</span> <b>blin:</b></span> how about <tt>python3 -c 'import sys; print(sys.platform)'</tt> on your mac?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:42:21)</span> <b>dweitzel:</b></span> <pre>$ python3 -c 'import sys; print(sys.platform)'<br/>darwin</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(11:42:44)</span> <b>blin:</b></span> :eyes:<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:42:45)</span> <b>blin:</b></span> thanks<br/>
+<span style="color: #a72f79"><span style="font-size: small">(11:46:49)</span> <b>andrew.melo:</b></span> I have a proper RH host kicking around somewhere in ACCRE if you need that<br/>
+<span style="color: #a72f79"><span style="font-size: small">(11:46:57)</span> <b>andrew.melo:</b></span> (pretty sure)<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:48:41)</span> <b>blin:</b></span> yeah it'd be nice, to know what it contains. last I remember they did something goofy with their ID/ID_LIKE fields<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:05:10)</span> <b>andrew.melo:</b></span> @blin I got a hold of a colleague of a colleague who is willing to hit some commands. need anything other than os-release?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:05:28)</span> <b>blin:</b></span> nope, that's it<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:05:30)</span> <b>blin:</b></span> thanks!!<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:12:50)</span> <b>andrew.melo:</b></span> <pre>[root@adm1901ld longwiwl]# cat /etc/redhat-release<br/>Red Hat Enterprise Linux Server release 7.9 (Maipo)<br/>[root@adm1901ld longwiwl]# cat /etc/os-release<br/>NAME="Red Hat Enterprise Linux Server"<br/>VERSION="7.9 (Maipo)"<br/>ID="rhel"<br/>ID_LIKE="fedora"<br/>VARIANT="Server"<br/>VARIANT_ID="server"<br/>VERSION_ID="7.9"<br/>PRETTY_NAME="Red Hat Enterprise Linux"<br/>ANSI_COLOR="0;31"<br/>CPE_NAME="cpe:/o:redhat:enterprise_linux:7.9:GA:server"<br/>HOME_URL="<a href="https://www.redhat.com/">https://www.redhat.com/</a>"<br/>BUG_REPORT_URL="<a href="https://bugzilla.redhat.com/">https://bugzilla.redhat.com/</a>"<br/><br/>REDHAT_BUGZILLA_PRODUCT="Red Hat Enterprise Linux 7"<br/>REDHAT_BUGZILLA_PRODUCT_VERSION=7.9<br/>REDHAT_SUPPORT_PRODUCT="Red Hat Enterprise Linux"<br/>REDHAT_SUPPORT_PRODUCT_VERSION="7.9"</pre><br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:13:25)</span> <b>andrew.melo:</b></span> I wonder if ID_LIKE will change to "centos_stream" in the next RHEL release....<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:14:02)</span> <b>blin:</b></span> argh, of course it's "rhel"<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:14:04)</span> <b>blin:</b></span> yeah, i imagine<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:14:38)</span> <b>blin:</b></span> for fun, here's the fedora 31 <tt>/etc/os-release</tt><br/><pre>NAME=Generic<br/>VERSION="31 (Generic)"<br/>ID=generic<br/>ID_LIKE=fedora<br/>VERSION_ID=31<br/>PRETTY_NAME="Generic 31 (Generic)"<br/>ANSI_COLOR="0;34"<br/>LOGO=generic-logo-icon<br/>CPE_NAME="cpe:/o:generic:generic:31"<br/>HOME_URL="<a href="http://www.zombo.com/">http://www.zombo.com/</a>"<br/>SUPPORT_URL="<a href="https://en.wikipedia.org/wiki/Help!_(album)">https://en.wikipedia.org/wiki/Help!_(album)</a>"<br/>BUG_REPORT_URL="<a href="https://youtu.be/CSemARaqGqE">https://youtu.be/CSemARaqGqE</a>"<br/>REDHAT_BUGZILLA_PRODUCT="Generic"<br/>REDHAT_BUGZILLA_PRODUCT_VERSION=%{bug_version}<br/>REDHAT_SUPPORT_PRODUCT="Generic"<br/>REDHAT_SUPPORT_PRODUCT_VERSION=%{bug_version}<br/>PRIVACY_POLICY_URL="<a href="http://nsa.gov">http://nsa.gov</a>"</pre><br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:19:34)</span> <b>andrew.melo:</b></span> lol, i didn't think that os-release was a prime meme-injection point<br/>
+</blockquote>
+<span style="color: #9d8eee"><span style="font-size: small">(11:59:53)</span> <b>cat:</b></span> For Mac OS (also Big Sur, but 11.2) — I did a <tt>find /private/etc -iname '*rel*'</tt> (where <tt>/etc</tt> actually lives) and got nothing release to a release version.<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(12:01:45)</span> <b>cat:</b></span> And:<br/><pre>$  uname -a<br/>Darwin Tims-MacBook-Pro.local 20.3.0 Darwin Kernel Version 20.3.0: Thu Jan 21 00:07:06 PST 2021; root:xnu-7195.81.3~1/RELEASE_X86_64 x86_64</pre><br/><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:02:57)</span> <b>blin:</b></span> much appreciated<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(12:03:35)</span> <b>cat:</b></span> If you need specific parts of <tt>uname</tt> output (and the flags that yield them), just holler.<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:03:36)</span> <b>blin:</b></span> presumably <tt>uname -s</tt> returns <tt>Darwin</tt>?<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(12:03:55)</span> <b>cat:</b></span> <pre>$ uname -s<br/>Darwin</pre><br/><br/>
+<span style="color: #9d8eee"><span style="font-size: small">(12:04:32)</span> <b>cat:</b></span> <tt>usage: uname [-amnprsv]</tt><br/>
+<span style="color: #9d8eee"><span style="font-size: small">(12:04:59)</span> <b>cat:</b></span> (Keep in mind that mac OS is a FreeBSD variant, so often commands have different options, etc.)<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(14:09:03)</span> <b>cat:</b></span> @blin (et al.): For general OSG announcements to people interested in the software stack, say for the AHM, what list shoudl I use these days? <tt><a href="mailto:osg-software@opensciencegrid.org">osg-software@opensciencegrid.org</a></tt> is deprecated or gone, right?<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(14:10:09)</span> <b>cat:</b></span> Also, who can send a copy of the AHM announcement to the Topology contacts?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:11:28)</span> <b>blin:</b></span> site-announce would be the right list<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:11:54)</span> <b>blin:</b></span> @tim.theisen would you be able to send out the AHM announcement since you just sent the release announcement?<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:12:13)</span> <b>tim.theisen:</b></span> I can send it out.<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:13:13)</span> <b>tim.theisen:</b></span> Release announcements go to the following:<br/><pre>--recipients "<a href="mailto:osg-general@opensciencegrid.org">osg-general@opensciencegrid.org</a> <a href="mailto:osg-operations@opensciencegrid.org">osg-operations@opensciencegrid.org</a> <a href="mailto:osg-sites@opensciencegrid.org">osg-sites@opensciencegrid.org</a> <a href="mailto:software-discuss@opensciencegrid.org">software-discuss@opensciencegrid.org</a> <a href="mailto:site-announce@opensciencegrid.org">site-announce@opensciencegrid.org</a>" --oim-recipients resources --oim-contact-type administrative</pre><br/>
+<span style="color: #9d8eee"><span style="font-size: small">(14:13:22)</span> <b>cat:</b></span> Ok, thanks, @tim.theisen — I’ll get you the text in a bit. Sending the email later today or early tomorrow would be great.<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:13:42)</span> <b>tim.theisen:</b></span> Of course, give me the message and recipient list and I'll post it.<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:13:56)</span> <b>tim.theisen:</b></span> I can send it this afternoon.<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(14:15:56)</span> <b>cat:</b></span> I will be hitting all relevant mailing lists, so you can strip those off.<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(14:16:19)</span> <b>cat:</b></span> @blin, you don’t want to send it to <tt>software-discuss</tt>?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:16:45)</span> <b>blin:</b></span> sure that works too but i think you'll get everyone on it through topology + site announce<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(14:18:23)</span> <b>cat:</b></span> Ok, suit yourself.<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(14:20:20)</span> <b>cat:</b></span> This is what I have for lists right now:<br/><a href="mailto:osg-operations@opensciencegrid.org">osg-operations@opensciencegrid.org</a><br/><a href="mailto:osg-sites@opensciencegrid.org">osg-sites@opensciencegrid.org</a><br/><a href="mailto:site-announce@opensciencegrid.org">site-announce@opensciencegrid.org</a><br/><a href="mailto:osg-council@opensciencegrid.org">osg-council@opensciencegrid.org</a><br/><a href="mailto:osg-general@opensciencegrid.org">osg-general@opensciencegrid.org</a><br/><a href="mailto:osg@opensciencegrid.org">osg@opensciencegrid.org</a><br/><a href="mailto:osg-et@opensciencegrid.org">osg-et@opensciencegrid.org</a><br/><a href="mailto:staff@opensciencegrid.org">staff@opensciencegrid.org</a><br/>
+<span style="color: #9d8eee"><span style="font-size: small">(14:21:02)</span> <b>cat:</b></span> So, very high overlap with your standard release announcement list.<br/>
+</body>
+</html>

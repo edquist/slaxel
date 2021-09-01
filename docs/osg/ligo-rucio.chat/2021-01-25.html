@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jan 25, 2021 : #ligo-rucio (osg)</title>
+</head>
+<body>
+<h3>Mon Jan 25, 2021 : #ligo-rucio (osg)</h3>
+<span style="color: #a2a5dc"><span style="font-size: small">(11:01:02)</span> <b>james.clark:</b></span> hey <b>@channel</b>, i'm now fairly sure the problems we've seen getting data to Melbourne are on the FTS end.  We see:<br/><pre>gfal-copy error: 13 (Permission denied) - globus_ftp_control: gss_init_sec_context failed globus_gsi_callback_module: Could not verify credential globus_gsi_callback_module: Could not verify credential globus_gsi_callback_module: The certificate has been revoked: Serial number = -1 (0xFFFFFFFFFFFFFFFF) Subject=/C=BM/O=QuoVadis Limited/CN=QuoVadis Grid ICA G2</pre><br/>That certificate has been revoked as of <tt>osg-ca-certs-1.89-1.osg35.el7.noarch</tt>.   I'm able to manually copy files with newer versions of that package and I think the situation should be resolved if it can be updated on the FTS end.  Thanks!<br/>
+<span style="color: #ea2977"><span style="font-size: small">(11:03:48)</span> <b>jlstephen:</b></span> looking<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:04:00)</span> <b>paschos:</b></span> in plain english, we’ll need to update the osg-ca-certs on the fts server?<br/>
+<span style="color: #ea2977"><span style="font-size: small">(11:04:11)</span> <b>jlstephen:</b></span> possibly, yes<br/>
+<span style="color: #ea2977"><span style="font-size: small">(11:04:18)</span> <b>jlstephen:</b></span> i am checking to see which version is installed<br/>
+<span style="color: #ea2977"><span style="font-size: small">(11:05:02)</span> <b>jlstephen:</b></span> <a href="http://fts.mwt2.org">fts.mwt2.org</a> is using osg-ca-certs out of oasis<br/>
+<span style="color: #ea2977"><span style="font-size: small">(11:05:24)</span> <b>jlstephen:</b></span> what versions are installed on the source and destination?<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:10:28)</span> <b>paschos:</b></span> @james.clark ^?<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:11:03)</span> <b>paschos:</b></span> or what versions worked for you?<br/>
+<span style="color: #ea2977"><span style="font-size: small">(11:11:45)</span> <b>jlstephen:</b></span> i just moved fts to a local install of 1.92-1.osg35.el7 in case there's something from oasis that's causing issues, but it shouldn't be coming from the fts side<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:13:44)</span> <b>paschos:</b></span> I'll ask brian lin<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(11:19:01)</span> <b>james.clark:</b></span> Edgar noted that it looks like the cert changed from 1.89 to 1.92.    i can reproduce the error on the server side if i use a host with 1.91-1 but things work ok with 1.92-1.   So yes, i'm 99% sure just updating to 1.92-1 should fix it<br/>
+<span style="color: #ea2977"><span style="font-size: small">(11:23:04)</span> <b>jlstephen:</b></span> but the fts server was not using osg-ca-certs, it was using whatever is being shipped by osg out of oasis<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:03:01)</span> <b>paschos:</b></span> osg needs to release the update to the new version in oasis.. will let you know here once brian confirms<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(12:03:27)</span> <b>james.clark:</b></span> i'm not sure what changed then but those transfers just completed ok<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:21:12)</span> <b>paschos:</b></span> judith made a local updaet to the certs to 1.92 bypassing the typical way oof gettting those from the oasis release<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(12:30:28)</span> <b>james.clark:</b></span> ah got it, i wasn't entirely sure if it had happened.  looks like that did it, thanks<br/>
+</body>
+</html>

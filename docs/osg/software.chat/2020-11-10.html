@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Nov 10, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue Nov 10, 2020 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(13:48:06)</span> <b>blin:</b></span> argh<br/><pre>[root@fermicloud122 ~]# yum install glideinwms-vofrontend | tail<br/>Error: xrootd4-client-libs conflicts with 1:xrootd-client-libs-4.12.3-1.osg35.el7.x86_64<br/>Error: xrootd4-libs conflicts with 1:xrootd-libs-4.12.3-1.osg35.el7.x86_64<br/>---&gt; Package c-ares.x86_64 0:1.10.0-3.el7 will be installed<br/>---&gt; Package gssdp.x86_64 0:1.0.2-1.el7 will be installed<br/>---&gt; Package gstreamer-tools.x86_64 0:0.10.36-7.el7 will be installed<br/>---&gt; Package libsodium.x86_64 0:1.0.18-1.el7 will be installed<br/>---&gt; Package openpgm.x86_64 0:5.2.122-2.el7 will be installed<br/>--&gt; Processing Conflict: xrootd4-libs-4.12.5-1.el7.x86_64 conflicts xrootd-libs &lt; 1:5.0.0<br/>--&gt; Processing Conflict: xrootd4-client-libs-4.12.5-1.el7.x86_64 conflicts xrootd-client-libs &lt; 1:5.0.0<br/>--&gt; Finished Dependency Resolution<br/> You could try using --skip-broken to work around the problem<br/> You could try running: rpm -Va --nofiles --nodigest</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(13:55:52)</span> <b>matyas:</b></span> where does xrootd4-* come from?<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:30:34)</span> <b>tim.theisen:</b></span> Why is there both xrootd 4.12.3 and 4.12.5 listed? I would have expected one or the other.<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:32:40)</span> <b>edquist:</b></span> it looks like the latter is just in development.  i seem to remember that we talked about only releasing it after also releasing ... some other related package ... gfal2?<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:33:56)</span> <b>edquist:</b></span> wonder why they are both visible<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:34:40)</span> <b>edquist:</b></span> i'd expect 4.12.5 only to be visible if osg-development is enabled or if that rpm is already installed<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:38:16)</span> <b>tim.theisen:</b></span> 4.12.5-1.1 is in osg-development. 4.12.5-1 is in osg-testing<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:39:11)</span> <b>edquist:</b></span> ahh<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:39:24)</span> <b>edquist:</b></span> i forget the history<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:54:17)</span> <b>blin:</b></span> well that's not great. <tt>yum install osg-wn-client</tt> is just completely broken<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:55:03)</span> <b>blin:</b></span> is it because <tt>gfal2</tt> was built against xrootd 4.12.5?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:55:40)</span> <b>matyas:</b></span> "xrootd4" comes from epel<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:55:49)</span> <b>matyas:</b></span> look, it has no 'osg' in the dist tag<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:56:09)</span> <b>blin:</b></span> here's the full yum dep resolution<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:00:17)</span> <b>matyas:</b></span> can you bump up the debug level even more? -d5 oughta do it<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:04:49)</span> <b>blin:</b></span> <br/>
+<span style="color: #c386df"><span style="font-size: small">(16:15:53)</span> <b>matyas:</b></span> I'm guessing this one's to blame: <a href="https://koji.fedoraproject.org/koji/buildinfo?buildID=1626191">https://koji.fedoraproject.org/koji/buildinfo?buildID=1626191</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(16:16:34)</span> <b>matyas:</b></span> which went into the main epel repo on 10/30<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:23:52)</span> <b>matyas:</b></span> Not sure what the best fix is. The band-aid is to create our own set of xrootd4-* RPMs in trunk that just require the corresponding xrootd RPMs (with version &lt; 1:5.0.0)<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:24:03)</span> <b>matyas:</b></span> but I think that's going to make upgrading to 5 messier<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:28:35)</span> <b>blin:</b></span> <pre>214:TSINFO: Marking 1:xrootd-client-4.12.3-1.osg35.el7.x86_64 as install for osg-wn-client-3.5-4.osg35.el7.noarch<br/>614:TSINFO: Marking xrootd4-libs-4.12.5-1.el7.x86_64 as install for gfal2-plugin-xrootd-2.18.1-1.osg35.el7.x86_64<br/>686:TSINFO: Marking xrootd4-client-libs-4.12.5-1.el7.x86_64 as install for gfal2-plugin-xrootd-2.18.1-1.osg35.el7.x86_64</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(16:32:54)</span> <b>matyas:</b></span> releasing our xrootd 4.12.5 might also help<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:33:10)</span> <b>tim.theisen:</b></span> What happens if you enable osg-testing? Would it work any better with our xrootd 4.12.5?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:34:41)</span> <b>blin:</b></span> that fails, too<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:37:56)</span> <b>tim.theisen:</b></span> Alternatively, could you make gfal2-plugin-xrootd require xrootd-libs (maybe &lt; 5) directly. Yum might pull that in, rather than searching for the .so files and matching xrootd4-lib out of epel. Shouldn't the priorities take care of that (or do priorities work at the package level, not the .so level)<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:38:15)</span> <b>blin:</b></span> super weird<br/><pre>5 matches for "Marking[ 1:]*xrootd" in buffer: osg-wn-client.txt&lt;/root&gt;<br/>    215:TSINFO: Marking 1:xrootd-client-4.12.5-1.osg35.el7.x86_64 as install for osg-wn-client-3.5-4.osg35.el7.noarch<br/>    615:TSINFO: Marking xrootd4-libs-4.12.5-1.el7.x86_64 as install for gfal2-plugin-xrootd-2.18.1-1.osg35.el7.x86_64<br/>    687:TSINFO: Marking xrootd4-client-libs-4.12.5-1.el7.x86_64 as install for gfal2-plugin-xrootd-2.18.1-1.osg35.el7.x86_64<br/>    916:TSINFO: Marking 1:xrootd-libs-4.12.5-1.osg35.el7.x86_64 as install for 1:xrootd-client-4.12.5-1.osg35.el7.x86_64<br/>    920:TSINFO: Marking 1:xrootd-client-libs-4.12.5-1.osg35.el7.x86_64 as install for 1:xrootd-client-4.12.5-1.osg35.el7.x86_64</pre><br/><br/>
+<span style="color: #c386df"><span style="font-size: small">(16:38:20)</span> <b>matyas:</b></span> priorities work at the package level<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:41:28)</span> <b>blin:</b></span> argh so we'll need to rebuild gfal2 then?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:42:12)</span> <b>matyas:</b></span> we're already doing that, right?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:43:27)</span> <b>blin:</b></span> we did last week but if we're requiring the <tt>.so</tt> directly then maybe requiring the package names directly will allow yum prios to work?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:44:09)</span> <b>matyas:</b></span> worth a shot<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:44:54)</span> <b>blin:</b></span> this works:<br/><pre>yum install --exclude xrootd4-libs osg-wn-client</pre><br/><br/>
+<span style="color: #c386df"><span style="font-size: small">(16:45:33)</span> <b>matyas:</b></span> yes, that's expected<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:47:44)</span> <b>blin:</b></span> ya, it's something we can tell folks to do until we have a new gfal2 build<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:51:25)</span> <b>tim.theisen:</b></span> Oh ugh, does this affect osg 3.4 as well?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:54:47)</span> <b>matyas:</b></span> most likely<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:27:46)</span> <b>blin:</b></span> just checked, the answer is yes<br/>
+<span style="color: #a72f79"><span style="font-size: small">(19:48:47)</span> <b>andrew.melo:</b></span> Am I correct in saying that if a site wants to add GPUs to the global pool, the way to do that is they need to have a GPU entry added to the factory?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(20:31:46)</span> <b>dweitzel:</b></span> Yes, normally it's a separate entrypoint in the factory.<br/>
+</body>
+</html>

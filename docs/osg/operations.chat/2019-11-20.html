@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Nov 20, 2019 : #operations (osg)</title>
+</head>
+<body>
+<h3>Wed Nov 20, 2019 : #operations (osg)</h3>
+<span style="color: #e96699"><span style="font-size: small">(08:45:36)</span> <b>ian_cancercomputer:</b></span> @rynge @blin Only way I could get it to work is to change OSG_WN_TMP to /var/tmp, and the pilots now seem to specifically be using /var/lib/condor/execute/dir_####/var/tmp as its scratch dir now.<br/>
+<span style="color: #e96699"><span style="font-size: small">(08:49:17)</span> <b>ian_cancercomputer:</b></span> I'm not sure if that means its systemd's doing or not, i'll look into that in the coming days<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:33:09)</span> <b>blin:</b></span> @ian_cancercomputer i think the culprit then is HTCondor and <tt>MOUNT_UNDER_SCRATCH</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(09:34:44)</span> <b>matyas:</b></span> Do we want to support that as a use case?<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:35:03)</span> <b>matyas:</b></span> Have the pilot create <tt>/var/tmp/osg</tt> if it doesn't exist, for example?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:36:30)</span> <b>rynge:</b></span> Each site has their own idea on where local work should be done. I think it just happens in this case to overlap with MOUNT_UNDER_SCRATCH<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:41:09)</span> <b>matyas:</b></span> OK I guess we should document this then...<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:41:32)</span> <b>ian_cancercomputer:</b></span>  /var/tmp/osg does exist.  The problem is that '/' is no longer system root, it seems to be /var/lib/condor/execute/dir_####/ now.  Also setting MOUNT_UNDER_SCRATCH on either the worker or the CE didn't change behaviour, the pilot seems to kick out while doing checks before launching the internal condor instance (these pilots are 6-cpu instances, so they each run their own internal condor)<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:52:40)</span> <b>ian_cancercomputer:</b></span> I'll try setting it to a path not under /var, see if that makes a difference.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:09:48)</span> <b>blin:</b></span> and outside <tt>/tmp</tt>!<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:10:02)</span> <b>***ian_cancercomputer:</b></span> nods<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:18:36)</span> <b>blin:</b></span> ticket to track the documentation work: <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-3918">https://opensciencegrid.atlassian.net/browse/SOFTWARE-3918</a><br/>
+<span style="color: #e96699"><span style="font-size: small">(14:31:49)</span> <b>ian_cancercomputer:</b></span> @blin using an OSG_WN_TMP path not in /var/tmp or /tmp seems to be fine.  Though i still find it odd how early the glidein/pilot job rejects the path, it does so immediately after Setting X509_USER_PROXY and before checking the various signature files ...<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:37:29)</span> <b>blin:</b></span> i can't say i know the internals of the pilot startup well enough to explain why<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:46:08)</span> <b>ian_cancercomputer:</b></span> Whatever this is, its somewhat new; osg3.4 has been working with OSG_WN_TMP=/var/tmp/osg for quite some time, only now has it been an issue.  I assume htcondor's been at 8.8 throughout osg3.4 ?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:47:06)</span> <b>blin:</b></span> nope, that's a recent update<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:47:23)</span> <b>blin:</b></span> as of october: <a href="https://opensciencegrid.org/docs/release/3.4/release-3-4-37/">https://opensciencegrid.org/docs/release/3.4/release-3-4-37/</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:47:52)</span> <b>blin:</b></span> you may want to check this out if you haven't already: <a href="https://opensciencegrid.org/docs/release/release_series/#updating-to-htcondor-88x_1">https://opensciencegrid.org/docs/release/release_series/#updating-to-htcondor-88x_1</a><br/>
+<span style="color: #e96699"><span style="font-size: small">(14:52:10)</span> <b>ian_cancercomputer:</b></span> yep i have it open..<br/>
+</body>
+</html>

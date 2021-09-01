@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jun 26, 2018 : #operations (osg)</title>
+</head>
+<body>
+<h3>Tue Jun 26, 2018 : #operations (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(11:09:48)</span> <b>dweitzel:</b></span> I spoke with the admins here.  The current plan is to move the running VM's to other hardware.  The operation will be:<br/>1. Shutdown the current instance<br/>2. Transfer the VM image<br/>3. Startup the VM image on the new host<br/><br/>There will be a short downtime.  They are going to run tests, but they expect ~30 minutes.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:13:45)</span> <b>blin:</b></span> we should probably announce it if there's expected downtime<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:14:57)</span> <b>dweitzel:</b></span> I think there may be a way to make sure there is no downtime for most of the services.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:15:29)</span> <b>dweitzel:</b></span> They offered this solution because they don't know what services we are running.  But since most everything is in puppet, we could do a no-downtime dns transition, no issue.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:16:18)</span> <b>blin:</b></span> can we do the same thing for the oasis-replica transition? @marian @dwd?<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:19:30)</span> <b>marian:</b></span> oasis-replica is not on Anvil, or what is the question?<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:19:40)</span> <b>marian:</b></span> that is hosted by physical HW<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:19:50)</span> <b>marian:</b></span> OASIS* stuff<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:21:20)</span> <b>blin:</b></span> why can't we stand up the replacement host and then just do a dns transition?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:25:08)</span> <b>matyas:</b></span> @dweitzel, edquist made his clone of topology so you can add it as a remote<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:25:13)</span> <b>dweitzel:</b></span> k<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:26:52)</span> <b>marian:</b></span> I guess there is some iterative process due sync stuff going on on the oasis-replica during transition ... @dwd comment better, but I guess he thought of that and probably simple DNS switch is not a win-win here...<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(11:33:47)</span> <b>blin:</b></span> ok that makes sense<br/>
+</blockquote>
+<span style="color: #235e5b"><span style="font-size: small">(11:27:06)</span> <b>dweitzel:</b></span> @matyas updated, should see it in ~30 minutes.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:06:21)</span> <b>blin:</b></span> @dweitzel am i looking at the wrong place for glidein logs? <a href="https://gracc.opensciencegrid.org/kibana/app/kibana#/discover?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now%2Fy,mode:quick,to:now))&amp;_a=(columns:!(_source),index:'glidein.logs*',interval:auto,query:(match_all:()),sort:!('@timestamp',desc))">https://gracc.opensciencegrid.org/kibana/app/kibana#/discover?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now%2Fy,mode:quick,to:now))&amp;_a=(columns:!(_source),index:'glidein.logs*',interval:auto,query:(match_all:()),sort:!('@timestamp',desc))</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:17:37)</span> <b>dweitzel:</b></span> nope, that looks right.  It's possible the factory turned them off? @marian @jdost321?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:18:01)</span> <b>blin:</b></span> i don't see any records from the past year<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:21:40)</span> <b>marian:</b></span> not sure, may be filebeats are off there, I never took care of them, it was @jdost321<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:25:03)</span> <b>dweitzel:</b></span> Gracc deletes glidein logs older than 4 days. So if it’s off, they would eventually be deleted. <br/>
+<span style="color: #99a949"><span style="font-size: small">(13:49:50)</span> <b>dwd:</b></span> You know, it is a good point, that with a DNS switch for oasis-replica there shouldn’t be any noticeable downtime on that.  There will still be some downtime for oasis &amp; oasis-login, however, as they will need to be rebooted to get the new kernel after upgrade to el7.5.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:51:57)</span> <b>blin:</b></span> so oasis/oasis-login are on physical hosts?<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:52:37)</span> <b>dwd:</b></span> No, they are VMs<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:53:45)</span> <b>blin:</b></span> so why can't we spin up new VMs for oasis/oasis-login and switch the DNS? is there state on the hosts that need to be preserved?<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:54:52)</span> <b>dwd:</b></span> That’s more trouble than a reboot.  A little downtime doesn’t hurt much.<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:57:18)</span> <b>dwd:</b></span> Looking back through this channel, Derek said that VMs are going to be moved.  Are they all going to be moved or is he referring to a subset?  oasis &amp; oasis-itb are a special case because they are paired with Yubikeys plugged in to USB ports on their hypervisor hosts<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:00:37)</span> <b>dweitzel:</b></span> oasis and oasis-itb are not going to be moved, they are physical hosts and not affected by the upcoming hosting downtime.<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:04:32)</span> <b>dwd:</b></span> They are?  I thought they were VMs<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:05:11)</span> <b>dwd:</b></span> In fact I’m sure they are, because one time we had a problem with oasis-itb accidentally migrating to a different host after a reboot<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:09:16)</span> <b>dweitzel:</b></span> They may be VM's, but they are not on the Anvil openstack cluster.<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:09:30)</span> <b>dwd:</b></span> Ah yes, I think they were on a CMS cluster<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:09:49)</span> <b>dweitzel:</b></span> The *-dev nodes are on Anvil.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:10:52)</span> <b>dweitzel:</b></span> @marian has more details, but those may just go away just before the downtime.  No effort to keep them alive during the downtime.<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:17:09)</span> <b>marian:</b></span> correct, as I also said earlier, OASIS* production is not on Anvil... I have hcc-oasis-dev and hcc-oasis-login-dev on Anvil only ... that it used for nothing, we can shut it down<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:17:33)</span> <b>marian:</b></span> -itb hosts are also on CMS cluster (not Anvil), so for OASIS we are OK<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:19:40)</span> <b>dwd:</b></span> So @dweitzel, presumably there are OSG services on Anvil — when is this downtime planned for?  Do we want it to be the same day as the OASIS changes?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:20:41)</span> <b>dweitzel:</b></span> downtime does not have a planned date yet, will be some time after July 9th.<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:20:55)</span> <b>dwd:</b></span> ok, a separate day then<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:23:51)</span> <b>dweitzel:</b></span> slowly working through all the issues I didn't automate the first time, but <a href="https://repo-itb.opensciencegrid.org/">https://repo-itb.opensciencegrid.org/</a> and <a href="https://display-itb.opensciencegrid.org/">https://display-itb.opensciencegrid.org/</a> is now running on a separate host from the production repo.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:24:09)</span> <b>dweitzel:</b></span> Hopefully we can do a no-downtime DNS transition.<br/>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Oct 14, 2019 : #software (osg)</title>
+</head>
+<body>
+<h3>Mon Oct 14, 2019 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(09:34:28)</span> <b>blin:</b></span> fails for me:<br/><pre><br/>blin@blin-latitude:~$ ce=<a href="http://cms.rc.ufl.edu">cms.rc.ufl.edu</a><br/>blin@blin-latitude:~$ condor_q -name $ce -pool $ce:9619<br/><br/>-- Failed to fetch ads from: &lt;128.227.221.234:9619?addrs=128.227.221.234-9619&amp;noUDP&amp;sock=334088_abbf_3&gt; : <a href="http://cms.rc.ufl.edu">cms.rc.ufl.edu</a><br/>AUTHENTICATE:1003:Failed to authenticate with any method<br/>AUTHENTICATE:1004:Failed to authenticate using GSI<br/>GSI:5003:Failed to authenticate.  Globus is reporting error (851968:28).  There is probably a problem with your credentials.  (Did you run grid-proxy-init?)<br/>AUTHENTICATE:1004:Failed to authenticate using FS<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(09:35:03)</span> <b>blin:</b></span> if you set the config on each of those CEs then when you're using one as a client, i.e. when you run <tt>condor_ce_q</tt>,  it'll use that config<br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:45:22)</span> <b>bockjoo:</b></span> Don't you need a certificate?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:46:21)</span> <b>blin:</b></span> the point is that you shouldn't for condor_q<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:46:50)</span> <b>blin:</b></span> <pre><br/>$ _condor_CONDOR_Q_ONLY_MY_JOBS=False condor_q -name $ce -pool $ce:9619 | head<br/><br/><br/>-- Schedd: <a href="http://cms.rc.ufl.edu">cms.rc.ufl.edu</a> : &lt;128.227.221.234:9619?... @ 10/14/19 10:46:42<br/>OWNER    BATCH_NAME     SUBMITTED   DONE   RUN    IDLE   HOLD  TOTAL JOB_IDS<br/>cmspilot ID: 7349381  10/10 18:46      _      _      _      1      1 7349381.0<br/>cmspilot ID: 7349382  10/10 18:46      _      _      _      1      1 7349382.0<br/>cmspilot ID: 7349383  10/10 18:46      _      _      _      1      1 7349383.0<br/>cmspilot ID: 7349384  10/10 18:46      _      _      _      1      1 7349384.0<br/>cmspilot ID: 7349385  10/10 18:46      _      _      _      1      1 7349385.0<br/>cmspilot ID: 7349386  10/10 18:46      _      _      _      1      1 7349386.0<br/></pre><br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:56:28)</span> <b>bockjoo:</b></span> Do other non-Florida CEs behave correctly? I still don't understand you.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:57:13)</span> <b>blin:</b></span> yeah, it's not your particular CE that's the problem<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:57:43)</span> <b>blin:</b></span> it's just that an upstream condor change now forces authentication for queries<br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:58:31)</span> <b>bockjoo:</b></span> Other CMS CEs behave similarly to me.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:59:42)</span> <b>blin:</b></span> yup, that makes sense<br/>
+</body>
+</html>

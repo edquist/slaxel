@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Aug 8, 2018 : #operations (osg)</title>
+</head>
+<body>
+<h3>Wed Aug 8, 2018 : #operations (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(13:50:06)</span> <b>blin:</b></span> @dweitzel are there any issues with the central collector? <tt>condor_ce_info_status</tt> is hanging for me<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:50:20)</span> <b>blin:</b></span> <pre><br/>$ condor_ce_info_status -l<br/>Traceback (most recent call last):<br/>  File "/bin/condor_ce_info_status", line 200, in &lt;module&gt;<br/>    sys.exit(main(sys.argv))<br/>  File "/bin/condor_ce_info_status", line 176, in main<br/>    ce_ads = htcondorce.info_query.fetchCEAds(collector_addr)<br/>  File "/usr/lib/python2.7/site-packages/htcondorce/info_query.py", line 79, in fetchCEAds<br/>    ads            = collector.query(htcondor.AdTypes.Any, constraint)<br/>IOError: Failed communication with collector.<br/></pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:55:03)</span> <b>dweitzel:</b></span> works for me.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:55:04)</span> <b>dweitzel:</b></span> condor_status -pool <a href="http://collector.opensciencegrid.org:9619">collector.opensciencegrid.org:9619</a> -any<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:56:19)</span> <b>blin:</b></span> condor_status works fine, <tt>condor_ce_info_status</tt> doesn't<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:56:25)</span> <b>blin:</b></span> @matyas?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:56:52)</span> <b>bbockelm:</b></span> is it a "port 9619" issue?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:58:54)</span> <b>blin:</b></span> hrm, what do you mean?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:00:26)</span> <b>matyas:</b></span> that's weird. it works if i specify <tt>condor_ce_info_status --pool <a href="http://collector.opensciencegrid.org:9619">collector.opensciencegrid.org:9619</a></tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(14:03:07)</span> <b>matyas:</b></span> do condor_ce_config_val COLLECTOR_PORT<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:09:02)</span> <b>matyas:</b></span> i'm guessing what's going on is that CONDOR_CONFIG is set in your environment and it points to the _condor_ config not the _condor-ce_ config<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:09:16)</span> <b>matyas:</b></span> and COLLECTOR_PORT is set to 9618<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:21:55)</span> <b>blin:</b></span> negatory<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:21:59)</span> <b>blin:</b></span> <pre><br/>[root@fermicloud360 ~]# env | grep -i condor<br/>[root@fermicloud360 ~]# condor_ce_info_status -l<br/>Traceback (most recent call last):<br/>  File "/usr/kerberos/bin/condor_ce_info_status", line 200, in &lt;module&gt;<br/>    sys.exit(main(sys.argv))<br/>  File "/usr/kerberos/bin/condor_ce_info_status", line 176, in main<br/>    ce_ads = htcondorce.info_query.fetchCEAds(collector_addr)<br/>  File "/usr/lib/python2.7/site-packages/htcondorce/info_query.py", line 79, in fetchCEAds<br/>    ads            = collector.query(htcondor.AdTypes.Any, constraint)<br/>IOError: Failed communication with collector.<br/></pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(14:41:01)</span> <b>matyas:</b></span> and what does the above condor_ce_config_val return?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:42:13)</span> <b>blin:</b></span> huh, collector_port is set to 9618. interesting<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:43:01)</span> <b>blin:</b></span> we don't explicitly set collector_port in the CE<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:43:39)</span> <b>matyas:</b></span> so where does it get it from? param table?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:44:03)</span> <b>blin:</b></span> yup<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:44:13)</span> <b>matyas:</b></span> :man-facepalming:<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:44:14)</span> <b>blin:</b></span> this is what we set<br/><pre><br/>PORT = 9619<br/>COLLECTOR_HOST = $(CONDOR_HOST):$(PORT)<br/></pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(14:44:39)</span> <b>matyas:</b></span> that's what we set in the condor-ce config?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:44:50)</span> <b>matyas:</b></span> what about CONDOR_CE_COLLECTOR_HOST?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:46:40)</span> <b>blin:</b></span> yes and<br/><pre><br/># condor_ce_config_val -v condor_ce_collector_host<br/>CONDOR_CE_COLLECTOR_HOST = <a href="http://collector.opensciencegrid.org">collector.opensciencegrid.org</a><br/> # at: /usr/share/condor-ce/config.d/01-ce-info-services-defaults.conf, line 3<br/> # raw: CONDOR_CE_COLLECTOR_HOST = <a href="http://collector.opensciencegrid.org">collector.opensciencegrid.org</a><br/></pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(14:49:03)</span> <b>matyas:</b></span> here's basically the logic:<br/><pre><br/>    if opts.pool:  # --pool<br/>        collector = opts.pool<br/>    else:<br/>        collector = htcondor.param.get('CONDOR_CE_COLLECTOR_HOST', '<a href="http://collector.opensciencegrid.org">collector.opensciencegrid.org</a>')<br/>    if ':' not in collector:<br/>        collector_port = htcondor.param.get('COLLECTOR_PORT', 9619)<br/>        collector += ":" + str(collector_port)<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:49:33)</span> <b>blin:</b></span> man, how did this ever work<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:51:43)</span> <b>matyas:</b></span> maybe everybody specified <tt>--pool</tt>?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:52:08)</span> <b>blin:</b></span> i've run it without <tt>--pool</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:52:19)</span> <b>blin:</b></span> on this exact CE before<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:52:50)</span> <b>matyas:</b></span> did the default for COLLECTOR_PORT "change" while we weren't looking?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:53:21)</span> <b>blin:</b></span> nope<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:53:32)</span> <b>blin:</b></span> well...maybe it got added to the param table?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:55:44)</span> <b>matyas:</b></span> yeah, in 2014<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:58:52)</span> <b>matyas:</b></span> let's ignore COLLECTOR_PORT and look at CONDOR_CE_COLLECTOR_PORT instead, with a default of 9619<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:59:21)</span> <b>matyas:</b></span> that attribute doesn't exist but one day it might :slightly_smiling_face:<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:02:16)</span> <b>blin:</b></span> i'm not sure why using COLLECTOR_PORT makes sense at all, tbh<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:02:54)</span> <b>blin:</b></span> <tt>condor_ce_info_status</tt> doesn't look any site collector<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:03:06)</span> <b>blin:</b></span> it's supposed to look at the central collector, for which the port is well defined already<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:03:40)</span> <b>matyas:</b></span> don't all condor-ces run on 9619 by default already?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:08:22)</span> <b>matyas:</b></span> lol found it: <a href="https://github.com/opensciencegrid/htcondor-ce/commit/37c2b155d8507191b81c3424bb1e2657896b4a80">https://github.com/opensciencegrid/htcondor-ce/commit/37c2b155d8507191b81c3424bb1e2657896b4a80</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(15:14:14)</span> <b>matyas:</b></span> sorry dude :slightly_smiling_face:<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:14:27)</span> <b>blin:</b></span> rofl<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:14:40)</span> <b>blin:</b></span> ...i really don't remember why i did that<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:18:12)</span> <b>blin:</b></span> but yea, all ce's run on 9619 by default<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:27:59)</span> <b>matyas:</b></span> <a href="https://github.com/opensciencegrid/htcondor-ce/pull/197">https://github.com/opensciencegrid/htcondor-ce/pull/197</a><br/>
+</body>
+</html>

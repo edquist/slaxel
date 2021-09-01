@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Sep 19, 2018 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Wed Sep 19, 2018 : #gracc (osg)</h3>
+<span style="color: #5b89d5"><span style="font-size: small">(09:59:50)</span> <b>sthapa:</b></span> yeah, updated the probename to use condor: in the config files<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:50:08)</span> <b>dweitzel:</b></span> @sthapa anything interesting in the gratia logs?  Indeed, no records from the hosted ce's.<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(10:53:48)</span> <b>sthapa:</b></span> nothing in the logs, looks like normal operations. e.g.<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(10:53:54)</span> <b>sthapa:</b></span> <br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:59:54)</span> <b>dweitzel:</b></span> I am surprised there are any records "suppressed"<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(11:00:30)</span> <b>sthapa:</b></span> It’s a hosted ce, so I think the local dupes of jobs run on the remote cluster should get suppressed/ignored right?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:00:44)</span> <b>dweitzel:</b></span> ok, so 50% of jobs should be suppressed.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:01:12)</span> <b>dweitzel:</b></span> Does it give suppression reasons?<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(11:01:38)</span> <b>sthapa:</b></span> yeah:<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(11:01:38)</span> <b>sthapa:</b></span> 10:49:17 CDT Gratia: ERROR: unable to find valid certinfo file for job 15800<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(11:02:04)</span> <b>sthapa:</b></span> Info: suppressing record with GlobalJobId <a href="http://condor.hosted-ce20.grid.uchicago.edu#15896.0#1537284393">condor.hosted-ce20.grid.uchicago.edu#15896.0#1537284393</a> due to Grid == Local<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:02:09)</span> <b>dweitzel:</b></span> for a condor job, there shouldn't be a certinfo file.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:02:50)</span> <b>dweitzel:</b></span> send the condor_history for that job? job 15896<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(11:03:35)</span> <b>sthapa:</b></span> no history for that job<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(11:04:04)</span> <b>sthapa:</b></span> sorry, ran condor_history instead of condor_ce_history<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(11:04:04)</span> <b>sthapa:</b></span> root@hosted-ce20 gratia]# condor_ce_history 15896<br/> ID     OWNER          SUBMITTED   RUN_TIME     ST COMPLETED   CMD<br/>15896.0   osg             9/18 10:26   2+00:05:12 C   9/19 10:37 glidein_startup.sh -v std -name gfactory_instance -entry OSG_US_ASU_DELL_M420 -clientname osg-flock-grid-iu-ed<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(11:04:31)</span> <b>sthapa:</b></span> <br/>
+<span style="color: #5b89d5"><span style="font-size: small">(11:05:32)</span> <b>sthapa:</b></span> [root@hosted-ce20 gratia]# condor_ce_history -l 15896   | grep -i route<br/>RoutedToJobId = “15915.0”<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:08:51)</span> <b>dweitzel:</b></span> ok, and what about 15915.0<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(11:09:18)</span> <b>sthapa:</b></span> [root@hosted-ce20 gratia]# condor_ce_history 15915<br/> ID     OWNER          SUBMITTED   RUN_TIME     ST COMPLETED   CMD<br/>15915.0   osg             9/18 10:27   2+00:05:12 C   9/19 10:37 glidein_startup.sh -v std -name gfactory_instance -entry OSG_US_ASU_DELL_M420 -clientname osg-flock-grid-iu-ed<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:09:30)</span> <b>dweitzel:</b></span> gratia probe doesn't consider jobs with "RoutedToJobId" in them:<br/><pre><br/>    # Jobs that are routed to other jobs should be considered local<br/>    if 'RoutedToJobId' in classad:<br/>        r.Grid("Local", "Source of routed job")<br/></pre><br/>
+<span style="color: #5b89d5"><span style="font-size: small">(11:10:09)</span> <b>sthapa:</b></span> 10:49:17 CDT Gratia: Registering transient input file: /var/lib/gratia/data/history.15915.0<br/>10:49:17 CDT Gratia: ***********************************************************<br/>10:49:17 CDT Gratia: ERROR: unable to find valid certinfo file for job 15915<br/>10:49:17 CDT Gratia: Saved record to /var/lib/gratia/tmp/gratiafiles/subdir.condor_hosted-ce20.grid.uchicago.edu_gratia-osg-prod.opensciencegrid.org_80/outbox/r.232015.gratia.xml__9VoQ3aL5BF<br/>10:49:17 CDT Gratia: Deleting transient input file: /var/lib/gratia/data/history.15915.0<br/>10:49:17 CDT Gratia: OK - Record added to bundle (2/100)<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(11:10:43)</span> <b>sthapa:</b></span> bundle got sent according to gratia logs<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(11:11:30)</span> <b>sthapa:</b></span> 10:49:17 CDT Gratia: Processing bundle file: /var/lib/gratia/tmp/gratiafiles/subdir.condor_hosted-ce20.grid.uchicago.edu_gratia-osg-prod.opensciencegrid.org_80/outbox/r.232015.gratia.xml__9VoQ3aL5BF<br/>10:49:17 CDT Gratia: Bundle response indicates success, /var/lib/gratia/tmp/gratiafiles/subdir.condor_hosted-ce20.grid.uchicago.edu_gratia-osg-prod.opensciencegrid.org_80/outbox/r.232015.gratia.xml__9VoQ3aL5BF will be deleted<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:12:43)</span> <b>dweitzel:</b></span> and the summary below that says a bunch of records successfully sent?<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(11:13:19)</span> <b>sthapa:</b></span> yeah, the summary I posted above<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:18:41)</span> <b>dweitzel:</b></span> For that job, can you grep for <tt>JobStartDate</tt> in the job classad.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:19:11)</span> <b>dweitzel:</b></span> And grep for the same <tt>JobStartDate</tt> in the routedfrom job as well.<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(11:20:48)</span> <b>sthapa:</b></span> doesn’t seem to be a JobStartDate for either<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:29:28)</span> <b>dweitzel:</b></span> Ok, so that seems to be the problem.  The gratia probe is not setting the StartDate in the records because <tt>JobStartDate</tt> is not in the job classad.  GRACC is detecting the no StartDate, and puts the records into quarantine (which is just another index/table in GRACC).<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:32:14)</span> <b>dweitzel:</b></span> @blin this may be a bug in HTCondor, that for grid jobs, it is not setting <tt>JobStartDate</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(11:33:16)</span> <b>blin:</b></span> the routed grid jobs?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:34:41)</span> <b>blin:</b></span> and would it just be limited to bosco? we're not seeing this for other non-condor sites<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:35:04)</span> <b>dweitzel:</b></span> We don't run the gratia probe in this manner anywhere else.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:35:16)</span> <b>dweitzel:</b></span> most of the time, it's directly contacting SLURM, PBS, ...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:35:31)</span> <b>dweitzel:</b></span> so I'm not sure we would see this.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:38:50)</span> <b>dweitzel:</b></span> ok, indeed.  <tt>JobStartDate</tt> isn't defined in a few other grid jobs I looked at here.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:43:50)</span> <b>dweitzel:</b></span> @sthapa what about the attribute <tt>CompletionDate</tt> in the jobs.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:52:14)</span> <b>blin:</b></span> oh, duh<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(12:42:01)</span> <b>sthapa:</b></span> 15915 has that: CompletionDate = 1537371445<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(12:42:26)</span> <b>sthapa:</b></span> same for 15896 : CompletionDate = 1537371445<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:45:06)</span> <b>blin:</b></span> i'll open a ticket with the condor team<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:08:30)</span> <b>dweitzel:</b></span> Ok, CompletionDate looks good.  But HTCondor never creates a StartTime<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:09:00)</span> <b>dweitzel:</b></span> In theory, we could make one up.  If we know the end time, and the walltime, we could figure out the StartTime.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:09:25)</span> <b>dweitzel:</b></span> That's what we do with EndTime now.  If it isn't reported, we just go StartTime + WallTime = EndTime<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:12:15)</span> <b>blin:</b></span> @dweitzel @sthapa what versions of condor are you running?<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(13:12:32)</span> <b>sthapa:</b></span> 8.6.12 on this hosted ce<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:13:37)</span> <b>dweitzel:</b></span> yup, same on my CE:<br/><pre><br/>$ rpm -q condor<br/>condor-8.6.12-1.osg34.el6.x86_64<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:29:03)</span> <b>blin:</b></span> <a href="https://htcondor-wiki.cs.wisc.edu/index.cgi/tktview?tn=6773">https://htcondor-wiki.cs.wisc.edu/index.cgi/tktview?tn=6773</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:50:09)</span> <b>dweitzel:</b></span> thanks!<br/>
+</body>
+</html>

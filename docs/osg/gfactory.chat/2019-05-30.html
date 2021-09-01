@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu May 30, 2019 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Thu May 30, 2019 : #gfactory (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(09:19:51)</span> <b>blin:</b></span> @jdost321 is the new factory monitoring set up? i'm seeing the default apache page <a href="http://gfactory-2.opensciencegrid.org/">http://gfactory-2.opensciencegrid.org/</a><br/>
+<span style="color: #73769d"><span style="font-size: small">(10:59:47)</span> <b>tim.theisen:</b></span> I am trying to run some test jobs against the Madison ITB using glidein3. It's not working. It worked 2 days ago. Could someone help me figure out why?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:07:39)</span> <b>blin:</b></span> @jdost321 @marian @marco.mascheroni ^^<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:08:08)</span> <b>blin:</b></span> tim could you please provide the details of the situation we discussed?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:08:44)</span> <b>blin:</b></span> like, what specifically isn't working<br/>
+<span style="color: #73769d"><span style="font-size: small">(11:09:15)</span> <b>tim.theisen:</b></span> It looks like pilots might be starting, put never report to the collector on glidein3?<br/>
+<span style="color: #73769d"><span style="font-size: small">(11:10:28)</span> <b>tim.theisen:</b></span> So, condor_status never shows any nodes. The nodes on the ITB site stay in "Unclaimed Idle"<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:17:54)</span> <b>blin:</b></span> hey @tim.theisen i'm a little confused about the time frame we're talking about. looking at the CE job history, glideins ran around 6pm yesterday, not 10pm<br/>
+<span style="color: #73769d"><span style="font-size: small">(11:19:41)</span> <b>tim.theisen:</b></span> I did not submit anything until 10pm CDT last night. At 6:00 pm, I was on the golf course. So, that wasn't me.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:23:23)</span> <b>blin:</b></span> i see, so the spike in the pilots that we saw in the factory monitoring yesterday didn't correspond to your jobs<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:23:51)</span> <b>blin:</b></span> so that means that the factory didn't pick up on your job pressure at all and didn't submit pilots<br/>
+<span style="color: #73769d"><span style="font-size: small">(11:26:02)</span> <b>tim.theisen:</b></span> Yup<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:26:07)</span> <b>blin:</b></span> @efajardo i think we need help figuring this one out<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:00:51)</span> <b>efajardo:</b></span> I will take a look<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:49:39)</span> <b>jdost321:</b></span> @blin gfactory-2 monitoring is at <a href="http://gfactory-2.opensciencegrid.org/factory/monitor/">http://gfactory-2.opensciencegrid.org/factory/monitor/</a><br/>
+<span style="color: #385a86"><span style="font-size: small">(12:50:17)</span> <b>jdost321:</b></span> @blin @tim.theisen @efajardo I only see glowVO2 talking to gfactory-2, not the ITB, it's supposed to be glowVO3 right?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:51:03)</span> <b>blin:</b></span> ah ok, <a href="http://gfactory-1.t2.ucsd.edu/">http://gfactory-1.t2.ucsd.edu/</a> doesn't have the same apache page<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:51:58)</span> <b>blin:</b></span> and yeah, glowVO3 is the one we're concerned about for our ITB site<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:52:07)</span> <b>blin:</b></span> we should still be getting pilots from gfactory-1, though, right?<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:58:36)</span> <b>jdost321:</b></span> gfactory-1 won't submit new pilots, we shut it off the 28th to give it time to drain before the hostcert expires on the 30th<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:58:59)</span> <b>jdost321:</b></span> but any submitted before 5 pm PDT 28th will still be running normally<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:01:41)</span> <b>blin:</b></span> ah ok, i see<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:02:09)</span> <b>blin:</b></span> we have gfactory-2 in the glowVO3 frontend config, though<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:03:05)</span> <b>jdost321:</b></span> what's the IP of glowVO3?<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:03:12)</span> <b>jdost321:</b></span> let me see if it's failing auth on our side<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:03:30)</span> <b>blin:</b></span> 128.104.100.46<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:04:31)</span> <b>efajardo:</b></span> I see the problem in gldiein3<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:04:34)</span> <b>efajardo:</b></span> A missing /<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:04:37)</span> <b>efajardo:</b></span> <pre>&lt;collector DN="DC=org/DC=incommon/C=US/ST=WI/L=Madison/O=University of Wisconsin-Madison/OU=OCIS/CN=<a href="http://gfactory-2.opensciencegrid.org">gfactory-2.opensciencegrid.org</a>" comment="Second factory" fact\<br/>ory_identity="<a href="mailto:gfactory@gfactory-2.opensciencegrid.org">gfactory@gfactory-2.opensciencegrid.org</a>" my_identity="<a href="mailto:feglowitb@gfactory-1.t2.ucsd.edu">feglowitb@gfactory-1.t2.ucsd.edu</a>" node="<a href="http://gfactory-2.opensciencegrid.org">gfactory-2.opensciencegrid.org</a>"/&gt;<br/></pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(13:05:20)</span> <b>efajardo:</b></span> my bad<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:05:22)</span> <b>blin:</b></span> ah ok<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:06:06)</span> <b>jdost321:</b></span> yes that would be consistent with errors we're seeing in the factory collector logs<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:06:25)</span> <b>blin:</b></span> also, do we need to open our firewall for gfactory-2?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:06:37)</span> <b>blin:</b></span> because i don't believe we've done anything of the sort on our end<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:06:56)</span> <b>jdost321:</b></span> it didn't seem you needed to for the production glow frontend<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:06:57)</span> <b>efajardo:</b></span> no<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:07:05)</span> <b>efajardo:</b></span> communication is outoging not incoming<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:07:08)</span> <b>blin:</b></span> ok<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:07:11)</span> <b>blin:</b></span> thanks<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:10:47)</span> <b>jdost321:</b></span> I see it talking now <pre>condor_status -pool <a href="http://gfactory-2.opensciencegrid.org">gfactory-2.opensciencegrid.org</a> -any -const 'mytype=?="glideclient"' -af clientname | sort | uniq -c | grep chtc<br/>      5 chtc2.glowGPU<br/>     29 chtc2.IceCube<br/>      3 chtc2.IceCubeGPU<br/>     61 chtc2.main<br/>      5 chtc3.glowGPU<br/>     29 chtc3.IceCube<br/>     65 chtc3.main<br/>     61 chtc3.main-itb</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:11:07)</span> <b>blin:</b></span> perfect!<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:45:19)</span> <b>blin:</b></span> hey @jdost321 is factory ops following this ticket? I see that they're on the CC: <a href="https://support.opensciencegrid.org/public/tickets/8fe8b7d2fc74fcb3d4a9b23bd42370028d2087bdc9896b44eb5e69e630a661c2">https://support.opensciencegrid.org/public/tickets/8fe8b7d2fc74fcb3d4a9b23bd42370028d2087bdc9896b44eb5e69e630a661c2</a><br/>
+<span style="color: #385a86"><span style="font-size: small">(14:46:28)</span> <b>jdost321:</b></span> yeah, i see now steven has the updated DNs, i missed his reply<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:46:41)</span> <b>jdost321:</b></span> i'll reply to it once we have updated the factory configs<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:46:59)</span> <b>blin:</b></span> ok great, i just wanted to make sure you guys saw it<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:47:08)</span> <b>blin:</b></span> if factory ops is CCed can we assume that's sufficient in the future?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:47:33)</span> <b>blin:</b></span> or should we assign it to the factory ops freshdesk group?<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:48:11)</span> <b>jdost321:</b></span> yeah, cc'ing factory ops is probably best, the freshdesk group is supposed to add the list but Marian just discovered cases where it didn't<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:48:37)</span> <b>blin:</b></span> yeah i saw the email, i haven't had time to look at the config<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:48:44)</span> <b>blin:</b></span> i forget, do you have FD admin privs?<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:49:01)</span> <b>jdost321:</b></span> also i haven't had  a chacne to see if it was just a one off situation or if its recurring<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:49:03)</span> <b>jdost321:</b></span> yes, i do<br/>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Oct 6, 2020 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Tue Oct 6, 2020 : #xcache (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(09:47:17)</span> <b>dweitzel:</b></span> Does anyone have experience with "proxying" stashcache access, like squid?  A site is basically saying: "FW will fall down with any sort of stashcache load", even if they whitelist the cache servers.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:02:45)</span> <b>blin:</b></span> this jlab?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:06:07)</span> <b>dweitzel:</b></span> yes<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:18:12)</span> <b>blin:</b></span> i think maybe @efajardo has tried proxying?<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:19:41)</span> <b>efajardo:</b></span> It does not work<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:19:45)</span> <b>efajardo:</b></span> yea<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:19:55)</span> <b>efajardo:</b></span> basically the HTTP implementation of XRootd is not complete<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:20:15)</span> <b>efajardo:</b></span> so when squid asks stashcache what is the date since last modified of a file<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:20:22)</span> <b>efajardo:</b></span> stashcache always answers right now<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:20:29)</span> <b>efajardo:</b></span> and the squid is basically constantly trashing<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:20:56)</span> <b>efajardo:</b></span> I have this issue oppned for a long time<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:20:57)</span> <b>efajardo:</b></span> <a href="https://github.com/xrootd/xrootd/issues/1073">https://github.com/xrootd/xrootd/issues/1073</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:28:47)</span> <b>dweitzel:</b></span> @efajardo I think we are thinking of different things.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:28:59)</span> <b>dweitzel:</b></span> I don't want xcache to cache HTTP traffic.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:30:50)</span> <b>dweitzel:</b></span> I want to proxy StashCache traffic through a node.  I suppose we could ask them to install their own stash-cache, then have them customize their CVMFS config to point only to that cache.<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:43:11)</span> <b>efajardo:</b></span> yea<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:43:12)</span> <b>efajardo:</b></span> that works<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:43:30)</span> <b>efajardo:</b></span> but I try putting a squid proxy infront of a cache or an xrootd server<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:43:33)</span> <b>efajardo:</b></span> and it does not work<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:48:24)</span> <b>efajardo:</b></span> But what you are suggeesting seems like a good idea<br/>
+</body>
+</html>

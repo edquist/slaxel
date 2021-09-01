@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jan 13, 2021 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Jan 13, 2021 : #software (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(11:05:59)</span> <b>matyas:</b></span> @dweitzel/@efajardo do you remember what month we switch all the caches to xrootd 5?<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:26:32)</span> <b>efajardo:</b></span> I would say november<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:27:54)</span> <b>matyas:</b></span> thanks<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:29:25)</span> <b>matyas:</b></span> separate question: have you worked with ICTS? (Looks like a LIGO/IGWN site in India.) <a href="https://support.opensciencegrid.org/a/tickets/66570">https://support.opensciencegrid.org/a/tickets/66570</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(11:30:23)</span> <b>blin:</b></span> (^^ @kherner)<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(11:33:35)</span> <b>kherner:</b></span> DUNE hasn't worked with them at all yet; we've been working with TIFR.<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(11:34:08)</span> <b>kherner:</b></span> Er a different set of people I should say<br/>
+<span style="color: #7d414c"><span style="font-size: small">(12:42:46)</span> <b>bockjoo:</b></span> Is there a support for the GPUs with SLURM sites?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:45:07)</span> <b>dweitzel:</b></span> Yes, Nebraska's SLURM HPC has been running contributing GPUs to the OSG for years.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:45:21)</span> <b>andrew.melo:</b></span> Same w/Vanderbilt<br/>
+<span style="color: #7d414c"><span style="font-size: small">(12:54:55)</span> <b>bockjoo:</b></span> Could one of you send me some example sbatch files and the htcondor-ce configurations?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(12:58:12)</span> <b>bockjoo:</b></span> which GPU flavor is used by CMS jobs, tesla, geforce, cuda?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:58:58)</span> <b>dweitzel:</b></span> Does CMS jobs use GPUs?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:59:58)</span> <b>andrew.melo:</b></span> Not yet for production, but that will probably change soon<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:00:35)</span> <b>bockjoo:</b></span> Factory has some entries for GPUs. So, I am trying to configure for testing.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:00:52)</span> <b>andrew.melo:</b></span> <pre>JOB_ROUTER_ENTRIES = \<br/>    [ \<br/>      name = "SLURM_WholeNode"; \<br/>      set_ACCREQOS = "default"; \<br/>      Requirements = ( (isUndefined(TARGET.RequestGPUs) || \<br/>                        (TARGET.RequestGPUs =?= 0))  &amp;&amp; \<br/>                       (TARGET.WantWholeNode =?= True) \<br/>                        ); \<br/>    ] \<br/>    [ \<br/>      name = "SLURM_GPU"; \<br/>      Requirements = TARGET.RequestGPUs &gt;= 1; \<br/>      set_ACCREQOS = "default"; \<br/>    ] \<br/>    [ \<br/>      name = "SLURM_Default"; \<br/>      set_ACCREQOS = "default"; \<br/>      Requirements = ( (isUndefined(TARGET.RequestGPUs) || \<br/>                        (TARGET.RequestGPUs =?= 0))  &amp;&amp; \<br/>                       (isUndefined(TARGET.WantWholeNode) || \<br/>                        (TARGET.WantWholeNode =?= False)) \<br/>                        ); \<br/>    ]</pre><br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:01:49)</span> <b>andrew.melo:</b></span> then slurm_local_submit_attributes, we do a<br/><pre>elif [[ "${RequestGPUs:-0}" -gt 0 ]]; then<br/>    echo "#SBATCH --account=cms_gpu_acc"<br/>    echo "#SBATCH --partition=pascal"<br/>    echo "#SBATCH --gres=gpu:$RequestGPUs"</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:02:42)</span> <b>blin:</b></span> fwiw, an upcoming version of the blahp handles GPU requests properly so you won't need that last line in the local submit attrs<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:02:43)</span> <b>bockjoo:</b></span> Excellent! Thanks @andrew.melo!<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:03:07)</span> <b>andrew.melo:</b></span> Nice, @blin -- that'll let us tidy things up a bit<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:03:31)</span> <b>andrew.melo:</b></span> I need to also remove the extra requirements now that condor processes the job routes in order and stops at the first one<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:03:51)</span> <b>bockjoo:</b></span> Where should I plug this in?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:03:54)</span> <b>bockjoo:</b></span> copy_RequestGPUs = "orig_RequestGPUs";<br/> eval_set_OriginalGPUs = ifThenElse(orig_RequestGPUs isnt undefined, orig_RequestGPUs, undefined);<br/> set_GlideinGPUsIsGood = !isUndefined(MATCH_EXP_JOB_GLIDEIN_GPUs) &amp;&amp; (int(MATCH_EXP_JOB_GLIDEIN_GPUs) isnt error);<br/> set_JOB_GLIDEIN_GPUs = "$$(ifThenElse(WantWholeNode is true, !isUndefined(TotalGPUs) ? TotalGPUs : JobGPUs, OriginalGPUs))";<br/> set_JobGPUs = JobIsRunning ? int(MATCH_EXP_JOB_GLIDEIN_GPUs) : OriginalGPUs;<br/> set_RequestGPUs = ifThenElse((WantWholeNode is true &amp;&amp; OriginalGPUs isnt undefined),<br/> (!isUndefined(TotalGPUs) &amp;&amp; TotalGPUs &gt; 0) ? TotalGPUs : JobGPUs,<br/> OriginalGPUs);<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:04:00)</span> <b>blin:</b></span> for that you need to make sure you specify the order in <tt>JOB_ROUTER_ROUTE_NAMES</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:04:48)</span> <b>blin:</b></span> @bockjoo you shouldn't need to any thing to the router config. it looks like it should be properly handled, esp with WholeNodeJobs<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:05:19)</span> <b>blin:</b></span> the important part is Andrew's line here:<br/><pre>    echo "#SBATCH --gres=gpu:$RequestGPUs"</pre><br/><br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:05:24)</span> <b>andrew.melo:</b></span> Our setup is alittle weird because we have a separate partition + accounts for GPU nodes<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:05:45)</span> <b>andrew.melo:</b></span> I think for billing reasons?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:05:55)</span> <b>bockjoo:</b></span> OK, I will test this out.<br/>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Nov 14, 2018 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Nov 14, 2018 : #software (osg)</h3>
+<span style="color: #965d1b"><span style="font-size: small">(09:21:36)</span> <b>briedel:</b></span> @dwd what is the difference between <tt>/var/spool/cvmfs/</tt> and <tt>/srv/cvmfs</tt>?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:22:45)</span> <b>andrew.melo:</b></span> one is the hashed/chopped up files, the other is the actual filesystem tree<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:56:12)</span> <b>andrew.melo:</b></span> lol, @blin Is condor going to change the output of <tt>condor_ce_q</tt> after every revision? :slightly_smiling_face:<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:57:05)</span> <b>blin:</b></span> lol, yeah it's pretty enraging<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:57:13)</span> <b>blin:</b></span> what's it look like to you now?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:57:59)</span> <b>andrew.melo:</b></span> <pre><br/>-- Schedd: <a href="http://ce3.accre.vanderbilt.edu">ce3.accre.vanderbilt.edu</a> : &lt;129.59.197.118:5764&gt; @ 11/14/18 09:51:06<br/>OWNER      BATCH_NAME     SUBMITTED   DONE   RUN    IDLE   HOLD  TOTAL JOB_IDS<br/>lcgadmin   ID: 231533    5/31 13:15      _      _      _      1      1 231533.0<br/>lcgadmin   ID: 231601    5/31 13:42      _      _      _      1      1 231601.0<br/>lcgadmin   ID: 231619    5/31 13:46      _      _      _      1      1 231619.0<br/>&lt;snip&gt;<br/>cmspilot   ID: 1103872  11/14 09:46      _      _      1      _      1 1103872.<br/>cmspilot   ID: 1103873  11/14 09:46      _      _      1      _      1 1103873.<br/><br/>Total for query: 324 jobs; 9 completed, 0 removed, 180 idle, 120 running, 15 held, 0 suspended <br/>Total for all users: 324 jobs; 9 completed, 0 removed, 180 idle, 120 running, 15 held, 0 suspended<br/><br/>[root@ce3 ~]# <br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:09:17)</span> <b>blin:</b></span> oops, i thought i fixed that so that the default behavior didn't change<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:09:53)</span> <b>blin:</b></span> do you prefer the old <tt>condor_ce_q</tt> output?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:10:22)</span> <b>blin:</b></span> (i know i do)<br/>
+<span style="color: #a72f79"><span style="font-size: small">(10:12:57)</span> <b>andrew.melo:</b></span> TBH it doesn't super matter, I was just teasing you<br/>
+<span style="color: #a72f79"><span style="font-size: small">(10:13:03)</span> <b>andrew.melo:</b></span> I usually just check condor_ce_router_q<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:16:14)</span> <b>blin:</b></span> aiight, it stays then :slightly_smiling_face:<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:26:39)</span> <b>dwd:</b></span> @briedel I’m sorry I didn’t see your question until now. Andrew’s answer wasn’t quite correct.  /srv/cvmfs has all the hashed files, yes, but /var/spool/cvmfs is where various support files are, including the working space for overlayfs, where files are stored during a transaction before they are published.  So depending on how much is published at once, it could require a lot of space.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:27:07)</span> <b>andrew.melo:</b></span> so close<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:28:09)</span> <b>briedel:</b></span> i have a disk separate disk for <tt>/var/spool/cvmfs</tt> and <tt>/srv/cvmfs</tt><br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:28:15)</span> <b>briedel:</b></span> is that everything i need?<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:28:35)</span> <b>dwd:</b></span> Also /etc/cvmfs when you copy from one host to another<br/>
+<span style="color: #de5f24"><span style="font-size: small">(13:36:40)</span> <b>tiradani:</b></span> I don’t use <tt>condor_ce_router_q</tt> much, but since Andrew mentioned it, I tried it on our HTCondor-CE.  I found that it doesn’t handle HA collectors.  It treats the list as one hostname.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:56:41)</span> <b>andrew.melo:</b></span> @blin perhaps tomorrow we should take some time to look a bit deeper. It seems like a lot of jobs are being held with<br/><pre><br/>HoldReason = "Spooling input data files"<br/>HoldReasonCode = 16<br/><br/>#condor_ce_q<br/>Total for query: 1836 jobs; 8 completed, 0 removed, 320 idle, 132 running, 1376 held, 0 suspended <br/></pre><br/>... not sure why that is<br/>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Mar 4, 2020 : #uscms (osg)</title>
+</head>
+<body>
+<h3>Wed Mar 4, 2020 : #uscms (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(07:57:41)</span> <b>bbockelm:</b></span> @andrew.melo -  what's your <tt>cms.dfs</tt> setting?  that could affect what you're seeing ... for example, some modes farm the query out to data servers while others the query is done by the redirector.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(09:31:41)</span> <b>jthiltges:</b></span> Maybe you've already fixed it. Retrieving that file from Nebraska looks fine at present from all 10 vanderbilt servers.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(11:23:09)</span> <b>andrew.melo:</b></span> I didn’t change anything and I can’t reproduce it. It’s just the dumbass Sam test complaining<br/>
+<span style="color: #e06b56"><span style="font-size: small">(11:46:57)</span> <b>jthiltges:</b></span> Hrm. It seems to be a sporadic thing, with a file working during one test, and the same file failing during another test.<br/>Can you check your local redirector xrootd.log around one of the failures? It might be helpful to confirm that it's redirected to a storage server, and which one. Would be interesting to see if it's always the same storage server when the error is reported.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:18:28)</span> <b>andrew.melo:</b></span> cms.dfs limit 0 lookup distrib redirect verify retries 20 mdhold 20m<br/>
+<span style="color: #9e3997"><span style="font-size: small">(22:19:26)</span> <b>bbockelm:</b></span> <tt>lookup distrib</tt> -&gt; whenever a lookup needs to be done by the <tt>cmsd</tt>, it will reach out to a data server to do the lookup.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(22:20:04)</span> <b>bbockelm:</b></span> <tt>redirect verify</tt> -&gt; whenever a client shows up to a <tt>xrootd</tt> process looking for the file, the <tt>xrootd</tt> process will check to see if the file is local before redirecting to another server.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(22:21:51)</span> <b>bbockelm:</b></span> <tt>mdhold 20m</tt> -&gt; if a file is missing, then <tt>xrootd</tt> will look to see if the parent directory exists.  If that doesn't exist, then for the next 20 minutes the <tt>xrootd</tt> process will assume the parent directory doesn't exist (and hence the file can't exist).<br/>
+<span style="color: #9e3997"><span style="font-size: small">(22:24:00)</span> <b>bbockelm:</b></span> Additionally, for <tt>cmsd</tt> 's in general (outside of <tt>cms.dfs</tt>, there is <tt>cms.fxhold</tt> which is relevant - that's how long metadata responses are remembered in the <tt>cmsd</tt>.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(22:24:58)</span> <b>bbockelm:</b></span> Based on everything I see above - and the fact this looks to be a fairly static filename, I would crank up the <tt>cmsd</tt> logging on all your data servers (and/or redirector) and see who is telling a lie to the redirector about file existence.<br/>
+</body>
+</html>

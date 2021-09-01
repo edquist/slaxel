@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon May 24, 2021 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Mon May 24, 2021 : #gfactory (osg)</h3>
+<span style="color: #674b1b"><span style="font-size: small">(15:40:31)</span> <b>rynge:</b></span> @jdost321 and team: we are seeing some issues with our GPU entries:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:40:35)</span> <b>rynge:</b></span> <pre>05/24/21 10:18:40 (pid:81103) CONFIGURATION PROBLEM: Failed to insert ClassAd attribute STARTD_JOB_ATTRS = "x509userproxysubject,x509UserProxyFQAN,x509UserProxyVOName,x509UserProxyEmail,x509UserProxyExpiration,ProjectName" GPUsUsage GPUsMemoryUsage GPUsUsage GPUsMemoryUsage.  The most common reason for this is that you forgot to quote a string value in the list of attributes being added to the STARTD ad.<br/>05/24/21 10:18:40 (pid:81103) CONFIGURATION PROBLEM: Failed to insert ClassAd attribute GLIDEIN_Resource_Slots = GPUs,1,type=main.  The most common reason for this is that you forgot to quote a string value in the list of attributes being added to the STARTD ad.</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:41:02)</span> <b>rynge:</b></span> I might try 8.9.11 again - otherwise I don't know what changed<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:41:57)</span> <b>rynge:</b></span> Maybe I'm setting this one wrong:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:42:00)</span> <b>rynge:</b></span> <pre>      &lt;attr name="STARTD_JOB_ATTRS" glidein_publish="True" job_publish="False" parameter="True" type="string" value="x509userproxysubject,x509UserProxyFQAN,x509UserProxyVOName,x509UserProxyEmail,x509UserProxyExpiration,ProjectName"/&gt;</pre><br/><br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:40:59)</span> <b>bbockelm:</b></span> @rynge - the one about the ClassAd attributes is harmless, it's been there for months.  I believe the problem stems from the fact we specify this manually (and it's also done by default on current gWMS versions):<br/><pre>      &lt;attr name="STARTD_JOB_ATTRS" glidein_publish="True" job_publish="False" parameter="True" type="string" value="x509userproxysubject,x509UserProxyFQAN,x509UserProxyVOName,x509UserProxyEmail,x509UserProxyExpiration,ProjectName"/&gt;</pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:41:36)</span> <b>bbockelm:</b></span> I'm uncertain if the second item is fatal or not.<br/>
+</body>
+</html>

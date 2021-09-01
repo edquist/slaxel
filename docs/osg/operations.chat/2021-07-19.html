@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jul 19, 2021 : #operations (osg)</title>
+</head>
+<body>
+<h3>Mon Jul 19, 2021 : #operations (osg)</h3>
+<span style="color: #73769d"><span style="font-size: small">(07:15:22)</span> <b>tim.theisen:</b></span> It looks like <a href="http://repo.opensciencegrid.org">repo.opensciencegrid.org</a> is inaccessible. I get <tt>Gateway Timeout</tt>  @blin @matyas @jpeterson<br/>
+<blockquote>
+<span style="color: #3c8c69"><span style="font-size: small">(08:20:04)</span> <b>jpeterson:</b></span> I’m taking kid to dentist appt right now. I’ll be in 930ish<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:55:23)</span> <b>blin:</b></span> i'm not sure what was up before but things seem ok now<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:58:30)</span> <b>blin:</b></span> <b>@edquist</b> this thread seems relevant ^^'<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:59:20)</span> <b>edquist:</b></span> ah<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:59:21)</span> <b>edquist:</b></span> yeah<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:59:28)</span> <b>edquist:</b></span> it's cramping my installs<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:59:55)</span> <b>jpeterson:</b></span> I just clicked on the link and it worked?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:00:20)</span> <b>blin:</b></span> hrm, i got a <tt>Gateway Timeout</tt> just a second ago<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:00:25)</span> <b>blin:</b></span> something seems real flakey<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:00:27)</span> <b>edquist:</b></span> ah<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:00:29)</span> <b>edquist:</b></span> <a href="https://repo.opensciencegrid.org/osg/devops/el7/itb/x86_64/repodata/repomd.xml">https://repo.opensciencegrid.org/osg/devops/el7/itb/x86_64/repodata/repomd.xml</a><br/>
+<span style="color: #16569E"><span style="font-size: small">(15:00:41)</span> <b>edquist:</b></span> was recently timing out but now seems to work<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:00:42)</span> <b>edquist:</b></span> thx<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:01:47)</span> <b>matyas:</b></span> strange<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:02:22)</span> <b>matyas:</b></span> i was guessing maybe one of the pods was broken and the other one wasn't, but it looks like there's only one pod<br/>
+<span style="color: #73769d"><span style="font-size: small">(15:13:36)</span> <b>tim.theisen:</b></span> Are there squid proxies involved?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:13:57)</span> <b>matyas:</b></span> not from my laptop<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:14:00)</span> <b>blin:</b></span> i don't think so<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:14:07)</span> <b>blin:</b></span> i think traefik's got some issues<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:14:20)</span> <b>blin:</b></span> <pre>blin@blin-latitude:~$ kubectl -n osg logs traefik-586dc56bd4-kd4ff --since 30m | grep -i 'gateway timeout' | head<br/>time="2021-07-19T19:43:45Z" level=debug msg="'504 Gateway Timeout' caused by: dial tcp 192.168.112.14:80: i/o timeout"<br/>time="2021-07-19T19:43:45Z" level=debug msg="'504 Gateway Timeout' caused by: dial tcp 192.168.112.14:80: i/o timeout"<br/>time="2021-07-19T19:43:45Z" level=debug msg="'504 Gateway Timeout' caused by: dial tcp 192.168.112.14:80: i/o timeout"<br/>time="2021-07-19T19:44:09Z" level=debug msg="'504 Gateway Timeout' caused by: dial tcp 192.168.112.14:80: i/o timeout"<br/>time="2021-07-19T19:44:09Z" level=debug msg="'504 Gateway Timeout' caused by: dial tcp 192.168.112.14:80: i/o timeout"<br/>time="2021-07-19T19:44:10Z" level=debug msg="'504 Gateway Timeout' caused by: dial tcp 192.168.112.14:80: i/o timeout"<br/>time="2021-07-19T19:44:10Z" level=debug msg="'504 Gateway Timeout' caused by: dial tcp 192.168.112.14:80: i/o timeout"<br/>time="2021-07-19T19:44:11Z" level=debug msg="'504 Gateway Timeout' caused by: dial tcp 192.168.112.14:80: i/o timeout"<br/>time="2021-07-19T19:44:11Z" level=debug msg="'504 Gateway Timeout' caused by: dial tcp 192.168.112.14:80: i/o timeout"<br/>time="2021-07-19T19:44:12Z" level=debug msg="'504 Gateway Timeout' caused by: dial tcp 192.168.112.14:80: i/o timeout"</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:16:31)</span> <b>blin:</b></span> that IP does correspond to the repo pod<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:17:20)</span> <b>jpeterson:</b></span> and sshing to that host is being slow<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:17:30)</span> <b>jpeterson:</b></span> the hosting node that is<br/>
+<span style="color: #e06b56"><span style="font-size: small">(16:13:52)</span> <b>jthiltges:</b></span> Ah, I missed this thread. Copying my comments from the other one:<br/><br/>Looks like it ran out of RAM (500MB) and probably wedged until the OOM killer came along. 100-some httpd prefork workers is more than I was expecting. And then sometimes the update scripts kick in.<br/><br/>I need to switch repo data from local-storage back to Ceph. I'll bump the RAM at the same time.<br/><br/>Opened an osg-repo branch with the commits. I'm just not entirely sure how disruptive the change will be. Maybe a ~45m outage at worst. Need to test it on the osgdev instance.<br/>
+</blockquote>
+<span style="color: #43761b"><span style="font-size: small">(09:29:17)</span> <b>blin:</b></span> @timm i imagine you're having issues because a long while back we replaced default various binpath lines in <tt>blah.config</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(09:30:02)</span> <b>blin:</b></span> for scaling, we moved from an auto-detecting <tt>which</tt> pipeline to hardcoded paths with the idea that the admin would just modify the <tt>blah.config</tt><br/>
+<span style="color: #73769d"><span style="font-size: small">(09:31:57)</span> <b>tim.theisen:</b></span> @blin I had a long discussion about Bosco and HTCondor 9.0.1 with Steve on RT: <a href="https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=103708">https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=103708</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(09:32:09)</span> <b>blin:</b></span> it's a little roundabout to do it in the bosco setup right now but you can drop in your own blah.config via <tt>bosco_cluster -o &lt;OVERRIDE DIR&gt;</tt>, where <tt>&lt;OVERRIDE DIR&gt;</tt> contains <tt>glite/etc/blah.config</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(09:32:12)</span> <b>blin:</b></span> ah i see<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(09:59:40)</span> <b>timm:</b></span> yes it was a long time back but we hadn't upgraded our BOSCO at NERSC since Feb 2020.  Now we have to do it.<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(09:59:57)</span> <b>timm:</b></span> There's a lot of outdated bosco information out there from the 1.2 series yet.<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(10:00:21)</span> <b>timm:</b></span> I should be able to actually try to submit a job against my bosco installation later today.<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(10:01:06)</span> <b>timm:</b></span> But really what factory operators like myself need is a cheat sheet that maps htcondor submit attrs to SBATCH in slurm.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:04:53)</span> <b>blin:</b></span> yeah, we can certainly do that...however the logic can get a little complicated for all the CPU attrs<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(14:48:12)</span> <b>kherner:</b></span> NMSU is a hosted CE, right? I'm asking regarding <a href="https://support.opensciencegrid.org/a/tickets/67652">https://support.opensciencegrid.org/a/tickets/67652</a>.<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(14:58:05)</span> <b>blin:</b></span> it is<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:58:15)</span> <b>blin:</b></span> but it's run by the NMSU admins<br/>
+</blockquote>
+<span style="color: #16569E"><span style="font-size: small">(14:57:42)</span> <b>edquist:</b></span> anybody <b>@here</b> know why <a href="http://repo.opensciencegrid.org">repo.opensciencegrid.org</a> doesn't seem to be responding?<br/>
+<blockquote>
+<span style="color: #e06b56"><span style="font-size: small">(15:00:14)</span> <b>jthiltges:</b></span> Looking into it. k8s pod itself seems fine (I can get a shell and it responds.) And repo-itb seems OK.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:01:45)</span> <b>jthiltges:</b></span> Aaaand... now it seems fine for me. o.O<br/>
+<span style="color: #e06b56"><span style="font-size: small">(16:01:39)</span> <b>jthiltges:</b></span> Ugh. Looks like it ran out of RAM and probably wedged until the OOM killer came along.<br/>100-some httpd prefork workers is more than I was expecting. And then sometimes the update scripts kick in.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(16:09:34)</span> <b>jthiltges:</b></span> I need to switch repo data from local-storage back to Ceph. I'll bump the RAM at the same time. Thanks for pointing out the issue Carl.<br/>
+</blockquote>
+</body>
+</html>

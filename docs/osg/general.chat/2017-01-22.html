@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Sun Jan 22, 2017 : #general (osg)</title>
+</head>
+<body>
+<h3>Sun Jan 22, 2017 : #general (osg)</h3>
+<span style="color: #b14cbc"><span style="font-size: small">(00:40:18)</span> <b>tmartin:</b></span> No I do not think I do, did not know that was required. :slightly_smiling_face:<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(00:40:57)</span> <b>tmartin:</b></span> In fact I do not have the file at all.<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(00:41:22)</span> <b>tmartin:</b></span> So it has data_interface <a href="http://gftp-1.t2.ucsd.edu">gftp-1.t2.ucsd.edu</a> where that is the hostname of the gridftp server?<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(00:48:11)</span> <b>tmartin:</b></span> You are saying that the server will tell the client to connect to the data interface on the real server because if this setting, essentially bypassing the LVS system entirely?<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(00:49:13)</span> <b>tmartin:</b></span> In that way the whole, ftp passive tricks will be therefore be unecessary since a level 7 bit of protocol takes over for the layer 4 LVS system for the data channel?<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(01:13:06)</span> <b>tmartin:</b></span> Ya that fixes the issue, so definitely want to include those details in the configuration. I am still seeing IPv4 connects being noted on two of the entries in the ipvsadm output, but the IPv6 is clean, one connection, one transfer.<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(01:14:40)</span> <b>tmartin:</b></span> So the first setting may be ignored, not sure, but the second is working. You could also mangle the packets after marking them but this is easier I think.<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(01:18:15)</span> <b>tmartin:</b></span> I need to do some more testing, I am not sure now what fixed things. <br/>[2317] root@gftp-3 /etc/gridftp-hdfs# cat gridftp.conf<br/>data_interface <a href="http://gftp-3.t2.ucsd.edu">gftp-3.t2.ucsd.edu</a><br/>[2317] root@gftp-3 /etc/gridftp-hdfs#<br/>And<br/><br/>[2318] root@gftp-3 /etc/gridftp.d# cat data_interface.conf<br/>data_interface <a href="http://gftp-3.t2.ucsd.edu">gftp-3.t2.ucsd.edu</a><br/>[2318] root@gftp-3 /etc/gridftp.d#<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(01:26:37)</span> <b>tmartin:</b></span> I might need to do a bit more experimentation, remove one and figure out which is needed<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(02:06:54)</span> <b>tmartin:</b></span> Hmm, I did a packet trace. This is what is happening. <br/><br/>The control channel is running over IPv6, but even if I tell gfal-copy to use IPv6 it still handles the data channel over IPv4<br/><br/>[0004] root@gftp-1 ~# cat /etc/gridftp-hdfs/gridftp.conf /etc/gridftp.d/data_interface.conf<br/>data_interface 2607:f720:1700:1b30::84<br/>data_interface <a href="http://gftp-1.t2.ucsd.edu">gftp-1.t2.ucsd.edu</a><br/>[0006] root@gftp-1 ~#<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(02:08:18)</span> <b>tmartin:</b></span> Now the file that matters seemingly is the /etc/gridftp.d/data_interface.conf, without it nothing works. Now maybe this is because I do not have the DNS setup for the gridftp servers, but the client does have the hosts file setup with the IPv6 address, and not the IPv4 address.<br/>
+</body>
+</html>

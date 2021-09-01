@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jul 2, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Tue Jul 2, 2019 : #xcache (osg)</h3>
+<span style="color: #a63024"><span style="font-size: small">(12:51:52)</span> <b>efajardo:</b></span> HI folks<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:51:56)</span> <b>efajardo:</b></span> do you know what is the status pf this<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:51:57)</span> <b>efajardo:</b></span> <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-3584">https://opensciencegrid.atlassian.net/browse/SOFTWARE-3584</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:51:58)</span> <b>efajardo:</b></span> ?<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:52:01)</span> <b>efajardo:</b></span> I would like to take over<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:52:16)</span> <b>efajardo:</b></span> <b>@here</b><br/>
+<span style="color: #53b759"><span style="font-size: small">(12:54:42)</span> <b>marian:</b></span> according to timestamp of last comment in that ticket it lookes like @blin took it over on June 6 ... this week he is on vacation, though ... maybe @matyas or <b>@edquist</b> can provide more insight before you take it back?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:01:35)</span> <b>matyas:</b></span> go for it<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:03:56)</span> <b>marian:</b></span> @efajardo you've got :thumbsup:<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:04:06)</span> <b>efajardo:</b></span> <b>@edquist</b> what has already been done?<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:04:23)</span> <b>marian:</b></span> ¯\_(ツ)_/¯<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:04:39)</span> <b>marian:</b></span> I'd say nothing more than you were on it before<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:27:24)</span> <b>edquist:</b></span> sorry i just saw this convo<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:27:49)</span> <b>edquist:</b></span> @edgar you want it back?<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:28:09)</span> <b>edquist:</b></span> <a href="https://github.com/opensciencegrid/xcache/compare/master...edquist:SOFTWARE-3584.xcache-cmsd">https://github.com/opensciencegrid/xcache/compare/master...edquist:SOFTWARE-3584.xcache-cmsd</a><br/>
+<span style="color: #16569E"><span style="font-size: small">(14:28:17)</span> <b>edquist:</b></span> that's what i did previously, apparently<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:20:05)</span> <b>efajardo:</b></span> <b>@edquist</b> I was wondering why you did not use <tt>config.d</tt><br/>
+<span style="color: #16569E"><span style="font-size: small">(15:31:27)</span> <b>edquist:</b></span> i asked the same question in the JIRA ticket multiple times<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:31:34)</span> <b>edquist:</b></span> about where config files go<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:31:49)</span> <b>edquist:</b></span> &gt; And under what location and names?  (eg, /etc/xcache/config.d, with NN- prefixes?)<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:31:56)</span> <b>edquist:</b></span> nobody answered<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:32:07)</span> <b>edquist:</b></span> feel free to do whatever you like<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:34:16)</span> <b>edquist:</b></span> i only put the config files there to get things started<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:34:18)</span> <b>edquist:</b></span> actually -<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:34:35)</span> <b>edquist:</b></span> <pre><br/>%files -n cms-xcache<br/>%config(noreplace) %{_sysconfdir}/xrootd/xcache-cmsd.cfg<br/>%config(noreplace) %{_sysconfdir}/xrootd/xcache.cfg<br/></pre><br/>
+<span style="color: #16569E"><span style="font-size: small">(15:34:47)</span> <b>edquist:</b></span> so they get installed under /etc/xrootd<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:36:32)</span> <b>edquist:</b></span> i might have taken the paths from the package these config files came from<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:36:36)</span> <b>edquist:</b></span> i don't remember exactly<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:37:07)</span> <b>edquist:</b></span> i don't really have an opinion one way another about putting them under /etc/xrootd/config.d/<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:37:20)</span> <b>edquist:</b></span> feel free to move them there if that makes sense<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:44:53)</span> <b>marian:</b></span> yeah, I think we redesigned the way of configs for caches/origins in general that things reside under /etc/xrootd/config.d/ ... so it makes sense follow that direction also for cms-xcache<br/>
+</body>
+</html>

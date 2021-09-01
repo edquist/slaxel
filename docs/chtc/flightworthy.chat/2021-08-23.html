@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Aug 23, 2021 : #flightworthy (chtc)</title>
+</head>
+<body>
+<h3>Mon Aug 23, 2021 : #flightworthy (chtc)</h3>
+<span style="color: #4cc091"><span style="font-size: small">(08:52:35)</span> <b>blin:</b></span> how do you claim to be someone for <tt>CLAIMTOBE</tt>?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:07:36)</span> <b>johnkn:</b></span> you set an environment variable.  I'll see if I can find it...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:09:08)</span> <b>johnkn:</b></span> actually looks like you set a knob (which you can do with an environment variable)...  <tt>SEC_CLAIMTOBE_USER</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:10:19)</span> <b>johnkn:</b></span> if knob is not set, then <tt>CLAIMTOBE</tt> claims to be the current username :slightly_smiling_face:<br/>
+<span style="color: #4cc091"><span style="font-size: small">(09:23:18)</span> <b>blin:</b></span> gotcha, thanks<br/>
+<span style="color: #4cc091"><span style="font-size: small">(09:23:52)</span> <b>blin:</b></span> is that on the client side?<br/>
+<blockquote>
+<span style="color: #235e5b"><span style="font-size: small">(09:44:02)</span> <b>johnkn:</b></span> yes, on the client side<br/>
+</blockquote>
+<span style="color: #684b6c"><span style="font-size: small">(09:35:51)</span> <b>bbockelman:</b></span> <tt>_condor_SEC_CLAIMTOBE_USER</tt> env var is useful on the client.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(11:46:07)</span> <b>jfrey:</b></span> That was odd. I just posted a comment on a jira ticket. It updated the page to say the comment was posted “in 2 seconds”.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:46:32)</span> <b>tlmiller:</b></span> ... eventual consistency?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:47:15)</span> <b>johnkn:</b></span> FWIW,  repairman coming at 1:15  so I may be a bit late to the meeting...<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:42:15)</span> <b>wiscmoate:</b></span> What access level does a CredD need to run an <tt>UPDATE_AD_GENERIC</tt> command against a collector?  <tt>DAEMON</tt>?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:42:45)</span> <b>wiscmoate:</b></span> And is there a reference for which commands require which access levels?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:53:05)</span> <b>jcpatton:</b></span> To give some extra context, the credd advertises a <tt>MyType = "CredD"</tt> ad to the collector using <tt>UPDATE_AD_GENERIC</tt>, and there’s no <tt>ALLOW_ADVERTISE_GENERIC</tt> or <tt>ALLOW_ADVERTISE_CREDD</tt> authz level. So it seems that using IDTOKENS on an access point that’s also running a credd requires the token to have <tt>condor:/DAEMON</tt> in its list of scopes. Not optimal for trying to minimize the scope of a token…<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:54:08)</span> <b>wiscmoate:</b></span> From our CollectorLog:<br/><pre>[moate@cm3000 ~]$ sudo bzgrep -E '128\.104\.100\.115.*UPDATE_AD_GENERIC' /var/log/condor/old/CollectorLog.old.202*<br/>...<br/>/var/log/condor/old/CollectorLog.old.2021_08_21_03.bz2:08/21/21 01:46:47 (fd:31) (D_ALWAYS) PERMISSION GRANTED to <a href="mailto:condor_pool@chtc.wisc.edu">condor_pool@chtc.wisc.edu</a> from host 128.104.100.115 for command 58 (UPDATE_AD_GENERIC), access level DAEMON: reason: DAEMON authorization policy allows IP address 128.104.100.115; identifiers used for this remote host: 128.104.100.115,<a href="http://submit5.chtc.wisc.edu">submit5.chtc.wisc.edu</a></pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:02:08)</span> <b>tlmiller:</b></span> The schedd doesn't need <tt>condor:/DAEMON</tt>?<br/>
+<blockquote>
+<span style="color: #9e3997"><span style="font-size: small">(15:06:03)</span> <b>tlmiller:</b></span> To explain: maybe I'm misremembering, but if the credd is a trusted daemon, it will have access to the schedd's IDTOKEN unless you engage in some nontrivial contortions, right?  So I wouldn't expect the token on the access point not to have <tt>DAEMON</tt> access anyway, unless for some reason the schedd doesn't need that (which I thought it did, but I could of course be totally wrong).<br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:12:23)</span> <b>wiscmoate:</b></span> @tlmiller why does a schedd need <tt>DAEMON</tt>?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:14:09)</span> <b>tlmiller:</b></span> Maybe it doesn't?  Is the match password enough for everything it does to the startd?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:14:23)</span> <b>wiscmoate:</b></span> Think so<br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:14:47)</span> <b>wiscmoate:</b></span> And yes, CredD has access to the schedd's IDTOKEN<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:15:42)</span> <b>tlmiller:</b></span> Hrm.  Then I guess I can't actually think of a good reason for it to have <tt>DAEMON</tt>, then.  That seems a little weird to me (it's the most important part of the system), but whatever.<br/>
+</blockquote>
+<span style="color: #9e3997"><span style="font-size: small">(15:03:56)</span> <b>tlmiller:</b></span> (There's no <tt>ALLOW_ADVERTISE_CREDD</tt> because as you point out, there's no credd-specific command being executed.  I suppose we could add an <tt>ALLOW_ADVERTISE_GENERIC</tt>, though.)<br/>
+<span style="color: #684b6c"><span style="font-size: small">(15:11:22)</span> <b>bbockelman:</b></span> Why does the credd need an ad?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:11:46)</span> <b>wiscmoate:</b></span> I asked Mats for <tt>DAEMON</tt> authz on our IDTOKEN, and:<br/><pre>[moate@submit6 hello_ospool.0]$ condor_status -any -const 'MyType =?= "CredD" &amp;&amp; name =?= "<a href="http://submit6.chtc.wisc.edu">submit6.chtc.wisc.edu</a>"'<br/>MyType             TargetType         Name                                     <br/><br/>CredD              None               <a href="http://submit6.chtc.wisc.edu">submit6.chtc.wisc.edu</a> </pre><br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:16:18)</span> <b>wiscmoate:</b></span> I don't really know if a CredD requires a classad, but if it doesn't it shouldn't advertise one<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:28:22)</span> <b>jcpatton:</b></span> feel free to take a look <tt>condor_status -any -const 'MyType =?= "CredD"' -pool <a href="http://cm.chtc.wisc.edu">cm.chtc.wisc.edu</a></tt><br/>
+<span style="color: #684b6c"><span style="font-size: small">(15:28:22)</span> <b>bbockelman:</b></span> I'll write up a HTCondor feature request.  The CredD (and probably JobRouter) shouldn't require more permission than is needed for a schedd.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:28:36)</span> <b>johnkn:</b></span> we should have <tt>ALLOW_ADVERTISE</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:30:30)</span> <b>johnkn:</b></span> or perhaps we need to distinguish between putting ads with secrets into the collector, and putting ads without secrets in...?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:31:36)</span> <b>wiscmoate:</b></span> So, is there a reference anywhere for which type of commands (<tt>UPDATE_AD_GENERIC</tt>, etc etc) require which type of access levels?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:31:54)</span> <b>tlmiller:</b></span> I'm not aware of one.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:32:14)</span> <b>wiscmoate:</b></span> the CredLog output didn't seem to tell me that I needed <tt>DAEMON</tt> access level, it just said <tt>DENIED</tt><br/>
+<blockquote>
+<span style="color: #2b6836"><span style="font-size: small">(15:32:36)</span> <b>jcpatton:</b></span> ~I think you mean the CredLog~<br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:33:03)</span> <b>wiscmoate:</b></span> Doh, you're right<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:33:44)</span> <b>johnkn:</b></span> Pretty sure the collector does log what access level it needed<br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:33:53)</span> <b>wiscmoate:</b></span> Yes, I typoed<br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:34:08)</span> <b>wiscmoate:</b></span> Meant the CredLog (which was the client in this situation)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:34:08)</span> <b>johnkn:</b></span> The client side does not know<br/>
+</blockquote>
+<span style="color: #9b3b45"><span style="font-size: small">(15:34:21)</span> <b>jfrey:</b></span> The daemons that don’t have their own auth levels (master, startd, schedd) all require DAEMON level auth to advertise (looked at the code to determine this).<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:35:49)</span> <b>johnkn:</b></span> right.  this seems a bit broken to me - and hard to explain to configurators.<br/>Does it really make sense to allow a SCHEDD but not a MASTER from the same machine to send ads to the collector?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:37:26)</span> <b>wiscmoate:</b></span> I can kind of see why you might want to separate authorizations for <tt>ADVERTISE_STARTD</tt> and <tt>ADVERTISE_SCHEDD</tt><br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:38:17)</span> <b>wiscmoate:</b></span> Although both of them introduce vulnerabilities of different natures<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(15:38:49)</span> <b>tim:</b></span> @johnkn @jfrey The V9_1_4-branch is ready<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:38:57)</span> <b>johnkn:</b></span> ok.<br/>
+<span style="color: #684b6c"><span style="font-size: small">(15:39:44)</span> <b>bbockelman:</b></span> actually, I would file a ticket if that's possible -- appears I don't have the permission to set the "Fix issues" field and that's required to file a ticket.<br/>
+<blockquote>
+<span style="color: #684b6c"><span style="font-size: small">(15:40:17)</span> <b>bbockelman:</b></span> Here's the writeup I did if anyone else wants to file:<br/><br/><pre>Currently, ADVERTISE_SCHEDD only allows one to advertise a limited set of ad types related to the schedd daemon itself.  There's at least one other daemon, the credd, that's associated with a submit host but whose ad is not permitted with the ADVERTISE_SCHEDD authorization.<br/><br/>I'd claim that, with ADVERTISE_SCHEDD, the following ad types should be authorized:<br/><br/>* Anything the schedd does (Submitter, Schedd).  Probably already works.<br/>* GridManager stuff (GridResource, other?).  Might work, needs verification.<br/>* CredD.  Known not to work.<br/>* JobRouter.  Probably doesn't work.<br/><br/>There might be others on further review.</pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:40:56)</span> <b>tlmiller:</b></span> You mean "fix versions"?<br/>
+<span style="color: #684b6c"><span style="font-size: small">(15:41:08)</span> <b>bbockelman:</b></span> Yup, you're right.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:41:13)</span> <b>tlmiller:</b></span> I can't create new fix versions anymore (either), but I could select existing ones.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(15:43:02)</span> <b>tim:</b></span> Just select an existing one. If there is not an existing one.. You can ask the release manager (me) to make one.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(15:43:52)</span> <b>blin:</b></span> we can probably modify the permission scheme to be able to create new versions<br/>
+<span style="color: #684b6c"><span style="font-size: small">(15:46:06)</span> <b>bbockelman:</b></span> To be clear -- I can't file a ticket because the "fix versions" field doesn't appear for me but is required.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(15:58:21)</span> <b>blin:</b></span> weird. can you try again?<br/>
+<span style="color: #684b6c"><span style="font-size: small">(15:58:58)</span> <b>bbockelman:</b></span> works now.<br/>
+<span style="color: #684b6c"><span style="font-size: small">(16:00:42)</span> <b>bbockelman:</b></span> <a href="https://opensciencegrid.atlassian.net/browse/HTCONDOR-664">https://opensciencegrid.atlassian.net/browse/HTCONDOR-664</a> though I also notice that I can't create a due date for this ticket.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(16:01:37)</span> <b>blin:</b></span> try again<br/>
+<span style="color: #684b6c"><span style="font-size: small">(16:03:10)</span> <b>bbockelman:</b></span> Negative.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(16:14:18)</span> <b>blin:</b></span> i think i found it, try again<br/>
+<span style="color: #4cc091"><span style="font-size: small">(16:14:41)</span> <b>blin:</b></span> i changed <tt>Edit Issue</tt>  to also include the reporter of the ticket<br/>
+</blockquote>
+<span style="color: #684b6c"><span style="font-size: small">(21:18:01)</span> <b>bbockelman:</b></span> Hi all - not saying there's necessary a :fire: -- but Kenyi's message to condor-users tonight sure looks like there's a lot of smoke.  Clear delegation failure in the new X509 code where it was working before.<br/>
+</body>
+</html>

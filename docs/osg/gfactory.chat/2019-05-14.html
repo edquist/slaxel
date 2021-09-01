@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue May 14, 2019 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Tue May 14, 2019 : #gfactory (osg)</h3>
+<span style="color: #a63024"><span style="font-size: small">(13:02:46)</span> <b>efajardo:</b></span> <b>@here</b> I need some help<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:02:52)</span> <b>efajardo:</b></span> with some <tt>GLIDEIN_ToRetire</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(13:02:54)</span> <b>efajardo:</b></span> questions<br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:05:49)</span> <b>marco.mascheroni:</b></span> What about it<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:10:21)</span> <b>efajardo:</b></span> ON LSU SUper Micro<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:10:30)</span> <b>efajardo:</b></span> I see my glideins only lasting like 4 hours<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:10:31)</span> <b>efajardo:</b></span> I believe<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:11:08)</span> <b>efajardo:</b></span> the problem<br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:11:15)</span> <b>marco.mascheroni:</b></span> with jobs queued?<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:11:21)</span> <b>efajardo:</b></span> yea<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:11:24)</span> <b>efajardo:</b></span> is here<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:11:25)</span> <b>efajardo:</b></span> <a href="https://github.com/opensciencegrid/osg-gfactory/blob/master/10-noncms-osg.xml#L6309">https://github.com/opensciencegrid/osg-gfactory/blob/master/10-noncms-osg.xml#L6309</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(13:11:36)</span> <b>efajardo:</b></span> the entry does not have GLIDEIN_RetireTime<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:11:44)</span> <b>efajardo:</b></span> so it is taking probably the default which is pretty low<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:12:10)</span> <b>efajardo:</b></span> So basically I see this<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:12:12)</span> <b>efajardo:</b></span> GLIDEIN_ToRetire = 1557848072<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:12:16)</span> <b>efajardo:</b></span> which is in the past<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:12:21)</span> <b>efajardo:</b></span> but also this conflicting<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:12:26)</span> <b>efajardo:</b></span> <tt>RetirementTimeRemaining = 9988210</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(13:12:42)</span> <b>efajardo:</b></span> so how is that there is so much <tt>RetirementTimeRemaining</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(13:12:53)</span> <b>efajardo:</b></span> if the <tt>GLIDEINToRetire</tt> time already expired<br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:18:33)</span> <b>marco.mascheroni:</b></span> checking this<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:25:40)</span> <b>efajardo:</b></span> thank you<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:33:31)</span> <b>efajardo:</b></span> I believe it shoudl be just a matter of adding <tt>GLIDEINToRetire</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(13:33:32)</span> <b>efajardo:</b></span> to that entry<br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:34:50)</span> <b>marco.mascheroni:</b></span> but it's weird, many other entries do not have glideintoretire, but pilots last as much as their walltime<br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:35:04)</span> <b>marco.mascheroni:</b></span> the retire time in principle is added after the walltime<br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:43:52)</span> <b>marco.mascheroni:</b></span> I actually found one glidein that lasted 12 hours<br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:45:30)</span> <b>marco.mascheroni:</b></span> most of them just runs one jobs though<br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:46:13)</span> <b>marco.mascheroni:</b></span> actually yhtee jobs<br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:46:16)</span> <b>marco.mascheroni:</b></span> three<br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:47:44)</span> <b>marco.mascheroni:</b></span> Something like this with the pilots lasting 20 minutes seems a common pattern:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:47:53)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:48:39)</span> <b>marco.mascheroni:</b></span> I can add GLIDEINToRetire but I doubt it will help. Should I? it's a quick change<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:56:29)</span> <b>efajardo:</b></span> yes<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:56:48)</span> <b>efajardo:</b></span> the way I found this<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:56:55)</span> <b>efajardo:</b></span> is I have jobs in the queue for SUperMic<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:56:57)</span> <b>efajardo:</b></span> but they refuste<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:57:04)</span> <b>efajardo:</b></span> to start on pilots that are already rnning<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:57:45)</span> <b>efajardo:</b></span> <pre>-- Slot: slot1_3@glidein_23207_746904672@smic249 : Analyzing matches for 1 Jobs in 1 autoclusters<br/><br/>The Requirements expression for this slot is<br/><br/>    (START) &amp;&amp; (IsValidCheckpointPlatform) &amp;&amp;<br/>            (WithinResourceLimits)<br/><br/>  START is<br/>    (true &amp;&amp;<br/>--<br/>[26]          1  is_itb is undefined<br/>[29]          1  TARGET.desired_arch is undefined<br/>[33]      never  GLIDEIN_ToRetire is undefined<br/>[34]    not now  CurrentTime &lt; GLIDEIN_ToRetire<br/>[35]    not now  [33]F || [34]f<br/>[37]          1  IsValidCheckpointPlatform<br/>[39]          1  WithinResourceLimits</pre><br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:59:52)</span> <b>marco.mascheroni:</b></span> which slot is this? You should be able to give me the clusterid<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:00:07)</span> <b>marco.mascheroni:</b></span> probably not necessary<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:02:22)</span> <b>marco.mascheroni:</b></span> what value do you want me to put?<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:04:58)</span> <b>efajardo:</b></span> I am not sure<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:05:04)</span> <b>efajardo:</b></span> 40 hours<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:05:46)</span> <b>efajardo:</b></span> <tt>GLIDEIN_ClusterId = 6860459</tt><br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:05:52)</span> <b>marco.mascheroni:</b></span> ok thx<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:15:02)</span> <b>marco.mascheroni:</b></span> Ar you specifying Glidein_Job_Max_time in the frontend?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:15:03)</span> <b>marco.mascheroni:</b></span> <a href="http://glideinwms.fnal.gov/doc.prd/factory/custom_vars.html#lifetime">http://glideinwms.fnal.gov/doc.prd/factory/custom_vars.html#lifetime</a><br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:15:16)</span> <b>marco.mascheroni:</b></span> Or any of the parameters in the documentation<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:16:51)</span> <b>marco.mascheroni:</b></span> oh wait it is in the factory<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:17:12)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #a63024"><span style="font-size: small">(14:22:06)</span> <b>efajardo:</b></span> Yes<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:22:10)</span> <b>efajardo:</b></span> <tt>      &lt;attr name="GLIDEIN_Job_Max_Time" glidein_publish="True" job_publish="False" parameter="True" type="int" value="169200"/&gt;</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(14:22:28)</span> <b>efajardo:</b></span> but I think the problem is the Glidein_ToRetire<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:22:33)</span> <b>marco.mascheroni:</b></span> According to the documentation the glidein should retire after 38hours<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:22:54)</span> <b>marco.mascheroni:</b></span> glidein_toretire is calculated by glideinwms<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:23:00)</span> <b>marco.mascheroni:</b></span> I can0't set it directly<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:24:02)</span> <b>marco.mascheroni:</b></span> it should be enough to set the max walltime according to the documentation<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:24:11)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:24:26)</span> <b>marco.mascheroni:</b></span> this is GLIDEIN_Max_Walltime<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:24:51)</span> <b>marco.mascheroni:</b></span> so a glidein should retire after 38 hours<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:27:04)</span> <b>marco.mascheroni:</b></span> Are you setting this in the frontend:<br/><pre><br/>[1226] gfactory@gfactory-1 ~$ condor_status -pool  <a href="http://osg-ligo-1.t2.ucsd.edu">osg-ligo-1.t2.ucsd.edu</a> slot1_3@glidein_23207_746904672@smic249 -af GLIDEIN_Job_Max_Time<br/>169200<br/></pre><br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:27:18)</span> <b>marco.mascheroni:</b></span> ah wait<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:27:22)</span> <b>marco.mascheroni:</b></span> that's why then<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:28:08)</span> <b>marco.mascheroni:</b></span> if a single job maximum time is 169000 seconds, then the glidein will retire to leave enough time to execute a single job<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:28:50)</span> <b>marco.mascheroni:</b></span> which means wallime (172800) - job max time (169200)<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:30:04)</span> <b>marco.mascheroni:</b></span> PS I missed you said this before and had to query the ligo collector :stuck_out_tongue:<br/><pre><br/>      &lt;attr name="GLIDEIN_Job_Max_Time" glidein_publish="True" job_publish="False" parameter="True" type="int" value="169200"/&gt;<br/></pre><br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:30:12)</span> <b>marco.mascheroni:</b></span> Does it make sense?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:30:22)</span> <b>marco.mascheroni:</b></span> Please reduce the ma<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:30:30)</span> <b>marco.mascheroni:</b></span> max job time to something like 10 hours<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:33:10)</span> <b>marco.mascheroni:</b></span> maybe even less<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:33:20)</span> <b>marco.mascheroni:</b></span> otherwise the risk of fragmentation is high<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:33:50)</span> <b>marco.mascheroni:</b></span> how many cores do jobs have?<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:38:35)</span> <b>efajardo:</b></span> well<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:38:35)</span> <b>efajardo:</b></span> no<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:41:20)</span> <b>efajardo:</b></span> Cause LIGO has jobs that should be allowed to run for 40 hours<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:41:30)</span> <b>efajardo:</b></span> <tt>40*3600</tt><br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:49:54)</span> <b>marco.mascheroni:</b></span> It's fine, as long as the user jobs sets the classad (MaxRuntime, I forgot) and say the job is required to run for 40 hours..<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:50:08)</span> <b>marco.mascheroni:</b></span> they will be only matched to pilot who has enough room<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:52:05)</span> <b>marco.mascheroni:</b></span> otherwise if you set in the frontend 40 hours as max job time, the pilot will stop accepting jobs after: walltime - 40hours = (8 hours?)<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:53:24)</span> <b>marco.mascheroni:</b></span> i.e.: GLIDEINToRetire will be set 8hours after the glidein starts<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:53:38)</span> <b>marco.mascheroni:</b></span> and the glidin will stop accepting new user jobs<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:53:48)</span> <b>marco.mascheroni:</b></span> of course the pilots are 20 cores<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:54:36)</span> <b>marco.mascheroni:</b></span> if one single core is running a job, and the pilot is retiring then you are gonna be wastin 19 cores<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:54:46)</span> <b>marco.mascheroni:</b></span> since the pilot can't match when it is retiring<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:12:22)</span> <b>marco.mascheroni:</b></span> I can't find where this is enforced in the CMS negotiatior, or if it is a condor thing (like RequestCPUs). But in CRAB users sets things like:<br/><pre><br/>MaxWallTimeMins = 1250<br/></pre><br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:12:30)</span> <b>marco.mascheroni:</b></span> Maybe diego knows<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:18:50)</span> <b>marco.mascheroni:</b></span> Leaving now, I left the laptop recharger at CERN and my battery is at 2%. TTYT<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:44:34)</span> <b>efajardo:</b></span> hmm<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:44:38)</span> <b>efajardo:</b></span> We need to follow this up<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:44:41)</span> <b>efajardo:</b></span> this is insane<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:44:46)</span> <b>efajardo:</b></span> I will reduce it<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:44:49)</span> <b>efajardo:</b></span> on the FE<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:55:27)</span> <b>efajardo:</b></span> I reconfiged the LIGO pool<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:29:34)</span> <b>efajardo:</b></span> thanks @marco.mascheroni but I nneed the recipe to be able to run long running jobs<br/>
+</body>
+</html>

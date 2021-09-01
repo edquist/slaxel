@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Mar 2, 2021 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue Mar 2, 2021 : #software (osg)</h3>
+<span style="color: #a72f79"><span style="font-size: small">(12:40:24)</span> <b>andrew.melo:</b></span> Is there a better way to express this? I'd like to only set/define NETWORK_INTERFACE is the environment variable exists, and do nothing otherwise, but I can't quite sort out how to get things to evaulate in the right order<br/><pre>ACCRE_NETWORK_INTERFACE=$ENV(ACCRE_NETWORK_INTERFACE)                              <br/>if defined ACCRE_NETWORK_INTERFACE                                                 <br/>    NETWORK_INTERFACE=$(ACCRE_NETWORK_INTERFACE)                                   <br/>endif</pre><br/>Since ACCRE_NETWORK_INTERFACE is defined as $ENV(), the if statement always succeeds, but what I really want is to see if the $ENV() expression returned undefined<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:00:18)</span> <b>blin:</b></span> how often does the <tt>ACCRE_NETWORK_INTERFACE</tt> env var change? could you just write <tt>ACCRE_NETWORK_INTERFACE = True/False</tt> to a file instead?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:01:00)</span> <b>blin:</b></span> then you could use <tt>if ACCRE_NETWORK_INTERFACE</tt><br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:01:26)</span> <b>andrew.melo:</b></span> I set it like so:<br/><tt>*export* ACCRE_NETWORK_INTERFACE=$(ip route get 10.0.0.1 | *grep* dev | awk '{ print $5 }')</tt><br/>to prevent condor from trying to use the (firewalled) external interface to communicate back to the collector<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:02:05)</span> <b>andrew.melo:</b></span> There was a ticket to allow NETWORK_INTERFACE to allow a netmask instead of a specific IP, but it appears that didn't get implemented<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:03:27)</span> <b>andrew.melo:</b></span> (fwiw, there's a couple other magic variables I'd like to set, this is just an example)<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:11:41)</span> <b>blin:</b></span> so there are times when that'll yield nothing? i think the easiest thing to do would be having some script write out the value of <tt>ACCRE_NETWORK_INTERFACE</tt> to the config if that pipeline returns something, and not setting the var if it doesn't<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:45:57)</span> <b>bbockelm:</b></span> <a href="https://bitnami.com/stack/discourse/helm">https://bitnami.com/stack/discourse/helm</a> &lt;~ thoughts?<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(15:47:44)</span> <b>cat:</b></span> I think we should make this part of the discussion on Slack that Frank requested. Maybe form a plan before deploying technology.<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:47:52)</span> <b>matyas:</b></span> of _course_ there's a helm chart<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:48:24)</span> <b>matyas:</b></span> do they have an operator too?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:56:04)</span> <b>bbockelm:</b></span> :man-shrugging: If we're going to have a talk about Slack / communications, I'd probably setup an instance just to make sure everyone's seen the product.<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:00:15)</span> <b>matyas:</b></span> Mike posted <a href="https://ask.cyberinfrastructure.org/">https://ask.cyberinfrastructure.org/</a> in the #all-hands channel<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(16:16:21)</span> <b>cat:</b></span> There’s an instance! And we don’t even have to set one up.<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(16:17:34)</span> <b>cat:</b></span> Ha, first question I looked at had a reply from someone who attended one of the OSG User Schools!<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(16:17:45)</span> <b>cat:</b></span> I will definitely spend some time out here looking around.<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:36:39)</span> <b>lincoln:</b></span> ive set up discourse before... its ok<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:43:57)</span> <b>lincoln:</b></span> not sure of the context but there are very real network effects for things like slack when it comes to reaching end-users. as an end-user i'm absolutely not going to use matrix/gitter/mattermost/whatever is trending on hacker news today.  internal communication IMO is a far different beast and i'm 100% behind hosting something for that<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:51:22)</span> <b>bbockelm:</b></span> Right - I'm going to chat on Slack, not Discourse.  The context was less formal help / knowledge forums.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:51:46)</span> <b>bbockelm:</b></span> OSG support desk is very formalized; doesn't do much for knowledge transfer.<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:52:41)</span> <b>lincoln:</b></span> ya<br/>
+<span style="color: #e06b56"><span style="font-size: small">(16:55:52)</span> <b>jthiltges:</b></span> From my limited perspective (HCC), it's tricky to have public support channels when you're trying to assist someone with their unpublished research.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:58:35)</span> <b>bbockelm:</b></span> Right.  Honestly, since I don't do day-to-day user support, I was thinking more about sites.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:59:16)</span> <b>bbockelm:</b></span> Every year I expect a dozen sites that have never seen OSG before but often their questions are hard to put into the form of admin docs.<br/>
+</body>
+</html>

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jun 11, 2021 : #software (osg)</title>
+</head>
+<body>
+<h3>Fri Jun 11, 2021 : #software (osg)</h3>
+<span style="color: #a63024"><span style="font-size: small">(12:46:06)</span> <b>miwalls:</b></span> @bbockelm you mentioned this in a recent email whilst talking about CVMFS errors "All we're doing is looking at one of the extended attributes in the filesystem; you could do the same thing locally in the monitoring if you're interested." What attribute are you talking about that way I can monitor the same thing locally? At the moment every node seems happy as far as CVMFS goes.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:20:09)</span> <b>dweitzel:</b></span> @miwalls the OSG gathers the cvmfs errors with this: <a href="https://github.com/opensciencegrid/osg-flock/blob/8626641e507d3538e1c26cf611a4f400a716930f/node-check/osgvo-node-advertise#L394">https://github.com/opensciencegrid/osg-flock/blob/8626641e507d3538e1c26cf611a4f400a716930f/node-check/osgvo-node-advertise#L394</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(13:25:12)</span> <b>miwalls:</b></span> Okay, thanks I will implement that in checkmk.<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:19:01)</span> <b>miwalls:</b></span> That helped me find a couple misbehaving CVMFS clients. Any ideas on what causes the NIOERR to occur typically?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:34:22)</span> <b>bbockelm:</b></span> Hi Mitchell!  Thanks for following up here - some days I'm just really backed up in my inbox.  Typically NIOERR is due to a hiccup with the HTTP proxy.  It's triggered by someone trying to access a file and CVMFS not being able to serve it.<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:00:45)</span> <b>miwalls:</b></span> No worries, thanks. I just see it failed to find INODE but it was back Jun 4th so I remounted to clear out NIOERR.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(22:47:27)</span> <b>bbockelm:</b></span> yeah.  The existing test is a touch overly sensitive -- I asked upstream to provide a separate counter so we can see how long it's been since the last error instead.<br/>
+</body>
+</html>

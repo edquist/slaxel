@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jun 26, 2017 : #general (osg)</title>
+</head>
+<body>
+<h3>Mon Jun 26, 2017 : #general (osg)</h3>
+<span style="color: #e96699"><span style="font-size: small">(13:44:26)</span> <b>lincoln:</b></span> <a href="https://hub.docker.com/r/opensciencegrid/osg-wn/builds/">https://hub.docker.com/r/opensciencegrid/osg-wn/builds/</a> i think 3.4 is broken :disappointed:<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(14:04:14)</span> <b>tmartin:</b></span> I am having issues installing a WN client, it keeps mixing 6 and 7 stuff. I have tried repeatedly to clean things up, remove all osg, yum clean all etc...but it still wants to mix<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(14:04:32)</span> <b>tmartin:</b></span> ---&gt; Package libdirq.x86_64 0:0.4-1.el7 will be installed<br/>---&gt; Package libicu.x86_64 0:50.1.2-15.el7 will be installed<br/>---&gt; Package libxml2-python.x86_64 0:2.9.1-6.el7_2.3 will be installed<br/>---&gt; Package myproxy-libs.x86_64 0:6.1.18-1.4.osg33.el6 will be installed<br/>...<br/>---&gt; Package lksctp-tools.x86_64 0:1.0.17-2.el7 will be installed<br/>---&gt; Package myproxy-libs.x86_64 0:6.1.18-1.4.osg33.el6 will be installed<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(14:05:49)</span> <b>tmartin:</b></span> Clearly the last part should not be el6<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:58:05)</span> <b>ian_cancercomputer:</b></span> @tmartin yeah that's odd, i'm seeting .el7 on my packages..  did you upgrade this box from an el6 WN to an el7 WN ?<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:59:12)</span> <b>ian_cancercomputer:</b></span> @tmartin do you have any el6 repos installed still?<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(20:11:10)</span> <b>tmartin:</b></span> I have tried to remove all el6 from the host.<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(20:12:08)</span> <b>tmartin:</b></span> there is no el6 package and I removed OSG. It was not upgraded, though it was accidentally given the version 6 briefly. However in the past all I needed to do to fix it was to yum clean all after removing any osg repo files. I have confirmed that was done and there is no el6 reference in yum.repos.d that I can see<br/>
+<span style="color: #e96699"><span style="font-size: small">(21:09:27)</span> <b>ian_cancercomputer:</b></span> @tmartin " grep '/el6/' -r /etc/yum.repos.d  "  does that match anything?<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(21:09:33)</span> <b>tmartin:</b></span> no<br/>
+<span style="color: #e96699"><span style="font-size: small">(21:09:44)</span> <b>ian_cancercomputer:</b></span> that's -really- strange then.<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(21:09:59)</span> <b>tmartin:</b></span> I know<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(21:10:12)</span> <b>tmartin:</b></span> Hence my post :slightly_smiling_face:<br/>
+<span style="color: #e96699"><span style="font-size: small">(21:11:00)</span> <b>ian_cancercomputer:</b></span> Do you have a /var/lib/yum/repos/x86_64/6/ dir?<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(21:12:19)</span> <b>tmartin:</b></span> no<br/>
+<span style="color: #e96699"><span style="font-size: small">(21:12:56)</span> <b>ian_cancercomputer:</b></span> (...i'm not actually going to be of that much help, i'm not a centos/rhel guy..  likely i'm already going through things you've tried, sorry)<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(21:14:03)</span> <b>tmartin:</b></span> No worries :slightly_smiling_face: I have had things get messed up before, but like I said a yum remove and a yum clean all with the right settings fixes it usually.<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(21:15:43)</span> <b>tmartin:</b></span> 68  rpm -Uvh <a href="https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm">https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm</a><br/>   69   yum install yum-plugin-priorities<br/>   70  yum clean all<br/>   71    rpm -Uvh <a href="https://repo.grid.iu.edu/osg/3.3/osg-3.3-el7-release-latest.rpm">https://repo.grid.iu.edu/osg/3.3/osg-3.3-el7-release-latest.rpm</a><br/>   72  yum install osg-ca-certs<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(21:15:55)</span> <b>tmartin:</b></span> then I get every time it trying to install the darn version 6<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(21:17:19)</span> <b>tmartin:</b></span> I think there is something wrong with the 33 repo<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(21:17:24)</span> <b>tmartin:</b></span> 34 works fine<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(21:17:50)</span> <b>tmartin:</b></span> This would not be the first time things got screwed up in some weird way<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(21:18:53)</span> <b>tmartin:</b></span> In the case of this host I am not putting storage on it so no hadoop issues, but that will be a problem with 3.4<br/>
+<span style="color: #e96699"><span style="font-size: small">(21:25:33)</span> <b>ian_cancercomputer:</b></span> IIRC about a week ago there was a messup in the EPEL repositories that caused some havoc.  I don't know if that might have anything to do with it..?<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(21:26:29)</span> <b>tmartin:</b></span> That sounds like the kind of thing that would cause this<br/>
+<span style="color: #e96699"><span style="font-size: small">(21:27:16)</span> <b>ian_cancercomputer:</b></span> If you'd like I can tar up all the osg* files in my /etc/yum.repos.d/ , for comparison purposes...?<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(21:34:02)</span> <b>tmartin:</b></span> I have lots of 3.3 hosts, this was just one I was working on today. :slightly_smiling_face: Thanks though<br/>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Mar 17, 2017 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Fri Mar 17, 2017 : #gfactory (osg)</h3>
+<span style="color: #674b1b"><span style="font-size: small">(14:43:29)</span> <b>rynge:</b></span> @mkandes I wanted to try the whole node nebraska glideins<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:43:50)</span> <b>rynge:</b></span> But from some reason I can't get itb to request glideins there<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:43:52)</span> <b>rynge:</b></span> [2017-03-17 19:42:46,522] INFO: Jobs found total 225 idle 225 (good 225, old 225, grid 0, voms 0) running 0<br/>[2017-03-17 19:42:46,523] INFO: Group glideins found total 0 limit 50 curb 45; of these idle 0 limit 1000 curb 200 running 0<br/>[2017-03-17 19:42:46,523] INFO: Frontend glideins found total 10069 limit 60000 curb 59000; of these idle 344 limit 2500 curb 2000<br/>[2017-03-17 19:42:46,523] INFO: Overall slots found total 12467 limit 60000 curb 59000; of these idle 434 limit 2500 curb 2000<br/>[2017-03-17 19:42:46,523] INFO: Updating usermap<br/>[2017-03-17 19:42:46,523] INFO: Match<br/>[2017-03-17 19:42:46,525] INFO: Active forks = 3, Forks to finish = 8<br/>[2017-03-17 19:42:46,538] INFO: Active forks = 3, Forks to finish = 5<br/>[2017-03-17 19:42:46,549] INFO: Active forks = 2, Forks to finish = 2<br/>[2017-03-17 19:42:46,560] INFO: Active forks = 0, Forks to finish = 0<br/>[2017-03-17 19:42:46,560] INFO: All children terminated<br/>[2017-03-17 19:42:46,560] INFO: Total matching idle 225 (old 225) running 0 limit 100<br/>[2017-03-17 19:42:46,561] INFO:             Jobs in schedd queues                 |           Slots         |       Cores       | Glidein Req | Factory/Entry Information<br/>[2017-03-17 19:42:46,561] INFO: Idle (match  eff   old  uniq )  Run ( here  max ) | Total  Idle   Run  Fail | Total  Idle   Run | Idle MaxRun | State Factory<br/>[2017-03-17 19:42:46,561] INFO:     0(    0     0     0     0)     0(    0   100) |     0     0     0     0 |     0     0     0 |     0     0 | Up   CMS_T2_US_Nebraska_Red_op@gfactory_instance@ITBGOC@glidein-itb.grid.iu.edu<br/>[2017-03-17 19:42:46,562] INFO:             Jobs in schedd queues                 |           Slots         |       Cores       | Glidein Req | Factory/Entry Information<br/>[2017-03-17 19:42:46,562] INFO: Idle (match  eff   old  uniq )  Run ( here  max ) | Total  Idle   Run  Fail | Total  Idle   Run | Idle MaxRun | State Factory<br/>[2017-03-17 19:42:46,563] INFO:     0(    0     0     0     0)     0(    0   100) |     0     0     0     0 |     0     0     0 |     0     0 | Up   Sum of useful factories<br/>[2017-03-17 19:42:46,563] INFO:     0(    0     0     0     0)     0(    0     0) |     0     0     0     0 |     0     0     0 |     0     0 | Down Sum of down factories<br/>[2017-03-17 19:42:46,563] INFO:   225(  225   225   225   225)     0(    0     0) |     0     0     0     0 |     0     0     0 |     0     0 | Down Unmatched<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:44:13)</span> <b>rynge:</b></span> I have pressure, but gwms decides to not request at all<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:44:16)</span> <b>rynge:</b></span> Any ideas?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:23:38)</span> <b>mkandes:</b></span> @rynge: I don't see much of as a clue to why not. Can you get requests to any other sites? e.g., I only see running glideins for you at Comet via the ITB factory.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:24:17)</span> <b>mkandes:</b></span> Is it maybe because you are also passing the XSEDE allocation ID to the ITB factory?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:47:05)</span> <b>rynge:</b></span> Hmm that is a separate entry<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:47:53)</span> <b>rynge:</b></span> I have the comet requests as one entry with a sec credential including the project, and then an itb entry using my standard credential<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:08:13)</span> <b>rynge:</b></span> In the jobs, I had request_cpus=16<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:08:22)</span> <b>rynge:</b></span> That is why gwms decided to not match the jobs<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:09:10)</span> <b>rynge:</b></span> Which is weird, as it does not know how many cores the glidein can provide (GLIDEIN_CPUS = "auto")<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:09:23)</span> <b>rynge:</b></span> Changing it to request_cpus=1 works<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:10:26)</span> <b>rynge:</b></span> This will not be a problem for OSG VO. We have such a mixed workload that something will always match. It would be an issue for fe with a multicore specific groups<br/>
+<span style="color: #bd9336"><span style="font-size: small">(18:14:31)</span> <b>mkandes:</b></span> Ah, wait. I think I have to fix something. i.e., take out a default we set when "auto" broke in glideinWMS 3.2.16<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:15:30)</span> <b>rynge:</b></span> When was that version release?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(18:16:03)</span> <b>mkandes:</b></span> a few months ago<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:16:09)</span> <b>rynge:</b></span> I see it on another entry as well:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:16:11)</span> <b>rynge:</b></span> <a href="http://osg-flock.grid.iu.edu/vofrontend/monitor/frontendStatus.html?group=main_multicore_only&amp;factory=total&amp;infoGroup=Running&amp;elements=MatchJobRunningHere,MatchGlideinRunning,MatchGlideinIdle,MatchGlideinFailed,MatchCoreIdle,MatchCoreRunning,&amp;rra=3&amp;window_min=1485784969473.465&amp;window_max=1489683600000&amp;timezone=-7">http://osg-flock.grid.iu.edu/vofrontend/monitor/frontendStatus.html?group=main_multicore_only&amp;factory=total&amp;infoGroup=Running&amp;elements=MatchJobRunningHere,MatchGlideinRunning,MatchGlideinIdle,MatchGlideinFailed,MatchCoreIdle,MatchCoreRunning,&amp;rra=3&amp;window_min=1485784969473.465&amp;window_max=1489683600000&amp;timezone=-7</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:16:21)</span> <b>rynge:</b></span> Started around march 1st<br/>
+<span style="color: #bd9336"><span style="font-size: small">(18:16:54)</span> <b>mkandes:</b></span> Well, I don't think we at least put it into production until summer sometime. I can go back and check though.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:17:11)</span> <b>rynge:</b></span> That last entry is a production one<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:17:48)</span> <b>rynge:</b></span> I think we should open a bug report with the gwms team<br/>
+<span style="color: #bd9336"><span style="font-size: small">(18:18:06)</span> <b>mkandes:</b></span> Sorry, what bug?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:18:49)</span> <b>rynge:</b></span> So, that last entry (main_multicore_only) is only for multicore entries. It matches on jobs with request_cpus&gt;1<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:19:16)</span> <b>rynge:</b></span> But then it tries to be smart about it (I think) and decide what entries to actually request for<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:19:35)</span> <b>rynge:</b></span> There is some bad logic there<br/>
+<span style="color: #bd9336"><span style="font-size: small">(18:21:33)</span> <b>mkandes:</b></span> I'm getting confused. Are we talking about something different from GLDIEIN_CPUS = auto now?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(18:21:50)</span> <b>mkandes:</b></span> Sorry, been reading too much condor security docs today.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:23:10)</span> <b>rynge:</b></span> Me too<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:23:14)</span> <b>rynge:</b></span> Now it seems to work<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:23:36)</span> <b>rynge:</b></span> So, only ITB issue so far - forget about my production group<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:23:46)</span> <b>rynge:</b></span> Did you make a change?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(18:24:06)</span> <b>mkandes:</b></span> Give me a second. I'm rolling back the fix we had to make to glideinWMS 3.2.16 on the GOC-ITB factory ... which is now running 3.2.18.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(18:24:23)</span> <b>mkandes:</b></span> I forgot to remove it earlier.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(18:24:46)</span> <b>mkandes:</b></span> I may have lead to the confusion with only matching when cpu=1<br/>
+<span style="color: #bd9336"><span style="font-size: small">(18:25:58)</span> <b>mkandes:</b></span> Okay, now the default factory config on GOC-ITB should look like it did when GLIDEIN_CPUS = auto used to work.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:41:18)</span> <b>rynge:</b></span> @mkandes EntryName == "CMS_T2_US_Nebraska_Red_op"<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:41:22)</span> <b>rynge:</b></span> right?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:41:28)</span> <b>rynge:</b></span> Looks like I get 16 core glideins<br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:00:48)</span> <b>mkandes:</b></span> Hmm. We may need to check with @bbockelm if he is routing these glideins to whole nodes or not.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:02:14)</span> <b>mkandes:</b></span> Have you actually ran on some gliders there? I don't have any logs back yet indicating 16-cores.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:02:51)</span> <b>mkandes:</b></span> Ah, looks like you have some running now. I'll wait for the logs to come back.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(19:05:32)</span> <b>rynge:</b></span> DetectedCpus = 16<br/>TotalSlotCpus = 1<br/>
+<span style="color: #674b1b"><span style="font-size: small">(19:05:44)</span> <b>rynge:</b></span> So looks like they are single core glideins, on 16 way machines<br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:07:12)</span> <b>mkandes:</b></span> Well, the production entry for CMS_T2_US_Nebraska_Red_op sends in 8-core glideins. Maybe Brian hasn't given us a route to his bigger 56-core machine.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:07:26)</span> <b>mkandes:</b></span> s<br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:07:36)</span> <b>mkandes:</b></span> ?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(19:07:36)</span> <b>rynge:</b></span> Ok<br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:08:22)</span> <b>mkandes:</b></span> I think we'll need to double check with him what they have set at the CE. I gave him a submit attribute flag to redirect these gldieins where he wants, but I have not heard back from him.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:08:59)</span> <b>mkandes:</b></span> Landing on 16-core machines might be right for current config. I don't know.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:00:26)</span> <b>bbockelm:</b></span> Hm, yeah, I think this didn't get passed through.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:01:19)</span> <b>bbockelm:</b></span> @mkandes - what's the attribute you setup for this?<br/>
+</body>
+</html>

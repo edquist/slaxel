@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jun 29, 2016 : #general (osg)</title>
+</head>
+<body>
+<h3>Wed Jun 29, 2016 : #general (osg)</h3>
+<span style="color: #5870dd"><span style="font-size: small">(08:35:45)</span> <b>scotwk:</b></span> If I wanted to submit a few daily jobs to my Condor cluster to make sure that jobs are flocking properly (to the OSG) and Bosco'ing correctly (to a local cluster) is there a system in place for that?   I forget if RSV did any Condor monitoring, or if there is another tool.<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:08:02)</span> <b>lincoln:</b></span> we use jenkins, but it's perhaps a bit heavyweight<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:09:04)</span> <b>lincoln:</b></span> we have a jenkins slave that runs jobs as a normal user, submits to our flocking targets, and reports a successful build if it gets output<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:09:08)</span> <b>lincoln:</b></span> <a href="http://build.ci-connect.net:8080/job/OSG%20Connect/view/Monitor/">http://build.ci-connect.net:8080/job/OSG%20Connect/view/Monitor/</a> then it appears on this status board<br/>
+<span style="color: #5870dd"><span style="font-size: small">(09:17:58)</span> <b>scotwk:</b></span> How do you monitor for success?  Do you have a job that polls and has a timeout?<br/>
+<span style="color: #5870dd"><span style="font-size: small">(09:18:34)</span> <b>scotwk:</b></span> (hmm, can't see that URL.  Not sure if it's related to where I'm currently VPNed)<br/>
+<span style="color: #5870dd"><span style="font-size: small">(09:19:13)</span> <b>scotwk:</b></span> My latest failure for flocking was related to a certificate changing.  When that happened, nothing was matching so the jobs were sitting idle forever, but not failing in any way.<br/>
+<span style="color: #5870dd"><span style="font-size: small">(09:20:06)</span> <b>scotwk:</b></span> I could assume failure if the flocking jobs didn't match for 24h after submitting or something like that (have my daily job check that yesterdays jobs completed)<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:54:34)</span> <b>lincoln:</b></span> We have a timeout after a few hours. It has some false positives, but it mostly works.<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:56:22)</span> <b>lincoln:</b></span> our functionality tests live here: <a href="https://github.com/CI-Connect/functionality-tests">https://github.com/CI-Connect/functionality-tests</a><br/>the tests themselves are ‘cram’ files (tool from the Mercurial project for checking outputs), and a script <tt>run_and_wait.sh</tt> that watches the jobs for completion<br/>
+<span style="color: #5870dd"><span style="font-size: small">(09:58:44)</span> <b>scotwk:</b></span> Thanks for sharing.<br/>
+</body>
+</html>

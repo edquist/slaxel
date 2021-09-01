@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri May 17, 2019 : #general (osg)</title>
+</head>
+<body>
+<h3>Fri May 17, 2019 : #general (osg)</h3>
+<span style="color: #4cc091"><span style="font-size: small">(11:55:57)</span> <b>cbrown58:</b></span> Can anyone help me understand why this failed so I can fix it? - <a href="https://travis-ci.org/opensciencegrid/topology/builds/533896440?utm_source=github_status&amp;utm_medium=notification">https://travis-ci.org/opensciencegrid/topology/builds/533896440?utm_source=github_status&amp;utm_medium=notification</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:08:44)</span> <b>blin:</b></span> it's not immediately clear to me why that one failed but a subsequent build off that PR passed: <a href="https://travis-ci.org/opensciencegrid/topology/builds/533901985">https://travis-ci.org/opensciencegrid/topology/builds/533901985</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:08:50)</span> <b>blin:</b></span> sooo<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:08:54)</span> <b>blin:</b></span> ¯\_(ツ)_/¯<br/>
+<span style="color: #4cc091"><span style="font-size: small">(12:19:15)</span> <b>cbrown58:</b></span> Well, as long as everything is fine now :slightly_smiling_face: Thanks for looking into that<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:10:54)</span> <b>marian:</b></span> <b>@here</b>: I'm using CERN email for all github notifications and I realized starting April 18 CERN exchange server decides put 80% of github notifications (depends on project) to the "Junk" folder ... I really ignored it for some time thinking it may be temporary but now it starts to be annoying ... especially that using Thunderbird I haven't subscribed my "Junk" folder and using mailweb is not always comfortable just because viewing "Junk" ... anybody experienced this as well?<br/>
+<span style="color: #5a4592"><span style="font-size: small">(13:58:29)</span> <b>lmichael:</b></span> I’ve got an OSG Connect user who would like to run on machines with his CVMFS library and has dedicated hardware (two servers) at Vanderbilt for his project, which he thinks means he needs to ONLY run his jobs on those two servers. Two questions:<br/>1) How would he specify the machines to target (if that’s really what he wants, though I’ll try to disavow him of it)? Is this the same as if jobs run in a local HTCondor pool (using something like “Machine”)?<br/>2) Could he just require CVMFS and expect his jobs to run on servers that have *his* CVMFS library?<br/>3) Is there any way for Vanderbilt to prioritize HIS jobs? (I think the answer here is ‘no’, without prioritizing the entire OSG VO, but I’m happy to be wrong.)<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:59:42)</span> <b>blin:</b></span> uff dah<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:00:44)</span> <b>blin:</b></span> is he letting anyone else run on those machines? if not, i think that means there has to be machinery that goes into the entire pilot pipeline<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:01:11)</span> <b>blin:</b></span> what do you mean by his CVMFS library? is he running his own version of CVMFS?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:01:44)</span> <b>blin:</b></span> or just a library that he wants to be available via CVMFS?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:03:18)</span> <b>blin:</b></span> and if we wanted all OSG pilots running at vanderbilt to prioritize his jobs, i think that's a possibility (though @rynge won't like it) and i'm not sure if that's something we should be doing<br/>
+<span style="color: #5a4592"><span style="font-size: small">(14:33:19)</span> <b>lmichael:</b></span> @blin Regarding my #1, is it possible for his jobs to specify the Vanderbilt site AND these machines? (It’s not clear from your answer.) When you say “Is he letting anyone else run on those machines?” do you mean via Vanderbilt’s CE? or even through a local batch scheduler?<br/>#2. I’m assuming he’s referring to something in the ‘global’ cvmfs that is available through OSG, but I can ask.<br/>#3. So the only way is if all the OSG pilots running at vanderbilt would have to prioritize his jobs? (can’t be just his machines, which is what I was asking, and assuming ‘no’)<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:46:08)</span> <b>blin:</b></span> 1. it should be possible but it's going to be a janky looking requirements expression. And I'm wondering if he's ok with other OSG users (i.e. via Vanderbilt's CE)<br/>2. I hope that's the case. If so, then they can definitely just require CVMFS and he should have access to what he needs<br/>3. Using the OSG VO, there isn't a way for vanderbilt to prioritize his jobs. It's possible to do it with direct submission to the CE, changes to Vanderbilt's CE, and slurm partitions. I'm going to guess (and hope) that we don't wanna go that route<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:39:03)</span> <b>rynge:</b></span> Yeah, same issue as BNL, Duncan, and some others - I was supposed to write something up about it<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:39:08)</span> <b>rynge:</b></span> Haven't done that yet<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:52:53)</span> <b>dweitzel:</b></span> How did you solve that?  Custom VO front end group?  Customizations on the CE?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:54:13)</span> <b>blin:</b></span> i think fkw and @efajardo already have a solution for duncan<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:54:16)</span> <b>blin:</b></span> BNL's trickier, iirc<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:58:56)</span> <b>efajardo:</b></span> hmm<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:58:59)</span> <b>efajardo:</b></span> let’s step back<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:59:08)</span> <b>efajardo:</b></span> he said he as two servers at Vanderbilt<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:59:11)</span> <b>efajardo:</b></span> ?<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:00:17)</span> <b>efajardo:</b></span> Well I do not think Vanderbilt is right now allowing OSG so in principle he would be the only one runnig there. Am I wrong @rynge?<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:00:36)</span> <b>efajardo:</b></span> For two servers maybe 64 cores I would not even care to do anything<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:03:14)</span> <b>blin:</b></span> @efajardo i was mostly just wondering about what your solution was for duncan<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:03:22)</span> <b>efajardo:</b></span> well<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:03:31)</span> <b>efajardo:</b></span> WE created a second group for him<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:03:38)</span> <b>efajardo:</b></span> and some Negotiart tricks<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:03:54)</span> <b>efajardo:</b></span> but it worked cause PRP was not allowing anyone else from OSG<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:04:08)</span> <b>efajardo:</b></span> so the rwas no need for “repriorization”<br/>
+<span style="color: #5a4592"><span style="font-size: small">(16:38:32)</span> <b>lmichael:</b></span> @efajardo you’re saying we have no CE for Vanderbilt resources?<br/>
+<span style="color: #5a4592"><span style="font-size: small">(16:39:00)</span> <b>lmichael:</b></span> i.e. Vanderbilt doesn’t (yet) contribute resources to OSG?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:41:28)</span> <b>blin:</b></span> vanderbilt has CEs, they just serve CMS<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:35:36)</span> <b>rynge:</b></span> @lmichael @blin @efajardo @dweitzel Here are some thoughts on the site/project requirements/ranks problem. Feel free to edit - the idea is to have something to send up to ET<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:35:48)</span> <b>rynge:</b></span> <a href="https://docs.google.com/document/d/1VXbXq9qkreNzbxX5hamjUb9hqEU5Qk75bBlOlLvjpCo/edit?usp=sharing">https://docs.google.com/document/d/1VXbXq9qkreNzbxX5hamjUb9hqEU5Qk75bBlOlLvjpCo/edit?usp=sharing</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(18:35:50)</span> <b>efajardo:</b></span> I thought<br/>
+<span style="color: #a63024"><span style="font-size: small">(18:35:55)</span> <b>efajardo:</b></span> I had alreaty strted something<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:36:13)</span> <b>rynge:</b></span> Right - I forgot about that - I was going to combine the two!<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:36:17)</span> <b>rynge:</b></span> Sorry!<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:36:50)</span> <b>rynge:</b></span> However, I think they do fit well toghter<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:37:05)</span> <b>rynge:</b></span> Can you send me the link to your doc and I will try to combine?<br/>
+<span style="color: #a63024"><span style="font-size: small">(18:40:06)</span> <b>efajardo:</b></span> <a href="https://docs.google.com/document/d/1mT-AnTG_EYsLiTaC0EkY4oYkBpoSOgd4pYnoFyHxEBc/edit">https://docs.google.com/document/d/1mT-AnTG_EYsLiTaC0EkY4oYkBpoSOgd4pYnoFyHxEBc/edit</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:58:34)</span> <b>rynge:</b></span> Thanks!<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:59:42)</span> <b>rynge:</b></span> I thought we had one with a picture?<br/>
+</body>
+</html>

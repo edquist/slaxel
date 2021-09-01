@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Feb 4, 2020 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Tue Feb 4, 2020 : #xcache (osg)</h3>
+<span style="color: #a63024"><span style="font-size: small">(09:34:32)</span> <b>paschos:</b></span> @blin I got the host cert for the machine that ll test the xrootd standalone. will move forward on this in the afternoon<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(2020-02-10 08:45:29)</span> <b>blin:</b></span> hey @paschos i was sick most of last week<br/>
+<span style="color: #43761b"><span style="font-size: small">(2020-02-10 08:45:32)</span> <b>blin:</b></span> did you get any further on this?<br/>
+<span style="color: #a63024"><span style="font-size: small">(2020-02-10 09:53:50)</span> <b>paschos:</b></span> installed the cert but I wont have the chance to follow up until tomorrow afternoon.<br/>
+</blockquote>
+<span style="color: #a63024"><span style="font-size: small">(12:20:39)</span> <b>efajardo:</b></span> <b>@here</b> the file we use to test<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:20:41)</span> <b>efajardo:</b></span> the caches<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:20:47)</span> <b>efajardo:</b></span> cannot be retrived from the origin<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:20:56)</span> <b>efajardo:</b></span> <pre>xrdcp -vvv -f <a href="root://redirector.osgstorage.org:1094//user/dweitzel/public/blast/queries/query1">root://redirector.osgstorage.org:1094//user/dweitzel/public/blast/queries/query1</a> /dev/null<br/>[0B/0B][100%][==================================================][0B/s]<br/>Run: [ERROR] Server responded with an error: [3011] No servers are available to read the file.<br/></pre>```<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:21:00)</span> <b>efajardo:</b></span> Did that file got lost?<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:21:13)</span> <b>efajardo:</b></span> It is affecting the check_mk tests of the caches<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:22:22)</span> <b>rynge:</b></span> Yeah, need a new path based on /public<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:22:28)</span> <b>rynge:</b></span> You can use mine<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:23:12)</span> <b>rynge:</b></span> <tt>stash:///osgconnect/public/rynge/test.data</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:23:17)</span> <b>efajardo:</b></span> that is fine<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:23:24)</span> <b>efajardo:</b></span> the problem is the check_mk tests<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:23:28)</span> <b>efajardo:</b></span> adn availabilt<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:24:06)</span> <b>efajardo:</b></span> <a href="https://hcc-mon.unl.edu/osgmon/check_mk/index.py?start_url=%2Fosgmon%2Fcheck_mk%2Fview.py%3Fhost%3Dstashcache.t2.ucsd.edu%26service%3DCheck%2BCVMFS%2BAccess%26site%3Dosgmon%26view_name%3Dservice">https://hcc-mon.unl.edu/osgmon/check_mk/index.py?start_url=%2Fosgmon%2Fcheck_mk%2Fview.py%3Fhost%3Dstashcache.t2.ucsd.edu%26service%3DCheck%2BCVMFS%2BAccess%26site%3Dosgmon%26view_name%3Dservice</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:24:10)</span> <b>efajardo:</b></span> Are using the old file<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:24:22)</span> <b>efajardo:</b></span> at least that is what I get from this<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:24:23)</span> <b>efajardo:</b></span> <pre>check_mk_active-http!'-u' '/user/dweitzel/public/blast/queries/query1 -N' '--sni' '-p' '8000' '$_HOSTADDRESS_4$' '$HOSTADDRESS$'</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:17:29)</span> <b>dweitzel:</b></span> :slightly_smiling_face: that should be changed<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:17:44)</span> <b>dweitzel:</b></span> @huijun.zhu could you change check_mk to the new rynge test data?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:20:26)</span> <b>matyas:</b></span> so if I wanted to <tt>curl</tt> that file to test my cache, it would be <tt>curl <a href="http://cache_host:8000/public/rynge/test.data">http://cache_host:8000/public/rynge/test.data</a></tt> ?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:20:39)</span> <b>matyas:</b></span> (so I can update the instructions at <a href="https://opensciencegrid.org/docs/data/stashcache/install-cache/">https://opensciencegrid.org/docs/data/stashcache/install-cache/</a>)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:50:35)</span> <b>dweitzel:</b></span> that looks right.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:51:06)</span> <b>dweitzel:</b></span> <a href="http://hcc-stash.unl.edu:8000/osgconnect/public/rynge/test.data">http://hcc-stash.unl.edu:8000/osgconnect/public/rynge/test.data</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:51:10)</span> <b>dweitzel:</b></span> add osgconnect.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:51:56)</span> <b>matyas:</b></span> ok, that works<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:52:05)</span> <b>matyas:</b></span> thanks!<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:14:41)</span> <b>huijun.zhu:</b></span> updated check_mk to check /osgconnect/public/rynge/test.data<br/>
+</body>
+</html>

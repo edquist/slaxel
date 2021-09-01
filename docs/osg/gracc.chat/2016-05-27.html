@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri May 27, 2016 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Fri May 27, 2016 : #gracc (osg)</h3>
+<span style="color: #aba727"><span style="font-size: small">(09:27:02)</span> <b>sbhat:</b></span> hi all - as requested yesterday, here's a dump of extra records that showed up in GRATIA but not in GRACC.<br/>
+<span style="color: #aba727"><span style="font-size: small">(09:27:36)</span> <b>sbhat:</b></span> I've included in each row the fields from JobUsageRecord_Meta and then JobUsageRecord<br/>
+<span style="color: #aba727"><span style="font-size: small">(09:28:32)</span> <b>sbhat:</b></span> the time restriction is [2016-05-05 00:00,2016-05-06 00:00)<br/>
+<span style="color: #aba727"><span style="font-size: small">(09:29:14)</span> <b>sbhat:</b></span> <br/>
+<span style="color: #aba727"><span style="font-size: small">(09:31:28)</span> <b>sbhat:</b></span> what we do know is that of those, a number of them have more than one dbid for a single record ID - for example recordID <a href="http://uscms1.fltech-grid3.fit.edu:10245.1">uscms1.fltech-grid3.fit.edu:10245.1</a><br/>
+<span style="color: #aba727"><span style="font-size: small">(09:32:20)</span> <b>sbhat:</b></span> Finally, here's a list of just the recordIDs if you don't want to parse through the file above:<br/>
+<span style="color: #aba727"><span style="font-size: small">(09:33:46)</span> <b>sbhat:</b></span> <br/>
+<span style="color: #aba727"><span style="font-size: small">(09:36:43)</span> <b>sbhat:</b></span> to clarify, the duplicated rows in GRATIA actually do show up in GRACC, but only once.<br/>
+<span style="color: #aba727"><span style="font-size: small">(09:37:01)</span> <b>sbhat:</b></span> and that's most of the list<br/>
+<span style="color: #aba727"><span style="font-size: small">(09:37:45)</span> <b>sbhat:</b></span> The only records that don't show up when you add a distinct clause onto both lists are the following 5:<br/>
+<span style="color: #aba727"><span style="font-size: small">(09:38:11)</span> <b>sbhat:</b></span> <br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:41:46)</span> <b>dweitzel:</b></span> Hi @sbhat , do you have any conclusions from that CSV file?  A quick glance through show that there are indeed probes sending duplicate records.<br/>
+<span style="color: #aba727"><span style="font-size: small">(10:41:56)</span> <b>sbhat:</b></span> not yet<br/>
+<span style="color: #aba727"><span style="font-size: small">(10:42:06)</span> <b>sbhat:</b></span> we're looking through it to see what could be going on<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:42:10)</span> <b>dweitzel:</b></span> I can easily see that the localjobid’s are the same for multiple jobs.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:43:06)</span> <b>dweitzel:</b></span> I can see the problem in ticket: <a href="https://ticket.opensciencegrid.org/29760">https://ticket.opensciencegrid.org/29760</a> with the site names UFlorida-HPC and UFlorida-CMS<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:49:26)</span> <b>kretzke:</b></span> some background: Gratia decides if a record is a dupe by building an XML structure out of the record sans some fields: RecordIdentity block (RecordId, CreateTime), UserIdentity block (GlobalUsername, LocalUserId, VOName, ReportableVOName, CommonName), SiteName, Grid, and Origin<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:49:53)</span> <b>kretzke:</b></span> the md5sum of that is the fingerprint<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:51:23)</span> <b>kretzke:</b></span> GRACC has just been using the RecordID per the OGF spec (silly me)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:53:04)</span> <b>dweitzel:</b></span> There are clearly duplicates in this CSV file.  So that means they are duplicates in Gratia, but not duplicates in GRACC?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:54:17)</span> <b>kretzke:</b></span> correct<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:54:44)</span> <b>dweitzel:</b></span> ok, I’ve been slowly scanning through each record in the CSV file, and I haven’t found any obvious ones that are not duplicates.<br/>
+<span style="color: #aba727"><span style="font-size: small">(10:55:16)</span> <b>sbhat:</b></span> the only ones in the CSV that aren't duplicates are the recordIDs that were in the second file<br/>
+<span style="color: #aba727"><span style="font-size: small">(10:55:18)</span> <b>sbhat:</b></span> those 5<br/>
+<span style="color: #aba727"><span style="font-size: small">(10:57:37)</span> <b>sbhat:</b></span> hmm<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:57:47)</span> <b>kretzke:</b></span> I’m not convinced the first two pairs are dupes, they have different durations and hosts<br/>
+<span style="color: #aba727"><span style="font-size: small">(10:58:15)</span> <b>sbhat:</b></span> hmm - if anyone's looking, don't look at these:<br/>
+<span style="color: #aba727"><span style="font-size: small">(10:58:16)</span> <b>sbhat:</b></span> <a href="http://hadoop-osg.rcac.purdue.edu:3987320.1">hadoop-osg.rcac.purdue.edu:3987320.1</a><br/><a href="http://hadoop-osg.rcac.purdue.edu:3987320.2">hadoop-osg.rcac.purdue.edu:3987320.2</a><br/>
+<span style="color: #aba727"><span style="font-size: small">(10:58:25)</span> <b>sbhat:</b></span> those are showing up in GRACC (the other three don't)<br/>
+<span style="color: #aba727"><span style="font-size: small">(10:58:45)</span> <b>sbhat:</b></span> so I'm going to look and see if something changed or if my way of generating the list isn't quite airtight<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:02:33)</span> <b>kretzke:</b></span> another followup: processors is _mostly_ included in current records, some probes report “max” instead of “total”; those were missed.<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:34:45)</span> <b>sbhat:</b></span> follow-up:  Ignore my last statement.  Those two don't show up in GRACC (I was looking at the wrong record ID when reconciling).  So the list of 5 I gave is still correct (shows up in GRATIA, doesn't show up in GRACC)<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:34:56)</span> <b>sbhat:</b></span> sorry about that<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:22:24)</span> <b>dweitzel:</b></span> I’m not sure about those 80 core records from Oklahoma.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:22:40)</span> <b>dweitzel:</b></span> It doesn’t even look like something that should be in gratia.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:23:32)</span> <b>dweitzel:</b></span> it doesn’t have a Certificate tied to it.  Though they have different walltimes, they have the same local jobid.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:23:54)</span> <b>dweitzel:</b></span> I suspect LSF accounts for multicore oddly.  IE, breaks down usage on each node?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:27:42)</span> <b>dweitzel:</b></span> I’m going to email Horst about those jobs, maybe he can offer some insight.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:34:23)</span> <b>kretzke:</b></span> sounds good. I wonder if it’s spawning off sub-processes running on different nodes to get a total of 80 cores<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:42:06)</span> <b>dweitzel:</b></span> Well, wrt. Horst’s email, I suspect we can ignore all Oklahoma usage.<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(19:42:05)</span> <b>B14K7UVU4:</b></span> <br/>
+<span style="color: #3c8c69"><span style="font-size: small">(19:45:40)</span> <b>kretzke:</b></span> oops. thanks travis! :rage2:<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(19:45:43)</span> <b>B14K7UVU4:</b></span> <br/>
+<span style="color: #3c8c69"><span style="font-size: small">(19:46:09)</span> <b>kretzke:</b></span> :metal:<br/>
+</body>
+</html>

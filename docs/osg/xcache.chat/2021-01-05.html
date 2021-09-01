@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jan 5, 2021 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Tue Jan 5, 2021 : #xcache (osg)</h3>
+<span style="color: #84b22f"><span style="font-size: small">(17:02:00)</span> <b>ivukotic:</b></span> @blin I have tired that: I rebuilt xcache base image with ENV BASE_YUM_REPO osg-upcoming-development , then rebuilt atlas-xcache image and while I do get 5.1.0 it can not start:  ++++++ File system initialization started.<br/> ====&gt; ofs.osslib /usr/lib64/libXrdPss.so<br/> not found; falling back to using /usr/lib64/libXrdPss.so<br/>Plugin No such file or directory loading osslib /usr/lib64/libXrdPss.so<br/>++++++ Checkpoint initialization started.<br/>++++++ Checkpoint initialization completed.<br/>------ File system server initialization failed.<br/>210105 22:58:52 020 XrootdConfig: Unable to load base file system using default<br/>------ xrootd protocol initialization failed.<br/>210105 22:58:52 020 XrdProtocol: Protocol xroot could not be loaded<br/>
+<span style="color: #84b22f"><span style="font-size: small">(17:02:08)</span> <b>ivukotic:</b></span> any ideas?<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:04:26)</span> <b>matyas:</b></span> Does /usr/lib64/libXrdPss.so exist?<br/>
+<span style="color: #84b22f"><span style="font-size: small">(17:09:08)</span> <b>ivukotic:</b></span> no. It was always giving this warning by falling back to: /usr/lib64/libXrdPss-4.so<br/>
+<span style="color: #84b22f"><span style="font-size: small">(17:09:55)</span> <b>ivukotic:</b></span> this is how output from 2y ago looked like:<br/>
+<span style="color: #84b22f"><span style="font-size: small">(17:10:02)</span> <b>ivukotic:</b></span> ++++++ File system initialization started.<br/>=====&gt; ofs.osslib /usr/lib64/libXrdPss.so<br/>Plugin loaded unreleased XrdPss v20190521-555acca from osslib /usr/lib64/libXrdPss-4.so<br/>Copr.  2018, Stanford University, Pss Version v20190521-555acca<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:13:49)</span> <b>blin:</b></span> i thought xrootd tried the versioned .so's first<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:14:34)</span> <b>blin:</b></span> but i could be wrong. we did change so versioning for some of our other plugins but i don't think we own libXrdPss<br/>
+<span style="color: #84b22f"><span style="font-size: small">(17:24:09)</span> <b>ivukotic:</b></span> there is libXrdPss-5.so so I find it strange it is not used?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:29:51)</span> <b>blin:</b></span> @didavila spent a bunch of time battling versioned vs unversioned .so's for our packaging so maybe he remembers how it works<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:30:31)</span> <b>blin:</b></span> @ivukotic what's <tt>rpm -qf /usr/lib65/libXrdPss-5.so</tt> tell you?<br/>
+<span style="color: #84b22f"><span style="font-size: small">(17:34:01)</span> <b>ivukotic:</b></span> xrootd-server-libs-5.1.0-0.rc4.1.osgup.el7.x86_64<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(17:36:32)</span> <b>didavila:</b></span> this seems odd:<br/><pre>====&gt; ofs.osslib /usr/lib64/libXrdPss.so<br/> not found; falling back to using /usr/lib64/libXrdPss.so</pre><br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(17:36:53)</span> <b>didavila:</b></span> have you tried setting:<br/><pre>ofs.osslib libXrdPss.so</pre><br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(17:36:55)</span> <b>didavila:</b></span> or<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(17:37:02)</span> <b>didavila:</b></span> <pre>ofs.osslib /usr/lib64/libXrdPss-5.so</pre><br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(17:37:03)</span> <b>didavila:</b></span> ?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:38:42)</span> <b>blin:</b></span> we set that in the XCache RPM packaging<br/><pre>if exec xrootd<br/>   # Only Xrootd should be using osslib not cmsd<br/>   ofs.osslib  libXrdPss.so<br/>   # Second, the cache underlying the proxy.<br/>   pss.cachelib libXrdFileCache.so<br/>fi</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(17:38:58)</span> <b>blin:</b></span> real bizarre for this to be breaking all of a sudden<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(17:41:25)</span> <b>didavila:</b></span> Once I got weird log messages about the plugin versions and of course getting XRootD to fail to start when I had some XRootD-4 libs installed and compiled XRootD-5<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(17:42:09)</span> <b>didavila:</b></span> it kind of mixed libs from both versions some how<br/>
+<span style="color: #84b22f"><span style="font-size: small">(17:42:13)</span> <b>ivukotic:</b></span> this does not work: ofs.osslib /usr/lib64/libXrdPss-5.so<br/>
+<span style="color: #84b22f"><span style="font-size: small">(17:53:05)</span> <b>ivukotic:</b></span> this too does not work:  ofs.osslib  libXrdPss.so<br/>
+<span style="color: #84b22f"><span style="font-size: small">(17:53:39)</span> <b>ivukotic:</b></span> did anyone test 5.1.0?<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:01:38)</span> <b>blin:</b></span> i believe @efajardo's using rc4 at caltech<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:01:54)</span> <b>blin:</b></span> but yeah, it's not passing our internal tests =/<br/>
+<span style="color: #84b22f"><span style="font-size: small">(18:44:25)</span> <b>ivukotic:</b></span> is there some bug report? does Andy know about it?<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:45:17)</span> <b>blin:</b></span> we've got this for what's causing issues for us <a href="https://github.com/xrootd/xrootd/issues/1353">https://github.com/xrootd/xrootd/issues/1353</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(18:45:27)</span> <b>blin:</b></span> i think the problem you're seeing is different, though<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:45:46)</span> <b>blin:</b></span> seems pretty weird esp since @efajardo isn't seeing the same thing and i believe he has working xcache's on rc4<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:45:51)</span> <b>blin:</b></span> mostly working*<br/>
+<span style="color: #a63024"><span style="font-size: small">(18:55:28)</span> <b>efajardo:</b></span> Yes I have “working” caches on 5.1.0.rc4<br/>
+<span style="color: #84b22f"><span style="font-size: small">(20:20:44)</span> <b>ivukotic:</b></span> @efajardo do you see issue with XrdPss? What line do you have in the config?<br/>
+<span style="color: #a63024"><span style="font-size: small">(21:48:58)</span> <b>efajardo:</b></span> nop this is the crash we seee<br/>
+<span style="color: #a63024"><span style="font-size: small">(21:49:00)</span> <b>efajardo:</b></span> <pre>This is the crash in 5.1.0-rc4, in XCache BlockResponseHandler:<br/>(gdb) bt<br/>#0  _M_lower_bound (this=this@entry=0x7fbf6ce9e050, __k=@0x7fbecbdfdcb8: 0x7fbe9c020b20, __y=0x7fbf6ce9e058, __x=0xa7c03b9d9bb36a07)<br/>   at /usr/include/c++/4.8.2/bits/stl_tree.h:1141<br/>#1  std::_Rb_tree&lt;XrdPfc::IO*, std::pair&lt;XrdPfc::IO* const, XrdPfc::File::IODetails&gt;, std::_Select1st&lt;std::pair&lt;XrdPfc::IO* const, XrdPfc::File::IODetails&gt; &gt;, std::less&lt;XrdPfc::IO*&gt;, std::allocator&lt;std::pair&lt;XrdPfc::IO* const, XrdPfc::File::IODetails&gt; &gt; &gt;::find (<br/>   this=this@entry=0x7fbf6ce9e050, __k=@0x7fbecbdfdcb8: 0x7fbe9c020b20) at /usr/include/c++/4.8.2/bits/stl_tree.h:1792<br/>#2  0x00007fc1bd17245a in find (__x=@0x7fbecbdfdcb8: 0x7fbe9c020b20, this=0x7fbf6ce9e050) at /usr/include/c++/4.8.2/bits/stl_map.h:822<br/>#3  XrdPfc::File::ProcessBlockResponse (this=0x7fbf6ce9dfa0, brh=brh@entry=0x7fbf6c78fa90, res=524288)<br/>   at /usr/src/debug/xrootd/xrootd/src/XrdPfc/XrdPfcFile.cc:1200<br/>#4  0x00007fc1bd172af5 in XrdPfc::BlockResponseHandler::Done (this=0x7fbf6c78fa90, res=&lt;optimized out&gt;)<br/>   at /usr/src/debug/xrootd/xrootd/src/XrdPfc/XrdPfcFile.cc:1416<br/>#5  0x00007fc1be0ad0a0 in XrdPosixFileRH::DoIt (this=0x7fbef4039fa0) at /usr/src/debug/xrootd/xrootd/src/XrdPosix/XrdPosixFileRH.hh:58<br/>#6  0x00007fc1c3d28fbf in XrdScheduler::Run (this=0x614c20 &lt;XrdGlobal::Sched&gt;) at /usr/src/debug/xrootd/xrootd/src/Xrd/XrdScheduler.cc:382<br/>#7  0x00007fc1c3d29109 in XrdStartWorking (carg=&lt;optimized out&gt;) at /usr/src/debug/xrootd/xrootd/src/Xrd/XrdScheduler.cc:88<br/>#8  0x00007fc1c3ce9977 in XrdSysThread_Xeq (myargs=0x7fc0f002a890) at /usr/src/debug/xrootd/xrootd/src/XrdSys/XrdSysPthread.cc:86<br/>#9  0x00007fc1c3895ea5 in start_thread () from /lib64/libpthread.so.0<br/>#10 0x00007fc1c2b9696d in clone () from /lib64/libc.so.6</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(21:49:01)</span> <b>efajardo:</b></span> once a day<br/>
+</body>
+</html>

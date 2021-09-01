@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Aug 18, 2017 : #software (osg)</title>
+</head>
+<body>
+<h3>Fri Aug 18, 2017 : #software (osg)</h3>
+<span style="color: #b14cbc"><span style="font-size: small">(13:54:46)</span> <b>tmartin:</b></span> Question, why am I having to jump through hoops to get the latest xrootd-hdfs installed so that I can upgrade to what is apparently a critical bug fix release?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:02:38)</span> <b>dweitzel:</b></span> Unfortunately, @blin is out.  Maybe @matyas can answer?<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(14:04:39)</span> <b>tmartin:</b></span> I was able to grab most of what I need from Epel, but<br/> systemctl enable xrootd.service<br/>Failed to execute operation: No such file or directory<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(14:04:54)</span> <b>tmartin:</b></span> which is odd because  xrootd@.service<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:15:45)</span> <b>dweitzel:</b></span> yeah, xrootd is an instance aware service.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:16:12)</span> <b>dweitzel:</b></span> I'm not sure in your case what needs to be there.  For example, with stashcache, it's systemctl enable xrootd@stashcache.service<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(14:19:22)</span> <b>tmartin:</b></span> gotcha...hmm<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:21:02)</span> <b>matyas:</b></span> what hoops are you having to jump through?<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(14:21:52)</span> <b>tmartin:</b></span> I am trying to setup an xrootd service on some nodes with RHEL7. <br/><br/>1. What server do I start<br/>2. How do I get xrootd-hdfs so it will talk to hadoop properly<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:24:16)</span> <b>matyas:</b></span> it's different on RHEL7 than on RHEL6 -- the service you have to start depends on which xrootd config (i.e. <tt>.cfg</tt> file in <tt>/etc/xrootd</tt>)<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:24:43)</span> <b>matyas:</b></span> if your file is <tt>/etc/xrootd/xrootd-clustered.cfg</tt>, then start <tt>xrootd@clustered</tt><br/>
+<span style="color: #b14cbc"><span style="font-size: small">(14:25:07)</span> <b>tmartin:</b></span> gotcha, that is what I have<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(14:27:50)</span> <b>tmartin:</b></span> How about for cmsd<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(14:29:56)</span> <b>tmartin:</b></span> also do you know why xrootd-hdfs is mia?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:30:25)</span> <b>matyas:</b></span> it's not in 3.4 because hdfs is not in 3.4. for better or worse, we've decided to wait until hdfs 3 is out before including it<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:30:36)</span> <b>matyas:</b></span> it's still in 3.3<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(14:30:45)</span> <b>tmartin:</b></span> I get that, but I just got a big get upgraded because the 3.3 version sucks from higher up<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(14:31:00)</span> <b>tmartin:</b></span> It seems though that I can probably downgrade<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(14:31:11)</span> <b>tmartin:</b></span> because I am grabbing xrootd stuff from epel direct otherwise<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(14:31:32)</span> <b>tmartin:</b></span> apparently there is a huge performance improvement with this version<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(14:32:09)</span> <b>tmartin:</b></span> Personally I do not even know why 3.4 was released since it is impossible to use for hadoop sites it seems<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:33:08)</span> <b>dweitzel:</b></span> It's fine for CE's :slightly_smiling_face:<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(14:34:38)</span> <b>tmartin:</b></span> CPU is easy, storage is hard, disappointed nonetheless. Re-affirms that under no circumstances ever upgrade to the latest OSG in the first 12 months past release<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:35:00)</span> <b>matyas:</b></span> for cmsd, start cmsd@clustered<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:39:48)</span> <b>matyas:</b></span> @bbockelm, what's our plan if hadoop 3 still isn't done by january?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:45:50)</span> <b>matyas:</b></span> 3.3 is going to be fully supported until January and will be getting security updates till next June<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(14:50:04)</span> <b>tmartin:</b></span> Ok I think I got it figured, I need to go back to 3.3 though, any tips on the right order of commands to do that?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:52:42)</span> <b>matyas:</b></span> <tt>rpm -U --force <a href="https://repo.grid.iu.edu/osg/3.3/osg-3.3-el7-release-latest.rpm">https://repo.grid.iu.edu/osg/3.3/osg-3.3-el7-release-latest.rpm</a></tt> and merge <tt>/etc/yum.repos.d/*.rpmnew</tt> files<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(14:58:14)</span> <b>tmartin:</b></span> thanks<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(14:59:36)</span> <b>tmartin:</b></span> by merg you mean copy back over?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:00:23)</span> <b>matyas:</b></span> copy over, but if you made any changes (e.g. enabled osg-testing), then keep those changes<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(15:00:38)</span> <b>tmartin:</b></span> gotcha,<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(15:08:08)</span> <b>tmartin:</b></span> 152 packages excluded due to repository priority protections<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(15:08:20)</span> <b>tmartin:</b></span> I get that if I try to re-run the history<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(15:09:37)</span> <b>tmartin:</b></span> top<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:10:08)</span> <b>matyas:</b></span> those might be the epel packages getting excluded<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:11:48)</span> <b>matyas:</b></span> so that might be ok<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:12:14)</span> <b>matyas:</b></span> oh wait<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:12:31)</span> <b>matyas:</b></span> you need to do <tt>yum clean all</tt> after installing the new .repo files<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:12:40)</span> <b>matyas:</b></span> because the data from the old repos are still cached<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:12:50)</span> <b>matyas:</b></span> sorry, should have remembered that.<br/>
+</body>
+</html>

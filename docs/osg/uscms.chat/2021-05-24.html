@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon May 24, 2021 : #uscms (osg)</title>
+</head>
+<body>
+<h3>Mon May 24, 2021 : #uscms (osg)</h3>
+<span style="color: #de5f24"><span style="font-size: small">(10:06:56)</span> <b>justas.balcas:</b></span> @dmason No plans to break FNAL FTS upcoming days? Also - can FNAL have more backends under FTS? There is only 1 - <a href="https://cmsfts3.fnal.gov:8449/fts3/ftsmon/#/statistics/servers?vo=&amp;source_se=&amp;dest_se=&amp;time_window=1">https://cmsfts3.fnal.gov:8449/fts3/ftsmon/#/statistics/servers?vo=&amp;source_se=&amp;dest_se=&amp;time_window=1</a><br/>
+<span style="color: #de5f24"><span style="font-size: small">(10:15:03)</span> <b>justas.balcas:</b></span> Also - does anyone know the limit of FTS queues? e.g. I need to move more than 5mln files - so curious if FNAL would be able to handle that. (CERN FTS seems is having other issues whole weekend)<br/>
+<span style="color: #bc3663"><span style="font-size: small">(10:32:03)</span> <b>dmason:</b></span> We have to re-IP the node, so the "new" one will be broken at some point when thats done, that then frees us to do the switch properly.  If not rucio driven, in principle the current production server will continue chewing on requests it knows about after the switch.<br/>
+<span style="color: #bc3663"><span style="font-size: small">(10:32:51)</span> <b>dmason:</b></span> Rucio appears to break transfer requests in 200 file chunks.  Looks like job submissions can time out with numbers of files/job greater than that.  Not sure about where the total limit is at.<br/>
+<span style="color: #bc3663"><span style="font-size: small">(10:34:46)</span> <b>dmason:</b></span> Note presumably CERN FTS also has these limits -- the issue with FNAL is that we're swapping things around hopefully as soon as we can re-ip the thing.  I'm going to guess we can do this tomorrow.<br/>
+<span style="color: #bc3663"><span style="font-size: small">(10:38:42)</span> <b>dmason:</b></span> Better question -- @justas.balcas -- how long are you thinking it should take to transfer these 5M files?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(10:42:26)</span> <b>justas.balcas:</b></span> cern just blocked my transfers. The servers’s itself are capable of 1k max connections - and all files are very small. how long - good question<br/>
+<span style="color: #de5f24"><span style="font-size: small">(10:43:04)</span> <b>justas.balcas:</b></span> now i keep it in batches of 100 files and not to exceed 20k in submitted state, once it decreases to 10k - submit another 10k files request<br/>
+<span style="color: #bc3663"><span style="font-size: small">(10:57:02)</span> <b>dmason:</b></span> if total time is more than a few days, we should hold off doing all of it until after we swap over. Dont want the old server to have a lot left on it<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:00:10)</span> <b>justas.balcas:</b></span> Will not keep more than 20k files - and all of them are small and finish with-in an 1hour. Even if I loose all of them - no big issue<br/>
+</body>
+</html>

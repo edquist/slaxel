@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Feb 22, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Fri Feb 22, 2019 : #xcache (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(08:38:44)</span> <b>bbockelm:</b></span> Gotcha.  Are there any clients _inside_ Kubernetes too?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(08:56:41)</span> <b>bbockelm:</b></span> or are all clients outside k8s?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(08:57:26)</span> <b>bbockelm:</b></span> Basically, Andy was worried about having to route internal requests differently from external requests<br/>
+<span style="color: #9e3997"><span style="font-size: small">(08:58:12)</span> <b>bbockelm:</b></span> There was also a question about how many interfaces and addresses there are exposed inside the container - is it just one address (e.g., 10.1.1.2) and one interface?<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:28:19)</span> <b>isfiligoi:</b></span> Virtually all clients will be outside k8s<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:28:45)</span> <b>isfiligoi:</b></span> The pod sees a single interface, bound to the private address<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:38:12)</span> <b>isfiligoi:</b></span> There may be other deployment scenarios when a significant fraction of clients are in k8s, but not in our case.<br/>But even there, being routed through the NAT would likely be a minor overhead (although, it depends on how the NAT would be setup)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:58:12)</span> <b>bbockelm:</b></span> ok, thanks!<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:18:14)</span> <b>isfiligoi:</b></span> Is a hostcert really needed even for a unauthenticated origin?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(20:00:30)</span> <b>dweitzel:</b></span> We use host certs for reporting of cache stats. So technically no, it’s not needed for the normal operation of the origin. But it is for the OSG to capture origin and cache stats. <br/>
+<span style="color: #53b759"><span style="font-size: small">(20:20:18)</span> <b>isfiligoi:</b></span> In a containerized environment where a pod can move between nodes, having a host cert is not really feasible.<br/>BTW: What do you use it for?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(20:46:28)</span> <b>dweitzel:</b></span> Client authentication for uploading stats. <br/>
+<span style="color: #235e5b"><span style="font-size: small">(20:47:17)</span> <b>dweitzel:</b></span> The host cert though doesn’t have to be anything special for the non with origin. <br/>
+<span style="color: #235e5b"><span style="font-size: small">(20:47:49)</span> <b>dweitzel:</b></span> And the more I think of it, we may not even have the stats gathering enabled on the origins. Brian Lin might know. <br/>
+<span style="color: #235e5b"><span style="font-size: small">(20:50:35)</span> <b>dweitzel:</b></span> Sorry mobile. Non-auth origin. The host cert doesn’t have to be special for the non-auth origin. <br/>
+</body>
+</html>

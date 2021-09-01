@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jul 6, 2021 : #batlab (chtc)</title>
+</head>
+<body>
+<h3>Tue Jul 6, 2021 : #batlab (chtc)</h3>
+<span style="color: #bb86b7"><span style="font-size: small">(08:55:23)</span> <b>tim:</b></span> @johnkn The Windows 8 box is not in the BaTLab pool. I tried pinging it from <a href="http://batlab.chtc.wisc.edu">batlab.chtc.wisc.edu</a> However, <a href="http://exec-11.batlab.org">exec-11.batlab.org</a> does not appear to be in DNS.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(08:55:57)</span> <b>johnkn:</b></span> I'll see if I can RDP to it.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(08:56:34)</span> <b>johnkn:</b></span> nope<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:31:30)</span> <b>tlmiller:</b></span> I've been making some progress wringing unreliability out of <tt>cmd_drain_scavenging</tt>.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:35:38)</span> <b>tlmiller:</b></span> My latest discovery: <tt>time(2)</tt> truncates, rather than rounds, meaning HTCondor timers can fire up to (but not including) a full second early.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:37:18)</span> <b>tlmiller:</b></span> (Also: <tt>Register_Timer()</tt> uses <tt>time(2)</tt> to do it scheduling.)<br/>
+<span style="color: #d58247"><span style="font-size: small">(13:46:21)</span> <b>gthain:</b></span> does <tt>cmd_drain</tt> have the same issue?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:01:02)</span> <b>tlmiller:</b></span> No; this is happening in <tt>checkTiming()</tt>, which isn't in by <tt>cmd_drain</tt>.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:04:03)</span> <b>tlmiller:</b></span> TJ, is<br/><pre>1625525625.368 (D_ALWAYS) DaemonCore: async_pipe is signalled, but async_pipe_signal is false.</pre><br/>at all worrisome?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:04:13)</span> <b>tlmiller:</b></span> (In a StartLog.)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:30:39)</span> <b>tlmiller:</b></span> ...<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:30:45)</span> <b>tlmiller:</b></span> so much hate.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:31:13)</span> <b>tlmiller:</b></span> from <tt>master.cpp</tt>:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:31:18)</span> <b>tlmiller:</b></span> <pre>    std::string dirname;<br/>    if ( SharedPortEndpoint::CreatedSharedPortDirectory() &amp;&amp;<br/>         SharedPortEndpoint::GetDaemonSocketDir(dirname) ) {<br/><br/>        TemporaryPrivSentry tps(PRIV_CONDOR);<br/>        Directory d(dirname.c_str());<br/>        d.Remove_Entire_Directory();<br/>        if (-1 == rmdir(dirname.c_str())) {<br/>            dprintf(D_ALWAYS, "ERROR: failed to remove shared port temporary di$<br/>        }<br/>    }</pre><br/><br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:31:58)</span> <b>tlmiller:</b></span> from <tt>shared_point_endpoint.cpp</tt>:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:32:26)</span> <b>tlmiller:</b></span> <pre>bool<br/>SharedPortEndpoint::GetDaemonSocketDir(std::string &amp;result)<br/>{<br/>#ifdef WIN32<br/>    result = WINDOWS_DAEMON_SOCKET_DIR;<br/>#else<br/>...<br/>#endif<br/>    return true;<br/>}</pre><br/><br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:32:39)</span> <b>tlmiller:</b></span> from the SharedPortLog:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:32:56)</span> <b>tlmiller:</b></span> <pre>07/05/21 17:53:45.312 (D_ALWAYS) ERROR: SharedPortClient: Failed to open named pipe id 'slot1_3_10316_077c_3'  as requested by STARTD &lt;128.104.103.11:53727?addrs=128.104.103.11-53727&amp;alias=exec-11.batlab.org&amp;noUDP&amp;sock=startd_12640_fdd6&gt; on &lt;128.104.103.11:54504&gt; for sending socket: 2 The system cannot find the file specified.<br/>07/05/21 17:53:45.320 (D_ALWAYS) ERROR: SharedPortClient: Failed to open named pipe id 'slot1_3_10316_077c_3'  as requested by STARTD &lt;128.104.103.11:53727?addrs=128.104.103.11-53727&amp;alias=exec-11.batlab.org&amp;noUDP&amp;sock=startd_12640_fdd6&gt; on &lt;128.104.103.11:54505&gt; for sending socket: 2 The system cannot find the file specified.</pre><br/><br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:34:09)</span> <b>tlmiller:</b></span> (Those two failures prevent the starter from getting the SIGQUIT it needs.)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:34:36)</span> <b>tlmiller:</b></span> (And in case it wasn't clear:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:36:06)</span> <b>tlmiller:</b></span> <pre>static char const *WINDOWS_DAEMON_SOCKET_DIR = "\\\\.\\pipe\\condor";</pre><br/>).<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:36:59)</span> <b>tlmiller:</b></span> From which I infer that _any_ master shutting down on Windows can interfere with _every other_ shared port (running as the same user).<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:50:33)</span> <b>johnkn:</b></span> ??  the daemon socker dir does nothing on windows because pipes that pretend to be files in a directory are not a thing.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:51:36)</span> <b>johnkn:</b></span> there is a named pipe to talk to shared port, and it does need to have a globally unique name<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:52:44)</span> <b>tlmiller:</b></span> Note that WINDOWS_DAEMON_SOCKET_DIR doesn't point at a filesystem.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:53:17)</span> <b>johnkn:</b></span> I was reverring to the block of code that does directory stuff<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:53:50)</span> <b>tlmiller:</b></span> My understanding was that the shared port IDs that the shared port daemon uses to determine which daemon to send the socket to were in fact stored in <tt>\\.pipe\condor</tt>.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:54:17)</span> <b>tlmiller:</b></span> Does the Windows API prevent our directory-removal code from removing objects in the path <tt>\\.pipe\condor</tt>?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:54:31)</span> <b>johnkn:</b></span> that will just fail, yes<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:54:42)</span> <b>johnkn:</b></span> those are not files in the file system in any way.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:55:45)</span> <b>johnkn:</b></span> <tt>\\.\</tt> is the signal that the file system driver should step aside and hand the name down to the kernel where it will be treated as an object in the kernel namespace<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:00:33)</span> <b>tlmiller:</b></span> So I do see a call to <tt>CreateNamedPipe()</tt> passing <tt>\\.pipe\condor\&lt;shared port ID&gt;</tt> as the name.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:02:27)</span> <b>johnkn:</b></span> that sounds right.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:02:50)</span> <b>johnkn:</b></span> and we need to make an effort to make those id's globally unique on windows<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:02:52)</span> <b>tlmiller:</b></span> And the documentation says that the named pipe will be automagically cleaned up once the last handle to it is gone.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:03:00)</span> <b>johnkn:</b></span> yes<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:03:06)</span> <b>tlmiller:</b></span> Right, we included some PID to help with that.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:03:38)</span> <b>johnkn:</b></span> windows kernel objects can only live while there are handles open to them.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:03:50)</span> <b>tlmiller:</b></span> I haven't found the bit that says you can't clean them up earlier; the alternative would seem to be that the starter is buggy.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:04:34)</span> <b>johnkn:</b></span> you can't clean them up early.  if there is an open handle, then the kernel object is alive<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:16:06)</span> <b>tlmiller:</b></span> ... where are the sources to <tt>sleepw.exe</tt> kept?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:16:07)</span> <b>tlmiller:</b></span> ?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:17:08)</span> <b>johnkn:</b></span> basically my machine, although there is a clone in my personal github repo.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:17:29)</span> <b>tlmiller:</b></span> <pre>07/05/21 17:53:20.896 (pid:6888) (D_ALWAYS) About to exec D:/execute/dir_14524/userdir/condor_tests/sleepw.exe -u -k D:/execute/dir_14524/userdir/condor_tests/killfile-cds.1.2 3600<br/>07/05/21 17:53:20.901 (pid:6888) (D_ALWAYS) Create_Process succeeded, pid=7076<br/>07/05/21 17:53:45.238 (pid:6888) (D_ALWAYS) Process exited, pid=7076, status=0<br/>07/05/21 17:53:45.282 (pid:6888) (D_ALWAYS) All jobs have exited... starter exiting</pre><br/><br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:17:51)</span> <b>tlmiller:</b></span> What arguments does it _actually_ take on the command line?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:18:05)</span> <b>tlmiller:</b></span> Noting that it only slept for 25 seconds.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:19:23)</span> <b>johnkn:</b></span> presumably because of the killfile<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:19:43)</span> <b>johnkn:</b></span> <tt>sleepw -h</tt> will show usage on a windows box<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:20:11)</span> <b>johnkn:</b></span> I can post a screenshot :wink:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:20:44)</span> <b>tlmiller:</b></span> That would probably be a lot faster than me figuring out how to get it onto a Windows box, although I guess I'll start trying and see.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:23:58)</span> <b>tlmiller:</b></span> OK, so that's not it...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:24:51)</span> <b>johnkn:</b></span> <br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:25:00)</span> <b>tlmiller:</b></span> .. it's not text!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:25:29)</span> <b>tlmiller:</b></span> Thanks.<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:26:11)</span> <b>gthain:</b></span> Is this the same source as condor_tests/sleep.cpp ?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:26:23)</span> <b>johnkn:</b></span> I think so.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:29:19)</span> <b>johnkn:</b></span> yeah. that looks like the code.   built with -DNOCONSOLE<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:47:05)</span> <b>tlmiller:</b></span> Hrm.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:47:16)</span> <b>tlmiller:</b></span> So there's an interesting problem in the startd, I think.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:47:33)</span> <b>tlmiller:</b></span> ... although I've been wrong about that today already. :/<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:48:01)</span> <b>gthain:</b></span> You aren't wrong that "there is some problem in the startd"<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:48:09)</span> <b>gthain:</b></span> whether it is interesting, though ...<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:48:32)</span> <b>tlmiller:</b></span> in <tt>Starter::reallyKill()</tt>, if the shared port daemon can't find the target daemon's socket because the daemon no longer exists,<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:48:57)</span> <b>tlmiller:</b></span> we do NOT see ESRCH, and the startd takes a different codepath than it does on Linux.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:50:21)</span> <b>tlmiller:</b></span> (One which prevents final draining from occuring, thus causing the test to fail.)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:50:57)</span> <b>johnkn:</b></span> why would the Starter be killing daemons?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:51:20)</span> <b>tlmiller:</b></span> It's the startd telling the starter to kill the job.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:51:31)</span> <b>johnkn:</b></span> ok.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:52:12)</span> <b>tlmiller:</b></span> I will see if I can't delay that from happening until after the startd has noticed that the starter has died by various configuration tricks.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:52:54)</span> <b>johnkn:</b></span> So when the killfile results in the starter exiting of its own accord, we have a problem on windows<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:53:05)</span> <b>johnkn:</b></span> (question mark?)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:54:50)</span> <b>tlmiller:</b></span> It's not consistent.  If the last job exits of its own accord (I assume also because of the killfile) but doesn't do so (probably because of a slow filesystem) in time for the startd to notice before the kill-the-draining-jobs timer fires, the startd ... gets confused?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:55:32)</span> <b>johnkn:</b></span> and draining never finishes?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:56:10)</span> <b>johnkn:</b></span> sounds like you are describing a bug in the startd.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:56:40)</span> <b>tlmiller:</b></span> I'm not quite sure what state the startd is in, actually; the test thinks the drain completes, but the startd never starts the final phase of draining, or does so without saying so in the log.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:57:44)</span> <b>tlmiller:</b></span> It's not clear if it's a bug in the startd (what _should_ you do if the starter can't be sent a signal?), or if the problem is that "signals" are sent over TCP on Windows, and we don't have a way for the shared port daemon -- even if it could tell -- to reply with ESRCH rather than just closing the connection.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:59:26)</span> <b>johnkn:</b></span> I'm sure the race is worse on windows,  but there will always be  a race between the starter exiting on its own, and the startd deciding to kill it.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:59:47)</span> <b>tlmiller:</b></span> Yes, but on Linux if the starter is already dead, the startd can (and does) tell.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:00:09)</span> <b>johnkn:</b></span> that's what ESRCH is?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:00:17)</span> <b>tlmiller:</b></span> Yes.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:00:58)</span> <b>johnkn:</b></span> gotcha.  this is one of those places where if the we weren't trying so hard to pretend to be linux the answer would be easy.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:01:16)</span> <b>johnkn:</b></span> If you want to know if a process has exited, you hold a handle to the process object and  you ask the handle<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:02:12)</span> <b>tlmiller:</b></span> Strictly speaking, we don't actually care, but yes, if we had the handle we could also check for that condition where we currently check for ESRCH.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:03:10)</span> <b>tlmiller:</b></span> (Arguably, we _should_ care, but trying to send a signal on Linux is one of the easy ways to tell if the process exists...)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:03:56)</span> <b>johnkn:</b></span> in this case shared port does not even know that the message is a "signal" right?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:04:11)</span> <b>tlmiller:</b></span> Correct.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:04:33)</span> <b>johnkn:</b></span> so it can't reasonably return ESRCH when it discovers that the pipe it's trying to hand sockets off to is closed<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:06:39)</span> <b>tlmiller:</b></span> It could return something saying "I couldn't find that shared port ID", which the "signal"-sending code could interpret as "remote process is already dead", but yeah, it would be better if the "signal"-sending code checked for process existence first.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:08:37)</span> <b>tlmiller:</b></span> There's also some serious weirdness in the log where the startd logs the message that I think is causing it to send the sigquit after it fails to send it...<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:08:58)</span> <b>tlmiller:</b></span> and the sequence even on Linux makes me wonder how it could ever work on Windows.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:11:30)</span> <b>johnkn:</b></span> &gt; it would still be a race if the "signal"-sending code checked for process existence first.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:11:39)</span> <b>tlmiller:</b></span> The following log is from Windows<br/><pre>1625525604.869 (D_ALWAYS:2) slot1_1[1.0]: Received final job ClassAd update from starter.<br/>1625525604.869 (D_ALWAYS:2) slot1_1[1.0]: Closing job ClassAd update socket from starter.<br/>1625525604.892 (D_ALWAYS:2) SharedPort PipeListenerHelper got messages from Listener thread:<br/>        17:53:24.891 SharedPortEndpoint: Pipe connected and pid 10316 sent 1625525604.892 (D_ALWAYS:2) SharedPortEndpoint: Entered DoListenerAccept Win32 path.<br/>1625525604.896 (D_ALWAYS) slot1_1: Called deactivate_claim_forcibly()<br/>1625525604.896 (D_ALWAYS:2) slot1_1[1.0]: In Starter::kill() with pid 4028, sig 3 (SIGQUIT)<br/>1625525604.897 (D_ALWAYS:2) Send_Signal 3 to pid 4028 via TCP in blocking mode</pre><br/>-- for an instance where the signal-sending apparently succeeds.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:12:04)</span> <b>tlmiller:</b></span> Is the starter supposed to stick around to receive that SIGQUIT?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:12:12)</span> <b>johnkn:</b></span> it used to<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:12:44)</span> <b>johnkn:</b></span> we changed it so the starter exits not that long ago.  8.8?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:13:09)</span> <b>johnkn:</b></span> it used to be that the starter would stick around waiting to be killed<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:13:17)</span> <b>tlmiller:</b></span> In the Windows log I'm looking at it, it records catching it in one case but not in the other, possibly as a race condition?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:13:26)</span> <b>johnkn:</b></span> probably<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:13:53)</span> <b>johnkn:</b></span> I don't think it's likely that it would be caught but not logged<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:13:58)</span> <b>tlmiller:</b></span> No, sorry, belay that.  In the second case, the job hadn't exited yet.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:14:36)</span> <b>tlmiller:</b></span> Yeah, in the cases I see where the job exited, it doesn't record a SIGQUIT.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:19:53)</span> <b>tlmiller:</b></span> I'm not sure how or if to proceed at this point; I'm pretty convinced that the test (as amended on my branch) is actually reporting a real problem in HTCondor, but I don't have a plan for fixing the problem.  (Should the startd ignore failures to send signals on Windows?  Redesign the shared-port protocol to allow error returns?  See if there's anything that can be done in the current Create_Process() framework to return a handle so we can check if the starter's dead before killing it?  We have the PID; can that be used to determine if the process is alive?)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:20:18)</span> <b>johnkn:</b></span> I remember thinking a while ago that it would be cool if the socket handoff pipe could be used to hand off signals directly.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:21:18)</span> <b>johnkn:</b></span> there's no need for shared port to be involved at all for signals.  just open the pipe and drop a signal message into it.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:21:45)</span> <b>tlmiller:</b></span> It would be a terrible layering violation, but maybe it wouldn't be that hard to check if the sinful included a shared port ID in the signal-ending code and return ESRCH if the corresponding pipe doesn't exist.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:23:51)</span> <b>tlmiller:</b></span> (IIRC, one can at least theoretically send a TCP signal to another machine, so the code might have to fork off at a weird place, but that may bea better long-term solution.)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:24:27)</span> <b>tlmiller:</b></span> (I don't know enough about the pipe is used to know how complicated it would get for the receiving side to receive a "signal" message as opposed to a socket hand-off.)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:24:39)</span> <b>johnkn:</b></span> sure, condor signal *messages* would have to be dealt with the same way we do now.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:24:57)</span> <b>johnkn:</b></span> but there's no good reason to turn daemoncore::send_signal into one of those<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:25:39)</span> <b>johnkn:</b></span> we've had no end of problems because of that<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:26:19)</span> <b>tlmiller:</b></span> Unless you have to, but as I said, that decision is obviously being made somewhere (Linux supports TCP signals), but I'm thinking the current Windows code / #ifdefs bypasses that.  Maybe it's be easy, but I don't think I could handle the client side coding.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:26:27)</span> <b>tlmiller:</b></span> er,<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:26:30)</span> <b>tlmiller:</b></span> the target-side coding.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:26:58)</span> <b>tlmiller:</b></span> But if you know how to fix it for reals, please do. :)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:27:38)</span> <b>johnkn:</b></span> picking up the signal message from the pipe on the target side is probably easy, but its an async thread, so maybe a bit of work.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:28:05)</span> <b>johnkn:</b></span> the real problem is that the protocol for using the pipe does not allow for other types of messages<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:28:47)</span> <b>tlmiller:</b></span> That's what I was asking about and thinking would be difficult.  I don't know enough about the implementation to know how hard that would be to fix.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:29:03)</span> <b>johnkn:</b></span> but the pipe protocol is strictly local (i think), so we can change it (i think)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:29:19)</span> <b>tlmiller:</b></span> (Since the daemons are on the same machine, we're allowed to assume they're the same version, so we should be able to change the protocol at will.)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:31:01)</span> <b>johnkn:</b></span> right.  IIRC,  I don't remember what we put into the pipe to send to the target at first, but in reply we put a pid in the pipe from the target side, read it out and use it to make a handle then put that into the pipe.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:31:39)</span> <b>johnkn:</b></span> on linux when you put a handle into the pipe it gets translated to the destination process automagically. (right?).<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:31:48)</span> <b>johnkn:</b></span> on windows that translation is explicit.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:32:31)</span> <b>tlmiller:</b></span> There are no handles, per-se, on Linux.  But yes, the mechanism we use to transfer FDs translates them.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:33:15)</span> <b>johnkn:</b></span> so, whatever we put in the pipe to start the conversation on windows would have to be recognizable as a signal<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:33:25)</span> <b>johnkn:</b></span> then you skip the rest of the conversation.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:33:29)</span> <b>johnkn:</b></span> easy peazy<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:34:14)</span> <b>tlmiller:</b></span> INVALID_HANDLE_VALUE?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:34:32)</span> <b>tlmiller:</b></span> No, wait, that's the second thing.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:34:35)</span> <b>johnkn:</b></span> the handle comes later we can't create it until we get the pid back<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:35:27)</span> <b>johnkn:</b></span> figuring out how to do this without confusing the linux code flow is the hard bit here IMO<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:35:43)</span> <b>tlmiller:</b></span> Assuming you can't do it this afternoon, I guess we can ask ToddT tomorrow morning for enough of your time?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:36:16)</span> <b>johnkn:</b></span> I'm just here today and tomorrow this week. not really enough time for this<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:36:18)</span> <b>tlmiller:</b></span> It may end up being easier to just split DaemonCore::Send_Signal() right at the beginning; I don't know.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:36:21)</span> <b>tlmiller:</b></span> Ah, OK.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:36:35)</span> <b>johnkn:</b></span> but yeah.  I'd love to make time for this.  would solve a lot of problems.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:36:50)</span> <b>johnkn:</b></span> to have send_signal be async on windows as well as on linux<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:37:52)</span> <b>tlmiller:</b></span> We should ask for it, then.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:37:59)</span> <b>tlmiller:</b></span> Even if you can't get to it right away.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:38:05)</span> <b>johnkn:</b></span> yeah<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:04:51)</span> <b>johnkn:</b></span> btw this question<br/><pre>We have the PID; can that be used to determine if the process is alive?</pre><br/>the answer is yes (subject to ACL's which won't be a problem here)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:05:20)</span> <b>johnkn:</b></span> because you can open a handle to a process by pid<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:05:57)</span> <b>johnkn:</b></span> but if the handle is open *before* the process exits, the pid cannot be re-used and the process exit code is available to query<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:07:05)</span> <b>johnkn:</b></span> if all processes handles are closed, the kernel object goes away, and a subsequent attempt to open a handle to the pid will fail.<br/>
+</body>
+</html>

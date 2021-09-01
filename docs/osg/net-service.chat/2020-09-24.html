@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Sep 24, 2020 : #net-service (osg)</title>
+</head>
+<body>
+<h3>Thu Sep 24, 2020 : #net-service (osg)</h3>
+<span style="color: #4ec0d6"><span style="font-size: small">(11:13:26)</span> <b>smckee:</b></span> @dweitzel how goes it with the transform testing for the RabbitMQ pscheduler to ESmond data?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:39:24)</span> <b>dweitzel:</b></span> Sorry, had urgent grant stuff pop up.  But my afternoon is looking clear.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(14:01:34)</span> <b>smckee:</b></span> Hi Derek, just off my meetings.  Did you restart the testing pipeline?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:10:55)</span> <b>dweitzel:</b></span> battling to get the parallel infrastructure back up.  The collector broke... somehow...<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(14:21:05)</span> <b>smckee:</b></span> :disappointed:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:35:50)</span> <b>dweitzel:</b></span> selinux...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:35:52)</span> <b>dweitzel:</b></span> fixed<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:08:50)</span> <b>dweitzel:</b></span> getting near the end of the day.  I added throughput and traceroute support.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:09:01)</span> <b>dweitzel:</b></span> throughput is... odd.  But I think it's correct.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:11:41)</span> <b>dweitzel:</b></span> Also, apparently my dev VM just locks up when starting ~200 processes reading from various perfsonar hosts.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:11:52)</span> <b>dweitzel:</b></span> (now decreased to 10)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:14:18)</span> <b>dweitzel:</b></span> I think we have a bottleneck with DNS lookups.  The DNS lookup is necessary because the pushed messages only have ips, or hostnames.  And we need both.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:14:50)</span> <b>dweitzel:</b></span> I'm refactoring the collector such that it will use a thread pool (I'm hoping dns lookups release the python GIL) to do the dns lookups.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(16:56:46)</span> <b>smckee:</b></span> Do we need nscd ?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:11:11)</span> <b>dweitzel:</b></span> Will a process inside the docker container use it?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(19:02:11)</span> <b>dweitzel:</b></span> On Linux, it is thread safe. Though, I just finished reading an interesting article on how it was made thread safe on Mac. <a href="https://engineering.mongodb.com/post/the-saga-of-concurrent-dns-in-python-and-the-defeat-of-the-wicked-mutex-troll">https://engineering.mongodb.com/post/the-saga-of-concurrent-dns-in-python-and-the-defeat-of-the-wicked-mutex-troll</a><br/>
+</body>
+</html>

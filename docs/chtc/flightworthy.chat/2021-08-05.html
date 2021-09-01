@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Aug 5, 2021 : #flightworthy (chtc)</title>
+</head>
+<body>
+<h3>Thu Aug 5, 2021 : #flightworthy (chtc)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(10:47:16)</span> <b>tlmiller:</b></span> I will need a review for HTCONDOR-387, starting hopefully sometime today.  I'd like to know who earlier so I can get the reviewer's opinion on how much more testing is necessary.  Does anyone want to volunteer?  The ticket is a series of small changes intended to improve the code quality of _get_htcondor_, but also includes an automated smoke test of the same.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:59:21)</span> <b>coatsworth:</b></span> @tlmiller How soon do you need the review done? I'm out this afternoon and tomorrow, if it can wait until early next week I can take it.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:00:49)</span> <b>tlmiller:</b></span> I'm out all of next week, which is part of why I was asking -- I was hoping to get at least a quick opinion on the testing question before I left for and probably mostly forget where I am.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(11:04:09)</span> <b>jfrey:</b></span> I could review, but I’m not the best for test-suite related things.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:08:23)</span> <b>tlmiller:</b></span> For today and tomorrow, the question of how much (more) to test is more important.  (The test isn't currently planned to become part of per-build tests.)  It's also sensible for one person to review the bash (get_htcondor) and someone else the python (the test).<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:16:14)</span> <b>coatsworth:</b></span> It's an Ornithology test so I'm probably the best person to review that, but at first glance I don't think I'll have enough time to do a useful review before I leave :disappointed: I'll checkout the branch and give it a spin, stay tuned.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:21:25)</span> <b>tlmiller:</b></span> OK, but the Ornithology review is much less time-sensitive.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:21:39)</span> <b>tlmiller:</b></span> Thanks.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:20:17)</span> <b>coatsworth:</b></span> @tlmiller Not much progress with the Ornithology test but if that can wait until you get back, I'm happy to review it next week.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:26:36)</span> <b>tlmiller:</b></span> Sorry if I wasn't clear, but I want I really want to happen this week (today, ideally) is a look at my changes to get_htcondor and some advice or a decision about how much additional testing, if any, I have to do before we can consider the new code fully tested.  (Details about what's already been tested are in the comments on HTCONDOR-387.)  You (or any other volunteer) can safely ignore the Ornithology parts until I get back.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(12:27:39)</span> <b>jfrey:</b></span> I can look at that this afternoon.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:29:06)</span> <b>tlmiller:</b></span> @jfrey Thanks!  (I will begin testing an Ubuntu VM shortly; hopefully that will go well and be considered thorough enough.)<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(12:29:52)</span> <b>jfrey:</b></span> Can I get you to read over HTCONDOR-626 and HTCONDOR-627 and share initial thoughts in exchange?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:30:03)</span> <b>tlmiller:</b></span> Sure.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:30:52)</span> <b>tlmiller:</b></span> Were you wanting a quick look at the code, or just my thoughts on the tickets as written up?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(12:34:55)</span> <b>jfrey:</b></span> Just thoughts on the writeup<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:35:03)</span> <b>tlmiller:</b></span> I just noticed the following in our manual, which is almost certainly wrong:<br/>&gt; <tt>OpSysLongName</tt><br/>&gt; A string giving a full description of the operating system. For Linux platforms, this is generally the string taken from <tt>/etc/hosts</tt>, with extra characters stripped off Debian versions.<br/>Not sure which file in <tt>/etc</tt> we actually mean there, but it's almost certainly not <tt>hosts</tt>.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(12:35:09)</span> <b>jfrey:</b></span> There is code for the 9.0 bit<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(12:35:26)</span> <b>jfrey:</b></span> It’d be quick to review if you accept the premise.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:43:30)</span> <b>tlmiller:</b></span> So I agree that HTC-626 is a kludge, but nothing comes to mind as being any better.  HTC-627 is clearly a better solution, and I'm not sure it wouldn't be justified to go into the stable series; IIRC, it's OK to add support for a new platform in the stable series.  The kludge for 626 assumes that macOS 11.x remains and will remain sufficiently compatible with macOS X 10.x that treating the former as 10.16 will be valid for quite some time; I don't know how true that is or is going to be.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:44:22)</span> <b>tlmiller:</b></span> Before adding 626 in, it'd probably be worth it to consult with TimT and/or TJ (after implementing 627) about if 627 could go into stable.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(12:44:31)</span> <b>jfrey:</b></span> I haven’t seen anything to indicate it’ll be less true than between the previous major releases.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:45:09)</span> <b>tlmiller:</b></span> ... wasn't macOS 9 so wildly incompatible with version 10 that they added an 'X' to the name to make that clear?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(12:45:41)</span> <b>jfrey:</b></span> That was a switch to a completely new OS kernel.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(12:45:49)</span> <b>jfrey:</b></span> That’s not true for 10 going to 11.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(12:46:43)</span> <b>jfrey:</b></span> I’m using macOS 11.x now, and 12.x is coming out this next year.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:46:43)</span> <b>tlmiller:</b></span> I guess if it gets bad enough, we can always retcon it so that past a certain macOS 11 minor version, we don't pretend any more.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:46:55)</span> <b>tlmiller:</b></span> That's... much faster than ever before.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:47:02)</span> <b>tlmiller:</b></span> Will 12 be ARM-only?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:47:11)</span> <b>tlmiller:</b></span> At any rate,<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(12:47:13)</span> <b>jfrey:</b></span> They’re jumping on the rev-the-first-version-number train.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:47:56)</span> <b>tlmiller:</b></span> for me, the real question is, "if we just do 627 in the stable series because it's obviously the better idea, will we accidentally be making it harder for people to run their jobs?".<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:48:22)</span> <b>tlmiller:</b></span> I like the OpSysLegacy idea, but I'm not sure what any version comparison associated with it would look like,<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:48:27)</span> <b>tlmiller:</b></span> or if we expect one to be necessary.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(12:49:00)</span> <b>jfrey:</b></span> If we do 627 in the stable series, we should add a flag to opt into the older naming scheme.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:49:21)</span> <b>tlmiller:</b></span> (e.g., will "I want to run on macOS X 10.10 or later, including OS 11" be a thing?)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:49:55)</span> <b>tlmiller:</b></span> You mean, a flag to opt in to misrepresenting the version numbers for the sake of old jobs?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(12:50:16)</span> <b>jfrey:</b></span> Yes.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:50:33)</span> <b>tlmiller:</b></span> It would at least arguably break those jobs, otherwise, I suppose.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:50:46)</span> <b>tlmiller:</b></span> Which is verboten-ish for the stable series.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:51:17)</span> <b>tlmiller:</b></span> (Maybe make the knob a switch; in the stable series it defaults to ugly hack, in the dev series, it defaults to something saner?)<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(12:52:23)</span> <b>jfrey:</b></span> I like that. All of the code goes into stable, the default behavior changes in 9.1, and users can switch back or forth.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:53:54)</span> <b>tlmiller:</b></span> OK.  Back to testing for me. :/<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:54:20)</span> <b>johnkn:</b></span> Keep in mind that you can always override <tt>OpSys</tt>  values in your config<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:55:26)</span> <b>johnkn:</b></span> but we definitely need to stop ignoing the leading 10/11<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:56:45)</span> <b>johnkn:</b></span> So who decided to go to 11 first? Mac or Windows?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(12:57:17)</span> <b>jfrey:</b></span> Mac did it last year (announced last June)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:57:19)</span> <b>tlmiller:</b></span> Isn't it an anti-trust violation for Microsoft to do anything before Apple? ;)<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(12:57:31)</span> <b>jfrey:</b></span> I blame the browsers.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:57:32)</span> <b>johnkn:</b></span> before Netscape<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(12:58:00)</span> <b>jfrey:</b></span> Though I believe Solaris did it before them.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:58:08)</span> <b>johnkn:</b></span> Also, windows is the only OS that's not allowed to strongly integrate a browser into the OS<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:58:08)</span> <b>tlmiller:</b></span> You mean SunOS? ;)<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(12:59:15)</span> <b>jfrey:</b></span> Firefox is up to version 90 now?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:59:56)</span> <b>tlmiller:</b></span> If they don't skip Firefox 95, I will be alarmed.  If they don't skip Firefox 98, I will become extremely alarmed.<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:00:17)</span> <b>matyas:</b></span> and if they name if Firefox ME...?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:00:25)</span> <b>tlmiller:</b></span> I will set fire to their building?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:00:50)</span> <b>tlmiller:</b></span> (Does the Mozilla Foundation _have_ a building?)<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:02:13)</span> <b>matyas:</b></span> That's the problem with working remotely<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:02:59)</span> <b>tlmiller:</b></span> So you know that line about flamethrowers?<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:03:15)</span> <b>matyas:</b></span> they flame in a line?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:03:56)</span> <b>tlmiller:</b></span> A flamethrower means that somebody, somewhere once thought, "I want to set that person over there on fire, but darn it, I'm just not close enough."<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:04:55)</span> <b>tlmiller:</b></span> I'm not sure what the name of the weapon that will set people on fire based on their internet connection will be, but there will be a similar about it.<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:06:45)</span> <b>matyas:</b></span> <a href="http://www.bash.org/?4281">www.bash.org/?4281</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:07:03)</span> <b>tlmiller:</b></span> Word.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:11:01)</span> <b>johnkn:</b></span> (for when you eally want that person to set themselves on fire.)<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:15:06)</span> <b>matyas:</b></span> I am interested in this wrapper... where is it?<br/>
+<span style="color: #4cc091"><span style="font-size: small">(14:16:33)</span> <b>blin:</b></span> probably this? <a href="https://github.com/glideinWMS/glideinwms/blob/master/creation/web_base/frontend/default_singularity_wrapper.sh">https://github.com/glideinWMS/glideinwms/blob/master/creation/web_base/frontend/default_singularity_wrapper.sh</a><br/>
+<span style="color: #99a949"><span style="font-size: small">(14:16:43)</span> <b>matyas:</b></span> no I mean the one you guys are writing<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:16:52)</span> <b>matyas:</b></span> or the anti-wrapper you're writing?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:17:17)</span> <b>wiscmoate:</b></span> Regarding this from #flightworthy on July 23rd:<br/>&gt;  Segfault on negotiator that's running 9.1.2-0.550476<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:17:25)</span> <b>wiscmoate:</b></span> What version of HTCondor should we be running?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:17:56)</span> <b>wiscmoate:</b></span> Now that I've fixed the cert issue on <a href="http://cm3000.chtc.wisc.edu">cm3000.chtc.wisc.edu</a> I'm seeing:<br/><pre>[moate@cm3000 condor]$ sudo env _CONDOR_TOOL_DEBUG='D_COMMAND D_SECURITY D_FULLDEBUG' _CONDOR_TOOL.SEC_CLIENT_AUTHENTICATION_METHODS='GSI' _CONDOR_TOOL.SEC_CLIENT_AUTHENTICATION=REQUIRED condor_ping -table -address '&lt;144.92.181.89:9618?addrs=144.92.181.89-9618+[2607-f388-101c-1000--391]-9618&amp;alias=osggrid01.hep.wisc.edu&amp;noUDP&amp;sock=schedd_20998_75be&gt;' -type SCHEDD READ<br/>         Instruction Authentication Encryption Integrity Decision Identity<br/>WARNING: GSI authentication is enabled by your security configuration! GSI will not work in future releases.<br/>For details, see <a href="https://htcondor-wiki.cs.wisc.edu/index.cgi/wiki?p=PlanToReplaceGridCommunityToolkit">https://htcondor-wiki.cs.wisc.edu/index.cgi/wiki?p=PlanToReplaceGridCommunityToolkit</a><br/>WARNING: GSI authentication is being attempted! GSI will not work in future releases.<br/>For details, see <a href="https://htcondor-wiki.cs.wisc.edu/index.cgi/wiki?p=PlanToReplaceGridCommunityToolkit">https://htcondor-wiki.cs.wisc.edu/index.cgi/wiki?p=PlanToReplaceGridCommunityToolkit</a><br/>Segmentation fault</pre><br/>
+<span style="color: #684b6c"><span style="font-size: small">(14:31:24)</span> <b>bbockelman:</b></span> @blin / @lmichael - do you know the glideinWMS ticket to eradicate the warning messages?<br/>
+<span style="color: #684b6c"><span style="font-size: small">(14:31:39)</span> <b>bbockelman:</b></span> I will happily remind gWMS about it once a week.<br/>
+<span style="color: #684b6c"><span style="font-size: small">(14:32:28)</span> <b>bbockelman:</b></span> @blin - it's probably actually here: <a href="https://github.com/glideinWMS/glideinwms/blob/master/creation/web_base/singularity_lib.sh">https://github.com/glideinWMS/glideinwms/blob/master/creation/web_base/singularity_lib.sh</a> since I don't think OSG uses the default wrapper.<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:32:28)</span> <b>matyas:</b></span> are they messages that are legitimately useful for debugging?<br/>
+<span style="color: #4cc091"><span style="font-size: small">(14:33:04)</span> <b>blin:</b></span> it sounds like no<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:33:25)</span> <b>matyas:</b></span> OSG was using the default wrapper until Mats and I started working on it for Stampede2<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:34:34)</span> <b>matyas:</b></span> ... I might be confusing the pilot advertise scripts with the job wrapper though<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:35:43)</span> <b>edquist:</b></span> &gt;Dictionary functions<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:35:47)</span> <b>matyas:</b></span> but we should define a place where wrapper scripts can write legitimate warnings and errors that is not the user's stderr/stdout but is still available to people that have to debug<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:35:55)</span> <b>edquist:</b></span> as if bash does not have associative arrays<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:37:15)</span> <b>matyas:</b></span> <b>@edquist</b> keep in mind this was written for el6 where bash did not have associative arrays<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:38:17)</span> <b>edquist:</b></span> &gt; Settle Down Carl<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:38:32)</span> <b>edquist:</b></span> sorry i have been worked up since this morning<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:38:42)</span> <b>edquist:</b></span> the fires are affecting all of us<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:39:23)</span> <b>matyas:</b></span> Stay Cool, Carl :slightly_smiling_face:<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:40:20)</span> <b>wiscmoate:</b></span> <b>@here</b> hey guys, I need a working condor version for <a href="http://cm.chtc.wisc.edu">cm.chtc.wisc.edu</a>, hopefully with the security fixes - which release should we run and from which repo? 9.1.2?<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(14:41:03)</span> <b>tim:</b></span> Hang on Moate, I post the best one.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:42:02)</span> <b>wiscmoate:</b></span> ty<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(14:43:58)</span> <b>tim:</b></span> This version has the security fix and the bug fix you need: 9.1.3-0.552620  I'll let you know when it's in the RC repo (very soon.)<br/>
+<blockquote>
+<span style="color: #bb86b7"><span style="font-size: small">(2021-08-10 06:49:22)</span> <b>tim:</b></span> @wiscmoate This build is appropriate for all nodes. The crash that was happening on the central manager could happen on any node.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(2021-08-10 09:15:20)</span> <b>wiscmoate:</b></span> :thumbsup:<br/>
+<span style="color: #3c989f"><span style="font-size: small">(2021-08-10 09:15:29)</span> <b>wiscmoate:</b></span> @tim :arrow_up:<br/>
+</blockquote>
+<span style="color: #3c989f"><span style="font-size: small">(14:44:08)</span> <b>wiscmoate:</b></span> much appreciated Tim<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(14:46:03)</span> <b>tim:</b></span> OK, It's in the repo now.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:49:00)</span> <b>wiscmoate:</b></span> Which repo is that?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:49:10)</span> <b>wiscmoate:</b></span> URL works<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(14:49:49)</span> <b>tim:</b></span> <a href="https://research.cs.wisc.edu/htcondor/repo/9.1/el7/rc/">https://research.cs.wisc.edu/htcondor/repo/9.1/el7/rc/</a><br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:50:13)</span> <b>wiscmoate:</b></span> Got it, thank you<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:25:51)</span> <b>matyas:</b></span> Do non-root startds (without cgroups) still enforce memory limits? (By polling or something?)<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:26:09)</span> <b>gthain:</b></span> In CHTC, or generally?<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:26:13)</span> <b>matyas:</b></span> Generally<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:26:34)</span> <b>gthain:</b></span> They don't by default, but can be configured to do so<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:27:10)</span> <b>gthain:</b></span> Note that without cgroups, our memory usage numbers are... less accurate<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(15:27:53)</span> <b>jfrey:</b></span> “How many bytes are in that jar?”<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(15:28:23)</span> <b>jfrey:</b></span> “And you can’t walk around to see the back”<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:31:58)</span> <b>matyas:</b></span> @blin should we set that up in the pilot containers?<br/>
+<blockquote>
+<span style="color: #4cc091"><span style="font-size: small">(15:34:30)</span> <b>blin:</b></span> it's probably required for <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-4634">https://opensciencegrid.atlassian.net/browse/SOFTWARE-4634</a><br/>
+<span style="color: #99a949"><span style="font-size: small">(15:35:16)</span> <b>matyas:</b></span> yeah that's what I was thinking of<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:10:00)</span> <b>matyas:</b></span> Should I be a smartypants and only put that policy in if the user specifies MEMORY, or should that policy always be in there?<br/>
+<span style="color: #4cc091"><span style="font-size: small">(16:54:11)</span> <b>blin:</b></span> what would you set it to in the second case?<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:54:32)</span> <b>matyas:</b></span> I'd leave it alone<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:54:38)</span> <b>matyas:</b></span> der<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:55:26)</span> <b>matyas:</b></span> the hold policy is for jobs that go over the memory of their slot (which, since we're using pslots, is the same as request_memory)<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:55:57)</span> <b>matyas:</b></span> if the user specifies MEMORY, that's for the whole pslot<br/>
+<span style="color: #4cc091"><span style="font-size: small">(17:01:16)</span> <b>blin:</b></span> yeah, that sounds reasonable<br/>
+</blockquote>
+<span style="color: #99a949"><span style="font-size: small">(15:32:23)</span> <b>matyas:</b></span> Or @gthain should we set that up for the execute containers?<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:35:13)</span> <b>gthain:</b></span> I assume there's some good reason it is off by default<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:36:30)</span> <b>gthain:</b></span> Sadly, I don't think there's a way for a process running inside a container to get the resource limits of the container<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:40:51)</span> <b>matyas:</b></span> there isn't, which is why I make people specify it in the "MEMORY" environment variable<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:41:06)</span> <b>matyas:</b></span> (also specify it I should say)<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:41:12)</span> <b>matyas:</b></span> ditto for NUM_CPUS<br/>
+<span style="color: #684b6c"><span style="font-size: small">(20:25:47)</span> <b>bbockelman:</b></span> &gt; Sadly, I don't think there's a way for a process running inside a container to get the resource limits of the container<br/>Ye of little faith!  Lincoln Bryant actually has a clever solution in k8s which causes the controller to set env vars for condor appropriately <br/>
+<span style="color: #d58247"><span style="font-size: small">(21:04:37)</span> <b>gthain:</b></span> I meant first class.  Seems like a container interface failure<br/>
+</body>
+</html>

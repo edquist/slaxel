@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Feb 12, 2019 : #net-service (osg)</title>
+</head>
+<body>
+<h3>Tue Feb 12, 2019 : #net-service (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(11:41:10)</span> <b>bbockelm:</b></span> @smckee @dweitzel @jthiltges -&gt; let's meet here for the SAND doc afternoon.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:43:09)</span> <b>dweitzel:</b></span> Sure.  Say, 1pm central?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:43:24)</span> <b>dweitzel:</b></span> Are you somewhere on a beach in florida?  Just wondering how jealous I should be.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(11:44:01)</span> <b>smckee:</b></span> OK.  I will be around (in Ann Arbor :slightly_smiling_face: )<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:05:09)</span> <b>bbockelm:</b></span> :) hold on - running about 15-20 minutes late.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:17:06)</span> <b>dweitzel:</b></span> My first goal is to document the backup replay procedure.  And replay some old data, probably just to the parallel data pipeline I setup.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:17:19)</span> <b>dweitzel:</b></span> good opportunity to test it, without affecting the production one.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:27:20)</span> <b>bbockelm:</b></span> Alright, do we have a punchlist like what Derek put above?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:27:43)</span> <b>dweitzel:</b></span> punchlist of documents?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:28:40)</span> <b>bbockelm:</b></span> yeah<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:28:49)</span> <b>bbockelm:</b></span> If not .... <a href="https://github.com/sand-ci/sand-ci.github.io/projects/1">https://github.com/sand-ci/sand-ci.github.io/projects/1</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:33:41)</span> <b>bbockelm:</b></span> ah, I see @smckee is starting to hack on the docs.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:33:56)</span> <b>smckee:</b></span> Yes, never worked with this combination of tools<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:34:05)</span> <b>smckee:</b></span> Trying to figure out how to get things inserted correctly...<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:34:52)</span> <b>smckee:</b></span> So I need an "images" directory for my MD doc.  Does it go in the "root" as _images or in the _pages as "images" ?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:36:34)</span> <b>smckee:</b></span> Or it seems there is some kind of convention already?   <a href="https://github.com/sand-ci/sand-ci.github.io/blob/master/_includes/figure">https://github.com/sand-ci/sand-ci.github.io/blob/master/_includes/figure</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:39:12)</span> <b>dweitzel:</b></span> @smckee I usually put a top level directory called <tt>images</tt> (no underscore)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:39:24)</span> <b>dweitzel:</b></span> Like this repo: <a href="https://github.com/djw8605/djw8605.github.com">https://github.com/djw8605/djw8605.github.com</a><br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:39:33)</span> <b>smckee:</b></span> OK.  Just want to keep with the "standard" convention(s) :slightly_smiling_face:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:40:04)</span> <b>dweitzel:</b></span> Then, reference the files like: <pre>{% include figure image_path="/images/posts/StashCache-By-Numbers/CacheLocations.png" alt="Cache Locations" caption="Cache Locations in the U.S." %}</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:40:11)</span> <b>dweitzel:</b></span> <a href="https://github.com/djw8605/djw8605.github.com/blob/master/_posts/2018-09-26-stashcache-by-the-numbers.markdown">https://github.com/djw8605/djw8605.github.com/blob/master/_posts/2018-09-26-stashcache-by-the-numbers.markdown</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:41:04)</span> <b>dweitzel:</b></span> Some documentation from our theme: <a href="https://mmistakes.github.io/minimal-mistakes/docs/helpers/#figure">https://mmistakes.github.io/minimal-mistakes/docs/helpers/#figure</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:43:19)</span> <b>bbockelm:</b></span> @smckee - if it helps, I did the following patch:<br/><pre><br/>diff --git a/Gemfile b/Gemfile<br/>index 6db7332..1edf9a8 100644<br/>--- a/Gemfile<br/>+++ b/Gemfile<br/>@@ -14,7 +14,7 @@ gem "github-pages", group: :jekyll_plugins<br/> # To upgrade, run <tt>bundle update</tt>.<br/> <br/> gem "jekyll", "~&gt; 3.5"<br/>-gem "minimal-mistakes-jekyll"<br/>+#gem "minimal-mistakes-jekyll"<br/> <br/> # The following plugins are automatically loaded by the theme-gem:<br/> #   gem "jekyll-paginate"<br/>diff --git a/_config.yml b/_config.yml<br/>index 6772a8b..23c0ebb 100644<br/>--- a/_config.yml<br/>+++ b/_config.yml<br/>@@ -22,7 +22,7 @@ name                     : "Service Analysis and Network Diagnosis"<br/> description              : "Service Analysis and Network Diagnosis"<br/> url                      : <a href="https://sand-ci.org">https://sand-ci.org</a><br/> baseurl                  : # the subpath of your site, e.g. "/blog"<br/>-repository               : # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"<br/>+repository               : sand-ci/sand-ci.github.io<br/> teaser                   : # path of fallback teaser image, e.g. "/assets/images/500x300.png"<br/> # breadcrumbs            : false # true, false (default)<br/> words_per_minute         : 200<br/>@@ -225,6 +225,7 @@ plugins:<br/>   - jekyll-gist<br/>   - jekyll-feed<br/>   - jemoji<br/>+  - minimal-mistakes-jekyll<br/> <br/> # mimic GitHub Pages with --safe<br/> whitelist:<br/></pre><br/><br/>followed by:<br/><br/><pre><br/>docker run -t --rm -v "$PWD:/usr/src/app" -p "4000:4000" starefossen/github-pages<br/></pre><br/><br/>and got a local render of the site.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:44:13)</span> <b>dweitzel:</b></span> great!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:17:11)</span> <b>dweitzel:</b></span> I assume yes, but should I put the recovery documentation in markdown on the sand-ci site?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:22:09)</span> <b>bbockelm:</b></span> yes - I think we need a separate section, of course!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:25:26)</span> <b>bbockelm:</b></span> @dweitzel - what are our favorite Dashboard links from the SAND data?  Was fixing up the homepage...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:26:59)</span> <b>dweitzel:</b></span> As in ES dashboards?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:29:24)</span> <b>bbockelm:</b></span> yeah - any sort of link we can throw on the homepage.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:30:00)</span> <b>bbockelm:</b></span> I guess something like the Condor transfer page would work?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:31:27)</span> <b>jthiltges:</b></span> Threw together a quick stylized sand dunes thing in inkscape. ¯\_(ツ)_/¯<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:31:33)</span> <b>dweitzel:</b></span> Sure.  I guess I don't really look at any SAND dashboards.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:32:26)</span> <b>bbockelm:</b></span> hm - looks like GRACC is wedged<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:32:39)</span> <b>dweitzel:</b></span> indeed, we must have been both on it at the same time.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:32:46)</span> <b>dweitzel:</b></span> seems very wedged.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:32:58)</span> <b>dweitzel:</b></span> though, I know it was fine little more than an hour ago.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:33:34)</span> <b>bbockelm:</b></span> @jthiltges - I like it!  Can you move the "SAND-CI" text into the sand dune?  Or is the contrast all wrong for that?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:35:56)</span> <b>jthiltges:</b></span> <br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:41:38)</span> <b>bbockelm:</b></span> How about something like this?  Except make the sand dune flow down to the darker gray box?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(14:44:47)</span> <b>smckee:</b></span> So I am stucking getting Windows 10 Pro on my laptop do I can run Docker there.   Slowing me down, but it is useful to get the right tools in place to make things more straightforward in the future.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(14:45:12)</span> <b>smckee:</b></span> (I have Windows 10 Home and I am trying to get the key to upgrade from the University)<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(14:45:37)</span> <b>smckee:</b></span> I like the SAND-CI logo as well!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:47:34)</span> <b>bbockelm:</b></span> @smckee - I'm going to comment out the "Technical Docs" tab until you get a chance to clean out the TODOs.  Sound good?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(14:47:50)</span> <b>smckee:</b></span> Sure<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:51:45)</span> <b>bbockelm:</b></span> @dweitzel - where are you going to put the replay docs?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:53:31)</span> <b>dweitzel:</b></span> was just going through the _pages directory.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:53:35)</span> <b>dweitzel:</b></span> not sure, any preference?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:53:44)</span> <b>bbockelm:</b></span> I was thinking of having a "technical docs" collection.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:53:44)</span> <b>jthiltges:</b></span> <br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:54:33)</span> <b>bbockelm:</b></span> set it up the same way as the meeting minutes directory - you'd get one link per doc.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:55:06)</span> <b>dweitzel:</b></span> Sure.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(14:56:55)</span> <b>smckee:</b></span> Yes, the "Technical Docs" link was intended to be a collection...just didn't know how to do it.  I temp linked it to the architecture doc.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:57:48)</span> <b>jthiltges:</b></span> The different variations in case folks want to play with it.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:03:44)</span> <b>bbockelm:</b></span> ok, done -- @smckee: I made a copy of the document you are working on solely so I wouldn't clobber your work.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(15:03:56)</span> <b>smckee:</b></span> Thanks!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:04:09)</span> <b>bbockelm:</b></span> However, once you're ready to merge things, please remove the copy and just keep the contents in <tt>_technical_docs</tt>.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:04:30)</span> <b>bbockelm:</b></span> @dweitzel - once the replay doc is ready, just <tt>git mv</tt> it after a rebase.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(15:04:43)</span> <b>smckee:</b></span> So it shows as "Individual Documents" under "Technical Docs"<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:05:07)</span> <b>dweitzel:</b></span> Sure<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:04:26)</span> <b>bbockelm:</b></span> @dweitzel - how much SASS do you know?  What's the 'right' way to override?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:04:42)</span> <b>dweitzel:</b></span> A little.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:04:48)</span> <b>dweitzel:</b></span> are you trying to overwrite the font size?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:04:51)</span> <b>dweitzel:</b></span> if so, +1<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:12:31)</span> <b>bbockelm:</b></span> Ah - I think I figured it out<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:12:47)</span> <b>bbockelm:</b></span> that thing where life reminds you that you aren't a web developer.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:14:19)</span> <b>bbockelm:</b></span> @jthiltges ^^^ live at <a href="http://sand-ci.org">sand-ci.org</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:17:34)</span> <b>bbockelm:</b></span> ah - and if you could send me a favicon.ico variant, I'd be happy (perhaps just the dune with a "S"?)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:27:24)</span> <b>bbockelm:</b></span> Ah - and some sample images.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(17:34:10)</span> <b>jthiltges:</b></span> <br/>
+<span style="color: #e06b56"><span style="font-size: small">(17:35:06)</span> <b>jthiltges:</b></span> Updated SVG<br/>
+</body>
+</html>

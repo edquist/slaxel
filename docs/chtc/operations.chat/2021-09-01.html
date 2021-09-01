@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Sep 1, 2021 : #operations (chtc)</title>
+</head>
+<body>
+<h3>Wed Sep 1, 2021 : #operations (chtc)</h3>
+<span style="color: #2b6836"><span style="font-size: small">(08:39:21)</span> <b>jcpatton:</b></span> any thoughts why doing <tt>yum update</tt> (or anything that goes out to upstream) would be timing out inside an EL8 container on <tt><a href="http://scitokens-dev.chtc.wisc.edu">scitokens-dev.chtc.wisc.edu</a></tt>? I’ve gotten rid of the proxies in my env, the only other hint I see is this weird message when running <tt>yum</tt> on the host:<br/><pre>[jcpatton@scitokens-dev el8_docker]$ sudo yum list httpd*<br/>Loaded plugins: fastestmirror, priorities, product-id, search-disabled-repos, subscription-manager,<br/>              : versionlock<br/><br/>This system is not registered with an entitlement server. You can use subscription-manager to register.<br/><br/>&lt;normal output snipped&gt;</pre><br/>
+<span style="color: #2b6836"><span style="font-size: small">(08:40:40)</span> <b>jcpatton:</b></span> I also just installed Docker yesterday, could puppet have dropped some iptables rules in there<br/>
+<span style="color: #d58247"><span style="font-size: small">(08:40:50)</span> <b>gthain:</b></span> Is this a RHEL(tm) EL8?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(08:41:04)</span> <b>jcpatton:</b></span> no! <tt>scitokens-dev</tt> is CentOS 7<br/>
+<span style="color: #73769d"><span style="font-size: small">(08:41:24)</span> <b>jbart:</b></span> I see 'This system is not registered with an entitlement server.' on pretty much every YUM command I run here. I think it is benign? But don't quote me on that.<br/>
+<span style="color: #73769d"><span style="font-size: small">(08:43:39)</span> <b>jbart:</b></span> Some stackoverflow people are saying it's related to having the subscription-manager yum plugin loaded but not configured; I'm not sure if we're actually trying to utilize it or if we should actually turn that off.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(08:44:18)</span> <b>jcpatton:</b></span> I can’t ping <a href="http://mirrorlist.centos.org">mirrorlist.centos.org</a> from inside the container… seems like I probably shouldn’t have just installed Docker and assumed puppet wouldn’t come along and wreck me :upside_down_face:<br/>
+<span style="color: #2b6836"><span style="font-size: small">(08:50:55)</span> <b>jcpatton:</b></span> looks like I needed to add <tt>"iptables": true</tt> to the daemon config<br/>
+</body>
+</html>

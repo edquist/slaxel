@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Aug 11, 2015 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue Aug 11, 2015 : #software (osg)</h3>
+<span style="color: #e96699"><span style="font-size: small">(13:32:15)</span> <b>lincoln:</b></span> <b>@channel</b>: hi. so... my BeStMan server has to calculate adler32 checksums and store them in the xattrs of files for ATLAS DDM... problem is that that requires me re-reading the files once written and doing the adler32 ON the SRM server. <br/><br/>any pro tips on how to optimize this? i’m already seeing my SRM server in huge I/O wait and bottlenecked on the network interface<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:33:33)</span> <b>lincoln:</b></span> wondering if there is a way to do a clustered BeStMan, or maybe it can be simply round-robinned? or maybe the answer is to buy beefier hardware..?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:47:19)</span> <b>dweitzel:</b></span> @lincoln: I would ask on the osg-software mailing list.  We don’t have a quorum yet on here of software  people.<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:47:42)</span> <b>lincoln:</b></span> i just figured you guys were experts on everything :simple_smile:<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:47:52)</span> <b>lincoln:</b></span> will do<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:13:51)</span> <b>bbockelm:</b></span> Hm.  Is this on dCache?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:13:59)</span> <b>bbockelm:</b></span> wait, no, no BestMan on dCache.<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:14:01)</span> <b>lincoln:</b></span> no, Ceph<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:14:11)</span> <b>bbockelm:</b></span> Any way to trick Ceph into doing this for you?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:14:23)</span> <b>bbockelm:</b></span> Locally, we farm things out to the GridFTP servers as a part of the HDFS plugin.<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:14:28)</span> <b>lincoln:</b></span> i found that the StoRM folks wrote a GridFTP DSI that calculates the adler32 checksum<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:14:56)</span> <b>bbockelm:</b></span> yeah, that’s basically what we do.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:15:19)</span> <b>bbockelm:</b></span> I would recommend not writing your own DSI, but the StoRM one might be (mostly?) reusable?<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:15:25)</span> <b>lincoln:</b></span> yeah.. I’m just going to try to wrangle it to working with my existing GridFTP setup.<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:15:30)</span> <b>lincoln:</b></span> it looks pretty general<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:16:09)</span> <b>bbockelm:</b></span> Well, in the game of one-upsmanship, HDFS’s plugin calculates md5sum, cksum, adler32, and sha1sum.  Justincase.<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:16:28)</span> <b>lincoln:</b></span> hah. lovely<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:21:31)</span> <b>bbockelm:</b></span> you never know when the first three checksums fail and you’ll need a fourth!<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:24:57)</span> <b>lincoln:</b></span> why stop at four? :simple_smile:<br/>
+</body>
+</html>

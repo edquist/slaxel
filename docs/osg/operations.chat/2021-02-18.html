@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Feb 18, 2021 : #operations (osg)</title>
+</head>
+<body>
+<h3>Thu Feb 18, 2021 : #operations (osg)</h3>
+<span style="color: #674b1b"><span style="font-size: small">(10:34:13)</span> <b>rynge:</b></span> @blin *** Resource Group names must be unique across all Sites<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:34:31)</span> <b>rynge:</b></span> The context is the Jetstream update to topology<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:34:47)</span> <b>rynge:</b></span> <a href="https://github.com/opensciencegrid/topology/pull/1633">https://github.com/opensciencegrid/topology/pull/1633</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:35:03)</span> <b>blin:</b></span> yeah, didn't we agree on <tt>JetStream-IU/TACC</tt> or <tt>IU/TACC-JetStream</tt>?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:35:24)</span> <b>rynge:</b></span> Jeremy wanted <tt>Jetstream</tt><br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:35:28)</span> <b>rynge:</b></span> I can change it<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:35:41)</span> <b>rynge:</b></span> But I find it odd that different sites can't have resources named the same<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:36:45)</span> <b>blin:</b></span> eh, we have various needs for uniqueness<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:37:08)</span> <b>blin:</b></span> resource groups for the WLCG, sites for GRACC, resources for pilot/payload attributes to map back to the site/RG<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:37:39)</span> <b>rynge:</b></span> Right, sometimes topology feels hierarchical sometimes flat.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:39:13)</span> <b>rynge:</b></span> So is it the filename I need to change? <tt>Jetstream.yaml</tt> to <tt>TACC-Jetstream.yaml</tt> ? Or it is <tt>GroupDescription: Jetstream</tt> it is upset about?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:43:10)</span> <b>blin:</b></span> the filename<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:43:23)</span> <b>blin:</b></span> you should update the description, too, but that's just for sanity's sake<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:43:35)</span> <b>rynge:</b></span> Ok<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:44:54)</span> <b>matyas:</b></span> Back when Topology was OIM, it was in MySQL so it sorta was flat<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:48:37)</span> <b>rynge:</b></span> @blin Please take a look at it now - <a href="https://github.com/opensciencegrid/topology/pull/1633">https://github.com/opensciencegrid/topology/pull/1633</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:49:13)</span> <b>rynge:</b></span> I think that matches the email from 2/9<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:50:32)</span> <b>rynge:</b></span> In interesting related news: we scaled the resource down to 0 compute nodes to save power in Texas<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:51:58)</span> <b>blin:</b></span> hey @rynge i've been holding back on reviewing that PR because we're talking with CMS about HPC naming as well<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:52:11)</span> <b>blin:</b></span> that discussion may have settled, though, i'll try to review everything later today<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:53:07)</span> <b>rynge:</b></span> Yeah, no problem - it doesn't block me<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:52:50)</span> <b>blin:</b></span> <b>@edquist</b> @dweitzel @jthiltges topology appears to be down<br/>
+<span style="color: #16569E"><span style="font-size: small">(13:53:30)</span> <b>edquist:</b></span> hmm!<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:54:58)</span> <b>jthiltges:</b></span> I'm getting "Service Unavailable" from <a href="https://display.opensciencegrid.org/">https://display.opensciencegrid.org/</a> as well<br/>
+<span style="color: #16569E"><span style="font-size: small">(13:55:22)</span> <b>edquist:</b></span> did someone kill the tiger<br/>
+<span style="color: #16569E"><span style="font-size: small">(13:56:46)</span> <b>edquist:</b></span> pod seems to be running<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:56:55)</span> <b>blin:</b></span> yeah, maybe something wrong with traefik?<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(13:58:57)</span> <b>cat:</b></span> Who owns the service(s)?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:59:11)</span> <b>blin:</b></span> <pre>time="2021-02-18T19:57:23Z" level=error msg="Error while connection to backend: dial tcp 192.168.156.242:8443: connect: connection timed out"<br/>time="2021-02-18T19:57:23Z" level=error msg="Error while connection to backend: dial tcp 192.168.215.135:8443: connect: connection timed out"<br/>time="2021-02-18T19:57:23Z" level=error msg="Error while connection to backend: dial tcp 192.168.215.135:8443: connect: connection timed out"<br/>time="2021-02-18T19:57:23Z" level=error msg="Error while connection to backend: dial tcp 192.168.156.242:8443: connect: connection timed out"<br/>time="2021-02-18T19:57:23Z" level=error msg="Error while connection to backend: dial tcp 192.168.215.135:8443: connect: connection timed out"<br/>time="2021-02-18T19:57:23Z" level=debug msg="Handling connection from 128.104.103.206:10449"<br/>time="2021-02-18T19:57:27Z" level=debug msg="'504 Gateway Timeout' caused by: dial tcp 192.168.63.98:80: i/o timeout"</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:59:20)</span> <b>blin:</b></span> fyi @bbockelm @jpeterson @jdost321<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:59:56)</span> <b>jpeterson:</b></span> yes, Tiger networking looking into at the moment<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:01:52)</span> <b>jpeterson:</b></span> “seamless” calico upgrade..<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:20:33)</span> <b>lincoln:</b></span> what are the symptoms?<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:20:33)</span> <b>lincoln:</b></span> we ran into an issue on SLATE clusters a while back where calico exploded because we had multiple interfaces<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:20:33)</span> <b>lincoln:</b></span> and traffic wouldn't move<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(14:26:01)</span> <b>B01GA370NNT:</b></span> <br/>
+<span style="color: #A82F2F"><span style="font-size: small">(14:26:15)</span> <b>B01GA370NNT:</b></span> <br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:26:54)</span> <b>dweitzel:</b></span> Any ETA for this?  We can move "back" some of the recently moved services.  Gracc summarizer, topology...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:27:07)</span> <b>dweitzel:</b></span> mostly topology.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:31:37)</span> <b>bbockelm:</b></span> @dweitzel - debugging concurrently with Jeff.  I would estimate ~30 minutes.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:32:10)</span> <b>bbockelm:</b></span> @lincoln - Basically, when calico restarted, the undersized VM OOM'd various items<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:32:48)</span> <b>bbockelm:</b></span> Without the calico controller happy, it isn't picking up network policies.  Without applying network policies, no pod-to-pod comms.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:33:49)</span> <b>bbockelm:</b></span> traffic is moving to/from the cluster fine - and internally fine - it's just anything that is covered by networkpolicies is unhappy.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:38:10)</span> <b>lincoln:</b></span> oh that sounds fun<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:56:12)</span> <b>dweitzel:</b></span> Check in.  Any updates on the tiger outage?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:59:56)</span> <b>bbockelm:</b></span> unfortunately, no.  We got the controllers settled but that didn't solve the problem.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:32:10)</span> <b>bbockelm:</b></span> @dweitzel - things are starting to come back online<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:32:55)</span> <b>bbockelm:</b></span> The failure is not understood.<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(17:33:34)</span> <b>B01GA370NNT:</b></span> Your component *Display* has been set to *Major Outage* for over *3 hours*. (<a href="http://manage.statuspage.io/pages/ws62tz4wcmxv">http://manage.statuspage.io/pages/ws62tz4wcmxv</a>)<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(17:33:36)</span> <b>B01GA370NNT:</b></span> Your component *Hosted CE Infrastructure* has been set to *Partial Outage* for over *3 hours*. (<a href="http://manage.statuspage.io/pages/ws62tz4wcmxv">http://manage.statuspage.io/pages/ws62tz4wcmxv</a>)<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(17:33:38)</span> <b>B01GA370NNT:</b></span> Your incident *Hosting provider's network connections have been interrupted* has been open for over *3 hours*. (<a href="http://manage.statuspage.io/pages/ws62tz4wcmxv">http://manage.statuspage.io/pages/ws62tz4wcmxv</a>)<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(17:33:40)</span> <b>B01GA370NNT:</b></span> Your component *Topology* has been set to *Major Outage* for over *3 hours*. (<a href="http://manage.statuspage.io/pages/ws62tz4wcmxv">http://manage.statuspage.io/pages/ws62tz4wcmxv</a>)<br/>
+<span style="color: #e06b56"><span style="font-size: small">(17:33:55)</span> <b>jthiltges:</b></span> &gt; Before kubernetes: I had lots of fires.<br/>&gt; After kubernetes: I had horizontally autoscaling fires<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:34:50)</span> <b>dweitzel:</b></span> Is it going to take a bit before things come back up?  For example, topology is back up, but display is not.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:34:58)</span> <b>bbockelm:</b></span> To err is human; to err 100 million times is automation!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:36:25)</span> <b>bbockelm:</b></span> @dweitzel - I'll give the osg-display pod a kick<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:37:18)</span> <b>dweitzel:</b></span> I also have a ticket for <a href="http://psc-bridges2-ce1.svc.opensciencegrid.org">psc-bridges2-ce1.svc.opensciencegrid.org</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:37:32)</span> <b>dweitzel:</b></span> The hosted-ce doesn't seem to be reachable.<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(17:38:39)</span> <b>B01GA370NNT:</b></span> <br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:38:46)</span> <b>bbockelm:</b></span> looks like a PVC problem - rook?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:39:54)</span> <b>bbockelm:</b></span> oh, no, not that pod<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:41:33)</span> <b>bbockelm:</b></span> osg-display appears to have issues with display.json?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:00:51)</span> <b>dweitzel:</b></span> odd, I wonder what changed?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:07:49)</span> <b>bbockelm:</b></span> @dweitzel - osg-display is dying with:<br/><pre>elasticsearch.exceptions.RequestError: RequestError(400, 'search_phase_execution_exception', 'Text fields are not optimised for operations that require per-document field data like aggregations and sorting, so these operations are disabled by default. Please use a keyword field instead. Alternatively, set fielddata=true on [Network] in order to load field data by uninverting the inverted index. Note that this can use significant memory.')</pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:08:19)</span> <b>bbockelm:</b></span> that's causing the JSON file to not be created, which prevents the pod from being <tt>Ready</tt><br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:14:55)</span> <b>bbockelm:</b></span> @dweitzel - I'm also successfully failing to authenticate (no grid proxy) with <tt><a href="http://psc-bridges2-ce1.svc.opensciencegrid.org">psc-bridges2-ce1.svc.opensciencegrid.org</a></tt><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(18:25:40)</span> <b>jpeterson:</b></span> psc-bridges2 is on tiger so would have had issues, yes<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(20:33:32)</span> <b>B01GA370NNT:</b></span> Your component *Display* has been set to *Major Outage* for over *6 hours*. (<a href="http://manage.statuspage.io/pages/ws62tz4wcmxv">http://manage.statuspage.io/pages/ws62tz4wcmxv</a>)<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(20:33:34)</span> <b>B01GA370NNT:</b></span> Your component *Hosted CE Infrastructure* has been set to *Partial Outage* for over *6 hours*. (<a href="http://manage.statuspage.io/pages/ws62tz4wcmxv">http://manage.statuspage.io/pages/ws62tz4wcmxv</a>)<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(20:33:39)</span> <b>B01GA370NNT:</b></span> Your incident *Hosting provider's network connections have been interrupted* has been open for over *6 hours*. (<a href="http://manage.statuspage.io/pages/ws62tz4wcmxv">http://manage.statuspage.io/pages/ws62tz4wcmxv</a>)<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(20:39:39)</span> <b>B01GA370NNT:</b></span> <br/>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Mar 5, 2020 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Thu Mar 5, 2020 : #xcache (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(10:52:57)</span> <b>blin:</b></span> @efajardo done. if you could give the latest <tt>fresh</tt> container a try and verify that it works, we can promote it to stable<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:49:21)</span> <b>efajardo:</b></span> <b>@here</b> I am running into ap roblem using fresh<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:49:32)</span> <b>efajardo:</b></span> Fresh has xrootd<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:49:38)</span> <b>efajardo:</b></span> <pre>rpm -qv xrootd-server</pre><br/><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:49:41)</span> <b>efajardo:</b></span> <tt>xrootd-server-4.11.3-0.rc1.osg35.el7.x86_64</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:51:29)</span> <b>blin:</b></span> ah yeah -.-<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:51:53)</span> <b>blin:</b></span> go ahead and update the dockerfiles to installing all of the xcache packages from osg-testing<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:52:16)</span> <b>blin:</b></span> i'd be interested in seeing what's wrong with RC1, though<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:52:24)</span> <b>blin:</b></span> esp since we saw failures in the automated tests, too<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:52:25)</span> <b>efajardo:</b></span> This is the rror<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:52:32)</span> <b>blin:</b></span> and we should pass it along to the XRootD devs<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:52:33)</span> <b>efajardo:</b></span> <pre>200305 18:39:54 586 ?:<a href="mailto:211@ldas-nat.ligo.caltech.edu">211@ldas-nat.ligo.caltech.edu</a> XrdPoll: FD 211 attached to poller 0; num=1<br/>200305 18:39:54 586 ?:<a href="mailto:211@ldas-nat.ligo.caltech.edu">211@ldas-nat.ligo.caltech.edu</a> sysXrdHttp:  Process. lp:0x7f6eb80012b8 reqstate: 0<br/>200305 18:39:54 586 ?:<a href="mailto:211@ldas-nat.ligo.caltech.edu">211@ldas-nat.ligo.caltech.edu</a> sysXrdHttp:  Setting host: [::ffff:131.215.113.203]<br/>200305 18:39:54 586 ?:<a href="mailto:211@ldas-nat.ligo.caltech.edu">211@ldas-nat.ligo.caltech.edu</a> sysXrdHttp:  Entering SSL_accept...<br/>200305 18:39:54 586 ?:<a href="mailto:211@ldas-nat.ligo.caltech.edu">211@ldas-nat.ligo.caltech.edu</a> sysXrdHttp:  SSL_accept returned :-1<br/>140114551641856:error:1408A0C1:SSL routines:ssl3_get_client_hello:no shared cipher:s3_srvr.c:1435:<br/>200305 18:39:54 586 sysXrdHttp:  Cleanup<br/>200305 18:39:54 586 sysXrdHttp:  Reset<br/>200305 18:39:54 586 sysXrdHttp:  XrdHttpReq request ended.<br/>200305 18:39:54 586 ?:<a href="mailto:211@ldas-nat.ligo.caltech.edu">211@ldas-nat.ligo.caltech.edu</a> XrdPoll: FD 211 detached from poller 0; num=</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:52:52)</span> <b>efajardo:</b></span> So the problem is negotiation the SSL connection<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:52:54)</span> <b>blin:</b></span> let's bring that up on the call<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:53:00)</span> <b>efajardo:</b></span> but openssl is same between containers<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:55:36)</span> <b>efajardo:</b></span> Ok PR created<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:55:38)</span> <b>efajardo:</b></span> <a href="https://github.com/opensciencegrid/docker-xcache/pull/29">https://github.com/opensciencegrid/docker-xcache/pull/29</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:56:51)</span> <b>efajardo:</b></span> For now I am running my own container fine<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:56:52)</span> <b>efajardo:</b></span> <a href="https://github.com/opensciencegrid/prp-stashcache/blob/master/Dockerfile">https://github.com/opensciencegrid/prp-stashcache/blob/master/Dockerfile</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:57:05)</span> <b>efajardo:</b></span> which is stable + the AuthFile fix at initialization<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:45:22)</span> <b>efajardo:</b></span> I create an XrootD issue for the https cipher problem <a href="https://github.com/xrootd/xrootd/issues/1149">https://github.com/xrootd/xrootd/issues/1149</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(14:57:58)</span> <b>matyas:</b></span> is there a good way to cap the memory usage of xrootd?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:58:16)</span> <b>matyas:</b></span> my stash cache keeps getting killed by the OOM killer<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:06:43)</span> <b>efajardo:</b></span> I have never had that problem<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:08:05)</span> <b>efajardo:</b></span> @blin I have tested <tt>fresh</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(15:08:14)</span> <b>efajardo:</b></span> so feel free to promote it to stable<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(15:12:39)</span> <b>blin:</b></span> @matyas can you handle this? i'm helping with SLATE hosted-ce stuff atm <a href="https://opensciencegrid.org/technology/software/container-development-guide/#adding-tags">https://opensciencegrid.org/technology/software/container-development-guide/#adding-tags</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(15:13:11)</span> <b>matyas:</b></span> sure<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:18:59)</span> <b>matyas:</b></span> which containers?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:19:19)</span> <b>blin:</b></span> xcache and stash-cache<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:25:15)</span> <b>matyas:</b></span> is it ok to prune the tags?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:25:29)</span> <b>blin:</b></span> yup, always<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:45:28)</span> <b>matyas:</b></span> ok, I did the promoting. I got a 403 when trying to prune (I couldn't delete the tags from the web interface either)<br/>
+</blockquote>
+<span style="color: #53b759"><span style="font-size: small">(15:08:53)</span> <b>marian:</b></span> if you run any ganglia or nagios service at your institution, @matyas? assuming that host solely runs xrootd, you may have pretty accurate results from the monitoring...<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:09:14)</span> <b>marian:</b></span> and see possible mem leak or something<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:09:19)</span> <b>matyas:</b></span> I have core files<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:09:22)</span> <b>efajardo:</b></span> what are you setting <tt>pfc.ram</tt> to?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:09:22)</span> <b>matyas:</b></span> if that helps<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:09:22)</span> <b>jthiltges:</b></span> @matyas How much memory do you have available? I remember seeing highish (~2GB) memory usage, due to xrootd holding onto buffers when handling HTTP requests. After bumping up to MemoryLimit=2500M, it seemed OK.<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:09:51)</span> <b>efajardo:</b></span> I must admit I have lots of memory on my pods for cache<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:09:55)</span> <b>efajardo:</b></span> but the kubernetes<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:10:03)</span> <b>matyas:</b></span> this VM has 8GB<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:10:06)</span> <b>efajardo:</b></span> monitoring say I never usem ore than 10%<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:10:10)</span> <b>efajardo:</b></span> of allocated<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:10:45)</span> <b>matyas:</b></span> looks like pfc.ram is set to "1g"<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:12:14)</span> <b>marian:</b></span> lot of cores, at what size? we may have xrootd folks look at it ... or, someone among us :slightly_smiling_face:<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:12:41)</span> <b>matyas:</b></span> 2 cores<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:13:11)</span> <b>marian:</b></span> ah, I meant core files<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:13:57)</span> <b>efajardo:</b></span> MemoryUsage<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:13:57)</span> <b>marian:</b></span> your "2 cores" reply is about CPUs in VM I guess<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:14:03)</span> <b>efajardo:</b></span> This is the memory usage of my busiest stashcache<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:14:15)</span> <b>efajardo:</b></span> it is kinda stable at 13GB<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:14:19)</span> <b>efajardo:</b></span> so you might be into something<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:14:48)</span> <b>efajardo:</b></span> This is with <tt>pfc.ram 1g</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(15:14:59)</span> <b>efajardo:</b></span> so I can see why you would see it eventually killed<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:15:53)</span> <b>matyas:</b></span> oh yeah sorry. core files. They're about 7G each<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:16:39)</span> <b>matyas:</b></span> what would be a good way to serve them? put 'em on my origin? :stuck_out_tongue:<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:17:01)</span> <b>efajardo:</b></span> lol<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:17:49)</span> <b>efajardo:</b></span> <tt>stashcache-chicago</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(15:18:01)</span> <b>efajardo:</b></span> memory usage is getting awfully close to the limit<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:18:16)</span> <b>efajardo:</b></span> <a href="https://snapshot.raintank.io/dashboard/snapshot/KAicpjCN15lMIiVAo9FnXO2v0O5cPzNK?orgId=2">https://snapshot.raintank.io/dashboard/snapshot/KAicpjCN15lMIiVAo9FnXO2v0O5cPzNK?orgId=2</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(15:19:09)</span> <b>efajardo:</b></span> XRootd Cache is a memory hungry<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:32:19)</span> <b>matyas:</b></span> we tell people in our docs to give it 8GB of ram (<a href="https://opensciencegrid.org/docs/data/stashcache/install-cache/">https://opensciencegrid.org/docs/data/stashcache/install-cache/</a>)<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:32:50)</span> <b>matyas:</b></span> should we increase that? tell them to add swap? change something in the xrootd config to decrease the footprint?<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:42:02)</span> <b>efajardo:</b></span> Well<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:42:09)</span> <b>efajardo:</b></span> the thing is I do not know what is going on<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:42:17)</span> <b>efajardo:</b></span> the memory is not being used by the xrootd proces<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:42:30)</span> <b>efajardo:</b></span> <pre>[root@stashcache-chicago-78c7d497d6-np6rw xrootd]# ps aux<br/>USER        PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND<br/>root          1  0.0  0.0 117844 11492 ?        Ss   Mar03   0:35 /usr/bin/python /usr/bin/supervisord -c /etc/supervisord.conf<br/>xrootd      550  0.0  0.0 431532 22972 ?        Sl   Mar03   0:00 /usr/bin/cmsd -l /var/log/xrootd/cmsd.log -n stash-cache -k 10 -s /var/run/xrootd/xrootd-cmsd-stash-cache.pi<br/>xrootd      553 39.5  5.6 35713672 14910368 ?   Sl   Mar03 1223:13 xrootd -c /etc/xrootd/xrootd-stash-cache.cfg -k fifo -n stash-cache -k 10 -s /var/run/xrootd/xrootd-stash-c<br/>root        555  0.0  0.0  22700   704 ?        S    Mar03   0:00 /usr/sbin/crond -n<br/>xrootd     1632  8.4  1.2 18033220 3251760 ?    Sl   Mar03 250:09 xrootd -c /etc/xrootd/xrootd-stash-cache-auth.cfg -k fifo -n stash-cache-auth -k 10 -s /var/run/xrootd/xroot<br/>root      26983  1.0  0.0  15260  1972 pts/0    Ss   21:41   0:00 /bin/bash<br/>root      26998  0.0  0.0  55184  1864 pts/0    R+   21:41   0:00 ps aux</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(15:43:08)</span> <b>efajardo:</b></span> acccording to this it only usng 5% of the 20GB<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:43:21)</span> <b>efajardo:</b></span> but monitoring shows that pod using much more than that<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:43:34)</span> <b>efajardo:</b></span> I cannot understand where he differences comes from<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:43:46)</span> <b>efajardo:</b></span> this is a host which is pure NVME<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:48:17)</span> <b>efajardo:</b></span> so there shoudl be no swap<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:54:19)</span> <b>efajardo:</b></span> never mind this seems right<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:54:31)</span> <b>efajardo:</b></span> so the Xrootd process is using accoiidn to this 14GB of memory<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:56:15)</span> <b>efajardo:</b></span> I do not see this crazy pattern in the pure root CMS caches<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:56:39)</span> <b>efajardo:</b></span> so I believe what @jthiltges said<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:56:45)</span> <b>efajardo:</b></span> this is not Xrootd related but http related<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:58:20)</span> <b>efajardo:</b></span> @matyas let me know if you want me to open an issue for XrootD<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:59:29)</span> <b>matyas:</b></span> yeah that would help<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:59:57)</span> <b>matyas:</b></span> @jthiltges what do you mean by raising MemoryLimit? where did you raise it?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(16:03:08)</span> <b>jthiltges:</b></span> Sorry, for that particular case (our local redirector), we were running under systemd and using a cgroup memory limit.<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:03:33)</span> <b>matyas:</b></span> ah I see<br/>
+<span style="color: #e06b56"><span style="font-size: small">(16:06:44)</span> <b>jthiltges:</b></span> @matyas Just to confirm, you're running v4.10 or later?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:09:40)</span> <b>matyas:</b></span> yeah, xrootd-4.11.2-1.osg35.el7.x86_64<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:10:00)</span> <b>matyas:</b></span> took a bit of time to check; load average is around 1500<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:21:04)</span> <b>efajardo:</b></span> @matyas do you still ahve your cache configured to only accept connections from CHTC?<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:21:26)</span> <b>efajardo:</b></span> I think I know what is going on talking to @dwd. So dCache at FNAL is overun causing Nova jobs to read mostly from the nearby caches, I2Chicago and CHTC. I am also seeing a load of 1k on the I2Chicago Cache<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:21:37)</span> <b>efajardo:</b></span> It is holding now<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:22:15)</span> <b>dwd:</b></span> The individual clients are still doing frequent switching, however.<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:22:51)</span> <b>matyas:</b></span> the cache should accept connections from other places<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:22:53)</span> <b>dwd:</b></span> Here’s a section of /var/log/messages from one client:<br/><pre>Mar 5 16:06:04 fnpc19105 cvmfs2: (<a href="http://nova.osgstorage.org">nova.osgstorage.org</a>) switching host from <a href="http://osg-chicago-stashcache.nrp.internet2.edu:8000/">http://osg-chicago-stashcache.nrp.internet2.edu:8000/</a> to <a href="http://sc-cache.chtc.wisc.edu:8000/">http://sc-cache.chtc.wisc.edu:8000/</a><br/>Mar 5 16:06:34 fnpc19105 cvmfs2: (<a href="http://nova.osgstorage.org">nova.osgstorage.org</a>) switching host from <a href="http://sc-cache.chtc.wisc.edu:8000/">http://sc-cache.chtc.wisc.edu:8000/</a> to <a href="http://mwt2-stashcache.campuscluster.illinois.edu:8000/">http://mwt2-stashcache.campuscluster.illinois.edu:8000/</a><br/>Mar 5 16:06:34 fnpc19105 cvmfs2: (<a href="http://nova.osgstorage.org">nova.osgstorage.org</a>) switching host from <a href="http://mwt2-stashcache.campuscluster.illinois.edu:8000/">http://mwt2-stashcache.campuscluster.illinois.edu:8000/</a> to <a href="http://fndca1.fnal.gov:8000/">http://fndca1.fnal.gov:8000/</a><br/>Mar 5 16:07:38 fnpc19105 cvmfs2: (<a href="http://nova.osgstorage.org">nova.osgstorage.org</a>) switching host from <a href="http://fndca1.fnal.gov:8000/">http://fndca1.fnal.gov:8000/</a> to <a href="http://osg-chicago-stashcache.nrp.internet2.edu:8000/">http://osg-chicago-stashcache.nrp.internet2.edu:8000/</a><br/>Mar 5 16:07:53 fnpc19105 cvmfs2: (<a href="http://nova.osgstorage.org">nova.osgstorage.org</a>) switching host from <a href="http://osg-chicago-stashcache.nrp.internet2.edu:8000/">http://osg-chicago-stashcache.nrp.internet2.edu:8000/</a> to <a href="http://sc-cache.chtc.wisc.edu:8000/">http://sc-cache.chtc.wisc.edu:8000/</a><br/>Mar 5 16:08:23 fnpc19105 cvmfs2: (<a href="http://nova.osgstorage.org">nova.osgstorage.org</a>) switching host from <a href="http://sc-cache.chtc.wisc.edu:8000/">http://sc-cache.chtc.wisc.edu:8000/</a> to <a href="http://mwt2-stashcache.campuscluster.illinois.edu:8000/">http://mwt2-stashcache.campuscluster.illinois.edu:8000/</a><br/>Mar 5 16:08:25 fnpc19105 cvmfs2: (<a href="http://nova.osgstorage.org">nova.osgstorage.org</a>) switching host from <a href="http://mwt2-stashcache.campuscluster.illinois.edu:8000/">http://mwt2-stashcache.campuscluster.illinois.edu:8000/</a> to <a href="http://fndca1.fnal.gov:8000/">http://fndca1.fnal.gov:8000/</a><br/>Mar 5 16:09:05 fnpc19105 cvmfs2: (<a href="http://nova.osgstorage.org">nova.osgstorage.org</a>) switching host from <a href="http://fndca1.fnal.gov:8000/">http://fndca1.fnal.gov:8000/</a> to <a href="http://osg-chicago-stashcache.nrp.internet2.edu:8000/">http://osg-chicago-stashcache.nrp.internet2.edu:8000/</a></pre><br/><br/>
+<span style="color: #a63024"><span style="font-size: small">(16:23:17)</span> <b>efajardo:</b></span> Well I will have to give more resources to the I2Chicago ndoe<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:23:22)</span> <b>efajardo:</b></span> to make it hold<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:23:24)</span> <b>efajardo:</b></span> wait<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:23:40)</span> <b>dwd:</b></span> It is more likely problems with it retrieving things from FNAL dCache<br/>
+<span style="color: #e06b56"><span style="font-size: small">(16:28:31)</span> <b>jthiltges:</b></span> @matyas Going back to some old notes, I believe xrootd holds a 1MB buffer for each open HTTP connection. And the memory may not get immediately released when the connection is closed. (It uses an XrdBuffer.) You can check the memory usage for buffers:<br/><pre>xrdfs &lt;host&gt; query stats b</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(16:31:43)</span> <b>matyas:</b></span> <pre>reqs=6920<br/>mem=5818233856<br/>buffs=6984<br/>adj=698<br/>xlreqs=0<br/>xlmem=0<br/>xlbuffs=0</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(16:32:24)</span> <b>matyas:</b></span> that's a lot of open http connections<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:41:17)</span> <b>dwd:</b></span> I heard that nova recently switched to reading flux files via <a href="http://nova.osgstorage.org">nova.osgstorage.org</a>, and apparently they’re reading too much.<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:49:09)</span> <b>matyas:</b></span> kibana says that nova is currently the biggest reader of files from <a href="http://sc-cache.chtc.wisc.edu">sc-cache.chtc.wisc.edu</a>, at 10.611 TB in the last 7 days<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:49:33)</span> <b>matyas:</b></span> (out of 11.127TB)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:07:24)</span> <b>dweitzel:</b></span> The caches are there for a reason. Is there such a thing as “too much?”<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:07:48)</span> <b>dweitzel:</b></span> Is fermilab running a cache?  Can they?<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:09:41)</span> <b>efajardo:</b></span> Well the way I see it is dcahe at FNAL is overloadded but not dead. So nova jobs at FNAL try to read fist from dcache at FNAL and then switch to the I2Chicago cache which tries to read from Dccahe at FNAL and hangs (does nto die) getting the files from the origin<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:09:48)</span> <b>efajardo:</b></span> and then the problem just grows<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(17:11:29)</span> <b>kherner:</b></span> We're looking into the Nova issue now. And yes, on-site jobs are supposed to read directly from FNAL dCache over the webdav door and not go through the caches.<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(17:16:39)</span> <b>kherner:</b></span> I think we're on to something; more soon<br/>
+</body>
+</html>

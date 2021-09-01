@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Mar 11, 2019 : #net-service (osg)</title>
+</head>
+<body>
+<h3>Mon Mar 11, 2019 : #net-service (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(09:49:52)</span> <b>dweitzel:</b></span> @smckee I'm around.  Should we start the test?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:50:10)</span> <b>smckee:</b></span> Sure, I can shutdown psrsv now<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:50:18)</span> <b>dweitzel:</b></span> are you shutting down the whole server?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:50:40)</span> <b>dweitzel:</b></span> I have the message bus web interface open.  Should be able to see the rates drop to 0<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:51:15)</span> <b>smckee:</b></span> No, plan was to just do 'docker stop' on the container.  Do you prefer the whole server goes down?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:51:34)</span> <b>dweitzel:</b></span> is the old rsv-perfsonar in a docker container as well?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:51:41)</span> <b>smckee:</b></span> No<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:51:47)</span> <b>dweitzel:</b></span> ok, so what are we testing?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:52:24)</span> <b>smckee:</b></span> Before I answer, what is the status of your new replacement ?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:54:04)</span> <b>smckee:</b></span> Have we already cut-over to it?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:54:11)</span> <b>smckee:</b></span> I didn't see the details above before<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:54:23)</span> <b>dweitzel:</b></span> We haven't cut over, and I wanted to do it this week.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:55:51)</span> <b>smckee:</b></span> OK, I had assumed the "container" was the source of the input to the bus but that *shouldn't* be the case, right?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:56:12)</span> <b>dweitzel:</b></span> right, the container is still going to the ITB (parallel) data flow.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:57:59)</span> <b>smckee:</b></span> Then I don't think there is a current issue.   My misunderstanding was that I thought we had a repackaged version of the RSV collector in a container as an intermediate step towards the new version.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:58:29)</span> <b>smckee:</b></span> Regarding the testing, is the data amount the same?    Is the lag (do the the host in NL) understood?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:59:28)</span> <b>dweitzel:</b></span> The data amount is the same.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:59:32)</span> <b>dweitzel:</b></span> the lag is not understood.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(10:00:03)</span> <b>smckee:</b></span> OK, but from the info in this channel, it seems 1 host (only) had a 1 hour lag which caused ALL the hosts to lag by 1 hour?!<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(10:00:44)</span> <b>smckee:</b></span> Or was that another issue?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:01:32)</span> <b>dweitzel:</b></span> 1 host that I observed.  It's likely that many hosts have a similar lag.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:01:49)</span> <b>dweitzel:</b></span> I'm instrumenting "timings" now so that I can see how long it's taking to query some hosts.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:02:04)</span> <b>dweitzel:</b></span> I suspect it's taking ~1 hour to query a single host, which seems very unreasonable.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:02:22)</span> <b>dweitzel:</b></span> The architecture should not allow 1 host to hold up the rest.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(10:02:39)</span> <b>smckee:</b></span> OK, I just didn't want any host to impact the data gathering from other hosts.  Is the new process single-threaded?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(10:03:53)</span> <b>smckee:</b></span> Do you know if this behavior is present in the current perfSONAR RSV ? (Is it a property of the remote host(s))?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:05:49)</span> <b>dweitzel:</b></span> The new process is mult-process.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:06:34)</span> <b>dweitzel:</b></span> starts a pool of 200 processes to asynchronously query ps hosts.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(10:07:48)</span> <b>smckee:</b></span> With Elasticsearch, there should be a way to plot the "latency" between 'now()' and the timestamp of the most recent data for a given host?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(10:16:33)</span> <b>smckee:</b></span> I guess we are missing one of the timestamps we need:  I believe the current timestamp should be the "event" time when the data was measured but we don't have timestamp for when the data is written to ES.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(10:28:14)</span> <b>smckee:</b></span> @dweitzel can you check the RSV collector.   Is the "timestamp" we are getting the time from the perfSONAR data measurement or the time that the collector reads it?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:28:35)</span> <b>dweitzel:</b></span> data measurement.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:29:10)</span> <b>dweitzel:</b></span> right, we don't have a "Received" or "collected" timestamp.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(10:29:23)</span> <b>smckee:</b></span> Good, but that means we have very low latency...if I look at the discover page I see data from "now()" basically<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:31:53)</span> <b>dweitzel:</b></span> sure, there are constantly probes running.  Doesn't mean that for a particular probe, it's not taking a while.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(10:33:12)</span> <b>smckee:</b></span> True, but you can look at the "Discover"  tab and do the "Last 15 minutes".  You can see the "latency" approximately...the most recent 4 minutes shows  a fall-off but it is pretty flat for longer times.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(10:33:56)</span> <b>smckee:</b></span> I expect a few hosts might be filling in later...but we have no way to track that.   Could we add a timecollected field into each index?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(10:41:09)</span> <b>smckee:</b></span> @dweitzel, can you remind me where the  RSV code (original) and its replacement are stored?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:41:45)</span> <b>dweitzel:</b></span> I am adding prometheus processing monitoring as we speak.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(10:41:53)</span> <b>smckee:</b></span> Cool :slightly_smiling_face:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:41:55)</span> <b>dweitzel:</b></span> that way we can see, per endpoint, how long it's taking to query each endpoint.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(10:42:51)</span> <b>smckee:</b></span> That would be great.   We can also use it to verify we don't get worse with the new code AND be able to set expectations on the timeliness of data (for near-real-time use cases)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:23:28)</span> <b>dweitzel:</b></span> @smckee can you see this: <a href="https://gracc.opensciencegrid.org/dashboard/db/perfsonar-collector?orgId=1">https://gracc.opensciencegrid.org/dashboard/db/perfsonar-collector?orgId=1</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:23:42)</span> <b>dweitzel:</b></span> It hasn't run long enough for all of the perfsonar endpoints to report in.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:28:34)</span> <b>smckee:</b></span> @dweitzel Very nice!   How do you get the "received" time?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:29:02)</span> <b>dweitzel:</b></span> which "received" time are you referring to?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:29:32)</span> <b>smckee:</b></span> Are you just plotting "now()-ts" for the data at some point in the pipeline?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:29:46)</span> <b>smckee:</b></span> Organized by source MA<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:31:28)</span> <b>dweitzel:</b></span> nah, prometheus does something more special.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:31:35)</span> <b>smckee:</b></span> I guess you are plotting "query time"<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:31:42)</span> <b>dweitzel:</b></span> we are actually timing how longer the get_data function takes within the collector.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:31:44)</span> <b>smckee:</b></span> Not data latency<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:31:57)</span> <b>dweitzel:</b></span> right, not data latency<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:32:01)</span> <b>dweitzel:</b></span> though, it should be related.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:32:23)</span> <b>smckee:</b></span> Maybe, though your query could actually be getting old data....<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:32:38)</span> <b>smckee:</b></span> (fell behind and is catching up)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:32:50)</span> <b>dweitzel:</b></span> yes, though over time, it should be "more correct"<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:33:19)</span> <b>smckee:</b></span> On your plot, anything longer than a minute or two is problematic.  Shouldn't take that long to respond.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:34:09)</span> <b>dweitzel:</b></span> I agree.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:34:16)</span> <b>smckee:</b></span> A histogram of the Average Query Time would also be good (10 second bins from 0 up to 1800 seconds)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:35:08)</span> <b>dweitzel:</b></span> ah, physicists and histograms.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:35:17)</span> <b>dweitzel:</b></span> Yeah, I think I could come up with that.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:35:52)</span> <b>smckee:</b></span> It would be good to see that "most" are in a tight distribution near between 0 and 60 seconds or so...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:48:50)</span> <b>dweitzel:</b></span> So the data type isn't quite right to display a histogram.  I was able to create a timeseries heatmap of the query times.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:18:24)</span> <b>smckee:</b></span> Looks like running/pending is increasing?  <a href="https://gracc.opensciencegrid.org/dashboard/db/perfsonar-collector?orgId=1&amp;from=1552317489626&amp;to=1552328289626&amp;refresh=10s&amp;panelId=5&amp;fullscreen">https://gracc.opensciencegrid.org/dashboard/db/perfsonar-collector?orgId=1&amp;from=1552317489626&amp;to=1552328289626&amp;refresh=10s&amp;panelId=5&amp;fullscreen</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:20:50)</span> <b>dweitzel:</b></span> yeah, it's an interesting graph.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:20:58)</span> <b>dweitzel:</b></span> I'm looking more into it.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:27:41)</span> <b>smckee:</b></span> OK	proc_rsv	Open the action menu	OK - 388 processes 32125.3 MB virtual, 4032.6 MB physical, 18.5% CPU, youngest running for 0 sec, oldest running for 19 min	2019-03-08 10:14:45	50.5 s	<br/>388<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:27:59)</span> <b>smckee:</b></span> (From psetf monitoring psrsv...it only sees 388 processes right now)<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:32:47)</span> <b>smckee:</b></span> Looks like you fixed something...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:36:23)</span> <b>dweitzel:</b></span> I just added another metric, and restarted the docker container.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:49:55)</span> <b>smckee:</b></span> Derek, does the "average" time include pending tasks?    If a task is already trying to get data from a node, does another one get started anyway every 5 minutes?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:56:41)</span> <b>smckee:</b></span> Would be nice to have the original average query time line-graph as well as keeping the heatmap.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:10:41)</span> <b>dweitzel:</b></span> Average time does not include pending time.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:10:58)</span> <b>dweitzel:</b></span> And it should not start another query before the previous one ends. <br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:49:01)</span> <b>dweitzel:</b></span> I was measuring the "running" probes in an incorrect way.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:52:58)</span> <b>bbockelm:</b></span> hey, just caught up to the bottom of this discussion<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:53:04)</span> <b>bbockelm:</b></span> dashboard looks great!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:53:27)</span> <b>dweitzel:</b></span> yeah, it's getting there.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:54:14)</span> <b>bbockelm:</b></span> kinda looks like there are about 100-150 queries that take minutes.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:54:39)</span> <b>bbockelm:</b></span> Given the perfSonar API is blocking, that explains why we need ~200 processes to keep things from getting stuck.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:55:40)</span> <b>bbockelm:</b></span> (all - don't forget we have a meeting in 5 minutes where we can go over this topic...)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:24:02)</span> <b>dweitzel:</b></span> restarted the collector 1 more time for the checkpoint directory mapping<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:46:31)</span> <b>dweitzel:</b></span> we didn't even talk about the new pipeline alerts.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:46:40)</span> <b>dweitzel:</b></span> is everyone that needs to get them, getting them?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:46:52)</span> <b>dweitzel:</b></span> @smckee did you get them today?  @bbockelm?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(15:47:08)</span> <b>smckee:</b></span> I did get them.  Thanks!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:52:28)</span> <b>dweitzel:</b></span> Also, we are now "Omiting Sumaries"<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:52:35)</span> <b>dweitzel:</b></span> (I'll fix the misspelling in the code)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:54:36)</span> <b>dweitzel:</b></span> also, gave me a chance to test the state file "saving".  Worked!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:54:43)</span> <b>dweitzel:</b></span> <tt>/var/lib/ps-collector</tt><br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(18:42:37)</span> <b>smckee:</b></span> Great!   Progress :slightly_smiling_face:<br/>
+</body>
+</html>

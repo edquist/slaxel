@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jan 28, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Mon Jan 28, 2019 : #xcache (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(10:53:48)</span> <b>blin:</b></span> @bbockelm working on it, do you have access to the OSG docker hub org? i think i need to be added to it<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:54:16)</span> <b>bbockelm:</b></span> what's your username?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:54:38)</span> <b>blin:</b></span> brianhlin<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:57:49)</span> <b>bbockelm:</b></span> done<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:44:37)</span> <b>isfiligoi:</b></span> Need some help with topology:<br/><a href="https://topology.opensciencegrid.org/stashcache/origin-authfile-public?fqdn=stashcache.t2.ucsd.edu">https://topology.opensciencegrid.org/stashcache/origin-authfile-public?fqdn=stashcache.t2.ucsd.edu</a><br/>failes complaining about VO Fermilab!The above URL is being used by  stash-origin-authfile-update<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:46:47)</span> <b>matyas:</b></span> OK, I will fix the data in topology.  Anybody know which origin serves Fermilab data?<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:48:17)</span> <b>isfiligoi:</b></span> FYI: I used VO=ANY for my origin. I hope that’s OK<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:48:26)</span> <b>matyas:</b></span> yeah that's fine<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:49:20)</span> <b>matyas:</b></span> TBH I see no good reason to put anything _other than_ VO=ANY for origins<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:49:34)</span> <b>matyas:</b></span> if you don't want to serve a VO's data, don't put it on your machine<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:17:23)</span> <b>blin:</b></span> @isfiligoi do you have a branch on prp-stashcache for your origin work yet?<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:17:44)</span> <b>isfiligoi:</b></span> no, not yet… still working on it<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:19:42)</span> <b>blin:</b></span> feel free to submit a WIP PR whenever you have a chance<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:31:34)</span> <b>isfiligoi:</b></span> @matyas Any update on the topology issue?<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:33:01)</span> <b>isfiligoi:</b></span> My origin is failing to start, and I think that’s the root cause<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:33:37)</span> <b>matyas:</b></span> do you know which VO(s) your origin will serve data for?<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:34:38)</span> <b>isfiligoi:</b></span> I don’t think they are registered as a VO at this point in time<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:34:48)</span> <b>isfiligoi:</b></span> It is MERRA2 data<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:34:57)</span> <b>isfiligoi:</b></span> the plan was to make it publicly avaialble<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:36:47)</span> <b>isfiligoi:</b></span> I would be happy if only the un-authenticated part of the origin worked, but even that failed<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:37:00)</span> <b>isfiligoi:</b></span> It is still looking for the autentication file<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:37:21)</span> <b>matyas:</b></span> if it's public then we'll make sure anybody can cache it, but we need to make sure to limit what origins can serve it<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:37:42)</span> <b>matyas:</b></span> because the namespace is global so if multiple origins serve the same paths then they'll stomp over each other<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:38:01)</span> <b>isfiligoi:</b></span> yes, I know…<br/><br/>I was planning to keep the<br/>/merra2<br/>base path<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:39:29)</span> <b>matyas:</b></span> maybe we can make a stub VO file for MERRA2 so that you can serve its data?<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:40:02)</span> <b>isfiligoi:</b></span> if it’s needed…<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:45:00)</span> <b>matyas:</b></span> is there a plan to make a VO for MERRA2? or are their jobs just going to run under OSG or something?<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:45:50)</span> <b>isfiligoi:</b></span> Possibly… but not in the short term.<br/>I am just exporting the data to give them the taste of what’s possible<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:47:08)</span> <b>isfiligoi:</b></span> And it is my playground for testing, origin, too, since nobody will complain if iI mess up initially :slightly_smiling_face:<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:52:56)</span> <b>matyas:</b></span> if it's just for testing and there's noone else serving MERRA2 data then for now just make the authfile by hand.<br/>Make something like <tt>/etc/xrootd/public-origin-authfile</tt> and use these contents:<br/><pre>u * /merra2 rl</pre><br/>then put this in <tt>/etc/xrootd/config.d/10-origin-site-local.cfg</tt>:<br/><pre>set StashOriginPublicAuthfile = /etc/xrootd/public-origin-authfile</pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(12:53:42)</span> <b>isfiligoi:</b></span> OK, will try, thanks<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:37:50)</span> <b>bbockelm:</b></span> (how'd it go?)<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:47:58)</span> <b>isfiligoi:</b></span> The recipe above solved my auth problems, thanks<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:49:33)</span> <b>isfiligoi:</b></span> Trying to figure out the port issue now…<br/>No luck with k8 so far<br/>Can I change it just in the xrootd configs, instead?<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:53:05)</span> <b>isfiligoi:</b></span> BTW: The default yum install does not bring in<br/>/usr/lib64/libXrdSec.so<br/>so the auth origin fails to start  (at least I am assuming that’s the root cause… the file definitley does not exist)<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:53:15)</span> <b>isfiligoi:</b></span> not a problem for me at this point, but will be<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:55:45)</span> <b>matyas:</b></span> we can fix that<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:56:06)</span> <b>matyas:</b></span> surprised that xrootd-server does not bring it in<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:07:40)</span> <b>isfiligoi:</b></span> Do I need to declare the origin as production in topology, before I can pull a file from it?<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:08:43)</span> <b>isfiligoi:</b></span> <a href="https://github.com/opensciencegrid/topology/blob/master/topology/University%20of%20California%20San%20Diego/SDSC%20OSG/DataInfrastructure.yaml">https://github.com/opensciencegrid/topology/blob/master/topology/University%20of%20California%20San%20Diego/SDSC%20OSG/DataInfrastructure.yaml</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(14:10:57)</span> <b>matyas:</b></span> nope<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:14:55)</span> <b>isfiligoi:</b></span> ok, then I have some other problem<br/>BTW: what should I replace &gt;export dir&gt; with<br/>xrdmapc -r --verify --list s <a href="http://redirector.osgstorage.org:1094">redirector.osgstorage.org:1094</a> &lt;exported dir&gt;<br/>?<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:16:48)</span> <b>isfiligoi:</b></span> I tried /merra2, /hcc and /cms, and always get ?s<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:25:09)</span> <b>blin:</b></span> @isfiligoi <a href="https://hub.docker.com/r/opensciencegrid/xcache/tags">https://hub.docker.com/r/opensciencegrid/xcache/tags</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:25:49)</span> <b>blin:</b></span> huh, the <tt>latest</tt> tag doesn't get automatically generated<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:27:42)</span> <b>matyas:</b></span> @blin that makes sense; we (can) make multiple builds so the dev should be in control over what gets tagged as 'latest'<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:28:36)</span> <b>bbockelm:</b></span> @isfiligoi - I also don't see your origin listed in the redirector.  Your next step is to check the cmsd logs<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:28:50)</span> <b>isfiligoi:</b></span> I have created a “clean” docker image in<br/><a href="https://cloud.docker.com/u/sfiligoi/repository/docker/sfiligoi/prp-stashcache-origin">https://cloud.docker.com/u/sfiligoi/repository/docker/sfiligoi/prp-stashcache-origin</a><br/>Source in<br/><a href="https://github.com/sfiligoi/prp-stashcache-origin">https://github.com/sfiligoi/prp-stashcache-origin</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(14:29:16)</span> <b>isfiligoi:</b></span> Can backport to brian’s branch once everything works<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:30:09)</span> <b>bbockelm:</b></span> what hostname or IP address should I look for in the log files of <a href="http://redirector.osgstorage.org">redirector.osgstorage.org</a>?<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:30:41)</span> <b>isfiligoi:</b></span> <a href="http://stashcache.t2.ucsd.edu">stashcache.t2.ucsd.edu</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:30:55)</span> <b>bbockelm:</b></span> <a href="https://github.com/sfiligoi/prp-stashcache-origin/blob/master/supervisord.d/stash-origin.conf#L11">https://github.com/sfiligoi/prp-stashcache-origin/blob/master/supervisord.d/stash-origin.conf#L11</a> &lt;~ I don't see a <tt>cmsd</tt> listed here.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:32:27)</span> <b>bbockelm:</b></span> ( @blin - your <tt>10-stash-origin.conf</tt> contains the same problem...)<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(14:38:57)</span> <b>blin:</b></span> errr, i don't have a <tt>10-stash-origin.conf</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:39:16)</span> <b>blin:</b></span> i didn't think <tt>cmsd</tt> was necessary for the cache<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:39:21)</span> <b>blin:</b></span> if that's what you meant<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:47:57)</span> <b>bbockelm:</b></span> ah, duh, that's right.<br/>
+</blockquote>
+<span style="color: #53b759"><span style="font-size: small">(14:33:00)</span> <b>isfiligoi:</b></span> OK… good point…<br/>I guess there is no docs on how to configure that without systemd, though?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:33:16)</span> <b>bbockelm:</b></span> Right.  You need to look at the systemd unit and convert over to supervisord.<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:33:34)</span> <b>isfiligoi:</b></span> OK.. will do… thanks for pointing it out<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:33:55)</span> <b>bbockelm:</b></span> Now, I think that sample supervisor.d configs should belong in the upstream RPMs, just to keep all this knowledge in one place ... even if supervisord is obviously not used for RPM installs.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:34:51)</span> <b>bbockelm:</b></span> <a href="https://github.com/opensciencegrid/xcache/blob/master/configs/10-stash-origin-auth-overrides.conf">https://github.com/opensciencegrid/xcache/blob/master/configs/10-stash-origin-auth-overrides.conf</a> &lt;~ here's the list of dependencies for XRootD.  There's also the (unlisted) <tt>cmsd</tt> dependency... but there's an open ticket for that somewhere<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:35:25)</span> <b>bbockelm:</b></span> (ah, here's the ticket: <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-3544">https://opensciencegrid.atlassian.net/browse/SOFTWARE-3544</a> .  @matyas is assigned)<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:35:43)</span> <b>lincoln:</b></span> for some reason a lot of kubernetes fans have an aversion to supervisord or anything resembling an init. they _really_ want you to explode everything out into as tiny bits as possible. :face_with_head_bandage:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:37:17)</span> <b>bbockelm:</b></span> @lincoln - agreed, that's the k8s preferred way.  For support reasons, we decided to go the supervisord route for now -- we want to be able to support "pure" Docker as well.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:37:23)</span> <b>lincoln:</b></span> :thumbsup:<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:43:37)</span> <b>isfiligoi:</b></span> Does this look OK?<br/>[program:stash-origin-cmsd]<br/>command=/usr/bin/cmsd -l /var/log/xrootd/cmsd.log -c /etc/xrootd/xrootd-stash-origin.cfg -k fifo -s /var/run/xrootd/cmsd-stash-origin.pid -n stash-origin<br/>user=xrootd<br/>autorestart=true<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:45:00)</span> <b>bbockelm:</b></span> Looks fine to me, but I'm not sure I "speak" supervisord all that well.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:48:30)</span> <b>blin:</b></span> the supervisord parts look fine to me, not sure about the xrootd bits<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:48:46)</span> <b>blin:</b></span> so with both our responses i think it's good :slightly_smiling_face:<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:52:34)</span> <b>isfiligoi:</b></span> just deployed… and I am able to get a file with stashcp :slightly_smiling_face:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:55:53)</span> <b>bbockelm:</b></span> great!<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:25:47)</span> <b>isfiligoi:</b></span> So… now I have stashcp working…<br/>How do I get the same file to show up under CVMFS?<br/>And under which path?<br/>stashcp /merra2/data/MERRA2/M2I1NXASM.5.12.4/1980/01/MERRA2_100.inst1_2d_asm_Nx.19800120.nc4.xml b.xml<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:26:14)</span> <b>isfiligoi:</b></span> This part is not mentioned in the install docs<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:30:22)</span> <b>matyas:</b></span> CVMFS has to be set up by stashcache ops, i.e. @marian (maybe @dweitzel can do it too)<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:30:54)</span> <b>isfiligoi:</b></span> OK, thanks…<br/>Having this info in the install docs would be useful<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:31:47)</span> <b>matyas:</b></span> sure<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:41:44)</span> <b>blin:</b></span> <a href="https://hub.docker.com/r/opensciencegrid/stash-cache/tags">https://hub.docker.com/r/opensciencegrid/stash-cache/tags</a><br/>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jan 14, 2021 : #operations (osg)</title>
+</head>
+<body>
+<h3>Thu Jan 14, 2021 : #operations (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(09:28:34)</span> <b>jpatton:</b></span> Hello ops folks, per Miron’s interest, I’m trying to stash job histories from schedds reporting to <tt><a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a></tt> in Elasticsearch, and one of the assumptions I make is that <tt>GLIDEIN_MATCH_{key}</tt> entries in a job ad should match the same data type as <tt>{key}</tt> alone, e.g. <tt>GLIDEIN_MATCH_ProcId</tt> should be an integer just as <tt>ProcId</tt> should be an integer. However, on <tt><a href="http://xd-login.opensciencegrid.org">xd-login.opensciencegrid.org</a></tt> and <tt><a href="http://scosg16.jlab.org">scosg16.jlab.org</a></tt>, it seems that <tt>GlobalJobId</tt> s are (sometimes) being reported in job ads’ <tt>GLIDEIN_MATCH_ProcId</tt>. Do you know if this is a simple (mis)config? Is this expected?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:59:08)</span> <b>matyas:</b></span> @jthiltges, once topology gets kubernetized, what's going to be the procedure for doing updates? Right now I log onto hcc-osg-topology, do a git pull in /opt/topology, and restart httpd<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:13:49)</span> <b>jthiltges:</b></span> My not-so-great method has been to delete the pods (one at a time), and let kubernetes pull the new image and restart.<br/>A better method would be to tweak the github/docker integration so the github tags get applied to docker builds. Then edit the flux repo to point topology at the new tag (or have flux automatically deploy it).<br/>Or maybe there's an even better way? Not sure!<br/>
+<span style="color: #5a4592"><span style="font-size: small">(13:27:57)</span> <b>lmichael:</b></span> AMNH having issues with their CE: <a href="https://support.opensciencegrid.org/a/tickets/66583">https://support.opensciencegrid.org/a/tickets/66583</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:11:35)</span> <b>jpeterson:</b></span> I was talking with him earlier as well, looks like they are getting jobs that are going nuts with memory usage.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:15:45)</span> <b>dweitzel:</b></span> pw.x is quantum espresso, if that helps narrow it down.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:16:54)</span> <b>jpeterson:</b></span> or makes everything more vague?<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:17:00)</span> <b>edquist:</b></span> that sounds very tasty<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:17:05)</span> <b>edquist:</b></span> _maybe_<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:19:59)</span> <b>dweitzel:</b></span> I think you can track it down if you get the hostname of the node.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:20:09)</span> <b>dweitzel:</b></span> probably grep through the audit logs on the submit nodes.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:22:47)</span> <b>jpeterson:</b></span> I am seeing scratch out of space errors on the most recent factory logs<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:23:39)</span> <b>dweitzel:</b></span> interesting... and OOM on the AMNH nodes.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:25:26)</span> <b>jpeterson:</b></span> that is what I am looking at<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:26:16)</span> <b>jpeterson:</b></span> found the scratch while checking for memory errors in the factory logs.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:26:46)</span> <b>jpeterson:</b></span> which apparently that is on a different node, and “glide_eUjohf” is using 126G<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:34:32)</span> <b>dweitzel:</b></span> Will the glidein logs show memory errors?  Interesting.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:34:52)</span> <b>jpeterson:</b></span> I don’t know?  they are just the logs I know how to check first.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:35:24)</span> <b>jpeterson:</b></span> seeing out of space on device so far on logs from the hosts he mentions in the ticket.<br/>
+</body>
+</html>

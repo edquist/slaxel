@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Sep 17, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Tue Sep 17, 2019 : #xcache (osg)</h3>
+<span style="color: #a63024"><span style="font-size: small">(09:29:33)</span> <b>efajardo:</b></span> well but we told sites<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:29:44)</span> <b>efajardo:</b></span> to use the higher numbers right<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:31:00)</span> <b>matyas:</b></span> some things you need to set before the osg config, some things you need to set after<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:36:09)</span> <b>efajardo:</b></span> Well<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:36:13)</span> <b>efajardo:</b></span> setting this one on 10<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:36:14)</span> <b>efajardo:</b></span> did not work<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:36:16)</span> <b>efajardo:</b></span> <pre>if named stash-cache-auth<br/>   set HttpsPort=8444<br/>fi</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(09:36:30)</span> <b>efajardo:</b></span> <pre> Using TLS 1.2<br/>190917 14:34:23 619 sysConfig: XRDROLE:  server<br/>190917 14:34:23 619 sysConfig: Configured as HTTP(s) data server.<br/>------ HTTP protocol initialization completed.<br/>------ xrootd <a href="mailto:stash-cache-auth@fiona-r-uva.vlan7.uvalight.net">stash-cache-auth@fiona-r-uva.vlan7.uvalight.net</a>:8443 initialization completed.<br/>190917 14:34:23 640 XrdFileCache_Manager: info Cache::Purge() Started.<br/>190917 14:34:23 640 XrdFileCache_Manager: info Cache::Purge() Finished, removed 0 data files, total size 0, bytes to remove at end: 0</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(09:44:22)</span> <b>matyas:</b></span> they might have an old xcache install. Their config says <tt>xrd.protocol http:8443 libXrdHttp.so</tt> and I think the new one we ship has <tt>xrd.protocol http:$HttpsPort libXrdHttp.so</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(09:45:38)</span> <b>efajardo:</b></span> well I am using fresh<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:46:07)</span> <b>efajardo:</b></span> <pre>stashcache:<br/>    Container ID:   <a href="docker://b2f981d3b3ef9536e1c1ce2c4fd497aa8350ccd681900410b8e8423c9a39d3c8">docker://b2f981d3b3ef9536e1c1ce2c4fd497aa8350ccd681900410b8e8423c9a39d3c8</a><br/>    Image:          opensciencegrid/stash-cache:fresh<br/>    Image ID:       <a href="docker-pullable://opensciencegrid/stash-cache@sha256:54e46f7844de095dba4a94ebb478fd4c6e55b99813b87781be13d4efae9b5b4f">docker-pullable://opensciencegrid/stash-cache@sha256:54e46f7844de095dba4a94ebb478fd4c6e55b99813b87781be13d4efae9b5b4f</a><br/></pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(09:46:14)</span> <b>efajardo:</b></span> The only way I can make it work<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:46:15)</span> <b>efajardo:</b></span> is with<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:46:36)</span> <b>efajardo:</b></span> <pre>if named stash-cache-auth<br/>   xrd.protocol http:8444 libXrdHttp.so<br/>fi</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(09:55:26)</span> <b>matyas:</b></span> ugh. yeah, do what you're doing<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:55:33)</span> <b>matyas:</b></span> looks like we didn't make that change yet<br/>
+</body>
+</html>

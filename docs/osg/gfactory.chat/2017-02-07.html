@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Feb 7, 2017 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Tue Feb 7, 2017 : #gfactory (osg)</h3>
+<span style="color: #53b759"><span style="font-size: small">(12:00:24)</span> <b>marian:</b></span> just fyi - I upgraded factory to 3.2.17 but it doesn't start properly ... I have to run for lunch appointment now which I'm late anyway, but when I come back I'll investigate further... unless someone else wants to take a peek ... GOC-ITB factory I'm talking about...<br/>
+<span style="color: #e7392d"><span style="font-size: small">(13:26:01)</span> <b>klarson1:</b></span> did you run upgrade after?  sometimes there is a change that requires a rewrite of all gwms files.  reconfig doesn't do that<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:30:30)</span> <b>marian:</b></span> yep I did<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(15:54:11)</span> <b>sthapa:</b></span> If a site offers features like high mem nodes or gpu nodes, what’s the best way to support that through the factories?<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(15:54:45)</span> <b>sthapa:</b></span> I.e. is there a way to tell the factories to start submitting jobs to certain queues if it sees jobs requiring these features?<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:21:12)</span> <b>marian:</b></span> @mkandes: did you have some handy trick you parsed through last .err glidein logs and checked StarterLog for Colorado entry?<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:28:27)</span> <b>marian:</b></span> nevermind, I think I was able to check things...<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:33:05)</span> <b>mkandes:</b></span> @sthapa: the factories are dumb. they only forward requests from the frontends. that kind of logic would have to be setup in a frontend configuration.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:33:12)</span> <b>mkandes:</b></span> at least that is my understanding.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:33:34)</span> <b>mkandes:</b></span> I've not had to setup a frontend before myself.<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:34:43)</span> <b>marian:</b></span> yeah, @sthapa, you need here combination of Frontend config versus JOB_ROUTE on the HTCondor-CE side<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:37:13)</span> <b>marian:</b></span> there is nothing special on the factory entry other than the attribute we add to the entry point .. like Request_GPUs=1 or somethign like that for those jobs which you make then sure on the CE side to match against appropriate ROUTE<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:37:54)</span> <b>marian:</b></span> we have few entries like that in the factory for Nebraska CEs<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:38:20)</span> <b>marian:</b></span> on the Frontend side Derek would know more how to set it<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:44:04)</span> <b>mkandes:</b></span> @sthapa: If you're simply thinking about how to  best advertise high memory and/or GPU nodes at a site for use, then, as Marian indicated, you'd want to setup "special" job routes that we could direct high memory and/or GPU glideins to target. We'd then place an equivalent high mem/GPU entry in the factory configs to advertise these resources to the frontends who might be able to use them.<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(16:55:44)</span> <b>sthapa:</b></span> I’m sort of thinking of the best way for sites to advertise  and provide these services<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(16:56:16)</span> <b>sthapa:</b></span> There’s a few sites that might be coming online with these types of services and there doesn’t seem to be a uniform way to provide this to osg<br/>
+</body>
+</html>

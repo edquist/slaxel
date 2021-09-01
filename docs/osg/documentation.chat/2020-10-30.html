@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Oct 30, 2020 : #documentation (osg)</title>
+</head>
+<body>
+<h3>Fri Oct 30, 2020 : #documentation (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(08:32:14)</span> <b>blin:</b></span> hrm, any helpful err messages?<br/>
+<span style="color: #c386df"><span style="font-size: small">(08:52:46)</span> <b>matyas:</b></span> No, just the links are wrong. In <tt>detailed-overview.md</tt>,  <tt>release/supported_platforms.md</tt> gets turned into <tt>/detailed-overview/release/supported-platforms</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(08:54:34)</span> <b>blin:</b></span> hrmmm<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:56:14)</span> <b>blin:</b></span> i guess we don't have any internal links in the tech area page root docs<br/>
+<span style="color: #c386df"><span style="font-size: small">(08:56:53)</span> <b>matyas:</b></span> and if I change the link to make it <tt>../release/supported_platforms.md</tt> then mkdocs complains that it contains a link "which is not found in the documentation files"<br/>
+<span style="color: #c386df"><span style="font-size: small">(08:57:05)</span> <b>matyas:</b></span> it's not specific to links in the root docs, it happens everywhere<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:58:06)</span> <b>blin:</b></span> well, that makes my head hurt<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:00:20)</span> <b>blin:</b></span> got a branch i could peek at?<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:13:38)</span> <b>matyas:</b></span> <a href="https://github.com/matyasselmeci/docs/tree/pr/mkdocsv1">https://github.com/matyasselmeci/docs/tree/pr/mkdocsv1</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:57:55)</span> <b>blin:</b></span> @matyas have you committed your updated links? i'm using <tt>795e7869b27687376d742e79f82cda0b3bc7c8fa</tt> and the link you're talking about looks properly formatted to me. I get:<br/><a href="http://localhost:8000/release/supported_platforms/">http://localhost:8000/release/supported_platforms/</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(14:01:23)</span> <b>matyas:</b></span> well travis doesn't like it: <a href="https://travis-ci.com/github/matyasselmeci/docs/builds/196405046">https://travis-ci.com/github/matyasselmeci/docs/builds/196405046</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:04:06)</span> <b>blin:</b></span> curious. you got the ITB working, right? could you push an ITB branch and see how that works?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:07:32)</span> <b>matyas:</b></span> done<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:35:13)</span> <b>blin:</b></span> looks ok <a href="https://opensciencegrid.org/docs-itb/detailed-overview/">https://opensciencegrid.org/docs-itb/detailed-overview/</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(14:38:55)</span> <b>matyas:</b></span> travis is full of fail. <a href="https://travis-ci.com/github/opensciencegrid/docs/builds/196676827">https://travis-ci.com/github/opensciencegrid/docs/builds/196676827</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:39:57)</span> <b>blin:</b></span> ya, could just be linkchecker being the worst?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:41:13)</span> <b>matyas:</b></span> all the actual links on the page are relative...<br/><pre>&lt;a href="../other/install-gwms-frontend/"&gt;</pre><br/><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:43:00)</span> <b>blin:</b></span> i see that in the technology area, too <tt>href="../style-guide/"</tt><br/>
+<span style="color: #9d8eee"><span style="font-size: small">(14:45:23)</span> <b>cat:</b></span> Do you have a reason to care about the format of the _generated_ links?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:48:15)</span> <b>matyas:</b></span> I'm just guessing at why linkchecker might be messing up<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:39:26)</span> <b>blin:</b></span> @matyas i vote that we merge your changes in on monday and see how it does because afaict, it's just the tests that are angry and your implementation is fine<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:40:13)</span> <b>matyas:</b></span> uhhh if the CI always fails then we're just going to ignore it<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:41:35)</span> <b>matyas:</b></span> if it's just linkchecker being a problem then maybe we should hold off on merging it until we replace linkchecker<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:43:36)</span> <b>blin:</b></span> if the CI continues to fail after a merge, it'll provide us with more data and we'll revert the change<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:43:39)</span> <b>blin:</b></span> that sound good?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:43:55)</span> <b>matyas:</b></span> ok...<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:44:11)</span> <b>matyas:</b></span> I mean it failed on the itb branch -- how is the production branch going to be different?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:49:19)</span> <b>blin:</b></span> we've seen the linkchecker fail in some weird instances like when @tim.theisen creates new release notes it complains about the links in the release overview tables even though the new file exists and builds properly<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:49:32)</span> <b>blin:</b></span> after merging the linkchecker is mysteriously happy...<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:11:14)</span> <b>matyas:</b></span> I wonder if there's something different going on between <tt>mkdocs serve</tt> and <tt>mkdocs gh-deploy</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(17:12:09)</span> <b>matyas:</b></span> or some sort of race condition between mkdocs rendering the pages and linkchecker starting<br/>
+</body>
+</html>

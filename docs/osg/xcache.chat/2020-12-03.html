@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Dec 3, 2020 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Thu Dec 3, 2020 : #xcache (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(10:20:37)</span> <b>matyas:</b></span> @dweitzel, the scitokens.conf file that topology generates for an origin for a VO that doesn't have any scitokens information is<br/><pre>[Global]<br/>audience =</pre><br/>which doesn't have any issuers so xrootd-scitokens complains.<br/>Is that OK or should I stick a dummy issuer in there or something?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:21:05)</span> <b>dweitzel:</b></span> I thought we fixed that in xrootd-scitokens.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:21:08)</span> <b>dweitzel:</b></span> did that get merged?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:26:00)</span> <b>matyas:</b></span> <a href="https://github.com/scitokens/xrootd-scitokens/blob/master/src/XrdAccSciTokens.cc#L906-L909">https://github.com/scitokens/xrootd-scitokens/blob/master/src/XrdAccSciTokens.cc#L906-L909</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:26:26)</span> <b>matyas:</b></span> nope. That causes configuration to fail: <a href="https://github.com/scitokens/xrootd-scitokens/blob/master/src/XrdAccSciTokens.cc#L296-L298">https://github.com/scitokens/xrootd-scitokens/blob/master/src/XrdAccSciTokens.cc#L296-L298</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:26:42)</span> <b>dweitzel:</b></span> shoot, could of sworn we had a ticket and resolved that.<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:27:13)</span> <b>matyas:</b></span> weird that I don't actually see the "Failed to configure" message in the logs<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:27:51)</span> <b>blin:</b></span> @dweitzel i think this is the ticket you're thinking of? <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-4223">https://opensciencegrid.atlassian.net/browse/SOFTWARE-4223</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:34:44)</span> <b>dweitzel:</b></span> of course it's assigned to me.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:34:47)</span> <b>dweitzel:</b></span> :slightly_smiling_face:<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:36:48)</span> <b>matyas:</b></span> I guess I'll add a dummy issuer. Weird that this is only biting new origins<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:58:22)</span> <b>dweitzel:</b></span> Change under review: <a href="https://github.com/xrootd/xrootd-scitokens/pull/7">https://github.com/xrootd/xrootd-scitokens/pull/7</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:58:47)</span> <b>matyas:</b></span> in addition to icecube, this is also affecting a new LIGO origin: <a href="https://support.opensciencegrid.org/a/tickets/66383">https://support.opensciencegrid.org/a/tickets/66383</a><br/>I noticed you're planning on setting up scitokens for LIGO: <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-3941">https://opensciencegrid.atlassian.net/browse/SOFTWARE-3941</a>. Can we add a scitokens section for their stashcache config in topology?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:59:59)</span> <b>dweitzel:</b></span> Yes, that should be good.  That was 2 steps away I think, but no reason to not do it now,<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:00:30)</span> <b>matyas:</b></span> cool. what should I use for their "issuer" and "base path" ?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:01:54)</span> <b>dweitzel:</b></span> <pre>[Issuer ligo]<br/>issuer = <a href="https://scitokens.org/ligo">https://scitokens.org/ligo</a><br/>base_path = /user/ligo</pre><br/>Here's the working config for our servers.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:33:45)</span> <b>matyas:</b></span> Think it will be a problem if I add a SciTokens config for IceCube? Their issuer doesn't exist, nor does their private data path, but I don't think that will cause any issues<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:34:45)</span> <b>dweitzel:</b></span> Shouldn't be a problem.  It will only try the issuer if it gets a token claiming from that issuer.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:06:22)</span> <b>bbockelm:</b></span> @dweitzel - at yesterday's TPC meeting, a question came up about the xrootd-scitokens plugin.  It looks like my PR was merged - did it make it into the 5.1.0-rc1 build?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:07:13)</span> <b>dweitzel:</b></span> Good question, I'm on the xcache call now with Andy.  I'll ask.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:08:37)</span> <b>dweitzel:</b></span> I think no.  It didn't get into the tag at least.  I'll make sure it gets into rc2.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:20:24)</span> <b>dweitzel:</b></span> <a href="https://github.com/xrootd/xrootd/pull/1348">https://github.com/xrootd/xrootd/pull/1348</a><br/>
+</body>
+</html>

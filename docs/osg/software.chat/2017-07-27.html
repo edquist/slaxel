@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jul 27, 2017 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu Jul 27, 2017 : #software (osg)</h3>
+<span style="color: #ea2977"><span style="font-size: small">(14:08:43)</span> <b>jlstephen:</b></span> @bbockelm we started seeing weird behavior on one of our gridftp servers on Monday running globus-gridftp-server 11.8-1.2.osg33.el7<br/>
+<span style="color: #ea2977"><span style="font-size: small">(14:12:55)</span> <b>jlstephen:</b></span> the behavior we are seeing is that there are a ton of globus-gridftp-server processes that are being left open on the host, but they are all running as root never make any progress<br/>
+<span style="color: #ea2977"><span style="font-size: small">(14:14:01)</span> <b>jlstephen:</b></span> in gridftp-auth.log there are entries like this for the processes that keep hanging<br/>
+<span style="color: #ea2977"><span style="font-size: small">(14:14:04)</span> <b>jlstephen:</b></span> <pre>[7280] Thu Jul 27 12:57:36 2017 :: GFork functionality not enabled.:<br/>[7280] Thu Jul 27 12:57:36 2017 :: Configuration read from /etc/gridftp.conf.<br/>[7280] Thu Jul 27 12:57:36 2017 :: Server started in inetd mode.<br/>[7280] Thu Jul 27 12:57:36 2017 :: Couldn't get remote IP address.  Possibly using a non-tcp protocol.<br/>[7280] Thu Jul 27 12:57:36 2017 :: New connection from: 0.0.0.0</pre><br/>
+<span style="color: #ea2977"><span style="font-size: small">(14:14:13)</span> <b>jlstephen:</b></span> have you seen this before?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:14:32)</span> <b>bbockelm:</b></span> yeah - that's a patch that we apply and fix.<br/>
+<span style="color: #ea2977"><span style="font-size: small">(14:15:59)</span> <b>jlstephen:</b></span> ok. what do we need to apply to fix it?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:18:42)</span> <b>bbockelm:</b></span> I'd be suspicious that there's a non-OSG version of some globus library<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:19:59)</span> <b>bbockelm:</b></span> Look at <tt>globus-gridftp-server-control</tt> version, I think.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:20:02)</span> <b>bbockelm:</b></span> that's where that bug is fixed.<br/>
+<span style="color: #ea2977"><span style="font-size: small">(14:21:28)</span> <b>jlstephen:</b></span> ok, thanks<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:24:01)</span> <b>bbockelm:</b></span> FYI - the issue is that upstream Globus GridFTP hangs if you open a TCP socket and immediately close without writing any data.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:24:07)</span> <b>bbockelm:</b></span> Which is exactly how LVS tests for aliveness<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:24:19)</span> <b>bbockelm:</b></span> which is exactly the world's easiest DDoS attack.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:25:20)</span> <b>bbockelm:</b></span> (is there not a 'sad panda' emoji?)<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(14:49:54)</span> <b>kherner:</b></span> <br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:51:57)</span> <b>bbockelm:</b></span> Yup - he also answered in the other channel :wink:<br/>
+</body>
+</html>

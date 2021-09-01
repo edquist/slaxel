@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Dec 11, 2019 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Dec 11, 2019 : #software (osg)</h3>
+<span style="color: #7d414c"><span style="font-size: small">(15:31:23)</span> <b>bockjoo:</b></span> @sombody, I want to debug this issue: <a href="https://github.com/xrootd/xrootd/issues/1098">https://github.com/xrootd/xrootd/issues/1098</a> and confirm whether it is due to the filesystem or the cmsd. Where can I find the source code that went in to xrootd-4.11.0-1.osg35.el7.x86_64?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:33:49)</span> <b>blin:</b></span> you could pick apart the src rpm here: <a href="https://koji.chtc.wisc.edu/koji/buildinfo?buildID=13173">https://koji.chtc.wisc.edu/koji/buildinfo?buildID=13173</a><br/>
+<span style="color: #7d414c"><span style="font-size: small">(15:38:16)</span> <b>bockjoo:</b></span> Thanks!<br/>
+<span style="color: #7d414c"><span style="font-size: small">(19:18:58)</span> <b>bockjoo:</b></span> I rebuilt it using the src rpm but the shared library has a missing symbol:<br/>
+<span style="color: #7d414c"><span style="font-size: small">(19:19:30)</span> <b>bockjoo:</b></span> [root@cmsio3 lib64]# /usr/bin/xrootd -l /var/log/xrootd/xrootd.log -c /etc/xrootd/xrootd-clustered.cfg -k fifo -s /var/run/xrootd/xrootd-clustered.pid -n clustered -R xrootd<br/>/usr/bin/xrootd: symbol lookup error: /lib64/libXrdServer.so.2: undefined symbol: _ZN9XrdOucTPC6tpcSgiE<br/>
+<span style="color: #7d414c"><span style="font-size: small">(19:20:51)</span> <b>bockjoo:</b></span> rebuilding creates this rpm: /RPMS/x86_64/xrootd-server-libs-4.11.0-1.el7.x86_64.rpm that does not have the osg<br/>
+</body>
+</html>

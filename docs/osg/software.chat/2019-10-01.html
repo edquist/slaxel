@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Oct 1, 2019 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue Oct 1, 2019 : #software (osg)</h3>
+<span style="color: #dd8527"><span style="font-size: small">(11:19:30)</span> <b>marcom:</b></span> I'm packaging a simple python app (a web app run via flask + a python script run via cron) . I thought to distribute it as RPM. Should I do just the spec file or use setuptools and use that from the RPM?  Or would be better even skip the RPM and use setuptools only? Which is the best practice? Anyone did something similar in OSG?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:20:43)</span> <b>matyas:</b></span> If you want to get it into OSG (in either main or contrib), you'll need a spec file so we can build it in Koji<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:22:33)</span> <b>matyas:</b></span> if it's intended to be run as an unprivileged user then you might not need the RPM but in general, running pip install as root is not recommended because the libraries you install might conflict with the libraries you get from RPMs<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:26:11)</span> <b>blin:</b></span> @matyas do we have any packages that use <tt>python setup.py</tt> in the spec file?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:26:52)</span> <b>dweitzel:</b></span> stashcp :slightly_smiling_face:<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:27:01)</span> <b>matyas:</b></span> yeah was just gonna mention that :slightly_smiling_face:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:27:11)</span> <b>dweitzel:</b></span> (stashcache-client is the RPM name I think)<br/>
+<span style="color: #dd8527"><span style="font-size: small">(11:42:39)</span> <b>marcom:</b></span> Do you use the spec file out of bdist_rpm for stashcp or have a custom one?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:43:41)</span> <b>matyas:</b></span> we have a custom one<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:46:23)</span> <b>blin:</b></span> <a href="https://github.com/opensciencegrid/Software-Redhat/blob/trunk/stashcache-client/osg/StashCache.spec">https://github.com/opensciencegrid/Software-Redhat/blob/trunk/stashcache-client/osg/StashCache.spec</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:47:23)</span> <b>dweitzel:</b></span> huh, we're in the process of changing that spec file though to use <tt>python setup.py</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(11:48:30)</span> <b>blin:</b></span> ah yeah, @didavila’s working on it<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:49:32)</span> <b>matyas:</b></span> try using this as an example: <a href="https://github.com/opensciencegrid/Software-Redhat/blob/devops/mash/osg/mash.spec">https://github.com/opensciencegrid/Software-Redhat/blob/devops/mash/osg/mash.spec</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(11:50:44)</span> <b>matyas:</b></span> I just tried setup.py bdist_rpm and the spec file it creates has a lot of garbage in it so I wouldn't use it<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(11:53:27)</span> <b>didavila:</b></span> what I’m doing, and seems to work fine,  is the following:<br/><pre>%build<br/>%py2_build<br/><br/>%install<br/>%py2_install</pre><br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(11:57:18)</span> <b>didavila:</b></span> you can see here: /usr/lib/rpm/macros.d/macros.python2 that the macro is doing the following:<br/><pre>%py2_install() %{expand:\\\<br/>  CFLAGS="%{optflags}" %{__python2} %{py_setup} %{?py_setup_args} install -O1 --skip-build --root %{buildroot} %{?*}<br/>}</pre><br/>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jun 15, 2021 : #flightworthy (chtc)</title>
+</head>
+<body>
+<h3>Tue Jun 15, 2021 : #flightworthy (chtc)</h3>
+<span style="color: #9b3b45"><span style="font-size: small">(09:45:53)</span> <b>jfrey:</b></span> Any objections to me removing the DCCredd class, meant for the crusty old dead credd?<br/>
+<blockquote>
+<span style="color: #5a4592"><span style="font-size: small">(14:17:09)</span> <b>tannenba:</b></span> @jfrey @johnkn Hey Jaime, are you sure it is not being used for the crusty old WINDOWS credd, which is most definitely not dead?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(14:18:27)</span> <b>jfrey:</b></span> I grepped the code and found no uses. And no server-side implementation for most of the command ints.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(14:19:19)</span> <b>jfrey:</b></span> And the DCCredd code is expecting to handle X509 proxies.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(14:20:06)</span> <b>tannenba:</b></span> Well, I guess that settles it....<br/>
+<span style="color: #5a4592"><span style="font-size: small">(14:20:21)</span> <b>tannenba:</b></span> :slightly_smiling_face:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:21:04)</span> <b>johnkn:</b></span> That tracks with what I know as well.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:21:38)</span> <b>johnkn:</b></span> the new credd uses store_cred.cpp as the tool code<br/>
+</blockquote>
+<span style="color: #d58247"><span style="font-size: small">(10:01:22)</span> <b>gthain:</b></span> When in doubt, cut it out!<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:21:13)</span> <b>matyas:</b></span> the gridmanager is what calls slurm_submit.sh, right? How do I set arguments? I want to pass the allocation (<tt>-A</tt>)<br/>
+<span style="color: #4cc091"><span style="font-size: small">(13:58:55)</span> <b>blin:</b></span> specify <tt>BatchProject</tt> in the grid job <a href="https://github.com/htcondor/BLAH/blob/devel/src/server.c#L1320">https://github.com/htcondor/BLAH/blob/devel/src/server.c#L1320</a><br/>
+<span style="color: #99a949"><span style="font-size: small">(14:14:57)</span> <b>matyas:</b></span> <tt>set_BatchProject = "GravSearches"</tt> in the job route?<br/>
+<span style="color: #5a4592"><span style="font-size: small">(14:19:21)</span> <b>tannenba:</b></span> @tlmiller <b>@edquist</b> So if I make a branch with a jira ticket in the name, e.g <tt>V9_1-HTCONDOR-414-branch</tt>, will I now get BaTLab builds kicked off when I make commits to that branch?  Or do I have to make a pull request?  Thanks.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(14:26:59)</span> <b>jfrey:</b></span> @matyas That looks like what you’ll want to do.<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:28:29)</span> <b>edquist:</b></span> @tannenba, right now it waits for tags showing up with the pattern <tt>^build-HTCONDOR-\d+$</tt><br/>
+<blockquote>
+<span style="color: #5a4592"><span style="font-size: small">(14:50:02)</span> <b>tannenba:</b></span> <b>@edquist</b> @tlmiller Ah, so it looks for a tag of a given pattern instead of a branch name.  That works for now, certainly an improvement from where we were...I'll give it a try!  Mucho gracias.  Meanwhile are the wheels still turning to also kick off a batlab build after a pull request?<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:54:04)</span> <b>edquist:</b></span> Did a bit of initial investigation, there were at least a couple questions though, including: PRs from which github users should trigger a build?  (presumably not any random user on the internet - whereas tags can already only be created by people with write access to the repo).  And, should a build happen just for the initial PR commit, or every time the PR is updated also?<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:54:55)</span> <b>edquist:</b></span> (vs a build tag update, which is treated as an explicit request to build a specific commit)<br/>
+<span style="color: #5a4592"><span style="font-size: small">(14:57:06)</span> <b>tannenba:</b></span> Understood..... thanks for the update Carl. I will get back to you on these questions.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(2021-06-21 15:59:38)</span> <b>tannenba:</b></span> <b>@edquist</b> @tlmiller Hi Carl, so I pushed a topic branch that had a tag <tt>build-HTCONDOR-554</tt>.   About 45 minutes later, I still do not see any evidence on the <a href="https://batlab.chtc.wisc.edu/results/">HTCondor build dashboard</a> that my build has even been submitted.  How long does it take? Carl, could you check your logs and see if the build/test batlab submit happened?<br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 10:13:35)</span> <b>edquist:</b></span> Hi @tannenba, sorry i didn't see your reply yesterday - i will check and see what's going on on batlab.  If things are working properly it should kick off the build immediately (within a few seconds of your git push command).  Probably something is not right on our end.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(2021-06-22 10:28:54)</span> <b>tannenba:</b></span> <b>@edquist</b> Thanks<br/>
+<span style="color: #5a4592"><span style="font-size: small">(2021-06-22 10:29:22)</span> <b>tannenba:</b></span> Please lemme know what you discover.  I really want everyone in HTCSS Dev to start using this capability....<br/>
+<span style="color: #5a4592"><span style="font-size: small">(2021-06-22 11:56:56)</span> <b>tannenba:</b></span> <b>@edquist</b> any news?<br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 12:20:37)</span> <b>edquist:</b></span> Hi @tannenba, yeah - it got the request for <tt>build-HTCONDOR-554</tt> but it turns out it was trying to fetch from my (edquist) fork of the htcondor repo (which is where i had been doing all my testing) instead of the main htcondor/htcondor fork, so it failed since the tag did not exist.  My bad.  I've updated it and dropped the tag.  Can you re-push your build tag?<br/>
+<span style="color: #5a4592"><span style="font-size: small">(2021-06-22 13:30:24)</span> <b>tannenba:</b></span> <b>@edquist</b> Repushed the tag, but doubt it did anything as it says "Everything is up-to-date".  I could improve some comments, move the tag, and push again....<br/>
+<span style="color: #5a4592"><span style="font-size: small">(2021-06-22 13:41:44)</span> <b>tannenba:</b></span> Ok, I forced a retag, and pushed it.<br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 13:52:50)</span> <b>edquist:</b></span> @tannenba do you push to the afs repo or github directly?<br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 13:53:07)</span> <b>edquist:</b></span> i don't actually know what is standard these days<br/>
+<span style="color: #5a4592"><span style="font-size: small">(2021-06-22 13:53:18)</span> <b>tannenba:</b></span> I pushed to the AFS repo, which is then (supposedly) mirrored to github.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(2021-06-22 13:54:09)</span> <b>tannenba:</b></span> The mirroring (at least of the commits) already happened.<br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 13:54:24)</span> <b>edquist:</b></span> ah, ok.<br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 13:54:35)</span> <b>edquist:</b></span> so there is some lag involved i guess<br/>
+<span style="color: #5a4592"><span style="font-size: small">(2021-06-22 13:55:02)</span> <b>tannenba:</b></span> Did the build get submitted yet?  The mirroring took place 17 minutes ago.<br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 13:58:35)</span> <b>edquist:</b></span> it looks like it did at 13:45:08<br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 13:58:36)</span> <b>edquist:</b></span> <a href="http://batlab.chtc.wisc.edu/nmi/results/details?runID=546596">http://batlab.chtc.wisc.edu/nmi/results/details?runID=546596</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(2021-06-22 13:59:17)</span> <b>tlmiller:</b></span> <a href="https://batlab.chtc.wisc.edu/results/workspace.php">https://batlab.chtc.wisc.edu/results/workspace.php</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(2021-06-22 13:59:30)</span> <b>tlmiller:</b></span> Apparently submitted as <tt>edquist</tt>.<br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 13:59:50)</span> <b>edquist:</b></span> wah wah<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2021-06-22 13:59:57)</span> <b>tlmiller:</b></span> ... with a name that's sadly just a little too long. :/<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2021-06-22 14:00:30)</span> <b>tlmiller:</b></span> Looks like another build went in at 12:20:07, but I assume that was from Carl fixing the problem?<br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 14:01:52)</span> <b>edquist:</b></span> i think that was unintentional but probably yes.  i had deleted the tag from github (but not afs) ... most likely i suspect the afs mirror pushed the original back to github and that's what triggered it<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2021-06-22 14:02:27)</span> <b>tlmiller:</b></span> Ah, that makes sense (and is why we never push anything directly to github).<br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 14:03:35)</span> <b>edquist:</b></span> it also explains why ToddT got the "already up to date" message<br/>
+<span style="color: #5a4592"><span style="font-size: small">(2021-06-22 15:21:51)</span> <b>tannenba:</b></span> <b>@edquist</b> @tlmiller So..... are things improved/changed/fixed?  Description could just be the tag name ("build-HTCONDOR-554"), no need for the "test tag-build for " prefix since that is obvious from the "build-" prefix on the tag.  If I moved the tag again, will it show up as a 'personal run' under my user now ?<br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 15:40:41)</span> <b>edquist:</b></span> i've cleaned up the job description.  getting a personal run under separate users sounds a bit more interesting.  is there a parameter to <tt>condor_nmi_submit</tt> for setting the user name or is it locked as the submitting user?  i saw a <tt>--notify</tt> option for specifying users to notify with results.  But even then it is not obvious how to identify the user who created the tag.  Github includes the "sender" info in the webhook payload, which is the github username responsible for pushing the tag -- that's you (your github user, anyway) if you pushed directly to github, but since you pushed to afs it's the user the mirror script is using (TimT?)<br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 15:41:55)</span> <b>edquist:</b></span> anyway for now no there is nothing to identify who "requested" the build via the build tag<br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 15:42:45)</span> <b>edquist:</b></span> one idea (i guess!) is to make an annotated tag for builds<br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 15:43:03)</span> <b>edquist:</b></span> that way an email address is associated with the tag<br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 15:43:26)</span> <b>edquist:</b></span> (not necessarily the same email as the author/committer of the commit you want to build)<br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 15:44:53)</span> <b>edquist:</b></span> that can be faked of course, but only people with repo write access would be able to push tags pointing to such annotated tags<br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 15:47:25)</span> <b>edquist:</b></span> we could go that route but then there is the more general question of how to submit a <tt>condor_nmi_submit</tt>  job as an arbitrary user ... easiest thing i guess would be to include the email for the tag (if an annotated tag) for the <tt>--notify</tt>  option<br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 15:48:05)</span> <b>edquist:</b></span> those are my thoughts for now, feel free to let me know if you have any thoughts / preferences<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2021-06-22 15:48:58)</span> <b>tlmiller:</b></span> Well, the obvious approach would be to run <tt>condor_nmi_submit</tt> as the user in question, but that might require more privileges than we want to deal with.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2021-06-22 15:49:56)</span> <b>tlmiller:</b></span> It might work, for identities, just to pull the committer out of the hash the tag points to.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2021-06-22 15:50:08)</span> <b>tlmiller:</b></span> And then to put that first in the description field.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2021-06-22 15:51:11)</span> <b>tlmiller:</b></span> (Although once you're confident it's working, we should probably move the tag-builder to a dedicated non condorauto user.)<br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 15:58:58)</span> <b>edquist:</b></span> right - so yeah i think to run condor_nmi_submit as _whoever_ would basically require root<br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 15:59:56)</span> <b>edquist:</b></span> &gt; It might work, for identities, just to pull the committer out of the hash the tag points to.<br/>so just to be clear, there are three potential "identities" (ie email addresses) to work with for git tags<br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 16:00:33)</span> <b>edquist:</b></span> if the tag is just a lightweight tag, you only have the commit object to work with, which has a "committer" and an "author"<br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 16:01:00)</span> <b>edquist:</b></span> but you might want to build a commit that was committed/authored by someone other than you<br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 16:01:50)</span> <b>edquist:</b></span> so for that reason i am thinking you could make an "annotated tag" (<tt>git tag -a</tt>)<br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 16:02:06)</span> <b>edquist:</b></span> and in that case there is a third identity (email) for the tagger<br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 16:02:16)</span> <b>edquist:</b></span> which does not have to match the author/committer<br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 16:02:43)</span> <b>edquist:</b></span> so that would be a way for you to select a commit to build even if it was not your commit<br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 16:03:13)</span> <b>edquist:</b></span> i don't think at the moment there is a good way to run this as whatever user we want<br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 16:03:24)</span> <b>edquist:</b></span> but we could at least set the notify address<br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 16:03:49)</span> <b>edquist:</b></span> &gt; i don't think at the moment there is a good way to run this as whatever user we want<br/><br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 16:03:54)</span> <b>edquist:</b></span> without running as root i mean<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2021-06-22 16:24:11)</span> <b>tlmiller:</b></span> We could play sudo games.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2021-06-22 16:24:49)</span> <b>tlmiller:</b></span> I don't think we _want_ to set the notify address; we don't for anything else.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2021-06-22 16:25:32)</span> <b>tlmiller:</b></span> And there's few enough for whom we should be autobuilding tags that I'm OK with maintaining a lookup table from email to unix username if we have to for the dashboard.<br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 16:27:00)</span> <b>edquist:</b></span> &gt; We could play sudo games<br/>&gt; I'm OK with maintaining a lookup table<br/>yeah fair points<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2021-06-22 16:28:49)</span> <b>tlmiller:</b></span> Although if all we care about is the dashboard, maybe having a <tt>tagbuilder</tt> user would be good enough?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2021-06-22 16:28:54)</span> <b>tlmiller:</b></span> Haven't really though about it at all.<br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 16:42:03)</span> <b>edquist:</b></span> Having a dedicated user (like <tt>tagbuilder</tt> or whatever) seems hunky dory to me.  (And again we can still provide a mechanism to notify the tagger.)<br/>
+<span style="color: #5a4592"><span style="font-size: small">(2021-06-22 16:51:27)</span> <b>tannenba:</b></span> Having it show up as <tt>tagbuild</tt> or whatever is fine w/ me since the name of the tag itself (and thus the JIRA ticket) is also there<br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 16:52:52)</span> <b>edquist:</b></span> i can talk to moate about getting a dedicated user for that<br/>
+<span style="color: #5a4592"><span style="font-size: small">(2021-06-22 17:03:16)</span> <b>tannenba:</b></span> In the meantime, it will show up as edquist? or ?<br/>
+<span style="color: #16569E"><span style="font-size: small">(2021-06-22 17:03:45)</span> <b>edquist:</b></span> fraid so, sorry<br/>
+<span style="color: #5a4592"><span style="font-size: small">(2021-06-22 17:05:02)</span> <b>tannenba:</b></span> Not the end of the world, just so it works....<br/>
+<span style="color: #5a4592"><span style="font-size: small">(2021-06-22 17:05:05)</span> <b>tannenba:</b></span> thanks<br/>
+</blockquote>
+<span style="color: #235e5b"><span style="font-size: small">(14:31:51)</span> <b>johnkn:</b></span> Anyone got any wisdom why the <tt>job_dagman_submit_parse</tt> test has this ?<br/><pre># We need to turn off shared port for this test if we're testing on Windows.<br/>my $appendCondorConfig = "";<br/>if( is_windows() ) {<br/>    $appendCondorConfig .= "JOB_ROUTER.USE_SHARED_PORT = FALSE\n";<br/>}</pre><br/>No, this test does not start a job router.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:32:57)</span> <b>johnkn:</b></span> git blame tags that line to a big set of changes to make tests work with shared port.  91f93e5d<br/>
+</body>
+</html>

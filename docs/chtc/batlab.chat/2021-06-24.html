@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jun 24, 2021 : #batlab (chtc)</title>
+</head>
+<body>
+<h3>Thu Jun 24, 2021 : #batlab (chtc)</h3>
+<span style="color: #9b3b45"><span style="font-size: small">(09:40:34)</span> <b>jfrey:</b></span> Anyone know what’s going on with the Ubuntu 20 build?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(09:40:57)</span> <b>jfrey:</b></span> It’s complaining about libgomp1 missing.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(09:41:08)</span> <b>jfrey:</b></span> That code changed in March.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(09:47:17)</span> <b>jfrey:</b></span> Ah, apt download is failing complaining about an IPv6 address. So “not our fault”?<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(09:49:42)</span> <b>tim:</b></span> Yes, there was a security update and I have to adjust the Docker build image.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(09:50:18)</span> <b>tim:</b></span> Hopefully, I'll get to that today.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:52:28)</span> <b>johnkn:</b></span> Darn, would have had a green build/test line on my last workspace build if not for that.<br/>
+<span style="color: #d58247"><span style="font-size: small">(09:53:38)</span> <b>gthain:</b></span> tests were all green :slightly_smiling_face:<br/>
+<span style="color: #d58247"><span style="font-size: small">(12:07:06)</span> <b>gthain:</b></span> tests are failing across the board in batlab because of port exhaustion in 127.0.0.1<br/>
+<span style="color: #d58247"><span style="font-size: small">(12:07:21)</span> <b>gthain:</b></span> I've lowered NUM_CPUS to 16 on the test machine, and restarted the C1 startd<br/>
+<blockquote>
+<span style="color: #9e3997"><span style="font-size: small">(13:12:41)</span> <b>tlmiller:</b></span> Are we not going to look into using virtualized addresses?<br/>
+</blockquote>
+<span style="color: #d58247"><span style="font-size: small">(12:07:24)</span> <b>gthain:</b></span> Let's see how that does<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:35:53)</span> <b>johnkn:</b></span> how about this instead.<br/><pre>MODIFY_REQUEST_EXPR_REQUESTCPUS = quantize(RequestCpus, {$(DETECTED_CPUS)/16})</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:36:12)</span> <b>johnkn:</b></span> so we aren't lying about the number of cpus<br/>
+<span style="color: #d58247"><span style="font-size: small">(12:43:54)</span> <b>gthain:</b></span> Looks like the batlab C1 test jobs have <tt>network = host</tt>  now?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:45:21)</span> <b>johnkn:</b></span> i think that's controlled by nmi_tools, so it would depend on the sha<br/>
+<span style="color: #d58247"><span style="font-size: small">(12:51:55)</span> <b>gthain:</b></span> I think we changed it locally on <a href="http://batlab.chtc.wisc.edu">batlab.chtc.wisc.edu</a>, but that change was wiped out when Todd installed a new metronome with the chirp changes<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:53:15)</span> <b>johnkn:</b></span> nmi_tools has this<br/><pre>	# Glorious hack.<br/>	if( $runtype eq "build" ) {<br/>		print CMDFILE "request_cpus = 1\n";<br/>		print CMDFILE "request_memory = 4G\n";<br/>		print CMDFILE "request_disk = 8G\n";<br/><br/>		# Select Docker NAT network for more reliable HTCondor startup<br/>		print CMDFILE "docker_network_type = nat\n";<br/>	} else {<br/>		print CMDFILE "request_cpus = 1\n";<br/>		print CMDFILE "request_memory = 4G\n";<br/>		print CMDFILE "request_disk = 8G\n";<br/><br/>		# Select Docker NAT network to avoid port exhaustion when running lots of test runs<br/>		print CMDFILE "docker_network_type = nat\n";<br/>	</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:54:42)</span> <b>johnkn:</b></span> but I'm looking at the code and docker-api doesn't understand "nat" only "host" and "none"<br/>
+<span style="color: #d58247"><span style="font-size: small">(12:55:50)</span> <b>gthain:</b></span> [gthain@batlabsubmit0001 local]$ condor_q -allusers -af DockerNetworkType | sort -u<br/>host<br/>undefined<br/>
+<span style="color: #d58247"><span style="font-size: small">(12:56:36)</span> <b>gthain:</b></span> I believe "bridge" is what is wanted there<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:04:03)</span> <b>johnkn:</b></span> docker-api doesn't understand "bridge" either<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:04:35)</span> <b>johnkn:</b></span> it appears to presume that neither host nor none is the default for docker<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:14:00)</span> <b>tlmiller:</b></span> ... didn't we think that changing it to NAT had had some effect?<br/>
+<span style="color: #d58247"><span style="font-size: small">(13:14:23)</span> <b>gthain:</b></span> It looks like we lost the change<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:14:35)</span> <b>tlmiller:</b></span> Uh, TJ says we didn't.<br/>
+<span style="color: #d58247"><span style="font-size: small">(13:15:09)</span> <b>gthain:</b></span> <pre>$ condor_q -allusers -af DockerNetworkType | sort -u<br/>host<br/>undefined</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:15:11)</span> <b>johnkn:</b></span> so looking at the startd code, anything that is not "host" or "none" is whatever the default for docker is.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:15:24)</span> <b>johnkn:</b></span> so changing it away from "host" could have an effect<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:15:54)</span> <b>johnkn:</b></span> I don't understand why we aren't seeing "nat",  but undefined will give the same result as "nat"<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:16:53)</span> <b>johnkn:</b></span> everthing in the queue is currently condorauto<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:17:21)</span> <b>johnkn:</b></span> does condorauto use condor_nmi_submit? or does it do something else?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:19:06)</span> <b>tlmiller:</b></span> It uses condor_nmi_submit, of course.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:20:51)</span> <b>johnkn:</b></span> that's what I thought.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(13:21:19)</span> <b>tim:</b></span> @gthain I submitted a 9.1.0 + patches workspace build. condor_nmi_submit selected host networking for tests.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(13:21:46)</span> <b>tim:</b></span> I didn't think about it when I submitted. Currrent submissions should all use NAT.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:22:29)</span> <b>tlmiller:</b></span> Interesting.  The cmdfile and the subfile are different.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:22:45)</span> <b>tlmiller:</b></span> It shouldn't be possible for Greg to be right, but maybe he was.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:23:05)</span> <b>tlmiller:</b></span> (git should have alarmed if the situation was as he proposed.)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:23:44)</span> <b>tlmiller:</b></span> Of course, it's also possible that this _never_ worked.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(13:24:18)</span> <b>tim:</b></span> Maybe I am wrong. Now that I think of it. We override builds to use NAT in the older condor_nmi_submit. Now we override the nmi default with nat in all cases.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:24:51)</span> <b>tlmiller:</b></span> Huh!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:25:06)</span> <b>tlmiller:</b></span> I think it may have only been working by coincidence, if it was working.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:25:07)</span> <b>johnkn:</b></span> as long as it's not set to "host" it doesn't matter<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(13:25:12)</span> <b>tim:</b></span> Is the nmi default still host except for CentOS6 where it is always nat.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:25:36)</span> <b>tlmiller:</b></span> TJ, if a <tt>+XY = foo</tt> and <tt>x_y = bar</tt> are set in the same submit file, which wins?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:25:50)</span> <b>johnkn:</b></span> the startd only checks for "host" and "none".<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:26:00)</span> <b>johnkn:</b></span> undefined and "nat" are basically the same<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:26:10)</span> <b>tlmiller:</b></span> The NMI default _was_ <tt>host</tt> on all non-CentOS6 platforms, where it said nothing at all.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:26:29)</span> <b>tlmiller:</b></span> It is now <tt>host</tt> for all Docker builds.<br/>
+<span style="color: #d58247"><span style="font-size: small">(13:26:30)</span> <b>gthain:</b></span> ? -- What's special about CentOS6<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:26:43)</span> <b>johnkn:</b></span> +foo<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:26:47)</span> <b>johnkn:</b></span> always wins<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:26:52)</span> <b>johnkn:</b></span> it happens last<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:26:56)</span> <b>tlmiller:</b></span> OK.  Then this never worked.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(13:28:05)</span> <b>tim:</b></span> The default in nmi should be nat. line 1491 of /usr/local/bin/nmi_submit it is set to host.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(13:28:37)</span> <b>tim:</b></span> In the htcondor repo, we override that to nat for build runs and test runs.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:28:58)</span> <b>tlmiller:</b></span> Except, if you notice, there's no conditional there.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(13:32:07)</span> <b>tim:</b></span> If I recall, CentOS6 had some problems with too many networks.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(13:32:51)</span> <b>tim:</b></span> In chtc, the execute nodes have more network interfaces defined than one would expect.<br/>
+<span style="color: #d58247"><span style="font-size: small">(13:37:49)</span> <b>gthain:</b></span> Pretty sure this was set at some time:<br/>
+<span style="color: #d58247"><span style="font-size: small">(13:37:54)</span> <b>gthain:</b></span> <pre>$ grep ^DockerNetworkType history | sort | uniq -c | sort -n<br/>   5519 DockerNetworkType = "host"<br/>  32755 DockerNetworkType = "nat"</pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:40:24)</span> <b>tlmiller:</b></span> I don't understand, from the code I'm looking at, how that could have happened, but I guess I'm glad it did.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:41:50)</span> <b>tlmiller:</b></span> OK, now I see it.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:41:55)</span> <b>tlmiller:</b></span> I was looking in the wrong place.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:45:15)</span> <b>tlmiller:</b></span> So what's going on is that Metronome is unconditionally setting 'host' networking, because that's what we used to want.  What used to be happening in condor_nmi_submit is that it was settting <tt>++docker_network_type</tt> because of a bug in 8.8, and because Metronome makes sure that those all get sorted to the end of the Condor submit file, it was winning.  I changed <tt>++docker_network_type</tt> to <tt>docker_network_type</tt> , forgetting that we need a <tt>+</tt> there to move from the Metronome submit language to the Condor submit language.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:47:01)</span> <b>tlmiller:</b></span> ... and somebody hasn't done a merge to master recently, so right now the fix is only on the stable branch.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:47:09)</span> <b>***tlmiller:</b></span> will cherry-pick it in shortly.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:50:24)</span> <b>tlmiller:</b></span> OK, Metronome also fixed not to set networking to host by default for docker.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:50:45)</span> <b>tlmiller:</b></span> Greg, consider reverting your concurrency-limiting change.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(13:51:34)</span> <b>jfrey:</b></span> It looks like my commits are causing merge conflicts. I’m merging now.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:51:46)</span> <b>tlmiller:</b></span> No worries.  The cherry-pick worked fine.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(13:51:57)</span> <b>jfrey:</b></span> I should do it regardless.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:52:16)</span> <b>tlmiller:</b></span> Sure, I just didn't want you to feel bad because I was complaining about it. ;)  [Not least because I have no room to talk!]<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(13:52:27)</span> <b>jfrey:</b></span> :thumbsup:<br/>
+<span style="color: #d58247"><span style="font-size: small">(13:52:35)</span> <b>gthain:</b></span> Changing the startd requires a restart, so I'll let the metronome test jobs drain first<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:52:52)</span> <b>tlmiller:</b></span> Sounds good.  Thanks.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:53:08)</span> <b>tlmiller:</b></span> (We may have to do it again later, but let's not change more than one thing at a time, right?)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:53:12)</span> <b>johnkn:</b></span> what's changing in the stard?<br/>
+<span style="color: #d58247"><span style="font-size: small">(13:53:14)</span> <b>gthain:</b></span> Exactly<br/>
+<span style="color: #d58247"><span style="font-size: small">(13:53:30)</span> <b>gthain:</b></span> NUM_CPUS<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:54:39)</span> <b>johnkn:</b></span> did you see my quantize expression?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:55:55)</span> <b>tlmiller:</b></span> I did; we might deploy it, or a similar expression, when/if the time comes to limit the amount of test concurrency for reals (and not because I broke things).<br/>
+</body>
+</html>

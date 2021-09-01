@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Aug 29, 2018 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Aug 29, 2018 : #software (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(09:06:28)</span> <b>bbockelm:</b></span> @jlstephen @lincoln - mirror down again.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:06:31)</span> <b>bbockelm:</b></span> <pre><br/>DEBUG util.py:421:  <a href="http://mirror.grid.uchicago.edu/pub/linux/centos/7/os/x86_64/Packages/libICE-1.0.9-9.el7.x86_64.rpm">http://mirror.grid.uchicago.edu/pub/linux/centos/7/os/x86_64/Packages/libICE-1.0.9-9.el7.x86_64.rpm</a>: [Errno 12] Timeout on <a href="http://mirror.grid.uchicago.edu/pub/linux/centos/7/os/x86_64/Packages/libICE-1.0.9-9.el7.x86_64.rpm">http://mirror.grid.uchicago.edu/pub/linux/centos/7/os/x86_64/Packages/libICE-1.0.9-9.el7.x86_64.rpm</a>: (28, 'connect() timed out!')<br/></pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(09:06:36)</span> <b>lincoln:</b></span> hm<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:06:45)</span> <b>lincoln:</b></span> i am under the impression there's network stuff going on<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:07:03)</span> <b>bbockelm:</b></span> ahh, right, I saw some notification from the Wisconsin T2.<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:07:24)</span> <b>lincoln:</b></span> particularly I think we're trying to get another /24 ? added to our network<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:07:33)</span> <b>bbockelm:</b></span> nope, doesn't work from UNL either.  Might be on your side.<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:07:34)</span> <b>lincoln:</b></span> and apparently the switch/router config changes are causing issues<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:08:11)</span> <b>lincoln:</b></span> I'm sure if it's stuck they'll roll back - sorry, I didn't realize our mirror has become critical for this stuff or else we would've sent out a notification<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:08:43)</span> <b>bbockelm:</b></span> Just annoying as it appears to be listed as the primary mirror.<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:08:47)</span> <b>lincoln:</b></span> ah<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:08:51)</span> <b>bbockelm:</b></span> so each package has to timeout / fallback.<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:09:15)</span> <b>lincoln:</b></span> take an hour long coffee break!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:09:25)</span> <b>bbockelm:</b></span> LET'S GO TO A MEETING<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:52:06)</span> <b>bbockelm:</b></span> Dang, no, I was wrong.  Eventually the thing failed.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:52:12)</span> <b>bbockelm:</b></span> Soo.... how's that routing going?<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:00:58)</span> <b>jlstephen:</b></span> looks like it's a hypervisor issue, not specifically network<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:01:02)</span> <b>jlstephen:</b></span> I'm working on it<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:25:50)</span> <b>bbockelm:</b></span> @blin @matyas - in the meantime, is there another mirror we can switch to?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:26:19)</span> <b>matyas:</b></span> I guess we can switch back to <a href="http://mirror.batlab.org">mirror.batlab.org</a> for now<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:28:40)</span> <b>bbockelm:</b></span> sure.  Why did we switch away from it?  I can't recall.<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:29:05)</span> <b>matyas:</b></span> one less thing for moate to maintain<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:33:35)</span> <b>blin:</b></span> yeah, i don't think moate had enough time to maintain it as an official mirror<br/>
+<span style="color: #a72f79"><span style="font-size: small">(10:33:55)</span> <b>andrew.melo:</b></span> Is it just rsync?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:34:16)</span> <b>matyas:</b></span> yeah but he mirrors specific directories instead of the whole thing<br/>
+<span style="color: #a72f79"><span style="font-size: small">(10:35:08)</span> <b>andrew.melo:</b></span> I'm just asking because it wouldn't be hard to cron that up and make a new mirror<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:36:09)</span> <b>matyas:</b></span> i was thinking i might put a mirror directly on <a href="http://koji.chtc.wisc.edu">koji.chtc.wisc.edu</a>, if i can make koji work with file:/// urls<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:44:05)</span> <b>matyas:</b></span> ok, builds should work when these are done: <a href="https://koji.chtc.wisc.edu/koji/tasks?method=newRepo&amp;owner=Matyas%20Selmeci&amp;state=all&amp;view=tree&amp;order=-id">https://koji.chtc.wisc.edu/koji/tasks?method=newRepo&amp;owner=Matyas%20Selmeci&amp;state=all&amp;view=tree&amp;order=-id</a><br/>
+<span style="color: #e96699"><span style="font-size: small">(10:59:09)</span> <b>lincoln:</b></span> i think Mirror is back up btw<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:59:47)</span> <b>lincoln:</b></span> our NAT went down and OpenStack went berzerk<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:03:19)</span> <b>lincoln:</b></span> if there's anything we can help with for making mirror stuff a bit more robust let me know<br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:08:12)</span> <b>bbockelm:</b></span> In case you guys didn't see the announcement yet:<br/>&gt; TACC, in partnerships with Dell EMC and Intel, will deploy Frontier, a hybrid system offering 39 PF (double precision) of Intel Xeon processors, complemented by 11 PF (single precision) of GPU cards for machine learning applications. In addition to 3x the per node memory of NSF's prior leadership-class computing system primary compute nodes, Frontier will have 2x the storage bandwidth in a storage hierarchy that includes 55PB of usable disk-based storage and 3PB of 'all flash' storage, to enable next generation data-intensive applications and support for the data science community<br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:08:38)</span> <b>bbockelm:</b></span> 39PF of Xeons, 11PF of nvidia GPUs.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:12:50)</span> <b>bbockelm:</b></span> I think that works out to somewhere between 200k and 250k Xeon cores<br/>
+<span style="color: #a72f79"><span style="font-size: small">(20:15:56)</span> <b>andrew.melo:</b></span> I'll take two of them, please<br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:16:20)</span> <b>bbockelm:</b></span> CMS-in-a-box anyone?<br/>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Aug 25, 2021 : #flightworthy (chtc)</title>
+</head>
+<body>
+<h3>Wed Aug 25, 2021 : #flightworthy (chtc)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(09:49:43)</span> <b>johnkn:</b></span> does anyone have a clue what this message means?<br/><pre>"root: can't figure out DISPLAY, set it manually<br/>In case you run a remote ssh session, restart your ssh session with:<br/>=========&gt;  ssh -Y"<br/><br/>I used both ssh -XY and ssh -Y commands. Error occurred again.</pre><br/>This is from a RT ticket to condor-admin.  He says this is happening when he runs condor_submit.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:06:38)</span> <b>johnkn:</b></span> I'm tempted to say "you can't run condor_submit as root", but that's really side-stepping the question.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(10:23:26)</span> <b>jfrey:</b></span> Looking at the attachments in the ticket, <tt>root</tt> is a program he’s trying to run via the vanilla universe.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(10:24:11)</span> <b>jfrey:</b></span> It’s installed at CERN. A poor choice of application name.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:25:29)</span> <b>jcpatton:</b></span> We have a CHTC user that is requesting and getting provisioned (per <tt>MemoryProvisioned</tt>) 51200 MB, but some of his jobs are getting put on hold at like 51066 MB with the log/hold messages<br/><pre>007 (14257368.007.000) 2021-08-24 23:51:14 Shadow exception!<br/>	Error from <a href="mailto:slot1_25@e2385.chtc.wisc.edu">slot1_25@e2385.chtc.wisc.edu</a>: Job has gone over memory limit of 46080 megabytes. Peak usage: 51066 megabytes.<br/>	0  -  Run Bytes Sent By Job<br/>	173774512  -  Run Bytes Received By Job<br/>...<br/>012 (14257368.007.000) 2021-08-24 23:51:14 Job was held.<br/>	Error from <a href="mailto:slot1_25@e2385.chtc.wisc.edu">slot1_25@e2385.chtc.wisc.edu</a>: Job has gone over memory limit of 46080 megabytes. Peak usage: 51066 megabytes.<br/>	Code 34 Subcode 0</pre><br/>
+<blockquote>
+<span style="color: #9f69e7"><span style="font-size: small">(12:48:26)</span> <b>lmichael:</b></span> @gthain ^<br/>
+</blockquote>
+<span style="color: #2b6836"><span style="font-size: small">(10:25:59)</span> <b>jcpatton:</b></span> I’m guessing that 46080 is the cgroups soft limit or something like that?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:26:20)</span> <b>jcpatton:</b></span> Still… unexpected behavior<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:28:11)</span> <b>jcpatton:</b></span> 46080 is exactly 90% of 51200<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:29:31)</span> <b>tlmiller:</b></span> Sounds like a Greg question.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:29:37)</span> <b>jcpatton:</b></span> Yeah :confused:<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(10:33:26)</span> <b>jfrey:</b></span> I can take the root ticket.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:07:05)</span> <b>johnkn:</b></span> @jfrey thank you.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(11:07:53)</span> <b>jfrey:</b></span> I’ve stolen it.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(11:51:38)</span> <b>tim:</b></span> @blin We plan to have a 9.1.4 RC1 posted before 1:00 PM. After Jaime does his Bosco test, we'd like you to do your Bosco test.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(11:52:07)</span> <b>tim:</b></span> I will build for OSG devops, as soon as it is posted.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(11:55:40)</span> <b>blin:</b></span> i don't think we care about bosco here<br/>
+<span style="color: #4cc091"><span style="font-size: small">(11:56:18)</span> <b>blin:</b></span> at least for the RC/devops release: Hosted CE containers use the version of condor available in the upcoming-{development,testing,release} repos, not devops<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(12:33:54)</span> <b>tim:</b></span> @jfrey @tannenba 9.1.4-0.554772 has been posted to the RC repository.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(12:37:25)</span> <b>tim:</b></span> @blin This RC contains fixes for the following two issues. The GPU fix will come later:<br/><a href="https://opensciencegrid.atlassian.net/browse/HTCONDOR-664">https://opensciencegrid.atlassian.net/browse/HTCONDOR-664</a><br/><a href="https://opensciencegrid.atlassian.net/browse/HTCONDOR-674">https://opensciencegrid.atlassian.net/browse/HTCONDOR-674</a><br/>
+<span style="color: #4cc091"><span style="font-size: small">(12:40:18)</span> <b>blin:</b></span> sounds good. what's the ETA?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(12:40:44)</span> <b>jfrey:</b></span> Bosco smoketest passes.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(12:52:18)</span> <b>tim:</b></span> koji build in progess. Will have to kick off OSG VMU devops test when devops-itb updates (after lunch)<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(13:48:18)</span> <b>tim:</b></span> @blin Koji build finished. Still waiting for condor 9.1.4 to show up in devops-itb. Still don't have a minefield.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(13:49:44)</span> <b>blin:</b></span> @matyas can we manually kick off a repo sync for Tim?<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:52:28)</span> <b>matyas:</b></span> sure<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:59:47)</span> <b>matyas:</b></span> done I think<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(14:03:45)</span> <b>tim:</b></span> Yup, OSG VMU test kicked off.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(14:34:46)</span> <b>tim:</b></span> @blin HTCondor 9.1.4 RC1 passed OSG VMU tests in devops<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:35:04)</span> <b>johnkn:</b></span> rename <tt>GRID</tt> universe and <tt>GridResource</tt> job attributes?<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(14:36:18)</span> <b>tim:</b></span> @blin Remember that condor in devops-itb, needs blahp from 3.5-upcoming-testing<br/>
+<span style="color: #4cc091"><span style="font-size: small">(14:37:35)</span> <b>blin:</b></span> err does the upcoming-testing blahp work with condor 9.1.2 in upcoming-release?<br/>
+<span style="color: #4cc091"><span style="font-size: small">(14:37:46)</span> <b>blin:</b></span> seems like we should start shipping a blahp in the devops pipe<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(14:38:11)</span> <b>tim:</b></span> Yes, blahp 2.1.1 will work fine with condor 9.1.2.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(14:40:20)</span> <b>blin:</b></span> do we have to sync the release of condor 9.1.4rc1 to devops with the release of blahp 2.1.1 release into 3.5 upcoming?<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(14:41:32)</span> <b>tim:</b></span> The condor 9.1.4 RPM has <tt>Requires: blahp &gt;= 2.1.1</tt><br/>
+<span style="color: #684b6c"><span style="font-size: small">(14:41:44)</span> <b>bbockelman:</b></span> The <tt>G</tt> universe and the <tt>GResource</tt> attributes?<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(14:42:52)</span> <b>tim:</b></span> So, the newer blahp needs to be present for HTCondor. So, the blahp promotion should go first.<br/>
+<blockquote>
+<span style="color: #4cc091"><span style="font-size: small">(14:47:20)</span> <b>blin:</b></span> devops should move faster than the regular release cycle: can we build the blahp for devops?<br/>
+<span style="color: #4cc091"><span style="font-size: small">(14:47:42)</span> <b>blin:</b></span> maybe we don't have to do it for this round in the name of expediency<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(14:48:42)</span> <b>tim:</b></span> @blin Yes, we can build blahp in devops.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(14:48:49)</span> <b>blin:</b></span> we can tell OSG Ops to install blahp out of 3.5 upcoming testing after we promote 9.1.4rc1 to devops prod for now<br/>
+</blockquote>
+<span style="color: #bb86b7"><span style="font-size: small">(14:43:54)</span> <b>tim:</b></span> The new blahp is compatible with 9.0.x and 9.1.x condors.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(15:01:58)</span> <b>tim:</b></span> @blin @matyas I tried building blahp in devops and the el7 build failed because the epel repodate seems to be out of date.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:02:21)</span> <b>johnkn:</b></span> The <tt>OUTER</tt> universe and <tt>OuterResource</tt><br/>
+<span style="color: #4cc091"><span style="font-size: small">(15:02:55)</span> <b>blin:</b></span> <tt>OUTIE</tt> vs <tt>INNIE</tt><br/>
+<span style="color: #bb86b7"><span style="font-size: small">(15:03:50)</span> <b>tim:</b></span> It's the end of my day (heading to the links :golf: )  So, I'll just leave things as is.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(15:04:33)</span> <b>blin:</b></span> er, what's the deadline on this?<br/>
+<blockquote>
+<span style="color: #bb86b7"><span style="font-size: small">(15:14:43)</span> <b>tim:</b></span> @blin I was supposed to get this to you today. @tannenba would have the big picture.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(2021-08-26 10:13:11)</span> <b>tim:</b></span> @blin I believe that Miron wanted this on the Open Pool ASAP.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(2021-08-26 10:36:19)</span> <b>tannenba:</b></span> ^ specifically, on the execution points (i.e. register the tarball with the factory).... no need at this point to update the access points or central manager....<br/>
+</blockquote>
+<span style="color: #99a949"><span style="font-size: small">(15:05:29)</span> <b>matyas:</b></span> @tim submit again when the createrepo tasks finish <a href="https://koji.opensciencegrid.org/koji/tasks?state=all&amp;view=flat&amp;method=createrepo&amp;order=-id">https://koji.opensciencegrid.org/koji/tasks?state=all&amp;view=flat&amp;method=createrepo&amp;order=-id</a><br/>
+<blockquote>
+<span style="color: #bb86b7"><span style="font-size: small">(15:11:38)</span> <b>tim:</b></span> Done.<br/>
+</blockquote>
+<span style="color: #235e5b"><span style="font-size: small">(15:10:33)</span> <b>johnkn:</b></span> The <tt>REMOTE</tt> universe and <tt>RemoteResource</tt>  although the use of Resource here is a bit vague.  perhaps <tt>RemoteResourceAddress</tt> ?<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:11:47)</span> <b>matyas:</b></span> <tt>SOMEBODYELSES</tt> universe and <tt>SomebodyElsesResource</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:12:11)</span> <b>johnkn:</b></span> the <tt>BORROWED</tt> universe :wink:<br/>
+<span style="color: #684b6c"><span style="font-size: small">(15:12:45)</span> <b>bbockelman:</b></span> <tt>DelegatedUniverse</tt> ?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:16:54)</span> <b>johnkn:</b></span> the gridmanager is really a kind of shadow that speaks Gahp right?<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(15:19:28)</span> <b>tim:</b></span> @blin @matyas blahp 2.1.1 is in devops-itb (well, when it syncs.) I'm out of here.<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:22:44)</span> <b>matyas:</b></span> bad news: GAHP has "Grid" in it<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:23:08)</span> <b>johnkn:</b></span> pretend it stands for generic<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:23:13)</span> <b>johnkn:</b></span> the <tt>NINE</tt> Universe.   (<tt>NEIN</tt> universe?)<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(16:29:47)</span> <b>lmichael:</b></span> @johnkn I think I asked this recently, but I’m assuming that the ‘44’ includes some pslots that a job would never match to?<br/><pre>The Requirements expression for job 82233.058 reduces to these conditions:<br/><br/>         Slots<br/>Step    Matched  Condition<br/>-----  --------  ---------<br/>[0]       11978  TARGET.PoolName == "CHTC"<br/>[5]        4846  Target.HasCHTCStaging == true<br/>[6]        4817  [0] &amp;&amp; [5]<br/>[11]        264  TARGET.Disk &gt;= RequestDisk<br/>[12]         57  [6] &amp;&amp; [11]<br/>[13]        150  TARGET.Memory &gt;= RequestMemory<br/>[14]         45  [12] &amp;&amp; [13]<br/>[15]        205  TARGET.Cpus &gt;= RequestCpus<br/>[16]         44  [14] &amp;&amp; [15]</pre><br/>Did we request already to have the counts ignore pslots, since jobs can never match to them?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:32:13)</span> <b>johnkn:</b></span> jobs always match to p-slots, that's the only thing they match to<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:33:42)</span> <b>johnkn:</b></span> The problem you are thinking of is that the summary at the bottom will include slots that would only match if they were first drained<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(16:48:10)</span> <b>lmichael:</b></span> Isn’t THE pslot (on each machine) un-matchable?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(22:35:44)</span> <b>johnkn:</b></span> @lmichael no, it's un claimable.  The match is made to the p-slot, which, when claimed, creates the d-slot. the p-slot remains unclaimed (for now) and the d-slot ends up claimed.  (and is destroyed as soon as it transitions to unclaimed)<br/>
+</body>
+</html>

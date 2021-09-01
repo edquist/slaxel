@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jun 19, 2018 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue Jun 19, 2018 : #software (osg)</h3>
+<span style="color: #a72f79"><span style="font-size: small">(13:01:34)</span> <b>andrew.melo:</b></span> Weird q: does the line <tt>xrd.protocol http:1094 /usr/lib64/libXrdHttp-4.so</tt> in the xrootd config mean it *only* serves data via HTTP(S), or does it do some sort of negotiation to whatever the client wants<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:04:37)</span> <b>dweitzel:</b></span> I'm not 100% sure, but I think that means that it will only perform HTTP(s) requests on that port.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:14:39)</span> <b>bbockelm:</b></span> Nope.  It'll look at the first few bytes and select the correct protocol accordingly.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:14:49)</span> <b>bbockelm:</b></span> So you can run HTTP, XRootD, and HTTPS out the same port<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:15:02)</span> <b>bbockelm:</b></span> (in fact you have to if you want it to work well with the <tt>cmsd</tt>)<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:15:14)</span> <b>andrew.melo:</b></span> So that line doesn't override the default xrootd protocol, it just adds more?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:15:27)</span> <b>bbockelm:</b></span> yup<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:19:02)</span> <b>andrew.melo:</b></span> I'm trying to hunt down why this client (who connected over ipv4) is getting rejected, when I have the file on the log:<br/><tt>nobody.264:29@198.32.44.10 do_Select: failed; No servers are reachable via public IPv6 network to read the file. </tt><br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:19:24)</span> <b>andrew.melo:</b></span> Will it try again with v4, or did the client get an actual deadly error<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:19:25)</span> <b>bbockelm:</b></span> CMSSW version of Xrootd or standalone?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:19:34)</span> <b>andrew.melo:</b></span> Dunno. I'm just watching the logs on the new redirector I'm trying to bring up<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:19:45)</span> <b>bbockelm:</b></span> there was an older version of the Xrootd client that screws up IPv6 detection.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:21:48)</span> <b>andrew.melo:</b></span> I guess there's not much I can do about that<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:22:56)</span> <b>andrew.melo:</b></span> Does this monitoring go somewhere useful? <tt>xrootd.monitor all auth flush 30s mbuff 1472 window 5s dest files io info user <a href="http://xrootd.t2.ucsd.edu:9930">xrootd.t2.ucsd.edu:9930</a></tt><br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:24:41)</span> <b>andrew.melo:</b></span> I'm seeing that ipv6 error for some files in <tt>/store/unmerged</tt>, which I presume would be something written by a recent CMSSW <tt>/store/unmerged/RunIIFall17DRPremix/HWminusJ_HToWW_M120_13TeV_powheg_pythia8_TuneCP5/GEN-SIM-RAW/PU2017_94X_mc2017_realistic_v11-v1/100000/0AC334FA-436C-E811-AB01-F01FAFDC6061.root</tt><br/>
+<span style="color: #16569E"><span style="font-size: small">(15:45:42)</span> <b>edquist:</b></span> @jthiltges, I just wanted to confirm - did you get to test the new <tt>zookeeper-3.4.5+cdh5.14.2+142-1.cdh5.14.2.p0.11.1.osgup.el7</tt> build, and if so did it work for you as expected?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:48:53)</span> <b>jthiltges:</b></span> Ah, yes. Didn't run into any issues. I'll roll it out on more things.<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:50:18)</span> <b>edquist:</b></span> Ok, cool, thanks!<br/>
+</body>
+</html>

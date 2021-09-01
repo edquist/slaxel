@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Nov 16, 2018 : #software (osg)</title>
+</head>
+<body>
+<h3>Fri Nov 16, 2018 : #software (osg)</h3>
+<span style="color: #965d1b"><span style="font-size: small">(12:07:56)</span> <b>briedel:</b></span> @dwd how do i check the revision number of a repo?<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:10:16)</span> <b>dwd:</b></span> on a client or server?<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:11:15)</span> <b>briedel:</b></span> server<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:11:17)</span> <b>dwd:</b></span> Well in both cases you can use the client way, which is attr -qg revision /cvmfs/repo.name<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:12:02)</span> <b>briedel:</b></span> <pre><br/>[connect@cvmfs-origin ~]$ attr -qg revision /cvmfs/connect.opensciencegrid.org<br/>attr_get: No data available<br/>Could not get "revision" for /cvmfs/connect.opensciencegrid.org<br/></pre><br/>i did that<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:12:54)</span> <b>dwd:</b></span> Oh right I forgot that extended attributes are disabled on the server.  On the server you can do cat -v /srv/cvmfs/repo.name/.cvmfspublished and look at the line beginning with S<br/>
+<span style="color: #965d1b"><span style="font-size: small">(14:41:05)</span> <b>briedel:</b></span> @dwd i just ran a publish on the new server and it seems to have worked<br/>
+<span style="color: #965d1b"><span style="font-size: small">(14:41:08)</span> <b>briedel:</b></span> can you take a look?<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:42:13)</span> <b>dwd:</b></span> What should I look for?<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:44:52)</span> <b>dwd:</b></span> See if the snapshots are working to the osg stratum 1?<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:45:30)</span> <b>dwd:</b></span> for <a href="http://connect.opensciencegrid.org">connect.opensciencegrid.org</a>?<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:46:12)</span> <b>dwd:</b></span> Nov 16 14:45:05 <a href="http://hcc-cvmfs-itb.unl.edu">hcc-cvmfs-itb.unl.edu</a> cvmfs_server[2531]: CernVM-FS: replicating from <a href="http://osg-cvmfs.grid.uchicago.edu:8000/cvmfs/connect.opensciencegrid.org">http://osg-cvmfs.grid.uchicago.edu:8000/cvmfs/connect.opensciencegrid.org</a><br/>Nov 16 14:45:05 <a href="http://hcc-cvmfs-itb.unl.edu">hcc-cvmfs-itb.unl.edu</a> cvmfs_server[2531]: CernVM-FS: using public key(s) /etc/cvmfs/keys/opensciencegrid.org.pub, /etc/cvmfs/keys/oasis-itb.opensciencegrid.org.pub<br/>Nov 16 14:45:48 <a href="http://hcc-cvmfs-itb.unl.edu">hcc-cvmfs-itb.unl.edu</a> cvmfs_server[2531]: Failed to contact stratum 0 server (7 - host connection problem)<br/>
+<span style="color: #965d1b"><span style="font-size: small">(14:53:18)</span> <b>briedel:</b></span> could this be cause the RSA key changed?<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:53:35)</span> <b>dwd:</b></span> What RSA key?<br/>
+<span style="color: #965d1b"><span style="font-size: small">(14:53:47)</span> <b>briedel:</b></span> the machines RSA key that ssh checks<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:53:57)</span> <b>dwd:</b></span> No this isn’t using ssh, it is http<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:55:00)</span> <b>dwd:</b></span> Connecting to <a href="http://osg-cvmfs.grid.uchicago.edu">osg-cvmfs.grid.uchicago.edu</a> port 8000 hangs.  Could be firewall/iptables issue<br/>
+<span style="color: #965d1b"><span style="font-size: small">(14:56:55)</span> <b>briedel:</b></span> openstack settings<br/>
+<span style="color: #965d1b"><span style="font-size: small">(14:57:03)</span> <b>briedel:</b></span> it should be okay now<br/>
+<span style="color: #965d1b"><span style="font-size: small">(15:34:17)</span> <b>briedel:</b></span> @dwd still seeing issues on the stratum1?<br/>
+<span style="color: #965d1b"><span style="font-size: small">(15:34:22)</span> <b>briedel:</b></span> same repo<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:36:53)</span> <b>dwd:</b></span> Looks good<br/>
+<span style="color: #965d1b"><span style="font-size: small">(15:39:54)</span> <b>briedel:</b></span> great<br/>
+<span style="color: #965d1b"><span style="font-size: small">(15:40:05)</span> <b>briedel:</b></span> one less el6 host<br/>
+</body>
+</html>

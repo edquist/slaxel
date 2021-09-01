@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri May 19, 2017 : #software (osg)</title>
+</head>
+<body>
+<h3>Fri May 19, 2017 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(09:25:36)</span> <b>blin:</b></span> @gattebury thanks!<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:32:59)</span> <b>blin:</b></span> @gattebury do you have a second to help me troubleshoot a gridftp lvs issue?<br/>
+<span style="color: #d1707d"><span style="font-size: small">(10:56:52)</span> <b>gattebury:</b></span> maybe — what’s the issue ?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:18:50)</span> <b>blin:</b></span> max at MIT is seeing multiple gridftp server processes start up on his real server when he starts keepalived<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:19:07)</span> <b>blin:</b></span> and the only thing in the gridftp logs is:<br/><pre><br/>[3942] Fri May 19 11:35:21 2017 :: New connection from: 0.0.0.0<br/>[3948] Fri May 19 11:35:31 2017 :: Configuration read from /etc/gridftp.conf.<br/>[3948] Fri May 19 11:35:31 2017 :: Server started in inetd mode.<br/>[3948] Fri May 19 11:35:31 2017 :: Couldn't get remote IP address.  Possibly using a non-tcp protocol.<br/></pre><br/>
+<span style="color: #d1707d"><span style="font-size: small">(13:53:18)</span> <b>gattebury:</b></span> We see the same thing — not sure what causes it to be honest (the 0.0.0.0 address), but I think it -might- be related to IPv6. Gridftp does dumb things logging v6 addresses (in fact just now I saw v4/v6 addresses mangled together in the logs). Grid software and all<br/>
+<span style="color: #d1707d"><span style="font-size: small">(13:54:26)</span> <b>gattebury:</b></span> I don’t recall seeing this before though, as in this is the first time I’ve noticed it. Perhaps some new packets of evilness being thrown around the internet? I’d be interested in figuring it out but too many other fires to put out first<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:04:15)</span> <b>blin:</b></span> @gattebury  do you also see multiple gridftp process spawning?<br/>
+<span style="color: #d1707d"><span style="font-size: small">(14:06:15)</span> <b>gattebury:</b></span> I’m going to vote no --- at least not persistent processes in any way.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:09:26)</span> <b>blin:</b></span> ok, thanks<br/>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu May 20, 2021 : #icecube-condor (osg)</title>
+</head>
+<body>
+<h3>Thu May 20, 2021 : #icecube-condor (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(08:32:05)</span> <b>bbockelm:</b></span> @dschultz - how many held jobs were you experiencing?<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(08:33:00)</span> <b>dschultz:</b></span> looks like I have 2000 held jobs with that code sitting there right now<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(08:33:31)</span> <b>dschultz:</b></span> some are from syracuse this morning<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:44:59)</span> <b>blin:</b></span> agh and Syracuse is talking about idle GPU pilots<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:39:38)</span> <b>bbockelm:</b></span> <tt>SURGE-OSG-C7-GPU-10-5-75-5</tt> and <tt>SURGE-OSG-C7-GPU-10-5-57-10</tt> appears to have eaten all the GPU jobs.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:40:23)</span> <b>bbockelm:</b></span> <pre>$ condor_q -all -name <a href="http://sub-1.icecube.wisc.edu">sub-1.icecube.wisc.edu</a> -held | grep Sing | awk '{print $7;}' | sort | uniq -c<br/>    182 slot1_1@glidein_1259_268754650@SURGE-OSG-C7-GPU-10-5-75-5:<br/>    311 slot1_1@glidein_15081_366161969@SURGE-OSG-C7-GPU-10-5-75-5:<br/>      7 slot1_1@glidein_23212_636967751@SURGE-OSG-C7-GPU-10-5-75-5:<br/>    437 slot1_1@glidein_28128_60226488@SURGE-OSG-C7-GPU-10-5-75-5:<br/>    151 slot1_1@glidein_30068_353781007@SURGE-OSG-C7-GPU-10-5-75-5:<br/>      7 slot1_1@glidein_3521_1006641300@SURGE-OSG-C7-GPU-10-5-75-5:<br/>    259 slot1_1@glidein_3946_554192015@SURGE-OSG-C7-GPU-10-5-57-10:<br/>      7 slot1_1@glidein_7205_182868336@SURGE-OSG-C7-GPU-10-5-75-5:<br/>    640 slot1_1@glidein_7785_293743890@SURGE-OSG-C7-GPU-10-5-75-5:</pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:01:25)</span> <b>bbockelm:</b></span> @dschultz - what requirements are you adding for singularity at CHTC?<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(12:09:11)</span> <b>dschultz:</b></span> we're using this constraint: <tt>(PYGLIDEIN_TIME_TO_LIVE || HasSingularity)</tt>, which says "either the glidein is pyglidein, or we require singularity"<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(12:09:26)</span> <b>dschultz:</b></span> so for CHTC glideins, it should use the default singularity image<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:18:40)</span> <b>bbockelm:</b></span> @dschultz - confirmed with Moate that the problem glideins were turned off.<br/>
+</body>
+</html>

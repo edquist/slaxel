@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Oct 25, 2018 : #operations (osg)</title>
+</head>
+<body>
+<h3>Thu Oct 25, 2018 : #operations (osg)</h3>
+<span style="color: #e06b56"><span style="font-size: small">(12:55:46)</span> <b>jthiltges:</b></span> Is there a reason that <tt>/usr/share/httpd/.ssh/known_hosts</tt> is managed by puppet on hcc-osg-topology2?<br/>It looks like something is appending to it, and puppet keeps reverting it.<br/>(The bitbucket IPs in the puppet config seem to have changed in the meantime too.)<br/>If the update process can add keys, is it OK to just let the file be?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:59:11)</span> <b>matyas:</b></span> I did not know the update process could add keys<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:59:13)</span> <b>jthiltges:</b></span> Looking at getting a VM running for the automerge webhook magic, can it run on the same topology box? @matyas<br/>(If the topology box gets compromised, it can serve bad data. If the webhook box gets compromised, the topology box will serve bad data.)<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:59:44)</span> <b>matyas:</b></span> yeah, I asked @dweitzel to set up a different VM for the webhook<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:00:03)</span> <b>jthiltges:</b></span> He delegated to me. :stuck_out_tongue_closed_eyes:<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:01:30)</span> <b>matyas:</b></span> I'd personally be OK with the two things being separate apps running on separate ports; it was @bbockelm that suggested separating them even further<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:02:48)</span> <b>jthiltges:</b></span> (Hoping for fewer things to manage, so wanted to ask if it could be on the same box.)<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:05:36)</span> <b>matyas:</b></span> if Brian's OK with it, so am I<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:27:34)</span> <b>jthiltges:</b></span> I took the management of <tt>/usr/share/httpd/.ssh/known_hosts</tt> out of our puppet config. This change affects <a href="http://hcc-osg-topology.unl.edu">hcc-osg-topology.unl.edu</a> and <a href="http://hcc-osg-topology2.unl.edu">hcc-osg-topology2.unl.edu</a>.<br/>And hcc-osg-topology isn't currently running puppet. Should be turned on, @dweitzel ?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:29:48)</span> <b>matyas:</b></span> we make manual changes to <tt>/etc/opt/topology/config-itb.py</tt> for testing; that file should probably get removed from puppet<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:30:52)</span> <b>matyas:</b></span> can you make sure that <tt>/usr/share/httpd/.ssh/known_hosts</tt> always exists, with correct permissions on it and <tt>/usr/share/httpd/.ssh</tt>?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:32:40)</span> <b>jthiltges:</b></span> There's existing config to create the directory:<br/><pre>    file {'/usr/share/httpd/.ssh':<br/>        ensure =&gt; directory,<br/>        mode =&gt; '0700',<br/>        owner =&gt; 'apache',<br/>        group =&gt; 'root',<br/>    }</pre><br/>I'd guess known_hosts would get created as needed.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:33:05)</span> <b>matyas:</b></span> ok<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:33:35)</span> <b>jthiltges:</b></span> Looks like <tt>/etc/opt/topology/config-itb.py</tt> isn't currently managed by puppet. Just <tt>config-production.py</tt><br/>(Gaah, copy paste error)<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:33:55)</span> <b>matyas:</b></span> what do you mean?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:34:02)</span> <b>matyas:</b></span> ah ok<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:34:16)</span> <b>matyas:</b></span> ok, that's good. yes, you can turn puppet back on, then<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:42:08)</span> <b>dweitzel:</b></span> yeah, config-itb is purposefully not managed by puppet.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:42:15)</span> <b>dweitzel:</b></span> by request from Matyas some time ago.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:43:09)</span> <b>matyas:</b></span> ok, I took out the comment that said otherwise<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:58:33)</span> <b>jthiltges:</b></span> puppet is back on for hcc-osg-topology. (Confirmed that nothing notable was changed.)<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:59:07)</span> <b>matyas:</b></span> looks good<br/>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jun 25, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Tue Jun 25, 2019 : #xcache (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(09:58:43)</span> <b>dweitzel:</b></span> Hi @bockjoo, I got my testbed all up and running.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:03:30)</span> <b>bockjoo:</b></span> What should I do now?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:06:44)</span> <b>dweitzel:</b></span> I'm not super familiar with the CMS directory structure.  Is there a file, maybe some load test, that will exist at both nebraska and florida?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:07:12)</span> <b>dweitzel:</b></span> In my testbed, I used a real data file, which may or may not exist at florida.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:07:22)</span> <b>dweitzel:</b></span> <pre>/store/data/Run2018E/Cosmics/AOD/PromptReco-v1/000/325/696/00000/74B8577C-D802-0A4A-9F35-E54C412C966B.root</pre><br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:09:26)</span> <b>bockjoo:</b></span> I don't have that at Florida, but  /store/mc/SAM/GenericTTbar/AODSIM/CMSSW_9_2_6_91X_mcRun1_realistic_v2-v1/00000/A64CCCF2-5C76-E711-B359-0CC47A78A3F8.root should exist everywhere.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:11:38)</span> <b>dweitzel:</b></span> yup, great!  Exists at nebraska as well.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:12:06)</span> <b>dweitzel:</b></span> ok, update your system to the new xrootd-scitokens.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:12:37)</span> <b>bockjoo:</b></span> If you prepend /store/test/xrootd/T2_US_Nebraska or /store/test/xrootd/T2_US_Florida to the file, you can get the file from the specified site.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:13:23)</span> <b>dweitzel:</b></span> eh, the same file will make things easier I think.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:14:04)</span> <b>dweitzel:</b></span> open the file <tt>/etc/xrootd/scitokens.cfg</tt>.  We're going to add the demo issuer for just this file.  That way we can try the same token for both sites.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:15:29)</span> <b>dweitzel:</b></span> There will likely be a difference in the scitokens.cfg file.  At nebraska, we pre-pend /store with the acutal HDFS directory.  I presume florida does something similar for their lustre path?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:16:04)</span> <b>dweitzel:</b></span> So our entry in <tt>scitokens.cfg</tt> looks like:<br/><pre><br/>[Issuer Demo]<br/>issuer = <a href="https://demo.scitokens.org">https://demo.scitokens.org</a><br/>base_path = /user/uscms01/pnfs/unl.edu/data4/cms/store/mc/SAM/GenericTTbar/AODSIM/CMSSW_9_2_6_91X_mcRun1_realistic_v2-v1/00000</pre><br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:20:47)</span> <b>bockjoo:</b></span> I think you should drop "/store/mc/SAM/GenericTTbar/AODSIM/CMSSW_9_2_6_91X_mcRun1_realistic_v2-v1/00000" part<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:21:07)</span> <b>dweitzel:</b></span> nah, we only want to test 1 file for now, not open up the entire storage to the demo issuer.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:25:53)</span> <b>bockjoo:</b></span> That's fine, too.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:27:02)</span> <b>dweitzel:</b></span> ok, once you have that working, then we will get our tokens.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:27:19)</span> <b>dweitzel:</b></span> restart xrootd when the change is done.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:32:20)</span> <b>bockjoo:</b></span> So, I am still using the old xrootd-scitoken to make sure the config works.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:32:27)</span> <b>dweitzel:</b></span> sure<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:32:56)</span> <b>dweitzel:</b></span> I suppose I've only tested on the new xrootd-scitokens, but it should work on either.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:33:32)</span> <b>dweitzel:</b></span> File to generate "read-all" tokens from <a href="http://demo.scitokens.org">demo.scitokens.org</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:33:48)</span> <b>dweitzel:</b></span> Here is a file to generate a scitoken from the demo issuer.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:33:59)</span> <b>dweitzel:</b></span> it should print out the generated scitokens.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:37:09)</span> <b>bockjoo:</b></span> Works for me!<br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:37:19)</span> <b>bockjoo:</b></span> -bash-4.2$ curl --capath /etc/grid-security/certificates -H "Authorization: Bearer $(python token.py)"   <a href="https://cmsio3.rc.ufl.edu:1094//store/user/bockjoo/hello_world.txt">https://cmsio3.rc.ufl.edu:1094//store/user/bockjoo/hello_world.txt</a><br/>hello world!<br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:38:00)</span> <b>bockjoo:</b></span> It should work because I did not upgrade xrootd-scitoken yet.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:38:20)</span> <b>bockjoo:</b></span> Let me upgrade it and see if it sill works.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:41:27)</span> <b>bockjoo:</b></span> [root@cmsio3 ~]# rpm -qa | grep "xrootd-scitokens\|scitokens-cpp"<br/>scitokens-cpp-0.3.0-4.osg34.el7.x86_64<br/>xrootd-scitokens-1.0.0-1.osg34.el7.x86_64<br/>[root@cmsio3 ~]# systemctl restart xrootd-privileged@clustered<br/>[root@cmsio3 ~]# systemctl status xrootd-privileged@clustered<br/>● xrootd-privileged@clustered.service - XRootD xrootd deamon instance clustered<br/>   Loaded: loaded (/usr/lib/systemd/system/xrootd-privileged@.service; enabled; vendor preset: disabled)<br/>   Active: active (running) since Tue 2019-06-25 11:41:08 EDT; 4s ago<br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:41:58)</span> <b>bockjoo:</b></span> It still works!<br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:43:23)</span> <b>bockjoo:</b></span> Is it because it's non-X509?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:43:53)</span> <b>bockjoo:</b></span> My previous test was using<br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:44:04)</span> <b>bockjoo:</b></span> -bash-4.2$ rpm -qf  $(which x509-scitoken-init)<br/>x509-scitokens-issuer-client-0.5.3-1.osg34.el7.x86_64<br/>to create the token<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:54:05)</span> <b>dweitzel:</b></span> The x509 just means it was using x509 to get a scitoken.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:54:10)</span> <b>dweitzel:</b></span> it should both be a scitoken.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:56:29)</span> <b>bockjoo:</b></span> For some reason, I can not create a scitoken using x509-scitoken-init <a href="https://scitokens.org/cms">https://scitokens.org/cms</a><br/>. I have to fix something first.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:03:32)</span> <b>dweitzel:</b></span> k<br/>
+<blockquote>
+<span style="color: #7d414c"><span style="font-size: small">(2019-07-24 10:41:05)</span> <b>bockjoo:</b></span> Can we start again with what we left off because of <a href="http://scitokens.org/cms">scitokens.org/cms</a> issue<br/>
+<span style="color: #235e5b"><span style="font-size: small">(2019-07-24 10:41:29)</span> <b>dweitzel:</b></span> sure.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(2019-07-24 10:41:52)</span> <b>bockjoo:</b></span> I sent an email to <a href="mailto:cms-t2@fnal.gov">cms-t2@fnal.gov</a><br/>
+<span style="color: #7d414c"><span style="font-size: small">(2019-07-24 10:43:22)</span> <b>bockjoo:</b></span> curl --capath /etc/grid-security/certificates -H "Authorization: Bearer $token" <a href="https://cmsio7.rc.ufl.edu:1094//store/user/bockjoo/hello_world.txt">https://cmsio7.rc.ufl.edu:1094//store/user/bockjoo/hello_world.txt</a><br/>
+<span style="color: #7d414c"><span style="font-size: small">(2019-07-24 10:44:04)</span> <b>bockjoo:</b></span> works becuase cmsio7 is the non-cpp scitoken. But not with cpp scitoken:<br/>
+<span style="color: #7d414c"><span style="font-size: small">(2019-07-24 10:44:18)</span> <b>bockjoo:</b></span> curl --capath /etc/grid-security/certificates -H "Authorization: Bearer $token" <a href="https://cmsio3.rc.ufl.edu:1094//store/user/bockjoo/hello_world.txt">https://cmsio3.rc.ufl.edu:1094//store/user/bockjoo/hello_world.txt</a><br/>Unable to open /store/user/bockjoo/hello_world.txt; permission denied<br/>
+<span style="color: #7d414c"><span style="font-size: small">(2019-07-24 10:47:34)</span> <b>bockjoo:</b></span> Can you check the package<br/>x509-scitokens-issuer-client-0.5.3-1.osg34.el7.x86_64 and see if something needs to be done there?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(2019-07-24 10:48:04)</span> <b>dweitzel:</b></span> interesting.  I know the <a href="http://scitokens.org/cms">scitokens.org/cms</a> issuer is using python.  I wonder if the python issuer is creating tokens that can't be read into the cpp version.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(2019-07-24 10:48:18)</span> <b>dweitzel:</b></span> Can you send me the token, even if it's expired.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(2019-07-24 10:51:15)</span> <b>bockjoo:</b></span> I sent it through Direct Messages.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(2019-07-24 11:04:41)</span> <b>dweitzel:</b></span> ok, I can confirm that the cpp json parser doesn't like the token.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(2019-07-24 11:04:44)</span> <b>dweitzel:</b></span> debugging why...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(2019-07-24 11:39:17)</span> <b>dweitzel:</b></span> ok, I now know why.  But that uncovered another issue.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(2019-07-24 11:47:17)</span> <b>bockjoo:</b></span> OK<br/>
+<span style="color: #7d414c"><span style="font-size: small">(2019-07-24 11:48:22)</span> <b>bockjoo:</b></span> I was upgrading to xrootd-4.10.0-1 but will wait until issues are fixed.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(2019-07-25 09:05:15)</span> <b>dweitzel:</b></span> BTW, I found 1 bug, which just uncovered a difference in behavior between python and c++ base64 parsing.  The bug is fixed in this pull request <a href="https://github.com/scitokens/scitokens-cpp/pull/12">https://github.com/scitokens/scitokens-cpp/pull/12</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(2019-07-25 09:05:22)</span> <b>dweitzel:</b></span> working on the difference in behavior.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(2019-07-25 10:33:12)</span> <b>bockjoo:</b></span> I am guessing probably nothing currently uses the token generated by x509-scitoken-init. If so, I think there is no reason for me to stop upgrading xrootd.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(2019-07-25 10:34:11)</span> <b>bockjoo:</b></span> By the ways, thanks for working on the issue.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(2019-07-25 10:40:23)</span> <b>dweitzel:</b></span> Yup, here's the other fix: <a href="https://github.com/scitokens/cms/pull/1">https://github.com/scitokens/cms/pull/1</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(2019-07-25 10:40:32)</span> <b>dweitzel:</b></span> After both of those are complete, it "should" work.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(2019-07-25 10:48:36)</span> <b>bockjoo:</b></span> So, the only thing that I have to do is upgrading scitokens-cpp, I guess, when it is rebuilt.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(2019-07-25 10:54:10)</span> <b>dweitzel:</b></span> yup, should be fine then.<br/>
+</blockquote>
+<span style="color: #7d414c"><span style="font-size: small">(11:49:24)</span> <b>bockjoo:</b></span> x509-scitoken-init <a href="https://scitokens.org/cms">https://scitokens.org/cms</a><br/>
+<span style="color: #7d414c"><span style="font-size: small">(11:49:39)</span> <b>bockjoo:</b></span> fails with<br/>
+<span style="color: #7d414c"><span style="font-size: small">(11:49:42)</span> <b>bockjoo:</b></span> requests.exceptions.SSLError: [Errno 1] _ssl.c:492: error:14077410:SSL routines:SSL23_GET_SERVER_HELLO:sslv3 alert handshake failure<br/>
+<span style="color: #7d414c"><span style="font-size: small">(11:50:14)</span> <b>bockjoo:</b></span> I think something is wrong with <a href="https://scitokens.org/cms">https://scitokens.org/cms</a> but don't know what.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(11:53:55)</span> <b>bockjoo:</b></span> I think @bbockelm has to fix  <a href="https://scitokens.org/cms">https://scitokens.org/cms</a> but he is not online.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(11:54:17)</span> <b>bockjoo:</b></span> I am afraid that's all for today's test.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(12:01:59)</span> <b>bockjoo:</b></span> Hmm, that's not it. I will check more.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:35:36)</span> <b>dweitzel:</b></span> I don't think <a href="http://scitokens.org/cms">scitokens.org/cms</a> is the issuer.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:35:44)</span> <b>dweitzel:</b></span> isn't it like <a href="http://cmsweb.cern.ch">cmsweb.cern.ch</a> or something like that?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(12:37:53)</span> <b>bockjoo:</b></span> No. It looks like <a href="http://scitokens.org/cms">scitokens.org/cms</a> is not accepting my certificate anymore.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(12:44:48)</span> <b>bockjoo:</b></span> Last time I ran x509-scitoken-init <a href="https://scitokens.org/cms">https://scitokens.org/cms</a> , I had no problem in generating the token. My certificate works just fine with other operations. It must be <a href="https://scitokens.org/cms">https://scitokens.org/cms</a> . So, I am afraid there is nothing more I can test today.<br/>
+</body>
+</html>

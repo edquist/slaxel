@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Feb 28, 2017 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Tue Feb 28, 2017 : #gfactory (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(10:27:42)</span> <b>bbockelm:</b></span> @jdost321 @mkandes - is <tt>test_os.sh</tt> something unique at the gfactory?<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:31:58)</span> <b>marian:</b></span> yes, it's "standard glidein script stuff"<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:32:22)</span> <b>marian:</b></span> anything wrong with it @bbockelm ?<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:32:48)</span> <b>marian:</b></span> script is used for OS validation<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:33:03)</span> <b>marian:</b></span> OS version<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:33:37)</span> <b>bbockelm:</b></span> well, CMS wants to change GLIDEIN_REQUIRED_OS to provide a comma-separated list.<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:35:09)</span> <b>marian:</b></span> ok, so current script won't handle the list I think<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:35:43)</span> <b>marian:</b></span> just having quick peek at the code...<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:36:37)</span> <b>bbockelm:</b></span> yeah, I was hitting those validation issues.<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:37:14)</span> <b>marian:</b></span> it's usually Jeff talking to gwms developers about "new features" ... should I file a note for glidein Ops to bring it up?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:41:15)</span> <b>bbockelm:</b></span> I thought <tt>test_os.sh</tt> was something OSG specific?<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:44:27)</span> <b>marian:</b></span> actually that might be right, script doesn't seem to belong to any package<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:44:29)</span> <b>marian:</b></span> [0843] gfactory@gfactory-1 ~$ rpm -fq /etc/gwms-factory/test_os.sh <br/>file /etc/gwms-factory/test_os.sh is not owned by any package<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:51:32)</span> <b>marian:</b></span> I'll file JIRA for gWMS Ops team take a look at this ... how your validation fails when you provide the list?<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:51:53)</span> <b>marian:</b></span> like "unsupported OS" or something?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:02:20)</span> <b>bbockelm:</b></span> yeah, something like that.<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:03:13)</span> <b>marian:</b></span> <a href="https://jira.opensciencegrid.org/browse/GFACTOPS-1107">https://jira.opensciencegrid.org/browse/GFACTOPS-1107</a><br/>
+<span style="color: #bd9336"><span style="font-size: small">(11:05:38)</span> <b>mkandes:</b></span> @bbockelm: Yeah, I'm not sure about the origin story of test_os.sh. It's not in glideinWMS repo or @jdost321 factools repo. However, I do remember Jeff recently (in the last 6 months maybe) made changes to it to support RHEL7 validation. I would assume adding some ORing to check multiple OS versions wouldn't be to hard when GLIDEIN_REQUIRED_OS has multiple values. I think glideinWMS probably already supports the comma-separated list there. But maybe not.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:19:33)</span> <b>bbockelm:</b></span> yeah - we should get that script "owned" by someone...<br/>
+<span style="color: #e7392d"><span style="font-size: small">(11:25:03)</span> <b>klarson1:</b></span> if it's something all factories use can we add to gwms?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(11:25:22)</span> <b>klarson1:</b></span> i think there are a few scripts all the factories have configured<br/>
+<span style="color: #e7392d"><span style="font-size: small">(13:38:32)</span> <b>klarson1:</b></span> hi all.  the SAM tests fail a lot of the time at CMS_T1_US_FNAL_condce3. it's not a CMS CE so the tests don't need to go there.  it sounds like they use GLIDEIN_CMSSite to determine where to send SAM tests.  I don't think non-CMS sites/entries have this set so can we remove it?  or will this cause a problem somewhere?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(13:46:13)</span> <b>mkandes:</b></span> @klarson1: I think you're right. Probably not a problem to remove since CMS does not submit to that entry.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(13:48:39)</span> <b>klarson1:</b></span> ok.  i am going to remove, please let me know if you have any issues!<br/>
+<span style="color: #e7392d"><span style="font-size: small">(13:51:49)</span> <b>klarson1:</b></span> oh wait, i reshot the machine that had the repo access set up.  can someone please do this for me?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(13:52:38)</span> <b>klarson1:</b></span> no hurry<br/>
+<span style="color: #bd9336"><span style="font-size: small">(13:53:49)</span> <b>mkandes:</b></span> @marian: are you working ops today? can you help @klarson1 with the change? Also, I think @sthapa needs a change or two as well.<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:57:39)</span> <b>marian:</b></span> oh yes<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:57:49)</span> <b>marian:</b></span> sorry was on lunch and haven't read slack channel<br/>
+<span style="color: #bd9336"><span style="font-size: small">(13:58:16)</span> <b>mkandes:</b></span> No problem. Thanks.<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:58:48)</span> <b>marian:</b></span> so what's issue? should I remove CMS_T1_US_FNAL_condce3 entry?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(13:59:18)</span> <b>klarson1:</b></span> no, just the GLIDEIN_CMSSite attr from the entry<br/>
+<span style="color: #e7392d"><span style="font-size: small">(13:59:53)</span> <b>klarson1:</b></span> the entry is fine, we just don't want CMS SAM tests to think they should test it :slightly_smiling_face:<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:00:12)</span> <b>marian:</b></span> so remove GLIDEIN_CMSSite from that entry only, right?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:00:20)</span> <b>klarson1:</b></span> yes<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:00:36)</span> <b>marian:</b></span> is your push access broken again? Just curious...<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:01:05)</span> <b>klarson1:</b></span> i had it working on a second factory i was testing.  i forgot to fix the prod factory repo before i reshot the test factory.  oops :slightly_smiling_face:<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:01:18)</span> <b>marian:</b></span> :slightly_smiling_face:<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:01:34)</span> <b>marian:</b></span> alright, going to change what you wanted<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:01:39)</span> <b>klarson1:</b></span> thanks very much!<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:01:54)</span> <b>klarson1:</b></span> i'll pull the changes locally when you are done<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:01:54)</span> <b>marian:</b></span> sure!<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:02:05)</span> <b>marian:</b></span> will tell you, give me sec<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:21:38)</span> <b>marian:</b></span> well, anyone played with git repo?<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:21:39)</span> <b>marian:</b></span> [1220] gfactory@gfactory-1 /etc/osg-gfactory$ git push <br/>ERROR: Permission to opensciencegrid/osg-gfactory.git denied to zvada.<br/>fatal: The remote end hung up unexpectedly<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:24:32)</span> <b>marian:</b></span> @mkandes, do you know about anything re git repo before I try to dig more?<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(14:26:13)</span> <b>sthapa:</b></span> is it on github?  amazon east is down<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:34:56)</span> <b>marian:</b></span> it is<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:35:05)</span> <b>marian:</b></span> push works from goc-itb factory though<br/>
+<span style="color: #bd9336"><span style="font-size: small">(14:35:18)</span> <b>mkandes:</b></span> @marian: No, I hadn't heard about any problems. I made a push last night from GOC-ITB.<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:35:30)</span> <b>marian:</b></span> yeah, from GOC-ITB works<br/>
+<span style="color: #bd9336"><span style="font-size: small">(14:36:59)</span> <b>mkandes:</b></span> Did we ever setup ability to push from SDSC factory? I always only make changes on GOC-ITB first, then push and pull into production.<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:38:37)</span> <b>marian:</b></span> @klarson1: your changes are done and pushed, sorry for late info<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:38:52)</span> <b>marian:</b></span> I believe it worked from any factory<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:39:21)</span> <b>marian:</b></span> I'm doing changes and commits depending on which factory I'm on at the time ... and never had trouble (besides CERN one where you need to be root to do that)<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:40:14)</span> <b>marian:</b></span> oOo ... factory didn't start on GOC-ITB ... lock file issue from 3.2.17?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(14:41:05)</span> <b>mkandes:</b></span> Well, we can discuss tomorrow at meeting. Jeff setup git permissions. So I'm not sure exactly what the problem might be. You'd have to investigate. And yes, you need to remove the lock file on GOC-ITB still.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(14:41:11)</span> <b>mkandes:</b></span> check history<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:41:15)</span> <b>marian:</b></span> Jeff sent me to you :slightly_smiling_face:<br/>
+<span style="color: #bd9336"><span style="font-size: small">(14:41:29)</span> <b>mkandes:</b></span> history | grep sudo<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:41:32)</span> <b>marian:</b></span> nevermind... we can talk tomorrow, not an issues as it works from GOC-ITB<br/>
+<span style="color: #bd9336"><span style="font-size: small">(14:41:34)</span> <b>mkandes:</b></span> you'll see<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:42:11)</span> <b>marian:</b></span> yeah, figured ... forgot about that lock file issue<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:42:12)</span> <b>marian:</b></span> thanks<br/>
+<span style="color: #bd9336"><span style="font-size: small">(14:42:26)</span> <b>mkandes:</b></span> No problem. Hopefully it is fixed in 3.2.18.<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:42:36)</span> <b>marian:</b></span> is it out?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:42:41)</span> <b>klarson1:</b></span> thanks all.  and 3.2.18 was released :slightly_smiling_face:<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:42:41)</span> <b>marian:</b></span> in development repo at least?<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:43:19)</span> <b>marian:</b></span> well, I'd like to hear thing was fixed rather that thing was released :slightly_smiling_face:<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:43:19)</span> <b>klarson1:</b></span> check the development one, i think they go there first<br/>
+<span style="color: #bd9336"><span style="font-size: small">(14:43:22)</span> <b>mkandes:</b></span> Yeah, I think it's working it's way into the osg repos.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(14:44:01)</span> <b>mkandes:</b></span> And actually, I bet they are trying to push it into osg production repo. Somehow 3.2.17 made it into production least release I think.<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:44:02)</span> <b>marian:</b></span> ok, when it's in osg-development or osg-testing we may try on GOC-ITB<br/>
+<span style="color: #bd9336"><span style="font-size: small">(14:44:26)</span> <b>mkandes:</b></span> Yeah, this is definitely a topic for tomorrow.<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:44:33)</span> <b>marian:</b></span> sounds good<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:01:48)</span> <b>marian:</b></span> @mkandes: anything with test frontend you know about? have difficulties to submit through it ...<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:02:05)</span> <b>marian:</b></span> Submitting job(s)<br/>ERROR: Failed to connect to local queue manager<br/>CEDAR:6001:Failed to connect to &lt;169.228.130.121:9615?sock=17301_3460_5&gt;<br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:15:07)</span> <b>mkandes:</b></span> Not that I know of.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:16:12)</span> <b>mkandes:</b></span> Looks like condor is stopped.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:16:20)</span> <b>mkandes:</b></span> Do you have root access?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:17:33)</span> <b>mkandes:</b></span> We had a power outage at UCSD last night. This system may have been in the affected area, if I had to guess.<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:27:50)</span> <b>marian:</b></span> ok, without doing anything I was curious if you know of any issues<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:27:58)</span> <b>marian:</b></span> I'll figure it out and try to fix, thanks<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:28:12)</span> <b>marian:</b></span> need to run away of computer now<br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:42:50)</span> <b>mkandes:</b></span> @marian: I restarted condor for you.<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:43:31)</span> <b>marian:</b></span> Thanks!<br/>
+<span style="color: #53b759"><span style="font-size: small">(18:02:14)</span> <b>marian:</b></span> I was able submit some sleeps...<br/>
+</body>
+</html>

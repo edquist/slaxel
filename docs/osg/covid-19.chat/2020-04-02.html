@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Apr 2, 2020 : #covid-19 (osg)</title>
+</head>
+<body>
+<h3>Thu Apr 2, 2020 : #covid-19 (osg)</h3>
+<span style="color: #5a4592"><span style="font-size: small">(09:57:47)</span> <b>lmichael:</b></span> @rynge maybe check with COVID19_Illinois_Gammie that they understand submit files correctly? Their usage gradually creeped up from 0.2 to 0.1 core hours, yesterday, so I’m wondering if they think that ‘queue’ with multiple *processes* is assigning tasks to the same job/slot, requesting 8 CPUs. (Maybe not, but given our conversation yesterday about their estimated throughput on 8 cores, maybe they’re misunderstanding?) I’m not otherwise sure how they would have had such a gradual amount of tiny usage.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:59:44)</span> <b>rynge:</b></span> They haven't submitted their first real job yet. We iterated on the submit file and it seems like they are close to get going<br/>
+<span style="color: #5a4592"><span style="font-size: small">(10:46:24)</span> <b>lmichael:</b></span> okay. I was a bit worried, given that the fractional hours were split across multiple resources (indicating multiple jobs each running for a tiny bit of time, but requiring the course of the day to complete), further suggesting that they don’t HAVE to use 8-core jobs. What amount of jobs with what resource requests are they planning?<br/>
+<span style="color: #5a4592"><span style="font-size: small">(10:47:03)</span> <b>lmichael:</b></span> (looking at <a href="https://gracc.opensciencegrid.org/dashboard/db/covid-19-research?orgId=1">https://gracc.opensciencegrid.org/dashboard/db/covid-19-research?orgId=1</a>)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:51:05)</span> <b>rynge:</b></span> We just have to be patient. I did talk to them about the 8 core requirement, and the reply:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:51:08)</span> <b>rynge:</b></span> <pre>We will think about how to do it. In principle the job is embarrassingly parallel after some "burn-in" time. It would be good for us to know how long that time is anyway, so we'll look into that value. After, I'll have a better idea of whether it doesn't make sense to split into single-core jobs...</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:51:25)</span> <b>rynge:</b></span> They are aware, and working on getting set up<br/>
+<span style="color: #5a4592"><span style="font-size: small">(10:56:27)</span> <b>lmichael:</b></span> For the other group, you mentioned a concern about data storage. Is that for input, output, or do they have data they want to provide publicly (after the fact)? Or something else?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:00:23)</span> <b>rynge:</b></span> They brought it up as part of "what scale can we run at". It being a folding code, it will be easy to scale out, so we suspect the first bottle neck we hit will be handling the output data. It sounds like a small amount, and maybe they can stage it back to Stanford quickly enough. I think we just need to have large enough buffer disk.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(11:00:26)</span> <b>lmichael:</b></span> And for the Illinois group, did you let them know that they could have orders of magnitude more cores in use, across jobs, if they use single-core, so that it’s worth getting right, now? (In other words, it doesn’t matter how short the 8-core jobs are, there are only so many 8-core slots that come available, and many more single-core slots.)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:00:37)</span> <b>rynge:</b></span> Yes<br/>
+<span style="color: #5a4592"><span style="font-size: small">(11:00:41)</span> <b>lmichael:</b></span> thanks<br/>
+<span style="color: #5a4592"><span style="font-size: small">(11:03:13)</span> <b>lmichael:</b></span> (I’m in the ET meeting, so that’s where some of these questions are arising)<br/>
+<span style="color: #5a4592"><span style="font-size: small">(11:06:02)</span> <b>lmichael:</b></span> For the Stanford project with the data concern, make sure they’re aware that the storage on the submit servers is not backed up, and that we can give them a fair amount of space for output (even if we have to use Stash), but we want to understand how they plan to accumulate data throughout their project, and make sure they have a plan fo persistent storage with more redundancy. Or do you already have info/thoughts on that? We should dig more.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:09:55)</span> <b>rynge:</b></span> Yes, I will bring it up again<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:21:18)</span> <b>blin:</b></span> @lmichael i've got a PR pending for some major doc changes (<a href="https://github.com/opensciencegrid/docs/pull/685">https://github.com/opensciencegrid/docs/pull/685</a>)<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:21:45)</span> <b>blin:</b></span> i've merged some of the changes from your PR but if you want to make any further changes, it'd be a good idea to submit a PR against my branch instead<br/>
+<span style="color: #5a4592"><span style="font-size: small">(12:24:16)</span> <b>lmichael:</b></span> not sure I’m adept at that, starting from my PR... help? (I’m also completely overloaded with work atm, so help is much appreciated.)<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:29:35)</span> <b>blin:</b></span> if you don't have any other changes to make, don't worry about it<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:29:51)</span> <b>blin:</b></span> if you do, please hold off until #685 is merged<br/>
+<span style="color: #5a4592"><span style="font-size: small">(12:39:06)</span> <b>lmichael:</b></span> will do<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:28:53)</span> <b>blin:</b></span> @bbockelm do you have time to review <a href="https://github.com/opensciencegrid/docs/pull/685">https://github.com/opensciencegrid/docs/pull/685</a>? if not, can we just move forward with it?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:56:54)</span> <b>blin:</b></span> argh there's an issue with github so our docs aren't updating<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:49:51)</span> <b>bbockelm:</b></span> @blin - I'm not going to have time to review things until tomorrow at the earliest.  Move forward if you think it's ready.<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:50:34)</span> <b>blin:</b></span> yup, I gathered that already. everything's merged but github issues have prevented the docs from being published<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:50:44)</span> <b>blin:</b></span> so i don't think we can announce it until tomorrow anyway<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:59:55)</span> <b>rynge:</b></span> Github should be back now<br/>
+</body>
+</html>

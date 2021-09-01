@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Aug 18, 2021 : #flightworthy (chtc)</title>
+</head>
+<body>
+<h3>Wed Aug 18, 2021 : #flightworthy (chtc)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(10:03:00)</span> <b>johnkn:</b></span> @matyas that's to be expected.   I sort of see what's happening.  since the " after [OSG] is whitespace delimited, but the one before it is not, the very simple tokenizer is not seeing it.   so this works.<br/><pre>(isUndefined(OSG_PROJECT_NAME) ? ProjectName : strcat( "[OSG] ", OSG_PROJECT_NAME)) AS "PROJECT"</pre><br/>but this does not<br/><pre>(isUndefined(OSG_PROJECT_NAME) ? ProjectName : strcat("[OSG] ", OSG_PROJECT_NAME)) AS "PROJECT"</pre><br/><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:05:42)</span> <b>johnkn:</b></span> This also works for me.<br/><pre>'isUndefined(OSG_PROJECT_NAME) ? ProjectName : strcat("[OSG] ",OSG_PROJECT_NAME)' AS "PROJECT"</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:06:14)</span> <b>johnkn:</b></span> which is what I meant by putting the expression in ''<br/>
+<span style="color: #4cc091"><span style="font-size: small">(11:34:31)</span> <b>blin:</b></span> @tim where are we on the blahp release? we just got a bug report that should be super easy to fix<br/>
+<span style="color: #4cc091"><span style="font-size: small">(11:43:43)</span> <b>blin:</b></span> @jfrey <a href="https://github.com/htcondor/BLAH/pull/62">https://github.com/htcondor/BLAH/pull/62</a><br/>
+<span style="color: #bb86b7"><span style="font-size: small">(11:48:45)</span> <b>tim:</b></span> I tagged the 2.1.1 final release yesterday.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(11:49:27)</span> <b>jfrey:</b></span> I don’t see how the existing expression would evaluate to undefined, or cause a hold/removal when JobCurrentExecutingStartDate isn’t defined.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(11:50:54)</span> <b>jfrey:</b></span> If JobCurrentExecutingStartDate is undefined, the existing expression should evaluate to false, and thus not take action on the job (holding or removing).<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(11:52:10)</span> <b>jfrey:</b></span> We have to fix that in HTCONDOR-441 (resulting in the current expression)<br/>
+<span style="color: #4cc091"><span style="font-size: small">(11:52:33)</span> <b>blin:</b></span> the user is seeing<br/><pre># Some classads<br/>RemoveReason = "via condor_rm (by user osg01)"<br/>LastHoldReason = "The job attribute PeriodicRemove expression 'JobStatus == 2 &amp;&amp; time() - JobCurrentStartExecutingDate &gt; 172800' evaluated to UNDEFINED"</pre><br/>
+<span style="color: #9b3b45"><span style="font-size: small">(11:53:16)</span> <b>jfrey:</b></span> That’s the old expression that predates HTCONDOR-441<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(11:54:28)</span> <b>jfrey:</b></span> …which went into blahp 2.0.2<br/>
+<span style="color: #4cc091"><span style="font-size: small">(11:54:30)</span> <b>blin:</b></span> errr, interesting. i'm having trouble finding the commit for that<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(11:54:46)</span> <b>jfrey:</b></span> 5c069fd31e37ce6d2b97127000f81255d0a41b35<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(11:54:50)</span> <b>jfrey:</b></span> …in the blahp repo<br/>
+<span style="color: #4cc091"><span style="font-size: small">(11:55:03)</span> <b>blin:</b></span> ah got it<br/>
+<span style="color: #4cc091"><span style="font-size: small">(11:56:21)</span> <b>blin:</b></span> you're right, sorry! i gotta stop triaging issues during meetings...<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(11:59:49)</span> <b>jfrey:</b></span> I’m just relieved this wasn’t yet another round ‘we can’t write proper expressions’.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(12:20:26)</span> <b>tannenba:</b></span> @tim @tlmiller @johnkn Looks like we have a serious regression in condor_gpu_discovery that will need a fix asap in v9.0.x!  Long ago, we changed condor_gpu_discovery to honor CUDA_VISIBLE_DEVICES, so when a glidein will honor whatever devices the site scheduler allocated to our glidein.  Looks like this is broken!  Email from Igor:<br/><pre>hen CUDA_VISIBLE_DEVICES is set, it gets confused and always reports the first GPU only!<br/><br/> <br/><br/>[root@wn-exa4-a7 isfiligoi]# /usr/libexec/condor/condor_gpu_discovery<br/><br/>DetectedGPUs="GPU-86ea891e, GPU-5df99b75"<br/><br/>[root@wn-exa4-a7 isfiligoi]# export CUDA_VISIBLE_DEVICES=GPU-86ea891e<br/><br/>[root@wn-exa4-a7 isfiligoi]# /usr/libexec/condor/condor_gpu_discovery <br/><br/>DetectedGPUs="GPU-86ea891e"<br/><br/>[root@wn-exa4-a7 isfiligoi]# export CUDA_VISIBLE_DEVICES=GPU-5df99b75<br/><br/>[root@wn-exa4-a7 isfiligoi]# /usr/libexec/condor/condor_gpu_discovery <br/><br/>DetectedGPUs="GPU-86ea891e"<br/><br/> <br/><br/>This is a serious problem for glideins (which all of OSG relies on)!<br/><br/> <br/><br/>I tried with both 9.0.0 and your 9.0.6 pre-release with identical results.</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:24:35)</span> <b>johnkn:</b></span> Yeah, that looks bad<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(12:37:03)</span> <b>tim:</b></span> Oh, ugh.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:38:40)</span> <b>johnkn:</b></span> So the code to parse CUDA_VISIBLE_DEVICES does not understand uuids<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:38:52)</span> <b>johnkn:</b></span> it only understands device indexes<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:47:23)</span> <b>johnkn:</b></span> Glide-in config needs to use <tt>CUDA_VISIBLE_DEVICES=0</tt> or <tt>CUDA_VISIBLE_DEVICES=1</tt>, etc. not device uuids<br/>
+<span style="color: #684b6c"><span style="font-size: small">(12:49:13)</span> <b>bbockelman:</b></span> I believe the host condor is setting <tt>CUDA_VISIBLE_DEVICES</tt>, not glidein.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:50:53)</span> <b>johnkn:</b></span> Ugh.  that never worked unless they were setting it to a simple list of integers.<br/><pre>bool addToDeviceWhiteList( char * list, std::list&lt;int&gt; &amp; dwl ) {<br/>	char * tokenizer = strdup( list );<br/>	if( tokenizer == NULL ) {<br/>		// Deliberately unparseable.<br/>		fprintf( stderr, "Error: device list too long\n" );<br/>		return false;<br/>	}<br/>	char * next = strtok( tokenizer, "," );<br/>	for( ; next != NULL; next = strtok( NULL, "," ) ) {<br/>		dwl.push_back( atoi( next ) );<br/>	}<br/>	free( tokenizer );<br/>	return true;<br/>}</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:51:32)</span> <b>johnkn:</b></span> <tt>atoi</tt> will just return 0 if you pass it <tt>CUDA1</tt> or <tt>GPU-ab123</tt> because it does not begin with a number<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:53:26)</span> <b>johnkn:</b></span> the <tt>-device</tt> argument works the same way<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:55:59)</span> <b>johnkn:</b></span> So _technically_ this is not a regression....<br/>
+<span style="color: #5a4592"><span style="font-size: small">(13:04:31)</span> <b>tannenba:</b></span> Moving the condor_gpu_discovery file into a thread so we don't clog up this channel....<br/>
+<blockquote>
+<span style="color: #5a4592"><span style="font-size: small">(13:09:27)</span> <b>tannenba:</b></span> @tlmiller @johnkn So if I understand correctly, these days when HTCondor runs a job, it may set CUDA_VISIBLE_DEVICES to be a guid like "GPU-86ea891e" instead of just an integer.  (question: does it always use a guid now instead of an integer, or only when using a MIG device?).  But when condor_gpu_discovery inspects CUDA_VISIBLE_DEVICES, it only understands integer values.   The net result is if a site uses HTCondor as their scheduler, glideins running at that site will not honor the GPU device provisioned for them.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:10:01)</span> <b>johnkn:</b></span> Condor never put a simple integer into CUDA_VISIBLE_DEVICES<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:10:25)</span> <b>johnkn:</b></span> not by default anyway. it could be configured to<br/>
+<span style="color: #5a4592"><span style="font-size: small">(13:10:32)</span> <b>tannenba:</b></span> This was starting with HTCondor v9.0.x ?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:10:57)</span> <b>johnkn:</b></span> no, for as long as GPU discovery was part of condor<br/>
+<span style="color: #5a4592"><span style="font-size: small">(13:11:31)</span> <b>tannenba:</b></span> ?!?!? That is not my recollection....<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:12:01)</span> <b>johnkn:</b></span> Before 9.0 discovery would report <tt>CUDA0 CUDA1</tt><br/>
+<span style="color: #5a4592"><span style="font-size: small">(13:12:26)</span> <b>tannenba:</b></span> At any rate, certainly condor_gpu_discovery needs to understand guids as well as integers.  Is this something straight forward to implement?<br/>
+<span style="color: #5a4592"><span style="font-size: small">(13:12:39)</span> <b>tannenba:</b></span> (seems like it should be....)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:13:24)</span> <b>johnkn:</b></span> not hard, but the whitelist is currently a list of &lt;int&gt;  so that code needs to be tossed, it will be a bit of work to switch to a set of names<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:13:42)</span> <b>johnkn:</b></span> even more work if we need to support either name or index for device selection<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:15:06)</span> <b>johnkn:</b></span> and to be fully correct, we need to accept both short names, long names or indexes and have that match to whatever discovery is configured to emit.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:15:58)</span> <b>tlmiller:</b></span> Note that we can't give up on indices, because we use the same code to support <tt>GPU_DEVICE_ORDINAL</tt>.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(13:16:33)</span> <b>tannenba:</b></span> Yes, seems like we would like the whitelist to work with either, since we do not know if the site scheduler (HTCondor v8.8, SLURM, etc) will set CUDA_VISIBLE_DEVICES using ints, or if the site scheduler (HTCondor v9.x, ...) will set CUDA_VISIBLE_DEVICES using guids.  And in either case, we want HTCondor v9.x pilots to behave properly.....<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:16:41)</span> <b>johnkn:</b></span> right.  plus NVIDIA probably still accepts indicies<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:17:27)</span> <b>johnkn:</b></span> and mig comlicates this further, because the base device has a different name than the children<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:18:10)</span> <b>johnkn:</b></span> (or not, depending on the driver version) &lt;sigh&gt;<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:21:13)</span> <b>johnkn:</b></span> btw,  to regression test this we also need to make it so that discovery can simulate the full range of devices.   Right now we can't test this in our automated tests at all.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:22:32)</span> <b>tlmiller:</b></span> So who's going to do the rewrite?<br/>
+<span style="color: #5a4592"><span style="font-size: small">(14:17:43)</span> <b>tannenba:</b></span> Yes, this is a fire....  Seems to me that @johnkn’s plate is less full than @tlmiller.  I suggest TJ do the rewrite, ToddM do the code review, and we ask Igor to test (as before).  Sound good?  If yes, TJ, could you provide a rough guesstimate as to when the patch could be ready to try?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:19:48)</span> <b>tlmiller:</b></span> Works for me(TM).<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:06:52)</span> <b>johnkn:</b></span> Probably a couple of days to have something to try, if I drop everything else.   Friday earliest,  more likely Monday or Tuesday of next week.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:09:39)</span> <b>johnkn:</b></span> Stefano just asked if we could have a call tomorrow (would normally be next week).  I think that means I won't be able to focus on this tomorrow<br/>
+<span style="color: #5a4592"><span style="font-size: small">(16:12:05)</span> <b>tannenba:</b></span> Well, the call w/ CNAF is just an hour, yes?  If you feel an hour will make a difference re the GPU patch, feel free to tell Stefano we prefer to stick to the normal schedule (i.e. having the call next week) unless something is really imploding at CNAF.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(16:12:15)</span> <b>tannenba:</b></span> @johnkn :point_up:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:41:30)</span> <b>johnkn:</b></span> It's only just an hour if I don't have to prep or follow up.   with CNAF it often both unless they have no questions that week.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(17:09:22)</span> <b>tannenba:</b></span> @johnkn: If you have to prep, tell them next week.  If there is follow-up, tell them you won't get to it for several days.  Feel free to blame me, and tell Stefano he can drop me an email if he urgently feels the need for us to reprioritize.  My position is fires in OSG or CHTC is more important than fires at CNAF....<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:10:52)</span> <b>johnkn:</b></span> Fair enough.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(17:11:00)</span> <b>tannenba:</b></span> Thanks TJ!<br/>
+</blockquote>
+<span style="color: #5a4592"><span style="font-size: small">(13:17:39)</span> <b>tannenba:</b></span> @jfrey @gthain Ok, I did my part and sent an initial reply to Mary @ NIKHEF.  I will let the current RUST reader reply to any follow-ups (or can help more if you ping me).<br/>
+<span style="color: #d58247"><span style="font-size: small">(14:27:27)</span> <b>gthain:</b></span> Thanks!<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:11:16)</span> <b>gthain:</b></span> NRAO has tripped over a annoying little bug<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:11:48)</span> <b>gthain:</b></span> They have bought into The Condor way, and they use chirp frequently from their jobs to send updates to the job log about progress<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:12:18)</span> <b>gthain:</b></span> Turns out you can't chirp from an output file xfer plugin, as it causes a deadlock...<br/>
+<span style="color: #5a4592"><span style="font-size: small">(16:13:16)</span> <b>tannenba:</b></span> Ugh!  That is quite the bug!<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:13:42)</span> <b>gthain:</b></span> For some reason, we can chirp from an input xfer plugin<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:14:48)</span> <b>gthain:</b></span> we spawn the plugin with a blocking  <tt>my_popen</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:39:52)</span> <b>johnkn:</b></span> We fork the shadow for input transfers, but not for output transfers, right?<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:41:43)</span> <b>gthain:</b></span> Doesn't the starter run all the file xfer plugins?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:42:06)</span> <b>johnkn:</b></span> yes<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:42:16)</span> <b>gthain:</b></span> and the starter handles chirp<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:42:19)</span> <b>johnkn:</b></span> but chirp requires both shadow and starter to be responding<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:42:46)</span> <b>gthain:</b></span> Pretty sure it isn't getting to the shadow<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:43:02)</span> <b>johnkn:</b></span> pretty sure it's handing on the line trying to<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:43:03)</span> <b>jfrey:</b></span> I believe the shadow forks for both input and output transfers.<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:43:28)</span> <b>gthain:</b></span> starter does a blocking popen, and the spawned xfer then connects back to that same starter, who is waiting for the xfer to exit ...<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:44:30)</span> <b>jfrey:</b></span> The starter doesn’t do a blocking my_popen for input file xfer plugins?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:44:42)</span> <b>johnkn:</b></span> sounds like chirp should never work from a plugin<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:45:23)</span> <b>jfrey:</b></span> Oh, wait. The starter doesn’t fork for one direction of FileTransfer (output, it appears).<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:45:41)</span> <b>johnkn:</b></span> Ah ok.  I was thinking that was the shadow.<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:46:15)</span> <b>gthain:</b></span> Yeah, I thought it was the shadow that forked, mainly for memory footprint reasons<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:46:36)</span> <b>jfrey:</b></span> I’m pretty sure the shadow forks for both directions. The starter forks for only one direction.<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:46:59)</span> <b>gthain:</b></span> Don't suppose you remember any wisdom as to why?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:47:04)</span> <b>jfrey:</b></span> So on input xfer, it’s the child process that’s blocked on my_popen for the plugins.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:48:26)</span> <b>jfrey:</b></span> As I recall, both were blocking long ago. Input was changed to having a child process because the starter needed to be responsive for some reason.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:49:11)</span> <b>jfrey:</b></span> Output wasn’t changed at the same time because it wasn’t causing a problem then.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:49:46)</span> <b>jfrey:</b></span> At some point, I looked at changing output xfer to fork, and handling all of the sequences of events coming into the starter was complicated, so I left it alone.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(17:02:31)</span> <b>jfrey:</b></span> It appears I’m wrong. The file transfer code in the starter was born forking for input and blocking for output.<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:05:30)</span> <b>gthain:</b></span> Presumably, there's no deep or fundamental reason why, is there?<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:07:15)</span> <b>gthain:</b></span> Does this mean that output file transfer has to complete within the child not responding timeout?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(20:24:54)</span> <b>jfrey:</b></span> Yes. An extra long transfer time (including waiting for a transfer slot from the schedd) can lead to premature death.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(20:29:13)</span> <b>jfrey:</b></span> I don’t know of a deep or fundamental reason for the starter not forking for output transfer.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(20:30:06)</span> <b>jfrey:</b></span> But changing it looked daunting when I looked a few years ago. The starter code is a maze of twisty little passages, all alike.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(20:30:55)</span> <b>jfrey:</b></span> Correctly handling all of the various signals and messages the starter could receive during a transfer was difficult to sort out.<br/>
+</body>
+</html>

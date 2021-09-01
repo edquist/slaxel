@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Aug 19, 2021 : #operations (chtc)</title>
+</head>
+<body>
+<h3>Thu Aug 19, 2021 : #operations (chtc)</h3>
+<span style="color: #df3dc0"><span style="font-size: small">(10:10:34)</span> <b>cat:</b></span> Who owns <a href="https://accounting.chtc.wisc.edu">https://accounting.chtc.wisc.edu</a>? Yesterday, it worked fine for me, but today I just get a “Bad Request” when I try to access it.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(10:40:55)</span> <b>wiscmoate:</b></span> @cat it falls into a Venn diagram overlap area with one circle being the inf team, another circle being @jcpatton and another circle being <b>@edquist</b><br/>
+<span style="color: #3c989f"><span style="font-size: small">(10:41:35)</span> <b>wiscmoate:</b></span> I'm currently having no trouble seeing the default web interface on <a href="https://accounting.chtc.wisc.edu">https://accounting.chtc.wisc.edu</a><br/>
+<span style="color: #684b6c"><span style="font-size: small">(10:48:12)</span> <b>bbockelman:</b></span> Works for me, data looks reasonably-well populated.<br/>
+<span style="color: #684b6c"><span style="font-size: small">(10:48:57)</span> <b>bbockelman:</b></span> Sometimes the browser gets confused by the SSO in front of it so opening a fresh tab works.  Haven't had a problem with that specific page but certainly causes problems on check_mk.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(10:54:13)</span> <b>wiscmoate:</b></span> Could also try Chrome incognito mode (CTL+SHIFT+N) or Firefox private mode (CTL+SHIFT+P) to guarantee a fresh session<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(11:33:42)</span> <b>cat:</b></span> It did seem to fail right after the SSO hand-off. New tabs, etc., did not work. I quit the browser and restarted, and now it is fine.<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(11:33:46)</span> <b>cat:</b></span> Not ideal…<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:36:17)</span> <b>ckoch5:</b></span> does anyone know if we automatically bind-mount /cvmfs to our docker jobs?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:36:24)</span> <b>ckoch5:</b></span> ^^ @gthain @wiscmoate<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:38:40)</span> <b>gthain:</b></span> Looks like docker uni jobs in chtc just mount /software and /staging<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:38:41)</span> <b>edquist:</b></span> w<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:39:06)</span> <b>ckoch5:</b></span> would there be any unexpected badness to mounting /cvmfs?<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:39:27)</span> <b>gthain:</b></span> Other than the wrath of :sauron: ?<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:39:29)</span> <b>edquist:</b></span> that sounds like a question for miron<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:39:42)</span> <b>matyas:</b></span> dang, beaten<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:39:46)</span> <b>edquist:</b></span> no greg, that would be expected badness<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:40:04)</span> <b>gthain:</b></span> No unexpected badness<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:40:22)</span> <b>gthain:</b></span> We can even make the mount conditional on something in the job if you like<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:40:31)</span> <b>matyas:</b></span> One thing you should do is mount it in shared mode, i.e. <tt>-v /cvmfs:/cvmfs:shared</tt><br/>
+<span style="color: #16569E"><span style="font-size: small">(15:40:48)</span> <b>edquist:</b></span> ooh what does that do<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:41:05)</span> <b>matyas:</b></span> it makes automounted filesystems visible to the host<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:41:19)</span> <b>edquist:</b></span> aah<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:41:21)</span> <b>tlmiller:</b></span> Why is that a good thing?<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:41:28)</span> <b>gthain:</b></span> Can it be shared and read-only?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:42:08)</span> <b>tlmiller:</b></span> (Why does the host care what's in /cvmfs?  Shouldn't that only matter to the guests?)<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:42:40)</span> <b>matyas:</b></span> sorry, by visible, I mean it propagates the mounts<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:42:58)</span> <b>matyas:</b></span> so if one guest mounts /cvmfs/oasis.osg.org then the other guests can use that mount too<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:45:30)</span> <b>gthain:</b></span> Unless it hangs...<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:45:36)</span> <b>ckoch5:</b></span> is /cvmfs mounted by default on singularity jobs, by chance?<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:46:01)</span> <b>matyas:</b></span> OSG ones<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:46:20)</span> <b>gthain:</b></span> Not on CHTC<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:46:30)</span> <b>gthain:</b></span> we REALLY need to get our terminology consistent<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:46:51)</span> <b>gthain:</b></span> and if Miron doesn't want to use the term "GLOW", we should purge it from all of OSG<br/>
+<span style="color: #684b6c"><span style="font-size: small">(15:47:22)</span> <b>bbockelman:</b></span> :fire:<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:47:51)</span> <b>matyas:</b></span> IIRC we don't run Singularity jobs from the OSG VO at CHTC<br/>
+<span style="color: #684b6c"><span style="font-size: small">(15:48:00)</span> <b>bbockelman:</b></span> "What's the center's name?  CHTC"  "What's the condor cluster named at CHTC?  CHTC"  "What's the glideinWMS setup again?  CHTC"<br/>
+<blockquote>
+<span style="color: #d58247"><span style="font-size: small">(15:49:32)</span> <b>gthain:</b></span> What's the VO name?<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:49:56)</span> <b>matyas:</b></span> *GLOW*<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:49:56)</span> <b>gthain:</b></span> And technically, I don't the the condor cluster here has a name, but that's another rant<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:50:56)</span> <b>gthain:</b></span> The name of the HPC cluster is "The Cluster"<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:51:17)</span> <b>matyas:</b></span> Das Kluster<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:52:08)</span> <b>ckoch5:</b></span> Das Kluster und Der Grid<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:17:40)</span> <b>tlmiller:</b></span> "What's the undergrid?  Oh, it's the opposite of the overgrid."<br/>
+</blockquote>
+<span style="color: #9e3997"><span style="font-size: small">(15:48:05)</span> <b>tlmiller:</b></span> (Wait, so without :shared, only one guest can ever see any particular mount in /cvmfs?  That seems kind of bizarre.)<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:48:17)</span> <b>matyas:</b></span> (No, each guest mounts their own copy)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:48:37)</span> <b>tlmiller:</b></span> (And that causes problems because ... people expect to be updating CVMFS during a job run?)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:48:53)</span> <b>tlmiller:</b></span> (Performance problems, maybe?)<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:49:00)</span> <b>matyas:</b></span> (I think it's just an efficiency thing)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:49:05)</span> <b>tlmiller:</b></span> (OK.  Thanks.)<br/>
+<blockquote>
+<span style="color: #4cc091"><span style="font-size: small">(15:58:12)</span> <b>blin:</b></span> i like that this entire conversation happened in whispers :slightly_smiling_face:<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:08:32)</span> <b>matyas:</b></span> if only slack had subscripts<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:16:46)</span> <b>tlmiller:</b></span> I still represent conversational asides as parenthetical remarks and will probably continue to do so for decades after the last chat client I use gets around to supporting threads...<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:17:16)</span> <b>matyas:</b></span> What if there's an aside to an aside? Double parens?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:18:22)</span> <b>tlmiller:</b></span> You can nest parens, and a long time ago in a chat client far away, I've had multiple asides using different kinds of parens.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:19:18)</span> <b>tlmiller:</b></span> (Thread one)  [Thread two]  ((Thread one's first subthread.)) [(Thread two's first subthread.)] ([Thread one's second subthread.])<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:19:46)</span> <b>tlmiller:</b></span> As you might expect, this could very easily lead to a great deal of confusion. :/<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:20:44)</span> <b>matyas:</b></span> now I'm imaging a thread dag<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:22:20)</span> <b>tlmiller:</b></span> All sufficiently-well-featured editors become emacs, all sufficiently-well-featured textual communication programs become a newsreader?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(2021-08-20 09:02:03)</span> <b>baydemir:</b></span> <tt>(Thread one) [Thread two] ...</tt><br/><br/>Does this parse as valid Lisp? :thinking_face:<br/>
+<span style="color: #99a949"><span style="font-size: small">(2021-08-20 09:02:42)</span> <b>matyas:</b></span> not Lisp but maybe Clojure<br/>
+<span style="color: #e23f99"><span style="font-size: small">(2021-08-20 09:04:16)</span> <b>baydemir:</b></span> Dialect of Lisp. Close enough. :stuck_out_tongue:<br/>
+<span style="color: #99a949"><span style="font-size: small">(2021-08-20 09:06:02)</span> <b>matyas:</b></span> I think at this point all Lisps are dialects<br/>
+</blockquote>
+<span style="color: #e7392d"><span style="font-size: small">(15:52:42)</span> <b>ckoch5:</b></span> @gthain @wiscmoate so we’d be okay with adding cvmfs to our list of auto-mounts to docker jobs *if* it exists on the node?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:52:48)</span> <b>ckoch5:</b></span> can I go ahead and create a ticket?<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:53:18)</span> <b>gthain:</b></span> I'm fine with that -- should we go ahead and add it to singularity jobs while we are at it?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:53:25)</span> <b>ckoch5:</b></span> yes!<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:54:06)</span> <b>gthain:</b></span> Looks like Singularity has /staging, but not /software<br/>
+<span style="color: #3c989f"><span style="font-size: small">(16:21:44)</span> <b>wiscmoate:</b></span> Are these bind mounts @gthain?<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:23:34)</span> <b>gthain:</b></span> Yes<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:23:50)</span> <b>gthain:</b></span> Just like we do with /staging<br/>
+</body>
+</html>

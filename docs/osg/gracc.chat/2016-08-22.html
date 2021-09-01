@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Aug 22, 2016 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Mon Aug 22, 2016 : #gracc (osg)</h3>
+<span style="color: #3c8c69"><span style="font-size: small">(10:56:04)</span> <b>kretzke:</b></span> @dweitzel: I updated gracc-request and logstash, and things have gone very awry <a href="https://gracc.opensciencegrid.org/dashboard/db/raw-vs-summary?from=now-7d&amp;to=now">https://gracc.opensciencegrid.org/dashboard/db/raw-vs-summary?from=now-7d&amp;to=now</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:57:11)</span> <b>dweitzel:</b></span> well thats not good<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:24:52)</span> <b>dweitzel:</b></span> @kretzke did you update the logstash configuration too?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:25:58)</span> <b>kretzke:</b></span> yes<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:46:29)</span> <b>kretzke:</b></span> ah, I found it… <tt>Endtime</tt> != <tt>EndTime</tt>  <a href="https://github.com/opensciencegrid/gracc-summary/blob/master/tests/logstash/logstash.conf#L34">https://github.com/opensciencegrid/gracc-summary/blob/master/tests/logstash/logstash.conf#L34</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:48:55)</span> <b>dweitzel:</b></span> shoot, how did that sneak in!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:49:12)</span> <b>dweitzel:</b></span> great Catch!<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:51:40)</span> <b>kretzke:</b></span> I must have fixed it last week when testing the deployment and forgot to open an issue.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:52:42)</span> <b>kretzke:</b></span> sweet, everything looks right on now!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:53:39)</span> <b>dweitzel:</b></span> everything everything?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:54:02)</span> <b>kretzke:</b></span> everything on here anyways <a href="https://gracc.opensciencegrid.org/dashboard/db/raw-vs-summary?editorTab=General">https://gracc.opensciencegrid.org/dashboard/db/raw-vs-summary?editorTab=General</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:54:27)</span> <b>dweitzel:</b></span> that’s awesome!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:54:59)</span> <b>dweitzel:</b></span> so, what did I mess up.  1. EndTime spelling.  2. Bucket sizes. ?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:55:07)</span> <b>dweitzel:</b></span> is that all that made the difference?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:55:19)</span> <b>kretzke:</b></span> yep<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:55:28)</span> <b>dweitzel:</b></span> great!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:55:49)</span> <b>dweitzel:</b></span> so how are we going to test to see if using summary records is faster than using raw?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:56:08)</span> <b>dweitzel:</b></span> I mean it should be, it’s a huge, huge decrease in the number of documents to scan.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:58:42)</span> <b>kretzke:</b></span> need to do some back-filling so we can do practical comparisons, but yeah, it should make a very noticeable difference<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:00:20)</span> <b>kretzke:</b></span> <a href="https://gracc.opensciencegrid.org/dashboard/db/gracc-payload-summary">https://gracc.opensciencegrid.org/dashboard/db/gracc-payload-summary</a> vs <a href="https://gracc.opensciencegrid.org/dashboard/db/gracc-summary-payload-summary">https://gracc.opensciencegrid.org/dashboard/db/gracc-summary-payload-summary</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:25:40)</span> <b>dweitzel:</b></span> Yup, my goal today is to get the command line tool working so it’s easy to backfill.<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(13:06:55)</span> <b>B167BCLN5:</b></span> <br/>
+</body>
+</html>

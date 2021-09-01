@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Apr 21, 2017 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Fri Apr 21, 2017 : #xcache (osg)</h3>
+<span style="color: #84b22f"><span style="font-size: small">(11:18:04)</span> <b>ivukotic:</b></span> hi everyone<br/>
+<span style="color: #84b22f"><span style="font-size: small">(11:18:14)</span> <b>ivukotic:</b></span> a lot of questions from me today:<br/>
+<span style="color: #84b22f"><span style="font-size: small">(11:18:31)</span> <b>ivukotic:</b></span> 1. what should be the current version of stashcp<br/>
+<span style="color: #84b22f"><span style="font-size: small">(11:20:39)</span> <b>ivukotic:</b></span> what I get is 4.2.1  after doing module load stashcp<br/>
+<span style="color: #84b22f"><span style="font-size: small">(11:21:54)</span> <b>ivukotic:</b></span> 2. when I run it several times in a row it flip-flops between bnl and UC origin server. That has no sense given that it is governed only by distance.<br/>
+<span style="color: #84b22f"><span style="font-size: small">(11:22:59)</span> <b>ivukotic:</b></span> 3. We now have a new origin server: <a href="http://ceph-gridftp1.grid.uchicago.edu">ceph-gridftp1.grid.uchicago.edu</a> to server x1t data.<br/>
+<span style="color: #84b22f"><span style="font-size: small">(11:23:48)</span> <b>ivukotic:</b></span> it works correctly and reports to the redirector: xrdcp -d 2 -f  <a href="root://redirector.osgstorage.org://xenon/rucio/x1t_SR001_170419_1605_mv/73/90/XENON1T-0-000008000-000008999-000001000.zip">root://redirector.osgstorage.org://xenon/rucio/x1t_SR001_170419_1605_mv/73/90/XENON1T-0-000008000-000008999-000001000.zip</a> /dev/null<br/>
+<span style="color: #84b22f"><span style="font-size: small">(11:24:01)</span> <b>ivukotic:</b></span> [33.07MB/33.07MB][100%][==================================================][33.07MB/s]<br/>
+<span style="color: #84b22f"><span style="font-size: small">(11:24:14)</span> <b>ivukotic:</b></span> but stashcp does not find it:<br/>
+<span style="color: #84b22f"><span style="font-size: small">(11:24:28)</span> <b>ivukotic:</b></span> ~ &gt;stashcp -d /xenon/rucio/x1t_SR001_170419_1605_mv/73/90/XENON1T-0-000008000-000008999-000001000.zip test1.root                                                          11:23<br/>2017-04-21T11:24:22+0000 root         DEBUG    Trying geoip site of: <a href="http://cvmfs-egi.gridpp.rl.ac.uk:8000/cvmfs/oasis.opensciencegrid.org">http://cvmfs-egi.gridpp.rl.ac.uk:8000/cvmfs/oasis.opensciencegrid.org</a><br/>2017-04-21T11:24:22+0000 root         DEBUG    Querying for closest cache: <a href="http://cvmfs-egi.gridpp.rl.ac.uk:8000/cvmfs/oasis.opensciencegrid.org/api/v1.0/geo/@proxy@/stash.osgconnect.net,xrd-cache-1.t2.ucsd.edu,mwt2-stashcache.campuscluster.illinois.edu,hcc-stash.unl.edu,osgxroot.usatlas.bnl.gov">http://cvmfs-egi.gridpp.rl.ac.uk:8000/cvmfs/oasis.opensciencegrid.org/api/v1.0/geo/@proxy@/stash.osgconnect.net,xrd-cache-1.t2.ucsd.edu,mwt2-stashcache.campuscluster.illinois.edu,hcc-stash.unl.edu,osgxroot.usatlas.bnl.gov</a><br/>2017-04-21T11:24:22+0000 root         DEBUG    Got error code 200 from <a href="http://cvmfs-egi.gridpp.rl.ac.uk:8000/cvmfs/oasis.opensciencegrid.org">http://cvmfs-egi.gridpp.rl.ac.uk:8000/cvmfs/oasis.opensciencegrid.org</a><br/>2017-04-21T11:24:22+0000 root         DEBUG    Got response [‘5’, ‘1’, ‘3’, ‘4’, ‘2’]<br/>2017-04-21T11:24:22+0000 root         DEBUG    Returning closest cache: <a href="root://osgxroot.usatlas.bnl.gov">root://osgxroot.usatlas.bnl.gov</a><br/>2017-04-21T11:24:22+0000 root         DEBUG    Checking size of file.<br/>[ERROR] Server responded with an error: [3011] Unable to locate /xenon/rucio/x1t_SR001_170419_1605_mv/73/90/XENON1T-0-000008000-000008999-000001000.zip; no such file or directory<br/><br/>Unable to find size of file<br/><br/>None<br/>
+<span style="color: #84b22f"><span style="font-size: small">(11:25:38)</span> <b>ivukotic:</b></span> why are we sensitive to errors on geoip of <a href="http://rl.ac.uk">rl.ac.uk</a> ?<br/>
+<span style="color: #84b22f"><span style="font-size: small">(11:25:52)</span> <b>ivukotic:</b></span> why can’t it locate the file?<br/>
+<span style="color: #84b22f"><span style="font-size: small">(11:26:29)</span> <b>ivukotic:</b></span> why does it prints two very wrong/uninformative lines: “Unable to find size of file” and “None”<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:40:23)</span> <b>dweitzel:</b></span> Hi @ivukotic<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:40:29)</span> <b>dweitzel:</b></span> Sorry for the delay, crazy day here.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:41:14)</span> <b>dweitzel:</b></span> Stashcp was designed to be used to copy from Stash, the uchicago storage system.  Not much thought was put into it being used for another origin.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:42:31)</span> <b>dweitzel:</b></span> For Geo-ip, it randomly selects 1 of the 6 CVMFS geo-ip sites.  Just happened to use the uk one this time.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:42:52)</span> <b>dweitzel:</b></span> If that geo-ip site would fail, it would move on to the next, trying all of them.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:44:13)</span> <b>dweitzel:</b></span> The "Unable to find size of file" is because the file, I assume, is not located on Stash.  It always checks for the file existence by directly querying <a href="root://stash.osgconnect.net">root://stash.osgconnect.net</a> .  Maybe not the best method, but that's the way it has always been.<br/>
+<span style="color: #84b22f"><span style="font-size: small">(13:01:29)</span> <b>ivukotic:</b></span> well now we have the second origin. There is nothing limiting us to one right?<br/>
+<span style="color: #84b22f"><span style="font-size: small">(13:02:37)</span> <b>ivukotic:</b></span> for GeoIP, I don’t mind it using 6 as long as if one fails seamlessly tries the other ones until it succeed.<br/>
+<span style="color: #84b22f"><span style="font-size: small">(13:02:54)</span> <b>ivukotic:</b></span> that is not what happened..<br/>
+<span style="color: #84b22f"><span style="font-size: small">(13:04:15)</span> <b>ivukotic:</b></span> &gt;&gt;&gt; The “Unable to find size of file” is because the file, I assume, is not located on Stash.  It always checks for the file existence by directly querying <a href="root://stash.osgconnect.net">root://stash.osgconnect.net</a> .  Maybe not the best method, but that’s the way it has always been.<br/>
+<span style="color: #84b22f"><span style="font-size: small">(13:04:34)</span> <b>ivukotic:</b></span> that is not how it should work. it should ask redirector for the file.<br/>
+<span style="color: #84b22f"><span style="font-size: small">(13:05:36)</span> <b>ivukotic:</b></span> it is fine if we use only one origin. For more than one it has to ask redirector. Or origins need to redirect to the redirector if file is not found locally.<br/>
+<span style="color: #84b22f"><span style="font-size: small">(13:06:12)</span> <b>ivukotic:</b></span> do you expect --cache option to work?<br/>
+<span style="color: #84b22f"><span style="font-size: small">(13:06:20)</span> <b>ivukotic:</b></span> because it does not.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:08:12)</span> <b>dweitzel:</b></span> Right, stashcp was designed for 1 origin.  We would need to modify it to support a non-stash origin.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:08:56)</span> <b>dweitzel:</b></span> GeoIP worked fine, from the output above.  It worked at the UK.  It's when it tried to determine the size of the file (and check the existence of the file) on stash, that it failed.  The file isn't on stash, it's on this new origin.  Makes sense.<br/>
+<span style="color: #84b22f"><span style="font-size: small">(13:15:59)</span> <b>ivukotic:</b></span> if it is one origin why do we have redirector?<br/>
+<span style="color: #84b22f"><span style="font-size: small">(13:16:32)</span> <b>ivukotic:</b></span> GeoIP did not work: Got error code 200 from <a href="http://cvmfs-egi.gridpp.rl.ac.uk:8000/cvmfs/oasis.opensciencegrid.org">http://cvmfs-egi.gridpp.rl.ac.uk:8000/cvmfs/oasis.opensciencegrid.org</a><br/>
+<span style="color: #84b22f"><span style="font-size: small">(13:16:39)</span> <b>ivukotic:</b></span> that’s hardly working.<br/>
+<span style="color: #84b22f"><span style="font-size: small">(13:17:16)</span> <b>ivukotic:</b></span> Also if it gives me BNL as the closest one when I’m working 5 meters from origin is not exactly correct result<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:19:12)</span> <b>dweitzel:</b></span> HTTP error code 200 is OK<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:20:19)</span> <b>dweitzel:</b></span> Good question on the redirectory.  I suspect stashcp was written before we even considered multiple origins.  Now we have Ligo origin, NOVA origin, stash origin, and now xenon1t origin.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:20:55)</span> <b>dweitzel:</b></span> I'm not sure why it gave you BNL.  The geoip hosts have some caching in front of them that I haven't fully debugged.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:21:20)</span> <b>dweitzel:</b></span> probably have to send it some unique string in the URL so it doesn't cache the result from another node hitting it.<br/>
+<span style="color: #84b22f"><span style="font-size: small">(13:22:00)</span> <b>ivukotic:</b></span> caching has nothing to do with it. it just returns coordinates for a given IP. It’s the same answer whoever asks for it<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:23:14)</span> <b>dweitzel:</b></span> that's not how the geo-ip works with the CVMFS geo-ip services we are using.  You send it a list of servers, and it should tell you the closest to you.  It uses the IP that you are reaching out from.<br/>
+<span style="color: #84b22f"><span style="font-size: small">(13:30:02)</span> <b>ivukotic:</b></span> that’s rather crazy system: you are always sending it the same list … where is the list coming from?<br/>
+<span style="color: #84b22f"><span style="font-size: small">(13:31:02)</span> <b>ivukotic:</b></span> is 4.2.1 the latest version of stashcp?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:32:50)</span> <b>dweitzel:</b></span> Yup, 4.2.1 is the latest.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:33:13)</span> <b>dweitzel:</b></span> Well, yeah, you're always sending it the list of cache servers.  The cache servers rarely change.<br/>
+<span style="color: #84b22f"><span style="font-size: small">(13:33:26)</span> <b>ivukotic:</b></span> but where do you get them?<br/>
+<span style="color: #84b22f"><span style="font-size: small">(13:33:40)</span> <b>ivukotic:</b></span> also how are people using other origins?<br/>
+<span style="color: #84b22f"><span style="font-size: small">(13:34:00)</span> <b>ivukotic:</b></span> you say there are numerous ones, how I can stashcp from them?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:35:08)</span> <b>dweitzel:</b></span> The other origins all use the CVMFS integration.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:35:22)</span> <b>dweitzel:</b></span> The list of caches comes from the cache.json in the same directory as stashcp.<br/>
+<span style="color: #84b22f"><span style="font-size: small">(13:36:00)</span> <b>ivukotic:</b></span> Ok. Then there are some things we need to change. First stashcp should ask redirector for the file not one specific origin<br/>
+<span style="color: #84b22f"><span style="font-size: small">(13:36:23)</span> <b>ivukotic:</b></span> all origins should have redirector as their manager<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:36:33)</span> <b>dweitzel:</b></span> agreed, stashcp wasn't written with multiple origins in mind.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:36:57)</span> <b>dweitzel:</b></span> and I think all origins do have the redirector as their origin, @marian can answer the config question.<br/>
+<span style="color: #84b22f"><span style="font-size: small">(13:37:06)</span> <b>ivukotic:</b></span> we need to update cache.json as there is now one more origin server<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:37:09)</span> <b>dweitzel:</b></span> redirector as their manager.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:37:22)</span> <b>dweitzel:</b></span> cache.json is only listing the caches.  Not the origins.<br/>
+<span style="color: #84b22f"><span style="font-size: small">(13:37:34)</span> <b>ivukotic:</b></span> I know for sure that UC origin and the new x1t origin have it set.<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:37:48)</span> <b>marian:</b></span> yes, all origins should ahve redirector as their manager<br/>
+<span style="color: #84b22f"><span style="font-size: small">(13:37:54)</span> <b>ivukotic:</b></span> OK<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:38:27)</span> <b>marian:</b></span> it's DNS alias ... that what you should use: <a href="http://redirector.opensciencegrid.org">redirector.opensciencegrid.org</a><br/>
+<span style="color: #84b22f"><span style="font-size: small">(13:38:31)</span> <b>ivukotic:</b></span> when can you make the first change<br/>
+<span style="color: #84b22f"><span style="font-size: small">(13:38:39)</span> <b>ivukotic:</b></span> ?<br/>
+<span style="color: #84b22f"><span style="font-size: small">(13:40:28)</span> <b>ivukotic:</b></span> actually NO!<br/>
+<span style="color: #84b22f"><span style="font-size: small">(13:42:35)</span> <b>ivukotic:</b></span> xrdcp should get the address of the nearest cache, cache should redirect upstream to redirector, redirector would find the origin and origin would deliver file to the cache. So why would stashcp know about any specific origin?<br/>
+<span style="color: #84b22f"><span style="font-size: small">(13:42:51)</span> <b>ivukotic:</b></span> It never should have known about any origin<br/>
+<span style="color: #84b22f"><span style="font-size: small">(13:43:09)</span> <b>ivukotic:</b></span> are all the caches pointing upstream to the redirector if the file was not found in cache?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:44:49)</span> <b>dweitzel:</b></span> &gt; xrdcp should get the address of the nearest cache, cache should redirect upstream to redirector, redirector would find the origin and origin would deliver file to the cache. So why would stashcp know about any specific origin?<br/>Yup, that how it should be with multiple origins.<br/>
+</body>
+</html>

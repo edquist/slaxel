@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jun 1, 2018 : #security (osg)</title>
+</head>
+<body>
+<h3>Fri Jun 1, 2018 : #security (osg)</h3>
+<span style="color: #5b89d5"><span style="font-size: small">(07:55:10)</span> <b>mvkrenz:</b></span> @mvkrenz has left the channel<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:25:15)</span> <b>bbockelm:</b></span> @dwd @jteheran - can you take a look at <a href="https://github.com/opensciencegrid/topology/pull/43">https://github.com/opensciencegrid/topology/pull/43</a> and provide some review comments?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:25:35)</span> <b>bbockelm:</b></span> This would be a notification tool allowing you to send out security announcements.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:26:15)</span> <b>jteheran:</b></span> looking at it now<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:30:06)</span> <b>bbockelm:</b></span> For a production announcement, you would write the text into a file and do something like:<br/><pre><br/>osg-notify --type production \<br/>   --message ~/path/to/message \<br/>   --subject 'OSG-SEC-12345 Some Vulnerability' \<br/>   --oim-recipients resources \<br/>   --oim-contact-type security \<br/>   --from security<br/>   --sign-id 7FD42669<br/></pre><br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:31:49)</span> <b>jteheran:</b></span> is there any chance we could have a --cc option to add new recipients<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:31:51)</span> <b>jteheran:</b></span> ?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:34:47)</span> <b>bbockelm:</b></span> yes, there's the <tt>--recipients</tt> flag.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:35:11)</span> <b>bbockelm:</b></span> it's all additive.  You can do <tt>--oim-recipients resources --oim-recipients vos --recipients <a href="mailto:bbockelm@cse.unl.edu">bbockelm@cse.unl.edu</a></tt>, for example.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:35:25)</span> <b>jteheran:</b></span> awesome<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:36:29)</span> <b>bbockelm:</b></span> you need the python2-gpg RPM installed and whatever key you want to sign with installed locally.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:36:56)</span> <b>jteheran:</b></span> can I provide an already signed message?<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:37:28)</span> <b>dwd:</b></span> No package python2-gpg available<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:38:00)</span> <b>bbockelm:</b></span> I'll send you a sample email from it.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:38:18)</span> <b>bbockelm:</b></span> You're right, it's called <tt>python2-gnupg</tt>.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:39:05)</span> <b>bbockelm:</b></span> You can provide a signed message then just add the <tt>--no-signed</tt> flag to tell the program to not to try to sign it again.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:39:21)</span> <b>jteheran:</b></span> Just got the sample email, good :slightly_smiling_face:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:40:12)</span> <b>bbockelm:</b></span> if you let the <tt>osg-notify</tt> tool sign it, it will do a correct multipart MIME message.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:40:32)</span> <b>bbockelm:</b></span> if you sign it separately, it'll do the embedded style of signature.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:40:53)</span> <b>jteheran:</b></span> I can see that, we used to get the whole enclosing  of the signature if the email client did not support PGP<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:41:13)</span> <b>bbockelm:</b></span> Right.  You could do it either way.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:41:36)</span> <b>bbockelm:</b></span> Looking around a bit, it seems many more email clients handle PGP better these days.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:41:43)</span> <b>bbockelm:</b></span> (Outlook Express was the last Big Bad Client)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:42:20)</span> <b>bbockelm:</b></span> The tool can do either style -- I'd like to at least try doing it 'correctly' and see if there's a problem.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:42:55)</span> <b>bbockelm:</b></span> Another item is the MTA -- right now, it assumes the local host is running sendmail.  The way the DNS records are setup, it's possible some sites will reject emails sent from non-FNAL IP addresses.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:43:24)</span> <b>bbockelm:</b></span> If you would like, Derek could open up the DNS records a bit to allow announcements from UW / UNL / IU also (the other sites for non-security items).<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:43:26)</span> <b>jteheran:</b></span> I can always use the VPN to send announcements when I’m not at the lab<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:44:26)</span> <b>jteheran:</b></span> and we will need to have IU added because Zalak sends announcements too<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:46:56)</span> <b>dwd:</b></span> So where are you testing it from, Brian?  Can we just install sendmail on a fermicloud machine?  I think we (that is OSG) will want some other sites to be able to send mail, depending on who wants to send.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:46:59)</span> <b>bbockelm:</b></span> sure - just send me and Derek the netblocks that need to be able to send announcements.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:47:16)</span> <b>bbockelm:</b></span> I'm testing from a UNL host -- I just use plain old sendmail, I think (whatever Garhan has setup).<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:49:02)</span> <b>dwd:</b></span> Fermicloud machines come with /usr/lib/sendmail from postfix<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:49:49)</span> <b>bbockelm:</b></span> hm, yup, looking at the process tree, that's what we have too.<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:01:45)</span> <b>dwd:</b></span> Our fermicloud postfix is sending through <a href="http://mail.protection.outlook.com">mail.protection.outlook.com</a>, so it doesn’t look good that it’s going to allow sending from <a href="http://opensciencegrid.org">opensciencegrid.org</a>.  I have made a SNOW ticket to ask that my account be allowed, no word yet<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:04:10)</span> <b>dwd:</b></span> Hang on, one of my test messages finally came through and it does show it from <a href="mailto:help@opensciencegrid.org">help@opensciencegrid.org</a>.  I was just testing using /usr/lib/sendmail directly.  Still checking.<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:07:53)</span> <b>dwd:</b></span> Do we need to set PYTHONPATH to find the topology_utils package?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:12:43)</span> <b>bbockelm:</b></span> yes, if you are running from a source build.  I don't think there's a <tt>setup.py</tt> yet.<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:13:13)</span> <b>dwd:</b></span> I made this script in my bin, where I check out the PR in $HOME/work/topology:<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:13:15)</span> <b>dwd:</b></span> #!/bin/bash<br/>PYTHONPATH=$HOME/work/topology/src exec $HOME/work/topology/bin/<tt>basename $0</tt><br/>
+<span style="color: #99a949"><span style="font-size: small">(15:20:05)</span> <b>dwd:</b></span> I tried the following<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:20:07)</span> <b>dwd:</b></span> osg-notify --type test --recipients <a href="mailto:dwd@drdykstra.us">dwd@drdykstra.us</a> --message /tmp/testmessage --no-sign --subject ‘First test of osg-notify’ --from security<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:20:28)</span> <b>dwd:</b></span> and got an error “osg-notify: error: argument --type is required” but I did specify --type, what did I do wrong<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:25:53)</span> <b>bbockelm:</b></span> strange.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:26:09)</span> <b>bbockelm:</b></span> is something swallowing an argument possibly?<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:26:42)</span> <b>dwd:</b></span> I need to step away for a few minutes, I’ll be back<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:26:48)</span> <b>bbockelm:</b></span> let me try to replicate it locally.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:29:00)</span> <b>bbockelm:</b></span> I wasn't able to replicate.  Note that your quote characters are messed up, but that might be an issue copy/pasting from your terminal.<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:36:14)</span> <b>dwd:</b></span> They look right to me, even in slack<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:37:10)</span> <b>dwd:</b></span> Ah, it’s my shell script, I forgot the “$@”<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:02:39)</span> <b>dwd:</b></span> So osg-notify works from fermicloud and even passed SPF at <a href="http://protection.outlook.com">protection.outlook.com</a>, because it is sent from a 131.225.0.0/16 address<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:02:51)</span> <b>dwd:</b></span> Received-SPF: Pass (<a href="http://protection.outlook.com">protection.outlook.com</a>: domain of <a href="http://opensciencegrid.org">opensciencegrid.org</a><br/> designates 131.225.12.126 as permitted sender)<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:27:06)</span> <b>dwd:</b></span> I don’t think --recipients should be required if --oim-recipients is specified.  I think --oim-recipients should have an option to do both resources &amp; vos<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:32:15)</span> <b>dwd:</b></span> I think it would be nice for the command to have a little feedback when it succeeds, such as the number of recipients that were sent a message.<br/>
+</body>
+</html>

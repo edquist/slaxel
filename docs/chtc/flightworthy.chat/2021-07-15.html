@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jul 15, 2021 : #flightworthy (chtc)</title>
+</head>
+<body>
+<h3>Thu Jul 15, 2021 : #flightworthy (chtc)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(10:39:38)</span> <b>tlmiller:</b></span> So Lauren asked me to look into what's going on with <tt>ExitCode</tt> not being set in jobs when <tt>OnExitHold</tt> fires.  The problem, of course, is our obsession with only updating those parts of the job ad which we've hard-coded as being worthy of the schedd's attention.  Specifically: the shadow updates its copy of the job ad with an <tt>ExitCode</tt> when the starter conveys that information, and then "updates" the job ad.  Because we are so very, very clever, <tt>ATTR_ON_EXIT_CODE</tt> is only _not_ ignored when the update "type" is <tt>U_TERMINATE</tt>.  Of course, the shadow never sends an update of this type, because <tt>terminateJob()</tt> is never called -- the <tt>OnExitHold</tt> expression is evaluated first and <tt>holdJob()</tt> is called instead.  Adding <tt>ATTR_ON_EXIT_CODE</tt> to the allow-list for holds confirms this analysis.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:39:59)</span> <b>tlmiller:</b></span> This solution seems unsatisfactory.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:42:27)</span> <b>tlmiller:</b></span> <tt>ATTR_ON_EXIT_CODE</tt> is set by the shadow in <tt>resourceExit()</tt>, which is called from <tt>pseduo_job_exit()</tt>, which "updates" the job ad with type <tt>U_STATUS</tt>.  We _could_ add a bunch of attributes to <tt>U_STATUS</tt> (which is currently empty)... or we could actually do a _complete_ update, since the starter is now gone.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:44:47)</span> <b>tlmiller:</b></span> Does anyone know why we don't?  (I've been told that we always do a complete update before the shadow exits, but that's obviously not true.)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:45:22)</span> <b>tlmiller:</b></span> (Is the bug really that we don't always do a complete update before exiting?)<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:00:12)</span> <b>gthain:</b></span> <br/>
+<blockquote>
+<span style="color: #9f69e7"><span style="font-size: small">(2021-07-16 10:01:17)</span> <b>lmichael:</b></span> What about for CHTC’s HTCondor pool?<br/>
+<span style="color: #d58247"><span style="font-size: small">(2021-07-16 11:06:44)</span> <b>gthain:</b></span> Range is much tigher for chtc -- min is 11,000, max is 31,000<br/>
+<span style="color: #d58247"><span style="font-size: small">(2021-07-16 11:07:17)</span> <b>gthain:</b></span> <br/>
+<span style="color: #d58247"><span style="font-size: small">(2021-07-16 11:11:26)</span> <b>gthain:</b></span> The min mips in ospool is 111 (sic).  That's got to be a bug in condor, or an overloaded machine.  Maybe the open pool should not schedule such machines?<br/>
+</blockquote>
+<span style="color: #2b6836"><span style="font-size: small">(15:00:50)</span> <b>jcpatton:</b></span> a pdf of a cdf just seems wrong<br/>
+<span style="color: #3c989f"><span style="font-size: small">(16:36:46)</span> <b>wiscmoate:</b></span> @tim I upgraded the central manager and a few submit nodes including <tt><a href="http://submit-1.chtc.wisc.edu">submit-1.chtc.wisc.edu</a></tt> ;  Tomorrow is Friday, I'll wait until next week to tackle <tt><a href="http://submit2.chtc.wisc.edu">submit2.chtc.wisc.edu</a></tt> and <tt><a href="http://submit3.chtc.wisc.edu">submit3.chtc.wisc.edu</a></tt>  -&gt; <a href="https://wiki.chtc.wisc.edu/wiki/HTCondor_9.1_CHTC_Pool_Upgrade_Logs">https://wiki.chtc.wisc.edu/wiki/HTCondor_9.1_CHTC_Pool_Upgrade_Logs</a><br/>
+<span style="color: #bb86b7"><span style="font-size: small">(16:37:51)</span> <b>tim:</b></span> That's fine. Thank you.<br/>
+</body>
+</html>

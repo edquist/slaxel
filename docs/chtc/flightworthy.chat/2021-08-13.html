@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Aug 13, 2021 : #flightworthy (chtc)</title>
+</head>
+<body>
+<h3>Fri Aug 13, 2021 : #flightworthy (chtc)</h3>
+<span style="color: #9f69e7"><span style="font-size: small">(09:58:32)</span> <b>lmichael:</b></span> Can someone at least acknowledge Matt Garcia, please? @jfrey<br/><a href="https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=103093">https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=103093</a><br/>(also @tannenba @coatsworth) Thanks!<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(10:10:25)</span> <b>jfrey:</b></span> I will send a reply this morning.<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:10:36)</span> <b>matyas:</b></span> are regexes in condor mapfiles anchored? That is, is<br/><tt>GSI /foo/ username</tt><br/>the same as<br/><tt>GSI /^foo$/ username</tt><br/>?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:31:19)</span> <b>johnkn:</b></span> no<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:32:15)</span> <b>johnkn:</b></span> the hash keys are though.  so<br/><pre>GSI foo username</pre><br/>is the same as<br/><pre>GSI /^foo$/ username</pre><br/><br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:32:46)</span> <b>johnkn:</b></span> (when using the knob that assumes bare keys are hash keys)<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:18:57)</span> <b>matyas:</b></span> thanks<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:22:01)</span> <b>matyas:</b></span> ran into an annoyance at "University of California, San Diego":<br/>VOMS attributes are separated from the DN by commas. So if the incoming cert has any VOMS attributes, then commas in the DN are replaced with <tt>&amp;comma;</tt>.<br/>If the cert does not have VOMS attributes, then the commas in the DN are left alone.<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:23:23)</span> <b>matyas:</b></span> so if UCSD wants to handle certs with and without VOMS attributes, they'd have to do something like this in the regex:<br/><tt>University of California(,|\&amp;comma;) San Diego</tt><br/>
+<span style="color: #99a949"><span style="font-size: small">(15:04:41)</span> <b>matyas:</b></span> What's the difference between <tt>IMMUTABLE_JOB_ATTRS</tt> and <tt>SYSTEM_IMMUTABLE_JOB_ATTRS</tt>?<br/>(Similarly, <tt>PROTECTED_JOB_ATTRS</tt> vs <tt>SYSTEM_PROTECTED_JOB_ATTRS</tt>?)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:07:12)</span> <b>johnkn:</b></span> you should never set knobs that start with <tt>SYSTEM_</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:07:47)</span> <b>johnkn:</b></span> those exist so that we can set reasonable defaults for lists that you might want to add things to and we don't trust you to do that correctly<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:08:00)</span> <b>johnkn:</b></span> so the non-system knobs are where you add things<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:08:43)</span> <b>johnkn:</b></span> If we had a way to put a knob in the param table, and make it impossible to change the value from the config file, we would do that<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:11:47)</span> <b>matyas:</b></span> so the actual immutable job attrs are essentially <tt>$(SYSTEM_IMMUTABLE_JOB_ATTRS), $(IMMUTABLE_JOB_ATTRS)</tt> ?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:11:54)</span> <b>johnkn:</b></span> yes<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:12:06)</span> <b>johnkn:</b></span> but without the comma :wink:<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:13:02)</span> <b>matyas:</b></span> you might want to put somewhere in the manual that you should never (attempt to) change knobs starting with <tt>SYSTEM_</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:13:22)</span> <b>johnkn:</b></span> are you saying we didn't ??<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:14:21)</span> <b>johnkn:</b></span> ugh. we didn't<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:14:36)</span> <b>matyas:</b></span> yeah I can't find anything to that effect<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:14:51)</span> <b>johnkn:</b></span> we call them 'predefined'  but never say that you should not attempt to change them.<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:15:02)</span> <b>matyas:</b></span> technically all of them are predefined<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:15:19)</span> <b>johnkn:</b></span> the non system lists are empty<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:15:39)</span> <b>johnkn:</b></span> but I guess that still sort of pre-defined in a way?<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:18:57)</span> <b>matyas:</b></span> I guess I interpret 'predefined' as meaning 'its default value is not UNDEFINED'<br/>
+<blockquote>
+<span style="color: #99a949"><span style="font-size: small">(15:29:39)</span> <b>matyas:</b></span> or 'shows up in a config dump' for languages that don't have an UNDEFINED<br/>
+</blockquote>
+<span style="color: #674b1b"><span style="font-size: small">(15:21:20)</span> <b>coatsworth:</b></span> We have a big pile of stale issues in Jira. @tim @gthain @jfrey can you please update these by end of day today? <a href="https://opensciencegrid.atlassian.net/secure/Dashboard.jspa?selectPageId=11620">https://opensciencegrid.atlassian.net/secure/Dashboard.jspa?selectPageId=11620</a><br/>
+<span style="color: #bb86b7"><span style="font-size: small">(15:23:08)</span> <b>tim:</b></span> So, commits don't count as activity?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:24:05)</span> <b>coatsworth:</b></span> No, commits don't count. The Jira API gets very limited information back from Github.<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:26:30)</span> <b>gthain:</b></span> But time tracking does...<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(15:27:30)</span> <b>jfrey:</b></span> HTCONDOR-549 is waiting on an entry in the blahp change logs before resolving.<br/>
+<blockquote>
+<span style="color: #bb86b7"><span style="font-size: small">(16:36:28)</span> <b>tim:</b></span> @jfrey I added and entry in the changelog on August 6th. I just neglected to commit and push it. It is in the blahp changelog now.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:38:58)</span> <b>jfrey:</b></span> Cool. I just resolved the ticket.<br/>
+</blockquote>
+<span style="color: #9b3b45"><span style="font-size: small">(15:27:58)</span> <b>jfrey:</b></span> HTCONDOR-562 should get a new reviewer.<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:29:47)</span> <b>gthain:</b></span> I can take -562<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(15:30:55)</span> <b>jfrey:</b></span> Thanks, Greg.<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:59:10)</span> <b>gthain:</b></span> anyone know what src/condor_scripts/gpt-data is used for?<br/>
+<blockquote>
+<span style="color: #2b6836"><span style="font-size: small">(16:06:50)</span> <b>jcpatton:</b></span> Googling some of those filenames brings up <tt>gpt-setup</tt> <a href="https://www.systutorials.com/docs/linux/man/8-gpt-setup/">https://www.systutorials.com/docs/linux/man/8-gpt-setup/</a><br/>
+<span style="color: #2b6836"><span style="font-size: small">(16:07:22)</span> <b>jcpatton:</b></span> some kind of packaging thing I have never heard of and am probably better for it<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:08:33)</span> <b>gthain:</b></span> Looks like there have been no substantive changes to this since we converted the repo to git...<br/>
+<span style="color: #2b6836"><span style="font-size: small">(16:19:47)</span> <b>jcpatton:</b></span> I vote :put_litter_in_its_place:<br/>
+</blockquote>
+<span style="color: #99a949"><span style="font-size: small">(16:02:40)</span> <b>matyas:</b></span> @johnkn case in point: <a href="https://github.com/opensciencegrid/ospool-access-point/blob/master/config.d/50-job-control.conf#L24">https://github.com/opensciencegrid/ospool-access-point/blob/master/config.d/50-job-control.conf#L24</a><br/>
+<span style="color: #99a949"><span style="font-size: small">(16:02:52)</span> <b>matyas:</b></span> :disappointed:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:03:36)</span> <b>johnkn:</b></span> I get 404 for that page<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:03:52)</span> <b>matyas:</b></span> oh, it's a private repo, my bad<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:05:23)</span> <b>matyas:</b></span> one sec<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:05:57)</span> <b>matyas:</b></span> we have this on the OSG login nodes<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:07:12)</span> <b>johnkn:</b></span> Yeah,  not the first time I've seen admins using the SYSTEM_IMMUTABLE_JOB_ATTRS knob.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:07:48)</span> <b>johnkn:</b></span> I think there must have been a recipe that used it and it spread from there<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:08:14)</span> <b>johnkn:</b></span> at least the did not delete the pre-defined values<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:11:08)</span> <b>matyas:</b></span> looks like SYSTEM_PERIODIC_... might be an exception to the "do not edit SYSTEM_ vars" rule<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:11:19)</span> <b>johnkn:</b></span> yeah,  forgot about that one.<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:11:28)</span> <b>gthain:</b></span> Also, now that we have the param table, do we need src/condor_example/condor_config.annotated?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:11:41)</span> <b>johnkn:</b></span> those should probably be called SCHEDD_PERIODIC_*<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:12:23)</span> <b>johnkn:</b></span> @gthain probably not<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:12:24)</span> <b>matyas:</b></span> can we generate the annotation from the manual?<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:12:37)</span> <b>matyas:</b></span> or param table<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:12:40)</span> <b>gthain:</b></span> Not if we want to keep it as broken and out of date as it currently is<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:14:15)</span> <b>johnkn:</b></span> someday maybe, much of the annotation is in the param_table input file, but it's not used<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:14:37)</span> <b>johnkn:</b></span> I have some code on a branch somewhere that adds knob help to condor_config_val.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:15:13)</span> <b>johnkn:</b></span> but at lot of the information we need was never added to the param_table input file<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:27:39)</span> <b>johnkn:</b></span> Actually, since we probably need to re-think the PERIODIC_* expression stuff so that you can have a list of expressions, we may get a chance to rename those knobs.<br/>
+</body>
+</html>

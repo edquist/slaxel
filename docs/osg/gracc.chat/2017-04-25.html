@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Apr 25, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Tue Apr 25, 2017 : #gracc (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(09:40:58)</span> <b>dweitzel:</b></span> Is there anything we can watch to see probes now reporting to gracc in production?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:11:11)</span> <b>kretzke:</b></span> collector logs. <tt>sudo journalctl -f CONTAINER_NAME=graccosg_gracc-collector_1</tt><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:12:58)</span> <b>kretzke:</b></span> should probably setup logspout or something to stick all the agent logs into elasticsearch (after turning off debugging on some…)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:15:58)</span> <b>dweitzel:</b></span> ok, so we should be looking for different "from" sources?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:16:05)</span> <b>kretzke:</b></span> yep<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:16:13)</span> <b>dweitzel:</b></span> right now it's all from the <a href="http://gratia-main-osg.fnal.gov">gratia-main-osg.fnal.gov</a>, which I assume is just the normal replications.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:16:29)</span> <b>kretzke:</b></span> yep. here’s a probe in itb: <tt>Apr 25 15:15:41 gratiav2-1.novalocal dockerd[23184]: time="2017-04-25T15:15:41Z" level=info msg="received multiupdate" bundlesize=1 from="condor:<a href="http://fife-jobsub-dev02.fnal.gov">fife-jobsub-dev02.fnal.gov</a>" </tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:16:29)</span> <b>dweitzel:</b></span> cool, something to watch.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:17:24)</span> <b>dweitzel:</b></span> They just put in the DNS change request this morning, so who knows when it will go in affect, and all of the caches get updated...<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:17:46)</span> <b>kretzke:</b></span> you can ignore warnings like <tt> level=warning msg="bundle contains unrecognized record type; ignoring!" type={ ProbeDetails}</tt>; that’s the “heartbeat” record that I’ve got a ticket to handle at some point<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:18:12)</span> <b>dweitzel:</b></span> Any idea how that was used in gratia?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:18:16)</span> <b>dweitzel:</b></span> was it just stored and ignored?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:18:40)</span> <b>kretzke:</b></span> gratia recorded the last time it got a heartbeat from each probe<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:18:55)</span> <b>dweitzel:</b></span> right, but did anyone ever look at that? or care?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:19:12)</span> <b>kretzke:</b></span> possibly; there was a report, so maybe someone cared<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:20:22)</span> <b>kretzke:</b></span> @sbhat you’ve created a new probe report right?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:20:50)</span> <b>dweitzel:</b></span> If we're not recording it, I'm not sure where it would even query to test it.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:20:56)</span> <b>kretzke:</b></span> think he’s just using @received now<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:21:09)</span> <b>dweitzel:</b></span> ah, ok.<br/>
+<span style="color: #aba727"><span style="font-size: small">(10:31:42)</span> <b>sbhat:</b></span> sorry - just read this<br/>
+<span style="color: #aba727"><span style="font-size: small">(10:31:51)</span> <b>sbhat:</b></span> yes, I did create a gracc probe report<br/>
+<span style="color: #aba727"><span style="font-size: small">(10:32:37)</span> <b>sbhat:</b></span> and yes, it looks at <tt>@received</tt><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:32:59)</span> <b>kretzke:</b></span> who does that go to?<br/>
+<span style="color: #aba727"><span style="font-size: small">(10:33:32)</span> <b>sbhat:</b></span> GOC<br/>
+<span style="color: #aba727"><span style="font-size: small">(10:33:35)</span> <b>sbhat:</b></span> specifically <tt><a href="mailto:goc@opensciencegrid.org">goc@opensciencegrid.org</a></tt><br/>
+<span style="color: #aba727"><span style="font-size: small">(10:34:15)</span> <b>sbhat:</b></span> it reports if a probe hasn't sent any batch records in the past two days<br/>
+<span style="color: #aba727"><span style="font-size: small">(10:35:35)</span> <b>sbhat:</b></span> and then for those probes, it runs a second query to see when was the last time within the past month the probe did report in<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:40:08)</span> <b>kretzke:</b></span> ok, thanks<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:50:47)</span> <b>marian:</b></span> should ops people receive it? I don't think I'm <a href="mailto:goc@opensciencegrid.org">goc@opensciencegrid.org</a> for example ... well, not that I don't have my inbox full enough already :slightly_smiling_face: ... just trying to understand we should be watching that<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:51:43)</span> <b>kretzke:</b></span> I don’t think so… ops should just be concerned that GRACC is getting *some* records<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:03:19)</span> <b>sbhat:</b></span> eventually, GOC wants to run that report themselves<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:03:30)</span> <b>sbhat:</b></span> or so they said<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:03:54)</span> <b>dweitzel:</b></span> It's kinda like what Frank was talking about.  Who owns the infrastructure and who owns the data?  Those lines are not clearly set.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:04:12)</span> <b>dweitzel:</b></span> That gracc probe report is clearly the "data"<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:04:41)</span> <b>sbhat:</b></span> yeah<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:40:18)</span> <b>marian:</b></span> looks like we have issues getting this done: <a href="https://ticket.opensciencegrid.org/33543">https://ticket.opensciencegrid.org/33543</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(11:40:38)</span> <b>marian:</b></span> I'm watching situation ...<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:47:45)</span> <b>kretzke:</b></span> @marian @dweitzel looks like archive and request agents died during rabbitmq maintenance <a href="https://gracc.opensciencegrid.org/dashboard/db/gracc-monitor-alerts?orgId=1&amp;refresh=1m">https://gracc.opensciencegrid.org/dashboard/db/gracc-monitor-alerts?orgId=1&amp;refresh=1m</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(12:51:23)</span> <b>marian:</b></span> looking now<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:06:49)</span> <b>dweitzel:</b></span> @marian you should be able to restart the archive agents.<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:07:30)</span> <b>marian:</b></span> yeah, graccreq service was down<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:07:48)</span> <b>marian:</b></span> figuring out with Kevin in other chat window<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:08:44)</span> <b>marian:</b></span> there is restart set to always but seems it doesnt' do a job<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:09:54)</span> <b>dweitzel:</b></span> odd, ok.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:09:57)</span> <b>kretzke:</b></span> right, because it hits the unit restart limits <a href="https://www.freedesktop.org/software/systemd/man/systemd.unit.html#StartLimitIntervalSec=">https://www.freedesktop.org/software/systemd/man/systemd.unit.html#StartLimitIntervalSec=</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:10:03)</span> <b>dweitzel:</b></span> also, the graccarchive ?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:10:53)</span> <b>kretzke:</b></span> we had increased the restart timeout I thought, but it must not have been committed and got overwritten with the last update<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:11:15)</span> <b>dweitzel:</b></span> ah, ok.  Send it to me, I'll be sure to add it.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:11:16)</span> <b>kretzke:</b></span> presumably the archiver has the same issue<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:12:16)</span> <b>kretzke:</b></span> I don’t recall, is <tt>RestartSec</tt> the right setting?  <a href="https://www.freedesktop.org/software/systemd/man/systemd.service.html#RestartSec=">https://www.freedesktop.org/software/systemd/man/systemd.service.html#RestartSec=</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:14:32)</span> <b>dweitzel:</b></span> yeah, that sounds right.<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:20:34)</span> <b>marian:</b></span> I've set <tt>RestartSec=30</tt> in <tt>/usr/lib/systemd/system/graccreq.service</tt> and did daemon-reload<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:21:27)</span> <b>kretzke:</b></span> ok. archiver is <tt>/usr/lib/systemd/system/graccarchive@.service</tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(13:21:30)</span> <b>marian:</b></span> we have <tt>TimeoutStopSec=20</tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(13:22:00)</span> <b>marian:</b></span> there is an restart <tt>on-failure</tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(13:22:03)</span> <b>marian:</b></span> not <tt>always</tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(13:22:10)</span> <b>marian:</b></span> for graccarchive<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:23:04)</span> <b>marian:</b></span> on-failure will ignore "restar on clean exit code or signal"<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:23:22)</span> <b>marian:</b></span> so I guess that's ok<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:23:58)</span> <b>marian:</b></span> will set <tt>RestartSec=30</tt> as well<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:24:37)</span> <b>marian:</b></span> done<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:24:56)</span> <b>marian:</b></span> daemon-reload initiated<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:25:58)</span> <b>dweitzel:</b></span> is the graccarchives restarted?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:26:10)</span> <b>dweitzel:</b></span> still looks like the queue is building up.<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:27:24)</span> <b>marian:</b></span> hmm, is it service? <tt>systemctl status graccarchive<br/>Unit graccarchive.service could not be found.</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:29:20)</span> <b>dweitzel:</b></span> run <tt>systemctl</tt> and look for archive.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:29:34)</span> <b>dweitzel:</b></span> it's templated services.<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:29:55)</span> <b>marian:</b></span> yeah, figure it has @<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:32:03)</span> <b>dweitzel:</b></span> still no restart?<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:32:14)</span> <b>marian:</b></span> graccarchive@transfer.service                                               loaded activating auto-restart GRACC Archiver<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:32:29)</span> <b>marian:</b></span> nope<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:32:41)</span> <b>dweitzel:</b></span> I think there's 3, right?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:32:48)</span> <b>dweitzel:</b></span> 1 of them needs to be disabled and turned off.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:32:56)</span> <b>dweitzel:</b></span> I think the 'transfers' is the correct one.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:33:02)</span> <b>dweitzel:</b></span> and there's a 'raw' one.<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:33:09)</span> <b>marian:</b></span> other two are running<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:33:21)</span> <b>marian:</b></span> only this one "transfer" was failed<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:33:29)</span> <b>dweitzel:</b></span> yeah, disable the transfer one.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:33:38)</span> <b>dweitzel:</b></span> and restart the other 2.  They seem stuck, given the event queue.<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:34:25)</span> <b>marian:</b></span> got it<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:34:48)</span> <b>dweitzel:</b></span> ah, much better.  The queues are going down now.<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:35:07)</span> <b>marian:</b></span> next thing to document for myself<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:35:13)</span> <b>dweitzel:</b></span> Also, I'm seeing probe data come into gracc!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:35:37)</span> <b>dweitzel:</b></span> goodbye gratia!<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:37:41)</span> <b>kretzke:</b></span> hm, didn’t realize UNL was running a gratia collector <tt>msg="received ping" from="collector:<a href="http://hcc-gratia.unl.edu:8880">http://hcc-gratia.unl.edu:8880</a>" </tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:39:20)</span> <b>dweitzel:</b></span> yup<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:39:29)</span> <b>kretzke:</b></span> transfers coming in too<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:39:33)</span> <b>dweitzel:</b></span> great!<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:39:48)</span> <b>marian:</b></span> and, DNS alisas switched!<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:29:26)</span> <b>kretzke:</b></span> nevermind<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:42:37)</span> <b>marian:</b></span> btw, on main gracc web page, what's the purpose of "Help" subpage ...<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:43:04)</span> <b>marian:</b></span> it's empty at some point...<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:44:15)</span> <b>kretzke:</b></span> its purpose is despair :slightly_smiling_face:<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:45:01)</span> <b>kretzke:</b></span> no, it’s just meant to provide general help and list help pages<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(14:48:07)</span> <b>kherner:</b></span> <br/>
+<span style="color: #53b759"><span style="font-size: small">(14:54:53)</span> <b>marian:</b></span> ok, so it still needs work there ... we have user question, btw:<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:55:10)</span> <b>marian:</b></span> Question I am now trying to answer: what fraction of usage at FNAL T1 and 7 US T2s was opportunistic in 2016?<br/>Best answer I have come up with so far:<br/><a href="https://gracc.opensciencegrid.org/dashboard/db/site-summary?orgId=1&amp;from=now-1y%2Fy&amp;to=now-1y%2Fy&amp;var-interval=$__auto_interval&amp;var-site=Caltech%20CMS%20Tier2&amp;var-site=FNAL%20USCMS%20Tier1&amp;var-site=GLOW&amp;var-site=MIT%20CMS&amp;var-site=Nebraska-CMS&amp;var-site=Purdue%20CMS&amp;var-site=UCSD%20CMS%20Tier2&amp;var-site=UF%20HPC&amp;var-type=Payload">https://gracc.opensciencegrid.org/dashboard/db/site-summary?orgId=1&amp;from=now-1y%2Fy&amp;to=now-1y%2Fy&amp;var-interval=$__auto_interval&amp;var-site=Caltech%20CMS%20Tier2&amp;var-site=FNAL%20USCMS%20Tier1&amp;var-site=GLOW&amp;var-site=MIT%20CMS&amp;var-site=Nebraska-CMS&amp;var-site=Purdue%20CMS&amp;var-site=UCSD%20CMS%20Tier2&amp;var-site=UF%20HPC&amp;var-type=Payload</a><br/>But I have trouble believing that the majority of usage was opportunistic.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:56:16)</span> <b>kretzke:</b></span> try Job Type “Batch”<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:58:36)</span> <b>marian:</b></span> looks more reasonable<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:58:48)</span> <b>marian:</b></span> what is difference?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:59:07)</span> <b>kretzke:</b></span> <a href="https://gracc.opensciencegrid.org/dashboard/db/help-batch-vs-payload?orgId=1">https://gracc.opensciencegrid.org/dashboard/db/help-batch-vs-payload?orgId=1</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(14:59:13)</span> <b>marian:</b></span> heh :slightly_smiling_face:<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:59:24)</span> <b>marian:</b></span> help pages I referred to :slightly_smiling_face:<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:59:40)</span> <b>kretzke:</b></span> :slightly_smiling_face:<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:01:55)</span> <b>marian:</b></span> so, all the CMS jobs do come in via pilots, and thus they are the payloads?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:02:24)</span> <b>dweitzel:</b></span> I don't think CMS sends us payload records.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:02:36)</span> <b>dweitzel:</b></span> so we only see their usage through the Batch jobs.<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:03:27)</span> <b>marian:</b></span> referring to the plots difference between job type "batch" and "payload" ... and what's in help page ... which makes me think I want payload.  But batch gives me a much more reasonable answer (16% is opportunistic).<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:04:44)</span> <b>kretzke:</b></span> well, but even if we got payload records, you probably want to see the total usage of the pilots<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:09:47)</span> <b>marian:</b></span> so how to really read difference? I'm confused about this explanation vs numbers in plots by type: <a href="https://gracc.opensciencegrid.org/dashboard/db/help-batch-vs-payload?orgId=1">https://gracc.opensciencegrid.org/dashboard/db/help-batch-vs-payload?orgId=1</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:15:10)</span> <b>dweitzel:</b></span> @marian The batch vs. payload is a bit confusing.  Call about it? <a href="https://nebraskaextension.zoom.us/j/975795134">https://nebraskaextension.zoom.us/j/975795134</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:16:29)</span> <b>dweitzel:</b></span> I think the transfers archiver needs to be kicked.<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:19:53)</span> <b>marian:</b></span> well, it's more to explain Ken Bloom about details ... I just get from him: It’s interesting then that we see CMS showing up in the payload records at all.<br/>But OK, if we know that payload gives insufficient information, then at least we believe batch gives less insufficient information!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:20:25)</span> <b>dweitzel:</b></span> well, the information is coming from 2 different sources, measuring 2 different things.<br/>
+<blockquote>
+<span style="color: #53b759"><span style="font-size: small">(15:28:00)</span> <b>marian:</b></span> dweitzel: so Ken is asking further: Do we know which I want to measure?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:28:42)</span> <b>dweitzel:</b></span> Depends on the question.  But I think the question was: <br/>&gt; what fraction of usage at FNAL T1 and 7 US T2s was opportunistic in 2016?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:28:50)</span> <b>dweitzel:</b></span> In that case, Batch is what you want to use.<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:29:37)</span> <b>marian:</b></span> yep, that was the question<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:30:28)</span> <b>marian:</b></span> so all clear I believe, that was also assumption<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:30:30)</span> <b>marian:</b></span> thanks<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:30:36)</span> <b>dweitzel:</b></span> k, np<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:31:02)</span> <b>marian:</b></span> where did you notice archiver needs kick?<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:31:15)</span> <b>marian:</b></span> is it in dashboard?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:32:06)</span> <b>dweitzel:</b></span> I've been watching the rabbitmq queues to see if there is any change with the DNS move: <a href="https://gracc.opensciencegrid.org/dashboard/db/rabbitmq-queues?refresh=1m&amp;orgId=1">https://gracc.opensciencegrid.org/dashboard/db/rabbitmq-queues?refresh=1m&amp;orgId=1</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(15:44:30)</span> <b>marian:</b></span> bookmarked, good resource<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:44:35)</span> <b>marian:</b></span> thanks<br/>
+</blockquote>
+<span style="color: #53b759"><span style="font-size: small">(15:21:24)</span> <b>marian:</b></span> @marian uploaded a file: <a href="https://opensciencegrid.slack.com/files/marian/F5579R2G6/tail_of_archiver_.txt">Tail of archiver:</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:23:07)</span> <b>dweitzel:</b></span> Yeah, I think they have been restarting rabbitmq at the GOC, tuesday<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:26:18)</span> <b>marian:</b></span> ah<br/>
+</body>
+</html>

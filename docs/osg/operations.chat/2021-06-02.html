@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jun 2, 2021 : #operations (osg)</title>
+</head>
+<body>
+<h3>Wed Jun 2, 2021 : #operations (osg)</h3>
+<span style="color: #53b759"><span style="font-size: small">(09:15:32)</span> <b>marian:</b></span> I'm getting these errors in the UCSD ligo Collector:<br/><pre>06/02/21 07:12:30 condor_read(): Socket closed when trying to read 21 bytes from &lt;128.104.103.217:9870&gt;</pre><br/>it points to <a href="http://tiger0023.chtc.wisc.edu">tiger0023.chtc.wisc.edu</a> ... can somebody help me identify what this host is, please?<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:17:04)</span> <b>matyas:</b></span> that's on the Tiger (Kubernetes) cluster at UW<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:18:02)</span> <b>marian:</b></span> and purpose of that host?<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:19:52)</span> <b>matyas:</b></span> it's a Kubernetes node so it runs several services. At the moment, it's running a couple of hosted CEs, the IGWN frontend and apparently a PS collector<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:21:09)</span> <b>matyas:</b></span> I am seeing some condor_advertise failures in the logs<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:21:25)</span> <b>matyas:</b></span> <pre>ExeError: Unexpected Error running '/usr/sbin/condor_advertise -tcp -multiple UPDATE_AD_GENERIC /tmp/gfi_ar_572643638_2021'. Details: Command '/usr/sbin/condor_advertise -tcp -multiple UPDATE_AD_GENERIC /tmp/gfi_ar_572643638_2021' returned non-zero exit status 1: failed to send classad to &lt;169.228.130.104:9618?alias=osg-ligo-1.t2.ucsd.edu&gt;<br/>failed to send classad to &lt;169.228.130.104:9618?alias=osg-ligo-1.t2.ucsd.edu&gt;</pre><br/><br/>
+<span style="color: #aba727"><span style="font-size: small">(10:22:39)</span> <b>moate:</b></span> @bbockelm @dweitzel @jdost321: @tslauson and myself are running a position interview, we may be late or absent from the standup<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:23:00)</span> <b>dweitzel:</b></span> Good luck!<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:53:02)</span> <b>marian:</b></span> @matyas: could there be anything networking related? fw/iptables in the way? more generic to that host?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:55:50)</span> <b>matyas:</b></span> I can connect to that port<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:57:30)</span> <b>marian:</b></span> yeah, to collectors at Caltech as well as UCSD, but maybe inbound connectivity to Tiger host?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:59:52)</span> <b>matyas:</b></span> condor_advertise is from inside going out<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:01:15)</span> <b>matyas:</b></span> none of our frontends have inbound connectivity<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:19:33)</span> <b>marian:</b></span> so maybe something that blocks things at UCSD and Caltech?<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:19:45)</span> <b>marian:</b></span> but telnet works to all those ports<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:19:55)</span> <b>marian:</b></span> from anywhere ...<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:45:08)</span> <b>bbockelm:</b></span> @marian - if I had to bet, I'd guess that it's an authorization issue with the collector.<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:46:26)</span> <b>marian:</b></span> maybe some sort of expired certs issue somewhere?<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:47:20)</span> <b>marian:</b></span> I'll check those places but this didn't give me to think anything certificated related:<br/><pre>06/02/21 07:12:30 condor_read(): Socket closed when trying to read 21 bytes from &lt;128.104.103.217:9870&gt;</pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:50:55)</span> <b>bbockelm:</b></span> where do you see that log message?  What file on what host?<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:57:40)</span> <b>marian:</b></span> CollectorLog on the central manager<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:57:55)</span> <b>marian:</b></span> at UCSD for example ... same at Caltech one<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:59:01)</span> <b>marian:</b></span> some stuff updates just fine e.g. here is portion of the recent lines:<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:59:04)</span> <b>marian:</b></span> <pre>06/02/21 11:51:29 condor_read(): Socket closed when trying to read 21 bytes from &lt;128.104.103.217:63521&gt;<br/>06/02/21 11:51:29 IO: EOF reading packet header<br/>06/02/21 11:51:29 Command 58 on Sock not followed by ClassAd (or timeout occured)<br/>06/02/21 11:51:29 Received malformed ad from command (58). Ignoring.<br/>06/02/21 11:51:29 condor_read(): Socket closed when trying to read 21 bytes from &lt;128.104.103.217:47350&gt; in non-blocking mode<br/>06/02/21 11:51:29 IO: EOF reading packet header<br/>06/02/21 11:51:29 condor_read(): Socket closed when trying to read 21 bytes from &lt;128.104.103.217:47350&gt;<br/>06/02/21 11:51:29 IO: EOF reading packet header<br/>06/02/21 11:51:29 Command 58 on Sock not followed by ClassAd (or timeout occured)<br/>06/02/21 11:51:29 Received malformed ad from command (58). Ignoring.<br/>06/02/21 11:51:29 StartdAd     : Updating ... "&lt; slot1@glidein_44368_717439206@ccwcondor0728.in2p3.fr , 134.158.52.38 &gt;"<br/>06/02/21 11:51:29 StartdPvtAd  : Updating ... "&lt; slot1@glidein_44368_717439206@ccwcondor0728.in2p3.fr , 134.158.52.38 &gt;"</pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(13:59:51)</span> <b>marian:</b></span> host of this CollectorLog is: <a href="http://osg-ligo-1.t2.ucsd.edu">osg-ligo-1.t2.ucsd.edu</a><br/>
+<span style="color: #5a4592"><span style="font-size: small">(14:14:56)</span> <b>lmichael:</b></span> Is this for @blin or really for someone else? <a href="https://support.opensciencegrid.org/a/tickets/67381">https://support.opensciencegrid.org/a/tickets/67381</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:17:07)</span> <b>blin:</b></span> yes that's for me<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:48:52)</span> <b>jthiltges:</b></span> Looks like the new certificate for <a href="http://collector.opensciencegrid.org">collector.opensciencegrid.org</a> went through. I'm going to update collector[12].osg shortly.<br/>
+<blockquote>
+<span style="color: #e06b56"><span style="font-size: small">(14:56:02)</span> <b>jthiltges:</b></span> Certificate updated on collector[12] and <tt>condor_ce_reconfig</tt> run. Apache reloaded too, and certificate looks fine in a browser.<br/>
+</blockquote>
+<span style="color: #235e5b"><span style="font-size: small">(14:50:56)</span> <b>dweitzel:</b></span> Get back to vacation!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:16:23)</span> <b>bbockelm:</b></span> @marian - what's the DN of that host?<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:17:00)</span> <b>marian:</b></span> subject= /DC=org/DC=incommon/C=US/ST=California/L=La Jolla/O=University of California, San Diego/CN=<a href="http://osg-ligo-1.t2.ucsd.edu">osg-ligo-1.t2.ucsd.edu</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:19:50)</span> <b>bbockelm:</b></span> ah-ha!  That's diffferent.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:19:56)</span> <b>bbockelm:</b></span> <a href="https://github.com/opensciencegrid/tiger-osg-config/blob/master/manifests/production/vo-frontend-igwn/frontend.xml#L430">https://github.com/opensciencegrid/tiger-osg-config/blob/master/manifests/production/vo-frontend-igwn/frontend.xml#L430</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:20:09)</span> <b>bbockelm:</b></span> <pre>/DC=org/DC=incommon/C=US/ST=California/L=La Jolla/O=University of California, San Diego/OU=UCSD/CN=<a href="http://osg-ligo-1.t2.ucsd.edu">osg-ligo-1.t2.ucsd.edu</a></pre><br/>Note that has <tt>OU=UCSD</tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(15:27:17)</span> <b>marian:</b></span> ha!!!<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:28:14)</span> <b>marian:</b></span> who is playing us with changing certs?<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:28:31)</span> <b>marian:</b></span> now I recognize something/somehow replaced cert at UCSD:<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:28:34)</span> <b>marian:</b></span> <pre>[1316] root@osg-ligo-1 ~# ls -al /etc/grid-security/hostcert.pem<br/>-rw-r--r--. 1 root root 2390 May 28 12:50 /etc/grid-security/hostcert.pem</pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(15:28:38)</span> <b>marian:</b></span> on May 28<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:28:47)</span> <b>bbockelm:</b></span> @jdost321 @didavila ^^^ Note the above.  It appears the InCommon DN format appears to have changed again for UCSD.<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:30:01)</span> <b>marian:</b></span> as an immediate fix for this I'm going to update <tt>frontend.xml</tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(15:30:53)</span> <b>marian:</b></span> objections?<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(15:32:48)</span> <b>didavila:</b></span> yeah that hit us as well few week ago, not sure why they change the DN from time to time<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:34:23)</span> <b>marian:</b></span> we'd need some better mechanism to know about it<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:34:25)</span> <b>marian:</b></span> ideas?<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:34:37)</span> <b>marian:</b></span> not just when things go belly up<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(15:34:41)</span> <b>didavila:</b></span> Frank was supposed to write to the people managing this certs to ask them to stop changing the DN or at least give us a heads up when they do<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(15:34:58)</span> <b>didavila:</b></span> I’ll remind him<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:35:03)</span> <b>marian:</b></span> thanks!<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:47:34)</span> <b>marian:</b></span> I guess all the schedds associated with this collector needs to update their <tt>condormap_file</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(15:58:39)</span> <b>paschos:</b></span> how?<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:58:52)</span> <b>paschos:</b></span> is this on the FE only?<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:04:42)</span> <b>paschos:</b></span> apparently not :disappointed:<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:09:59)</span> <b>marian:</b></span> nope<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:10:08)</span> <b>marian:</b></span> schedds are being updated now<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:10:38)</span> <b>marian:</b></span> Frank should blame someone at UCSD for this :wink: ...<br/>
+</body>
+</html>

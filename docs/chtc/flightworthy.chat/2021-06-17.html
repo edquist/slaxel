@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jun 17, 2021 : #flightworthy (chtc)</title>
+</head>
+<body>
+<h3>Thu Jun 17, 2021 : #flightworthy (chtc)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(10:06:12)</span> <b>johnkn:</b></span> Please keep in mind that most of this code is shared with windows.<br/>The master already waits for children to be reaped before it kills the SHARED_PORT daemon, and finally the procd (which isn't in its list of daemons)<br/>Adding the Collector to the reaped-last list is simple, but I think we need to understand what commands are arriving that make the master try and communicate - I'd expect that to be a small list.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:07:26)</span> <b>johnkn:</b></span> I see that Greg already put an early out in the masters update-the-schedd code, we need to understand why that is not sufficient.<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:10:36)</span> <b>gthain:</b></span> Tests don't have D_COMMAND on, we we don't know what the incoming command is<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:11:35)</span> <b>gthain:</b></span> Does condor_who talk directly to the master?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:18:27)</span> <b>johnkn:</b></span> it does<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:18:57)</span> <b>johnkn:</b></span> I did a build with a hack the turned on D_COMMAND when it set the mastershutdown flag<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:19:08)</span> <b>johnkn:</b></span> have not looked at the results yet<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:19:36)</span> <b>gthain:</b></span> What command does who send?  config_val ?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:23:52)</span> <b>johnkn:</b></span> no it's a command specific to condor_who querying the status of the daemons. let me find it.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:25:33)</span> <b>johnkn:</b></span> it's <tt>DC_QUERY_READY</tt><br/>
+<span style="color: #d58247"><span style="font-size: small">(10:26:45)</span> <b>gthain:</b></span> But that doesn't require the master to talk to the collector, does it?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:28:11)</span> <b>johnkn:</b></span> no, but it does go through shared port<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:29:32)</span> <b>johnkn:</b></span> DC_QUERY_READY has an optional param that basically says "don't reply until timeout or this condition is met"<br/>we use that to wait for the daemons to be ready on startup,  but we don't do anything on shutdown right now<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:34:34)</span> <b>johnkn:</b></span> condor_who queries the master when it gets the <tt>-quick</tt> flag, which the perl code does not use when shutting down if it thinks the master is dead.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:37:17)</span> <b>johnkn:</b></span> No, thats wrong.  when shutting down, the perl code always passes the <tt>-quick</tt> arg.  that seems like a bug<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:04:46)</span> <b>tlmiller:</b></span> We may want to have different shutdown code on Windows and Linux, if we're seeing different shut down issue on different platforms.  Not a big a fan of the idea, but it might make sense.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:30:23)</span> <b>johnkn:</b></span> The shutdown code in the master is intimately connected to the restart code.  I think it would be a mistake to throw it out and do something both platform specific and specialized for tests<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:01:07)</span> <b>tlmiller:</b></span> Fair.  I don't like the idea of writing test-specific code, either, but I'd also like to see what we can do to clean shutdown up; it's only a minor problem for users, but handing on the way out of the door isn't really OK.  But if it's a quick hack and it turns out to help with the tests, that's a good sign that we have some improvements to make.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:01:35)</span> <b>tlmiller:</b></span> [For some reason, this computer didn't make a noise at me when you typed that, or I missed it completely.  We'll see..]<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:03:36)</span> <b>johnkn:</b></span> Greg figured out that port exhaustion was a problem when we ran lots of tests runs at the same time.  So he suggested we try using NAT in the test runs, and that seems to have helped a lot.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:03:38)</span> <b>johnkn:</b></span> <a href="https://batlab.chtc.wisc.edu/results/run-details.php?runid=546024">https://batlab.chtc.wisc.edu/results/run-details.php?runid=546024</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:04:03)</span> <b>johnkn:</b></span> test runs load1 - load8 are without NAT.  and c1 crashed<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:04:23)</span> <b>johnkn:</b></span> load9 ran alone with NAT<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:04:36)</span> <b>johnkn:</b></span> load10 - load18 ran at the same time with NAT<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:05:12)</span> <b>tlmiller:</b></span> That doesn't seem like it should be enough to exhaust ports, but maybe TCP_WAIT?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:05:52)</span> <b>tlmiller:</b></span> (The evidence appears indisputable, I'm just saying, the naive math is something like 1000 ports, right?)<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:06:25)</span> <b>gthain:</b></span> Sock::bind is failing in the C1 (I believe asking for the system for a port)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:06:43)</span> <b>tlmiller:</b></span> ... incidentally, that page is much easier to read in that format than with the builds cluttering things up, so thanks for poking me about getting the container test-only submissions fixed.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:07:12)</span> <b>johnkn:</b></span> like 6 ports per condor, at least 10 condors per test run,  up to 128 simultaneous test runs?<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:07:39)</span> <b>gthain:</b></span> and all the random tools running<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:08:00)</span> <b>gthain:</b></span> isn't shared port on in the tests?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:08:17)</span> <b>tlmiller:</b></span> Well, I was thinking from the data displayed -- 9 test runs, 10 condors per test run, six ports per condor  = 540 and double that for transients.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:08:17)</span> <b>johnkn:</b></span> generally, but about 10 tests turn it off explicitly.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:08:53)</span> <b>johnkn:</b></span> It's not 9, its 9*6<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:09:04)</span> <b>johnkn:</b></span> *every* docker test run is on a single machine.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:10:32)</span> <b>tlmiller:</b></span> Right.  <tt>load1</tt> to <tt>load9</tt> all on one machine is 9.  Each of those 9 run 10 condors at the same time.  Each of those 90 condors uses ~6 ports.  That's 540 ports, doubled for transients.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:10:36)</span> <b>tlmiller:</b></span> What did I miss?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:10:53)</span> <b>johnkn:</b></span> 6 platforms per test run<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:11:01)</span> <b>tlmiller:</b></span> Ah, thank you.<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:11:20)</span> <b>gthain:</b></span> Still feels like it isn't enough to run out<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:11:29)</span> <b>gthain:</b></span> might be worth running netstat and checking<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:11:32)</span> <b>tlmiller:</b></span> So... 6000 ports is still only 10% of what's available.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:12:02)</span> <b>tlmiller:</b></span> So either we're dramatically underestimating the number of transients, or this is another symptom of our clean-up problem.<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:12:40)</span> <b>gthain:</b></span> or turning on the NAT changes something else<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:12:48)</span> <b>tlmiller:</b></span> (Ah-ha!  Unplugging the headphones helped.)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:15:08)</span> <b>tlmiller:</b></span> (In other news, I expect to push the CMR test rewrite today.)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:15:35)</span> <b>tlmiller:</b></span> (I'm thinking maybe a squash merge instead of ... 29 separate commits?)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:15:57)</span> <b>johnkn:</b></span> yow<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:16:34)</span> <b>johnkn:</b></span> So load10 - load18 are done.  I see 1 test failure other than the sinful test.<br/>
+<blockquote>
+<span style="color: #d58247"><span style="font-size: small">(16:18:18)</span> <b>gthain:</b></span> And that one is known to be non-deterministic<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:23:12)</span> <b>johnkn:</b></span> right<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:24:03)</span> <b>johnkn:</b></span> I find it amusing/distressing that we consistently fail 1 test on windows.  but it's never the same one...<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:36:37)</span> <b>gthain:</b></span> That's not going to be fun to find<br/>
+<span style="color: #d58247"><span style="font-size: small">(2021-06-18 09:55:03)</span> <b>gthain:</b></span> Is there any consistency in how they fail?<br/>
+<span style="color: #d58247"><span style="font-size: small">(2021-06-18 09:55:14)</span> <b>gthain:</b></span> e.g. timeout starting condor? timeout killing condor?<br/>
+</blockquote>
+<span style="color: #9e3997"><span style="font-size: small">(16:16:35)</span> <b>tlmiller:</b></span> I find testing tests to be very demanding of know _exactly_ what you were testing, so I make a lot of commits. :/<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:16:54)</span> <b>gthain:</b></span> The runtimes for load10-18 are remarkably consistent<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:18:24)</span> <b>tlmiller:</b></span> ... maybe I'll take a look at the sinful test.<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:18:35)</span> <b>gthain:</b></span> I pushed a fix for the sinful test<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:18:43)</span> <b>gthain:</b></span> problem is that docker nat doesn't support ipv6<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:19:00)</span> <b>tlmiller:</b></span> We knew that, but why was that causing the sinful test to fail?<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:19:13)</span> <b>gthain:</b></span> test assumes ipv6 works on all non-Windows platforms<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:19:20)</span> <b>tlmiller:</b></span> Was it just trying too hard to test IPv6?<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:19:41)</span> <b>gthain:</b></span> So now we skip ipv6 test if we can't ping -6 localhost<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:19:58)</span> <b>johnkn:</b></span> why does it think ipv6 does not work on windows?<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:20:28)</span> <b>gthain:</b></span> "See #5534"<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:20:37)</span> <b>gthain:</b></span> Quoth the comment<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:21:55)</span> <b>tlmiller:</b></span> .. because I don't know the Windows API, it looks like.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:22:05)</span> <b>johnkn:</b></span> Ah,  fair enough.<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:31:34)</span> <b>gthain:</b></span> Running 40 tests in parallel on chevre, I see ~5,000 sockets in TIME_WAIT<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:32:15)</span> <b>tlmiller:</b></span> That's much higher than I would have expected.  (By 40 you mean 40 copies of HTCondor?)<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:32:33)</span> <b>gthain:</b></span> 40 tests.  Most tests start 1 condor, some start more than 1 concurrently<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:33:06)</span> <b>johnkn:</b></span> more than 100 sockets per test seems excessive.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:33:21)</span> <b>tlmiller:</b></span> ... or maybe tests are running faster on average than I think, so two minutes of TIME_WAIT forms a backlog?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:34:04)</span> <b>johnkn:</b></span> many of the tests run in less than 30 sec<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:34:58)</span> <b>tlmiller:</b></span> So maybe 25 sockets per test?  Still seems a little high, maybe?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:35:04)</span> <b>***tlmiller:</b></span> will bbiab.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:35:07)</span> <b>johnkn:</b></span> in fact &lt; 10 seconds is pretty common on linux.<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:35:29)</span> <b>gthain:</b></span> Every tool uses one, maybe 2 if it also talks to the collector to lookup an address<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:37:04)</span> <b>tlmiller:</b></span> Including polling for start-up and shut-down, maybe 10-20 tool invocations per test is about right?  I'm not sure.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:37:18)</span> <b>tlmiller:</b></span> ... but I'm still curious about the procd question I asked earlier.<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:38:14)</span> <b>gthain:</b></span> I guess we could run one test D_NETWORK (and grab the tool logs, somehow) and correlate  the ports in TIME_WAIT with who created them<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:38:58)</span> <b>johnkn:</b></span> btw.  this whole build and multiple test run set<br/><a href="https://batlab.chtc.wisc.edu/results/run-details.php?runid=546024">https://batlab.chtc.wisc.edu/results/run-details.php?runid=546024</a><br/>has a hack in the master that turns on D_COMMAND and D_ALWAYS:2 when the master sets it's mastershutdown flag<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:39:33)</span> <b>johnkn:</b></span> I was expecting to see some shutdown failures, but there were none.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:47:33)</span> <b>johnkn:</b></span> It's bugged me forever that you can't turn on a log file for tools.  Maybe I should fix that and we can turn on tool logging<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:12:05)</span> <b>tlmiller:</b></span> It has always been a little weird that you need to do both <tt>_CONDOR_TOOL_DEBUG=D_FULLDEBUG</tt> and pass <tt>-debug</tt> on the command-line.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:21:13)</span> <b>johnkn:</b></span> a few tools will accept the flags on the command line, but yeah.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:24:26)</span> <b>tlmiller:</b></span> OK, test results aren't coming back as fast as I was hoping, so I'll probably do the CMR stuff tomorrow.  Also forgot that I need to decide what to do about Debian 9.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:25:35)</span> <b>johnkn:</b></span> I pushed the change to do NAT for batlab docker test runs.<br/>
+<span style="color: #d58247"><span style="font-size: small">(20:37:03)</span> <b>gthain:</b></span> drain tests look a bit flakey, they always have been<br/>
+</body>
+</html>

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Dec 16, 2019 : #operations (osg)</title>
+</head>
+<body>
+<h3>Mon Dec 16, 2019 : #operations (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(10:48:45)</span> <b>dweitzel:</b></span> FYI: OSG message bus is in a very odd state, affecting: GRACC, Perfsonar data collection, XRootd Stash data collection...  Ticket opened with provider.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:46:43)</span> <b>blin:</b></span> @jthiltges what kind of certs/subject/SANs are you using for the two prod central collector hosts?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:47:10)</span> <b>blin:</b></span> because i'm seeing issues when trying to query it directly:<br/><pre># condor_status -pool <a href="http://collector.opensciencegrid.org:9619">collector.opensciencegrid.org:9619</a> -schedd<br/>Error: communication error<br/>AUTHENTICATE:1003:Failed to authenticate with any method<br/>AUTHENTICATE:1004:Failed to authenticate using GSI<br/>GSI:5008:We are trying to connect to a daemon with certificate DN (/DC=org/DC=incommon/C=US/postalCode=68588/ST=NE/L=Lincoln/street=14th And R St./O=University of Nebraska-Lincoln/OU=Holland Computing Center/CN=<a href="http://collector1.opensciencegrid.org">collector1.opensciencegrid.org</a>), but the host name in the certificate does not match any DNS name associated with the host to which we are connecting (host name is '<a href="http://hcc-osg-collector.unl.edu">hcc-osg-collector.unl.edu</a>', IP is '129.93.175.54', Condor connection address is '&lt;129.93.175.54:9619?alias=<a href="http://hcc-osg-collector.unl.edu">hcc-osg-collector.unl.edu</a>&gt;').  Check that DNS is correctly configured.  If the certificate is for a DNS alias, configure HOST_ALIAS in the daemon's configuration.  If you wish to use a daemon certificate that does not match the daemon's host name, make GSI_SKIP_HOST_CHECK_CERT_REGEX match the DN, or disable all host name checks by setting GSI_SKIP_HOST_CHECK=true or by defining GSI_DAEMON_NAME.</pre><br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:48:57)</span> <b>jthiltges:</b></span> Doh. Looks like it's just <tt>collector1.osg</tt> No <tt>collector.osg</tt> SAN. =/<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:53:58)</span> <b>jthiltges:</b></span> @blin Hmm. I agree that the certificate needs to be sorted out, but I'm unable to replicate the auth error.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:55:12)</span> <b>blin:</b></span> ah, i think it has to do with the minicondor instance i'm running<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:55:23)</span> <b>blin:</b></span> minicondor is turning out to be a giant PITA<br/>
+</body>
+</html>

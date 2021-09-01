@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Mar 3, 2021 : #operations (osg)</title>
+</head>
+<body>
+<h3>Wed Mar 3, 2021 : #operations (osg)</h3>
+<span style="color: #5a4592"><span style="font-size: small">(10:45:03)</span> <b>lmichael:</b></span> Ah. the other one is : <a href="https://support.opensciencegrid.org/a/tickets/66870">https://support.opensciencegrid.org/a/tickets/66870</a> (sorry!)<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:05:46)</span> <b>marian:</b></span> I can't do much with this one, it's marked as "deleted"?<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:05:52)</span> <b>marian:</b></span> @lmichael?<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:06:44)</span> <b>marian:</b></span> nor assign to myself or anything while I've got complaint via email from BrianB it's already due ticket, ehm...<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:24:43)</span> <b>bbockelm:</b></span> Looks like the deletion was accidental, I undeleted it.  All the assignments got cleared out when it got deleted though.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(13:32:06)</span> <b>lmichael:</b></span> Yeah, I bet someone thought it was a duplicate, which is why I was trying to point to BOTH related tix<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:13:12)</span> <b>bbockelm:</b></span> (the tickets were identical except for 6 characters (<tt>-devel</tt>) in a URL.  I almost missed it too!)<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(14:15:36)</span> <b>timm:</b></span> some hosted-ce's down at the moment, both <a href="http://hosted-ce10.opensciencegrid.org">hosted-ce10.opensciencegrid.org</a> and <a href="http://tacc-frontera-ce1.services.opensciencegrid.org">tacc-frontera-ce1.services.opensciencegrid.org</a><br/>
+<span style="color: #50a0cf"><span style="font-size: small">(14:23:54)</span> <b>timm:</b></span> should I file a ticket?<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(14:25:10)</span> <b>cat:</b></span> Yes, please<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(14:34:44)</span> <b>timm:</b></span> They aren't actually down it turns out but the certs are messed up.<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(14:34:51)</span> <b>timm:</b></span> ticket coming shortly<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(15:03:31)</span> <b>timm:</b></span> 66884<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:12:02)</span> <b>bbockelm:</b></span> @timm - FYI if you grab a copy of the 8.9.12 release candidate, the python bindings can now cough up the SSL host certificate used.<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(15:19:05)</span> <b>timm:</b></span> this submit is done deep inside the glideinwms factory<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(15:19:18)</span> <b>timm:</b></span> would have to hack that, not fun<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(15:19:52)</span> <b>timm:</b></span> openssl s_client against hosted-ce:9619 doesn't give the client cert<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:24:27)</span> <b>bbockelm:</b></span> Right - that's the problem, HTCondor is not TLS.  Let me find the ticket.<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:28:01)</span> <b>blin:</b></span> and fwiw, there's an 8.9.12 prerelease available in 3.5 <tt>osg-upcoming-development</tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(16:28:55)</span> <b>marian:</b></span> some of the formatting went obsolete? see <a href="https://opensciencegrid.org/operations/external-oasis-repos/">https://opensciencegrid.org/operations/external-oasis-repos/</a> ... syntax like <tt>%RED% ... %ENDCOLOR%</tt> not recognized anymore ...<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(17:28:56)</span> <b>blin:</b></span> yeah, that's been broken for quite some time, unfortunately<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:29:11)</span> <b>blin:</b></span> we don't plan on resurrecting it but you can use <tt>hl_lines</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(17:30:18)</span> <b>blin:</b></span> <a href="https://squidfunk.github.io/mkdocs-material/reference/code-blocks/#highlighting-specific-lines">https://squidfunk.github.io/mkdocs-material/reference/code-blocks/#highlighting-specific-lines</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(17:31:09)</span> <b>blin:</b></span> i don't /think/ that you need to enable a mkdocs plugin but you may have to<br/>
+</blockquote>
+<span style="color: #9e3997"><span style="font-size: small">(16:46:32)</span> <b>bbockelm:</b></span> Ok, that took way too long to pull into cache.  Example:<br/><pre>$ python -c 'import htcondor; ad = htcondor.Collector("<a href="http://collector2.opensciencegrid.org:9619">collector2.opensciencegrid.org:9619</a>").locate(htcondor.DaemonTypes.Schedd, "<a href="http://hosted-ce10.opensciencegrid.org">hosted-ce10.opensciencegrid.org</a>"); print htcondor.SecMan().ping(ad, "READ")["ServerPublicCert"]' | openssl x509 -noout -subject -enddate<br/>subject= /CN=<a href="http://hosted-ce10.opensciencegrid.org">hosted-ce10.opensciencegrid.org</a><br/>notAfter=Apr 26 12:26:42 2021 GMT</pre><br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(2021-03-04 08:34:37)</span> <b>blin:</b></span> @huijun.zhu @jdost321 do we have a ticket for monitoring hosted CE certs? this would be a good thing to stuff in the description<br/>
+<span style="color: #3c989f"><span style="font-size: small">(2021-03-04 09:38:06)</span> <b>huijun.zhu:</b></span> hosted-ce certs are not monitored at the check-mk site<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2021-03-04 11:04:24)</span> <b>bbockelm:</b></span> Let's get them in!  I know most (all?) are _supposed to_ auto-renew but we've seen in the last few weeks that even auto-renewal breaks...<br/>
+</blockquote>
+<span style="color: #9e3997"><span style="font-size: small">(16:49:00)</span> <b>bbockelm:</b></span> @timm :point_up:<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(18:24:29)</span> <b>timm:</b></span> thanks<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(18:24:45)</span> <b>timm:</b></span> so it's not expired--but this is second time we've seen this cert timeout happen on a hosted-CE in less than a week<br/>
+</body>
+</html>

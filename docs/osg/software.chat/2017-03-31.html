@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Mar 31, 2017 : #software (osg)</title>
+</head>
+<body>
+<h3>Fri Mar 31, 2017 : #software (osg)</h3>
+<span style="color: #53b759"><span style="font-size: small">(11:21:57)</span> <b>marian:</b></span> I'm bit puzzled about Steve Timm suggestion to upgrade vo-client packages ... sounds to me like more to OSG software people to comment on that. Doesn't it affects other places? It doesn't look to me like a factory thing only. Discussion here:  <a href="https://ticket.opensciencegrid.org/33249">https://ticket.opensciencegrid.org/33249</a> ... any comment very much appreciated<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:36:15)</span> <b>blin:</b></span> it doesn't sound like he's saying it's a factory-only thing<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:36:24)</span> <b>blin:</b></span> factories, frontends, and possibly CEs?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:36:27)</span> <b>blin:</b></span> what a mess<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:39:33)</span> <b>tiradani:</b></span> the VOMS servers changed and along with them, the signing certs changed<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:39:47)</span> <b>tiradani:</b></span> wouldn’t you need to update the lsc files to reflect that?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:40:09)</span> <b>dweitzel:</b></span> And the gums configuration?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:41:05)</span> <b>blin:</b></span> those were all updated iirc<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:41:27)</span> <b>dweitzel:</b></span> Well, were they? Did all sites update their gums?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:41:51)</span> <b>tiradani:</b></span> iirc the url didn’t change, right?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:41:51)</span> <b>blin:</b></span> <b>@edquist</b> ?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:42:06)</span> <b>tiradani:</b></span> therefore the only thing that really needs to change are the lsc files, right?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:42:27)</span> <b>blin:</b></span> fermilab DNS was updated to point to the <a href="http://grid.iu.edu">grid.iu.edu</a> servers<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:45:14)</span> <b>blin:</b></span> <a href="https://github.com/opensciencegrid/osg-vo-config/commit/7462068c1280dea10ed9e7f623db4a9846197cb8">https://github.com/opensciencegrid/osg-vo-config/commit/7462068c1280dea10ed9e7f623db4a9846197cb8</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(11:45:18)</span> <b>blin:</b></span> lsc files updated<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:48:13)</span> <b>marian:</b></span> yeah, that's why I posted my question here as it doesn't seem to me tight up with Factory thing only ...<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:48:52)</span> <b>marian:</b></span> and, if it's factory thing ... not sure we do anything with vo-client package on the  factory<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:49:20)</span> <b>tiradani:</b></span> I guess my point was that anything that does the full chain lookup needs to update the vo-client rpms to get the new lsc files<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:51:14)</span> <b>marian:</b></span> and I don't know if Factory does<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:51:22)</span> <b>edquist:</b></span> the <tt>gums.config.template</tt> changes were just removals<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:51:31)</span> <b>edquist:</b></span> urls didn't change there<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:51:45)</span> <b>marian:</b></span> I'm just hesitant to upgrade anything on Friday basis on production Factories<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:52:07)</span> <b>marian:</b></span> unless it's anything super critical and can't stay as is<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:53:56)</span> <b>blin:</b></span> i think factories not being able to perform vo attribute verifications would qualify<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:54:29)</span> <b>edquist:</b></span> @tiradani,<br/>&gt;therefore the only thing that really needs to change are the lsc files, right?<br/>&gt;I guess my point was that anything that does the full chain lookup needs to update the vo-client rpms to get the new lsc files<br/>i believe that's correct<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:55:44)</span> <b>marian:</b></span> Does Factory is doing it? I thought it just delegates proxy from Frontend and then it's validated on the CE side ...<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:56:24)</span> <b>marian:</b></span> (long time ago I knew more about factory code ;))<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:57:09)</span> <b>marian:</b></span> and trust between FE and Factory is host-based auth which shouldn't be affected by this<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:57:30)</span> <b>marian:</b></span> or am I off way?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:57:33)</span> <b>blin:</b></span> can you find a definite answer to that question?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:57:59)</span> <b>blin:</b></span> i'm not entirely sure how the factory manages pilot proxies<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:58:29)</span> <b>marian:</b></span> @tiradani, do you know more about it or need to talk to developers?<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:00:47)</span> <b>marian:</b></span> (I'll be back from lunch shortly)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:24:47)</span> <b>bbockelm:</b></span> hi guys - there's various things in the HTCondor-CE that can break if validation fails.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:25:43)</span> <b>blin:</b></span> yea, i think we need to revert this DNS alias and give sites/frontend owners more time to install this vo-client<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:26:03)</span> <b>bbockelm:</b></span> who manages the DNS alias?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:26:12)</span> <b>blin:</b></span> scott does<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:26:24)</span> <b>bbockelm:</b></span> Gotcha.  Did you get Scott and/or RobQ on the phone yet?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:26:44)</span> <b>bbockelm:</b></span> Do we also need to release a new vo-client?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:27:02)</span> <b>blin:</b></span> but fermi needs to do a bunch of networking to get their voms servers associated with <a href="http://voms.opensciencegrid.org">voms.opensciencegrid.org</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:27:06)</span> <b>blin:</b></span> so that needs to happen first<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:27:28)</span> <b>blin:</b></span> no, the new vo-client should work with both the old DNS setup and the new one<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:27:40)</span> <b>blin:</b></span> problem is the old vo-client doesn't work with the new DNS alias<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:27:53)</span> <b>bbockelm:</b></span> Gotcha - so we have a fairly solid workaround (upgrade), right?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:28:18)</span> <b>bbockelm:</b></span> when did the data release occur?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:28:21)</span> <b>blin:</b></span> i think so, just need to get all parties executing<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:28:54)</span> <b>blin:</b></span> data release went out tuesday, DNS switchover happened...yesterday?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:29:24)</span> <b>bbockelm:</b></span> Did we understand the impact of the DNS switchover?  Is there a reason why it didn't happen on a release day?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:31:34)</span> <b>blin:</b></span> the consequence of held OSG jobs wasn't forseen, i don't think there was a purposeful reason for not switching DNS on release day<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:32:26)</span> <b>blin:</b></span> the DNS switchover could have happened any time after the vo-client release: it would've been better if we had more time between the release and the switchover<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:32:46)</span> <b>blin:</b></span> it would've allowed for more widespread adoption of the vo-client update<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:33:00)</span> <b>bbockelm:</b></span> gotcha - yeah, VOMS server name changes need long lead times.  I don't suppose there's much point in pointing that out after the fact...<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:33:48)</span> <b>blin:</b></span> yea unfortunately all of this fermi funding stuff has forced things to happen very quickly in some ways<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:09:27)</span> <b>bbockelm:</b></span> @marian - yeah, the best way forward for now is to ask sites to upgrade <tt>vo-client</tt>.  We're trying out something a bit less clumsy; TBD.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:13:05)</span> <b>tiradani:</b></span> Actually, Steve has been trying to work with the GOC for the better part of 3 months to get this change through… they only decided to do something this week because funding was running out.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:13:35)</span> <b>bbockelm:</b></span> Yeah, I know Steve's been pushing it; I'm not sure GOC understood the impact here?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:41:54)</span> <b>bbockelm:</b></span> I don't suppose anyone did the corresponding upgrade in EGI?<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:47:46)</span> <b>marian:</b></span> does Factory would need upgrade of that too? that's what I wanted to understand... for sites, I'll try to query OSG VO glideins to see what's held and check which sites are affected<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:49:44)</span> <b>tiradani:</b></span> I talked with Parag a little while ago.  I believe that you do not need to worry about that on the factory provided you are not generating VOMS proxies from that host.  I believe that GUMS servers, CEs, and hosts that generate the proxies are the main hosts that need to be upgraded.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:56:45)</span> <b>bbockelm:</b></span> I concur!  And actually, CEs won't need to update once the workaround is finished.<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:04:59)</span> <b>marian:</b></span> thank @tiradani, that's what I thought that Factory is not affected by this<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:07:05)</span> <b>marian:</b></span> so Frontends needs to be informed plus sites ... will wait if workaround gets in place before we panic Frontend and site admins<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:07:32)</span> <b>bbockelm:</b></span> Frontends that use <a href="http://voms.grid.iu.edu">voms.grid.iu.edu</a> need to be informed.<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:07:46)</span> <b>marian:</b></span> yeah OSG VO, right<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:08:12)</span> <b>marian:</b></span> hmm, or others use that too? how to figure?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:10:22)</span> <b>blin:</b></span> @bbockelm do they need to be told today?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:11:39)</span> <b>bbockelm:</b></span> ahh - actually, the way things are setup, nothing needs to be done.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:11:43)</span> <b>bbockelm:</b></span> well, nothing urgent.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:11:53)</span> <b>bbockelm:</b></span> <tt>openssl s_client -connect <a href="http://voms2.opensciencegrid.org:15027">voms2.opensciencegrid.org:15027</a> | openssl x509 -in -noout -text</tt> that looks good<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:14:04)</span> <b>blin:</b></span> ok, good<br/>
+</body>
+</html>

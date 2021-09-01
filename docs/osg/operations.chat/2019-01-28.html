@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jan 28, 2019 : #operations (osg)</title>
+</head>
+<body>
+<h3>Mon Jan 28, 2019 : #operations (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(12:27:52)</span> <b>blin:</b></span> @marco.mascheroni i've uploaded the CE installation doc to the ops drive. One notable thing that it has missing is gratia-probe details in the config section. ping <b>@edquist</b> for help with that<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:28:14)</span> <b>blin:</b></span> @lincoln when can we have a VM up for marco to install a new hosted CE?<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:28:40)</span> <b>lincoln:</b></span> as soon as you like<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:29:06)</span> <b>lincoln:</b></span> I am still working on fixing the PTR records for the existing CEs<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:29:47)</span> <b>lincoln:</b></span> there's a permissions issue in the Uchicago infoblox setup that is not letting me set PTRs (and they can't delegate campus IP space to AWS for me :disappointed: )<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:41:03)</span> <b>blin:</b></span> if you can get to making the VM early this week that'd be wonderful<br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:28:42)</span> <b>marco.mascheroni:</b></span> Let me know when you have the machine ready Lincoln. shoud be 22<br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:35:47)</span> <b>marco.mascheroni:</b></span> also @blin @jdost321, should we add the spreadsheet about the hsoted CEs on the OSG operations shared google account? I don't have an updated version, I lost it when Suchandra account expired. Once it's there I can update it with my notes (I temporarily regressed and kept track of things in a txt file :))<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:36:58)</span> <b>blin:</b></span> marco, it's already in the ops team drive and you should be able to see it<br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:39:46)</span> <b>marco.mascheroni:</b></span> I misssed it, sorry, was only looking at quick links -_-<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:21:53)</span> <b>marco.mascheroni:</b></span> @lincoln have you fixed the DNS issues with 11, 12. 18, 19 ?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:22:02)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e96699"><span style="font-size: small">(14:22:06)</span> <b>lincoln:</b></span> I haven't yet- there's an issue with Infoblox<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:22:12)</span> <b>marco.mascheroni:</b></span> ok<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:22:16)</span> <b>lincoln:</b></span> it resolves internally but not externally<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:22:27)</span> <b>marco.mascheroni:</b></span> bummer<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:22:41)</span> <b>lincoln:</b></span> yeah, this is controlled by our central IT org<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:22:47)</span> <b>lincoln:</b></span> so I can't fix it myself :disappointed:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:23:01)</span> <b>marco.mascheroni:</b></span> I'll wait<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:17:20)</span> <b>matyas:</b></span> @jthiltges we've seen tons of httpd log entries from people trying to hack the server. is there some sort of ip banning we can add?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:17:28)</span> <b>matyas:</b></span> topology<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:18:42)</span> <b>blin:</b></span> this security exercise is serious business<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:18:57)</span> <b>matyas:</b></span> lol these have been going on since like day 1<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:19:35)</span> <b>edquist:</b></span> i just hadn't noticed them till today<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:19:42)</span> <b>edquist:</b></span> <br/>[Mon Jan 28 15:07:05.858085 2019] [core:error] [pid 29138] [client 129.93.246.4:44590] AH00126: Invalid URI in request GET ..\\..\\..\\..\\..\\..\\..\\..\\..\\..\\windows\\win.ini HTTP/1.1<br/>[Mon Jan 28 15:07:06.634321 2019] [core:error] [pid 29155] [client 129.93.246.4:44619] AH00126: Invalid URI in request GET ..\\..\\..\\..\\..\\..\\..\\..\\..\\..\\winnt\\win.ini HTTP/1.1<br/><br/>
+<span style="color: #16569E"><span style="font-size: small">(15:19:48)</span> <b>edquist:</b></span> [Mon Jan 28 15:07:30.212388 2019] [core:error] [pid 29155] [client 129.93.246.4:45300] AH00126: Invalid URI in request GET &lt;meta%20http-equiv=Set-Cookie%20content=%22testxmvf=951%22&gt; HTTP/1.1<br/><br/>
+<span style="color: #16569E"><span style="font-size: small">(15:19:52)</span> <b>edquist:</b></span> [Mon Jan 28 15:07:34.397605 2019] [core:error] [pid 29166] [client 129.93.246.4:45657] AH00126: Invalid URI in request GET c:\\boot.ini HTTP/1.1<br/><br/>
+<span style="color: #16569E"><span style="font-size: small">(15:20:00)</span> <b>edquist:</b></span> [Mon Jan 28 15:17:14.555447 2019] [core:error] [pid 29138] [client 129.93.246.4:2016] AH00126: Invalid URI in request GET /././.. HTTP/1.1<br/><br/>
+<span style="color: #16569E"><span style="font-size: small">(15:20:03)</span> <b>edquist:</b></span> etc<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:23:36)</span> <b>lincoln:</b></span> if there is a daemon talking HTTP out there in the world, someone will try to get ../../../../../etc/shadow from it.<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:24:11)</span> <b>matyas:</b></span> yeah, it's normal, just can we autoban them or something?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:44:43)</span> <b>blin:</b></span> random thought: since we update the topo webapp and data separately, is there any reason why we keep them in the same repo now?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:07:39)</span> <b>edquist:</b></span> haha<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:07:44)</span> <b>edquist:</b></span> beautiful thought<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:08:07)</span> <b>edquist:</b></span> i feel like i've had this discussion with mat before<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:08:56)</span> <b>edquist:</b></span> we could at least keep all of our data on its own branch with no code<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:09:17)</span> <b>edquist:</b></span> although i suppose you are asking specifically about the webapp<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:10:39)</span> <b>blin:</b></span> or we keep the webapp on a branch without any data<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:12:01)</span> <b>edquist:</b></span> for the sake of the discussion i'm considering 'master' to be a branch also -<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:12:14)</span> <b>edquist:</b></span> i guess we have 3 things<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:12:23)</span> <b>edquist:</b></span> webapp<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:12:27)</span> <b>edquist:</b></span> topology db data<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:12:30)</span> <b>edquist:</b></span> other scripts<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:12:44)</span> <b>edquist:</b></span> if we want to separate them,<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:12:50)</span> <b>edquist:</b></span> then the question is<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:12:58)</span> <b>edquist:</b></span> do you have<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:13:22)</span> <b>edquist:</b></span> [webapp], [data], [scripts]<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:13:31)</span> <b>edquist:</b></span> [webapp, scripts], [data]<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:13:41)</span> <b>edquist:</b></span> [webapp], [data, scripts]<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:13:49)</span> <b>edquist:</b></span> ?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:13:59)</span> <b>edquist:</b></span> i can see arguments for each<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:15:14)</span> <b>blin:</b></span> i think my main goal would be to separate the data from everything else so one of the first two<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:15:44)</span> <b>edquist:</b></span> makes sense; in that case i'd lean toward<br/>[webapp, scripts], [data]<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:16:18)</span> <b>edquist:</b></span> whether you want to make them separate repos or just separate branches are both options i guess<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:16:26)</span> <b>matyas:</b></span> separate repos please<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:17:08)</span> <b>matyas:</b></span> i prefer #1 but we can start with #2 first as a stepping stone<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:17:41)</span> <b>blin:</b></span> +1 on both accounts<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:18:42)</span> <b>matyas:</b></span> i would like to see user scripts (osg-topology, osg-notify) modified to download from the web service instead of reading the topo/user data directly<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:19:24)</span> <b>edquist:</b></span> sure<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:19:26)</span> <b>matyas:</b></span> if we have to add additional entry points to the web service to support that, so be it - not too hard<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:19:31)</span> <b>edquist:</b></span> won't be as fast of course ;)<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:19:40)</span> <b>matyas:</b></span> yeah but will be more consistent<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:19:46)</span> <b>edquist:</b></span> ok<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:20:02)</span> <b>matyas:</b></span> and have fewer dependencies<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:20:02)</span> <b>edquist:</b></span> i guess they will have to checkout a separate repo to run those scripts then?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:20:15)</span> <b>edquist:</b></span> or they will _only_ use the scripts?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:20:25)</span> <b>matyas:</b></span> only use the scripts<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:20:49)</span> <b>edquist:</b></span> so ideally they won't even have a checkout of the topology data repo?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:20:56)</span> <b>matyas:</b></span> correct<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:20:59)</span> <b>matyas:</b></span> that's the point<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:21:05)</span> <b>edquist:</b></span> makes sense then<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:21:18)</span> <b>edquist:</b></span> they can almost pretend the yaml files don't exist<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:21:24)</span> <b>edquist:</b></span> i'm on board<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:21:38)</span> <b>edquist:</b></span> the only thing i'll qualify is that any scripts used directly by the webapp belong in the same repo as the webapp<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:21:38)</span> <b>matyas:</b></span> yayyyy!!!<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:21:53)</span> <b>matyas:</b></span> i agree with your qualification<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:22:14)</span> <b>edquist:</b></span> great<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:22:17)</span> <b>matyas:</b></span> with the side note that any scripts used directly by the webapp should not be used by users<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:22:56)</span> <b>edquist:</b></span> yes, i guess that's kind of a corollary <br/>
+<span style="color: #c386df"><span style="font-size: small">(16:23:15)</span> <b>matyas:</b></span> i figured as much, but i wanted to be explicit<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:23:56)</span> <b>edquist:</b></span> i mean they can live in the webapp repo, rather than the scripts repo<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:24:29)</span> <b>matyas:</b></span> right<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:25:12)</span> <b>bbockelm:</b></span> It's an interesting conversation, but I'm not 100% convinced this is the highest priority item.  Much more interested in (a) auto-merge of downtimes and (b) starting to investigate the use of CILogon<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:25:26)</span> <b>matyas:</b></span> to run the webapp, you will only need to check out the webapp repo (the webapp will take care of checking out the data repo)<br/>to run the scripts, you will only need to check out the scripts repo (the scripts will query the webapp)<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:26:24)</span> <b>blin:</b></span> agreed on the priority but a) is done (right <b>@edquist</b>?) and b) can be done in parallel<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:27:35)</span> <b>blin:</b></span> if the cilogon stuff works out, the topology data may actually end up just as topology data (i.e. no VOs/projects!)<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:29:11)</span> <b>edquist:</b></span> just to note it here then, if/when we do this separation, may i suggest:<br/><br/>- all three (new) repos start at the same point in git history from opensciencegrid/topology:master<br/>- in each new repo, delete the files not relevant to the repo<br/><br/>this way the original file/commit histories remain intact for all three repos<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:30:36)</span> <b>blin:</b></span> hey carl, can you capture the above conversation in a JIRA ticket (assign it to the topology-cleanup epic)<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:30:37)</span> <b>matyas:</b></span> also, this should go without saying, but the data repo is the one that should keep the "topology" name<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:30:52)</span> <b>matyas:</b></span> holy carp, we have a topology-cleanup epic?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:31:03)</span> <b>edquist:</b></span> whew sure<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:31:09)</span> <b>edquist:</b></span> good thing i have pidgin logs<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:31:38)</span> <b>blin:</b></span> it's one of the epics that's actually epic<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:31:46)</span> <b>edquist:</b></span> and, downtime automerge is operational, yes<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:32:43)</span> <b>matyas:</b></span> it's the Augean Stables level of epic :)<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:33:05)</span> <b>edquist:</b></span> lol<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:33:39)</span> <b>matyas:</b></span> if we finish the task in one day, we can keep 1/10th of the data :)<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:34:59)</span> <b>edquist:</b></span> only it's running from the topology-itb host; i want to set it up on the non-itb topology realsoonnow<br/>
+<span style="color: #d1707d"><span style="font-size: small">(20:47:23)</span> <b>gattebury:</b></span> FYI, on the httpd logs mentioned above ^ note the client is 129.93.246.4 — that’s a nessus scanning box at Nebraska. Less hackery, more standard web probing that any webserver should expect to get prodded with.<br/>
+</body>
+</html>

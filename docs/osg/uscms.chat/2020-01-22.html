@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jan 22, 2020 : #uscms (osg)</title>
+</head>
+<body>
+<h3>Wed Jan 22, 2020 : #uscms (osg)</h3>
+<span style="color: #385a86"><span style="font-size: small">(11:09:14)</span> <b>goughes:</b></span> On the flip side...<br/>
+<span style="color: #385a86"><span style="font-size: small">(11:11:41)</span> <b>goughes:</b></span> It would be cool if the UI explained the calculations when you hover over the number. You lost X% for Y unknown, Z errors<br/>
+<span style="color: #de5f24"><span style="font-size: small">(12:42:25)</span> <b>justas.balcas:</b></span> Same as I wrote to sst hypernews<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:52:13)</span> <b>jthiltges:</b></span> Is there a way to see details about unknown SAM results? The linked SAM3 page doesn't seem to show them.<br/>@justas.balcas Would you have a link to the thread handy? I must not be subscribed to that one.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(12:56:26)</span> <b>justas.balcas:</b></span> its egroup not hypernews. I am still confused with all mix of e-groups/hypernews.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(12:56:36)</span> <b>justas.balcas:</b></span> and I am not allowed to see archive<br/>
+<span style="color: #de5f24"><span style="font-size: small">(12:57:45)</span> <b>justas.balcas:</b></span> <a href="http://e-groups.cern.ch">e-groups.cern.ch</a> -&gt; cms-comp-ops-site-support-team<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:48:36)</span> <b>justas.balcas:</b></span> @gattebury do we have davs transfers from Caltech to Nebraska configured to use davs?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:49:02)</span> <b>justas.balcas:</b></span> I do have this in my phedex agent to use davs for any debug transfers from Nebraska<br/>
+<span style="color: #619a4f"><span style="font-size: small">(15:49:13)</span> <b>clundstedt:</b></span> I believe so, let me look<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:49:56)</span> <b>justas.balcas:</b></span> twiki shows we should use fts3-devel, but from other chats, can we use fnal or cern prod fts?<br/>
+<span style="color: #619a4f"><span style="font-size: small">(15:50:53)</span> <b>clundstedt:</b></span> Nebraska is configure to use DAVS for all T2s in the US for download in the Debug instance.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:51:14)</span> <b>justas.balcas:</b></span> ok, which fts you use?<br/>
+<span style="color: #619a4f"><span style="font-size: small">(15:51:15)</span> <b>clundstedt:</b></span> Using <a href="http://fts3.cern.ch">fts3.cern.ch</a> (prod fts)<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:51:53)</span> <b>justas.balcas:</b></span> ok, now I see. was looking at fts3-devel<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:52:13)</span> <b>justas.balcas:</b></span> who drives these tests for us-cms? @didavila?<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(15:54:27)</span> <b>didavila:</b></span> I was asked, by Brian B and Frank, to setup the transfers over TPC between UCSD and Caltech only<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:57:14)</span> <b>justas.balcas:</b></span> ok<br/>
+<span style="color: #7d414c"><span style="font-size: small">(18:40:58)</span> <b>bockjoo:</b></span> SAM test jobs are idling in the htcondor-ce. How do I make it run as soon as it arrives at the CE?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(18:42:04)</span> <b>bockjoo:</b></span> Do I have to edit some specific config file in /etc/condor-ce/config.d?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(21:04:01)</span> <b>justas.balcas:</b></span> @bockjoo by giving higher prio? Also it depends on your site and if you have slots available. Once we moved to the whole node scheduling, this became complicated. we re-use Sleeper pool to run sam tests, so they always have slots available.  This is from one of our WNs:<br/><pre>SLOT_TYPE_1=100%<br/>SLOT_TYPE_1_PARTITIONABLE=TRUE<br/>NUM_SLOTS_TYPE_1=1<br/><br/>MULTIPLIER_CORES = 2<br/>NUM_CPUS = $(DETECTED_CPUS)*$(MULTIPLIER_CORES)<br/>MEMORY = $(DETECTED_MEMORY)*$(MULTIPLIER_CORES)<br/><br/>NUM_REAL_CPUS = $(DETECTED_CPUS)<br/>NUM_SLEEP_CPUS = $(NUM_CPUS)-$(NUM_REAL_CPUS)<br/><br/>NUM_SLOTS = 2<br/><br/># Type 1 is for the normal slots<br/>NUM_SLOTS_TYPE_1 = 1<br/>SLOT_TYPE_1_PARTITIONABLE = TRUE<br/>SLOT_TYPE_1 = cpus=$(NUM_REAL_CPUS), memory=$(DETECTED_MEMORY), 95%<br/><br/># For the sleep slots<br/>NUM_SLOTS_TYPE_2 = 1<br/>SLOT_TYPE_2_PARTITIONABLE = FALSE<br/>SLOT_TYPE_2 = cpus=$(NUM_SLEEP_CPUS), memory=$(DETECTED_MEMORY)<br/><br/>START = (\<br/>        (TARGET.CMSUser=?=TRUE &amp;&amp; SlotID==1) ||\<br/>        (!isUndefined(User) &amp;&amp; User=?="<a href="mailto:lcgadmin@ultralight.org">lcgadmin@ultralight.org</a>" &amp;&amp; SlotID&gt;1)\<br/>        )</pre><br/>
+<span style="color: #7d414c"><span style="font-size: small">(21:31:58)</span> <b>bockjoo:</b></span> @justas.balcas Thanks for the info! We have the slurm scheduler. I had to change walltime, numcpu, and memory requirement from /etc/blahp/slurm_local_submit_attributes.sh. After the change, the SAM tests arriving here every 15 minutes run with a couple minutes. So this seems to be working.<br/>
+</body>
+</html>

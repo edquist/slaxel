@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jul 15, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Jul 15, 2020 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(10:14:39)</span> <b>blin:</b></span> anyone else seeing issues with github PRs not being able to verify mergeability?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:19:23)</span> <b>blin:</b></span> nvm all is well<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:22:07)</span> <b>blin:</b></span> well but slow...<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:35:07)</span> <b>matyas:</b></span> I'm seeing it too<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:35:54)</span> <b>matyas:</b></span> <a href="http://githubstatus.com">githubstatus.com</a> claims everything is green, but at this rate I might just merge things by hand<br/>
+<span style="color: #a72f79"><span style="font-size: small">(11:33:45)</span> <b>andrew.melo:</b></span> Hi all. Our CEs are filling their logs with <tt>AuditPayloadLog</tt>. Googling that leads me only to <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-2788?focusedCommentId=345675&amp;page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel">https://opensciencegrid.atlassian.net/browse/SOFTWARE-2788?focusedCommentId=345675&amp;page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel</a> ... am I correct reading the accompanying PR that dropping <tt>MAX_NUM_COLLECTOR_AUDIT_LOG</tt>  to 2 will keep only 2 days of these logs?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:56:31)</span> <b>matyas:</b></span> That knob appears to be undocumented, but if it's anything like <tt>MAX_NUM_SCHEDD_AUDIT_LOG</tt>, then it will keep it for 2 _rotations_ of the logs. You may also want to set <tt>MAX_COLLECTOR_AUDIT_LOG=24Hr</tt>  to rotate it at least every 24 hours.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:57:20)</span> <b>blin:</b></span> wait, <tt>MAX_&lt;SUBSYS&gt;_LOG</tt> lets you rotate on time?!<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:57:27)</span> <b>blin:</b></span> i thought it was strictly a size limit<br/>
+<span style="color: #a72f79"><span style="font-size: small">(11:57:32)</span> <b>andrew.melo:</b></span> It appears so <a href="https://github.com/htcondor/htcondor-ce/pull/153/files#diff-9ae414cb30cf57490f9e504fb73667bdR19">https://github.com/htcondor/htcondor-ce/pull/153/files#diff-9ae414cb30cf57490f9e504fb73667bdR19</a><br/>
+<span style="color: #a72f79"><span style="font-size: small">(11:58:44)</span> <b>andrew.melo:</b></span> The defaults for that are pretty big. The auditpayload log for us is ~5-600MB/day, and it wants to keep 90 days by default<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:02:15)</span> <b>matyas:</b></span> I don't think this is a MAX_&lt;SUBSYS&gt;_LOG - MAX_something_AUDIT_LOG appears to be its own thing: <a href="https://htcondor.readthedocs.io/en/latest/admin-manual/configuration-macros.html">https://htcondor.readthedocs.io/en/latest/admin-manual/configuration-macros.html</a> and search for MAX_SCHEDD_AUDIT<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(12:10:50)</span> <b>blin:</b></span> fyi if you find the knob in the index, it'll give you a direct link to its documentation<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:13:18)</span> <b>matyas:</b></span> ah, didn't know that<br/>
+</blockquote>
+<span style="color: #43761b"><span style="font-size: small">(12:04:14)</span> <b>blin:</b></span> sure there is: <a href="https://htcondor.readthedocs.io/en/latest/admin-manual/configuration-macros.html#MAX_%3CSUBSYS%3E_LOG">https://htcondor.readthedocs.io/en/latest/admin-manual/configuration-macros.html#MAX_%3CSUBSYS%3E_LOG</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(12:04:26)</span> <b>matyas:</b></span> That's a different thing<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:04:48)</span> <b>matyas:</b></span> That's a <tt>MAX_&lt;SUBSYS&gt;_LOG</tt>  this is a <tt>MAX_&lt;SUBSYS&gt;_AUDIT_LOG</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:05:12)</span> <b>blin:</b></span> oh i misread your message, nevermind!<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:06:44)</span> <b>matyas:</b></span> I'm guessing this is from a "collector plugin" and not baked into HTCondor<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:12:20)</span> <b>andrew.melo:</b></span> Since I'm talking about CEs, is there a provision in htcondor-ce to submit batches of jobs at a time? E.G. If I were to submit a condor cluster of 100 jobs to a CE, is there a way for it to be submitted to SLURM as a jobarray of 100 jobs instead of submitting 100 individual jobs to SLURM<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:13:49)</span> <b>blin:</b></span> i don't /think/ so -- that'd be something that'd have to live in the blahp level<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:14:24)</span> <b>blin:</b></span> what're the semantics/interface to a job array?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:14:50)</span> <b>blin:</b></span> does slurm give you a single job that you can query the entire array with?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:14:59)</span> <b>blin:</b></span> (and cancel, etc)<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:18:48)</span> <b>andrew.melo:</b></span> A job array shares a job ID, then each "array task" has a separate ID. You can cancel/modify either the entire array or individual tasks. e.g.<br/><pre>sbatch --array=0-31 # submit a job with 32 tasks<br/># the job was assigned id 100<br/>scancel 100_4 # cancel the 4th task</pre><br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:19:12)</span> <b>andrew.melo:</b></span> Similar to clustering in condor, grouping in arrays helps with scheduling<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:20:13)</span> <b>blin:</b></span> @dweitzel do you know if this is possible with condor + slurm?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:25:55)</span> <b>andrew.melo:</b></span> I wouldn't be adverse to making the blah changes, but if the job router only works at the job level and not cluster granularity, I don't think it helps<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:28:10)</span> <b>blin:</b></span> yeah, it certainly only works at the job level but you could have a model where a single incoming job spawns a job array of identical payloads<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:32:04)</span> <b>andrew.melo:</b></span> Hmmmm.<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:37:21)</span> <b>blin:</b></span> and just have the incoming job interact with the "head" array job<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:35:12)</span> <b>andrew.melo:</b></span> Errrr, I updated my job routes to add one missing to a CE, and now when I reconfig/restart, the router dies with<br/><pre>Caught signal 6: si_code=4294967290, si_pid=1914395, si_uid=0, si_addr=0x1D361B<br/>Stack dump for process 1914395 at timestamp 1594838076 (17 frames)<br/>/lib64/libcondor_utils_8_8_8.so(dprintf_dump_stack+0x24)[0x7f77d6b93ec4]<br/>/lib64/libcondor_utils_8_8_8.so(_Z17unix_sig_coredumpiP9siginfo_tPv+0x69)[0x7f77d6c67549]<br/>/lib64/libpthread.so.0(+0xf5d0)[0x7f77d20425d0]<br/>/lib64/libc.so.6(gsignal+0x37)[0x7f77d1c9c207]<br/>/lib64/libc.so.6(abort+0x148)[0x7f77d1c9d8f8]<br/>/lib64/libstdc++.so.6(_ZN9__gnu_cxx27__verbose_terminate_handlerEv+0x165)[0x7f77d29ed7d5]<br/>/lib64/libstdc++.so.6(+0x5e746)[0x7f77d29eb746]<br/>/lib64/libstdc++.so.6(+0x5e773)[0x7f77d29eb773]<br/>/lib64/libstdc++.so.6(+0x5e993)[0x7f77d29eb993]<br/>/lib64/libstdc++.so.6(_ZSt20__throw_out_of_rangePKc+0x77)[0x7f77d2a40857]<br/>condor_job_router[0x40fbb4]<br/>condor_job_router(_ZN9JobRouter4PollEv+0x7c)[0x41b18c]<br/>/lib64/libcondor_utils_8_8_8.so(_ZN12TimerManager7TimeoutEPiPd+0x280)[0x7f77d6c3c260]<br/>/lib64/libcondor_utils_8_8_8.so(_ZN10DaemonCore6DriverEv+0x9ce)[0x7f77d6c58a0e]<br/>/lib64/libcondor_utils_8_8_8.so(_Z7dc_mainiPPc+0x13a9)[0x7f77d6c6acc9]<br/>/lib64/libc.so.6(__libc_start_main+0xf5)[0x7f77d1c883d5]<br/>condor_job_router[0x40c8d9]</pre><br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:35:20)</span> <b>andrew.melo:</b></span> seems bad? But I'm not sure of where to go from there<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:36:17)</span> <b>andrew.melo:</b></span> <pre>Version     : 4.2.1<br/>Release     : 1.osg35.el7</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:36:19)</span> <b>blin:</b></span> did you remove any routes?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:36:42)</span> <b>blin:</b></span> that's just the job router, right?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:37:37)</span> <b>andrew.melo:</b></span> Yeah, added a route and removed another route<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:37:41)</span> <b>blin:</b></span> could you check the jobs that have been routed, i think this should work <tt>condor_ce_q -const '!isUndefined(RoutedFromJobId)' -af routename</tt><br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:37:45)</span> <b>andrew.melo:</b></span> And yeah, it appears the rest of the daemons are up<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:37:56)</span> <b>blin:</b></span> <a href="https://htcondor-wiki.cs.wisc.edu/index.cgi/tktview?tn=7590,4">https://htcondor-wiki.cs.wisc.edu/index.cgi/tktview?tn=7590,4</a><br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:37:56)</span> <b>andrew.melo:</b></span> which route would you like?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:38:16)</span> <b>blin:</b></span> this is a known issue if you remove a route and there are existing jobs with said route<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:38:30)</span> <b>blin:</b></span> i think if you restore that removed route, the job router will start up ok<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:40:54)</span> <b>andrew.melo:</b></span> (there's quite a few undefined in that command you sent) Is there a way to delete the jobs, then let the router come up w/o removing the route?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:50:45)</span> <b>blin:</b></span> yeah, you could do something like <tt>condor_ce_q -const 'RouteName == "&lt;INSERT ROUTE NAME&gt;"' -af RoutedFromJobId</tt> to get the list of CE jobs belonging to that route<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:51:31)</span> <b>blin:</b></span> in general you want to remove the original CE job (i.e. not the routed job) so this is slightly annoying since <tt>RouteName</tt> is only set in the routed job<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:52:19)</span> <b>blin:</b></span> so you'll have to pass that list to <tt>condor_ce_rm</tt><br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:54:39)</span> <b>andrew.melo:</b></span> Bingo. Hit it, wait a few secs and then it was good to go<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:54:42)</span> <b>andrew.melo:</b></span> Thanks!<br/>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jul 30, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Tue Jul 30, 2019 : #xcache (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(10:30:54)</span> <b>blin:</b></span> alright, i've fixed up my <tt>sec.protocol</tt> config and it's still forcing the default <tt>/etc/lcmaps.db</tt>:<br/><pre><br/>   sec.protocol /usr/lib64 gsi \<br/>       -certdir:/etc/grid-security/certificates \<br/>       -cert:/etc/grid-security/xrd/xrdcert.pem \<br/>       -key:/etc/grid-security/xrd/xrdkey.pem \<br/>       -crl:1 \<br/>       -authzfun:libXrdLcmaps.so \<br/>       -authzfunparms:--lcmapscfg=/etc/xrootd/lcmaps.cfg,--no-authz \<br/>       -gmapopt:0 \<br/>       -authzto:3600<br/><br/>   sec protbind * gsi<br/><br/>   http.secxtractor /usr/lib64/libXrdLcmaps.so<br/></pre><br/>resulting in<br/><pre><br/>Plugin No such file or directory loading secxtractorlib /usr/lib64/libXrdLcmaps-4.so<br/>Config Falling back to using /usr/lib64/libXrdLcmaps.so<br/>Plugin loaded <br/>lcmaps[20631]     LOG_ERR: 2019-07-30.15:27:04Z: /etc/lcmaps.db:165: [warning] expecting rule definitions.<br/>lcmaps[20631]     LOG_ERR: 2019-07-30.15:27:04Z: /etc/lcmaps.db:165: [warning] no rules specified for policy: 'glexec' at line 153<br/>.<br/>lcmaps[20631]     LOG_ERR: 2019-07-30.15:27:04Z: lcmaps.mod-PluginInit(): plugin lcmaps_gums_client.mod not found (arguments: -res<br/>ourcetype ce -actiontype execute-now -capath /etc/grid-security/certificates -cert   /etc/grid-security/hostcert.pem -key    /etc/<br/>grid-security/hostkey.pem --cert-owner root --endpoint <a href="https://yourgums.yourdomain:8443/gums/services/GUMSXACMLAuthorizationServic">https://yourgums.yourdomain:8443/gums/services/GUMSXACMLAuthorizationServic</a><br/>ePort)<br/>lcmaps[20631]     LOG_ERR: 2019-07-30.15:27:04Z: lcmaps.mod-lcmaps_startPluginManager(): error initializing plugin: lcmaps_gums_cl<br/>ient.mod<br/>lcmaps[20631]     LOG_ERR: 2019-07-30.15:27:04Z: lcmaps_init() error: could not start plugin manager<br/>ERROR in xrootd-lcmaps config: Failed to initialize LCMAPS<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:44:06)</span> <b>blin:</b></span> aha, i needed to set <tt>xrootd.seclib /usr/lib64/libXrdSec.so</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:45:59)</span> <b>blin:</b></span> is there a good way to see if transfers are occurring over HTTPS vs HTTP?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:52:29)</span> <b>blin:</b></span> ah nvm, i just have to actually pass the cert/key to curl to see the SSL processing in the logs<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:04:47)</span> <b>blin:</b></span> @dweitzel does stashcp support auth cache access?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:04:55)</span> <b>blin:</b></span> a quick glance over the code makes it seem like no<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:08:39)</span> <b>dweitzel:</b></span> No, no it doesn’t support auth for reading. <br/>
+<span style="color: #43761b"><span style="font-size: small">(15:44:18)</span> <b>blin:</b></span> in a clustered xrootd setup, should each host in the cluster report via <tt>xrootd.monitor</tt>?<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:51:43)</span> <b>marian:</b></span> yep<br/>
+</body>
+</html>

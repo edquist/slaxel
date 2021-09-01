@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Apr 1, 2021 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Thu Apr 1, 2021 : #xcache (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(10:40:11)</span> <b>blin:</b></span> hey @didavila @dweitzel @matyas i'm starting to write OSG release notes for 5.1.1 and was hoping for some help with picking highlights from 5.0.3-5.1.1 that we should let folks know about <a href="https://github.com/xrootd/xrootd/blob/v5.1.1/docs/ReleaseNotes.txt#L9-L164">https://github.com/xrootd/xrootd/blob/v5.1.1/docs/ReleaseNotes.txt#L9-L164</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:40:26)</span> <b>blin:</b></span> (5.0.3 - 5.1.1 since we currently ship 5.0.2 in upcoming release)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:42:47)</span> <b>dweitzel:</b></span> I think 5.1 is the first release with SciTokens from XRootD.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:14:20)</span> <b>blin:</b></span> hey @jthiltges for this fix: <a href="https://github.com/opensciencegrid/xrootd-hdfs/pull/34/files">https://github.com/opensciencegrid/xrootd-hdfs/pull/34/files</a>. was this a problem where checksums were being written even if the actual file failed to be written?<br/>
+<blockquote>
+<span style="color: #e06b56"><span style="font-size: small">(11:23:06)</span> <b>jthiltges:</b></span> I'm trying to recall the details. That was a year ago, ya know. :stuck_out_tongue_closed_eyes:<br/><br/>Here's my recollection: if an upload was interrupted, the checksum file would still get created, but based on the incomplete data. This lead to confusing results when clients retrieved the checksum.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:23:39)</span> <b>blin:</b></span> ah ok<br/>
+<span style="color: #e06b56"><span style="font-size: small">(11:24:38)</span> <b>jthiltges:</b></span> Diego and I ran across it while debugging the checksum issues in SOFTWARE-4363<br/>
+<span style="color: #e06b56"><span style="font-size: small">(11:36:44)</span> <b>jthiltges:</b></span> Argh. I'm looking over the code, and trying to recall (and regretting my poor judgement in not copying the slack conversation with Diego to jira).<br/><br/>Trying make a one-line summary:<br/>&gt; [xrootd-hdfs] HDFS write failures no longer generate a checksum file<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:37:34)</span> <b>blin:</b></span> perfect, thank you!<br/>
+</blockquote>
+<span style="color: #43761b"><span style="font-size: small">(11:31:54)</span> <b>blin:</b></span> @dweitzel does 5.0.3 - 5.1.1 have the TLS changes required by SciTokens or was that earlier in 5.x?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:35:23)</span> <b>blin:</b></span> @didavila it looks like there are a lot of TPC bug fixes, can we express to users that 5.1.1 is solid for TPC?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:35:29)</span> <b>dweitzel:</b></span> I think the TLS changes was just 5.0<br/>
+<span style="color: #e06b56"><span style="font-size: small">(11:42:49)</span> <b>jthiltges:</b></span> There's still an unresolved memory leak in HTTP TPC (related to libcurl's usage of nss, and CA certificate loading). I think @bbockelm is hoping for a fix in v5.1.2.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:43:55)</span> <b>blin:</b></span> yup, i'm def planning on mentioning that<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:44:10)</span> <b>blin:</b></span> do you guys know if there's a github issue that we could link?<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(11:44:26)</span> <b>didavila:</b></span> yeah, I’m a bit confusing about Andy pushing us to adopt 5.1 when I saw a presentation of Wei last Wednesday talking about these leaks<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:45:44)</span> <b>blin:</b></span> ok i'll pull back on blessing this release<br/>
+<blockquote>
+<span style="color: #c386df"><span style="font-size: small">(11:48:36)</span> <b>matyas:</b></span> no release?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:48:52)</span> <b>matyas:</b></span> or just add another warning?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:49:01)</span> <b>blin:</b></span> sorry, closer to the latter<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:49:10)</span> <b>matyas:</b></span> that's fine<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:49:23)</span> <b>matyas:</b></span> (that was actually the answer I was hoping for)<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:49:24)</span> <b>blin:</b></span> i was hoping to say something along the lines of "this xrootd version is good, everyone should update!"<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:51:58)</span> <b>matyas:</b></span> Do you think this has anything to do with the TPC failures in our tests?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(11:53:02)</span> <b>andrew.melo:</b></span> I guess this is relevant to us (cms)?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:53:53)</span> <b>blin:</b></span> @matyas i kinda doubt it but we really need to split out the single/multistream TPC tests<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:54:24)</span> <b>blin:</b></span> @andrew.melo yup, i'm going to release with tons of caveats so hopefully that scares all of your sites away and you don't have to say anything :slightly_smiling_face:<br/>
+<span style="color: #a72f79"><span style="font-size: small">(11:54:50)</span> <b>andrew.melo:</b></span> Well, I guess since it's in upcoming, people won't grab it w/o some explicit action on their end<br/>
+</blockquote>
+<span style="color: #a2a5dc"><span style="font-size: small">(11:45:57)</span> <b>didavila:</b></span> here is Wei’s presentation: <a href="https://docs.google.com/presentation/d/1MVOAflhn2Be9H2Bsnhc6xbpIpzsVEcR5b38HCFUXOgs/edit#slide=id.p">https://docs.google.com/presentation/d/1MVOAflhn2Be9H2Bsnhc6xbpIpzsVEcR5b38HCFUXOgs/edit#slide=id.p</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:35:29)</span> <b>bbockelm:</b></span> @blin - this leak has existed since XrdTpc was first written (it's in curl).  Just became more apparent as ATLAS hammers endpoints much harder than CMS.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:35:42)</span> <b>bbockelm:</b></span> So it's definitely worth noting and getting 5.1 out the door.<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:36:32)</span> <b>blin:</b></span> yup, packages are already released. just working on the announcement/notes<br/>
+</body>
+</html>

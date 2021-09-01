@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jul 27, 2017 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Thu Jul 27, 2017 : #xcache (osg)</h3>
+<span style="color: #674b1b"><span style="font-size: small">(12:51:34)</span> <b>rynge:</b></span> Do we have a call today?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:53:45)</span> <b>dweitzel:</b></span> Yup, just sent out a reminder.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(13:18:34)</span> <b>bala:</b></span> meeting finished?<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:21:10)</span> <b>marian:</b></span> yep<br/>
+<span style="color: #e7392d"><span style="font-size: small">(13:22:15)</span> <b>bala:</b></span> just missed the meeting :slightly_smiling_face:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:27:32)</span> <b>bbockelm:</b></span> @lincoln - I bet we have a plugin that preserves UID.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:28:28)</span> <b>lincoln:</b></span> for xrd?<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:28:40)</span> <b>lincoln:</b></span> i think we discussed this at some point<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:28:40)</span> <b>bbockelm:</b></span> yeah<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:29:01)</span> <b>lincoln:</b></span> as i recall it ultimately came down to the fact that you can cheat a bit by talking to hdfs directly<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:29:13)</span> <b>lincoln:</b></span> instead of needing a setuid bin or root-running xrootd process that can change UIDs<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:29:45)</span> <b>bbockelm:</b></span> yeah, you'd still need to run as root - or run as xrootd but have systemd setcap appropriately.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:30:50)</span> <b>lincoln:</b></span> i thought xrd only runs as the xrd user?<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:31:19)</span> <b>lincoln:</b></span> anyhow if there were a generic uid setter for xrd that runs on plain ol' POSIX FS that'd be nice<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:31:50)</span> <b>lincoln:</b></span> we always talk about pushing data to the sites but then when asked how to get data back to OSG Connect?<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:31:53)</span> <b>lincoln:</b></span> ¯\_(ツ)_/¯<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:32:12)</span> <b>lincoln:</b></span> well, shrug or gridftp :slightly_smiling_face:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:42:16)</span> <b>bbockelm:</b></span> Yeah - I actually spoke with RobG about this.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:42:49)</span> <b>bbockelm:</b></span> Send someone to Nebraska for two days and we'll get this fixed up via xrootd.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:42:50)</span> <b>lincoln:</b></span> now that we have a CDN let's build a Content Retrieval Network :wink:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:44:42)</span> <b>bbockelm:</b></span> Basically, we need two things:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:45:23)</span> <b>bbockelm:</b></span> a) Xrootd switches filesystem UIDs (see <tt>man setfsuid</tt> -- it's a per-thread UID only for interacting with the filesystem).<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:45:45)</span> <b>bbockelm:</b></span> - This implies that Xrootd runs as user <tt>xrootd</tt> _but_ we add a Linux capability via the systemd service file.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:47:08)</span> <b>bbockelm:</b></span> b) Use the new condor_submit hooks to automatically generate a token that gets sent to the job.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:47:25)</span> <b>bbockelm:</b></span> - Shhhh - the token will be a X509 proxy.  Don't tell anyone.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:49:17)</span> <b>bbockelm:</b></span> (but the X509 proxy will be signed by the schedd -- basically, it acts as a CA that the Xrootd host recognizes.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:59:52)</span> <b>lincoln:</b></span> Sounds good. I prefer users never hear the word x509<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:12:09)</span> <b>lincoln:</b></span> @bbockelm so you can just add arbitrary caps to otherwise unprivileged processes via systemd?<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:13:18)</span> <b>lincoln:</b></span> I guess container engines must do similar stuff.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:17:52)</span> <b>bbockelm:</b></span> <a href="https://www.freedesktop.org/software/systemd/man/systemd.exec.html#AmbientCapabilities=">https://www.freedesktop.org/software/systemd/man/systemd.exec.html#AmbientCapabilities=</a> &lt;~ I think this is the config knob you want.<br/>
+</body>
+</html>

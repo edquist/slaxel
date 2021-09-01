@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Nov 30, 2018 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Fri Nov 30, 2018 : #xcache (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(12:20:45)</span> <b>matyas:</b></span> hey all, I'm looking at the kibana dashboard <a href="https://gracc.opensciencegrid.org/kibana/app/kibana#/dashboard/AWG5ztK58IKqxDdAglqh">https://gracc.opensciencegrid.org/kibana/app/kibana#/dashboard/AWG5ztK58IKqxDdAglqh</a> and don't see <a href="http://sc-cache.chtc.wisc.edu">sc-cache.chtc.wisc.edu</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(12:25:59)</span> <b>matyas:</b></span> the reporting appears to be running and I haven't seen any errors in the logs<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:26:35)</span> <b>dweitzel:</b></span> That data isn't from the "reporter", it comes directly from the xrootd daemon.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:26:59)</span> <b>dweitzel:</b></span> grep your stashcache xrootd configuration for <a href="http://xrd-mon.osgstorage.org">xrd-mon.osgstorage.org</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(12:27:45)</span> <b>matyas:</b></span> ah, it was using the old <a href="http://uct2-collectd.mwt2.org">uct2-collectd.mwt2.org</a> hostname<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:28:01)</span> <b>dweitzel:</b></span> well, that should be in there too.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:28:16)</span> <b>dweitzel:</b></span> but there is no  mention of <a href="http://xrd-mon.osgstorage.org">xrd-mon.osgstorage.org</a>?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:28:36)</span> <b>matyas:</b></span> I think we made that change recently<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:28:51)</span> <b>matyas:</b></span> and I didn't update our config file to match<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:33:09)</span> <b>dweitzel:</b></span> k<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:33:23)</span> <b>dweitzel:</b></span> yup adding that will make you show up in the monitoring.<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:52:36)</span> <b>matyas:</b></span> great, I see it now! it's hidden on the second page, but it's there<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:53:59)</span> <b>matyas:</b></span> so what about the "xrootd stashcache by logical directory"? what does it take to get on that?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:54:17)</span> <b>matyas:</b></span> is there a minimum, or does it only show the top 10?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:57:09)</span> <b>dweitzel:</b></span> Logical directory is hardcoded, more or less.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:57:13)</span> <b>dweitzel:</b></span> <a href="https://github.com/opensciencegrid/xrootd-monitoring-collector/blob/master/Collectors/DetailedCollector.py#L135">https://github.com/opensciencegrid/xrootd-monitoring-collector/blob/master/Collectors/DetailedCollector.py#L135</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:57:22)</span> <b>dweitzel:</b></span> You can open a pull request though!<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:58:28)</span> <b>matyas:</b></span> so right now <tt>/chtc/PUBLIC/matyas</tt> would be listed as an "unknown directory"?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:59:16)</span> <b>dweitzel:</b></span> Yup<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:09:05)</span> <b>matyas:</b></span> is there a way to report on number of cache hits/misses?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:11:04)</span> <b>dweitzel:</b></span> nope, that data is not recorded... anywhere in XRootD.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:23:41)</span> <b>bbockelm:</b></span> Actually, I think there's some data recorded along those lines -- Ilija's been struggling to interpret it, however.  The best way to do it is look at the ratio between input and output.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:27:48)</span> <b>matyas:</b></span> how about transfer data by files instead of bytes?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:27:56)</span> <b>matyas:</b></span> is that available?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:29:47)</span> <b>matyas:</b></span> also, looks like xrootd logs cache purges... maybe we can ask them to upload it, too? <a href="https://github.com/xrootd/xrootd/blob/master/src/XrdFileCache/XrdFileCachePurge.cc">https://github.com/xrootd/xrootd/blob/master/src/XrdFileCache/XrdFileCachePurge.cc</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:35:51)</span> <b>dweitzel:</b></span> yup, by bytes is certainly available.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:36:20)</span> <b>dweitzel:</b></span> Sorry,  files is available<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:48:40)</span> <b>bbockelm:</b></span> @matyas - the cache saves these statistics:<br/><a href="https://github.com/xrootd/xrootd/blob/master/src/XrdFileCache/XrdFileCacheInfo.hh#L51-L74">https://github.com/xrootd/xrootd/blob/master/src/XrdFileCache/XrdFileCacheInfo.hh#L51-L74</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:49:04)</span> <b>bbockelm:</b></span> For each cache access, open time, close time, bytes from disk, bytes from ram, and bytes missed.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:50:07)</span> <b>dweitzel:</b></span> interesting.  So you can kinda count it.  But those stats get rotated out, right?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:50:18)</span> <b>dweitzel:</b></span> is that the one that John said rotated out after 20 accesses?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:50:20)</span> <b>bbockelm:</b></span> Right.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:50:26)</span> <b>dweitzel:</b></span> ok, getting there.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:50:49)</span> <b>bbockelm:</b></span> That's what Matevz is working on keeping running counters in memory and dumping out per-directory.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:50:51)</span> <b>dweitzel:</b></span> I wonder how hard it would be to have that information sent to the detailed reporting (or summary, the per transfer stuff)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:52:46)</span> <b>bbockelm:</b></span> I think Matevz wants to be able to write it to a pipe and you can specify what process is on the other side of the pipe.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:52:53)</span> <b>bbockelm:</b></span> (i.e., could go straight to RabbitMQ)<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:34:41)</span> <b>matyas:</b></span> @marian could you add /chtc to CVMFS?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:34:56)</span> <b>matyas:</b></span> (or is it the origin server you need to add?)<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:48:42)</span> <b>marian:</b></span> ehm ... not sure I understand the question, @matyas<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:50:09)</span> <b>matyas:</b></span> is there anything that needs to be done for me to be able to do <tt>stat /cvmfs/stash.osgstorage.org/chtc</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:01:13)</span> <b>dweitzel:</b></span> Yup. I have to edit a script on hcc-cvmfs-repo to look at that directory. It only looks at /user right now. <br/>
+<span style="color: #c386df"><span style="font-size: small">(16:01:52)</span> <b>matyas:</b></span> could you do that? our origin server is ready<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:03:13)</span> <b>dweitzel:</b></span> Yup. Give me tonight to do it.<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:06:53)</span> <b>matyas:</b></span> cool, thanks!<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:14:37)</span> <b>marian:</b></span> @dweitzel, should we put this up for Ops somewhere? what script and how to use it?<br/>
+</body>
+</html>

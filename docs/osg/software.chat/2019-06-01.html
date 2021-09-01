@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Sat Jun 1, 2019 : #software (osg)</title>
+</head>
+<body>
+<h3>Sat Jun 1, 2019 : #software (osg)</h3>
+<span style="color: #a72f79"><span style="font-size: small">(11:35:58)</span> <b>andrew.melo:</b></span> It looks like there might need to be an update to the OSG Cert bundle, I get the following when trying to use the digicert certificate on my CE:<br/><br/><pre><br/>06/01/19 11:31:49 Condor GSI authentication failure<br/>GSS Major Status: Authentication Failed<br/>GSS Minor Status Error Chain:<br/>globus_gss_assist: Error during context initialization<br/>globus_gsi_callback_module: Could not verify credential<br/>globus_gsi_callback_module: Error with signing policy<br/>globus_gsi_callback_module: Error in OLD GAA code: The subject of the certificate "/DC=org/DC=terena/DC=tcs/C=US/ST=TN/L=Nashville/O=Vanderbilt University/CN=<a href="http://xrootd.accre.vanderbilt.edu">xrootd.accre.vanderbilt.edu</a>" does not match the signing policies defined in /etc/grid-security/certificates/bd43b60c.signing_policy<br/></pre><br/>
+<span style="color: #a72f79"><span style="font-size: small">(11:37:13)</span> <b>andrew.melo:</b></span> but the signing policy is<br/><pre><br/>cat /etc/grid-security/certificates/bd43b60c.signing_policy<br/># DigiCert Grid Trust CA G2 Signing Policy<br/>access_id_CA		X509	'/C=US/O=DigiCert Grid/OU=<a href="http://www.digicert.com/CN=DigiCert">www.digicert.com/CN=DigiCert</a> Grid Trust CA G2'<br/>pos_rights		globus	CA:sign<br/>cond_subjects		globus	'"/DC=com/DC=DigiCert-Grid/*" "/DC=com/DC=DigiCertGrid/*" "/C=US/O=DigiCert Grid/*"'<br/></pre><br/>note that my cert begins with <tt>/DC=org/DC=terena/DC=tcs</tt><br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:37:52)</span> <b>bbockelm:</b></span> Sure they signed with the right CA?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(11:38:22)</span> <b>andrew.melo:</b></span> the CA is correct:<br/><pre><br/>Certificate:<br/>    Data:<br/>        Version: 3 (0x2)<br/>        Serial Number:<br/>            06:c6:2f:b4:e8:6d:8b:ab:a2:93:6d:80:e3:77:64:64<br/>    Signature Algorithm: sha256WithRSAEncryption<br/>        Issuer: C=US, O=DigiCert Grid, OU=<a href="http://www.digicert.com">www.digicert.com</a>, CN=DigiCert Grid Trust CA G2<br/>        Validity<br/>            Not Before: May 31 00:00:00 2019 GMT<br/>            Not After : Jun 30 12:00:00 2020 GMT<br/>        Subject: DC=org, DC=terena, DC=tcs, C=US, ST=TN, L=Nashville, O=Vanderbilt University, CN=<a href="http://xrootd.accre.vanderbilt.edu">xrootd.accre.vanderbilt.edu</a><br/></pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:39:15)</span> <b>bbockelm:</b></span> I’m guessing they did your cert wrong<br/>
+<span style="color: #a72f79"><span style="font-size: small">(11:40:00)</span> <b>andrew.melo:</b></span> interestingly, xrootd doesn't complain<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:40:07)</span> <b>bbockelm:</b></span> <a href="http://www.digicert-grid.com/DigiCertGridCA-1G2-Classic-2015.signing_policy">http://www.digicert-grid.com/DigiCertGridCA-1G2-Classic-2015.signing_policy</a><br/>
+<span style="color: #a72f79"><span style="font-size: small">(11:40:40)</span> <b>andrew.melo:</b></span> fffffffff<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:42:08)</span> <b>bbockelm:</b></span> "Start your own CA infrastructure" they said.  "It'll be fun" they said.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:43:05)</span> <b>bbockelm:</b></span> Hey, they said their hours are 7am-3pm mountain time on Saturday.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:43:13)</span> <b>bbockelm:</b></span> (see <a href="http://www.digicert-grid.com/">http://www.digicert-grid.com/</a>)<br/>
+<span style="color: #a72f79"><span style="font-size: small">(11:43:16)</span> <b>andrew.melo:</b></span> gonna be a fun time getting this fixed by tomorrow<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:43:31)</span> <b>bbockelm:</b></span> how much would you like to confuse their Saturday support crew?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(11:45:05)</span> <b>andrew.melo:</b></span> gonna give it a shot, my existing certs expire tomorrow -- so it's gonna be interesting<br/>
+<span style="color: #a72f79"><span style="font-size: small">(11:46:24)</span> <b>andrew.melo:</b></span> ah, that signing policy is for "CN=DigiCert Grid CA-1 G2", but my cert is "DigiCert Grid Trust CA G2"<br/>
+<span style="color: #a72f79"><span style="font-size: small">(11:47:20)</span> <b>andrew.melo:</b></span> same difference, though -- <a href="http://www.digicert-grid.com/5d9ea26d.signing_policy">http://www.digicert-grid.com/5d9ea26d.signing_policy</a> -<br/><pre><br/># DigiCert Grid Trust CA G2 Signing Policy<br/>access_id_CA		X509	'/C=US/O=DigiCert Grid/OU=<a href="http://www.digicert.com/CN=DigiCert">www.digicert.com/CN=DigiCert</a> Grid Trust CA G2'<br/>pos_rights		globus	CA:sign<br/>cond_subjects		globus	'"/DC=com/DC=DigiCert-Grid/*" "/DC=com/DC=DigiCertGrid/*" "/C=US/O=DigiCert Grid/*"'<br/></pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:06:53)</span> <b>bbockelm:</b></span> Did you generate the right CSR?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:08:45)</span> <b>andrew.melo:</b></span> Yeah, they prepended those attributes when they sent the cert back<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:08:58)</span> <b>andrew.melo:</b></span> I got a hold of someone -- they have to fix their machinery<br/>
+</body>
+</html>

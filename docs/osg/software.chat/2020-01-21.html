@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jan 21, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue Jan 21, 2020 : #software (osg)</h3>
+<span style="color: #a63024"><span style="font-size: small">(14:51:44)</span> <b>paschos:</b></span> hi all ... i have a question --- How do I mount a cvmfs repo?<br/>I would like to mount <a href="http://singularity.opesciencegrid.org">singularity.opesciencegrid.org</a> in the our cvmfs origin <a href="http://osg-cvmfs.grid.uchicago.edu">osg-cvmfs.grid.uchicago.edu</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(14:52:05)</span> <b>paschos:</b></span> i added it in the default.local and did an autofs restart -- since it didn't work -- i am missing something<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:52:47)</span> <b>blin:</b></span> @dwd ^^<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:54:42)</span> <b>dwd:</b></span> By default the cvmfs client on cvmfs publishing machines is set up differently than an ordinary client.<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:55:10)</span> <b>dwd:</b></span> By “adding it to default.local” what exactly do you mean?<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:55:38)</span> <b>paschos:</b></span> <pre>[root@osg-cvmfs cvmfs]# cat /etc/cvmfs/default.local <br/>CVMFS_CACHE_BASE=/scratch/cvmfs/cache<br/>CVMFS_QUOTA_LIMIT=51200<br/>CVMFS_HTTP_PROXY="<a href="http://uct2-cvmfs.mwt2.org:3128">http://uct2-cvmfs.mwt2.org:3128</a>;<a href="http://iut2-cvmfs.mwt2.org:3128">http://iut2-cvmfs.mwt2.org:3128</a>|<a href="http://mwt2-cvmfs.campuscluster.illinois.edu:3128">http://mwt2-cvmfs.campuscluster.illinois.edu:3128</a>;DIRECT"<br/>CVMFS_REPOSITORIES=<a href="http://atlas.cern.ch">atlas.cern.ch</a>,<a href="http://atlas-condb.cern.ch">atlas-condb.cern.ch</a>,<a href="http://atlas-nightlies.cern.ch">atlas-nightlies.cern.ch</a>,<a href="http://sft.cern.ch">sft.cern.ch</a>,<a href="http://geant4.cern.ch">geant4.cern.ch</a>,<a href="http://grid.cern.ch">grid.cern.ch</a>,<a href="http://cms.cern.ch">cms.cern.ch</a>,<a href="http://oasis.opensciencegrid.org">oasis.opensciencegrid.org</a>,<a href="http://osg.mwt2.org">osg.mwt2.org</a>,<a href="http://singularity.opensciencegrid.org">singularity.opensciencegrid.org</a></pre><br/>
+<span style="color: #99a949"><span style="font-size: small">(14:56:10)</span> <b>dwd:</b></span> CVMFS_REPOSITORIES does not list the repositories that can be mounted, that’s a common misunderstanding<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:56:17)</span> <b>paschos:</b></span> ah ok<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:56:56)</span> <b>dwd:</b></span> It’s only a default list of repositories used by certain helper tools such as cvmfs_config<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:57:50)</span> <b>dwd:</b></span> cvmfs clients on a publishing machine usually get their config from /etc/cvmfs/repositories.d/&lt;reponame&gt;/client.conf, and that’s not what you want<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:59:50)</span> <b>dwd:</b></span> I think it is possible to set up ordinary repository mounts, but not through the automounter.  That clashes with the special mounts done by cvmfs_server for publishing.<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:00:02)</span> <b>dwd:</b></span> Do you have cvmfs-config-osg installed?<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:02:34)</span> <b>paschos:</b></span> sorry i was checking .. it;'s not in the path... where is it usually located?<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:02:42)</span> <b>dwd:</b></span> I mean the rpm<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:03:37)</span> <b>paschos:</b></span> nope --- it's not there<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:05:04)</span> <b>dwd:</b></span> That would be a minimum.  Install osg-oasis, which has cvmfs-config-osg as a dependency.  Then manually mkdir /cvmfs/config-osg.opensciencegrid.org and /cvmfs/singularity.opensciencegrid.org.  Then with your default.local you can probably manually mount those two repositories in that order.<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:07:17)</span> <b>paschos:</b></span> ok -- i will send you a message if i have any issues.. .<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:07:21)</span> <b>dwd:</b></span> <pre>sudo mount -t cvmfs <a href="http://config-osg.opensciencegrid.org">config-osg.opensciencegrid.org</a> /cvmfs/config-osg.opensciencegrid.org</pre><br/>
+<span style="color: #99a949"><span style="font-size: small">(15:08:48)</span> <b>dwd:</b></span> You may already have cvmfs-config-default installed<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:09:26)</span> <b>dwd:</b></span> That cannot be installed as the same time as cvmfs-config-osg<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:11:33)</span> <b>paschos:</b></span> that cvmfs is typically used for publishing updates on some collaboration software ... so a lot of the typical set up is mssing<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:12:04)</span> <b>dwd:</b></span> So I take back what I said about installing osg-oasis and cvmfs-config-osg.  You can get by with cvmfs-config-default, and not mounting <a href="http://config-osg.opensciencegrid.org">config-osg.opensciencegrid.org</a>.  I just tested it.<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:13:17)</span> <b>dwd:</b></span> You should be able to use what you have but just do<br/><pre>sudo mkdir /cvmfs/singularity.opensciencegrid.org</pre><br/>and<br/><pre>sudo mount -t cvmfs <a href="http://singularity.opensciencegrid.org">singularity.opensciencegrid.org</a> /cvmfs/singularity.opensciencegrid.org</pre><br/>or put the corresponding entry in /etc/fstab<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:13:31)</span> <b>paschos:</b></span> let me test this<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:13:52)</span> <b>paschos:</b></span> cause i tried this earlier -- but it did not work<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:14:58)</span> <b>paschos:</b></span> <pre>mount -t cvmfs <a href="http://singularity.opensciencegrid.org">singularity.opensciencegrid.org</a> /cvmfs/singularity.opensciencegrid.org<br/>required configuration repository directory does not exist: /cvmfs/config-osg.opensciencegrid.org/etc/cvmfs</pre><br/>
+<span style="color: #99a949"><span style="font-size: small">(15:15:38)</span> <b>dwd:</b></span> That sounds like cvmfs-config-osg is installed, or at least the file /etc/cvmfs/default.d/60-osg.conf<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:15:54)</span> <b>dwd:</b></span> Do you have the file?  If so is it installed by rpm or by puppet?<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:17:01)</span> <b>paschos:</b></span> i have the file<br/>/etc/cvmfs/default.d/60-osg.conf<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:17:21)</span> <b>paschos:</b></span> puppet<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:17:43)</span> <b>dwd:</b></span> Not good, that’s supposed to be an rpm-installed file<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:17:50)</span> <b>paschos:</b></span> hmm...<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:18:33)</span> <b>dwd:</b></span> And it’s intended for cvmfs client machines, not publishing machines<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:20:20)</span> <b>paschos:</b></span> ok --- i will need to sync with lincoln on this ... so --- the take away cvmfs-config-osg must rpm installed<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:25:06)</span> <b>dwd:</b></span> It should be on ordinary cvmfs client machines, yes.  It doesn’t have to be on the publishing machine, but then a file belonging to the rpm shouldn’t be there either.<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:26:47)</span> <b>dwd:</b></span> The cvmfs rpm requires exactly one cvmfs-config-* rpm, and on the publishing machine you could use either cvmfs-config-default or cvmfs-config-osg.<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:27:59)</span> <b>dwd:</b></span> If cvmfs-config-osg is installed on your publishing machine, and you want to mount ordinary cvmfs repos there too, you will need to mount /cvmfs/config-osg.opensciencegrid.org first.<br/>
+</body>
+</html>

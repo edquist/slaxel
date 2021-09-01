@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu May 9, 2019 : #scitokens (osg)</title>
+</head>
+<body>
+<h3>Thu May 9, 2019 : #scitokens (osg)</h3>
+<span style="color: #8f4a2b"><span style="font-size: small">(08:26:02)</span> <b>dabrown:</b></span> @bbockelm my plan for checkpointing is to create a fake ckpt:// uri and have the plugin for that handle checkpoints (I believe you mentioned that 6.9 allows users to take their own plugins with the job?)<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(08:27:20)</span> <b>dabrown:</b></span> I’ll use that plugin for both transfer input and output for the checkpoint file. If the file doesn’t exist on the server (because checkpoint failed or it’s the first job startup) then the plugin will just log that and exit with success anyway. <br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(08:28:32)</span> <b>dabrown:</b></span> Actually, that raises a question: Does the file transfer for checkpoints look at the entire job sandbox on the node, or just files listed under transfer output?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:14:03)</span> <b>bbockelm:</b></span> Hi @dabrown - per the SAS captain, I have two free hours in the Copenhagen airport.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:14:22)</span> <b>bbockelm:</b></span> You can utilize the <tt>transfer_output_remaps</tt> command to specify which files go where.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:55:52)</span> <b>matyas:</b></span> @dweitzel can you help me debug what's going on with Brian's xrootd-scitokens rewrite? the tests are failing because apparently there's no <tt>kid</tt> field in the token: <a href="https://travis-ci.org/matyasselmeci/xrootd-scitokens/builds/530399371">https://travis-ci.org/matyasselmeci/xrootd-scitokens/builds/530399371</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(13:57:35)</span> <b>matyas:</b></span> (what's the kid field? it's not mentioned in the spec at <a href="https://scitokens.org/technical_docs/Claims">https://scitokens.org/technical_docs/Claims</a>)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:21:25)</span> <b>dweitzel:</b></span> <tt>kid</tt> is Key ID.  It is used to identify which public key on the issuer to use to verify the token.  See the various keys at <a href="https://github.com/scitokens/osg-connect/blob/master/oauth2/certs">https://github.com/scitokens/osg-connect/blob/master/oauth2/certs</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:22:55)</span> <b>dweitzel:</b></span> I always thought kid was optional.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:27:57)</span> <b>dweitzel:</b></span> According to the RFC, <tt>kid</tt> is optional.<br/>&gt; Use of this Header Parameter is OPTIONAL.<br/>(<a href="https://tools.ietf.org/html/rfc7515#section-4.1.4">https://tools.ietf.org/html/rfc7515#section-4.1.4</a>)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:28:08)</span> <b>dweitzel:</b></span> so the scitokens-cpp code is wrong.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:38:48)</span> <b>dweitzel:</b></span> ok, <tt>kid</tt> is really embedded into scitokens-cpp.  Going to take some work to rip it out.<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:39:19)</span> <b>matyas:</b></span> should I make a github issue to keep track of it?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:39:28)</span> <b>dweitzel:</b></span> I'll consult with Brian.  Maybe we discussed at one time <tt>kid</tt> becoming mandatory and I forgot.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:39:40)</span> <b>dweitzel:</b></span> I'll open a pull request with the little changes I've made in the last 10 minutes.<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:43:12)</span> <b>matyas:</b></span> in the meantime, should we make <a href="https://github.com/bbockelm/xrootd-scitokens/blob/scitokens_cpp/test/create-pubkey.py">https://github.com/bbockelm/xrootd-scitokens/blob/scitokens_cpp/test/create-pubkey.py</a> add a <tt>kid</tt> so we can merge the xrootd-scitokens rewrite, or should we hold off on that?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:49:28)</span> <b>dweitzel:</b></span> Huh, that's going to be hard because the key is generated with <a href="https://github.com/bbockelm/xrootd-scitokens/blob/scitokens_cpp/test/test_inside_docker.sh#L51">https://github.com/bbockelm/xrootd-scitokens/blob/scitokens_cpp/test/test_inside_docker.sh#L51</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:49:53)</span> <b>dweitzel:</b></span> which doesn't expose a kid parameter.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:08:21)</span> <b>dweitzel:</b></span> ok, I think I figured something out.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:08:25)</span> <b>dweitzel:</b></span> <a href="https://github.com/scitokens/xrootd-scitokens/pull/17/commits/d193f2f2f6c8f0b265d8bec5fc91cff70e355645">https://github.com/scitokens/xrootd-scitokens/pull/17/commits/d193f2f2f6c8f0b265d8bec5fc91cff70e355645</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(15:26:45)</span> <b>matyas:</b></span> still failing.<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:27:03)</span> <b>matyas:</b></span> I've got a patch that prints extra debugging information: <a href="https://github.com/matyasselmeci/xrootd-scitokens/commit/501d43f645e5e510af13604a3fe40d46c8d55365">https://github.com/matyasselmeci/xrootd-scitokens/commit/501d43f645e5e510af13604a3fe40d46c8d55365</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(15:27:37)</span> <b>matyas:</b></span> if you can add that to the PR, it should help<br/>
+</body>
+</html>

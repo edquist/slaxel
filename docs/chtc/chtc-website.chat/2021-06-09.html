@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jun 9, 2021 : #chtc-website (chtc)</title>
+</head>
+<body>
+<h3>Wed Jun 9, 2021 : #chtc-website (chtc)</h3>
+<span style="color: #e85d72"><span style="font-size: small">(10:39:20)</span> <b>github2:</b></span> [CHTC/chtc-website-source] Issue opened by ChristinaLK<br/>
+<span style="color: #e85d72"><span style="font-size: small">(13:06:42)</span> <b>github2:</b></span> [CHTC/chtc-website-source] Pull request opened by CannonLock<br/>
+<span style="color: #e85d72"><span style="font-size: small">(13:20:02)</span> <b>github2:</b></span> [CHTC/chtc-website-source] Pull request merged by bbockelm<br/>
+<span style="color: #684b6c"><span style="font-size: small">(14:50:13)</span> <b>bbockelman:</b></span> hi @coatsworth @clock @jcpatton @tannenba - pulling folks in to see if we can quickly hammer out a plan for the condor website.  Do we want to slack or can we manage an impromptu call?<br/>
+<span style="color: #dd8527"><span style="font-size: small">(14:50:53)</span> <b>clock:</b></span> I am free<br/>
+<span style="color: #684b6c"><span style="font-size: small">(14:54:05)</span> <b>bbockelman:</b></span> while we're waiting - Cannon, did you get all the patches for the commits since late-Jan?<br/>
+<span style="color: #dd8527"><span style="font-size: small">(14:54:19)</span> <b>clock:</b></span> Yes<br/>
+<span style="color: #684b6c"><span style="font-size: small">(14:54:58)</span> <b>bbockelman:</b></span> awesome - I think I count 20 patches total?  How goes importing them?<br/>
+<span style="color: #dd8527"><span style="font-size: small">(14:56:25)</span> <b>clock:</b></span> I have all* the changes ready to push to the current website<br/>
+<span style="color: #dd8527"><span style="font-size: small">(14:57:27)</span> <b>clock:</b></span> *I just got the news.json from Brian so I can push all those changes right now<br/>
+<span style="color: #684b6c"><span style="font-size: small">(14:57:56)</span> <b>bbockelman:</b></span> great, since that site isn't live, let's go ahead and do so.<br/>
+<span style="color: #684b6c"><span style="font-size: small">(15:03:51)</span> <b>bbockelman:</b></span> but to be clear - there are still about 10-15 commits to the repo _not_ in the news.json.<br/>
+<span style="color: #684b6c"><span style="font-size: small">(15:03:59)</span> <b>bbockelman:</b></span> did you get those as well?<br/>
+<span style="color: #dd8527"><span style="font-size: small">(15:06:49)</span> <b>clock:</b></span> Yes, I am running through them now to double check but I do have them all recorded.<br/>
+<span style="color: #dd8527"><span style="font-size: small">(15:07:22)</span> <b>clock:</b></span> Thankfully majority of those are commits to the same page<br/>
+<span style="color: #684b6c"><span style="font-size: small">(15:12:48)</span> <b>bbockelman:</b></span> ok.  Looking at the script that deploys onto AFS, @jcpatton can you setup a new cronjob for Cannon?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:15:28)</span> <b>jcpatton:</b></span> if you know what goes in it, sure, but I’m not privvy to what all goes on in the existing scripts<br/>
+<span style="color: #684b6c"><span style="font-size: small">(15:15:50)</span> <b>bbockelman:</b></span> The only twist will be the fact the CHTC website appears to overwrite the entire directory where we will need to sync;  so something will probably end with a <tt>&amp;&amp; rsync /afs/foo /p/condor/public/html</tt> when we are ready to role.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:16:30)</span> <b>jcpatton:</b></span> ok, so we’re cloning to a different directory then copying over the bits that have changed<br/>
+<span style="color: #684b6c"><span style="font-size: small">(15:16:57)</span> <b>bbockelman:</b></span> Can you write to <tt>/p/condor/public</tt>?  I'd suggest we create a directory, <tt>/p/condor/public/html_generated</tt>, for now and have the cronjob write to that.  Then, on "go live day", we add the rsync.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:17:39)</span> <b>ckoch5:</b></span> @matyas did the original cron that syncs the current website<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:17:43)</span> <b>jcpatton:</b></span> I can do that, hopefully the ACLs remain correct for <tt>cndrutil</tt> to be able to write to <tt>html_generated/</tt><br/>
+<span style="color: #684b6c"><span style="font-size: small">(15:18:29)</span> <b>bbockelman:</b></span> We have a <tt>~cndrutil/bin/update-chtc-website</tt>; might as well make <tt>~cndrutil/bin/update-htcondor-website</tt><br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:20:34)</span> <b>jcpatton:</b></span> ok I got a <tt>/p/condor/public/html_generated/</tt> that <tt>cndrutil</tt> can write in<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:22:16)</span> <b>jcpatton:</b></span> what’s the repo<br/>
+<span style="color: #684b6c"><span style="font-size: small">(15:22:35)</span> <b>bbockelman:</b></span> <a href="https://github.com/htcondor/htcondor.github.io">https://github.com/htcondor/htcondor.github.io</a>, <tt>main</tt> branch<br/>
+<span style="color: #684b6c"><span style="font-size: small">(15:24:12)</span> <b>bbockelman:</b></span> I count 151GB of stuff in the condor website, ages and ages of stuff to sort through... definitely a big difference between what's on the server and what's linked :slightly_smiling_face:<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:30:15)</span> <b>jcpatton:</b></span> <br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:34:13)</span> <b>jcpatton:</b></span> hopefully @matyas is ok getting two more emails (<tt>HTCondor website update</tt>) to his <tt>matyas+cron</tt> email alias :)<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:34:45)</span> <b>jcpatton:</b></span> <pre>#<br/># Update CHTC web site at /p/condor/public/html_generated/htcondor<br/># Added by jpatton 2021-06-09 following matyas's work with the CHTC web site<br/>#<br/>*/10 * * * * /s/std/bin/runauth ~/bin/update-htcondor-website -vv<br/># run an extra time twice a day just to let me know the email is still functioning<br/>5 */12 * * * /s/std/bin/runauth ~/bin/update-htcondor-website -vv --notify-on-success</pre><br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:34:58)</span> <b>jcpatton:</b></span> oops that should be <tt>HTCondor web site</tt><br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:36:32)</span> <b>jcpatton:</b></span> anyway, I’ll check the log at 3:40 but should be good to go<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:38:26)</span> <b>matyas:</b></span> seems reasonable<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:40:59)</span> <b>jcpatton:</b></span> <pre>2021-06-09 15:40:01,583 INFO     Cleaning and updating /p/condor/public/html_generated/htcondor to the latest branch main from origin<br/><br/>2021-06-09 15:40:01,737 DEBUG    git --work-tree /p/condor/public/html_generated/htcondor --git-dir /p/condor/public/html_generated/htcondor/.git clean -df... ok  no output<br/><br/>2021-06-09 15:40:02,267 DEBUG    git --work-tree /p/condor/public/html_generated/htcondor --git-dir /p/condor/public/html_generated/htcondor/.git fetch origin... ok  no output<br/><br/>2021-06-09 15:40:02,339 DEBUG    git --work-tree /p/condor/public/html_generated/htcondor --git-dir /p/condor/public/html_generated/htcondor/.git reset --hard origin/main... ok  output:<br/>HEAD is now at 0d149e0 GHA 15: "Fixed unescaped quote in news json" by Mark Coatsworth [d6bd52b] pushed to GitHub Pages</pre><br/>:tada:<br/>
+<span style="color: #e85d72"><span style="font-size: small">(15:47:52)</span> <b>github2:</b></span> [CHTC/chtc-website-source] Issue opened by ChristinaLK<br/>
+<span style="color: #684b6c"><span style="font-size: small">(16:53:52)</span> <b>bbockelman:</b></span> @clock - I'm going to go ahead and merge the PR just because it's not the live site yet.<br/>
+<span style="color: #684b6c"><span style="font-size: small">(16:55:39)</span> <b>bbockelman:</b></span> Although in the future - no squashing commits.  One commit with +1.4k / -1.6k is brutal.<br/>
+<blockquote>
+<span style="color: #dd8527"><span style="font-size: small">(17:14:38)</span> <b>clock:</b></span> For the future - Would this be because of me copying and pasting the current pages over the old pages well updating them?<br/>
+<span style="color: #684b6c"><span style="font-size: small">(17:22:01)</span> <b>bbockelman:</b></span> I think you wanted to have one commit in the new repo for each commit in the old - allows for a side-by-side comparison.<br/>
+<span style="color: #dd8527"><span style="font-size: small">(17:23:04)</span> <b>clock:</b></span> Ah okay, thank you<br/>
+</blockquote>
+<span style="color: #684b6c"><span style="font-size: small">(17:08:07)</span> <b>bbockelman:</b></span> @clock - for <a href="http://htcondor.org">htcondor.org</a>, there's some funkiness in the news items:<br/>
+</body>
+</html>

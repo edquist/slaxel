@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Apr 14, 2016 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu Apr 14, 2016 : #software (osg)</h3>
+<span style="color: #e96699"><span style="font-size: small">(14:50:15)</span> <b>lincoln:</b></span> anyone have a handy STARTD expression for killing jobs that exceed a certain memory footprint? would something like “KILL = (ImageSize &gt;= 2000000)”  be sufficient?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:53:03)</span> <b>tiradani:</b></span> We do this from the schedd side with SYSTEM_PERIODIC_REMOVE expressions.  This has the downside of not being instantaneous, so it won't help if you are seeing applications expand memory usage rapidly.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:53:36)</span> <b>dweitzel:</b></span> We do holds: <br/><pre>SYSTEM_PERIODIC_HOLD = \<br/>   (JobStatus == 1 || JobStatus == 2) &amp;&amp; ((DiskUsage &gt; 100000000 || ResidentSetSize &gt; 1000*RequestMemory))</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:53:57)</span> <b>dweitzel:</b></span> but it’s also on the SCHEDD site.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:54:02)</span> <b>tiradani:</b></span> yeah, our remove expression looks very similar<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:54:28)</span> <b>dweitzel:</b></span> then we have hold reasons defined:<br/><pre>SYSTEM_PERIODIC_HOLD_REASON = strcat("Job in status ", JobStatus, " put on hold by SYSTEM_PERIODIC_HOLD due to ", ifThenElse(isUndefined(DiskUsage) || DiskUsage &lt; 100000000, strcat("memory usage ", ResidentSetSize), strcat("disk usage ", DiskUsage)), ".”)</pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(14:59:11)</span> <b>lincoln:</b></span> ah nice<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:02:14)</span> <b>lincoln:</b></span> is the KILL expression above possible to do on the startd side? trying to do this with bosco, where some jobs that have apparently OOMed workers so i was thinking of adding a KILL expression to the glidein <br/><br/>maybe there is value to having expressions on both the schedd side and the startd side?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:09:00)</span> <b>tiradani:</b></span> depends... how quickly are the jobs accumulating memory?  If it is fairly rapid, then yes, implementing a kill expression would be useful on the pilot.  I would recommend using ResidentSetSize rather than Image size, however.<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:09:10)</span> <b>lincoln:</b></span> alright<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:09:46)</span> <b>lincoln:</b></span> yeah I’m not sure how fast they’re gobbling up memory since they’re random arbitrary user jobs<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:13:11)</span> <b>tiradani:</b></span> If I recall correctly, the default classad update rate is every 5 minutes.  If you can wait that long, the easiest thing is to implement a hold or remove expression similar to the one that Derek posted (with the reason too, that is a nice touch).<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:13:43)</span> <b>tiradani:</b></span> if you think memory usage is blowing up faster, then the KILL expression will be necessary<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:18:45)</span> <b>lincoln:</b></span> great, thanks for the info.<br/>
+</body>
+</html>

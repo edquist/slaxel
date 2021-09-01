@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Feb 24, 2021 : #scitokens (osg)</title>
+</head>
+<body>
+<h3>Wed Feb 24, 2021 : #scitokens (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(06:46:57)</span> <b>jpatton:</b></span> This needs to go somewhere permanent, but seeing this in the credmon log means that you generated the wrong kind of private key<br/><pre>Traceback (most recent call last):<br/>  File "/usr/sbin/condor_credmon_oauth", line 101, in start_credmon_process<br/>    credmon.scan_tokens()<br/>  File "/usr/libexec/condor/credmon/CredentialMonitors/LocalCredmon.py", line 102, in scan_tokens<br/>    self.process_cred_file(file_name)<br/>  File "/usr/libexec/condor/credmon/CredentialMonitors/LocalCredmon.py", line 84, in process_cred_file<br/>    success = self.refresh_access_token(username, self.provider)<br/>  File "/usr/libexec/condor/credmon/CredentialMonitors/LocalCredmon.py", line 55, in refresh_access_token<br/>    serialized_token = token.serialize(issuer=self.token_issuer, lifetime=int(self.token_lifetime))<br/>  File "/usr/lib/python2.7/site-packages/scitokens/scitokens.py", line 168, in serialize<br/>    encoded = jwt.encode(payload, self._key, algorithm = self._key_alg, headers={'kid': self._key_id})<br/>  File "/usr/lib/python2.7/site-packages/jwt/api_jwt.py", line 55, in encode<br/>    json_payload, key, algorithm, headers, json_encoder<br/>  File "/usr/lib/python2.7/site-packages/jwt/api_jws.py", line 105, in encode<br/>    signature = alg_obj.sign(signing_input, key)<br/>  File "/usr/lib/python2.7/site-packages/jwt/algorithms.py", line 359, in sign<br/>    der_sig = key.sign(msg, ec.ECDSA(self.hash_alg()))</pre><br/><br/>
+<span style="color: #235e5b"><span style="font-size: small">(08:51:26)</span> <b>dweitzel:</b></span> Right, probably means you have an RSA public key, but you told the scitokens library that the algorithm is EC.<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:52:48)</span> <b>jpatton:</b></span> The algo is hardcoded to ES256 in the credmon, for better or worse, which is not the default for <tt>scitokens-admin-create-key</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(08:55:35)</span> <b>dweitzel:</b></span> yeah, I think you have to specify the <tt>--ec</tt> flag for an EC key.<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:56:30)</span> <b>jpatton:</b></span> Right. I think this is what threw off Greg (at LIGO)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:05:33)</span> <b>dweitzel:</b></span> will he need to upload a new public key to the ligo scitokens website?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:12:23)</span> <b>jpatton:</b></span> I would probably guess so<br/>
+</body>
+</html>

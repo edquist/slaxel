@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jul 1, 2021 : #python (chtc)</title>
+</head>
+<body>
+<h3>Thu Jul 1, 2021 : #python (chtc)</h3>
+<span style="color: #674b1b"><span style="font-size: small">(13:32:32)</span> <b>coatsworth:</b></span> I'm running into a maddening bug in one of my Python bindings tests.... I'm trying to put a bunch of ads to a collector using <tt>Collector.advertise()</tt> then read them with <tt>Collector.query()</tt>. This usually works fine, but sometimes the query arrives before all my ads have been written.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:33:55)</span> <b>coatsworth:</b></span> Is anybody aware of anything asynchronous happening during <tt>Collectory.advertise()</tt>? I can't see anything in the code that would indicate this, it's using TCP, but something somewhere must be happening out of order.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:37:31)</span> <b>tlmiller:</b></span> Nothing comes to mind, but are you sure the problem is client-side?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:37:53)</span> <b>tlmiller:</b></span> (e.g., could the collector be handling queued-up connections in the "wrong" order?)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:38:49)</span> <b>tlmiller:</b></span> (AFAIK, there's no reply from the collector on advertisements?)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:45:44)</span> <b>coatsworth:</b></span> I feel like if the collector was handling queued connections out of order, that would have revealed itself in all kinds of ugly ways already?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:46:27)</span> <b>tlmiller:</b></span> Maybe?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:46:53)</span> <b>tlmiller:</b></span> Send me the code you're seeing the problem with and I can poke at it a bit.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:47:25)</span> <b>johnkn:</b></span> The collector forks to handle queries, but not to handle advertise, so there is some asynchronicity there<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:48:05)</span> <b>johnkn:</b></span> also the client side of advertise probably returns as soon as the ads are buffered<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:48:47)</span> <b>johnkn:</b></span> you probably need to poll the collectorlog to see all of the ads arrive<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:50:40)</span> <b>coatsworth:</b></span> Okay, thanks. I could definitely poll to make sure all the ads arrived, I'm just trying to understand what's happening.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:52:14)</span> <b>johnkn:</b></span> best guess,  is query fork happens before the last buffer of ads has been processed by the collector.  I would expect that to be visible in the collector log<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:52:51)</span> <b>johnkn:</b></span> you might need to be logging D_COMMAND to see that<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:53:36)</span> <b>tlmiller:</b></span> I didn't the collector returned to the event loop while it was processing updates, actually.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:53:51)</span> <b>tlmiller:</b></span> Would that imply that sending the ads one at a time would have the desired result?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:54:07)</span> <b>johnkn:</b></span> I would expect so.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:54:48)</span> <b>coatsworth:</b></span> I already am sending the ads one at a time, since they need to go into different collector tables.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:55:10)</span> <b>tlmiller:</b></span> And none of them show up?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:55:26)</span> <b>tlmiller:</b></span> sorry, you said "all" of your ads.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:58:01)</span> <b>coatsworth:</b></span> Anyway, thanks for your suggestions. If we're expecting something asynchronous here then I can just poll for the ads. I just wanted to make sure this was by design and not a bug.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:59:15)</span> <b>tlmiller:</b></span> It's certainly counter-intuitive.  I guess as long as all of the ads do eventually show up, we can mutter something about eventual consistency and not have to change anything, but I'm more than a little curious as to what's going on.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:59:17)</span> <b>coatsworth:</b></span> (although I am kind of surprised)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:00:30)</span> <b>tlmiller:</b></span> So I would like to try running your code and spending a few minutes grovelling the collector log.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:05:16)</span> <b>johnkn:</b></span> Pretty sure that advertise is only a round-trip when negotiating on first contact. the rest of of the communication is one way, it could even be udp.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:05:42)</span> <b>johnkn:</b></span> so, now that I think of it, splitting this into multiple commands does not help much.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:05:45)</span> <b>tlmiller:</b></span> Hrm... we would go back into the event loop during security.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:06:02)</span> <b>coatsworth:</b></span> I just realized I missed something earlier, it seems like the particular mechanism used in <tt>Collector.advertise</tt> goes through a non-blocking command. That might explain it. Still trying to verify this...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:07:02)</span> <b>johnkn:</b></span> when daemons advertise, they us a non-blocking mechanism, but that relies on daemoncore, which I would not expect to work in tools<br/>
+</body>
+</html>

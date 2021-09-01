@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jun 21, 2021 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Mon Jun 21, 2021 : #gracc (osg)</h3>
+<span style="color: #a63024"><span style="font-size: small">(08:58:00)</span> <b>miwalls:</b></span> Unfortunately looks like our 'SIUE - CC' batch is still not coming through after the initial push since 06-10.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:10:28)</span> <b>dweitzel:</b></span> @miwalls There's some oddities that I don't recognize in your logs.  I think you were working with <b>@edquist</b>, right?  Are you running a modified version of the gratia probe?<br/>
+<blockquote>
+<span style="color: #16569E"><span style="font-size: small">(09:47:06)</span> <b>edquist:</b></span> Hey @dweitzel, what are the oddities you noticed?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:50:07)</span> <b>dweitzel:</b></span> Looked like some debugging statements.<br/><pre>2021-06-21 09:44:32 CDT Gratia: Running : &lt;function UsageCheckXmldoc at 0x7fffeba8aae8&gt;&lt;xml.dom.minidom.Document object at 0x7fffe91cc528&gt;FalseNone</pre><br/>
+<span style="color: #16569E"><span style="font-size: small">(09:55:11)</span> <b>edquist:</b></span> Hmm<br/>
+</blockquote>
+<span style="color: #a63024"><span style="font-size: small">(09:11:03)</span> <b>miwalls:</b></span> gratia-probe-slurm.x86_64         1.23.3-1.osg35.el7       @osg-testing<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:11:38)</span> <b>miwalls:</b></span> At the moment I see a bunch of gratia_certinfo_slurm_* files in /var/lib/gratia/data which is quite a bit different than previous issues.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:12:03)</span> <b>dweitzel:</b></span> that's great!  That's what you want to see.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:12:16)</span> <b>dweitzel:</b></span> Are you doing a vo map in your config?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:13:04)</span> <b>dweitzel:</b></span> Can you verify your rpm as well.<br/><pre>$ rpm -qV gratia-probe-common gratia-probe-slurm</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(09:16:17)</span> <b>miwalls:</b></span> No output from that.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:26:00)</span> <b>dweitzel:</b></span> shoot, let me check the command.<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:28:06)</span> <b>matyas:</b></span> it's supposed to be -V, not -qV, but apparently -qV works as well.<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:28:35)</span> <b>matyas:</b></span> If you're not seeing any output then that means none of the files in that package have been changed<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:28:55)</span> <b>dweitzel:</b></span> which surprises me, at the least the ProbeConfig should be modified.<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:29:00)</span> <b>miwalls:</b></span> Yeah I remember changing one of the files to add debugging but I think I did a reinstall since then.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:29:31)</span> <b>dweitzel:</b></span> Could you upload your configuration, /etc/gratia/*/ProbeConfig<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:29:48)</span> <b>matyas:</b></span> I don't remember the path to ProbeConfig but if you do <tt>rpm -qf &lt;FILE&gt;</tt> then you will get which package owns that file<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:30:48)</span> <b>miwalls:</b></span> rpm -qf /etc/gratia/slurm/ProbeConfig<br/>gratia-probe-slurm-1.23.3-1.osg35.el7.x86_64<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:32:11)</span> <b>miwalls:</b></span> Slightly confused should I have a /etc/gratia/htcondor-ce/ProbeConfig?<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:32:59)</span> <b>miwalls:</b></span> Here is the slurm one.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:33:35)</span> <b>dweitzel:</b></span> Do you have an htcondor-ce ProbeConfig?<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:34:27)</span> <b>miwalls:</b></span> No though it does have an rpmsave<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:38:54)</span> <b>dweitzel:</b></span> Ok, eventually we should probably move over to the htcondor-ce gratia probe.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:42:50)</span> <b>dweitzel:</b></span> The config looks _ok_.  Nothing obvious.  From the log, it makes it sound like it's hitting 1 error then exiting.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:43:35)</span> <b>dweitzel:</b></span> Could you increase the logging <tt>LogLevel</tt>  to 10.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:43:55)</span> <b>dweitzel:</b></span> I don't feel like the logs are debug'y enough.<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:45:53)</span> <b>miwalls:</b></span> Here is 10 for both debug and loglevel<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:50:47)</span> <b>dweitzel:</b></span> Is there any files in /var/lib/gratia/data with "4877" in the name?<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:52:11)</span> <b>miwalls:</b></span> No I checked for that earlier<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:55:29)</span> <b>dweitzel:</b></span> ugh, so it's creating some of the certinfo files, I see them in the list.  Just not the ones we want!<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:51:46)</span> <b>edquist:</b></span> Hi @miwalls, can you confirm the version of the condor package you have installed now?<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:51:49)</span> <b>edquist:</b></span> (rpm -q condor)<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:52:14)</span> <b>miwalls:</b></span> condor-9.0.1-1.1.osg35up.el7.x86_64<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:57:50)</span> <b>edquist:</b></span> ok thank you!  i just want to verify that you have the fixed version we were expecting after the update - which it seems you do<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:28:11)</span> <b>dweitzel:</b></span> @miwalls <b>@edquist</b> would you be available for an impromptu debugging session tomorrow afternoon over zoom?  I don't have a great idea where to go, but we can figure it out.<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:28:25)</span> <b>edquist:</b></span> sure thing any time<br/>
+</body>
+</html>

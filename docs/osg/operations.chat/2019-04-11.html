@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Apr 11, 2019 : #operations (osg)</title>
+</head>
+<body>
+<h3>Thu Apr 11, 2019 : #operations (osg)</h3>
+<span style="color: #e23f99"><span style="font-size: small">(04:52:28)</span> <b>marco.mascheroni:</b></span> @lincoln Can't ssh to <a href="http://hosted-ce24.grid.uchicago.edu">hosted-ce24.grid.uchicago.edu</a> , ssh is timing out. Do you need to reboot the machine? Also, I need a new VM for a Mexican T3<br/>
+<span style="color: #e23f99"><span style="font-size: small">(04:52:49)</span> <b>marco.mascheroni:</b></span> Maybe we should create a couple of spare one, so I don't bother you when new requests pops up<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:30:32)</span> <b>efajardo:</b></span> Deat Factory Ops, I wonder if what we are seeing at NIKHEF is just asymptom of an over wokred factory<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:30:54)</span> <b>efajardo:</b></span> I am really worried the Quality of services will start affecting more people as we put more pressure on the system<br/>
+<span style="color: #ea2977"><span style="font-size: small">(09:32:44)</span> <b>jlstephen:</b></span> @marco.mascheroni lincoln is out today and tomorrow<br/>
+<span style="color: #ea2977"><span style="font-size: small">(09:32:47)</span> <b>jlstephen:</b></span> i'll take a look<br/>
+<span style="color: #e23f99"><span style="font-size: small">(09:34:00)</span> <b>marco.mascheroni:</b></span> Thanks!<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:53:41)</span> <b>ian_cancercomputer:</b></span> hey all - just started seeing this:  <a href="http://xd-login.opensciencegrid.org/monitoring/glideins/entry_OSG_CA_CancerComputer_kitchener/job.7213332.0.out.txt">http://xd-login.opensciencegrid.org/monitoring/glideins/entry_OSG_CA_CancerComputer_kitchener/job.7213332.0.out.txt</a>  &lt;-- is that related to the tests-failing thing @matyas mentioned in #software yesterday?  Any intervention required or will it/has it cleared up on its own?<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:55:23)</span> <b>matyas:</b></span> the ones we're talking about are our integration tests; I don't think they're related unless that machine is using OSG 3.3 and/or bestman2<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:27:53)</span> <b>ian_cancercomputer:</b></span> nope its 3.4 and everything current..  hm.<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:29:31)</span> <b>jlstephen:</b></span> @marco.mascheroni hosted-ce24 should be back up. it needed to be rebooted<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:29:33)</span> <b>ian_cancercomputer:</b></span> so specifically this: "ERROR: My clock is ahead 20 minutes" I don't follow -- the system is chrony sync'ed and the clock is right...<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:29:52)</span> <b>jlstephen:</b></span> also can you try logging in to <a href="http://hosted-ce27.grid.uchicago.edu">hosted-ce27.grid.uchicago.edu</a> and let me know if anything else needs to be added from our end<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:38:45)</span> <b>marco.mascheroni:</b></span> @jlstephen both 24 and 27 works now, thanks!<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:56:13)</span> <b>marco.mascheroni:</b></span> FYI on 27 vim is not installed. Did you use a different puppet profile?<br/>
+<span style="color: #ea2977"><span style="font-size: small">(11:57:59)</span> <b>jlstephen:</b></span> no it's using the same one lincoln used for the most recent ones he set up<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:10:59)</span> <b>ian_cancercomputer:</b></span> ok I'm seeing this randomly throughout my clusters still -- how does the client/clock-check glidein check work?  Should I be asking in gfactory?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(12:11:19)</span> <b>marco.mascheroni:</b></span> No, Mats mantain the script<br/>
+<span style="color: #e23f99"><span style="font-size: small">(12:14:12)</span> <b>marco.mascheroni:</b></span> Notice that /etc/localtime might not be binded in the singularity container. See <a href="https://cdcvs.fnal.gov/redmine/issues/22334">https://cdcvs.fnal.gov/redmine/issues/22334</a> and <a href="https://github.com/sylabs/singularity/issues/1707">https://github.com/sylabs/singularity/issues/1707</a><br/>
+<span style="color: #e96699"><span style="font-size: small">(12:24:54)</span> <b>ian_cancercomputer:</b></span> @marco.mascheroni thanks -- so far as I can tell though from the logs (including the one I posted earlier) isn't this happening before the singularity wrapper starts?<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:30:07)</span> <b>ian_cancercomputer:</b></span> the check passes by hand on every system i'm running it on (and as mentioned all clocks are chrony synced); is this error being seen on any other clusters? HRM....or maybe my squid is for some reason just starting to cache requests to <a href="http://osg-vo.isi.edu/osg/ticktock.php">http://osg-vo.isi.edu/osg/ticktock.php</a> ...<br/>
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Oct 12, 2018 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Fri Oct 12, 2018 : #xcache (osg)</h3>
+<span style="color: #5b89d5"><span style="font-size: small">(00:54:53)</span> <b>sthapa:</b></span> Edgar is running gsiftp. this is trying to access ligo data through an authenticated stashcache instance<br/>
+<span style="color: #235e5b"><span style="font-size: small">(08:34:16)</span> <b>dweitzel:</b></span> Xrootd doesn’t understand gsiftp. That is certainly the wrong protocol. Edgar should use https with a client cert to view logo data. Or just CVMFS. <br/>
+<span style="color: #c386df"><span style="font-size: small">(10:27:36)</span> <b>matyas:</b></span> hey everybody, got some questions about configuring an origin server<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:27:50)</span> <b>dweitzel:</b></span> Sure, shoot<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:29:28)</span> <b>matyas:</b></span> the config that comes with the rpm says <pre><br/>set cachedir = &lt;admin fill this in&gt; (i'm guessing /stash)<br/>all.export $(cachedir)<br/></pre><br/>but the [docs](<a href="http://opensciencegrid.org/docs/data/stashcache/install-origin/#configuring-the-origin-server">http://opensciencegrid.org/docs/data/stashcache/install-origin/#configuring-the-origin-server</a>) say <pre><br/>set localroot = /stash<br/>all.export /<br/></pre><br/>which one is it?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:30:01)</span> <b>matyas:</b></span> also, the docs say you need to set <tt>oss.remoteroot /&lt;your VO&gt;</tt> but that's not in the config<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:32:03)</span> <b>dweitzel:</b></span> yeah, I think Brian updated the docs, and the RPM hasn't caught up.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:32:51)</span> <b>dweitzel:</b></span> <tt>oss.remoteroot</tt> is kinda what we were talking about yesterday.  Namespace collisions are avoided by each VO (Origin?) having a different <tt>oss.remoteroot</tt>.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:34:27)</span> <b>dweitzel:</b></span> The docs actually have a pretty good section on what everything does.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:34:35)</span> <b>dweitzel:</b></span> I would just follow the docs.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:34:41)</span> <b>dweitzel:</b></span> RPM hasn't caught up yet.<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:35:38)</span> <b>matyas:</b></span> yeah the docs seem to work (except @marian needs to add me to the redirector whitelist... btw, what's the hostname for the non-production redirector?)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:36:14)</span> <b>dweitzel:</b></span> @marian is on vacation for a week.  Can you see your origin in the output of that <tt>list</tt> command you mentioned yesterday?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:37:35)</span> <b>matyas:</b></span> yep<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:37:41)</span> <b>marian:</b></span> I’m at the airport... @matyas I don’t think I do whitelist on redirectors<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:37:57)</span> <b>marian:</b></span> (Though we should enable it)<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:37:57)</span> <b>matyas:</b></span> so anybody's origin can join?<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:38:04)</span> <b>marian:</b></span> Yep<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:38:23)</span> <b>marian:</b></span> If you know redirector hostname you can<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:40:59)</span> <b>dweitzel:</b></span> indeed, there is a <tt>whitelist</tt> file ,but it's not used in the config.<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:43:03)</span> <b>matyas:</b></span> hmm. I can have it join but can't download anything from it.<br/>back to the config for a minute,,. why does <tt>set localroot = /stash</tt> do anything, even though <tt>$(localroot)</tt> isn't used anywhere<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:48:29)</span> <b>dweitzel:</b></span> It appears it should be <tt>cachedir</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:48:35)</span> <b>dweitzel:</b></span> <tt>set cachedir = /stash</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:48:47)</span> <b>dweitzel:</b></span> since we have: <pre>oss.localroot $(cachedir)</pre> later in the config<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:57:33)</span> <b>matyas:</b></span> where? I see <tt>all.export $(cachedir)</tt> but nothing about <tt>oss.localroot</tt> (in the default config)<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:57:49)</span> <b>matyas:</b></span> I don't see <tt>oss.localroot</tt> in the doc either<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:59:25)</span> <b>matyas:</b></span> would something like this work? <pre><br/>oss.localroot /stash<br/>oss.remoteroot /user/&lt;yourVO&gt;<br/>all.export &lt;dir(s) under /stash&gt;<br/></pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:59:26)</span> <b>dweitzel:</b></span> ah, I was looking at the cache config.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:00:08)</span> <b>dweitzel:</b></span> <tt>/user</tt> usually reserved for osg-connect.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:00:32)</span> <b>matyas:</b></span> oh so more like <tt>oss.remoteroot /&lt;yourVO&gt;</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:00:58)</span> <b>dweitzel:</b></span> yeah<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:35:53)</span> <b>bbockelm:</b></span> FWIW - we really do need to cleanup the namespace.  Particularly, <tt>/user/ligo</tt> is a frustrating one.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:36:10)</span> <b>bbockelm:</b></span> (Derek, can you file a ticket about that?  We should be able to do this in a backward-compatible manner...)<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:01:49)</span> <b>matyas:</b></span> so here's my origin server config:<pre><br/>xrd.allow host *<br/>sec.protocol  host<br/>sec.protbind  * none<br/>all.adminpath /var/spool/xrootd<br/>all.pidpath /var/run/xrootd<br/><br/>oss.localroot /stash<br/>oss.remoteroot /matyas<br/>all.export /<br/><br/>xrd.port 1094<br/>all.role server<br/>all.manager <a href="http://redirector.osgstorage.org">redirector.osgstorage.org</a>+ 1213<br/><br/>xrootd.trace emsg login stall redirect<br/>ofs.trace all<br/>xrd.trace all<br/>cms.trace all</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(12:02:14)</span> <b>matyas:</b></span> and in <tt>/stash</tt> I have a file called <tt>deplister.py</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(12:03:25)</span> <b>matyas:</b></span> I started xrootd and cmsd on the origin server, then went to my cache server and did this: <pre><br/># stashcp /matyas/deplister.py /tmp/deplister.py<br/>2018-10-12T12:02:50+0000 root         ERROR    Unable to find caches.json in /usr/bin<br/>[ERROR] Server responded with an error: [3011] No servers are available to read the file.<br/><br/>Unable to find size of file<br/><br/>None</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(12:04:49)</span> <b>matyas:</b></span> Any ideas? Both servers are on Fermi VMs so a restrictive firewall could be a problem (although it failed instantly so I dunno if that's it)<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:13:30)</span> <b>matyas:</b></span> I just opened up TCP 1094 on the origin server to <tt>hcc-osg-redirector{1,2}.<a href="http://unl.edu">unl.edu</a></tt> but it didn't make a difference<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:23:20)</span> <b>dweitzel:</b></span> stashcp only works against the stash origin.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:23:27)</span> <b>dweitzel:</b></span> you have to use raw xrdcp commands<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:24:10)</span> <b>dweitzel:</b></span> so something like:<br/><pre>$ xrdcp <a href="root://redirector.osgstorage.org:1213/matyas/deplister.py">root://redirector.osgstorage.org:1213/matyas/deplister.py</a> /tmp/deplister.py</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:25:07)</span> <b>dweitzel:</b></span> add some debugging too if you have issues.  I think it's <tt>-d</tt>, but there might be a number after the 'd' as well.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:30:08)</span> <b>bbockelm:</b></span> @dweitzel - any reason why <tt>stashcp</tt> can't be made more generic?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:30:17)</span> <b>bbockelm:</b></span> I'm sure LIGO would also like to use it at non-CVMFS sites.<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:31:48)</span> <b>matyas:</b></span> <br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:33:53)</span> <b>dweitzel:</b></span> Ah, sorry, try just <a href="http://redirector.osgstorage.org:1094">redirector.osgstorage.org:1094</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:33:56)</span> <b>dweitzel:</b></span> wrong port.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:34:18)</span> <b>dweitzel:</b></span> It's been a while since I've used the raw commands.<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:34:40)</span> <b>matyas:</b></span> <pre># xrdcp -d1 <a href="root://redirector.osgstorage.org:1094/matyas/deplister.py">root://redirector.osgstorage.org:1094/matyas/deplister.py</a> /tmp/deplister.py<br/>[2018-10-12 12:34:14.078855 -0500][Error  ][File              ] Stat: failed: No such file or directory<br/>[0B/0B][100%][==================================================][0B/s]  <br/>Run: [ERROR] Server responded with an error: [3010] Opening relative path 'matyas/deplister.py' is disallowed.</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:34:55)</span> <b>dweitzel:</b></span> @bbockelm stashcp makes a bunch of assumptions.  Checks only 1 CVMFS repo for the data, stash.osgstorage.org...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:35:16)</span> <b>dweitzel:</b></span> @matyas add another "/" before <tt>/matyas</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(12:35:39)</span> <b>matyas:</b></span> <tt>Run: [ERROR] Server responded with an error: [3011] No servers are available to read the file.</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:35:51)</span> <b>dweitzel:</b></span> well that's a better error.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:36:48)</span> <b>bbockelm:</b></span> yeah, but we can unwind those assumptions, no?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:37:15)</span> <b>dweitzel:</b></span> like with flags?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:37:26)</span> <b>matyas:</b></span> or a config file?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:37:58)</span> <b>bbockelm:</b></span> Or by examining the prefixes given.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:38:24)</span> <b>bbockelm:</b></span> In the end, we need a generic access CLI if we want to grow the origins.  Would seem silly to write a new one, no?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:38:59)</span> <b>dweitzel:</b></span> @bbockelm what's the command to list directories served by an origin?  I remember there's some command you can issue against a redirector and it will repond with the servers serving that directory.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:39:14)</span> <b>bbockelm:</b></span> <tt>xrdmapc</tt> ?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:40:44)</span> <b>dweitzel:</b></span> yup<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:40:56)</span> <b>dweitzel:</b></span> @matyas<br/><pre># xrdmapc <a href="http://redirector.osgstorage.org:1094">redirector.osgstorage.org:1094</a> /user<br/>0*r** <a href="http://redirector.osgstorage.org:1094">redirector.osgstorage.org:1094</a><br/>  &gt;   Srv <a href="http://ceph-gridftp1.grid.uchicago.edu:1094">ceph-gridftp1.grid.uchicago.edu:1094</a><br/>      Srv <a href="http://stashcache.fnal.gov:1094">stashcache.fnal.gov:1094</a><br/>  &gt;   Srv <a href="http://stash.osgconnect.net:1094">stash.osgconnect.net:1094</a><br/>      Srv <a href="http://fermicloud339.fnal.gov:1094">fermicloud339.fnal.gov:1094</a><br/>      Srv <a href="http://origin.ligo.caltech.edu:1094">origin.ligo.caltech.edu:1094</a><br/>1     Man <a href="http://hcc-marian.unl.edu:1095">hcc-marian.unl.edu:1095</a><br/>           Srv <a href="http://hcc-marian.unl.edu:1094">hcc-marian.unl.edu:1094</a></pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:41:10)</span> <b>dweitzel:</b></span> so stash and ceph-gridftp1 server <tt>/user</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:41:22)</span> <b>dweitzel:</b></span> <pre># xrdmapc <a href="http://redirector.osgstorage.org:1094">redirector.osgstorage.org:1094</a> /matyas<br/>0*r** <a href="http://redirector.osgstorage.org:1094">redirector.osgstorage.org:1094</a><br/>      Srv <a href="http://ceph-gridftp1.grid.uchicago.edu:1094">ceph-gridftp1.grid.uchicago.edu:1094</a><br/>      Srv <a href="http://stashcache.fnal.gov:1094">stashcache.fnal.gov:1094</a><br/>      Srv <a href="http://stash.osgconnect.net:1094">stash.osgconnect.net:1094</a><br/>      Srv <a href="http://fermicloud339.fnal.gov:1094">fermicloud339.fnal.gov:1094</a><br/>      Srv <a href="http://origin.ligo.caltech.edu:1094">origin.ligo.caltech.edu:1094</a><br/>1     Man <a href="http://hcc-marian.unl.edu:1095">hcc-marian.unl.edu:1095</a><br/>           Srv <a href="http://hcc-marian.unl.edu:1094">hcc-marian.unl.edu:1094</a></pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:41:27)</span> <b>dweitzel:</b></span> nothing serves /matyas<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:41:54)</span> <b>bbockelm:</b></span> so the cmsd for <tt><a href="http://fermicloud339.fnal.gov:1094">fermicloud339.fnal.gov:1094</a></tt> is connected but isn't serving what we think it should serve.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:42:04)</span> <b>bbockelm:</b></span> can you post the relevant <tt>cmsd.log</tt>/<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:47:06)</span> <b>matyas:</b></span> <br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:50:18)</span> <b>bbockelm:</b></span> <pre><br/>181012 11:42:36 14178 manager.0:24@hcc-osg-redirector1.unl.edu do_State: /matyas/deplister.py<br/></pre><br/>Ok, that means you are getting the request.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:50:39)</span> <b>bbockelm:</b></span> I assume <tt>/stash/deplister.py</tt> exists?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:50:50)</span> <b>matyas:</b></span> yep<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:51:12)</span> <b>matyas:</b></span> and is world-readable<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:51:37)</span> <b>bbockelm:</b></span> try accessing it directly via <tt><a href="http://fermicloud339.fnal.gov:1094">fermicloud339.fnal.gov:1094</a></tt> with xrdcp<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:52:53)</span> <b>matyas:</b></span> <pre># xrdcp -d1 <a href="http://fermicloud339.fnal.gov:1094//stash/deplister.py">fermicloud339.fnal.gov:1094//stash/deplister.py</a> /tmp/deplister.py<br/>xrdcp: No such file or directory processing <a href="http://fermicloud339.fnal.gov:1094//stash/deplister.py">fermicloud339.fnal.gov:1094//stash/deplister.py</a><br/></pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:53:05)</span> <b>bbockelm:</b></span> I think it'd be at:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:53:20)</span> <b>bbockelm:</b></span> <tt><a href="root://fermicloud339.fnal.gov:1094//matyas/deplister.py">root://fermicloud339.fnal.gov:1094//matyas/deplister.py</a></tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(12:54:00)</span> <b>matyas:</b></span> <tt>Run: [ERROR] Server responded with an error: [3011] Unable to open /matyas/deplister.py; no such file or directory</tt><br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:55:04)</span> <b>bbockelm:</b></span> ah, ok.  Let's focus on debugging that.  What message was in <tt>xrootd.log</tt>?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:55:22)</span> <b>matyas:</b></span> on the origin?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:55:39)</span> <b>bbockelm:</b></span> yup<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:56:25)</span> <b>bbockelm:</b></span> (I'll probably ask you to up the <tt>oss.trace</tt> to help debug it, depending on what you copy/paste)<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:57:01)</span> <b>matyas:</b></span> <br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:57:38)</span> <b>bbockelm:</b></span> Can you add the following to the config file:<br/><pre><br/>oss.trace all<br/></pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(12:58:05)</span> <b>matyas:</b></span> ok. restart both daemons, or just xrootd?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:58:34)</span> <b>bbockelm:</b></span> just xrootd for now; once we figure this out, we'll bounce the <tt>cmsd</tt> too.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:59:58)</span> <b>bbockelm:</b></span> reading through upstream's docs, we may be using <tt>remoteroot</tt> incorrectly.  We should be able to tell from the <tt>oss</tt> debug lines.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:02:05)</span> <b>matyas:</b></span> I don't see any messages with "oss"<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:02:23)</span> <b>matyas:</b></span> (I tried the xrdcp again)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:04:39)</span> <b>bbockelm:</b></span> what happens with:<br/><pre><br/>xrdcp -d1 <a href="root://fermicloud339.fnal.gov:1094//deplister.py">root://fermicloud339.fnal.gov:1094//deplister.py</a> - &gt; /dev/null<br/></pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(13:05:11)</span> <b>matyas:</b></span> without the <tt>matyas</tt>?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:05:15)</span> <b>bbockelm:</b></span> yeah<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:05:44)</span> <b>bbockelm:</b></span> (under the theory that we're interpreting <tt>oss.remoteroot</tt> incorrectly)<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:06:25)</span> <b>matyas:</b></span> that works<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:06:53)</span> <b>matyas:</b></span> I get an initial <tt>Stat: failed: No such file or directory</tt> but then the file gets transferred<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:08:04)</span> <b>bbockelm:</b></span> ok, we'll have to ask upstream how to do this correctly.  For now, can you move everything into <tt>/stash/matyas/foo</tt> on the mount instead of <tt>/stash/foo</tt>?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:09:04)</span> <b>dweitzel:</b></span> None of our other origins use remoteroot<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:09:50)</span> <b>bbockelm:</b></span> yeah - which is how we've ended up with a mess of prefixes.  Was hoping we'd be able to clean that up going forward.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:10:19)</span> <b>matyas:</b></span> yep, that works<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:12:55)</span> <b>bbockelm:</b></span> <a href="https://github.com/xrootd/xrootd/issues/840">https://github.com/xrootd/xrootd/issues/840</a> &lt;~ opened a ticket asking for help with this setup.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:14:21)</span> <b>bbockelm:</b></span> I mean, one can always do this via bind-mount magic ... but blech.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:18:18)</span> <b>matyas:</b></span> OK, next question. What do I need to do to make stashcp work?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:21:33)</span> <b>bbockelm:</b></span> hm - from Derek's comments above, that might require a bit of work.  We should first get the redirector working.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:22:15)</span> <b>dweitzel:</b></span> Have you tried the redirect or again<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:24:21)</span> <b>matyas:</b></span> @dweitzel just tried it, didn't work<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:24:37)</span> <b>dweitzel:</b></span> Shoot<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:25:32)</span> <b>bbockelm:</b></span> (fyi - <tt><a href="http://fermicloud339.fnal.gov:1094">fermicloud339.fnal.gov:1094</a></tt> isn't open to the outside world)<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:25:45)</span> <b>matyas:</b></span> I opened it to the redirector<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:25:48)</span> <b>bbockelm:</b></span> what message do you see in the <tt>cmsd.log</tt>?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:26:00)</span> <b>bbockelm:</b></span> (yeah, I was just trying from a local dev machine - just wanted to give you a heads-up)<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:28:47)</span> <b>matyas:</b></span> <br/>
+<span style="color: #c386df"><span style="font-size: small">(13:28:56)</span> <b>matyas:</b></span> what's your dev machine? i could open it up to that, too<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:30:04)</span> <b>dweitzel:</b></span> Negative cache on the redirector?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:30:33)</span> <b>matyas:</b></span> what?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:30:51)</span> <b>bbockelm:</b></span> Note you can probably switch to <tt>all.export /matyas</tt> since files are in <tt>/stash/matyas</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:34:08)</span> <b>dweitzel:</b></span> If the redirector can’t find a file, it will keep a cache so it can quickly deny future requests. <br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:34:35)</span> <b>dweitzel:</b></span> Try putting another named file in that directory on the origin. And do xrdcp again for the new node. <br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:34:42)</span> <b>dweitzel:</b></span> New file*<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:35:16)</span> <b>matyas:</b></span> @dweitzel that seemed to work<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:35:33)</span> <b>dweitzel:</b></span> Great!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:35:59)</span> <b>dweitzel:</b></span> Ok. Negative cache. No worries. That times out in minutes. Maybe 15 or 30<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:40:38)</span> <b>dweitzel:</b></span> The redirector shows good things:<br/><pre><br/># xrdmapc <a href="http://redirector.osgstorage.org:1094">redirector.osgstorage.org:1094</a> /matyas<br/>0*r** <a href="http://redirector.osgstorage.org:1094">redirector.osgstorage.org:1094</a><br/>      Srv <a href="http://ceph-gridftp1.grid.uchicago.edu:1094">ceph-gridftp1.grid.uchicago.edu:1094</a><br/>      Srv <a href="http://stashcache.fnal.gov:1094">stashcache.fnal.gov:1094</a><br/>      Srv <a href="http://stash.osgconnect.net:1094">stash.osgconnect.net:1094</a><br/>  &gt;   Srv <a href="http://fermicloud339.fnal.gov:1094">fermicloud339.fnal.gov:1094</a><br/>      Srv <a href="http://origin.ligo.caltech.edu:1094">origin.ligo.caltech.edu:1094</a><br/>1     Man <a href="http://hcc-marian.unl.edu:1095">hcc-marian.unl.edu:1095</a><br/>           Srv <a href="http://hcc-marian.unl.edu:1094">hcc-marian.unl.edu:1094</a><br/></pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(13:41:01)</span> <b>matyas:</b></span> OK. Now trying stashcp:<br/><pre># stashcp /matyas/deplister2.py /tmp/deplister2.py<br/>2018-10-12T13:36:40+0000 root         ERROR    Unable to find caches.json in /usr/bin<br/>Traceback (most recent call last):<br/>  File "/usr/bin/stashcp", line 496, in &lt;module&gt;<br/>    main()<br/>  File "/usr/bin/stashcp", line 488, in main<br/>    result = doStashCpSingle(sourceFile=source, destination=destination, debug=args.debug)<br/>  File "/usr/bin/stashcp", line 197, in doStashCpSingle<br/>    xrd_exit=timed_transfer(filename=sourceFile, debug=debug, destination=destination)<br/>  File "/usr/bin/stashcp", line 334, in timed_transfer<br/>    filepath=nearest_cache+":1094//"+ filename<br/>TypeError: unsupported operand type(s) for +: 'NoneType' and 'str'</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:42:31)</span> <b>dweitzel:</b></span> pull down caches.json (should be the same place you pulled down stashcp) and put it in the same directory.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:44:37)</span> <b>matyas:</b></span> same directory as in <tt>/usr/bin/</tt>?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:45:33)</span> <b>matyas:</b></span> I didn't need to do that for <tt>stashcp /user/dweitzel/public/blast/queries/query1 query1</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:51:58)</span> <b>dweitzel:</b></span> oh ,it should have failed in the same manner<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:52:04)</span> <b>dweitzel:</b></span> unless CVMFS is installed.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:52:14)</span> <b>matyas:</b></span> ah, I believe it was<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:52:15)</span> <b>dweitzel:</b></span> then it doesn't look for a cache, it just grabs it from CVMFS<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:52:59)</span> <b>matyas:</b></span> ok, /usr/bin/caches.json doesn't sound good so how about I make the RPM version of stashcp look for it in <tt>/usr/share/stashcache/caches.json</tt>?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:53:43)</span> <b>dweitzel:</b></span> yeah, that makes much more sense.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:54:02)</span> <b>dweitzel:</b></span> It should probably look in CVMFS somewhere too.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:54:07)</span> <b>dweitzel:</b></span> but we can add that later<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:54:22)</span> <b>matyas:</b></span> doesn't that mean I'd have to add my local cache to that file if I want to use it?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:54:38)</span> <b>dweitzel:</b></span> there's a command line option to force it to use a cache.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:54:52)</span> <b>dweitzel:</b></span> I think it's just <tt>--cache=&lt;cache&gt;</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:55:57)</span> <b>dweitzel:</b></span> but yes, our cache discovery is pretty non-existent.  If there's a cache that is not in caches.json that you want to use, you have to use command line options, or add it to caches.json<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:57:20)</span> <b>matyas:</b></span> so from my cache server: <pre><br/># stashcp --cache=<tt>hostname -f</tt> /matyas/deplister2.py /tmp/deplister2.py<br/>xrdcp: No such file or directory processing <a href="http://fermicloud015.fnal.gov:1094///matyas/deplister2.py">fermicloud015.fnal.gov:1094///matyas/deplister2.py</a><br/>2018-10-12T13:56:30+0000 root         WARNING  XrdCP from cache failed on <a href="http://fermicloud015.fnal.gov">fermicloud015.fnal.gov</a>, pulling from main redirector</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(13:57:27)</span> <b>matyas:</b></span> it does get the file but doesn't cache it<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:59:44)</span> <b>bbockelm:</b></span> what error message do the logs on fermicloud015 have?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:00:56)</span> <b>matyas:</b></span> oh derp, I started the wrong service<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:12:02)</span> <b>matyas:</b></span> <br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:19:43)</span> <b>dweitzel:</b></span> I don't see any accesses in that log.  Just the normal startup messages.<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:19:56)</span> <b>matyas:</b></span> me neither<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:20:27)</span> <b>matyas:</b></span> but that's the whole thing<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:20:53)</span> <b>dweitzel:</b></span> try running the working <tt>xrdcp</tt> command.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:20:59)</span> <b>dweitzel:</b></span> hopefully you see something then<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:22:33)</span> <b>matyas:</b></span> xrdcp from the redirector?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:22:56)</span> <b>matyas:</b></span> oh, the cache<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:23:09)</span> <b>matyas:</b></span> yeah, _that_ works<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:23:25)</span> <b>matyas:</b></span> <pre>xrdcp -d1 root://<tt>hostname -f</tt>:1094//matyas/deplister2.py deplister2.py</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:31:55)</span> <b>dweitzel:</b></span> and you saw something from the log?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:32:26)</span> <b>dweitzel:</b></span> so you are trying to run stashcp ,but pull from your origin?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:32:49)</span> <b>dweitzel:</b></span> does stashcp actually work?  Run stashcp with the "debugging" flag <tt>-d</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(14:34:28)</span> <b>matyas:</b></span> no, I'm trying to pull from the cache<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:34:41)</span> <b>matyas:</b></span> er, stashcp from the cache<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:34:44)</span> <b>dweitzel:</b></span> also, stashcp requires a format to the cache ,similar to those in caches.json<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:35:07)</span> <b>dweitzel:</b></span> like: <tt><a href="root://xrd-cache-1.t2.ucsd.edu">root://xrd-cache-1.t2.ucsd.edu</a></tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:35:31)</span> <b>dweitzel:</b></span> so, it would be: <tt><a href="root://fermicloud">root://fermicloud</a>...</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(14:35:41)</span> <b>matyas:</b></span> ok, there we go<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:36:33)</span> <b>matyas:</b></span> looks like you can't specify a port though<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:37:48)</span> <b>dweitzel:</b></span> hum... ok.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:38:42)</span> <b>dweitzel:</b></span> indeed, apparently that is hard coded.<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(14:39:21)</span> <b>sthapa:</b></span> @dweitzel  what’s a typical command used to access ligo data from auth stashcache?  gfal …. or something else?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:39:32)</span> <b>dweitzel:</b></span> CVMFS<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:40:12)</span> <b>dweitzel:</b></span> I think that's the only client LIGO uses.  But you should be able to use xrootd, and gfal.  But I've never used those for auth stashcache.<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(14:40:34)</span> <b>sthapa:</b></span> is there a way to test auth stashcache connectivity outside of CVMFS.  I think I have the auth component running but would like to verify<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:40:34)</span> <b>dweitzel:</b></span> <tt>xrdcp</tt> should work.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:41:02)</span> <b>dweitzel:</b></span> well, to test the authentication, you have to have a cert that ligo trusts.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:41:04)</span> <b>dweitzel:</b></span> that's the hard part.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:41:15)</span> <b>dweitzel:</b></span> otherwise, it's just a curl command with client cert option.<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(14:42:13)</span> <b>sthapa:</b></span> okay, edgar was running something and was getting ssl negotiation failures and I figured with a dummy client cert, I could at least get that part fixed<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(14:42:36)</span> <b>sthapa:</b></span> this was the unknown transport/protocol error I was asking about yesterday<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:42:47)</span> <b>dweitzel:</b></span> wasn't that using gsiftp?<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(14:43:07)</span> <b>sthapa:</b></span> I think that was gsiftp but I’m not sure what Edgar ran, just got the output<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:44:16)</span> <b>dweitzel:</b></span> yeah, testing an auth stashcache isn't easy, since you need a cert that works with the VO.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:44:25)</span> <b>dweitzel:</b></span> I would go back to @efajardo and ask for more info.<br/>
+</body>
+</html>

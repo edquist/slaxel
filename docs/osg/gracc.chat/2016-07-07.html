@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jul 7, 2016 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Thu Jul 7, 2016 : #gracc (osg)</h3>
+<span style="color: #3c8c69"><span style="font-size: small">(10:00:51)</span> <b>kretzke:</b></span> @bbockelm: spider_osg.py line 57: results = es.search(index="_all", size=1000, body=body, _source=False)['hits']['hits’]<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:03:06)</span> <b>bbockelm:</b></span> doh.  That’s not what I meant to do...<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(13:11:01)</span> <b>boj:</b></span> For 2 pm, we can use Tanya's office for those at Fermilab<br/>
+<span style="color: #902d59"><span style="font-size: small">(13:53:09)</span> <b>tanya:</b></span> Fatal Error<br/>Courier Fetch: connect ECONNREFUSED<br/>
+<span style="color: #902d59"><span style="font-size: small">(13:53:11)</span> <b>tanya:</b></span> again!<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:54:07)</span> <b>kretzke:</b></span> I just restarted elasticsearch on the client node, it’s misbehaving<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:54:43)</span> <b>kretzke:</b></span> well, trying to...<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(14:02:28)</span> <b>boj:</b></span> @bbockelm? @dweitzel?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:02:46)</span> <b>bbockelm:</b></span> :confused: still on the US CMS mgmt meeting.<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(14:03:14)</span> <b>boj:</b></span> Oh come on, that doesn't have anything interesting in it<br/>
+<span style="color: #902d59"><span style="font-size: small">(14:04:00)</span> <b>tanya:</b></span> bo said that you are not that special and you should come to our meeting<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(14:05:15)</span> <b>boj:</b></span> Or is "US CMS mgmt meeting" code for "don't want to discuss my DoS script"? :wink:<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:12:59)</span> <b>kretzke:</b></span> RE: July 4 anomaly: Gratia summary procedure excludes records where condor.JobStatus == 3 (cancelled)<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(15:14:52)</span> <b>boj:</b></span> so these were jobs that ran for a while<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(15:14:55)</span> <b>boj:</b></span> and then were canceled?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:15:01)</span> <b>kretzke:</b></span> yes<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(15:16:47)</span> <b>boj:</b></span> ok, so I would argue those should be displayed<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(15:16:51)</span> <b>boj:</b></span> they consumed resources<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(15:16:58)</span> <b>boj:</b></span> so GRACC is right in this case<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(15:17:15)</span> <b>boj:</b></span> for comparison's sake, can we temporarily exclude in GRACC?<br/>
+<span style="color: #902d59"><span style="font-size: small">(15:18:05)</span> <b>tanya:</b></span> yes, i think we could do it but I didn't know that summary exclude 3<br/>
+<span style="color: #902d59"><span style="font-size: small">(15:18:16)</span> <b>tanya:</b></span> it is really weird<br/>
+<span style="color: #902d59"><span style="font-size: small">(15:18:43)</span> <b>tanya:</b></span> we definitely include killed by condor<br/>
+<span style="color: #902d59"><span style="font-size: small">(15:19:26)</span> <b>tanya:</b></span> so canceling should be no different from failed<br/>
+<span style="color: #902d59"><span style="font-size: small">(15:19:42)</span> <b>tanya:</b></span> so we will see much more resource waste now<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(15:20:38)</span> <b>boj:</b></span> that also brings up the interesting side questions of 1) what other categories are we excluding without knowing 2) how often are there significant cancelations like this? that was a lot of hours wasted, effectively<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(15:20:48)</span> <b>boj:</b></span> I was going to put "wasted" in quotes but this wasn't opportunistic<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:21:24)</span> <b>kretzke:</b></span> maybe it’s not being excluded. let me dig a bit more<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:34:13)</span> <b>kretzke:</b></span> ok, they’re in the summary data but are not showing up in gratiaweb for some reason<br/>
+<span style="color: #902d59"><span style="font-size: small">(15:34:28)</span> <b>tanya:</b></span> let me try to see why<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:36:04)</span> <b>kretzke:</b></span> Here’s his summary records, you can see that the total wall hours is 559K, same as reported by gracc<br/> ApplicationExitCode	Njobs	WallDuration/3600<br/>0	55	6863.681388888889<br/>196608	4226	462280.685<br/>196608	898	90265.92333333334<br/>
+<span style="color: #902d59"><span style="font-size: small">(15:37:04)</span> <b>tanya:</b></span> 196608 - this is code for canceled/killed jobs<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(17:34:29)</span> <b>boj:</b></span> incidentally, were those jobs from INC000000728474?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:35:15)</span> <b>kretzke:</b></span> yep, knew that name was familiar<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:39:46)</span> <b>kretzke:</b></span> this is why those jobs don’t show up in gratiaweb: <tt>R.WallDuration &lt; 1100000000</tt> is part of the WHERE clause. The total wall duration for the failed jobs is 1664210466<br/>
+</body>
+</html>

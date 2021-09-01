@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri May 1, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Fri May 1, 2020 : #software (osg)</h3>
+<span style="color: #73769d"><span style="font-size: small">(11:10:53)</span> <b>tim.theisen:</b></span> A bunch of jobs went on hold for this morning's nightly VMU test run. All complained about the lack of input image. Would someone look at that?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:13:45)</span> <b>matyas:</b></span> &gt; libguestfs: error: /usr/bin/supermin5 exited with error status 1.<br/>&gt; To see full error messages you may need to enable debugging.<br/>&gt; Do:<br/>&gt;   export LIBGUESTFS_DEBUG=1 LIBGUESTFS_TRACE=1<br/>&gt; and run the command again.  For further information, read:<br/>&gt;   <a href="http://libguestfs.org/guestfs-faq.1.html#debugging-libguestfs">http://libguestfs.org/guestfs-faq.1.html#debugging-libguestfs</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(11:21:18)</span> <b>matyas:</b></span> gonna kill them and submit a new run with those vars enabled<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:01:18)</span> <b>blin:</b></span> if that turns out to be helpful, could you push that upstream?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:12:42)</span> <b>matyas:</b></span> yeah<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:25:42)</span> <b>blin:</b></span> at some point i'd like to figure out all of the libguestfs issues we're having because the random failures are pretty obnoxious<br/>
+<span style="color: #73769d"><span style="font-size: small">(12:40:07)</span> <b>tim.theisen:</b></span> I think you should just killed the held jobs.  There were still some results to be seen.<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:56:16)</span> <b>matyas:</b></span> I thought only the held jobs were still in the queue<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:56:50)</span> <b>blin:</b></span> did you also kill the dag job?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:57:01)</span> <b>matyas:</b></span> probably<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:57:06)</span> <b>matyas:</b></span> wouldn't it have failed anyway?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:57:42)</span> <b>blin:</b></span> nope, you still get the results of the jobs that completed successfully<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:57:57)</span> <b>matyas:</b></span> oh<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:57:59)</span> <b>matyas:</b></span> my bad<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:58:25)</span> <b>blin:</b></span> the dag's robust to job failures, that's why you sometimes see blank cells in the results where you would expect a test<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:58:51)</span> <b>matyas:</b></span> I didn't see any non-held jobs in the condor_q output (but then I didn't run it with -nobatch)<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:00:14)</span> <b>blin:</b></span> i hate the new default condor_q output<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:00:26)</span> <b>blin:</b></span> <tt>-nob -all</tt> errday<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:05:40)</span> <b>matyas:</b></span> I think I figured out the issue<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:05:52)</span> <b>matyas:</b></span> &gt; supermin: error: statvfs: No space left on device: /var/lib/condor/spool/local_univ_execute/dir_3010411/.guestfs-20020/appliance.d.aabzso84/root<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:06:09)</span> <b>matyas:</b></span> <tt>/var/lib/condor/spool</tt> is only a 32G partition<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:06:17)</span> <b>blin:</b></span> damn ok<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:06:32)</span> <b>blin:</b></span> that's wild. is execute the larger one?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:06:54)</span> <b>blin:</b></span> could you create an inf ticket to expand it?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:07:11)</span> <b>matyas:</b></span> sure<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:07:30)</span> <b>matyas:</b></span> /home is like 250G, we can shrink it if we need to<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:07:40)</span> <b>blin:</b></span> ya<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:09:27)</span> <b>blin:</b></span> oh btw, we had an engagement with portland state this morning and they're interested in EL8<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:09:38)</span> <b>matyas:</b></span> of course they are<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:10:10)</span> <b>matyas:</b></span> can we throw together a CE using the UW condor?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:10:32)</span> <b>blin:</b></span> we don't need to worry about an EL8 CE<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:10:52)</span> <b>blin:</b></span> because we'll be doing a hosted CE<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:11:03)</span> <b>blin:</b></span> but they talked about standing up a test EL8 cluster for us so we can do development!<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:11:19)</span> <b>matyas:</b></span> cool!<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:11:48)</span> <b>blin:</b></span> since you got the WN client done, i think we're halfway there on the software dev side<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:12:32)</span> <b>blin:</b></span> we'll want to make changes to the hosted CE tools so that it downloads the EL8 client<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:12:51)</span> <b>blin:</b></span> does that mean that the CE needs to be EL8, too, or is the remote client independent from CE OS?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:14:53)</span> <b>matyas:</b></span> the remote should be independent as long as ssh works between the two hosts. IIRC if you're running on EL8, you'll need to pass <tt>-m PEM</tt> to <tt>ssh-keygen</tt> to make a key that EL7 versions of openssh can understand<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:15:07)</span> <b>matyas:</b></span> but we will most likely need an EL8 host to build the EL8 wn tarball<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:15:53)</span> <b>matyas:</b></span> (NBD, use a VM on your laptop)<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:20:19)</span> <b>blin:</b></span> ah, we don't have EL8 WN tarballs yet?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:21:50)</span> <b>matyas:</b></span> nope<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:23:46)</span> <b>blin:</b></span> ok so we need 1. EL8 WN tarballs and 2. hosted-ce-tools updates?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:24:51)</span> <b>matyas:</b></span> not sure we need 2. You have to specify which WN client tarball to use in endpoints.ini, it's just that 3.5-el7 is the default<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:25:05)</span> <b>blin:</b></span> ah ok, perfect<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:25:28)</span> <b>blin:</b></span> separately, i made an inf ticket for upgrading osghost. could you sanity check the process i outlined?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:25:55)</span> <b>matyas:</b></span> link?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:26:27)</span> <b>blin:</b></span> <a href="https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=100395">https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=100395</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(13:26:58)</span> <b>matyas:</b></span> fudgebunnies. You might need an el8 CE to run fetch-crl for the el8 tarball<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:28:05)</span> <b>blin:</b></span> booo<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:28:06)</span> <b>blin:</b></span> ok<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:34:18)</span> <b>matyas:</b></span> Not 100% sure about that though. We might run fetch-crl _from_ and el7 WN install and put the results _into_ the el8 WN install<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:34:24)</span> <b>matyas:</b></span> in which case we'd be fine<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:15:06)</span> <b>blin:</b></span> hey @matyas ops is running into an issue with the permissions on <tt>/var/lib/osg</tt> being too restrictive<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:15:47)</span> <b>blin:</b></span> <tt>rpm -qf</tt> doesn't show that it's owned by any package and osg-configure hasn't changed in ages, any idea why it'd be borked?<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:16:23)</span> <b>matyas:</b></span> nothing comes to mind<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:16:30)</span> <b>matyas:</b></span> can they just fix the permissions?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:21:44)</span> <b>blin:</b></span> yeah, that's what we're doing<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:21:56)</span> <b>blin:</b></span> turned out to be an issue with the VMs they're using<br/>
+</body>
+</html>

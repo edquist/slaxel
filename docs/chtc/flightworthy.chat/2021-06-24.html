@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jun 24, 2021 : #flightworthy (chtc)</title>
+</head>
+<body>
+<h3>Thu Jun 24, 2021 : #flightworthy (chtc)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(10:44:19)</span> <b>johnkn:</b></span> What is the name of the knob that controls how long the schedd can be offline before it can no longer startup and reconnect to running startd's<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:47:04)</span> <b>johnkn:</b></span> Im on a call with CNAF right now<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(10:57:17)</span> <b>jfrey:</b></span> JobLeaseDuration in each job ad.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(10:57:26)</span> <b>jfrey:</b></span> Default is 40 min<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(11:08:40)</span> <b>jfrey:</b></span> I need a reviewer for HTCONDOR-535. It’s a small change in the gridmanager.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:21:19)</span> <b>johnkn:</b></span> I can do it.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:22:20)</span> <b>johnkn:</b></span> I'll need a reviewer for HTCONDOR-508 soon,  I'm waiting on a decision about whether it goes in stable or devel.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(11:26:29)</span> <b>jfrey:</b></span> I can take that.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:26:43)</span> <b>johnkn:</b></span> Ok.  I'll let you know when it's ready.   hopefully today.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:28:18)</span> <b>johnkn:</b></span> I'm looking at 535 now.   I guess I'm not qualified to review this one.  would ToddM be better?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:28:42)</span> <b>johnkn:</b></span> Or are you the only one who knows this code well?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(11:44:34)</span> <b>jfrey:</b></span> Either of the Todds should know the code well enough.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:51:22)</span> <b>tlmiller:</b></span> Could someone who knows either acknowledge Dmitry's condor-users's bug or tell him that it's broken as designed?  -- with respect to CLAIM_WORKLIFE and how long it takes for the schedd to give up on a claim.<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:00:03)</span> <b>matyas:</b></span> So what is the problem with scaling to 128 slots? (And how does having 2 plots of 64 cores each help?)<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(15:02:11)</span> <b>jfrey:</b></span> The startd has trouble juggling 128 dslots. The hack is to run 2 startds and tell each to manage half of the resources.<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:02:37)</span> <b>matyas:</b></span> does it just get slow?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(15:02:58)</span> <b>jfrey:</b></span> Yes.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(15:03:17)</span> <b>jfrey:</b></span> I suspect there are some bad N^2 algorithms in there.<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:03:58)</span> <b>matyas:</b></span> but it's not actually broken, just slow? We're sending 128-core pilots to one of our HPC sites<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(15:04:43)</span> <b>jfrey:</b></span> I believe it’s tied to the number of instantiated slots. So if your 128-core pilots get matched to 8-core jobs, it’s not a problem.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(15:05:13)</span> <b>jfrey:</b></span> If you get a flood of 1-core jobs, you’ll start to see problems.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(15:05:47)</span> <b>jfrey:</b></span> And yes, the startd gets really slow, to the point where things start to time out.<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:09:07)</span> <b>matyas:</b></span> I'm not sure how we can configure pilots to do the two-startd thing.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(15:09:55)</span> <b>jfrey:</b></span> Can you configure the factories to send twice as many 64-core pilots?<br/>
+<span style="color: #4cc091"><span style="font-size: small">(15:10:07)</span> <b>blin:</b></span> @jfrey @johnkn do you guys remember which ticket it was that fixed the JR periodic remove?<br/>
+<blockquote>
+<span style="color: #4cc091"><span style="font-size: small">(15:13:28)</span> <b>blin:</b></span> i can't seem to find anything in the release notes<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:17:41)</span> <b>johnkn:</b></span> hmm.  there's HTCONDOR-402 but that won't be relevant if they are running an older conodr.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(15:19:07)</span> <b>jfrey:</b></span> HTCONDOR-408 wouldn’t relevant.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(15:19:14)</span> <b>blin:</b></span> i think i found where we solved it<br/>
+<span style="color: #4cc091"><span style="font-size: small">(15:19:52)</span> <b>blin:</b></span> <a href="https://github.com/htcondor/htcondor-ce/commit/6fdd8dce75c66a678f727f344197e88b0d6d017c">https://github.com/htcondor/htcondor-ce/commit/6fdd8dce75c66a678f727f344197e88b0d6d017c</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:20:21)</span> <b>johnkn:</b></span> plausible<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(15:20:56)</span> <b>jfrey:</b></span> That sounds about right for this problem.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(15:21:26)</span> <b>jfrey:</b></span> I need to work on never putting Removed or Completed jobs on hold.<br/>
+</blockquote>
+<span style="color: #99a949"><span style="font-size: small">(15:11:00)</span> <b>matyas:</b></span> Oh yeah, we could do that.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(15:14:04)</span> <b>blin:</b></span> @coatsworth @tim it looks like the 9.0/9.1 release note pages aren't bulleted lists anymore. Was this intentional? It's a little harder to read, imo<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(15:16:41)</span> <b>tim:</b></span> That's not an intentional change. Perhaps they are using a newer version of sphinx.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:17:06)</span> <b>coatsworth:</b></span> @blin That's weird, nothing seems to have changed. I'm looking into it now...<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(15:17:36)</span> <b>tim:</b></span> I got notice from the Fedora folks that our manual does not build in sphinx 4.x.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(15:17:56)</span> <b>tim:</b></span> So, we may have to make adjustments for the new version of Sphinx.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:22:24)</span> <b>coatsworth:</b></span> Interesting, I just updated my local sphinx package and now my docs builds are failing with the same error that broke our Python tutorials.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:22:50)</span> <b>tlmiller:</b></span> Progress!<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:23:09)</span> <b>jcpatton:</b></span> or time to go back to LaTeX :wink:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:23:28)</span> <b>tlmiller:</b></span> :sadness:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:41:12)</span> <b>johnkn:</b></span> real mean write css by hand<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:41:33)</span> <b>johnkn:</b></span> and aren't we the css group now anyway?<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:43:15)</span> <b>matyas:</b></span> the ht is invisible?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:45:21)</span> <b>johnkn:</b></span> redundant<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:46:13)</span> <b>johnkn:</b></span> HT is meant to distinguish from HP, but there is no such thing as HP CSS<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:46:48)</span> <b>gthain:</b></span> I would not be shocked if Hewlett Packard forked and had their own version of CSS<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:50:18)</span> <b>jcpatton:</b></span> We had a very motivated user in office hours just bring up HTCondor on the Google Cloud Marketplace. Apparently the off-the-shelf solution (I don’t know what it’s called) errors with some kind of type error having to do with <tt>None</tt> (no) accelerators being selected (if that makes any sense). Is this Google’s doing or somehow our problem?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:17:55)</span> <b>tlmiller:</b></span> We still -- after months of legal effort -haven't been able to take over the Google Cloud Marketplace entry.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:18:30)</span> <b>tlmiller:</b></span> However, we are in contact with the appropriate group over there, so we can probably get a fix/help in relatively short order.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:19:00)</span> <b>tlmiller:</b></span> (I don't recognize the error, but I'm guess something to do with GPUs?)<br/>
+<span style="color: #2b6836"><span style="font-size: small">(16:24:55)</span> <b>jcpatton:</b></span> if you don’t select a GPU apparently, it spits up some kind of type error (seems like it might be Python under the hood?) because <tt>None</tt> accelerators are chosen<br/>
+<span style="color: #2b6836"><span style="font-size: small">(16:25:19)</span> <b>jcpatton:</b></span> if you’re really interested in this user’s experience I can get you in contact<br/>
+<span style="color: #2b6836"><span style="font-size: small">(16:25:50)</span> <b>jcpatton:</b></span> he also found instructions for setting up condor… 8.4.something<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:26:24)</span> <b>tlmiller:</b></span> I think the version in the marketplace is 8.8?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(16:26:39)</span> <b>jcpatton:</b></span> yeah this must have been for a “roll your own” recipe<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:27:08)</span> <b>tlmiller:</b></span> But if you don't have a ticket, I guess just put me in contact with them; I will put them in contact with the people at Google.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(16:33:38)</span> <b>jcpatton:</b></span> if it makes sense after the reply to track it in htcondor-admin we can always move the conversation there<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:37:46)</span> <b>tlmiller:</b></span> Right-o.<br/>
+</body>
+</html>

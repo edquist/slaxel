@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri May 7, 2021 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Fri May 7, 2021 : #gfactory (osg)</h3>
+<span style="color: #385a86"><span style="font-size: small">(13:29:12)</span> <b>jdost321:</b></span> @rynge I double checked, the AMNH HEL entries are in ITB <a href="http://gfactory-itb-1.opensciencegrid.org/factory/monitor/factoryStatus.html?entry=COVID19_US_AMNH-HEL&amp;frontend=total&amp;infoGroup=running&amp;elements=StatusRunningCores,ClientCoresTotal,ClientCoresRunning,ClientCoresIdle,&amp;rra=0&amp;window_min=0&amp;window_max=0&amp;timezone=-7">http://gfactory-itb-1.opensciencegrid.org/factory/monitor/factoryStatus.html?entry=COVID19_US[…]esIdle,&amp;rra=0&amp;window_min=0&amp;window_max=0&amp;timezone=-7</a><br/>
+<span style="color: #385a86"><span style="font-size: small">(13:29:58)</span> <b>jdost321:</b></span> don't mind the misleading COVID19 names, they support both: GLIDEIN_Supported_VOs: OSGVO,COVID19<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:34:16)</span> <b>jdost321:</b></span> hmm you may have been requesting all along. I see now pilots on ITB are all going held with<br/><pre>012 (626693.000.000) 2021-05-07 05:08:13 Job was held.<br/>        Error connecting to schedd <a href="http://hosted-ce36.opensciencegrid.org">hosted-ce36.opensciencegrid.org</a>: SECMAN:2007:Failed to received post-auth ClassAd<br/>        Code 0 Subcode 0</pre><br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:35:44)</span> <b>rynge:</b></span> Hmm, I do get production glideins on it though<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:36:36)</span> <b>rynge:</b></span> Maybe it is unhappy about my stitoken<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:37:54)</span> <b>jdost321:</b></span> whats suspicous to me though is connection failures??<br/><pre>05/07/21 11:35:02 [2003890] (626764.0) doEvaluateState called: gmState GM_SUBMIT, remoteState 0<br/>05/07/21 11:35:02 [2003890] (626764.0) condor_job_submit() failed: Error connecting to schedd <a href="http://hosted-ce36.opensciencegrid.org">hosted-ce36.opensciencegrid.org</a>: SECMAN:2007:Failed to received<br/> post-auth ClassAd<br/>05/07/21 11:35:02 [2003890] (626764.0) Connection failure (try #1), retrying in 5 secs</pre><br/>
+<span style="color: #385a86"><span style="font-size: small">(13:43:33)</span> <b>jdost321:</b></span> logging into the CE to see if i find anything obv there in its logs..<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:48:43)</span> <b>jdost321:</b></span> i *think* its trying to use tokens<br/><pre>05/07/21 18:34:56 (D_ALWAYS|D_FAILURE) Failed to send RESCHEDULE to unknown daemon: <br/>05/07/21 18:34:56 (D_AUDIT) Examining SciToken with payload {"scope":"condor:/WRITE condor:/READ","sub":"Token","aud":"ANY","ver":"scitokens:2.0","iss":"<a href="https://scitokens.org/">https://scitokens.org/</a><br/>osg-connect","exp":1620415201,"iat":1620411601,"nbf":1620411601,"jti":"a10c97c6-33df-4ba2-abe6-66c60523cc49"}.<br/>05/07/21 18:34:56 (D_ALWAYS:2) ZKM: did not find user <a href="https://scitokens.org/osg-connect,Token">https://scitokens.org/osg-connect,Token</a>.<br/>05/07/21 18:34:56 (D_ALWAYS) ZKM: In wrap.<br/>05/07/21 18:34:56 (D_ALWAYS) DC_AUTHENTICATE: authentication of &lt;169.228.38.36:14897&gt; did not result in a valid mapped user name, which is required for this command (1112 QMGM<br/>T_WRITE_CMD), so aborting.</pre><br/>
+<span style="color: #385a86"><span style="font-size: small">(13:49:15)</span> <b>jdost321:</b></span> but we don't support that in the hosted ces yet<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:50:49)</span> <b>rynge:</b></span> Right, but we have the same setup on production<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:51:22)</span> <b>bbockelm:</b></span> @rynge - that's an interesting failure.  Basically it says authentication succeeded (SCITOKENS is enabled and passed) but it wasn't able to map the user to a local identity.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:52:01)</span> <b>bbockelm:</b></span> @blin might know the special sauce to get the map configured off the top of his head.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:52:16)</span> <b>rynge:</b></span> I'm disabling tokens for now<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:52:24)</span> <b>rynge:</b></span> I think this is something else<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:52:38)</span> <b>jdost321:</b></span> i could mod the CE in place in the pod, but i'd prefer to not possibly disturb production pilots<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:52:42)</span> <b>blin:</b></span> what version of htcondor-ce and what does your mapfile look like?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:52:46)</span> <b>rynge:</b></span> I have a scitoken configured globally, and it works for this site in the prodcion factory<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:53:23)</span> <b>jdost321:</b></span> this is only happening to pilots that are coming in from teh ITB factory<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:53:47)</span> <b>rynge:</b></span> Ok, check requests now<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:53:55)</span> <b>rynge:</b></span> Should not have any scitokens<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:54:10)</span> <b>blin:</b></span> the scitoken from the factory looks fine, it's a CE mapping config issue<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:54:35)</span> <b>jdost321:</b></span> i'll have to wait for fresh pilots<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:54:36)</span> <b>bbockelm:</b></span> <a href="https://github.com/opensciencegrid/hosted-ce-config/blob/master/AMNH-HEL/hosted-ce.yaml">https://github.com/opensciencegrid/hosted-ce-config/blob/master/AMNH-HEL/hosted-ce.yaml</a> here's the YAML<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:55:53)</span> <b>blin:</b></span> oh yeah, that CE's just not configured to map scitokens pilots<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:58:11)</span> <b>jdost321:</b></span> Mats 3 new ones came in still trying to use the token<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:58:35)</span> <b>bbockelm:</b></span> I see one production pilot and it's idle.<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:58:47)</span> <b>jdost321:</b></span> production pilots are fine<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:59:29)</span> <b>bbockelm:</b></span> I'd be fine with pushing out a mapfile update, won't affect running jobs that I can see.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:01:26)</span> <b>bbockelm:</b></span> <a href="https://github.com/opensciencegrid/tiger-osg-config/blob/master/manifests/development/itb-slurm-ce/helm.yaml#L84-L86">https://github.com/opensciencegrid/tiger-osg-config/blob/master/manifests/development/itb-slurm-ce/helm.yaml#L84-L86</a> @blin this is what's needed, right?<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(14:03:10)</span> <b>blin:</b></span> that and a new enough version of condor/condor-ce that can be specified with <a href="https://github.com/opensciencegrid/tiger-osg-config/blob/master/manifests/development/itb-slurm-ce/helm.yaml#L179">https://github.com/opensciencegrid/tiger-osg-config/blob/master/manifests/development/itb-slurm-ce/helm.yaml#L179</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:03:28)</span> <b>blin:</b></span> and a working bosco for the corresponding condor<br/><a href="https://github.com/opensciencegrid/tiger-osg-config/blob/master/manifests/development/itb-slurm-ce/helm.yaml#L142">https://github.com/opensciencegrid/tiger-osg-config/blob/master/manifests/development/itb-slurm-ce/helm.yaml#L142</a><br/>
+</blockquote>
+<span style="color: #43761b"><span style="font-size: small">(14:02:29)</span> <b>blin:</b></span> i think this points to a larger problem in our deployment plan though: gwms will use a scitoken if the VO provides one and all CEs prefer SciTokens. with a new enough condor, the CE will authN the SciToken but fail authZ unless the CE is configured to map to an existing user<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:02:32)</span> <b>blin:</b></span> so no GSI fallback<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:23:14)</span> <b>jdost321:</b></span> its using GSI again I htink Mat's change finally kicked in, and we have running AMNH-HEL pilots from the ITB factory now<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:05:48)</span> <b>bbockelm:</b></span> @blin - I'm fine with that.<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(2021-05-10 08:48:34)</span> <b>blin:</b></span> Doesn't this mean that all CEs will need OSG token mappings to get pilots once we update the factory? Similarly for CMS once their FEs start using tokens<br/>
+</blockquote>
+<span style="color: #43761b"><span style="font-size: small">(15:07:30)</span> <b>blin:</b></span> :adhesive_bandage: :pinching_hand::skin-tone-3: :put_litter_in_its_place:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:10:26)</span> <b>bbockelm:</b></span> (that said, I'm surprised "authenticated but not mapped" doesn't result in fallback)<br/>
+</body>
+</html>

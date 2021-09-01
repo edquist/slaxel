@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jul 20, 2020 : #xenon (osg)</title>
+</head>
+<body>
+<h3>Mon Jul 20, 2020 : #xenon (osg)</h3>
+<span style="color: #d55aef"><span style="font-size: small">(02:34:16)</span> <b>diego.ramirez:</b></span> Hi @rynge at al. I had some personal issues to attend on Friday and couldn't test this, sorry.<br/><br/>First of all, I see G4 version is now G4.10.6.2. Thanks a lot! :slightly_smiling_face:<br/>
+<span style="color: #d55aef"><span style="font-size: small">(02:35:25)</span> <b>diego.ramirez:</b></span> There's a single small issue when loading the container:<br/><tt>dramirez@login-el7:[~]$ singularity shell <a href="https://xenon.isi.edu/images/xenonnt-montecarlo%3Adevelopment.simg">https://xenon.isi.edu/images/xenonnt-montecarlo%3Adevelopment.simg</a></tt><br/><tt>rpm: /opt/XENONnT/anaconda/envs/XENONnT_development/lib/liblzma.so.5: version </tt>XZ_5.1.2alpha' not found (required by /lib64/librpmio.so.3)<tt><br/></tt>Singularity&gt;`<br/>
+<span style="color: #d55aef"><span style="font-size: small">(02:37:07)</span> <b>diego.ramirez:</b></span> And then there's an issue with our MC<br/><tt>Compiling xenon1t_<a href="http://G4p10.cc">G4p10.cc</a> ...</tt><br/><tt>Using global libraries ...</tt><br/><tt>Linking xenon1t_G4p10</tt><br/><tt>/opt/geant4/lib/libImt.so: undefined reference to </tt>tbb::interface7::internal::isolate_within_arena(tbb::interface7::internal::delegate_base&amp;, long)'<tt><br/></tt>/opt/geant4/lib/libImt.so: undefined reference to <tt>tbb::interface7::internal::task_arena_base::internal_terminate()'</tt><br/><tt>/opt/geant4/lib/libImt.so: undefined reference to </tt>tbb::interface7::internal::task_arena_base::internal_initialize()'<tt><br/></tt>/opt/geant4/lib/libImt.so: undefined reference to <tt>tbb::interface7::internal::task_arena_base::internal_execute(tbb::interface7::internal::delegate_base&amp;) const'</tt><br/><tt>collect2: error: ld returned 1 exit status</tt><br/><tt>make: *** [config/binmake.gmk:362: /home/dramirez/geant4_workdir/bin/Linux-g++/xenon1t_G4p10] Error 1compilation:</tt><br/><br/>I'm now googling on this last thing. Some links point at a system update of the libtbb2 and libtbb-dev libraries; some others at an extra argument required by the Makefile. I'll post something here if I get it to work.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:07:59)</span> <b>rynge:</b></span> Hi, yeah, I added 10.6.2<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:08:12)</span> <b>rynge:</b></span> It needed a new compiler, which is probalby what you are seeting there<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:08:19)</span> <b>rynge:</b></span> I will try to test things today<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:49:46)</span> <b>rynge:</b></span> @diego.ramirez Can you give me that code you are trying to compile, and the commands to get to that error?<br/>
+<span style="color: #d55aef"><span style="font-size: small">(12:50:18)</span> <b>diego.ramirez:</b></span> <a href="https://github.com/XENON1T/mc">https://github.com/XENON1T/mc</a><br/>
+<span style="color: #d55aef"><span style="font-size: small">(12:50:34)</span> <b>diego.ramirez:</b></span> On top of the <tt>mc</tt> directory, I just run <tt>make clean &amp;&amp; make</tt><br/>
+<span style="color: #d55aef"><span style="font-size: small">(12:51:16)</span> <b>diego.ramirez:</b></span> You have access to it, don't you?<br/>
+<span style="color: #d55aef"><span style="font-size: small">(12:51:36)</span> <b>diego.ramirez:</b></span> Otherwise, you can go to my home directory in the OSG login node. It's in there cloned from the morning.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:52:35)</span> <b>rynge:</b></span> Yes I have access<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:53:24)</span> <b>rynge:</b></span> Will you need the base_environment stuff in your environment? Like rucio or something from the Python setup?<br/>
+<span style="color: #d55aef"><span style="font-size: small">(12:58:23)</span> <b>diego.ramirez:</b></span> This is a good question. Since we currently have storage issues in dali, probably it's good to keep the communication with rucio. This was a plan B for the simulations' storage, from the last discussion with Evan and you in the Thursday meeting (long ago).<br/>
+<span style="color: #d55aef"><span style="font-size: small">(12:59:00)</span> <b>diego.ramirez:</b></span> Since we might want to also run full-chain simulations (i.e., process the simulated output with strax), in principle we'd like to have all features from the base_environment, plus the G4 and ROOT installations.<br/>
+<span style="color: #d55aef"><span style="font-size: small">(12:59:12)</span> <b>diego.ramirez:</b></span> Does this add an extra complication?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:00:49)</span> <b>rynge:</b></span> No, I just waned to know what expectations you would have<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:01:14)</span> <b>rynge:</b></span> That RPM warning is so far the only issue I have seen keeping both environments sourced at the same time<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:01:31)</span> <b>rynge:</b></span> And I suspect that is just an ordering issue<br/>
+<span style="color: #d55aef"><span style="font-size: small">(13:01:59)</span> <b>diego.ramirez:</b></span> Seems harmless, as it is unrelated with the compilation error.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:02:28)</span> <b>rynge:</b></span> Yeah<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:02:59)</span> <b>rynge:</b></span> I'll be looking at that error now, but it will take some time<br/>
+<span style="color: #d55aef"><span style="font-size: small">(13:03:52)</span> <b>diego.ramirez:</b></span> No problem. I didn't manage with the Makefile changes, but I'll try with a bit more time in the morning.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:09:24)</span> <b>rynge:</b></span> I wonder if RHEL7 might just be "too old" for this - let me try a RHEL8 container as well<br/>
+</body>
+</html>

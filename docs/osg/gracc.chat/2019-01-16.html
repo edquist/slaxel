@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jan 16, 2019 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Wed Jan 16, 2019 : #gracc (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(13:38:11)</span> <b>blin:</b></span> hey, i could use a hand figuring out what this dashboard is showing me for new mexico state: <a href="https://gracc.opensciencegrid.org/dashboard/db/site-summary?orgId=1&amp;from=now-30d&amp;to=now&amp;var-interval=$__auto_interval&amp;var-site=New%20Mexico%20State%20AggieGrid&amp;var-type=Batch">https://gracc.opensciencegrid.org/dashboard/db/site-summary?orgId=1&amp;from=now-30d&amp;to=now&amp;var-interval=$__auto_interval&amp;var-site=New%20Mexico%20State%20AggieGrid&amp;var-type=Batch</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:39:00)</span> <b>blin:</b></span> why are we showing wallhours = 0 when it appears that payload jobs are running?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:39:32)</span> <b>dweitzel:</b></span> Job Type is Batch.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:40:12)</span> <b>blin:</b></span> do we not calculate/record the number of wallhours for pilots?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:42:24)</span> <b>dweitzel:</b></span> Ah, it's a hosted CE<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:42:30)</span> <b>dweitzel:</b></span> so Processors = 0<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:42:48)</span> <b>dweitzel:</b></span> So CoreHours = (Processors) * (WallTime) = 0 * X = 0<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:43:09)</span> <b>blin:</b></span> but there are records where procs = 1 now<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:43:26)</span> <b>dweitzel:</b></span> are there?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:43:28)</span> <b>blin:</b></span> oh wait, maybe those are payload jobs<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:43:30)</span> <b>blin:</b></span> one sec<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:43:36)</span> <b>dweitzel:</b></span> I don't see them in Kibana<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:45:57)</span> <b>blin:</b></span> yeah, i'm struggling to find any pilot records in kibana<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:46:40)</span> <b>dweitzel:</b></span> <a href="https://gracc.opensciencegrid.org/kibana/app/kibana#/discover?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-30d,mode:quick,to:now))&amp;_a=(columns:!(ResourceType,CoreHours,CpuDuration_user,Processors),index:gracc.osg.summary,interval:auto,query:(query_string:(analyze_wildcard:!t,lowercase_expanded_terms:!f,query:'OIM_Site:%22New%20Mexico%20State%20AggieGrid%22%20AND%20ResourceType:Batch')),sort:!(EndTime,desc))">https://gracc.opensciencegrid.org/kibana/app/kibana#/discover?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-30d,mode:quick,to:now))&amp;_a=(columns:!(ResourceType,CoreHours,CpuDuration_user,Processors),index:gracc.osg.summary,interval:auto,query:(query_string:(analyze_wildcard:!t,lowercase_expanded_terms:!f,query:'OIM_Site:%22New%20Mexico%20State%20AggieGrid%22%20AND%20ResourceType:Batch')),sort:!(EndTime,desc))</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:46:59)</span> <b>dweitzel:</b></span> indeed, I don't see any since the 5th<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:47:54)</span> <b>blin:</b></span> damn it, i was searching for probename and was using <tt>condor</tt> instead of <tt>htcondor-ce</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:48:06)</span> <b>blin:</b></span> thanks for the help<br/>
+</body>
+</html>

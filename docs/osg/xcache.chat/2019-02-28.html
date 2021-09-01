@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Feb 28, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Thu Feb 28, 2019 : #xcache (osg)</h3>
+<span style="color: #e06b56"><span style="font-size: small">(09:45:43)</span> <b>jthiltges:</b></span> <b>@edquist</b> Would this be too crazy to add into the xrootd plugin specs?<br/><pre>Requires: xrootd = %(rpm -q xrootd-server-devel --queryformat "%{VERSION}" | cut -d. -f1-2)</pre><br/>I was hoping dynamically add a requirement of the the xrootd <tt>major.minor</tt> at build time.<br/>From some quick local testing, it seems to properly generate a <tt>xrootd = 4.9</tt> entry in the output RPM requirements.<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:47:05)</span> <b>matyas:</b></span> i'm not sure that pattern will match xrootd-4.9.0 though<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:47:26)</span> <b>matyas:</b></span> er, <tt>xrootd-4.9.0</tt> may not satisfy <tt>xrootd = 4.9</tt><br/>
+<span style="color: #e06b56"><span style="font-size: small">(09:48:24)</span> <b>jthiltges:</b></span> Ah, good question. I wasn't sure about that part. Could use two then? <tt>&gt;= 4.9.0</tt> and <tt>&lt;= 4.9.999</tt> or something?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:52:48)</span> <b>bbockelm:</b></span> oof.  That looks nasty.  I would maybe look around to see the status-quo?  Does any other package have a similar setup?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(09:59:25)</span> <b>jthiltges:</b></span> Unfortunately, I'm not aware of any examples offhand.<br/>In a less insane world, perhaps xrootd folks would increment their so numbers and RPM dependencies would be detected magically.<br/>Right now, xrootd seems to print an unhelpful (and non-fatal) message which is easily overlooked. And then fails to load the offending plugin.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:01:08)</span> <b>blin:</b></span> who needs so versions<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:01:13)</span> <b>blin:</b></span> &gt;.&gt;<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:17:43)</span> <b>matyas:</b></span> bad news on xrootd 4.9.0: <pre><br/># rpm -q xrootd-client-libs<br/>xrootd-client-libs-4.9.0-1.osg34.el7.x86_64<br/># export LD_PRELOAD=/usr/lib64/libXrdPosixPreload.so<br/># ls<br/>Segmentation fault<br/># cat<br/>Segmentation fault<br/></pre><br/>
+<span style="color: #16569E"><span style="font-size: small">(15:21:39)</span> <b>edquist:</b></span> sorry to jump in a bit late here<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:22:45)</span> <b>edquist:</b></span> i'm not wild about the idea of automatically doing the version requirement with an rpm query<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:22:56)</span> <b>edquist:</b></span> but it would work to do<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:23:36)</span> <b>edquist:</b></span> <pre><br/>Requires: xrootd &gt;= 1:4.9<br/>Requires: xrootd &lt; 1:4.10<br/></pre><br/>
+<span style="color: #16569E"><span style="font-size: small">(15:23:53)</span> <b>edquist:</b></span> the <tt>1</tt> epoch always gets me<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:24:39)</span> <b>edquist:</b></span> yeah it is too bad that the automatic .so requirements don't ensure this<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:51:05)</span> <b>jthiltges:</b></span> I liked the automatic version generation (despite being ugly!) because it doesn't won't require any later effort to keep things matched up. Maybe that's not a big deal to maintain.<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:51:29)</span> <b>matyas:</b></span> we could just toss in similar BuildRequires<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:51:44)</span> <b>matyas:</b></span> then the build will fail, which will remind us to update<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:51:48)</span> <b>jthiltges:</b></span> Ooh, good thinking!<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:04:25)</span> <b>blin:</b></span> wait, where would the BuildRequires go?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:04:52)</span> <b>matyas:</b></span> in every plugin spec?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:06:22)</span> <b>blin:</b></span> how would that remind us to update the plugins when we update xrootd?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:06:47)</span> <b>matyas:</b></span> oh is that what you mean<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:06:57)</span> <b>matyas:</b></span> well, the regular Requires will make the plugins fail to install if we update xrootd<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:07:58)</span> <b>matyas:</b></span> which means xrootd will fail to upgrade if they don't upgrade the plugins at the same time<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:08:10)</span> <b>blin:</b></span> yeah, sorry, i just thought you were trying to solve a different issue<br/>
+</body>
+</html>

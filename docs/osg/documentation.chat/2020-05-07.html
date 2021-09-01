@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu May 7, 2020 : #documentation (osg)</title>
+</head>
+<body>
+<h3>Thu May 7, 2020 : #documentation (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(12:58:18)</span> <b>blin:</b></span> @efajardo @didavila @tim.theisen @matyas <b>@edquist</b> @dweitzel doc focus starting up soon!<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:58:37)</span> <b>blin:</b></span> i've shuffled the tickets around a bunch, some of which already have a PR submitted<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:58:42)</span> <b>blin:</b></span> for those tickets, please review the PR<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:44:14)</span> <b>blin:</b></span> a bunch of us are stuck on a special xcache devops call<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:44:33)</span> <b>blin:</b></span> <b>@edquist</b> @tim.theisen do you have any questions about the tickets assigned to you or the prio?<br/>
+<span style="color: #73769d"><span style="font-size: small">(13:45:26)</span> <b>tim.theisen:</b></span> I got enough to get started.<br/>
+<span style="color: #16569E"><span style="font-size: small">(13:49:09)</span> <b>edquist:</b></span> i'm going to start with Document Corrections for GRACC, as it's got the highest prio<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:52:48)</span> <b>blin:</b></span> :thumbsup:<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:53:57)</span> <b>blin:</b></span> i also try to order the tasks by prio within the board: <a href="https://opensciencegrid.atlassian.net/secure/RapidBoard.jspa?rapidView=7&amp;projectKey=SOFTWARE">https://opensciencegrid.atlassian.net/secure/RapidBoard.jspa?rapidView=7&amp;projectKey=SOFTWARE</a><br/>
+<span style="color: #9d8eee"><span style="font-size: small">(14:10:59)</span> <b>cat:</b></span> Oooh, it’s like Trello, but uglier!<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(14:11:29)</span> <b>cat:</b></span> I really want to start moving stuff around and changing fields, but I suppose that would not actually be helpful…<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:12:00)</span> <b>blin:</b></span> since you have a jira account i could set up a project for you where you could futz around with things like a trello board<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(14:12:27)</span> <b>cat:</b></span> Please, no<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(14:12:36)</span> <b>cat:</b></span> :smile:<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:18:52)</span> <b>matyas:</b></span> hey @efajardo @blin, I'm reading through the stash origin container doc (<a href="https://github.com/opensciencegrid/docs/pull/681">https://github.com/opensciencegrid/docs/pull/681</a>) and see a lot of manual steps there...<br/>• create /opt/origin by hand<br/>• add authfile, environment file, configuration to /opt/origin<br/>• create /srv/origin by hand<br/>• copy-paste this systemd service file<br/>what do you think of putting all that in an RPM?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:19:09)</span> <b>matyas:</b></span> and yes, I am aware of how nuts it sounds to create an RPM for a docker container<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:20:14)</span> <b>blin:</b></span> why are we telling them to create those dirs? seems overly prescriptive to me (without looking at the doc)<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:20:45)</span> <b>matyas:</b></span> we're not explicitly telling them to create them<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:20:47)</span> <b>blin:</b></span> and what systemd file?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:20:58)</span> <b>matyas:</b></span> they're just what the doc uses in the config and command lines<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:22:33)</span> <b>matyas:</b></span> in case you're not using kubernetes, the doc has a systemd file to start/stop the container as if it were a regular service<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:22:45)</span> <b>blin:</b></span> ah, ok<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:23:36)</span> <b>matyas:</b></span> kinda cool actually<br/><pre>[Service]<br/>TimeoutStartSec=0<br/>Restart=always<br/>ExecStartPre=-/usr/bin/docker stop %n<br/>ExecStartPre=-/usr/bin/docker rm %n<br/>ExecStartPre=/usr/bin/docker pull opensciencegrid/stash-origin:stable<br/>ExecStart=/usr/bin/docker run --rm --name %n -p 1094:1094 -p 1095:1095 -v /srv/origin:/origin -v /opt/origin/10-origin-authfile.cfg:/etc/xrootd/config.d/10-origin-authfile.cfg -v /opt/origin/auth_file:/etc/xrootd/public-origin-authfile --env-file /opt/origin/.env opensciencegrid/stash-origin:stable</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:23:37)</span> <b>blin:</b></span> i think for the config dir/files + data dir, we should just refer to them as such and let the admin decide where they should be placed on the host<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:24:05)</span> <b>blin:</b></span> the systemd file...i'm not sure what to do here but creating an RPM feels gross<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:24:27)</span> <b>matyas:</b></span> well but we provide so many commands by hand that if we're not prescriptive, the admin will forget to fill in one of the blanks<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:24:28)</span> <b>blin:</b></span> esp since we'd force them to use specific config/data locations on the host<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:25:49)</span> <b>blin:</b></span> i appreciate the sentiment but it's a relatively short doc, so i'm not too worried about an admin missing a command<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:26:30)</span> <b>matyas:</b></span> it's not the page count, it's how many commands there are<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:27:18)</span> <b>blin:</b></span> that doc only has one command and a handful of files that we tell them to edit<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:27:35)</span> <b>blin:</b></span> it's not like the xrootd standalone or htcondor-ce install doc<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:10:40)</span> <b>matyas:</b></span> So does this mean you'd rather have <tt>&lt;CONFIG DIR&gt;</tt> <tt>&lt;DATA DIR&gt;</tt> instead of having defaults?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:12:17)</span> <b>blin:</b></span> yeah, in this case i think so<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:12:39)</span> <b>blin:</b></span> my reasoning is that we don't control /anything/ on the host in this case<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:12:46)</span> <b>blin:</b></span> it'd be different if we had RPMs :stuck_out_tongue:<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:12:50)</span> <b>matyas:</b></span> I was thinking of just having a table like<br/><pre>This document uses the following paths for configuration and data.<br/>You may use different paths on your host, in which case, adjust the commands below accordingly.<br/>| Path | Description |<br/>|------|-------------|<br/>| <tt>/opt/origin</tt> | Origin configuration files |<br/>| <tt>/opt/origin/.env</tt> | Environment file for Docker container |<br/>| <tt>/srv/origin</tt> | Location of user data |</pre><br/><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:12:53)</span> <b>blin:</b></span> but i think that's heavy-handed for this use case<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:13:35)</span> <b>matyas:</b></span> Well, I'd like to be prescriptive -- when they ask us to debug their stuff, we won't waste a round of emails asking them where their stuff is<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:13:39)</span> <b>blin:</b></span> i don't love that, i saw pascal copy-paste stuff directly into his terminal for examples<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:15:06)</span> <b>blin:</b></span> <pre>run this command:<br/><br/>    mkdir &lt;CONFIG DIR&gt;<br/><br/>replacing <tt>&lt;CONFIG DIR&gt;</tt> with your own blah blah blah. For example, if your <tt>&lt;CONFIG DIR&gt;</tt> is <tt>/opt/origin</tt>:<br/><br/>    mkdir /opt/origin/</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:15:29)</span> <b>blin:</b></span> ^^ this is how we do both in some of our other docs<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:16:52)</span> <b>blin:</b></span> i don't love the idea of telling them where to put their source data<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:17:13)</span> <b>matyas:</b></span> fine, we'll _ask nicely_<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:17:45)</span> <b>matyas:</b></span> actually the location of the configuration ("/opt/origin") pops up more often in the commands<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:17:54)</span> <b>matyas:</b></span> and I'd rather tell them where to put _that_<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:39:30)</span> <b>matyas:</b></span> how about a table like<br/><pre>This document uses the following placeholders for paths.<br/>You may pick the paths that best suit your system, or follow our recommendations.<br/>| Path               | Recommendation | Description                |<br/>|--------------------|----------------|----------------------------|<br/>| <tt>&lt;HOST PARTITION&gt;</tt> |  <tt>/srv/origin</tt> | Location of user data      |<br/>| <tt>&lt;CONFIG DIR&gt;</tt>     |  <tt>/opt/origin</tt> | Origin configuration files |</pre><br/><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:43:34)</span> <b>blin:</b></span> yeah, i'm ok with that<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:05:06)</span> <b>matyas:</b></span> on a separate topic, I'm confused by this ticket: <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-3996">https://opensciencegrid.atlassian.net/browse/SOFTWARE-3996</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(17:05:12)</span> <b>matyas:</b></span> what do you want me to change to what?<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:05:31)</span> <b>matyas:</b></span> the formats look about the same to me<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:12:07)</span> <b>blin:</b></span> <a href="https://opensciencegrid.org/docs/compute-element/job-router-recipes/#setting-batch-system-directives">https://opensciencegrid.org/docs/compute-element/job-router-recipes/#setting-batch-system-directives</a> is what we want<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:12:48)</span> <b>blin:</b></span> namely we want the <a href="http://htcondor-ce.readthedocs.io">htcondor-ce.readthedocs.io</a> documentation to look like the <tt>HTCondor-CE &gt;= 4</tt>  sections<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:13:21)</span> <b>blin:</b></span> it's much nicer, you set the attr then set the CE requirements to that list of attr<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:14:20)</span> <b>blin:</b></span> instead of setting <tt>default_remote_cerequirements</tt>  to some crazy string, which results in some pretty gross <tt>strcat()</tt> expressions if you don't want to set the vars statically<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:15:42)</span> <b>matyas:</b></span> ok, I see<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:18:09)</span> <b>matyas:</b></span> yeah that is pretty nice<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:47:08)</span> <b>blin:</b></span> do resource groups have to be unique across topology?<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:47:15)</span> <b>matyas:</b></span> yes<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:47:22)</span> <b>edquist:</b></span> and yes<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:47:47)</span> <b>edquist:</b></span> which raises an interesting question<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:47:53)</span> <b>edquist:</b></span> like gmail addresses<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:48:39)</span> <b>edquist:</b></span> will "big" researchers pay lots of money to lowly grad students who happen to weasel their way into a hip resource name?<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:48:42)</span> <b>edquist:</b></span> Hmm...<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:48:50)</span> <b>edquist:</b></span> i mean,<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:48:55)</span> <b>edquist:</b></span> to buy the rights to the name<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:49:52)</span> <b>matyas:</b></span> I mean right now we just let people pick whatever but if the grant money ever runs low we could start selling naming rights<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:50:11)</span> <b>edquist:</b></span> i think it might turn into a 3rd party business without our intervention<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:50:28)</span> <b>edquist:</b></span> though you bring up a good point that we could at least charge for them first<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:50:35)</span> <b>edquist:</b></span> like domain names<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:57:58)</span> <b>blin:</b></span> i'm gonna head out<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:58:01)</span> <b>blin:</b></span> have a good night everyone!<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:58:11)</span> <b>edquist:</b></span> you too!<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:58:11)</span> <b>edquist:</b></span> but<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:58:12)</span> <b>edquist:</b></span> first<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:58:20)</span> <b>edquist:</b></span> enjoy the rest of this glorious day!<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:58:24)</span> <b>edquist:</b></span> :sun:<br/>
+</body>
+</html>

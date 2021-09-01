@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Feb 5, 2021 : #uscms (osg)</title>
+</head>
+<body>
+<h3>Fri Feb 5, 2021 : #uscms (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(14:44:09)</span> <b>spiperov:</b></span> My concern is more of other VMs squeezing the NN into a corner. Also, what if the host becomes unstable due to other VMs? Needs to be restarted?<br/>
+<span style="color: #d1707d"><span style="font-size: small">(15:05:42)</span> <b>gattebury:</b></span> That’s a resource contention issue and not an easy question to answer — depending on your hypervisors’ abilities you could do some QoS things or pinning of CPUs to ensure some minimal level of performance, but it’s probably far easier to just not overload the hypervisor running the NN VM  in the first place.<br/><br/>We ran our NN and SNN as VMs briefly at Nebraska (think back in 2016 era, maybe even earlier) while shuffling some hardware around without issue. Didn’t have any issues, but I don’t think we ever had any real competition from other VMs. Our NN right now runs on an ancient 4 core 8 thread Xeon X3470 and gets along well enough, so it isn’t particularly demanding. Startups take a while of course but that doesn’t need to happen often.<br/>
+<span style="color: #d1707d"><span style="font-size: small">(15:07:35)</span> <b>gattebury:</b></span> It should all be CPU and memory limited for the most part — you shouldn’t have I/O problems with a NN or SNN as there isn’t much beyond the checkpoint to even happen there. Definitely don’t have swap. Swap is evil, especially on VMs.<br/>
+</body>
+</html>

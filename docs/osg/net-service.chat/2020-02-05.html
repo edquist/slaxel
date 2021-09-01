@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Feb 5, 2020 : #net-service (osg)</title>
+</head>
+<body>
+<h3>Wed Feb 5, 2020 : #net-service (osg)</h3>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:09:59)</span> <b>smckee:</b></span> @dweitzel I think I see what may be happening about the PRP network data.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:10:40)</span> <b>smckee:</b></span> I believe it is getting on the RabbitMQ bus, however the ingestors have some code: <a href="https://github.com/sand-ci/ps-ingest/blob/master/siteMapping.py#L189">https://github.com/sand-ci/ps-ingest/blob/master/siteMapping.py#L189</a><br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:12:10)</span> <b>smckee:</b></span> They also need to parse the list of hosts by reading from psconfig currently.  This is to get the list  of hosts and I believe they are used to "filter" what is grabbed from the bus.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:12:58)</span> <b>smckee:</b></span> To make the PRP case work we would need to 1) support having more than one configuration URL and 2) parse the pSConfig format to extract the hosts<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:18:52)</span> <b>dweitzel:</b></span> so the source and destination right now are just the ip addresses?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:23:13)</span> <b>dweitzel:</b></span> looking through the code.  It appears that the siteMapping only adds useful information if the perfsonar host is registered in atlas-agis, gocdb, or OIM (topology?)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:23:25)</span> <b>dweitzel:</b></span> these hosts won't be registered in any of those sources.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:25:39)</span> <b>dweitzel:</b></span> The sitemapping only adds <tt>dest_site</tt>, <tt>dest_vo</tt> , <tt>src_site</tt>...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:26:06)</span> <b>dweitzel:</b></span> but that's it.  Looks like it adds a total of 4 attributes to the record.  I'm not sure that is the issue.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:26:46)</span> <b>dweitzel:</b></span> For the part that is reading <a href="http://psconfig.osg.org">psconfig.osg.org</a>, it is only there to add <tt>dest_production</tt> and <tt>src_production</tt> attributes to the records.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:54:45)</span> <b>smckee:</b></span> Yeah, looking at the <a href="https://github.com/sand-ci/ps-ingest/blob/master/NetworkPacketLossCollector.py">https://github.com/sand-ci/ps-ingest/blob/master/NetworkPacketLossCollector.py</a> code, I don't see that missing that metadata would stop it from sending records into ES.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:55:04)</span> <b>smckee:</b></span> Are there any interesting things showing up in the logs of the ingestors?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:24:26)</span> <b>dweitzel:</b></span> I setup a test collector real quick, with all the debugging.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:24:33)</span> <b>dweitzel:</b></span> I found this host: <a href="https://atlas-kibana.mwt2.org/s/networking/app/kibana#/discover?_g=(refreshInterval:(pause:!t,value:0),time:(from:now-7d,mode:quick,to:now))&amp;_a=(columns:!(_source),index:'612543e0-0061-11e8-8f2f-ab6704660c79',interval:auto,query:(language:kuery,query:'10.244.12.40'),sort:!(timestamp,desc))">https://atlas-kibana.mwt2.org/s/networking/app/kibana#/discover?_g=(refreshInterval:(pause:!t,value:0),time:(from:now-7d,mode:quick,to:now))&amp;_a=(columns:!(_source),index:'612543e0-0061-11e8-8f2f-ab6704660c79',interval:auto,query:(language:kuery,query:'10.244.12.40'),sort:!(timestamp,desc))</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:24:44)</span> <b>dweitzel:</b></span> looks like collection started at the right time.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:27:29)</span> <b>dweitzel:</b></span> that ip address, 10.244.12.40, that's some private IP, right?<br/>
+</body>
+</html>

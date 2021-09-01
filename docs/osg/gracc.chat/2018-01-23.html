@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jan 23, 2018 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Tue Jan 23, 2018 : #gracc (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(11:05:00)</span> <b>matyas:</b></span> hey folks<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:05:33)</span> <b>matyas:</b></span> got a weird issue somewhere between the gratia probes and gracc and I'm not sure how it's happening<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:06:25)</span> <b>matyas:</b></span> gratia-probe is supposedly sending "bundles" which are pipe-separated, and ScanBundle in <a href="https://github.com/opensciencegrid/gracc-collector/blob/master/collector.go">https://github.com/opensciencegrid/gracc-collector/blob/master/collector.go</a> is splitting them<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:08:20)</span> <b>matyas:</b></span> except I can't find the part in the gratia code that sends pipe-separated bundles. as far as I can tell, the bundles are supposed to be enclosed in <tt>&lt;RecordEnvelope&gt;</tt> tags<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:08:40)</span> <b>matyas:</b></span> so I'm wondering what's going on.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:09:06)</span> <b>matyas:</b></span> this is for <a href="https://ticket.grid.iu.edu/34406">https://ticket.grid.iu.edu/34406</a> by the way<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:45:25)</span> <b>kretzke:</b></span> @matyas the pipe-separated bundles that are processed by <tt>handleUpdate()</tt> are sent by Gratia collectors. The XML “multiupdate” is what probes send, see <a href="https://github.com/opensciencegrid/gracc-collector/blob/master/collector.go#L203">https://github.com/opensciencegrid/gracc-collector/blob/master/collector.go#L203</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(11:49:47)</span> <b>matyas:</b></span> I didn't know that gratia-collectors were still in the loop<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:51:19)</span> <b>kretzke:</b></span> no, they’re not anymore, but replication was used during development and transition to populate GRACC<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:52:36)</span> <b>dweitzel:</b></span> UNL still uses gratia-collectors locally.  Then forwards the data up to GRACC.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:52:44)</span> <b>dweitzel:</b></span> But I think we're the only one. :slightly_smiling_face:<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:59:03)</span> <b>kretzke:</b></span> ah, forgot about those. All the FNAL ones (including OSG) are shut down<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:03:03)</span> <b>dweitzel:</b></span> probably for the best.<br/>
+</body>
+</html>

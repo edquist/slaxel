@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jun 2, 2021 : #collaboration-support (osg)</title>
+</head>
+<body>
+<h3>Wed Jun 2, 2021 : #collaboration-support (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(09:21:30)</span> <b>ruben.lara:</b></span> After the last update performed by @jdost321, we are getting GPU jobs. All our nodes are busy at the moment.<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:41:47)</span> <b>paschos:</b></span> @marian @ruben.lara @jdost321<br/>@james.clark just submitted a bunch of igwn of jobs targeting gatech but we are getting this:<br/><pre>$ condor_status -pool $IGWN_POOL -const 'GLIDEIN_Site=="GATech"' -long | grep -i gpu | sort | uniq<br/>GPUDetection = "No GPUs detected"<br/>OSG_NODE_WARNINGS = "GPU detection failed!. "</pre><br/><br/>
+<span style="color: #a63024"><span style="font-size: small">(13:43:39)</span> <b>paschos:</b></span> gatech is getting. OSG gpus running there but i am having trouble confirming that the resource can be targeted from other pools<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:53:04)</span> <b>ruben.lara:</b></span> Please note that the GLIDEIN setting on the worker nodes is this:<br/><pre>GLIDEIN_ResourceName = "Georgia_Tech_PACE_CE_2"</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(13:53:52)</span> <b>paschos:</b></span> yeah --- but the glideiin_site string is gatech --- so it. should match from there<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:01:00)</span> <b>marian:</b></span> I'm encoutering some issues with the collectors, too ... but I can't confirm yet this is related here...<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:29:54)</span> <b>ruben.lara:</b></span> I found at lease one LIGO job that’s using a GPU:<br/><pre>-- Schedd: <a href="http://osg-login2.pace.gatech.edu">osg-login2.pace.gatech.edu</a> : &lt;128.61.254.78:17266?...<br/>The Requirements expression for job 433359.000 is<br/><br/>    (TARGET.Arch == "X86_64") &amp;&amp; (TARGET.OpSys == "LINUX") &amp;&amp;<br/>    (TARGET.Disk &gt;= RequestDisk) &amp;&amp; (TARGET.Memory &gt;= RequestMemory) &amp;&amp;<br/>    (TARGET.GPUs &gt;= RequestGPUs) &amp;&amp; (TARGET.HasFileTransfer)<br/><br/>Job 433359.000 defines the following attributes:<br/><br/>    RequestDisk = 1<br/>    RequestGPUs = 1<br/>    RequestMemory = 4000<br/><br/>The Requirements expression for job 433359.000 reduces to these conditions:<br/><br/>         Slots<br/>Step    Matched  Condition<br/>-----  --------  ---------<br/>[0]         611  TARGET.Arch == "X86_64"<br/>[1]         611  TARGET.OpSys == "LINUX"<br/>[3]         611  TARGET.Disk &gt;= RequestDisk<br/>[5]         611  TARGET.Memory &gt;= RequestMemory<br/>[7]          21  TARGET.GPUs &gt;= RequestGPUs<br/><br/><br/>433359.000:  Job is running.</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(14:30:16)</span> <b>ruben.lara:</b></span> <pre># condor_q 433359.000<br/><br/><br/>-- Schedd: <a href="http://osg-login2.pace.gatech.edu">osg-login2.pace.gatech.edu</a> : &lt;128.61.254.78:17266?... @ 06/02/21 15:30:04<br/>OWNER    BATCH_NAME    SUBMITTED   DONE   RUN    IDLE  TOTAL JOB_IDS<br/>ligo     ID: 433359   6/2  14:44      _      1      _      1 433359.0</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(14:32:48)</span> <b>ruben.lara:</b></span> In short: there are LIGO jobs using GPUs.<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:32:58)</span> <b>ruben.lara:</b></span> In the GATech cluster.<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:45:11)</span> <b>paschos:</b></span> @ruben.lara can. you look on the CE itself running condor_ce_q<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:45:27)</span> <b>paschos:</b></span> and find jobs with RequestGpus<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:48:08)</span> <b>ruben.lara:</b></span> There are quite a few with <tt>RequestGPUs = 1</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(14:50:33)</span> <b>paschos:</b></span> which VOs<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:52:12)</span> <b>ruben.lara:</b></span> IGWN (LIGO) and OSG, as far as I can see.<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:53:20)</span> <b>ruben.lara:</b></span> Is there a way to know for sure<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:53:22)</span> <b>ruben.lara:</b></span> ?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:53:36)</span> <b>ruben.lara:</b></span> I’m reviewing the output of <tt>condor_ce_q -long</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(14:54:47)</span> <b>paschos:</b></span> if you grep by the service user and find request gpus there then that should suffice<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:55:26)</span> <b>paschos:</b></span> a=<tt>condor_q -all | grep ligo | awk ' { print $3 } ‘</tt><br/>for i in $a; do condor_q -long $i | grep “RequestGPUs =” ; done<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:01:35)</span> <b>ruben.lara:</b></span> there are at least 30 jobs with <tt>RequestGPUs = 1</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(15:01:35)</span> <b>paschos:</b></span> i see 64 entries for osg<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:02:06)</span> <b>ruben.lara:</b></span> Summary: we are getting and running GPU jobs.<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:03:53)</span> <b>paschos:</b></span> regardless, the issue  remains with users targeting the resource from the igwn pool which was the focus of the original post —<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:06:25)</span> <b>paschos:</b></span> @briedel could your team submit a bunch of gpu jobs targeting georgia tech? at this point i see 3 icecube gpu jobs on the CE which agrees with the factory entry for the glow FE and *OSG_US_GATech_osg-sched2_gpu*<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:00:59)</span> <b>marian:</b></span> there is in general issue now with IGWN schedd's can't talk to the UCSD collector<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:01:54)</span> <b>marian:</b></span> I'm talking to James spread the message and update <tt>condor_mapfile</tt> with new DN that UCSD collector uses since May 28 ... The change happened without notice as it is InCommon cert managed by other people at UCSD than us<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:02:16)</span> <b>marian:</b></span> the line that needs to be added on each schedd:<br/><pre>GSI "/DC=org/DC=incommon/C=US/ST=California/L=La Jolla/O=University of California, San Diego/CN=<a href="http://osg-ligo-1.t2.ucsd.edu">osg-ligo-1.t2.ucsd.edu</a>" condor</pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(16:02:37)</span> <b>marian:</b></span> <tt>condor</tt> can be replaced with arbitrary name schedd used with previous cert<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:03:14)</span> <b>marian:</b></span> to figure which file is correct to edit on the schedd host:<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:03:43)</span> <b>marian:</b></span> <tt>$ condor_config_val CERTIFICATE_MAPFILE</tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(16:04:06)</span> <b>marian:</b></span> ideally should point to:<br/><pre>/etc/condor/certs/condor_mapfile</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(16:06:06)</span> <b>paschos:</b></span> @ruben.lara ^<br/>
+</body>
+</html>

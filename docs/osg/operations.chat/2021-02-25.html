@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Feb 25, 2021 : #operations (osg)</title>
+</head>
+<body>
+<h3>Thu Feb 25, 2021 : #operations (osg)</h3>
+<span style="color: #3c8c69"><span style="font-size: small">(06:33:42)</span> <b>jpeterson:</b></span> Working with Tufts on some HostedCE tuning and this slurm question came up.  I think the answer is “cancel” so our system can do the rescheduling, but just looking for a sanity check confirmation:<br/><pre>Question: If we setup an osg-preempt or osg-cpu-preempt partition that has lower priority than our regular preempt, gpu-preempt partitions how should the osg partitions handle OSG jobs that get preempted?  We could cancel or set them to reschedule? What do most sites do?</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(07:55:08)</span> <b>dweitzel:</b></span> Nebraska does cancel.<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:48:28)</span> <b>efajardo:</b></span> @efajardo has left the channel<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:53:10)</span> <b>matyas:</b></span> <a href="http://repo-itb.opensciencegrid.org">repo-itb.opensciencegrid.org</a> is asking me for a password when I try to ssh in<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:54:02)</span> <b>matyas:</b></span> did it get moved to tiger?<br/>
+<blockquote>
+<span style="color: #e06b56"><span style="font-size: small">(12:55:42)</span> <b>jthiltges:</b></span> Not yet! Lemme poke at it.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:57:32)</span> <b>jthiltges:</b></span> You're ssh-ing as user osgcollab?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:57:40)</span> <b>matyas:</b></span> yep<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:00:18)</span> <b>jthiltges:</b></span> Any issues connecting to repo.osg?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:00:40)</span> <b>jthiltges:</b></span> So far, not seeing anything obvious... but the SSH logs are kinda swimming with bruteforce attempts.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:03:10)</span> <b>matyas:</b></span> no, repo.osg is fine<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:03:36)</span> <b>matyas:</b></span> I was trying last night -- let me try again<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:03:55)</span> <b>matyas:</b></span> ... and it just started working<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:07:21)</span> <b>jthiltges:</b></span> I have no explanation. :disappointed:<br/>Didn't see anything in /var/log/secure for osgcollab yesterday. You're welcome to poke around if you like.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:08:08)</span> <b>matyas:</b></span> nah, I just wanted to upload a file. Sorry to bother you<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:08:34)</span> <b>jthiltges:</b></span> No worries at all. If it's broken or acting weird, I want to know! :-)<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:10:04)</span> <b>jthiltges:</b></span> I guess this is a good time to ask... what sort of manual changes do you expect on repo? And how to handle them in a k8s world?<br/><br/>Right now, I've got the koji and mirrorlist magic running on tiger. <a href="https://repo.osgdev.chtc.io/">https://repo.osgdev.chtc.io/</a><br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:10:28)</span> <b>jthiltges:</b></span> Underneath, it's two replicas, each with its own PV.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:12:11)</span> <b>matyas:</b></span> well in this case I wanted to add our new RPM signing key -- so RPM-GPG-OSG* <a href="http://repo.opensciencegrid.org/osg/">http://repo.opensciencegrid.org/osg/</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(13:12:53)</span> <b>matyas:</b></span> in general we update the <a href="http://repo.opensciencegrid.org/cadist/">http://repo.opensciencegrid.org/cadist/</a> directory whenever we make a new cert release<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:13:13)</span> <b>matyas:</b></span> I think that's a cron job that runs on repo<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:14:12)</span> <b>jthiltges:</b></span> For cadist, need to finish up that piece: adding a container to run the cronjob.<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:35:47)</span> <b>tim.theisen:</b></span> Actually its a systemd timer. And, I think we have more than one of those.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:17:54)</span> <b>jthiltges:</b></span> I'd made notes on the cron/timer pieces to migrate.<br/><br/>In the koji container:<br/><pre>update-all-repos.timer    Update all mash repos, every 30 minutes<br/>update-mashfiles.timer    Update all .mash files, once daily<br/>update-mirror.timer       Mirror updates for repo servers, every 30 minutes</pre><br/>In the cadist container:<br/><pre>repo-update-cadist.timer  Hourly cadist update for repo servers</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(15:18:52)</span> <b>matyas:</b></span> that sounds right<br/>
+</blockquote>
+<span style="color: #aba727"><span style="font-size: small">(16:53:22)</span> <b>moate:</b></span> @jdost321 @bbockelm as discussed, I'm going on vacation/furlough starting tomorrow to return March 9th, and have the following tickets open:<br/>• <a href="https://support.opensciencegrid.org/a/tickets/66474">https://support.opensciencegrid.org/a/tickets/66474</a> "Singularity behavior from CHTC submit points"<br/>• <a href="https://support.opensciencegrid.org/a/tickets/66747">https://support.opensciencegrid.org/a/tickets/66747</a> "GPU node utilization"<br/>• <a href="https://support.opensciencegrid.org/a/tickets/66653">https://support.opensciencegrid.org/a/tickets/66653</a> "OpenCL error for IceCube jobs at SDSC-PRP"<br/>• <a href="https://support.opensciencegrid.org/a/tickets/66798">https://support.opensciencegrid.org/a/tickets/66798</a> "Old version of osg-ca-certs at CRUSH?"<br/>• <a href="https://support.opensciencegrid.org/a/tickets/66837">https://support.opensciencegrid.org/a/tickets/66837</a> "Access to PRP through GLOW GWMS Frontend"<br/>• <a href="https://support.opensciencegrid.org/a/tickets/66695">https://support.opensciencegrid.org/a/tickets/66695</a> "CVMFS activity from Wisconsin CHTC"<br/>• <a href="https://support.opensciencegrid.org/a/tickets/66845">https://support.opensciencegrid.org/a/tickets/66845</a> "Switch GLOW glidein startds to use starter to run Singularity, not the USER_JOB_WRAPPER"<br/>How shall I handle?<br/>
+<span style="color: #aba727"><span style="font-size: small">(16:57:52)</span> <b>moate:</b></span> Also, looks like I'm on Freshdesk triage Monday, March 8th;  I wouldn't mind doing a little triage but I'm on furlough that day, so can't touch work.<br/>
+<span style="color: #385a86"><span style="font-size: small">(17:24:18)</span> <b>jdost321:</b></span> @moate apologies i forgot we were going to chat today. Thanks for the list I'll go thru it and seek out other folks to assign them to while you're away. Also we'll make sure some one else covers your triage on Mon<br/>
+<span style="color: #385a86"><span style="font-size: small">(17:25:00)</span> <b>jdost321:</b></span> (Mon the :sunglasses:<br/>
+<span style="color: #385a86"><span style="font-size: small">(17:25:09)</span> <b>jdost321:</b></span> 8th<br/>
+<span style="color: #aba727"><span style="font-size: small">(17:25:14)</span> <b>moate:</b></span> Much appreciated<br/>
+<span style="color: #aba727"><span style="font-size: small">(17:25:28)</span> <b>moate:</b></span> I'm totally about trading a day with somebody, or a week<br/>
+<span style="color: #aba727"><span style="font-size: small">(17:25:32)</span> <b>moate:</b></span> whatever works<br/>
+<span style="color: #385a86"><span style="font-size: small">(17:29:06)</span> <b>jdost321:</b></span> ok sounds good, enjoy your time off!<br/>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Aug 20, 2020 : #general (osg)</title>
+</head>
+<body>
+<h3>Thu Aug 20, 2020 : #general (osg)</h3>
+<span style="color: #5a4592"><span style="font-size: small">(08:47:40)</span> <b>lmichael:</b></span> I’m not sure bandwidth is our issue, or at least, my impression is that other barriers have kept us from even realizing any bandwidth issues. We haven’t really been asking new sites to support CVMFS (we should probably change that approach), so they don’t even try, but it’s also a non-trivial undertaking to install CVMFS (thinking AMNH/Sajesh, who is more skilled/able to spend the time that what I’ve gathered for staff at other sites).<br/>
+<span style="color: #5a4592"><span style="font-size: small">(08:48:19)</span> <b>lmichael:</b></span> Do we have an idea of what bandwidth levels are necessary to support CVMFS (I’m guessing that per-exec-node and out from the campus both matter)?<br/>
+<span style="color: #965d1b"><span style="font-size: small">(11:09:37)</span> <b>briedel:</b></span> i think CVMFS should not be the issue<br/>
+<span style="color: #965d1b"><span style="font-size: small">(11:09:47)</span> <b>briedel:</b></span> in terms of bandwidth<br/>
+<span style="color: #965d1b"><span style="font-size: small">(11:10:05)</span> <b>briedel:</b></span> it can be cached locally<br/>
+<span style="color: #965d1b"><span style="font-size: small">(11:10:28)</span> <b>briedel:</b></span> the big thing is more that we need a way to get to mount at <tt>/cvmfs</tt><br/>
+<span style="color: #965d1b"><span style="font-size: small">(11:12:18)</span> <b>briedel:</b></span> us pulling in the data will be significantly more bandwidth intense than CVMFS<br/>
+<span style="color: #5a4592"><span style="font-size: small">(11:18:00)</span> <b>lmichael:</b></span> I don’t mean bandwidth specific to IceCube, but @blin do we have recommendations for when a site’s bandwidth might be too low to support CVMFS, in general?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:03:39)</span> <b>blin:</b></span> idk off-hand<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:06:08)</span> <b>blin:</b></span> maybe some friendly admins have thoughts -- but i imagine it's going to probably depend on supported VOs<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:07:06)</span> <b>blin:</b></span> @jlstephen @lincoln @clundstedt do you guys have any recommendations on minimum bandwidth necessary to support CVMFS at your sites?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:07:22)</span> <b>andrew.melo:</b></span> For CMS, our 10-15k slots are behind 2 squid proxies, and steady-state is a couple megabits<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:09:15)</span> <b>andrew.melo:</b></span> just double-checked... 10s of megabits<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:09:31)</span> <b>andrew.melo:</b></span> (swapped bits and bytes)<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:15:20)</span> <b>lincoln:</b></span> if the SLATE monitoring is to be believed, here's the utilization for our primary squid at UChicago for MWT2<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:15:22)</span> <b>lincoln:</b></span> <br/>
+<span style="color: #e96699"><span style="font-size: small">(12:17:11)</span> <b>lincoln:</b></span> that's for 10kish slots?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:28:58)</span> <b>dweitzel:</b></span> Note that stashcache through CVMFS does not go through squid.  But singularity from CVMFS will go through squid. <br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(12:29:47)</span> <b>blin:</b></span> huh, why's that?<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:33:32)</span> <b>lincoln:</b></span> i assume stashcache will directly talk to an XRootD cache rather than Squid?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:45:37)</span> <b>blin:</b></span> that would mean that it's using the xrootd protocol instead of http<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:45:41)</span> <b>blin:</b></span> i think?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:50:34)</span> <b>matyas:</b></span> I think so<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:56:50)</span> <b>dweitzel:</b></span> CVMFS uses only HTTP to talk to the HTTP port of stashcache servers.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:05:18)</span> <b>blin:</b></span> so i'm confused. why then would it not go through squid then?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:06:01)</span> <b>matyas:</b></span> It's CVMFS's decision whether to use squid for a transfer or not<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:07:14)</span> <b>matyas:</b></span> Guessing there's no point in caching a file twice (once at stashcache, once at squid) so CVMFS bypasses squid.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:07:56)</span> <b>blin:</b></span> wouldn't it save WAN bandwidth if the stash cache isn't also at the site?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:09:21)</span> <b>matyas:</b></span> There's pros and cons for doing it each way.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:10:17)</span> <b>blin:</b></span> if this is the case, it would make sense to default to going through squid since we have way more squids than stash caches<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:10:48)</span> <b>dweitzel:</b></span> The goal with StashCache was larger files.  Larger than a squid would cache anyways.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:11:04)</span> <b>blin:</b></span> oh duh<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:11:07)</span> <b>blin:</b></span> that makes a lot more sense<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:11:25)</span> <b>dweitzel:</b></span> CVMFS will use "external" URL's in order to pull the data from stashcache caches.  The metadata is still through CVMFS and squid infrastructure.<br/>
+</blockquote>
+<span style="color: #9e3997"><span style="font-size: small">(13:01:32)</span> <b>bbockelm:</b></span> $0.02: Sites without CVMFS can generally expect higher bandwidth usage than sites with CVMFS.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(15:54:56)</span> <b>lmichael:</b></span> I understand that CVMFS is better for bandwidth, but that’s not the question.<br/>The question is: how to get IceCube (and maybe other) GPU jobs running across more sites, many of which don’t have CVMFS. Should we propose to Miron and Frank that we need to start (nearly) requiring sites to go through the effort of supporting CVMFS? Do we think we have a better shot at that, worth the time and effort and assumption that site admins will do the work, or at dealing with some changes to the IceCube data management scheme and causing a bit more bandwidth without CVMFS? @bbockelm should we propose these options and action plans to Miron/Frank?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:08:55)</span> <b>bbockelm:</b></span> I think we can state right now we don't have sufficient workloads for GPUs without CVMFS.  We should talk through the problem but I don't know if I've thought through the problem enough to propose options or plans.  Would be a good discussion with Frank and Miron!<br/>
+</body>
+</html>

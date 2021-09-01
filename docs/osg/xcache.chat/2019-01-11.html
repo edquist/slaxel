@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jan 11, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Fri Jan 11, 2019 : #xcache (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(14:16:23)</span> <b>blin:</b></span> i'm getting this error when starting up my cache:<br/><pre><br/>190111 00:00:25 126 XrdConfig: Unable to create home directory //stash-cache; permission denied<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:16:57)</span> <b>blin:</b></span> i have <tt>set cachedir = /stash</tt> but i'm starting up xrootd with <tt>-n stash-cache</tt> -- do they have to match?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:17:26)</span> <b>dweitzel:</b></span> Does it work otherwise?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:17:57)</span> <b>blin:</b></span> to work around it i <tt>set cachedir = /stash-cache</tt> and i seem to at least be getting further along<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:18:34)</span> <b>dweitzel:</b></span> I think I've seen that error before, but it doesn't stop xrootd from running.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:41:07)</span> <b>blin:</b></span> ¯\_(ツ)_/¯<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:41:18)</span> <b>blin:</b></span> next error:<br/><pre><br/>=====&gt; pfc.diskusage 0.90 0.95<br/>Config continuing with file /etc/xrootd/config.d/50-stash-cache-authz.cfg ...<br/>Config continuing with file /etc/xrootd/config.d/50-stash-cache-logging.cfg ...<br/>190111 20:28:45 117 XrdFileCache_Cache::ConfigParameters(): pfc.diskusage should have lowWatermark &lt; highWatermark.<br/>------ File Caching Proxy interface initialization failed<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:41:22)</span> <b>blin:</b></span> that looks right, though?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:49:21)</span> <b>matyas:</b></span> looks ok to me<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:49:35)</span> <b>matyas:</b></span> low first, then high<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:49:40)</span> <b>blin:</b></span> yeah, right?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:07:27)</span> <b>jthiltges:</b></span> We've got <tt>pfc.diskusage 0.98 0.99</tt>... so yours should be fine. Any chance pfc.diskusage is being set elsewhere in the config? (Wouldn't think that should matter, but who knows.)<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:08:16)</span> <b>blin:</b></span> Doesn't look like it:<br/><pre><br/>sh-4.2# grep -R pfc.diskusage /etc/xrootd<br/>grep -R pfc.diskusage /etc/xrootd<br/>/etc/xrootd/config.d/40-osg-xcache.cfg:pfc.diskusage 0.90 0.95<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:47:19)</span> <b>blin:</b></span> rofl<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:47:33)</span> <b>blin:</b></span> <tt>pfc.diskusage 0.98 0.99</tt> works<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:52:43)</span> <b>matyas:</b></span> wtf<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:46:46)</span> <b>dweitzel:</b></span> I just did a test with those same values, 0.90 and 0.95.  Worked for me<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:46:49)</span> <b>dweitzel:</b></span> :shrug:<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:48:59)</span> <b>blin:</b></span> yeah, i reverted my changes and it works now<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:49:07)</span> <b>blin:</b></span> though i was changing a lot of things so maybe it was a red herring<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:50:08)</span> <b>blin:</b></span> for stashcache/auth stashcache, do we need a hostcert/key in the regular location or do you just need the xrd copies?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:51:10)</span> <b>dweitzel:</b></span> have to check the configs if they ever refer to the regular location.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:51:29)</span> <b>dweitzel:</b></span> Also, if this is a cache or origin.<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:52:06)</span> <b>blin:</b></span> it's a cache<br/>
+</body>
+</html>

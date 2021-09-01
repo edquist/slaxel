@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed May 6, 2020 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Wed May 6, 2020 : #gracc (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(10:56:31)</span> <b>blin:</b></span> hey @dweitzel i spoke with @jdost321 and the only entry in the factory for the ND GPU hosted CE sets the <tt>ResourceName</tt> to "ND - CAML_GPU"<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:57:14)</span> <b>blin:</b></span> and looking through the history in he factory for the past 6 months, i don't see any references to <tt>ND_CAMLGPU</tt> or <tt>ND - CMS_GPU</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:57:26)</span> <b>blin:</b></span> which records are referencing which of these names again?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:03:01)</span> <b>dweitzel:</b></span> ND - CMS_GPU showed up in payload records from March 16th to April 6th.  It looks like it was the GLIDEIN_ResourceName<br/>
+<span style="color: #385a86"><span style="font-size: small">(11:03:36)</span> <b>jdost321:</b></span> let me check the commit history, maybe we had it wrong initially then reconfigured<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:06:51)</span> <b>dweitzel:</b></span> ND_CAMLGPU has never shown up in GRACC<br/>
+<span style="color: #385a86"><span style="font-size: small">(11:09:15)</span> <b>jdost321:</b></span> yes, looks like at some point we had it set to ND - CMS_GPU but then changed it later<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:16:05)</span> <b>blin:</b></span> ok, so we should be able to just rename the <tt>ND_CAMLGPU</tt> resource to <tt>ND - CAML_GPU</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(11:16:15)</span> <b>blin:</b></span> if you update your PR, i'll merge that<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:17:33)</span> <b>dweitzel:</b></span> updated<br/>
+<span style="color: #385a86"><span style="font-size: small">(11:19:57)</span> <b>jdost321:</b></span> hmm just quicly looking at the pr.. to add confusion GLIDEIN_ResourceName doesn't normally == Resource in topology, it normally is supposed to match ResourceGroup (the yaml filename)<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:38:32)</span> <b>blin:</b></span> i think changing it to the resourcegroup name would be fine since the gracc lookup would respect that<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:38:45)</span> <b>blin:</b></span> what do you guys do if there are multiple CEs in a resource group?<br/>
+<span style="color: #385a86"><span style="font-size: small">(11:39:29)</span> <b>jdost321:</b></span> it remains the same for all, this is because that used to be teh BDII site name<br/>
+<span style="color: #385a86"><span style="font-size: small">(11:39:36)</span> <b>jdost321:</b></span> and what WLCG still sees as the site name<br/>
+<span style="color: #385a86"><span style="font-size: small">(11:44:38)</span> <b>jdost321:</b></span> @marco.mascheroni just gave me more context for the initial factory change for ND - CAML_GPU, Kenyi really wants this to look like another site <a href="https://support.opensciencegrid.org/a/tickets/64552">https://support.opensciencegrid.org/a/tickets/64552</a><br/>
+<span style="color: #385a86"><span style="font-size: small">(11:46:32)</span> <b>jdost321:</b></span> i've gotten pushback from Julia from WLCG for Purdue we actually did the opposite, they looked like different sites per cluster but WLCG wanted them all to have name Purdue, so we changed resource group / factory GLIDEIN_ResourceName accordingly. I guess this doesn't apply for ND since its a  T3, i'm assuming we don't have to worry about APEL accountign<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:48:37)</span> <b>blin:</b></span> it's a real shame that we inherited our factory config from CMS and use a different topology than what WLCG needs<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:49:23)</span> <b>blin:</b></span> but yeah, if renames are done right, the accounting system can handle it<br/>
+<span style="color: #385a86"><span style="font-size: small">(11:51:26)</span> <b>jdost321:</b></span> i think for this ND GPU resource though we can just follow osg conventions? so make it look like a different site, like we did for Utah clusters? <a href="https://github.com/opensciencegrid/topology/tree/master/topology/University%20of%20Utah">https://github.com/opensciencegrid/topology/tree/master/topology/University%20of%20Utah</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:00:02)</span> <b>bbockelm:</b></span> wait - why does WLCG have anything to do with the factory config?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:02:17)</span> <b>blin:</b></span> well, just what our definitions are for resources/sites in the factory vs what we use in topology<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:02:32)</span> <b>jdost321:</b></span> i'm not sure where WLCG actually gets the field.. but the site name they get is the same as resource_group which is the same as GLIDEIN_ResourceName in the pilot config, and the name of the yaml file in topology<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:02:38)</span> <b>jdost321:</b></span> those historically have all had to match<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:03:04)</span> <b>jdost321:</b></span> is GLIDEIN_ResourceName used in the payload information?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:03:36)</span> <b>blin:</b></span> so WLCG site = topology resource group = factory resource<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:03:55)</span> <b>jdost321:</b></span> right, that's how i understand it<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:04:26)</span> <b>blin:</b></span> yup, <tt>GLIDEIN_ResourceName</tt> is used by the GRACC to figure out which site the job ran at<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:04:58)</span> <b>blin:</b></span> @dweitzel can correct me if i'm wrong/explain the what the GRACC compares that field to in topology<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:06:51)</span> <b>dweitzel:</b></span> GRACC tries to match the GLIDEIN_ResourceName to: Resource, Site, and ResourceGroup looking for a match.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:09:18)</span> <b>bbockelm:</b></span> Right - but that's all internal.  The WLCG accounting name should be completely disjoint from anything internal to OSG.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:09:45)</span> <b>bbockelm:</b></span> e.g. <a href="https://github.com/opensciencegrid/topology/blob/master/topology/University%20of%20Nebraska/Nebraska-CMS/Nebraska.yaml#L47">https://github.com/opensciencegrid/topology/blob/master/topology/University%20of%20Nebraska/Nebraska-CMS/Nebraska.yaml#L47</a><br/>
+<span style="color: #385a86"><span style="font-size: small">(14:10:38)</span> <b>jdost321:</b></span> When Julia complianed Purdue looked like multiple sites on their side she showed me this link <a href="https://rebus.cern.ch/apps/topology/">https://rebus.cern.ch/apps/topology/</a><br/>
+<span style="color: #385a86"><span style="font-size: small">(14:10:53)</span> <b>jdost321:</b></span> their topology shows site names that echo what we call the "resource group" in the OSG side<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:11:03)</span> <b>jdost321:</b></span> i do not know where they get this from<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:11:12)</span> <b>jdost321:</b></span> but it historically also mapped to the BDII site name<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:11:14)</span> <b>jdost321:</b></span> when we had bdii<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:12:05)</span> <b>bbockelm:</b></span> a long long time ago, perhaps.  But if there's any overlaps, we should handle the override only at the WLCG layer versus changing our topology<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:12:15)</span> <b>bbockelm:</b></span> (that said, if a site wants them lined up, I have no big objection)<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:13:01)</span> <b>jdost321:</b></span> but this resource group doesn't even show up in the WLCGInformation blob, its the name of the yaml file it comes from, it must be visible and parsed from WLCG somewhere<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:14:40)</span> <b>dweitzel:</b></span> GRACC's APEL uploader uses the Resource Group, not that WLCG accounting name.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:21:40)</span> <b>bbockelm:</b></span> yeah - probably need the indirection layer in the APEL uploader.  That has the topology information available, right?<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:24:58)</span> <b>jdost321:</b></span> i see both in the WLCG link i shared, first column "Federation Accounting Name" looks like the AccountingName in WLCGInformation<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:25:04)</span> <b>jdost321:</b></span> but 2nd column site looks like the resource group<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:31:26)</span> <b>dweitzel:</b></span> APEL has topology information that is available in the summary (enriched) records.<br/>
+</body>
+</html>

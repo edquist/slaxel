@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jun 1, 2020 : #facilitation (osg)</title>
+</head>
+<body>
+<h3>Mon Jun 1, 2020 : #facilitation (osg)</h3>
+<span style="color: #4d5e26"><span style="font-size: small">(16:44:01)</span> <b>jmvera:</b></span> I'm trying to troubleshoot the following error with Matlab jobs: <tt>./hello_world: error while loading shared libraries: libmwlaunchermain.so: cannot open shared object file: No such file or directory</tt><br/>I am able to reproduce the error following our matlab hello world example, I got that the necessary library can't be located, but I'm not sure why<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:48:27)</span> <b>dweitzel:</b></span> Was there a module load command?  What’s the value in your environment of LD_LIBRARY_PATH? After the module load. <br/>
+<span style="color: #4d5e26"><span style="font-size: small">(16:53:31)</span> <b>jmvera:</b></span> yes, I used<br/><pre>set -e<br/>module load matlab/R2018b</pre><br/><br/>
+<span style="color: #4d5e26"><span style="font-size: small">(16:54:04)</span> <b>jmvera:</b></span> and for <tt>LD_LIBRARY_PATH</tt> i got <tt>/uufs/chpc.utah.edu/common/home/osguserk/bosco-osg-wn-client/lib64:/uufs/chpc.utah.edu/common/home/osguserk/bosco-osg-wn-client/lib:/uufs/chpc.utah.edu/common/home/osguserk/bosco-osg-wn-client/usr/lib64:/uufs/chpc.utah.edu/common/home/osguserk/bosco-osg-wn-client/usr/lib:/uufs/chpc.utah.edu/common/home/osguserk/bosco-osg-wn-client/usr/lib64/dcap:/uufs/chpc.utah.edu/common/home/osguserk/bosco-osg-wn-client/usr/lib64/lcgdm:$ORIGIN/../lib:$ORIGIN/../lib/condor</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:15:13)</span> <b>dweitzel:</b></span> Huh. I don’t see any path there that would be a module path. <br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:15:29)</span> <b>dweitzel:</b></span> All of those look like site settings. <br/>
+<span style="color: #4d5e26"><span style="font-size: small">(17:53:20)</span> <b>jmvera:</b></span> hmm, I can confirm that the jobs are requiring access to modules and that <tt>matlab/R2018b</tt> is listed when my job runs <tt>module avail</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(20:23:46)</span> <b>dweitzel:</b></span> Well, I found that file, it's here: <tt>/cvmfs/connect.opensciencegrid.org/modules/packages/linux-rhel7-x86_64/gcc-6.4.0spack/matlab-R2018b-cg5ysgn5gb2waoe73lv5ooteg4ntah46/v95/bin/glnxa64/libmwlaunchermain.so</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(20:27:06)</span> <b>dweitzel:</b></span> Try adding that directory to the LD_LIBRARY_PATH:<br/><pre>export LD_LIBRARY_PATH=/cvmfs/connect.opensciencegrid.org/modules/packages/linux-rhel7-x86_64/gcc-6.4.0spack/matlab-R2018b-cg5ysgn5gb2waoe73lv5ooteg4ntah46/v95/bin/glnxa64</pre><br/>If this works, I'm not sure why it didn't include it already in the LD_LIBRARY_PATH<br/>
+</body>
+</html>

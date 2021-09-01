@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Sep 11, 2020 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Fri Sep 11, 2020 : #gfactory (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(09:47:12)</span> <b>bbockelm:</b></span> @jthiltges - The issue is here:<br/><pre>PERMISSION DENIED to <a href="mailto:pilot-okd-gpfe01.fnal.gov@daemon.opensciencegrid.org">pilot-okd-gpfe01.fnal.gov@daemon.opensciencegrid.org</a></pre><br/>Particularly, I bet your <tt>ALLOW_WRITE</tt> contains something like <tt>*@users.opensciencegrid.org</tt> and not any mention of <tt>@daemon.opensciencegrid.org</tt><br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:48:29)</span> <b>bbockelm:</b></span> So you need to check how <tt><a href="http://pilot-okd-gpfe01.fnal.gov">pilot-okd-gpfe01.fnal.gov</a></tt> is being mapped by LCMAPS.  Particularly, if the CE was unable to validate the VOMS extension, it might cause this.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:49:19)</span> <b>bbockelm:</b></span> Anything with a VOMS attribute automatically gets punted to <tt><a href="http://users.osg.org">users.osg.org</a></tt> while anything else is a daemon.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:12:30)</span> <b>jthiltges:</b></span> I appreciate the info, thank you.<br/>After increasing the debug level and a restart, pilot-okd-gpfe01 is working. Perhaps the CE had old config that was long ago changed, but not applied.<br/>I'm puzzled by the pilot-gpfrontend01 denials (also seeing it on red and crane CEs), but nobody is complaining. ¯\_(ツ)_/¯<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(10:49:11)</span> <b>kherner:</b></span> Hmmm... we (FIFE experiments) had stuff running there as recently as 2:30 yesterday afternoon. Nothing now, but that might just be low demand.<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:39:48)</span> <b>efajardo:</b></span> HI Folks is <tt><a href="http://gfactory-itb-1.opensciencegrid.org">gfactory-itb-1.opensciencegrid.org</a></tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:39:49)</span> <b>efajardo:</b></span> down?<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:40:05)</span> <b>efajardo:</b></span> <pre>ueryError: Error executing htcondor query to pool <a href="http://gfactory-itb-1.opensciencegrid.org">gfactory-itb-1.opensciencegrid.org</a> with constraint (GlideinMyType=?="glidefactoryclient") &amp;&amp; (ReqClientName=?="IGWN-OSG-GWMSFrontend.itb-virgo") &amp;&amp; ((GLIDEIN_MaxMemMBs=!=UNDEFINED) &amp;&amp; (stringListMember("VIRGO", GLIDEIN_Supported_VOs) &amp;&amp; (FactoryType == "OSG-ITB" || FactoryType == "CERN-ITB-Dev"))) and format_list None: Error querying pool <a href="http://gfactory-itb-1.opensciencegrid.org">gfactory-itb-1.opensciencegrid.org</a> using python bindings: Failed communication with collector..</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:41:14)</span> <b>blin:</b></span> yeah, there's an issue with the update to 3.5<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:44:24)</span> <b>efajardo:</b></span> :disappointed:<br/>
+</body>
+</html>

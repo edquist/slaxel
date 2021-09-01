@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Feb 14, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Thu Feb 14, 2019 : #xcache (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(08:31:51)</span> <b>bbockelm:</b></span> @isfiligoi - Xrootd by default looks at the local interfaces in order to determine where to redirect clients.  Seems like that's really the wrong thing to do here.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(08:35:26)</span> <b>bbockelm:</b></span> Ah, but it looks like you got it by setting up <tt>xrd.network</tt> routes?  Can you leave a note here so others can do the same?<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:19:49)</span> <b>isfiligoi:</b></span> @bbockelm No, I still cannot get it to work… I was trying out the network setting, but without any success :disappointed:<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:20:51)</span> <b>isfiligoi:</b></span> I sent an email to the listserve, but no answer yet:<br/><a href="https://listserv.slac.stanford.edu/cgi-bin/wa?A2=ind1902&amp;L=XROOTD-L&amp;P=3927">https://listserv.slac.stanford.edu/cgi-bin/wa?A2=ind1902&amp;L=XROOTD-L&amp;P=3927</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(09:21:28)</span> <b>isfiligoi:</b></span> I may need to ask for a new feature from the xrootd team… what is the right channel for that?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:37:33)</span> <b>bbockelm:</b></span> ah - so reading again, I tried exactly the wrong thing.  Let me verify again with xrdfs.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:40:12)</span> <b>bbockelm:</b></span> So, here's the response to the locate:<br/><pre><br/>[2019-02-14 09:39:35.942345 -0600][Dump   ][XRootD            ] [<a href="http://stashcache-origin-merra2.nautilus.optiputer.net:31094">stashcache-origin-merra2.nautilus.optiputer.net:31094</a>] Got a kXR_ok response to request kXR_locate (path: */merra2/robots.txt, flags<br/>: kXR_prefname )<br/>[2019-02-14 09:39:35.942385 -0600][Dump   ][XRootD            ] [<a href="http://stashcache-origin-merra2.nautilus.optiputer.net:31094">stashcache-origin-merra2.nautilus.optiputer.net:31094</a>] Parsing the response to kXR_locate (path: */merra2/robots.txt, flags: kXR_pre<br/>fname ) as LocateInfo: Sw[::10.244.22.54]:31094<br/></pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:41:30)</span> <b>bbockelm:</b></span> Here's fundamentally the issue:<br/><pre><br/>$  xrdfs <a href="root://stashcache-origin-merra2.nautilus.optiputer.net:31094/">root://stashcache-origin-merra2.nautilus.optiputer.net:31094/</a> locate /merra2/robots.txt                                                             <br/>[::10.244.22.54]:31094 Server ReadWrite <br/></pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(10:45:31)</span> <b>isfiligoi:</b></span> Right… I need to override the auto-detect IP in xrootd<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:46:22)</span> <b>isfiligoi:</b></span> I know what it is supposed to be… but not how to force xrootd to use it!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:13:05)</span> <b>bbockelm:</b></span> (or override the hostname in a similar manner to how we do the <tt>altds</tt> for the port number)<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:41:49)</span> <b>isfiligoi:</b></span> Yes, something along the lines of that<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:42:30)</span> <b>isfiligoi:</b></span> The point is that I need to provide either a IP or DNS name that is external to the node itself<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:59:21)</span> <b>bbockelm:</b></span> I'd file a ticket.  There may be something I missed that exists.<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:01:10)</span> <b>isfiligoi:</b></span> Nobody from the xrootd team monitors their mailing list?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:58:51)</span> <b>bbockelm:</b></span> FYI - our sick.  Not going to make the meeting in 2 minutes.<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:16:42)</span> <b>blin:</b></span> @ivukotic is there a particular reason why ATLAS XCache doesn't support http?<br/>
+<span style="color: #84b22f"><span style="font-size: small">(15:20:19)</span> <b>ivukotic:</b></span> @blin Wahid B tested its performance for ATLAS workloads multiple times and it was always inadequate. Not sure anything changed recently but I don't think anyone tested.<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:43:31)</span> <b>blin:</b></span> hey, this map is really out of date, isn't it? <a href="https://opensciencegrid.org/docs/data/stashcache/StashCacheMap.png">https://opensciencegrid.org/docs/data/stashcache/StashCacheMap.png</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(15:43:37)</span> <b>marian:</b></span> @isfiligoi: for suggestions re xrootd features or behavior, best to reach developers is file xrootd github ticket (<a href="https://github.com/xrootd/xrootd/issues/new">https://github.com/xrootd/xrootd/issues/new</a>). Btw, xrootd-l is sometime slow in responses, that nature of that mailing list, you won't get quick answers<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:43:59)</span> <b>marian:</b></span> yes, the map is old, @blin<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:44:14)</span> <b>blin:</b></span> who made it originally, @dweitzel?<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:44:30)</span> <b>marian:</b></span> not sure who had source of it but we may try to generate something more dynamically in the future<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:44:31)</span> <b>dweitzel:</b></span> indeed, I made it originally.<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:44:34)</span> <b>blin:</b></span> do we need <a href="http://map-xcache.opensciencegrid.org">map-xcache.opensciencegrid.org</a>? :stuck_out_tongue:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:45:17)</span> <b>dweitzel:</b></span> we have this<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:47:22)</span> <b>blin:</b></span> could we just link to that in <a href="https://opensciencegrid.org/docs/data/stashcache/overview/">https://opensciencegrid.org/docs/data/stashcache/overview/</a>?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:50:26)</span> <b>dweitzel:</b></span> sure<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:50:28)</span> <b>matyas:</b></span> can we stick Madison on there? our cache at least is up and running even though we don't have much on the origin<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:50:45)</span> <b>dweitzel:</b></span> Let me see if I can find the source...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:58:36)</span> <b>dweitzel:</b></span> <br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:00:01)</span> <b>dweitzel:</b></span> I'll put the map into the team drive.<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:00:10)</span> <b>marian:</b></span> how about use this: <a href="https://github.com/ayastreb/jekyll-maps">https://github.com/ayastreb/jekyll-maps</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(16:00:51)</span> <b>marian:</b></span> <a href="https://ayastreb.me/jekyll-maps/#examples">https://ayastreb.me/jekyll-maps/#examples</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(16:01:06)</span> <b>marian:</b></span> we could read lat/long from topology<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:01:41)</span> <b>dweitzel:</b></span> eh, it just uses google maps<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:01:46)</span> <b>dweitzel:</b></span> and we already have experience with those.<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:02:20)</span> <b>marian:</b></span> or other equivalent, doesn't need to be google maps, of course<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:03:14)</span> <b>dweitzel:</b></span> also, OSG docs is mkdocs, not jekyll<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:03:43)</span> <b>marian:</b></span> (random search to get an idea if something exist)<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:51:58)</span> <b>isfiligoi:</b></span> I see you changed the config files for stash-origin; the file to change is<br/>10-common-site-local.cfg, not 10-origin-site-local.cfg in the latest RPMs<br/>Please at least updated the ITB docs:<br/><a href="https://opensciencegrid.org/docs-itb/data/stashcache/install-origin/">https://opensciencegrid.org/docs-itb/data/stashcache/install-origin/</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(18:04:12)</span> <b>matyas:</b></span> yeah we need to do that<br/>
+<span style="color: #53b759"><span style="font-size: small">(18:14:26)</span> <b>isfiligoi:</b></span> FYI: You have (temporarily) broken my test setup… but I will survive :slightly_smiling_face:<br/>
+<span style="color: #53b759"><span style="font-size: small">(19:15:24)</span> <b>isfiligoi:</b></span> I want to move my stashcache-origin from one node to another; what’s the best way to do this in topology?<br/>Just replace the hostname there, or should I create a new resource?<br/>(I can let them both run for a period of time, since they serve data from a shared file system)<br/>
+<span style="color: #53b759"><span style="font-size: small">(19:59:20)</span> <b>marian:</b></span> I think for the sake of keeping history once the origin you have is in the topology create new one and when fully commissioned we set former (old) as inactive... but that only my 2c, I let topology folks to decide...<br/>
+<span style="color: #53b759"><span style="font-size: small">(21:09:04)</span> <b>isfiligoi:</b></span> It is logically the same olne, just moved<br/>
+</body>
+</html>

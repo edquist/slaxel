@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jan 5, 2017 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Thu Jan 5, 2017 : #xcache (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(11:46:48)</span> <b>dweitzel:</b></span> @lincoln how's the cache node?<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:47:38)</span> <b>lincoln:</b></span> broken :slightly_smiling_face:<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:48:01)</span> <b>lincoln:</b></span> workin on it<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:48:10)</span> <b>dweitzel:</b></span> k<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:48:44)</span> <b>lincoln:</b></span> <pre><br/>170105 11:43:45 38589 XrdFileCache_Config: Configuration =   Fail<br/>170105 11:43:45 38589 Retrieve: Error - unable to create a factory.<br/>170105 11:43:45 38589 proxy_Config: Unable to get cache object from libXrdFileCache.so<br/>------ Proxy storage system initialization failed.<br/>------ File system server initialization failed.<br/>170105 11:43:45 38589 XrootdConfig: Unable to load file system.<br/></pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(11:48:45)</span> <b>lincoln:</b></span> ;(<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:49:49)</span> <b>lincoln:</b></span> <pre><br/>[root@stashcache stashcache-cache-server]# rpm -qa | grep 'stashcache\|xrootd'<br/>xrootd-server-4.4.0-1.osg33.el7.x86_64<br/>stashcache-daemon-0.6-2.osg33.el7.noarch<br/>xrootd-python-4.4.0-1.osg33.el7.x86_64<br/>xrootd-client-libs-4.4.0-1.osg33.el7.x86_64<br/>xrootd-server-libs-4.4.0-1.osg33.el7.x86_64<br/>stashcache-cache-server-0.6-2.osg33.el7.noarch<br/>xrootd-libs-4.4.0-1.osg33.el7.x86_64<br/></pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:53:07)</span> <b>dweitzel:</b></span> hum... does the cache directory exist?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:53:20)</span> <b>dweitzel:</b></span> @marian any ideas?<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:55:18)</span> <b>lincoln:</b></span> yeah maybe its an issue with the cache dir<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:55:23)</span> <b>marian:</b></span> that is upgrade from very old version?<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:55:31)</span> <b>lincoln:</b></span> new install<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:55:34)</span> <b>lincoln:</b></span> on EL7<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:55:36)</span> <b>marian:</b></span> looks like you need to tweak config with new directives<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:55:40)</span> <b>lincoln:</b></span> ok.<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:55:43)</span> <b>marian:</b></span> previous was el6/<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:55:44)</span> <b>marian:</b></span> ?<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:55:46)</span> <b>lincoln:</b></span> yea<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:55:56)</span> <b>marian:</b></span> and rpm version do you recall?<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:55:57)</span> <b>lincoln:</b></span> ok im just going to copy/pasta the config from the website<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:56:05)</span> <b>lincoln:</b></span> no idea what rpm version we were using on EL6<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:56:15)</span> <b>lincoln:</b></span> i can fire up the VM and check but I am just going to try a fresh config<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:56:27)</span> <b>marian:</b></span> give me sec<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:56:34)</span> <b>lincoln:</b></span> ok<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:56:57)</span> <b>lincoln:</b></span> the current confg is a frankenstein of what you sent me for putting data on multiple arrays + whatever we had on the old VM i think :slightly_smiling_face:<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:57:20)</span> <b>lincoln:</b></span> (just once, I’d like to be able to set up XRootD and have it working on the first try :))<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:58:22)</span> <b>marian:</b></span> that config on the twiki need update<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:58:40)</span> <b>lincoln:</b></span> ah ha<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:58:42)</span> <b>marian:</b></span> I just didn't until everyone updates to latest xrootd<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:58:54)</span> <b>marian:</b></span> that is BNL blocking<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:59:00)</span> <b>marian:</b></span> but I will just go ahead probably<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:59:19)</span> <b>lincoln:</b></span> eh, cant make a omelette without cracking a few eggs<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:59:21)</span> <b>marian:</b></span> now will send you UNL ones to try out<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:59:21)</span> <b>lincoln:</b></span> :slightly_smiling_face:<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:02:29)</span> <b>marian:</b></span> look at this one: <a href="http://t2.unl.edu/store/zvada/stashcache/xrootd-stashcache-cache-server.cfg">http://t2.unl.edu/store/zvada/stashcache/xrootd-stashcache-cache-server.cfg</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(12:02:45)</span> <b>marian:</b></span> I track there also changes which were in version1 cache<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:03:25)</span> <b>lincoln:</b></span> ok<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:03:40)</span> <b>lincoln:</b></span> im gonna just copy/pasta this in and change the cache dir and see if that starts<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:04:06)</span> <b>lincoln:</b></span> well and change all.sitenamet etc<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:04:30)</span> <b>lincoln:</b></span> should i keep your tunings?<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:05:05)</span> <b>marian:</b></span> you can clean it as you wish imo<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:05:13)</span> <b>marian:</b></span> I'll be changing it in twiki anyway<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:05:30)</span> <b>marian:</b></span> it needs also bit of sanitizing<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:05:31)</span> <b>lincoln:</b></span> here’s what im going with to start<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:05:35)</span> <b>lincoln:</b></span> <pre><br/># <a href="https://confluence.grid.iu.edu/pages/viewpage.action?title=Installing+an+XRootD+server+for+Stash+Cache&amp;spaceKey=STAS">https://confluence.grid.iu.edu/pages/viewpage.action?title=Installing+an+XRootD+server+for+Stash+Cache&amp;spaceKey=STAS</a><br/># above is obsolete, keeping it just till the page get removed, new doc for StashCache Cache Server installation is at:<br/># <a href="https://twiki.grid.iu.edu/bin/view/Documentation/Release3/InstallStashCache">https://twiki.grid.iu.edu/bin/view/Documentation/Release3/InstallStashCache</a><br/><br/>all.export  /<br/>set cachedir = /data1/stash<br/>xrd.allow host *<br/>sec.protocol  host<br/>sec.protbind  * none<br/>all.adminpath /var/spool/xrootd<br/><br/>xrootd.trace emsg login stall redirect<br/>ofs.trace all<br/>xrd.trace all<br/>cms.trace all<br/><br/>ofs.osslib  libXrdPss.so<br/>pss.origin <a href="http://redirector.osgstorage.org:1094">redirector.osgstorage.org:1094</a><br/>pss.cachelib libXrdFileCache.so<br/>pss.setopt DebugLevel 1<br/><br/>oss.localroot $(cachedir)<br/><br/># Config for v2 (4.4.0 pre-release)<br/>pfc.blocksize 512k<br/>pfc.ram       32g<br/>pfc.prefetch  10<br/>pfc.diskusage 0.98 0.99<br/><br/># Tune the client timeouts to more aggressively timeout.<br/>pss.setopt ParallelEvtLoop 10<br/>pss.setopt RequestTimeout 25<br/>pss.setopt ConnectTimeout 25<br/>pss.setopt ConnectionRetry 2<br/><br/>xrd.protocol http:8000 libXrdHttp.so<br/><br/>#Sending reports to Ilija's collector, added by Marian 04-14-2016<br/>xrd.report <a href="http://uct2-collectd.mwt2.org:9931">uct2-collectd.mwt2.org:9931</a><br/>xrootd.monitor all auth flush 30s window 5s fstat 60 lfn ops xfr 5 dest redir fstat info user <a href="http://uct2-collectd.mwt2.org:9930">uct2-collectd.mwt2.org:9930</a><br/><br/>all.sitename MWT2<br/></pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(12:05:45)</span> <b>marian:</b></span> sounds good<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:06:09)</span> <b>marian:</b></span> give it a try<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:10:34)</span> <b>lincoln:</b></span> <pre><br/>● xrootd@stashcache-cache-server.service - XRootD xrootd deamon instance stashcache/cache/server<br/>   Loaded: loaded (/usr/lib/systemd/system/xrootd@.service; disabled; vendor preset: disabled)<br/>   Active: failed (Result: exit-code) since Thu 2017-01-05 12:10:19 CST; 9s ago<br/>     Docs: man:xrootd(8)<br/>           <a href="http://xrootd.org/docs.html">http://xrootd.org/docs.html</a><br/>  Process: 39399 ExecStart=/usr/bin/xrootd -l /var/log/xrootd/xrootd.log -c /etc/xrootd/xrootd-%i.cfg -k fifo -s /var/run/xrootd/xrootd-%i.pid -n %i (code=exited, status=1/FAILURE)<br/> Main PID: 39399 (code=exited, status=1/FAILURE)<br/><br/>Jan 05 12:10:19 <a href="http://stashcache.grid.uchicago.edu">stashcache.grid.uchicago.edu</a> systemd[1]: Started XRootD xrootd deamon instance stashcache/cache/server.<br/>Jan 05 12:10:19 <a href="http://stashcache.grid.uchicago.edu">stashcache.grid.uchicago.edu</a> systemd[1]: Starting XRootD xrootd deamon instance stashcache/cache/server...<br/>Jan 05 12:10:19 <a href="http://stashcache.grid.uchicago.edu">stashcache.grid.uchicago.edu</a> systemd[1]: xrootd@stashcache-cache-server.service: main process exited, code=exited, status=1/FAILURE<br/>Jan 05 12:10:19 <a href="http://stashcache.grid.uchicago.edu">stashcache.grid.uchicago.edu</a> systemd[1]: Unit xrootd@stashcache-cache-server.service entered failed state.<br/>Jan 05 12:10:19 <a href="http://stashcache.grid.uchicago.edu">stashcache.grid.uchicago.edu</a> systemd[1]: xrootd@stashcache-cache-server.service failed.<br/></pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(12:10:55)</span> <b>lincoln:</b></span> <pre><br/>170105 12:10:19 39399 XrdFileCache_Factory::ConfigParameters() unmatched pfc parameter: ram<br/>[2017-01-05 12:10:19.932668 -0600][Error  ][App               ] Factory::Config() error in parsing<br/>170105 12:10:19 39399 XrdFileCache_Config: Configuration =   Fail<br/>170105 12:10:19 39399 Retrieve: Error - unable to create a factory.<br/>170105 12:10:19 39399 proxy_Config: Unable to get cache object from libXrdFileCache.so<br/>------ Proxy storage system initialization failed.<br/>------ File system server initialization failed.<br/>170105 12:10:19 39399 XrootdConfig: Unable to load file system.<br/>------ xrootd protocol initialization failed.<br/>170105 12:10:19 39399 XrdProtocol: Protocol xrootd could not be loaded<br/>170105 12:10:19 39399 XrdConfig: Unable to create home directory //stashcache-cache-server; permission denied<br/>------ xrootd <a href="mailto:stashcache-cache-server@stashcache.grid.uchicago.edu">stashcache-cache-server@stashcache.grid.uchicago.edu</a>:-1 initialization failed.<br/></pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(12:11:13)</span> <b>lincoln:</b></span> <pre><br/>[root@stashcache stashcache-cache-server]# cat /etc/sysconfig/xrootd<br/>CMSD_DEFAULT_OPTIONS="-l /var/log/xrootd/cmsd.log -c /etc/xrootd/stashcache-server.cfg -k fifo"<br/>XROOTD_DEFAULT_OPTIONS="-l /var/log/xrootd/xrootd.log -c /etc/xrootd/stashcache-server.cfg -k fifo"<br/></pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(12:11:19)</span> <b>lincoln:</b></span> am i missing something obvious?<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:11:27)</span> <b>lincoln:</b></span> "Unable to create home directory //stashcache-cache-server; permission denied” looks super weird<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:14:37)</span> <b>marian:</b></span> ah, systemd ...<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:14:49)</span> <b>marian:</b></span> finishing my lunch I'll be back with you shortly<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:16:00)</span> <b>marian:</b></span> how do you start process? should do <tt>service xrootd@stash-server start</tt> or something similar in your case?<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:16:10)</span> <b>lincoln:</b></span> yes<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:17:04)</span> <b>lincoln:</b></span> <pre><br/>[root@stashcache stashcache-cache-server]# systemctl stop xrootd@stashcache-cache-server.service<br/>[root@stashcache stashcache-cache-server]# systemctl start xrootd@stashcache-cache-server.service<br/></pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(12:19:32)</span> <b>lincoln:</b></span> <a href="https://github.com/xrootd/xrootd/issues/365">https://github.com/xrootd/xrootd/issues/365</a><br/>
+<span style="color: #e96699"><span style="font-size: small">(12:19:33)</span> <b>lincoln:</b></span> relevant?<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:19:40)</span> <b>lincoln:</b></span> <pre><br/>170105 12:18:08 39520 XrdConfig: Unable to create home directory //stashcache-cache-server; permission denied<br/></pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(12:20:56)</span> <b>lincoln:</b></span> so<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:20:59)</span> <b>lincoln:</b></span> there’s also<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:21:13)</span> <b>lincoln:</b></span> 170105 12:18:08 39520 XrdConfig: Unable to create envfile /var/run/xrootd/xrootd.stashcache-cache-server.env; no such file or directory<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:21:28)</span> <b>lincoln:</b></span> <tt>/var/log/xrootd/</tt> doens’t exist<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:21:43)</span> <b>lincoln:</b></span> on EL7<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:25:30)</span> <b>lincoln:</b></span> well I give up for now<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:25:34)</span> <b>lincoln:</b></span> please let me know if there’s something I can try<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:26:13)</span> <b>lincoln:</b></span> er, <tt>/var/run/xrootd</tt>* not <tt>/var/log/xrootd</tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(12:28:52)</span> <b>marian:</b></span> yeah, that github ticketis also relevant sort of<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:29:16)</span> <b>marian:</b></span> yeap, change tht to /var/run/xrootd too<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:29:23)</span> <b>lincoln:</b></span> change what<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:29:38)</span> <b>lincoln:</b></span> ok i added this<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:29:46)</span> <b>lincoln:</b></span> all.adminpath /var/spool/xrootd<br/>all.pidpath /var/run/xrootd<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:29:47)</span> <b>lincoln:</b></span> and did<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:30:08)</span> <b>lincoln:</b></span> mkdir -p /var/spool/xrootd<br/>mkdir -p /var/run/xrootd<br/>chown xrootd: /var/run/xrootd<br/>chown xrootd: /var/spool/xrootd<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:30:16)</span> <b>marian:</b></span> btw /etc/sysconfing/xrootd is irrelevant on EL7<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:30:19)</span> <b>lincoln:</b></span> ok<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:30:26)</span> <b>lincoln:</b></span> why does it exist then?<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:31:09)</span> <b>lincoln:</b></span> seems like someone might want to take a look at OSG’s EL7 XRootD package because it doesn’t seem to work out of the box :disappointed:<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:31:32)</span> <b>lincoln:</b></span> anyhow i see a testfile made now<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:31:36)</span> <b>marian:</b></span> didn't you copy over?<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:31:51)</span> <b>marian:</b></span> things in  /usr/lib/systemd/system/xrootd@.service should point to right config<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:32:05)</span> <b>lincoln:</b></span> OH, ok<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:32:20)</span> <b>marian:</b></span> yes, we also need repackage things a bit<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:32:21)</span> <b>lincoln:</b></span> nvm, I thought the package installed /etc/sysconfig/xrootd, I didn’t realize Greg made that<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:32:27)</span> <b>marian:</b></span> didn't have much input on that till now :slightly_smiling_face:<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:32:30)</span> <b>lincoln:</b></span> i retract that particular complaint :wink:<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:32:35)</span> <b>marian:</b></span> ah ok<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:32:36)</span> <b>marian:</b></span> :slightly_smiling_face:<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:32:37)</span> <b>lincoln:</b></span> anyhow<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:32:40)</span> <b>marian:</b></span> so it was copy<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:33:01)</span> <b>lincoln:</b></span> <pre><br/>/data1/stash/user/bbockelm/public/testfile<br/>/data1/stash/user/bbockelm/public/testfile.cinfo<br/></pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(12:33:03)</span> <b>lincoln:</b></span> this exists now<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:33:04)</span> <b>lincoln:</b></span> yay<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:33:14)</span> <b>lincoln:</b></span> theres still the homedir config error in the log however<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:33:58)</span> <b>lincoln:</b></span> the <tt>//stashcache-cache-server</tt> feels like there’s a null env variable or something between the slashes.<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:35:08)</span> <b>lincoln:</b></span> one last thing I’d like to get working<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:35:22)</span> <b>lincoln:</b></span> Marian you sent me a config for multiple spaces<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:35:28)</span> <b>lincoln:</b></span> does this still work?<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:35:32)</span> <b>marian:</b></span> yes<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:35:32)</span> <b>lincoln:</b></span> <pre><br/>oss.space public /data1/stash<br/>oss.space public /data2/stash<br/>oss.space public /data3/stash<br/>oss.space public /data4/stash<br/>oss.space public /data5/stash<br/>oss.space public /data6/stash<br/></pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(12:35:35)</span> <b>marian:</b></span> that should<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:35:52)</span> <b>marian:</b></span> oh, well, let me check if that host is el7 actually<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:35:59)</span> <b>marian:</b></span> if not we don't have it tested<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:36:02)</span> <b>lincoln:</b></span> what shoudl i make<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:36:04)</span> <b>lincoln:</b></span> so..<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:36:06)</span> <b>lincoln:</b></span> right now i have<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:36:07)</span> <b>lincoln:</b></span> <pre><br/>set cachedir = /data1/stash<br/></pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(12:36:13)</span> <b>lincoln:</b></span> <pre><br/>oss.localroot $(cachedir)<br/></pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(12:36:24)</span> <b>marian:</b></span> ups, so that is centos 6.8<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:36:29)</span> <b>lincoln:</b></span> if I want to use multiple spaces, I’m not sure what I should make oss.localroot<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:36:38)</span> <b>marian:</b></span> so can't confirm how it plays with el7<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:37:08)</span> <b>lincoln:</b></span> thats OK<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:37:17)</span> <b>lincoln:</b></span> i basically just need to know what to set <tt>cachedir</tt> to<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:37:24)</span> <b>lincoln:</b></span> I don’t mind trying/breaking it<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:38:04)</span> <b>lincoln:</b></span> the USCD config has <tt>oss.localroot    /xrdpfc/stash</tt><br/>
+<span style="color: #e96699"><span style="font-size: small">(12:38:13)</span> <b>lincoln:</b></span> should i just <tt>mkdir -p /xrdpfc/stash</tt> and try it?<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:38:19)</span> <b>lincoln:</b></span> well and chown it to xroot<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:39:31)</span> <b>marian:</b></span> localroot should just point to wherever 'stash' subtree starts...<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:40:00)</span> <b>lincoln:</b></span> what lives in oss.localroot vs oss.space ?<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:40:14)</span> <b>marian:</b></span> good point just checking ...<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:42:15)</span> <b>marian:</b></span> e.g. we have there test files<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:42:29)</span> <b>lincoln:</b></span> hm<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:42:41)</span> <b>lincoln:</b></span> i see<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:42:51)</span> <b>marian:</b></span> I never understood well this localroot and when I did I always forget the real meaning of that<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:42:53)</span> <b>lincoln:</b></span> <pre><br/>lrwxrwxrwx 1 xrootd xrootd   63 Jan  5 12:42 test.1M -&gt; /data5/stash/public/00/E0926E58BE9B00000000c0aae3fa000000000D6%<br/>lrwxrwxrwx 1 xrootd xrootd   63 Jan  5 12:42 test.1M.cinfo -&gt; /data5/stash/public/01/E0926E58BE9B00000000c0aae3fa010000000D6%<br/></pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(12:42:57)</span> <b>lincoln:</b></span> it stores symlinks to the datadirs<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:43:00)</span> <b>marian:</b></span> yep<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:43:15)</span> <b>marian:</b></span> yes, now I see it too<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:43:21)</span> <b>marian:</b></span> to the actual spce<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:43:21)</span> <b>lincoln:</b></span> so its just unifying the namespace<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:43:43)</span> <b>marian:</b></span> alright, any luck on restart?<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:50:25)</span> <b>lincoln:</b></span> OK, working now with everything chowned correctly<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:50:56)</span> <b>lincoln:</b></span> <pre><br/>[root@stashcache /]# find /data*<br/>/data1<br/>/data1/stash<br/>/data1/stash/public<br/>/data2<br/>/data2/stash<br/>/data2/stash/public<br/>/data3<br/>/data3/stash<br/>/data3/stash/public<br/>/data4<br/>/data4/stash<br/>/data4/stash/public<br/>/data5<br/>/data5/stash<br/>/data5/stash/public<br/>/data5/stash/public/00<br/>/data5/stash/public/00/37956E586A9D00000000c0aae3fa000000000D6%<br/>/data5/stash/public/01<br/>/data5/stash/public/01/37956E586A9D00000000c0aae3fa010000000D6%<br/></pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(12:51:03)</span> <b>lincoln:</b></span> <pre><br/>[root@stashcache /]# find /xrdpfc/<br/>/xrdpfc/<br/>/xrdpfc/user<br/>/xrdpfc/user/ivukotic<br/>/xrdpfc/user/ivukotic/xAOD_mc.pool.root.cinfo<br/>/xrdpfc/user/ivukotic/xAOD_mc.pool.root<br/></pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(12:54:05)</span> <b>marian:</b></span> sounds good!<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:54:11)</span> <b>lincoln:</b></span> thanks for the help Marian!<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:54:19)</span> <b>marian:</b></span> yeah, chown to xrootd is always thing to remember<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:54:25)</span> <b>marian:</b></span> will put it on twiki too<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:54:31)</span> <b>lincoln:</b></span> i would appreciate it if OSG people could look at the homedir thing as well<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:54:33)</span> <b>marian:</b></span> glad all works!<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:54:58)</span> <b>marian:</b></span> 'homedir thing' what you mean?<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:55:40)</span> <b>lincoln:</b></span> <pre><br/>170105 12:49:27 40298 XrdConfig: Unable to create home directory //stashcache-cache-server; permission denied<br/></pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(12:55:43)</span> <b>lincoln:</b></span> this still shows up<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:55:51)</span> <b>lincoln:</b></span> doesn’t seem to affect functionality<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:55:59)</span> <b>lincoln:</b></span> but seems to imply something is broken<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:56:41)</span> <b>marian:</b></span> ah ... that is somewhat more xrootd defaults related how things are handled in el7 ...<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:57:03)</span> <b>lincoln:</b></span> right, seems like it could be fixed in the packaging perhaps?<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:57:05)</span> <b>marian:</b></span> I may review that #365 github ticket to see if there is answer on that<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:57:31)</span> <b>marian:</b></span> yes, but that needs also more upstream fix I'd say ... in epel first<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:57:38)</span> <b>lincoln:</b></span> :thumbsup:<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:39:24)</span> <b>lincoln:</b></span> oh, Marian, I forgot to mention I had to comment both of these out to get xrootd to start<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:39:26)</span> <b>lincoln:</b></span> #pfc.ram       32g<br/>#pfc.prefetch  10<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:40:29)</span> <b>marian:</b></span> ah, ok ... was it braking something too?<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:40:35)</span> <b>lincoln:</b></span> yeah<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:40:48)</span> <b>marian:</b></span> because that should be supported<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:40:52)</span> <b>lincoln:</b></span> 170105 13:38:54 40840 XrdFileCache_Factory::ConfigParameters() unmatched pfc parameter: ram<br/>[2017-01-05 13:38:54.251857 -0600][Error  ][App               ] Factory::Config() error in parsing<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:41:14)</span> <b>marian:</b></span> I see, so even more changes after v2 cache release<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:41:30)</span> <b>lincoln:</b></span> heres what i have htat is currently working<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:41:32)</span> <b>lincoln:</b></span> <pre><br/># Config for v2 (4.4.0 pre-release)<br/>pfc.blocksize 512k<br/>#pfc.ram       32g<br/>#pfc.prefetch  10<br/>pfc.diskusage 0.98 0.99<br/></pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(13:42:16)</span> <b>marian:</b></span> can you do again rpm -qa | grep xrootd for me?<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:42:25)</span> <b>lincoln:</b></span> yup<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:42:40)</span> <b>lincoln:</b></span> <pre><br/>xrootd-server-4.4.0-1.osg33.el7.x86_64<br/>xrootd-python-4.4.0-1.osg33.el7.x86_64<br/>xrootd-client-libs-4.4.0-1.osg33.el7.x86_64<br/>xrootd-server-libs-4.4.0-1.osg33.el7.x86_64<br/>xrootd-libs-4.4.0-1.osg33.el7.x86_64<br/></pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(13:42:48)</span> <b>marian:</b></span> ouch!<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:42:49)</span> <b>marian:</b></span> :slightly_smiling_face:<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:43:00)</span> <b>marian:</b></span> sorry to ask you this, but can you update with:<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:43:15)</span> <b>marian:</b></span> <a href="http://xrd-cache-1.t2.ucsd.edu/RPMS/rhel7/">http://xrd-cache-1.t2.ucsd.edu/RPMS/rhel7/</a><br/>
+<span style="color: #e96699"><span style="font-size: small">(13:43:17)</span> <b>lincoln:</b></span> you break it, you buy it!<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:43:20)</span> <b>lincoln:</b></span> sure<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:43:29)</span> <b>marian:</b></span> <a href="http://xrd-cache-1.t2.ucsd.edu/RPMS/ChangeLog.txt">http://xrd-cache-1.t2.ucsd.edu/RPMS/ChangeLog.txt</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(13:43:47)</span> <b>marian:</b></span> we want 4.5.0-0.7.beta everywhere now<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:43:52)</span> <b>lincoln:</b></span> oh<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:43:57)</span> <b>lincoln:</b></span> does OSG not provide a repo for this?<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:44:14)</span> <b>marian:</b></span> there are few mgmnt issues why we don't have it in repos though<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:44:19)</span> <b>lincoln:</b></span> OK<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:44:30)</span> <b>marian:</b></span> but not a block for us to do rpm -Uvh<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:44:51)</span> <b>marian:</b></span> nope, OSG is far behind it<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:45:24)</span> <b>marian:</b></span> and reason is that this cache version of rpms 0.7beta is not yet in the mainline code of xrootd which is being discussed<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:45:50)</span> <b>marian:</b></span> but it's matter just push it there just Andy et al were bit slow on it<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:46:00)</span> <b>marian:</b></span> functionally all is good<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:46:11)</span> <b>marian:</b></span> we use it on UNL cache too<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:46:57)</span> <b>lincoln:</b></span> alrighty<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:46:59)</span> <b>marian:</b></span> so that's why this is all sort of also funky keep documented well as of now<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:47:00)</span> <b>lincoln:</b></span> updated &amp; running<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:47:05)</span> <b>lincoln:</b></span> the pfc. directives work now<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:47:10)</span> <b>marian:</b></span> cool!<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:47:15)</span> <b>lincoln:</b></span> still get the <pre>Unable to create home directory //stashcache-cache-server; permission denied</pre> errors on 4.5<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:47:23)</span> <b>lincoln:</b></span> just fyi<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:47:26)</span> <b>marian:</b></span> yes, that's in mainline :slightly_smiling_face:<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:47:29)</span> <b>lincoln:</b></span> :slightly_smiling_face:<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:47:45)</span> <b>marian:</b></span> pretend you don't see it :slightly_smiling_face:<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:47:55)</span> <b>lincoln:</b></span> will do!<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:49:19)</span> <b>marian:</b></span> look at that ChangeLog too if you get a chance, there are some nice features added to oss.space but it's still lack of detailed info<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:54:14)</span> <b>marian:</b></span> and update this page if you can: <a href="https://twiki.grid.iu.edu/bin/view/Documentation/Release3/StashCacheUpgrades">https://twiki.grid.iu.edu/bin/view/Documentation/Release3/StashCacheUpgrades</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(13:54:23)</span> <b>marian:</b></span> for UChicago<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:55:43)</span> <b>marian:</b></span> just a sec, need to do 2017 spread sheet<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:56:07)</span> <b>lincoln:</b></span> OK<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:57:43)</span> <b>marian:</b></span> done for 2017<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:58:17)</span> <b>marian:</b></span> @Derek, should we add Syracuse there too?<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:58:48)</span> <b>marian:</b></span> @dweitzel, should we add Syracuse there too?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:59:01)</span> <b>dweitzel:</b></span> We will add Syracuse when we add them to the caches.json.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:59:13)</span> <b>dweitzel:</b></span> Which may be in a few weeks.<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:00:39)</span> <b>marian:</b></span> sounds good<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:02:12)</span> <b>lincoln:</b></span> @marian done<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:02:34)</span> <b>marian:</b></span> thanks!<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:05:30)</span> <b>lincoln:</b></span> I was under the impression that GOC was going to set up a cache at IU but I  guess this hasn’t happened? We have some retired dCache nodes there we can repurpose for this.<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:20:56)</span> <b>marian:</b></span> who from GOC suppose to be involved in it?<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:21:08)</span> <b>lincoln:</b></span> no idea it was an idea floated like a year ago<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:21:16)</span> <b>marian:</b></span> ah<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:21:27)</span> <b>lincoln:</b></span> i think will just go ahead and do it and if they make one later then that’s fine too :wink:<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:21:40)</span> <b>marian:</b></span> because I see there have registered origin (not cache) in the monitoring at least ... but result is continuosly red<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:22:14)</span> <b>lincoln:</b></span> the hardware/software config for us at IU will be the same so it should be easy for Greg to push this out via Puppet once we have the node rebuilt as SL7<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:22:50)</span> <b>marian:</b></span> btw, looks like you need to kick in condor on the cache node<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:23:19)</span> <b>marian:</b></span> can you check logs or hasn't it started yet?<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:23:27)</span> <b>lincoln:</b></span> <pre><br/>[root@stashcache ~]# condor_status<br/>Name               OpSys      Arch   State     Activity LoadAv Mem   ActvtyTime<br/><br/>xrootd@stashcache. undefined  undefi undefined undefine [????] [??]<br/>                     Machines Owner Claimed Unclaimed Matched Preempting<br/><br/><br/>               Total        0     0       0         0       0          0<br/><br/>                    (Omitted 1 malformed ads in computed attribute totals)<br/><br/>[root@stashcache ~]# systemctl restart condor<br/></pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(15:23:29)</span> <b>lincoln:</b></span> ¯\_(ツ)_/¯<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:23:48)</span> <b>lincoln:</b></span> its restarted, same status msg<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:23:50)</span> <b>lincoln:</b></span> let me check the logs<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:24:04)</span> <b>lincoln:</b></span> <pre><br/>01/05/17 15:23:50 SECMAN: required authentication with &lt;129.79.53.205:9619&gt; failed, so aborting command UPDATE_MASTER_AD.<br/>01/05/17 15:23:50 ERROR: SECMAN:2004:Failed to create security session to &lt;129.79.53.205:9619&gt; with TCP.|AUTHENTICATE:1003:Failed to authenticate with any method|AUTHENTICATE:1004:Failed to authenticate using GSI|GSI:5003:Failed to authenticate.  Globus is reporting error (851968:40).  There is probably a problem with your credentials.  (Did you run grid-proxy-init?)<br/>01/05/17 15:23:51 Traceback (most recent call last):<br/>  File "/usr/sbin/stashcache", line 81, in run<br/>    raise ValueError<br/>ValueError<br/><br/>01/05/17 15:23:51 Stopping StashCache daemon<br/></pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(15:24:12)</span> <b>lincoln:</b></span> :thumbsup:<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:24:40)</span> <b>marian:</b></span> hostcerts are in place on new host?<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:24:43)</span> <b>lincoln:</b></span> they are<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:24:49)</span> <b>lincoln:</b></span> <pre><br/>[root@stashcache grid-security]# ls -lha<br/>total 76K<br/>drwxr-xr-x   4 root root 4.0K Jan  4 15:55 .<br/>drwxr-xr-x. 83 root root 4.0K Jan  5 13:46 ..<br/>drwxr-xr-x   2 root root  52K Jan  4 17:34 certificates<br/>-rw-r--r--   1 root root 1.8K Aug  9 19:49 gsi.conf<br/>-rw-r--r--   1 root root 1.7K Jan  4 15:55 hostcert.pem<br/>-rw-r--r--   1 root root 1.7K Jan  4 15:54 hostkey.pem<br/>drwxr-xr-x   2 root root 4.0K Jul  6  2016 vomsdir<br/></pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(15:26:05)</span> <b>marian:</b></span> getenforce?<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:26:16)</span> <b>lincoln:</b></span> disabled<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:26:16)</span> <b>marian:</b></span> what it gives...<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:26:19)</span> <b>marian:</b></span> ok<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:27:24)</span> <b>marian:</b></span> what is CA your host certs were issued?<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:30:05)</span> <b>marian:</b></span> and is that error in StashcacheLog or in other condor log?<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:30:25)</span> <b>marian:</b></span> seems like GOC collector doesn't like you<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:30:41)</span> <b>lincoln:</b></span> <pre><br/>[root@stashcache grid-security]# openssl x509 -in hostcert.pem -enddate -subject -noout<br/>notAfter=Nov 17 16:05:43 2017 GMT<br/>subject= /DC=org/DC=opensciencegrid/O=Open Science Grid/OU=Services/CN=<a href="http://stashcache.grid.uchicago.edu">stashcache.grid.uchicago.edu</a><br/></pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(15:41:22)</span> <b>marian:</b></span> so this is not new cert and was used just fine sending reports to goc collector before moving to el7?<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:41:28)</span> <b>lincoln:</b></span> yeah<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:41:48)</span> <b>lincoln:</b></span> i could try to issue a new cert<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:41:58)</span> <b>lincoln:</b></span> maybe we skipped a step while reinstalling on EL7<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:42:11)</span> <b>lincoln:</b></span> perhaps the CAs or CRLs or osmething are messed up<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:42:23)</span> <b>marian:</b></span> yeah that is my guess<br/>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jun 15, 2021 : #batlab (chtc)</title>
+</head>
+<body>
+<h3>Tue Jun 15, 2021 : #batlab (chtc)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(12:02:55)</span> <b>johnkn:</b></span> In case anyone cares, I kicked off 5 test runs against a current master build.<br/><a href="https://batlab.chtc.wisc.edu/results/run-details.php?runid=545395">https://batlab.chtc.wisc.edu/results/run-details.php?runid=545395</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:30:43)</span> <b>johnkn:</b></span> This seems to have caused the <tt>lib_shared_port-collector_van</tt> test to fail on all docker test runs.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:30:59)</span> <b>johnkn:</b></span> Is this a known issue?<br/>
+<span style="color: #d58247"><span style="font-size: small">(12:43:45)</span> <b>gthain:</b></span> That happened yesterday too<br/>
+<span style="color: #d58247"><span style="font-size: small">(12:44:08)</span> <b>gthain:</b></span> I just fixed a problem in <tt>python_bindings_htcondor</tt> where it was listening on a fixed port<br/>
+<span style="color: #d58247"><span style="font-size: small">(12:44:16)</span> <b>gthain:</b></span> perhaps this test has the same problem<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:21:38)</span> <b>johnkn:</b></span> Not that I can see.  It has this config<br/><pre>  # set the collector to use the shared port<br/>  COLLECTOR_HOST = $(FULL_HOSTNAME):0?sock=collector<br/><br/>  # named sockets cannot have very long paths (~100 chars), so put them<br/>  # in /tmp to avoid problems<br/>  DAEMON_SOCKET_DIR = /tmp/$(USERNAME)-condor-test-sock'.$$.'</pre><br/><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:23:47)</span> <b>johnkn:</b></span> the test failure is partial, *some* of the expected log messages are missing.<br/><pre>collector_van.saveme/pdir30811condor1/log/SharedPortLog<br/><br/>FAILED check CondorLog(match_regexp=SharedPortServer: request from MASTER,num_retries=4,daemon=SHARED_PORT) in test lib_shared_port-collector_van</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:25:17)</span> <b>johnkn:</b></span> spot checking, it seems to be successful except that the log message for "request from MASTER" is not found<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:26:06)</span> <b>johnkn:</b></span> still waiting for tests to finish to I can look at the log messages.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:02:02)</span> <b>johnkn:</b></span> I have an instance of the test_drain_policies test (ornithology?).  that reports both FAILURE and ERROR, but the dashboard shows "teardown error".<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:02:04)</span> <b>johnkn:</b></span> <a href="https://batlab.chtc.wisc.edu/nmi-runs/johnkn/2021/06/johnkn_batlabsubmit0001.chtc.wisc.edu_1623756560_3049235/userdir/nmi-zdev:x86_64_AmazonLinux2/test_drain_policies-1.out">https://batlab.chtc.wisc.edu/nmi-runs/johnkn/2021/06/johnkn_batlabsubmit0001.chtc.wisc.[…]dir/nmi-zdev:x86_64_AmazonLinux2/test_drain_policies-1.out</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:02:18)</span> <b>tlmiller:</b></span> How does one test report both?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:02:56)</span> <b>tlmiller:</b></span> Ah, report in that sense.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:04:23)</span> <b>johnkn:</b></span> I was hoping to see a perl teardown error, since I just added code for that in this test build.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:05:04)</span> <b>tlmiller:</b></span> Could you post the link to the dashboard page in question?  (You have a lot runs right now.)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:05:18)</span> <b>johnkn:</b></span> <a href="https://batlab.chtc.wisc.edu/results/test-details.php?runid=545395&amp;testids=545431&amp;group=johnkn:%20workspace:%20load4">https://batlab.chtc.wisc.edu/results/test-details.php?runid=545395&amp;testids=545431&amp;group=johnkn:%20workspace:%20load4</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:05:51)</span> <b>tlmiller:</b></span> Thanks.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:07:33)</span> <b>tlmiller:</b></span> <tt>test_drain_policies</tt> is recording an rval -1035, so the dashboard is reacting correctly, as far that goes.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:07:51)</span> <b>tlmiller:</b></span> This is probably just me screwing up the Ornithology code that does this.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:09:52)</span> <b>johnkn:</b></span> Looks like a more general ornithology problem.  here's another one that has both FAILED and ERROR. reporting "Setup error".<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:09:53)</span> <b>johnkn:</b></span> <a href="https://batlab.chtc.wisc.edu/nmi-runs/johnkn/2021/06/johnkn_batlabsubmit0001.chtc.wisc.edu_1623756549_3049065/userdir/nmi-zdev:x86_64_CentOS7/test_htcondor_personal-1.out">https://batlab.chtc.wisc.edu/nmi-runs/johnkn/2021/06/johnkn_batlabsubmit0001.chtc.wisc.[…]erdir/nmi-zdev:x86_64_CentOS7/test_htcondor_personal-1.out</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:10:14)</span> <b>johnkn:</b></span> this page<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:10:15)</span> <b>johnkn:</b></span> <a href="https://batlab.chtc.wisc.edu/results/test-details.php?runid=545395&amp;testids=545430&amp;group=johnkn:%20workspace:%20load3">https://batlab.chtc.wisc.edu/results/test-details.php?runid=545395&amp;testids=545430&amp;group=johnkn:%20workspace:%20load3</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:11:02)</span> <b>tlmiller:</b></span> Yeah, looking at it, the code in Ornithology assumes that errors should be reported in preference to failures, which isn't really the case.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:11:15)</span> <b>tlmiller:</b></span> I'll work on fixing this.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:11:21)</span> <b>johnkn:</b></span> ah.  yeah, not the way we have currently defined errors.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:11:40)</span> <b>tlmiller:</b></span> It worked in my test cases because I didn't check that case. :/<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:41:11)</span> <b>tlmiller:</b></span> ... OK, that should fix it.<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:53:24)</span> <b>gthain:</b></span> I think I just heard Josh Karpel's head explode:<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:54:00)</span> <b>gthain:</b></span> <pre>my $perl = "perl";<br/>     if (exists($needs-&gt;{python})) {<br/>         print "run_test $$: $testname is python, checking python bindings\n";<br/>         SetupPythonPath();<br/>         $perl = "python3";</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:54:29)</span> <b>johnkn:</b></span> My perl is python...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:55:45)</span> <b>johnkn:</b></span> I just pushed todays work - I moved the startup of condor from inside the test to outside via #testreq for about 30 perl tests.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:58:03)</span> <b>tlmiller:</b></span> That means they get the start-up/tear-down error reporting, right?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:58:12)</span> <b>johnkn:</b></span> right<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:58:16)</span> <b>tlmiller:</b></span> Awesome.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:00:54)</span> <b>johnkn:</b></span> Turns out there are a bunch of tests (~10?)  That use StartCondorWithParams but pass <tt>do_not_start</tt> because they just want a custom config.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:01:29)</span> <b>johnkn:</b></span> Seems like it might be worthwhile to add that to the #testreq capabilities.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:04:37)</span> <b>johnkn:</b></span> There are more tests that can be converted to #testreq, perhaps as many as 50 more.  The rese want to have a config that is not static or want multiple condors<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:05:51)</span> <b>johnkn:</b></span> For the multiple condor case, if there was a way to add to the config and reconfig from within the test, that would satisfy many of those tests.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:08:12)</span> <b>johnkn:</b></span> BTW.  I found the condor_off -master test amusing.  it doesn't actually turn off the master, it just calls EndTest and expects a failure to turn the master off to fail....<br/>
+</body>
+</html>

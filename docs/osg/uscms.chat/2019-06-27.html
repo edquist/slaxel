@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jun 27, 2019 : #uscms (osg)</title>
+</head>
+<body>
+<h3>Thu Jun 27, 2019 : #uscms (osg)</h3>
+<span style="color: #b14cbc"><span style="font-size: small">(13:00:53)</span> <b>tmartin:</b></span> Hey folks, I am trying to upgrade my hadoop finally, and I do a save name space, but I do not get a successful message, it just ends.<br/><br/>hdfs dfsadmin -saveNamespace<br/>Is that a problem?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:06:08)</span> <b>blin:</b></span> @marian @khurtado ^^<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(13:07:01)</span> <b>tmartin:</b></span> Thanks Brian :slightly_smiling_face:<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:19:29)</span> <b>marian:</b></span> hey, another channel to watch? what's up?<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:19:42)</span> <b>marian:</b></span> ah, scitokens ... that's @dweitzel's land I believe<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(13:19:50)</span> <b>tmartin:</b></span> I am having fun with hadoop upgrades<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(13:20:05)</span> <b>tmartin:</b></span> I was wondering if the fact that savenamespace is not returning anything is of a large concern or not<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:20:17)</span> <b>marian:</b></span> oh<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:21:28)</span> <b>blin:</b></span> @marian i always forget who's in charge of HDFS at UNL :anguished:<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:23:12)</span> <b>marian:</b></span> @clundstedt may be of help I believe<br/>
+<span style="color: #619a4f"><span style="font-size: small">(13:24:17)</span> <b>clundstedt:</b></span> @gattebury @jthiltges are better at the HDFS upgrading of things<br/>
+<span style="color: #619a4f"><span style="font-size: small">(13:24:31)</span> <b>clundstedt:</b></span> I've never done the savenamespace magicks before<br/>
+<span style="color: #d1707d"><span style="font-size: small">(13:27:17)</span> <b>gattebury:</b></span> I honestly don’t recall <tt>savenamespace</tt> at all — I imagine the command doesn’t return anything at the CLI, but you should probably see things of interest (like indication of completed checkpoint) in the logs<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(13:28:54)</span> <b>tmartin:</b></span> Let me try it again. I did not see anything in the logs either<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:29:18)</span> <b>jthiltges:</b></span> Yeah, we started with that command. I'm guessing you'll see the edit log file increment.<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(13:30:46)</span> <b>tmartin:</b></span> Is that in the namespace directory?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:31:21)</span> <b>jthiltges:</b></span> Here's my notes from our last upgrade: <a href="https://paste.fedoraproject.org/paste/2klCo3Rpz0OBNHoPNJUmng/raw">https://paste.fedoraproject.org/paste/2klCo3Rpz0OBNHoPNJUmng/raw</a><br/>Admittedly over a year and a half old.<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(13:32:08)</span> <b>tmartin:</b></span> You run the stuff as the hdfs user?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:32:47)</span> <b>jthiltges:</b></span> I'm assuming you'll see a new file in <tt>${fs.checkpoint.dir}/current</tt> after the savenamespace command completes.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:33:12)</span> <b>jthiltges:</b></span> As the hdfs user, yup<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(13:33:31)</span> <b>tmartin:</b></span> Like this<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(13:33:32)</span> <b>tmartin:</b></span> 30 Jun 27 10:50 edits_0000000003227460122-0000000003227460123<br/>?<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(13:33:51)</span> <b>tmartin:</b></span> I always ran stuff as root...not sure if that matters in the end<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:35:22)</span> <b>jthiltges:</b></span> Probably OK. That might have been a copy-paste thing that I just didn't change.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:36:54)</span> <b>jthiltges:</b></span> If you look at the NN status page (something like <a href="http://hadoop-widget:50070/">http://hadoop-widget:50070/</a> ), does the "Current transaction ID" match the last number of the checkpoint <tt>edits_...</tt> file?<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(13:37:11)</span> <b>tmartin:</b></span> Just ran it<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(13:37:12)</span> <b>tmartin:</b></span> -rw-r--r--  1 hdfs hdfs           30 Jun 27 11:30 edits_0000000003227460124-0000000003227460125<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(13:38:00)</span> <b>tmartin:</b></span> 3227460126<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(13:38:08)</span> <b>tmartin:</b></span> Off by 1?<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(13:38:50)</span> <b>tmartin:</b></span> edits_inprogress_0000000003227460126<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(13:38:53)</span> <b>tmartin:</b></span> That matches<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:39:09)</span> <b>jthiltges:</b></span> I'm not absolutely certain without trying myself, but that sounds reasonable.<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(13:42:53)</span> <b>tmartin:</b></span> Well, I guess I can go ahead, and see.<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(13:43:20)</span> <b>tmartin:</b></span> I understand that is mostly to improve the restart speed, and the small in progress seems small, restarts were already quick today when I tried<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(13:44:09)</span> <b>tmartin:</b></span> Doing the backup, so I guess I can revert if I need to<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(14:16:24)</span> <b>tmartin:</b></span> <pre><br/>2019-06-27 12:15:46,056 INFO org.apache.hadoop.util.JvmPauseMonitor: Detected pause in JVM or host machine (eg GC): pause of approximately 1517ms<br/>GC pool 'ParNew' had collection(s): count=1 time=1666ms<br/>2019-06-27 12:15:59,397 INFO org.apache.hadoop.util.JvmPauseMonitor: Detected pause in JVM or host machine (eg GC): pause of approximately 1835ms<br/>GC pool 'ParNew' had collection(s): count=1 time=2269ms<br/></pre><br/>
+<span style="color: #b14cbc"><span style="font-size: small">(14:16:40)</span> <b>tmartin:</b></span> hopefully that is not bad :slightly_smiling_face:<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(14:18:18)</span> <b>tmartin:</b></span> I see it has a status web page, nice<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:23:35)</span> <b>jthiltges:</b></span> The old jsp status pages are still there and mostly work fine.<br/>I like the jsp node list since it shows all the nodes on a single page, and I can scroll to a particular point and refresh the page without losing my place.<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(14:47:05)</span> <b>tmartin:</b></span> It takes a bit to have a datanode upgrade itself?<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(14:47:23)</span> <b>tmartin:</b></span> I am waiting on my first one to report after the software update<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:12:21)</span> <b>jthiltges:</b></span> Which version are you updating from? When I'd upgraded, the datanodes came up quite quickly.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:16:48)</span> <b>jthiltges:</b></span> At least from my notes, it was ~10 seconds. It should just depend on how long it takes to do a stat of the directory contents.<br/>Quick bash snippet to make the datanode service start a bit faster:<br/><pre>for i in /hadoop-data* ; do find $i -size 0 &amp; done</pre><br/>This loads the metadata from all disks in parallel. The datanode does each one sequentially.<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(15:19:09)</span> <b>tmartin:</b></span> It is taking over an hour at the moment. hadoop-client-2.0.0+1612-1.cdh4.7.1.p0.12.7.osg33.el6.x86_64<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(15:21:15)</span> <b>tmartin:</b></span> One has gotten done one disk, moving the the second, but if it is taking an hour / disk that will take over 12 hours for some of my nodes<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(15:21:46)</span> <b>tmartin:</b></span> ok the last two disks went faster<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(15:23:25)</span> <b>tmartin:</b></span> Ok first one in<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:26:31)</span> <b>jthiltges:</b></span> I didn't think there was a disk layout change for that upgrade, and it was quite fast, but I might be mistaken.<br/>And great!<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(15:42:53)</span> <b>tmartin:</b></span> Ok, so how do I get gridftp updated? It does not want to seem to come with the updates on the nodes, and there is no install docs :disappointed:<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(15:43:26)</span> <b>tmartin:</b></span> Hmm under POSIX...<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(15:44:34)</span> <b>tmartin:</b></span> ok maybe I found it<br/>
+</body>
+</html>

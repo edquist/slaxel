@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Oct 10, 2017 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Tue Oct 10, 2017 : #gfactory (osg)</h3>
+<span style="color: #e7392d"><span style="font-size: small">(10:47:48)</span> <b>klarson1:</b></span> i tried to reconfig my factory this morning but am getting switchboard errors:<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:47:49)</span> <b>klarson1:</b></span> Reconfiguring the factoryerror switching to uid 43687, tracking gid 0: code -10 failed to set real uid<br/>Failed to create clientlog dir (user cmsglobal_1): Unexpected Error running '/usr/bin/../sbin/condor_root_switchboard exec 0 4'. Details: Command '/usr/bin/../sbin/condor_root_switchboard exec 0 4' returned non-zero exit status 1: . Stdout:<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:48:12)</span> <b>klarson1:</b></span> i am running condor 8.6.5 and osg3.4 and gwms 3.2.19 (i think that is what everyone else has?)<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:48:58)</span> <b>klarson1:</b></span> i am wondering if it is choking on making the new pic entry?  it's hard to know with the switchboard<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:49:03)</span> <b>klarson1:</b></span> anyone else have issues?<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:49:51)</span> <b>marian:</b></span> and what's Stdout?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:50:35)</span> <b>klarson1:</b></span> that's the whole message<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:50:57)</span> <b>klarson1:</b></span> nothing else :disappointed:<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:52:37)</span> <b>klarson1:</b></span> but i don't see the dir for CMSHTPC_T1_ES_PIC_ce14-multicore in /var/lib/gwms-factory/work-dir/ but i know that entry was added because of the git log<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:53:39)</span> <b>klarson1:</b></span> i'm also now getting errs processing the globals classads "RSAError: padding check failed"<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:53:51)</span> <b>klarson1:</b></span> it started around the same time i did the first reconfig attempt<br/>
+<span style="color: #e7392d"><span style="font-size: small">(11:09:08)</span> <b>klarson1:</b></span> yep, it was creating the new entry that was the prob.  i manually removed the new pic entry from the file and reconfig worked fine<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:09:42)</span> <b>marian:</b></span> alright then<br/>
+<span style="color: #e7392d"><span style="font-size: small">(11:10:05)</span> <b>klarson1:</b></span> you all have had no problems creating new entries after upgrades, right?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:17:24)</span> <b>amjad:</b></span> @klarson1 I faced the same problem<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:18:09)</span> <b>amjad:</b></span> you need to check the /etc/gwms* folder ownership &amp; ownership of xml in /etc/osg*<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:18:27)</span> <b>amjad:</b></span> for me was like that<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:18:40)</span> <b>amjad:</b></span> or shutoff condor and start it over<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:18:56)</span> <b>amjad:</b></span> (was offered by Jeff befor) and worked for me<br/>
+<span style="color: #e7392d"><span style="font-size: small">(11:20:00)</span> <b>klarson1:</b></span> ok.  let me try that, thanks!  i'm still getting the errs processing the globals classads too, i think that is where the updated credentials are passed so i need to get this working or pilots will fail<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:20:04)</span> <b>amjad:</b></span> check /etc/gwms-factory/ ownership of folder itself and files inside<br/>
+<span style="color: #e7392d"><span style="font-size: small">(11:20:29)</span> <b>klarson1:</b></span> do you know why this matters now?  i have not changed anything<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:20:51)</span> <b>amjad:</b></span> also ownership of /etc/osg-gfactory folder and files inside<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:21:02)</span> <b>amjad:</b></span> it happened to me after condor upgrade<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:21:11)</span> <b>amjad:</b></span> but no clue why<br/>
+<span style="color: #e7392d"><span style="font-size: small">(11:24:13)</span> <b>klarson1:</b></span> ok. most of my files are owned by root.  glideinWMS.xml is owned by the factory user<br/>
+<span style="color: #e7392d"><span style="font-size: small">(11:24:37)</span> <b>klarson1:</b></span> i'll update mine to look similar to your factory ownership amjad<br/>
+</body>
+</html>

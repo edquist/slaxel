@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Apr 2, 2019 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue Apr 2, 2019 : #software (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(10:23:34)</span> <b>matyas:</b></span> anyone have any idea what might be happening to the StashCache tests here: <a href="http://vdt.cs.wisc.edu/tests/20190402-0423/packages.html">http://vdt.cs.wisc.edu/tests/20190402-0423/packages.html</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:24:25)</span> <b>matyas:</b></span> the tests are supposed to be coming from the opensciencegrid:xcache-1.0.2 branch but it doesn't seem that way<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:25:58)</span> <b>matyas:</b></span> they're trying to start up xrootd@stashcache-cache-server, which is not what the code says<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:29:26)</span> <b>matyas:</b></span> actually, they're trying to start xrootd@stashcache-cache-server but later on checking for xrootd@stash-cache so it's like some of the test files are taken from the new branch and some of them from the old branch<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:30:21)</span> <b>matyas:</b></span> which makes absolutely no sense<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:37:37)</span> <b>dweitzel:</b></span> so test_155 and test_460 check different services?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:38:21)</span> <b>matyas:</b></span> yeah<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:40:05)</span> <b>matyas:</b></span> actually, it's even more messed up than that. test_460 checks for the old rpms (e.g. stashcache-origin-server) but the new service (xrootd@stash-origin)<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:40:37)</span> <b>matyas:</b></span> some sort of bad merge?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:40:49)</span> <b>dweitzel:</b></span> that seems like the correct behavior from master.<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:41:26)</span> <b>matyas:</b></span> that's not the branch i'm looking at. the new stashcache tests need to run off of the <tt>xrootd-1.0.2</tt> branch of osg-test<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:42:30)</span> <b>dweitzel:</b></span> how can one tell from the test output what branch it ran off?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:46:09)</span> <b>matyas:</b></span> the main results page says it in the table: "StashCache 	3.4 Testing (opensciencegrid:xcache-1.0.2)"<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:46:55)</span> <b>matyas:</b></span> oh, and if you hover over the test result, it says the hash<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:47:08)</span> <b>matyas:</b></span> 5af9ca2<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:47:22)</span> <b>matyas:</b></span> which is not the right hash<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:47:39)</span> <b>matyas:</b></span> (should be 04ed2fe)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:48:23)</span> <b>dweitzel:</b></span> that's the latest in master.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:48:27)</span> <b>dweitzel:</b></span> that hash.<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:49:09)</span> <b>matyas:</b></span> yeah, looks like it<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:49:50)</span> <b>matyas:</b></span> maybe VMU runs don't behave correctly when some of the tests are from one branch, and some of the tests are from another branch<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:54:43)</span> <b>matyas:</b></span> yeah, I think that's it. the VMU scripts first make a single tarball called <tt>osg-test-git.tar.gz</tt> and stuff that into the input disk image for the test run, and it uses the same <tt>osg-test-git.tar.gz</tt> files for each test, regardless of what branch was specified in the yaml file<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:56:01)</span> <b>matyas:</b></span> <a href="https://github.com/opensciencegrid/vm-test-runs/blob/master/create-io-images#L26">https://github.com/opensciencegrid/vm-test-runs/blob/master/create-io-images#L26</a><br/>
+</body>
+</html>

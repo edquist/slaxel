@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Feb 20, 2018 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue Feb 20, 2018 : #software (osg)</h3>
+<span style="color: #b14cbc"><span style="font-size: small">(12:55:33)</span> <b>tmartin:</b></span> Ok got a question, with the OSG_CE, what is the OSG_APP aka app_dir correct setting on a site with only CVMFS?<br/><br/>app_dir:<br/>This directory will be accesed via the $OSG_APP environment variable. It should be visible on both the CE and worker nodes. Only the CE needs to have write access to this directory. This directory must also contain a sub-directory etc/ with 1777 permissions.<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:57:58)</span> <b>matyas:</b></span> set it to "UNSET"<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:58:27)</span> <b>matyas:</b></span> wait<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(12:59:47)</span> <b>tmartin:</b></span> Nope<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(12:59:58)</span> <b>tmartin:</b></span> well maybe if it is case sensitve<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(13:00:09)</span> <b>tmartin:</b></span> app_dir = UNSET<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(13:00:13)</span> <b>tmartin:</b></span> is what I have<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(13:01:01)</span> <b>sthapa:</b></span> UNAVAILABLE ?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:01:03)</span> <b>matyas:</b></span> I'm sorry. Set it to "/cvmfs/oasis.opensciencegrid.org"<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(13:01:12)</span> <b>tmartin:</b></span> That makes sense<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:01:41)</span> <b>matyas:</b></span> I should fix the comment and docs to say that<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(13:02:32)</span> <b>tmartin:</b></span> That would be great, it has been a mystery in the docs for a while. :slightly_smiling_face: Also, I am having a heck of a time trying to get fetch-crl-cron to enable on RHEL7<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(13:02:48)</span> <b>tmartin:</b></span> [1059] root@osg-gw-4 /etc/cron.d#  /bin/systemctl  is-active fetch-crl-cron.service<br/>inactive<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(13:02:56)</span> <b>tmartin:</b></span> THis is after I run systemctl to enable it<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:03:07)</span> <b>matyas:</b></span> you mean to start it?<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(13:03:47)</span> <b>tmartin:</b></span> It is a cron job, so more enabling it<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(13:04:13)</span> <b>sthapa:</b></span> I believe you need to start it to put the config into the cron dir<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:04:51)</span> <b>matyas:</b></span> yeah. fetch-crl-cron isn't really a cron job, it's a service that puts a sentinel file in a directory so the cron job will run<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:05:03)</span> <b>matyas:</b></span> that made a lot more sense before systemd<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(13:05:08)</span> <b>tmartin:</b></span> It used to take just an enable, but now it needs a system start?<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(13:05:39)</span> <b>tmartin:</b></span> That is the issue, ok now do a start :slightly_smiling_face:<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(13:05:46)</span> <b>sthapa:</b></span> it does unless you reboot<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(13:06:06)</span> <b>tmartin:</b></span> systemctl start is what I meant, I will add that to my puppet<br/>
+</body>
+</html>

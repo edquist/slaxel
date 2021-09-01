@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Oct 13, 2020 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Tue Oct 13, 2020 : #xcache (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(08:51:23)</span> <b>matyas:</b></span> I'm getting "hand shake failed" when trying to xrdcp from the redirector:<br/><pre>Run: [FATAL] Hand shake failed:  (source)<br/>FAIL: xrdcp from <a href="xroot://redirector.osgstorage.org:1094//chtc/PUBLIC/matyas/testing2000.txt">xroot://redirector.osgstorage.org:1094//chtc/PUBLIC/matyas/testing2000.txt</a></pre><br/>Client tools are 4.12.3.<br/>
+<span style="color: #c386df"><span style="font-size: small">(08:57:54)</span> <b>matyas:</b></span> @dweitzel, is this related to turning on SSL?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:18:03)</span> <b>dweitzel:</b></span> Yes, that is related to the turning on of TLS<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:18:14)</span> <b>dweitzel:</b></span> You are now required to have a 5.0+ client to communicate with the redirector.<br/>
+<blockquote>
+<span style="color: #8d4b84"><span style="font-size: small">(09:31:45)</span> <b>kherner:</b></span> That is not true if one's still accessing stash over CVMFS, correct?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:37:23)</span> <b>dweitzel:</b></span> Right, doesn't affect stash access through CVMFS.  That's all HTTP access anyways.<br/>
+</blockquote>
+<span style="color: #c386df"><span style="font-size: small">(09:19:52)</span> <b>matyas:</b></span> :disappointed:<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:21:05)</span> <b>matyas:</b></span> We will need to update the stashcache-client RPM to require xrootd-client 5 and move it into the osg-upcoming repo until we move xrootd 5 into trunk<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:21:28)</span> <b>matyas:</b></span> and update the worker node client to require stashcache-client from upcoming<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:22:19)</span> <b>matyas:</b></span> can you turn it back off until we can do that?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:36:46)</span> <b>dweitzel:</b></span> stashcache client should no longer contact the redirector<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:36:54)</span> <b>dweitzel:</b></span> I thought that change was in the most recent release?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:37:11)</span> <b>dweitzel:</b></span> It will try 3 (maybe 4?) caches, then move on to the next transfer method.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:37:58)</span> <b>dweitzel:</b></span> It's in the release notes, so it must be true: <a href="https://github.com/opensciencegrid/StashCache/releases/tag/v6.1.0">https://github.com/opensciencegrid/StashCache/releases/tag/v6.1.0</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(09:38:51)</span> <b>matyas:</b></span> ah OK.<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:39:13)</span> <b>matyas:</b></span> never mind then<br/>
+</body>
+</html>

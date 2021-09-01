@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed May 11, 2016 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Wed May 11, 2016 : #gracc (osg)</h3>
+<span style="color: #3c8c69"><span style="font-size: small">(10:02:40)</span> <b>kretzke:</b></span> @dweitzel: are you working on the elasticsearch cluster?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:02:49)</span> <b>dweitzel:</b></span> no<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:04:20)</span> <b>kretzke:</b></span> hm, maybe it managed to recover. there were several unassigned shards that are now initializing, cluster is yellow<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:04:32)</span> <b>dweitzel:</b></span> ok, good.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:04:56)</span> <b>dweitzel:</b></span> did a node temporarily go down last night?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:05:02)</span> <b>dweitzel:</b></span> do we have any sort of monitoring for that?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:07:07)</span> <b>kretzke:</b></span> no we don't<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:10:22)</span> <b>kretzke:</b></span> I don’t think it was a node; it was just one index (gracc-osg-2016.05.11) with unassigned shards.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:10:44)</span> <b>dweitzel:</b></span> weird.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:12:24)</span> <b>kretzke:</b></span> maybe a sign the cluster is overloaded.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:13:43)</span> <b>dweitzel:</b></span> like, needs more nodes?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:13:55)</span> <b>dweitzel:</b></span> or, io overloaded?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:14:27)</span> <b>dweitzel:</b></span> We did some monitoring of our instances, the gratiav2 data nodes are always hovering around 100+ IOPS at all times.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:23:51)</span> <b>kretzke:</b></span> from a brief sampling with iostat it looks like the disks are doing fine. await is in the 10s of ms, %util mostly in the 50% range<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:29:47)</span> <b>dweitzel:</b></span> interesting, I wonder how that translates down the virtualization stack.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:42:56)</span> <b>kretzke:</b></span> I’m getting some system monitoring up<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:43:22)</span> <b>dweitzel:</b></span> ok<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:45:39)</span> <b>dweitzel:</b></span> we have monitoring on the underlying hardware, storage and compute.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:48:45)</span> <b>kretzke:</b></span> <a href="https://gracc.opensciencegrid.org/dashboard/db/grace-system-monitoring">https://gracc.opensciencegrid.org/dashboard/db/grace-system-monitoring</a> work in progress<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:48:15)</span> <b>dweitzel:</b></span> great!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:50:05)</span> <b>dweitzel:</b></span> @kretzke: why so many unassigned shards?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:53:18)</span> <b>kretzke:</b></span> restarted elasticsearch on a node (gratia2-2) to increase the file descriptor limit, it’s recovering. it’s not clear to me why it needs to do so many shards, I disabled shard allocation per <a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/_rolling_restarts.html">https://www.elastic.co/guide/en/elasticsearch/guide/current/_rolling_restarts.html</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:02:17)</span> <b>kretzke:</b></span> ah, some interesting reading here <a href="https://gibrown.com/2013/12/05/managing-elasticsearch-cluster-restart-time/">https://gibrown.com/2013/12/05/managing-elasticsearch-cluster-restart-time/</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:09:27)</span> <b>dweitzel:</b></span> very interesting read.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:14:57)</span> <b>dweitzel:</b></span> I’m very interested if we are hitting any sort of IO bottleneck.  Is there a way you could monitor io time?  Or IO load somehow?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:16:21)</span> <b>kretzke:</b></span> probably, there’s a bunch of system and elasticsearch metrics being thrown into influxdb now (telegraf is pretty neat)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:25:03)</span> <b>dweitzel:</b></span> <br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:25:27)</span> <b>dweitzel:</b></span> Looks like elasticsearch thinks gratia2-2 is offline, and a new one (with same name) came up?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:31:44)</span> <b>kretzke:</b></span> I was wondering that myself. the node gets an auto-generated id on startup, e.g. [root@gratiav2-1 ~]# curl -XGET '<a href="http://localhost:9200/_cat/nodes?h=id,name&amp;full_id=true">http://localhost:9200/_cat/nodes?h=id,name&amp;full_id=true</a>'<br/>710orxOHQyqYSB2_OHeAog gratia2-3 <br/>MqLJv0BzRf2rqD1BVLcBSQ gratia2-2 <br/>nkX1XXv8SmipkJjldRQj8w gratia2-4 <br/>uzbjP-qNTfarPAI_bGVaQA gratia2-1<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:32:06)</span> <b>kretzke:</b></span> so that’s why there’s multiple entries in kibana<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:33:28)</span> <b>kretzke:</b></span> I don’t think it’s a problem though. when it starts up it should be looking at the data on disk and talking to the rest of the nodes to find out what needs to be recovered<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:36:06)</span> <b>kretzke:</b></span> from the above article (and the linked dev post) my understanding is that due to the non-deterministic storing of data the actual storage of the same shards on two nodes can be quite different, so when it tries to recover it basically says “nope, this is wrong” and gets a new copy of the shard<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(18:21:37)</span> <b>kretzke:</b></span> looks like gratiav2-4 ran out of heap and restarted around 17:45 <a href="https://gracc.opensciencegrid.org/dashboard/db/grace-system-monitoring?from=1463006003428&amp;to=1463007521795&amp;var-node=gratiav2-4">https://gracc.opensciencegrid.org/dashboard/db/grace-system-monitoring?from=1463006003428&amp;to=1463007521795&amp;var-node=gratiav2-4</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(18:31:13)</span> <b>kretzke:</b></span> out of file descriptor errors, went ahead and bumped it up. I’ll do gratiav2-3 in the morning, it’s hovering very close to the limit<br/>
+<span style="color: #235e5b"><span style="font-size: small">(20:22:29)</span> <b>dweitzel:</b></span> Yup, I see it’s recovering still.<br/>
+</body>
+</html>

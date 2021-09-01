@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jan 7, 2021 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Thu Jan 7, 2021 : #gracc (osg)</h3>
+<span style="color: #16569E"><span style="font-size: small">(09:36:51)</span> <b>edquist:</b></span> @bbockelm, @dweitzel, most of these records are showing up with WallDuration 0, even though there appears to be something non-zero in the raw xml, eg<br/><br/><pre><br/>&lt;WallDuration urwg:description="Was entered in seconds"&gt;PT3.0H23M8.0S&lt;/WallDuration&gt;<br/></pre><br/><br/>does anything look broken about this?<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:36:53)</span> <b>edquist:</b></span> <a href="https://gracc.opensciencegrid.org/kibana/goto/b24a1510b81b266e9a01f51394ac9329">https://gracc.opensciencegrid.org/kibana/goto/b24a1510b81b266e9a01f51394ac9329</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:42:39)</span> <b>dweitzel:</b></span> (comparing to a normal record)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:53:37)</span> <b>dweitzel:</b></span> I think I see the issue.  How are you setting the wall duration in the probe?<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:56:00)</span> <b>edquist:</b></span> i think i'm just assigning a numeric value in seconds<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:56:01)</span> <b>edquist:</b></span> <a href="https://github.com/opensciencegrid/gratia-probe/blob/master/osg-pilot-container/osgpilot_meter#L522">https://github.com/opensciencegrid/gratia-probe/blob/master/osg-pilot-container/osgpilot_meter#L522</a><br/>
+<span style="color: #16569E"><span style="font-size: small">(09:56:27)</span> <b>edquist:</b></span> (with <tt>SECONDS = "Was entered in seconds"</tt>)<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:57:13)</span> <b>edquist:</b></span> <tt>row.WallDuration</tt> is a value returned by the sqlite query, which i believe is numeric<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:59:00)</span> <b>dweitzel:</b></span> so this is an odd one, maybe caused by python 3?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:59:20)</span> <b>dweitzel:</b></span> The wall duration you have linked as a decimal for the hours, <tt>3.0</tt> and for the seconds.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:59:49)</span> <b>dweitzel:</b></span> But, the wiki page says:<br/>&gt; The smallest value used may also have a decimal fraction, as in "P0.5Y" to indicate half a year.<br/><a href="https://en.wikipedia.org/wiki/ISO_8601#Durations">https://en.wikipedia.org/wiki/ISO_8601#Durations</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:00:28)</span> <b>dweitzel:</b></span> And indeed, the 8601 parser that the gracc collector uses (written by Kevin) does not recognize decimals for the hours, only the seconds field.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:00:56)</span> <b>dweitzel:</b></span> <a href="https://github.com/retzkek/iso8601duration/blob/master/duration.go#L33">https://github.com/retzkek/iso8601duration/blob/master/duration.go#L33</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:01:42)</span> <b>dweitzel:</b></span> Forgot to mention, hours <tt>3.0</tt> is not the smallest value.  In your example, seconds is the smallest.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:08:19)</span> <b>dweitzel:</b></span> so, in summary.  I don't think gratia is conforming to the standard.  And I don't think the collector is 100% correct either.  But even if the collector is 100% corrected, I still don't think the gratia probe is conforming to the standard.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:10:30)</span> <b>bbockelm:</b></span> is there something simple like a missing conversion to <tt>int</tt>?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:12:52)</span> <b>dweitzel:</b></span> The gratia code is not the easiest to parse: <a href="https://github.com/opensciencegrid/gratia-probe/blob/master/common2/gratia/common2/timeutil.py#L72">https://github.com/opensciencegrid/gratia-probe/blob/master/common2/gratia/common2/timeutil.py#L72</a><br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(10:21:46)</span> <b>blin:</b></span> that's the understatement of the year<br/>
+</blockquote>
+<span style="color: #9e3997"><span style="font-size: small">(10:14:54)</span> <b>bbockelm:</b></span> Glad we have pre-python 2.6 support in there...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:15:26)</span> <b>dweitzel:</b></span> indeed, somewhere around here: <a href="https://github.com/opensciencegrid/gratia-probe/blob/master/common2/gratia/common2/timeutil.py#L101">https://github.com/opensciencegrid/gratia-probe/blob/master/common2/gratia/common2/timeutil.py#L101</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:15:50)</span> <b>dweitzel:</b></span> divmod returns floats if you send it a float.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:16:34)</span> <b>dweitzel:</b></span> so maybe we're keeping the number of seconds as a float in the pilot container?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:24:30)</span> <b>bbockelm:</b></span> @dweitzel - it's here: <a href="https://github.com/opensciencegrid/gratia-probe/blob/2704d76164f43654850a6df4700eecdc6b80a897/common/gratia/common/record.py#L123-L141">https://github.com/opensciencegrid/gratia-probe/blob/2704d76164f43654850a6df4700eecdc6b80a897/common/gratia/common/record.py#L123-L141</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:24:42)</span> <b>bbockelm:</b></span> there's _another_ ISO8601 generator.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:25:03)</span> <b>bbockelm:</b></span> and it doesn't appear to do the right thing for python3, uses the wrong division operator.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:25:48)</span> <b>bbockelm:</b></span> <b>@edquist</b> - that's your problem!<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:30:04)</span> <b>edquist:</b></span> i see.  so, i am not as worried about the stuff under common2 - that was marco's library used only for the 'new' lsf probe<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:30:37)</span> <b>bbockelm:</b></span> (the ISO8601 formatter actually looks quite nicer than the one in record.py<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:31:05)</span> <b>edquist:</b></span> but yeah i did not think about the implications of the <tt>/</tt> operator when trying to make gratia py2/3 compatible<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:31:18)</span> <b>edquist:</b></span> i guess that was an oversight<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:31:31)</span> <b>edquist:</b></span> (@bbockelm, that's what you mean by my problem, right?)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:32:01)</span> <b>bbockelm:</b></span> yup<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:34:04)</span> <b>edquist:</b></span> thanks @dweitzel &amp; @bbockelm for taking a look!<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:36:23)</span> <b>edquist:</b></span> PS python3 was a mistake<br/>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Dec 18, 2017 : #software (osg)</title>
+</head>
+<body>
+<h3>Mon Dec 18, 2017 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(09:31:17)</span> <b>blin:</b></span> also @tim.theisen<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(10:47:03)</span> <b>kherner:</b></span> Interesting… Mu2e is reporting some intermittent crashes in their commissioning jobs at JINR; they are running the 2.4.2 client. It doesn’t fail all the time though<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:13:22)</span> <b>dweitzel:</b></span> @matyas I like <a href="https://opensciencegrid.github.io/docs-itb/">https://opensciencegrid.github.io/docs-itb/</a>  Did you change the theme to "red"?  Looks very Nebraska'ish, which I'm ok with.<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:25:33)</span> <b>dwd:</b></span> @lincoln can you send me one of the core dump files, and can you locate a /var/log/messages message associated with the core dump?<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:31:51)</span> <b>lincoln:</b></span> <a href="http://stash.osgconnect.net/~lincolnb/cvmfs/">http://stash.osgconnect.net/~lincolnb/cvmfs/</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(11:32:37)</span> <b>matyas:</b></span> @dweitzel I didn't touch it but it looks good to me too. Menu bar on the left is still blue when you pull it out<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:32:46)</span> <b>matyas:</b></span> that should probably be changed<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:33:00)</span> <b>matyas:</b></span> but I tried it out w/o javascript and it still works fine<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:34:38)</span> <b>dweitzel:</b></span> great!<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:36:27)</span> <b>blin:</b></span> @matyas are we talkign about the docs-itb?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:36:37)</span> <b>matyas:</b></span> yeah<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:37:15)</span> <b>blin:</b></span> ah i see the blue menu bar you're talking about<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:37:25)</span> <b>blin:</b></span> ill fix it<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:38:34)</span> <b>dwd:</b></span> @lincoln I get 403 forbidden when trying to download the core file<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:39:57)</span> <b>lincoln:</b></span> grumble<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:39:57)</span> <b>lincoln:</b></span> ok<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:40:28)</span> <b>lincoln:</b></span> @dwd try now<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:40:57)</span> <b>dwd:</b></span> Yes that works, thanks<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:47:13)</span> <b>dwd:</b></span> Ok so the core dumps are a side effect of the message "required configuration repository directory does not exist: /cvmfs/config-osg.opensciencegrid.org/etc/cvmfs".  Then abort() is called and I didn't know that would cause a core dump.<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:48:19)</span> <b>dwd:</b></span> Can you search back through the /var/log/messages for the first occurrence of that error, and look at the cvmfs messages just prior to it.<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:06:21)</span> <b>blin:</b></span> @matyas i fixed the color of the blue menu bar but now the title of the full screen menu bar has an annoying background of red<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:06:30)</span> <b>blin:</b></span> anyways, naptime<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:39:59)</span> <b>dwd:</b></span> For the benefit of those watching the channel: I discussed with @lincoln via direct message.  It appears to have been caused by the fact that the cache dir wasn't created when they first installed cvmfs-2.4.2.  They downgraded to 2.4.1 when they suspected a problem with 2.4.2, but have now upgraded to 2.4.2 again and it is working.<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:44:56)</span> <b>matyas:</b></span> is that something we can test for and give a reasonable error message instead of core dump?<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:46:36)</span> <b>dwd:</b></span> It does give a reasonable error.  The core dump is an extra because it calls abort() after sending the error message to syslog.<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:48:35)</span> <b>matyas:</b></span> put another way: how can we make sure that the next time it happens we won't think it's a cvmfs bug? or is it a rare enough case that it's not worth the trouble?<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:05:04)</span> <b>dwd:</b></span> I think people should get in the habit of looking in /var/log/messages for debugging cvmfs issues before looking in core files.  I have seen the error message before a few times so I wouldn't say it is very rare.  In fact I contributed the code that made it call abort() because it used to be a lot harder to decipher the root cause if the config repository was not mounted.  I didn't realize that abort() makes core dumps though.  There are other places the cvmfs code calls abort()<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:12:30)</span> <b>matyas:</b></span> I feel like if there's a core dump, people's first assumption is that there's a problem with the software, not with their setup. Same reason why I try to avoid stack traces in my Python code for 'predictable' errors.<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:13:46)</span> <b>matyas:</b></span> (unless people explicitly turn on debugging)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:14:29)</span> <b>bbockelm:</b></span> I think <tt>abort()</tt> becomes <tt>SIGABRT</tt> which defaults to doing a core dump.<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:14:49)</span> <b>dwd:</b></span> So maybe cvmfs should be changed to just call exit instead<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:16:27)</span> <b>bbockelm:</b></span> yeah - if there's nothing to report back to the developers (known error condition due to misconfiguration / bad runtime environment), then <tt>exit()</tt> is likely better.<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:44:13)</span> <b>dwd:</b></span> I made a ticket <a href="https://sft.its.cern.ch/jira/browse/CVM-1461">https://sft.its.cern.ch/jira/browse/CVM-1461</a><br/>
+</body>
+</html>

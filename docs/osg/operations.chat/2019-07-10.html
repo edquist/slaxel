@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jul 10, 2019 : #operations (osg)</title>
+</head>
+<body>
+<h3>Wed Jul 10, 2019 : #operations (osg)</h3>
+<span style="color: #e23f99"><span style="font-size: small">(09:04:27)</span> <b>marco.mascheroni:</b></span> I have a pilot failing with with on the WN (it's a new hostedCE I am setting up):<br/><br/><pre><br/>Executing /scratch/glide_x6xwEZ/client/crl-check<br/>Checking CA certificate /home/CAM/gluex/osg-wn-client/etc/grid-security/certificates/70d35895.0<br/>ERROR: Missing required CA certificate: /home/CAM/gluex/osg-wn-client/etc/grid-security/certificates/70d35895.0<br/></pre><br/><br/>The script I use for updating the CA certificates on the hostedCE is:<br/><br/><pre><br/>#!/bin/bash<br/><br/>source  /home/CAM/gluex/osg-wn-client/setup.sh<br/>osg-ca-manage  refreshCA<br/>osg-ca-manage fetchCRL<br/></pre><br/><br/>and it runs successfully. In the logfile however I see:<br/><br/><tt>2019-07-03T00-00-23 Not preseving CRL 70d35895.r0 because there is no CA for it in the update</tt> (d690e530.r0 also has this error)<br/><br/>Any idea what is going on?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(09:04:38)</span> <b>marco.mascheroni:</b></span> @blin<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:46:29)</span> <b>blin:</b></span> i had to downgrade the osg-ca-cert package to figure out what CA that corresponds to<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:46:44)</span> <b>blin:</b></span> <pre><br/># ls -l /etc/grid-security/certificates/ | grep 70d35895 <br/>lrwxrwxrwx. 1 root root    15 Jul 10 09:45 70d35895.0 -&gt; cilogon-osg.pem<br/>lrwxrwxrwx. 1 root root    22 Jul 10 09:45 70d35895.namespaces -&gt; cilogon-osg.namespaces<br/>-rw-r--r--. 1 root root  9819 Jun 25 06:47 70d35895.r0<br/>lrwxrwxrwx. 1 root root    26 Jul 10 09:45 70d35895.signing_policy -&gt; cilogon-osg.signing_policy<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(09:47:12)</span> <b>blin:</b></span> the latest CA update removed the CILogon OSG CA since it's been retired<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:48:01)</span> <b>blin:</b></span> i'm not sure why the CRL is still there @matyas any idea why our tarball would still have the CRL?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:48:22)</span> <b>blin:</b></span> i assume that the pilot crl check is failing because it finds the CRL with no corresponding CA<br/>
+<span style="color: #e06b56"><span style="font-size: small">(09:55:39)</span> <b>jthiltges:</b></span> As a bit of a tangent, I'm seeing a similar situation on systems where osg-ca-certs has been upgraded. The CRL is present, but nothing else.<br/>Maybe helpful to list the CRLs as <tt>%config(missingok)</tt> in the spec?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:56:49)</span> <b>blin:</b></span> we don't package the CRLs in the ca certs packages though<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:57:02)</span> <b>blin:</b></span> or at least i don't think so...<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:57:03)</span> <b>matyas:</b></span> _does_ the tarball come with the CRL?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:57:51)</span> <b>blin:</b></span> <pre><br/># rpm -qf /etc/grid-security/certificates/70d35895.r0 <br/>file /etc/grid-security/certificates/70d35895.r0 is not owned by any package<br/></pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(09:57:52)</span> <b>matyas:</b></span> i don't think it does because CRLs need to be updated every three days so there's no point in putting them in a tarball that gets remade monthly<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:58:02)</span> <b>matyas:</b></span> or an rpm<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:58:31)</span> <b>blin:</b></span> hrm so somehow fetch-crl may be generating the CRL or not cleaning up CRLs for CAs that have been removed?<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:59:04)</span> <b>matyas:</b></span> look for a .crl_url file<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:59:28)</span> <b>matyas:</b></span> cilogon-osg.crl_url or something<br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:02:07)</span> <b>jthiltges:</b></span> If the CA is removed with a package upgrade, is it reasonable to remove the CRL at the same time?<br/>(My thought with missingok was to associate the CRLs with the package, even though CRLs are downloaded separately. I'm not sure offhand if missingok files would get removed on update, but if so, it would be handy.)<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:02:40)</span> <b>matyas:</b></span> i don't think missingok does that<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:02:58)</span> <b>matyas:</b></span> i think it just means that <tt>rpm -V</tt> won't complain if the file doesn't exist<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:03:45)</span> <b>matyas:</b></span> i think it's reasonable to remove the crl but it's probably something we'd have to put into a post-install script or something (and that wouldn't affect the tarball anyway)<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:04:39)</span> <b>matyas:</b></span> the correct thing to do imo is to ignore crls that don't have associated cas<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:05:27)</span> <b>matyas:</b></span> ... and I'd have to see the source code but "Missing required CA certificate: /home/CAM/gluex/osg-wn-client/etc/grid-security/certificates/70d35895.0" does not say to me that it found an extraneous CRL<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:05:45)</span> <b>matyas:</b></span> it could just be that the script specifically expects the OSG CA to be there<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:05:51)</span> <b>matyas:</b></span> like it has some list or something<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:06:00)</span> <b>blin:</b></span> could be<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:06:24)</span> <b>blin:</b></span> but it looks like a failure from the <tt>check-crl</tt> script<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:06:42)</span> <b>matyas:</b></span> I want to see that script<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:11:40)</span> <b>blin:</b></span> <a href="https://github.com/opensciencegrid/osg-flock/commit/946105359842f1b77453a4dc21b6035a7c6f4517">https://github.com/opensciencegrid/osg-flock/commit/946105359842f1b77453a4dc21b6035a7c6f4517</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:13:16)</span> <b>matyas:</b></span> and is that the version of the script that's installed?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:13:47)</span> <b>matyas:</b></span> because <a href="https://github.com/opensciencegrid/osg-flock/blob/946105359842f1b77453a4dc21b6035a7c6f4517/node-check/crl-check">https://github.com/opensciencegrid/osg-flock/blob/946105359842f1b77453a4dc21b6035a7c6f4517/node-check/crl-check</a> looks like it's doing what i'm saying it's doing<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:14:09)</span> <b>blin:</b></span> we'd have to ask @rynge, i think it's something that has to be installed in the frontend<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:15:16)</span> <b>rynge:</b></span> Hello<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:15:48)</span> <b>rynge:</b></span> Is the crl check failing?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:16:38)</span> <b>blin:</b></span> yup, it's still checking for the old hash<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:17:08)</span> <b>rynge:</b></span> Hmm, it could be an old glidein (they can sit around for a long time on the factory side)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:17:21)</span> <b>rynge:</b></span> But if it is a new CE, I would be surprised<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:17:28)</span> <b>rynge:</b></span> Let me check my glideins here<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:17:48)</span> <b>marco.mascheroni:</b></span> it's a new CE, and I sent the pilot yesterday<br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:18:58)</span> <b>jthiltges:</b></span> (On packaging, and removal of files generated later, I think <tt>%ghost</tt> is the thing to consider instead. I was mistaken on missingok.)<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:19:31)</span> <b>matyas:</b></span> %ghost sounds right<br/>
+<blockquote>
+<span style="color: #c386df"><span style="font-size: small">(10:23:41)</span> <b>matyas:</b></span> that would involve updating the rpm, with something like this in the %install section<br/><pre><br/>for dotzero in $RPM_BUILD_ROOT/etc/grid-security/certificates/*.0; do<br/>  touch ${dotzero%.0}.r0<br/>done<br/></pre><br/>and change the %files section<br/><pre><br/>/etc/grid-security/certificates/*.0<br/>/etc/grid-security/certifiactes/*.pem<br/>/etc/grid-security/certificates/(whole bunch of other extensions)<br/>%ghost /etc/grid-security/certificates/*.r0<br/></pre><br/>
+</blockquote>
+<span style="color: #674b1b"><span style="font-size: small">(10:19:48)</span> <b>rynge:</b></span> Hmm, I have the updated crl-check in my glideins. Are yours from <a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a>?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:24:31)</span> <b>marco.mascheroni:</b></span> Yes, but I am using the "manual_submit_glidein" command to send them. Let me double check if the crl-check script is up to date for those pilots.. Maybe there is something wrong there. Thanks for the help guys<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:24:56)</span> <b>rynge:</b></span> One quick check if you have the glidein in your execute dir:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:25:11)</span> <b>rynge:</b></span> <pre><br/># cat _condor_stdout  | grep ^OSG_GLIDEIN_VERSION<br/>OSG_GLIDEIN_VERSION 417<br/></pre><br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:25:26)</span> <b>rynge:</b></span> That should be 417 for the current ones<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:25:38)</span> <b>rynge:</b></span> If it is lower, you are picking up something older<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:26:43)</span> <b>rynge:</b></span> Or you can see it on the CE: <tt>condor_ce_q -l | grep ^Arguments</tt><br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:27:46)</span> <b>marco.mascheroni:</b></span> Oh wait, the CE is a GLUEX one :sweat_smile:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:28:07)</span> <b>marco.mascheroni:</b></span> Is it @efajardo mantaining the gluex frontend?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:28:29)</span> <b>rynge:</b></span> Probably. I know he picks up a bunch of my scripts, but not sure how they are updated<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:30:44)</span> <b>marco.mascheroni:</b></span> Edgar, can you check the check-crl verison on the gluex frontend?<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:31:24)</span> <b>efajardo:</b></span> Gluex uses gwms based singularity<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:31:26)</span> <b>efajardo:</b></span> not Mats Scripts<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:31:28)</span> <b>efajardo:</b></span> and works fine<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:33:05)</span> <b>marco.mascheroni:</b></span> how about the crl-check script? do you have this commit: <a href="https://github.com/opensciencegrid/osg-flock/commit/946105359842f1b77453a4dc21b6035a7c6f4517">https://github.com/opensciencegrid/osg-flock/commit/946105359842f1b77453a4dc21b6035a7c6f4517</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(10:38:05)</span> <b>efajardo:</b></span> We do not have that in GLuex<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:38:21)</span> <b>efajardo:</b></span> should I addd it?<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:38:34)</span> <b>efajardo:</b></span> never mind I do have that<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:08:51)</span> <b>marco.mascheroni:</b></span> Let meknow when you get the updated version and reconfigure the frontend<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:11:25)</span> <b>efajardo:</b></span> I just did it<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:36:30)</span> <b>blin:</b></span> @marco.mascheroni do you run any CEs with multiple endpoints, i.e. different remote hosts or remote users<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:13:29)</span> <b>matyas:</b></span> sorry, it's not multiple endpoints, it's multiple (local) users<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:14:14)</span> <b>matyas:</b></span> which might be OK<br/>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Feb 2, 2018 : #software (osg)</title>
+</head>
+<body>
+<h3>Fri Feb 2, 2018 : #software (osg)</h3>
+<span style="color: #de5f24"><span style="font-size: small">(11:05:41)</span> <b>tiradani:</b></span> what does voms-proxy-fake do?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:36:40)</span> <b>bbockelm:</b></span> :slightly_smiling_face: It reminds me we need to rename the binary.  @matyas ^^^<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:37:09)</span> <b>bbockelm:</b></span> <tt>voms-proxy-fake</tt> (or, rather, my preferred name is <tt>voms-proxy-direct</tt>) directly generates and signs a VOMS extension for a given grid proxy.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:38:15)</span> <b>tiradani:</b></span> so is OSG phasing out VOMS altogether?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:38:38)</span> <b>bbockelm:</b></span> It's meant for small VOs where there's no use of VOMS as a "management service" but only to sign a single pilot proxy.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:39:51)</span> <b>bbockelm:</b></span> Well, for as long as we use GSI, I think we'll use VOMS extensions.  However, I think creating the extensions will (has?) diverge a bit to big VOs (which may need a standalone VOMS service because they manage users) and small VOs (where the grid components are limited to a proxy and the manage users in a more traditional non-grid manner, like LDAP).<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:40:31)</span> <b>bbockelm:</b></span> So CMS and ATLAS will continue to use VOMS-Admin for a few more months or years (probably to be replaced with comanage or IAM)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:40:40)</span> <b>bbockelm:</b></span> FIFE projects will use Ferry<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:41:05)</span> <b>bbockelm:</b></span> But something like GLOW or HCC would rely on their local LDAP infrastructure to manage users.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:42:15)</span> <b>tiradani:</b></span> OK.  Edgar is doing his job :slightly_smiling_face: and is trying to help us transition to voms-proxy-fake/direct but I am trying to understand what the actual impact it for FIFE/CMS here.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:45:27)</span> <b>tiradani:</b></span> Since FNAL will still run a VOMS server, and CMS is going to be running VOMS for a while yet, so, I *think* we can still use the stock voms-proxy-init, correct?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:46:56)</span> <b>bbockelm:</b></span> correct.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:47:17)</span> <b>bbockelm:</b></span> CMS will be running VOMS-Admin for awhile.  I'm not sure what FNAL is going to be running.  Either way, it works with <tt>voms-proxy-init</tt>.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:47:37)</span> <b>tiradani:</b></span> FNAL will be dropping VOMS-Admin, but keeping VOMS.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:47:56)</span> <b>tiradani:</b></span> FERRY will be used to load the VOMS DB<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:48:28)</span> <b>tiradani:</b></span> OK.  Thank you!  I believe I understand the issues here.<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:14:49)</span> <b>matyas:</b></span> @tiradani @bbockelm your wish is my command: <a href="https://jira.opensciencegrid.org/browse/SOFTWARE-3123">https://jira.opensciencegrid.org/browse/SOFTWARE-3123</a><br/>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Aug 12, 2021 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu Aug 12, 2021 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(07:42:39)</span> <b>blin:</b></span> yikes!<br/>
+<span style="color: #43761b"><span style="font-size: small">(07:43:06)</span> <b>blin:</b></span> @justas.balcas send an email to <a href="mailto:help@opensciencegrid.org">help@opensciencegrid.org</a> with any core dumps from <tt>/var/log/condor-ce/</tt> if you've got em!<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:00:35)</span> <b>matyas:</b></span> &gt; 08/11/21 22:49:56 ChildAliveMsg: failed to send DC_CHILDALIVE to parent daemon at &lt;198.32.44.15:9619&gt; (try 3 of 3): SECMAN:2010:R*eceived "DENIED" from server for user <a href="mailto:condor@users.opensciencegrid.org">condor@users.opensciencegrid.org</a> using method GSI.*<br/>&gt; 08/11/21 22:49:56 ERROR "FAILED TO SEND INITIAL KEEP ALIVE TO OUR PARENT &lt;198.32.44.15:9619?addrs=198.32.44.15-9619&amp;noUDP&amp;sock=192115_4f06&gt;" at line 241 in file /builddir/build/BUILD/condor-8.8.15/src/condor_daemon_core.V6/daemon_keep_alive.cpp<br/>This seems relevant<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:01:10)</span> <b>matyas:</b></span> you'd think whatever daemon that is (Justas, what daemon is that log from?) would use FAMILY auth instead of GSI<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:02:56)</span> <b>blin:</b></span> not in 8.8, right?<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:09:27)</span> <b>matyas:</b></span> I thought FAMILY was older than that...<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:10:14)</span> <b>matyas:</b></span> is FS in your authentication methods?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:13:38)</span> <b>blin:</b></span> yeah, I don't think we take advantage of FAMILY until condor 9/htcondor-ce 5<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:15:29)</span> <b>blin:</b></span> and unless Justas mucked with the default CE mapfile, then FS should be in there<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:15:51)</span> <b>matyas:</b></span> is FS before GSI?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:16:07)</span> <b>blin:</b></span> also, if FS wasn't there, the CE probably wouldn't start<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:16:15)</span> <b>matyas:</b></span> well, is it starting?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:16:30)</span> <b>blin:</b></span> it shouldn't matter, htcondor-ce 4 mapfiles only use GSI for incoming jobs<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:16:45)</span> <b>matyas:</b></span> well apparently it's trying to use GSI for daemon-&gt;master communication<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:17:03)</span> <b>matyas:</b></span> so the daemon is getting mapped as the wrong thing<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:17:20)</span> <b>matyas:</b></span> i.e. as a user, not a daemon<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:17:21)</span> <b>blin:</b></span> (though it all hinges on Justas' config, so we'll see what he sends in!)<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:17:57)</span> <b>matyas:</b></span> yep, @justas.balcas please also add your config to the ticket<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(09:19:58)</span> <b>blin:</b></span> meaning <tt>condor_ce_config_val -dump</tt> and  <tt>/etc/condor-ce/condor_mapfile</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(09:20:21)</span> <b>matyas:</b></span> yep<br/>
+<span style="color: #de5f24"><span style="font-size: small">(12:54:40)</span> <b>justas.balcas:</b></span> I forgot map file, but not much in it:<br/><pre>[root@cit-gatekeeper2 condor-ce]# cat /etc/condor-ce/condor_mapfile<br/># ===================================================================<br/># WARNING! THIS FILE WAS AUTOMATICALLY PREPARED BY PUPPET<br/># ANY MODIFICATIONS TO THIS FILE WILL BE OVERWRITTEN ON PUPPET RUN<br/># IN CASE YOU WANT TO DO MODIFICATIONS, MAKE SURE YOU DISABLE PUPPET!<br/># ===================================================================<br/>GSI (.*) GSS_ASSIST_GRIDMAP</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:45:58)</span> <b>blin:</b></span> is that really it? that does seem broken<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:46:21)</span> <b>blin:</b></span> it should be<br/><pre>GSI (.*) GSS_ASSIST_GRIDMAP<br/>SSL "[-.A-Za-z0-9/= ]*/CN=([-.A-Za-z0-9/= ]+)" \1@unmapped.htcondor.org<br/>CLAIMTOBE .* anonymous@claimtobe<br/>FS "^(root|condor)$" \1@daemon.htcondor.org<br/>FS "(.*)" \1</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:53:53)</span> <b>blin:</b></span> also, i can't seem to pull down the core logs<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:56:46)</span> <b>matyas:</b></span> btw Justas if you paste Slack chat into a ticket, can you turn off dark mode in Slack first? Freshdesk keeps the foreground colors but not the background colors so the text is hard to read<br/>
+</blockquote>
+<span style="color: #73769d"><span style="font-size: small">(09:18:55)</span> <b>tim.theisen:</b></span> FAMILY first appeared in 8.9.0. Family security sessions appear automatically. You don't have to do any to use it.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(12:54:16)</span> <b>justas.balcas:</b></span> Done, sent. Thanks (Ticket 67813)<br/>
+<span style="color: #7d414c"><span style="font-size: small">(19:22:26)</span> <b>bockjoo:</b></span> Why do I get this error when I try to mount cvmfs?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(19:22:35)</span> <b>bockjoo:</b></span> required configuration repository directory does not exist: /cvmfs/config-osg.opensciencegrid.org/etc/cvmfs<br/>
+<span style="color: #7d414c"><span style="font-size: small">(20:22:51)</span> <b>bockjoo:</b></span> cvmfs-config-osg and cvmfs-config-default were mixed up.<br/>
+</body>
+</html>

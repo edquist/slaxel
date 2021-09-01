@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Apr 10, 2020 : #covid-19 (osg)</title>
+</head>
+<body>
+<h3>Fri Apr 10, 2020 : #covid-19 (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(09:19:15)</span> <b>bbockelm:</b></span> typically the negotiator is pretty good about stating why it stopped negotiating -- any reasonable hints in the log?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:20:17)</span> <b>rynge:</b></span> Last negotiation cycle<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:20:19)</span> <b>rynge:</b></span> <a href="http://flock.opensciencegrid.org/overview/negotiation.php">http://flock.opensciencegrid.org/overview/negotiation.php</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:20:32)</span> <b>rynge:</b></span> <pre>$ condor_q dweitzel<br/><br/><br/>-- Schedd: <a href="http://login05.osgconnect.net">login05.osgconnect.net</a> : &lt;192.170.227.146:9618?... @ 04/10/20 09:20:22<br/>OWNER    BATCH_NAME     SUBMITTED   DONE   RUN    IDLE   HOLD  TOTAL JOB_IDS<br/>dweitzel ID: 3091877   4/9  17:41  16599   2967    433      1  <a href="tel:200003091877">20000 3091877</a>.16595-19999<br/>dweitzel ID: 3091930   4/9  17:42      _      _  20000      _  <a href="tel:200003091930">20000 3091930</a>.0-19999<br/>dweitzel ID: 3092184   4/9  17:54   7714      _   1218     68   <a href="tel:90003092184">9000 3092184</a>.355-8999<br/><br/>Total for query: 24687 jobs; 0 completed, 0 removed, 21651 idle, 2967 running, 69 held, 0 suspended <br/>Total for all users: 86594 jobs; 0 completed, 0 removed, 75315 idle, 6539 running, 4740 held, 0 suspended</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:20:47)</span> <b>rynge:</b></span> It only tries to schedule 3091877<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:22:27)</span> <b>rynge:</b></span> In those 3 sets, there are 164 auto cluster ids<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:31:30)</span> <b>bbockelm:</b></span> this smells like a bug.  Does it go away if you turn off prefetch?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:31:46)</span> <b>bbockelm:</b></span> (there's a prefetch-related bug that got squashed and scheduled for 8.9.7)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:37:58)</span> <b>rynge:</b></span> I'll try - what's the settings?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:49:58)</span> <b>rynge:</b></span> <tt>USE_RESOURCE_REQUEST_COUNTS = False</tt> seems to help<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:00:32)</span> <b>rynge:</b></span> Or we just ran out of jobs in 2 out of the 3 sets<br/>
+<span style="color: #bc3663"><span style="font-size: small">(17:01:48)</span> <b>dmason:</b></span> @burt noticed the FAH accounting is a couple days off — it could be that its behind — have you guys seen, especially in this recent burst that the jobs are uploading stuff OK?  <a href="https://stats.foldingathome.org/team/258507">https://stats.foldingathome.org/team/258507</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:08:27)</span> <b>dweitzel:</b></span> I've noticed that the WU has gone up today, but the date hasn't changed.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:08:40)</span> <b>dweitzel:</b></span> not sure I trust the date.<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(17:11:43)</span> <b>burt:</b></span> The “Active CPUs” number looks weird too if it’s up-to-date.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:12:04)</span> <b>dweitzel:</b></span> We are watching that value as well.  We are seeing the work units may be long.  May be longer than 24 hours.  Trying to determine.  We do know there are WU's that are less then 24 hours so.  Trying to find the perfect time.<br/>
+<span style="color: #bc3663"><span style="font-size: small">(17:22:14)</span> <b>dmason:</b></span> I wonder what the “Active CPUs” number is going to mean in this case anyway — I have it running on two of my personal machines at home and I’ve always seen that number = 2 for me.  I don’t know what it might think its counting with all these guys living inside several layers of containers inside pilots…<br/>
+<span style="color: #bc3663"><span style="font-size: small">(17:23:22)</span> <b>dmason:</b></span> You can see at the end of a log …<br/>
+<span style="color: #bc3663"><span style="font-size: small">(17:23:23)</span> <b>dmason:</b></span> 11:35:04:WU00:FS00:Upload complete<br/>11:35:04:WU00:FS00:Server responded WORK_ACK (400)<br/>
+<span style="color: #bc3663"><span style="font-size: small">(17:23:28)</span> <b>dmason:</b></span> I think is a success<br/>
+<span style="color: #bc3663"><span style="font-size: small">(17:24:48)</span> <b>dmason:</b></span> My guess it would be in stdout on your side.  I see the work progressing in the pilot I’m sitting here watching, but you must have one work unit per job?  Not finding any completed detritus yet<br/>
+<span style="color: #bc3663"><span style="font-size: small">(17:26:00)</span> <b>dmason:</b></span> though not used to wandering around OSG pilots either.  Kinda like wandering into the wrong bathroom<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:26:13)</span> <b>dweitzel:</b></span> I have it configured to compete 1 work unit and exit. <br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:26:31)</span> <b>dweitzel:</b></span> Per job. Not per pilot. <br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:28:49)</span> <b>dweitzel:</b></span> Well, hopefully I have it configured that way. <br/>
+<span style="color: #bc3663"><span style="font-size: small">(17:28:55)</span> <b>dmason:</b></span> OK thats what it looked like.  maybe I just tail this one and see how it ends up.  But I think if you see that WORK_ACK in your logs it uploaded the results OK<br/>
+<span style="color: #bc3663"><span style="font-size: small">(17:34:01)</span> <b>dmason:</b></span> how long are your pilots?   This one looks like its going to last about 16 more hours and spent maybe 3 at the beginning waiting for work…<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:35:59)</span> <b>dweitzel:</b></span> What site are you looking at?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:36:04)</span> <b>dweitzel:</b></span> I can check the glidinewms config<br/>
+<span style="color: #bc3663"><span style="font-size: small">(17:36:30)</span> <b>dmason:</b></span> mine :wink:  FNAL.  I’m poking around inside one of your running jobs<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:36:36)</span> <b>dweitzel:</b></span> GPGrid or T1?<br/>
+<span style="color: #bc3663"><span style="font-size: small">(17:36:39)</span> <b>dmason:</b></span> T1<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:37:19)</span> <b>dweitzel:</b></span> factory config says the pilots max walltime is 47.5 hours<br/>
+<span style="color: #bc3663"><span style="font-size: small">(17:38:12)</span> <b>dmason:</b></span> OK good then I’ll camp out and see — found another one thats a bit further along<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:38:39)</span> <b>dweitzel:</b></span> ok, good.  Thanks for helping us.  We have some visibility, some jobs are running  at Nebraska and ISI, so we know they are running.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:39:11)</span> <b>dweitzel:</b></span> but until now, the logs tend to be big, and we're submitting 100's of thousands of jobs, so it's a bit daunting to figure out if they are succeeding.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:40:03)</span> <b>dweitzel:</b></span> 2420 jobs running at the FNAL T1 right now.<br/>
+<span style="color: #bc3663"><span style="font-size: small">(17:40:06)</span> <b>dmason:</b></span> I see them pulling down work and chewing on them, but would suck if they’re not returning things.  Hoping its just the FAH monitoring being slow (which has been the case)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:40:18)</span> <b>dweitzel:</b></span> I'm hoping as well.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(19:48:00)</span> <b>dweitzel:</b></span> We must be running thing right. The work units competed keeps rising and the time is update.   It’s in UTC<br/>
+<span style="color: #bc3663"><span style="font-size: small">(19:49:26)</span> <b>dmason:</b></span> Oh yeah it jumped up by a lot.<br/>
+<span style="color: #bc3663"><span style="font-size: small">(19:51:28)</span> <b>dmason:</b></span> Good — either way I have another couple hours tailing this job and I’ll see if it uploads OK.  But OK that probably says they’re behind<br/>
+<span style="color: #235e5b"><span style="font-size: small">(20:15:36)</span> <b>dweitzel:</b></span> Yup. I suspect there is a large lag. Or we are learning the right options for the OSG. Either way, progress is being made. <br/>
+<span style="color: #bc3663"><span style="font-size: small">(21:38:33)</span> <b>dmason:</b></span> OK — job I was watching is done — they’re just pretty far behind:<br/>
+<span style="color: #bc3663"><span style="font-size: small">(21:38:33)</span> <b>dmason:</b></span> 02:18:19:WU00:FS00:Uploading 3.19MiB to 155.247.164.213<br/>02:18:19:WU00:FS00:Connecting to 155.247.164.213:8080<br/>02:18:21:WU00:FS00:Upload complete<br/>02:18:21:WU00:FS00:Server responded WORK_ACK (400)<br/>02:18:21:WU00:FS00:Final credit estimate, 764.00 points<br/>
+<span style="color: #235e5b"><span style="font-size: small">(22:07:11)</span> <b>dweitzel:</b></span> Great!  The work units completed has grown significantly <br/>
+</body>
+</html>

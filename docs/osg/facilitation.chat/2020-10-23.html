@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Oct 23, 2020 : #facilitation (osg)</title>
+</head>
+<body>
+<h3>Fri Oct 23, 2020 : #facilitation (osg)</h3>
+<span style="color: #5a4592"><span style="font-size: small">(08:40:41)</span> <b>lmichael:</b></span> @christinalk looks like a job for <tt>getenv</tt>? (’Looks like this person is using a shared filesystem, which might be a point of clarification to another comment that pointed to our CHTC guide.)<br/>
+<span style="color: #5a4592"><span style="font-size: small">(08:40:47)</span> <b>lmichael:</b></span> @rynge how’d you find that?<br/>
+<span style="color: #db3150"><span style="font-size: small">(09:00:28)</span> <b>christinalk:</b></span> that was my thought, yes<br/>
+<span style="color: #db3150"><span style="font-size: small">(09:00:34)</span> <b>christinalk:</b></span> (getenv)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:52:00)</span> <b>rynge:</b></span> Showed up in a Reddit notification - I guess the app knows me well :slightly_smiling_face:<br/>
+<span style="color: #db3150"><span style="font-size: small">(10:36:33)</span> <b>christinalk:</b></span> @rynge I have a user whose jobs mostly fail, sometimes succeed<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:37:13)</span> <b>rynge:</b></span> Let me take a look. Username?<br/>
+<span style="color: #db3150"><span style="font-size: small">(10:37:26)</span> <b>christinalk:</b></span> it’s a cryptic error that seems to be caused by him loading a python package from the venv he created.<br/>
+<span style="color: #db3150"><span style="font-size: small">(10:37:46)</span> <b>christinalk:</b></span> user is <tt>howardjp</tt> on login04<br/>
+<span style="color: #db3150"><span style="font-size: small">(10:38:05)</span> <b>christinalk:</b></span> ticket (with error message) + a few success/failure job ids is here: <a href="https://support.opensciencegrid.org/a/tickets/65906">https://support.opensciencegrid.org/a/tickets/65906</a><br/>
+<span style="color: #db3150"><span style="font-size: small">(10:38:25)</span> <b>christinalk:</b></span> I would say the issue is sites, but it’s failed at more than one place (I think)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:40:03)</span> <b>rynge:</b></span> I'm guessing it is a site trying to push a osg-wn<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:40:12)</span> <b>rynge:</b></span> Let me make sure<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:48:49)</span> <b>rynge:</b></span> @christinalk Two things: 1) I'm fairly sure the error comes from PYTHONPATH being set by the site. In his wrapper script <tt>hospsimlp.sh</tt> , he should <tt>unset PYTHONPATH</tt> before setting up the venv. 2) Just requiring "RHEL 7" might not be enough. Python3 is an optional package in that release. I would recommend using our Singularity image as we know it has python3.<br/>
+<span style="color: #db3150"><span style="font-size: small">(11:02:57)</span> <b>christinalk:</b></span> ah, he should be using our module<br/>
+<span style="color: #db3150"><span style="font-size: small">(11:03:00)</span> <b>christinalk:</b></span> I’m not sure htat’s happening<br/>
+<span style="color: #db3150"><span style="font-size: small">(11:03:22)</span> <b>christinalk:</b></span> if he has “module load python/3.7.0” at the front of his shell script, does that address both issues?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:54:47)</span> <b>rynge:</b></span> Addresses 2 for sure<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:54:50)</span> <b>rynge:</b></span> Not sure about 1<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:55:08)</span> <b>rynge:</b></span> Also, he would need HAS_MODULES in the requirements<br/>
+<span style="color: #db3150"><span style="font-size: small">(12:55:12)</span> <b>christinalk:</b></span> he has that<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:55:58)</span> <b>rynge:</b></span> Ok, good<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:56:43)</span> <b>rynge:</b></span> I think I would still do:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:57:00)</span> <b>rynge:</b></span> <pre>unset PYTHONPATH<br/>module load python/3.7.0"</pre><br/><br/>
+<span style="color: #db3150"><span style="font-size: small">(13:06:09)</span> <b>christinalk:</b></span> cool<br/>
+</body>
+</html>

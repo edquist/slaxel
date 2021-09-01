@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri May 17, 2019 : #operations (osg)</title>
+</head>
+<body>
+<h3>Fri May 17, 2019 : #operations (osg)</h3>
+<span style="color: #ea2977"><span style="font-size: small">(09:20:52)</span> <b>jlstephen:</b></span> @marco.mascheroni lincoln figured out the hosted-ce persistent naming issue<br/>
+<span style="color: #ea2977"><span style="font-size: small">(09:21:20)</span> <b>jlstephen:</b></span> cloud-init is resetting the names<br/>
+<span style="color: #ea2977"><span style="font-size: small">(09:21:37)</span> <b>jlstephen:</b></span> i'm putting the fix in puppet and will let you know when it's in place so you can test it<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:27:11)</span> <b>rynge:</b></span> There are days I love cloud-init, and there are days I really hate it<br/>
+<span style="color: #ea2977"><span style="font-size: small">(09:37:49)</span> <b>jlstephen:</b></span> @marco.mascheroni the updated files are in place on all the hosted ces<br/>
+<span style="color: #ea2977"><span style="font-size: small">(09:38:00)</span> <b>jlstephen:</b></span> i also rebooted hosted-ce22 and the name was persistent this time<br/>
+<span style="color: #ea2977"><span style="font-size: small">(09:38:02)</span> <b>jlstephen:</b></span> can you check/verify?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:05:51)</span> <b>blin:</b></span> @jdost321 if marco isn't around please verify hosted-ce22<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:16:12)</span> <b>marco.mascheroni:</b></span> It seems it is working<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:17:31)</span> <b>marco.mascheroni:</b></span> the only one that had issues wa ce23, but it was not because of the name. There were stale pilots in the factory that I removed. Did it change IP address?<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:22:06)</span> <b>jdost321:</b></span> @marco.mascheroni @blin hosted-ce22 has steadily been losing registered pilots for the last 4h, see the declining slope <a href="http://gfactory-1.t2.ucsd.edu/factory/monitor/factoryStatus.html?entry=OSG_US_AMNH_ARES&amp;frontend=total&amp;infoGroup=running&amp;elements=StatusRunningCores,ClientCoresTotal,ClientCoresRunning,ClientCoresIdle,ReqIdle,&amp;rra=0&amp;window_min=0&amp;window_max=0&amp;timezone=-7">http://gfactory-1.t2.ucsd.edu/factory/monitor/factoryStatus.html?entry=OSG_US_AMNH_ARES&amp;frontend=total&amp;infoGroup=running&amp;elements=StatusRunningCores,ClientCoresTotal,ClientCoresRunning,ClientCoresIdle,ReqIdle,&amp;rra=0&amp;window_min=0&amp;window_max=0&amp;timezone=-7</a><br/>
+<span style="color: #385a86"><span style="font-size: small">(14:22:37)</span> <b>jdost321:</b></span> cert / auth errors again?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:25:37)</span> <b>marco.mascheroni:</b></span> Did I confuse ce22 and ce23?<br/>
+<span style="color: #ea2977"><span style="font-size: small">(14:27:00)</span> <b>jlstephen:</b></span> i thought ce22 was one that kept getting reset to hosted-ce.localhost on reboots<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:27:07)</span> <b>marco.mascheroni:</b></span> There were stale pilots in the factory. Running but nothing on the CE. Possibly an IP change and the grid manager on the factory that could not tald to che cached ip?<br/>
+<span style="color: #ea2977"><span style="font-size: small">(14:27:24)</span> <b>jlstephen:</b></span> i'm not aware of any ip changes that would have happened in the past day<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:27:33)</span> <b>marco.mascheroni:</b></span> uhm<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:28:51)</span> <b>jdost321:</b></span> So, the stale pilots explain why the slope declines, the factory thinks they are still running and doesn't submit more<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:29:08)</span> <b>jdost321:</b></span> but why did the ce22 queue just go empty? lose state on a reboot?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:29:09)</span> <b>marco.mascheroni:</b></span> Oh wait I was mixing the ce eheh<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:29:14)</span> <b>marco.mascheroni:</b></span> the schedd did not come back<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:29:20)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #385a86"><span style="font-size: small">(14:29:44)</span> <b>jdost321:</b></span> that would explain<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:29:50)</span> <b>blin:</b></span> errr<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:29:53)</span> <b>blin:</b></span> condor_ce_q?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:29:57)</span> <b>marco.mascheroni:</b></span> grr<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:30:16)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #43761b"><span style="font-size: small">(14:30:49)</span> <b>blin:</b></span> i would check the host cert/key, hostname, then CAs/CRLs<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:34:28)</span> <b>marco.mascheroni:</b></span> with 'systemctl start condor-ce' it starts again.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:36:31)</span> <b>blin:</b></span> what's <tt>systemctl is-enabled condor-ce</tt> say?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:37:13)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:37:16)</span> <b>marco.mascheroni:</b></span> duh<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:37:19)</span> <b>blin:</b></span> :anguished:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:39:30)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:44:35)</span> <b>marco.mascheroni:</b></span> well, I enabled it now an I updated the installation doc<br/>
+</body>
+</html>

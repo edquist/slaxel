@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Mar 8, 2019 : #operations (osg)</title>
+</head>
+<body>
+<h3>Fri Mar 8, 2019 : #operations (osg)</h3>
+<span style="color: #e23f99"><span style="font-size: small">(10:46:08)</span> <b>marco.mascheroni:</b></span> @blin @jdost321 I see registered cores dropping for AMNH, <a href="http://gfactory-1.t2.ucsd.edu/factory/monitor/factoryStatus.html?entry=OSG_US_AMNH_ARES">http://gfactory-1.t2.ucsd.edu/factory/monitor/factoryStatus.html?entry=OSG_US_AMNH_ARES</a> , not sure I'll be able to investigate today, I am going out for dinner later on. Maybe I can have a look when I came back if it's usrgent<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:46:12)</span> <b>marco.mascheroni:</b></span> *urgent<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:47:02)</span> <b>blin:</b></span> hrm ok, perhaps @rynge has an idea of why this may be happening<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:47:18)</span> <b>blin:</b></span> since as i understand it that means pilots are being sent, they're just not reporting back to the frontend?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:47:47)</span> <b>rynge:</b></span> Hmm, not sure - but I will look<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:47:55)</span> <b>rynge:</b></span> I wonder if that has to do with the new cert?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:48:12)</span> <b>marco.mascheroni:</b></span> Maybe Jeff can have a look at the master logs the factory retrieves<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:48:32)</span> <b>marco.mascheroni:</b></span> I am having a call with him, I bring it up<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:50:35)</span> <b>blin:</b></span> cool, thanks for the heads up Marco<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:51:12)</span> <b>blin:</b></span> and yeah, it could have to do with the new cert if they're only getting pilots with the new certificate<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:51:18)</span> <b>blin:</b></span> because the hosted CEs haven't been updated yet<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:53:23)</span> <b>marco.mascheroni:</b></span> Which new cert? I may have missed something<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:55:31)</span> <b>blin:</b></span> the new OSG pilot cert that we're testing<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:55:48)</span> <b>marco.mascheroni:</b></span> ok, gotcha<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:55:59)</span> <b>blin:</b></span> it's a host cert, hence the need for the condor ce upgrades<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:56:59)</span> <b>marco.mascheroni:</b></span> I was planning to do that on Monday, I could not get to it early this week, and it's something I would not do on a Fri<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:05:43)</span> <b>blin:</b></span> fair enough<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:06:53)</span> <b>blin:</b></span> if this is indeed due to the new certificate, jobs would be failing to submit to the CE entirely and you'd see errors in the CE auth logs<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:07:01)</span> <b>marco.mascheroni:</b></span> FYI, this is the AMNH error:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:07:07)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #43761b"><span style="font-size: small">(11:07:26)</span> <b>blin:</b></span> and "detected down grid resource" in the pilot job logs on the factory<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:08:10)</span> <b>blin:</b></span> hrm @rynge did we change the host cert on flock?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:08:24)</span> <b>blin:</b></span> otherwise i'd look at stale CRLs/CAs on the CE side<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:11:48)</span> <b>rynge:</b></span> hostcert is 9 months old<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:12:18)</span> <b>rynge:</b></span> We check the CRLs though so that shouldn't be it<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:12:32)</span> <b>rynge:</b></span> I mean we do that in the startup scripts of the glidein<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:12:57)</span> <b>rynge:</b></span> But maybe the new pilot cert is a problem<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:14:07)</span> <b>blin:</b></span> oh wait, @marco.mascheroni is the above log snippet from the CE ScheddLog or is it the pilot log?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:14:23)</span> <b>marco.mascheroni:</b></span> it's the master log on the wn<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:15:16)</span> <b>rynge:</b></span> Do you have an ip/hostname of that node? I want to look in the collectorlog<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:17:57)</span> <b>marco.mascheroni:</b></span> <a href="http://ares-n0021.ares.pcc.amnh.org">ares-n0021.ares.pcc.amnh.org</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:18:40)</span> <b>rynge:</b></span> Hmm, does not resolv. IP maybe?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:22:02)</span> <b>marco.mascheroni:</b></span> uhm.. 192.168.224.21<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:25:26)</span> <b>rynge:</b></span> Weird - I don't see that connection at all in the log<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:30:01)</span> <b>lincoln:</b></span> thats a private address?<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:30:12)</span> <b>lincoln:</b></span> presumably the NAT IP would be in your log<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:31:09)</span> <b>rynge:</b></span> Right, I'm looking - trying to match timestamps<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:31:33)</span> <b>rynge:</b></span> We might have to dial up the logging to get it<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:45:45)</span> <b>rynge:</b></span> Well I have a few suspect connections, but no information<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:45:53)</span> <b>rynge:</b></span> I will dial up the logging and see if we get anything<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:54:57)</span> <b>rynge:</b></span> <pre><br/>03/08/19 11:52:31 DC_AUTHENTICATE: received DC_AUTHENTICATE from &lt;216.73.246.83:37005&gt;<br/>03/08/19 11:52:31 DC_AUTHENTICATE: generating 3DES key for session flock:951746:1552067551:65312...<br/>03/08/19 11:52:31 SECMAN: new session, doing initial authentication.<br/>03/08/19 11:52:31 Returning to DC while we wait for socket to authenticate.<br/>03/08/19 11:52:31 AUTHENTICATE: setting timeout for (unknown) to 20.<br/>03/08/19 11:52:31 HANDSHAKE: in handshake(my_methods = 'GSI')<br/>03/08/19 11:52:31 HANDSHAKE: handshake() - i am the server<br/>03/08/19 11:52:31 HANDSHAKE: client sent (methods == 32)<br/>03/08/19 11:52:31 HANDSHAKE: i picked (method == 32)<br/>03/08/19 11:52:31 HANDSHAKE: client received (method == 32)<br/>03/08/19 11:52:31 Will return to DC because authentication is incomplete.<br/>03/08/19 11:52:31 AUTHENTICATE: method -1 (GSI) failed.<br/>03/08/19 11:52:31 HANDSHAKE: in handshake(my_methods = 'GSI')<br/>03/08/19 11:52:31 HANDSHAKE: handshake() - i am the server<br/>03/08/19 11:52:31 HANDSHAKE: client sent (methods == 0)<br/>03/08/19 11:52:31 HANDSHAKE: i picked (method == 0)<br/>03/08/19 11:52:31 HANDSHAKE: client received (method == 0)<br/>03/08/19 11:52:31 DC_AUTHENTICATE: required authentication of 216.73.246.83 failed: AUTHENTICATE:1003:Failed to authenticate with any method|AUTHENTICATE:1004:Failed to authenticate using GSI|GSI:5002:Failed to authenticate because the remote (client) side was not able to acquire its credentials.<br/></pre><br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:55:05)</span> <b>rynge:</b></span> Well nothing interesting there<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:56:31)</span> <b>blin:</b></span> did you set <tt>D_SECURITY:2</tt>? you may get more info that way<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:56:46)</span> <b>rynge:</b></span> Ok, hang on<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:00:05)</span> <b>rynge:</b></span> Still nothing - which if it fails validating the host cert makes sense<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:00:25)</span> <b>rynge:</b></span> The connection is not fully established, so we don't get to the auth part<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:04:19)</span> <b>blin:</b></span> the host cert is just the incommon one, right? that didn't change<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:05:23)</span> <b>rynge:</b></span> Right, it is the same one we have had since the move<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:05:39)</span> <b>rynge:</b></span> <pre><br/>/DC=org/DC=incommon/C=US/postalCode=53706/ST=WI/L=Madison/street=1210 West Dayton Street/O=University of Wisconsin-Madison/OU=OCIS/CN=<a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a><br/></pre><br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:13:38)</span> <b>rynge:</b></span> @marco.mascheroni Can you get me full stdout/stderr of the one of the broken glideins<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:13:45)</span> <b>efajardo:</b></span> <tt>globus_gsi_gssapi: Unable to verify remote side's credentials</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:13:48)</span> <b>efajardo:</b></span> this means<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:13:50)</span> <b>rynge:</b></span> I want to see if there is any other hints in there<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:14:11)</span> <b>efajardo:</b></span> that the issuer auth is not in the CA bundle<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:14:17)</span> <b>efajardo:</b></span> that the WN is looking at<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:14:42)</span> <b>efajardo:</b></span> so it could be 1. We need to look on the WN what is the CA_CERT_DIR pointing to and if it has the InCommon<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:14:50)</span> <b>efajardo:</b></span> second it could be a proxy delegation issue<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:15:13)</span> <b>rynge:</b></span> 1) our crl check should protect from that (at least mostly)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:15:32)</span> <b>rynge:</b></span> 2) yeah that is a possiblity - we have had issues with that in the past with the hosted ces<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:16:41)</span> <b>efajardo:</b></span> Secondly<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:16:52)</span> <b>efajardo:</b></span> Can we re request a subject name that is fully IGTF compliant?<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:17:09)</span> <b>efajardo:</b></span> <pre>However, our experts maintain that this certificate uses elements such<br/>as postalCode and streetAddress which are explicitely discouraged by<br/>grid policies, see e.g. <a href="https://www.ogf.org/documents/GFD.225.pdf">https://www.ogf.org/documents/GFD.225.pdf</a> page<br/>15, and so there is no guarantee that it works everywhere, given the<br/>support of such elements is not fully consistent.</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:17:23)</span> <b>efajardo:</b></span> They should not have postal code or street address<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:17:54)</span> <b>efajardo:</b></span> @blin should we update our docs regarding host certs requests?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:18:22)</span> <b>rynge:</b></span> That is probably a cilogon requirement<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:18:29)</span> <b>rynge:</b></span> And it works for all the other glideins<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:27:46)</span> <b>blin:</b></span> I think the street/postalcode issue has been sorted out by incommon: we just got IGTF certs via UNL and UW recently that have the street/postal code removed<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:28:07)</span> <b>blin:</b></span> so i think we need to do a broadcast suggesting that sites re-issue their incommon certs<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:28:59)</span> <b>blin:</b></span> but yeah, @lincoln is working on getting a new flock host cert issued by UChicago<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:35:01)</span> <b>lincoln:</b></span> yes.. I haven't heard back yet<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:35:20)</span> <b>bbockelm:</b></span> FWIW - the IGTF issue will definitely affect Java-based components.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:35:31)</span> <b>bbockelm:</b></span> But .... not a lot of those in a pure OSG setup.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:13:44)</span> <b>blin:</b></span> @bbockelm we should probably still send an announcement, though<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:35:48)</span> <b>marco.mascheroni:</b></span> @lincoln @jlstephen I am getting again the error about hosted-ce22 changing its hostname (it's again AMNH, but It's unrelated to the error I was showing before in the startd logs). When this happens the CE is flat out broken, it's shown as in downtime in the factory "condor activity" logs.<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:35:55)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e96699"><span style="font-size: small">(14:36:14)</span> <b>lincoln:</b></span> hm<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:36:17)</span> <b>lincoln:</b></span> can I reboot it since its broken anyhow?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:36:35)</span> <b>marco.mascheroni:</b></span> I am fixing it again with "sudo hostnamectl set-hostname <a href="http://hosted-ce22.grid.uchicago.edu">hosted-ce22.grid.uchicago.edu</a>"<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:36:38)</span> <b>lincoln:</b></span> we did have a hypervisor go down yesterday or wednesday, dont recall<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:36:40)</span> <b>lincoln:</b></span> yeah<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:36:50)</span> <b>lincoln:</b></span> can you try rebooting it after you do that?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:36:51)</span> <b>marco.mascheroni:</b></span> ok, if you need to reboot it do it<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:36:58)</span> <b>lincoln:</b></span> I just want to see if it persists<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:37:15)</span> <b>marco.mascheroni:</b></span> rebooting<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:41:15)</span> <b>marco.mascheroni:</b></span> Yeah every time you reboot the hostname is set to hosted-ce22.localdomain<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:41:27)</span> <b>marco.mascheroni:</b></span> do you want to try to fix it now?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:55:24)</span> <b>marco.mascheroni:</b></span> anyway, regardless this I have also noticed an error in a cronjob in the submission host of AMNH. I was runnign osg-update-certs directly, but I was not sourcing setup.sh<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:14:39)</span> <b>blin:</b></span> when do you have to run setup.sh?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:16:15)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:16:24)</span> <b>marco.mascheroni:</b></span> that's if I don't source setup.sh<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:17:19)</span> <b>marco.mascheroni:</b></span> as I had in the cron (I'll fix the installation document next week BTW)<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:19:59)</span> <b>blin:</b></span> thanks, and hopefully we can get rid of this cron on the head node nonsense with that JIRA ticket<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:20:33)</span> <b>marco.mascheroni:</b></span> yep!<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:22:38)</span> <b>blin:</b></span> i am seeing the registered cores go up again<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:22:53)</span> <b>blin:</b></span> do we have any idea why this VM keeps losing its hostname?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:30:09)</span> <b>marco.mascheroni:</b></span> Question for @lincoln, it happens when you reboot (he had to reboot for an issue with the hypervisor). Another thing that happens is that I get "stale running" pilots in the factory. I had pilots reported as running in the factory, but in the CE everything was held<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:56:47)</span> <b>lincoln:</b></span> so it did revert when you rebooted?<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:57:35)</span> <b>lincoln:</b></span> also not sure about the CE held thing / pilots running in the factory. what is the HoldReason?<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:58:04)</span> <b>lincoln:</b></span> I would gues maybe like.. the Condor GridManager popped them into held because it couldn't start the remote gahp because it started before the network was up or something?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:59:50)</span> <b>marco.mascheroni:</b></span> yes, it reverted when I rebooted<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:00:02)</span> <b>lincoln:</b></span> huh.<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:00:29)</span> <b>lincoln:</b></span> hm.<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:00:38)</span> <b>lincoln:</b></span> wonder if its using DHCP for its network address. maybe something like that<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:00:39)</span> <b>lincoln:</b></span> let me check<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:02:09)</span> <b>lincoln:</b></span> I changed it to static. can we try rebooting again?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(16:02:14)</span> <b>marco.mascheroni:</b></span> about  held/runnig I am more concerned about the factory keeping them runnging while they are not. I have put a workaround in glideinwms 3.4.3 (IIRC). The jobs goind held in the CE were legit, I could not even run condor_ce_q, no wonder they went held (and yes, reason was the gahp could not start)<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:05:35)</span> <b>lincoln:</b></span> ah<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:06:26)</span> <b>lincoln:</b></span> well I think they'd stay running regardless of what state they're in on the CE unless the gridmanager sends it a delete/stop/whatever<br/>
+<span style="color: #e23f99"><span style="font-size: small">(16:10:20)</span> <b>marco.mascheroni:</b></span> sometimes they stay running even after the CE goes up again.<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:45:07)</span> <b>jdost321:</b></span> @marco.mascheroni @blin @lincoln I see pilots registering again. In the end what was responsible? the failing osg-update-certs or the hostname change?<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:45:10)</span> <b>jdost321:</b></span> <a href="http://gfactory-1.t2.ucsd.edu/factory/monitor/factoryStatus.html?entry=OSG_US_AMNH_ARES&amp;frontend=total&amp;infoGroup=running&amp;elements=StatusRunningCores,ClientCoresTotal,ClientCoresRunning,ClientCoresIdle,&amp;rra=0&amp;window_min=0&amp;window_max=0&amp;timezone=-8">http://gfactory-1.t2.ucsd.edu/factory/monitor/factoryStatus.html?entry=OSG_US_AMNH_ARES&amp;frontend=total&amp;infoGroup=running&amp;elements=StatusRunningCores,ClientCoresTotal,ClientCoresRunning,ClientCoresIdle,&amp;rra=0&amp;window_min=0&amp;window_max=0&amp;timezone=-8</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:47:05)</span> <b>blin:</b></span> both? ¯\_(ツ)_/¯<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:47:21)</span> <b>blin:</b></span> i think most likely the hostname change but the certs not updating could also have contributed<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:51:13)</span> <b>jdost321:</b></span> yeah seeing the plot running flatline like that in the factory monitoring.. that's what happens when condor-g gets confused / no updates back from the CE about the real statuses<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:55:06)</span> <b>blin:</b></span> so the green area means that the factory is sending pilots but the black line means that the factory sees that they're actually...running?<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:55:48)</span> <b>jdost321:</b></span> no green area are pilots that are in "R" state in the factory queues<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:56:07)</span> <b>jdost321:</b></span> black line means they actually are registering back to the frontend collectors, that stat comes from the FEs not the factory<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:56:35)</span> <b>jdost321:</b></span> but when the green area is stuck at a fixed value, in this case 88 for hours with no movement its suspicious<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:56:45)</span> <b>jdost321:</b></span> especially when all the registered eventually go to 0<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:58:08)</span> <b>jdost321:</b></span> so i think the FE was reporting that the pilots eventually ran to completion but condor-g never got the message since it lost contact w/ the CE on the hostname change<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:58:30)</span> <b>jdost321:</b></span> and the factory keeps seeing "88" still running, i won't bother to submit any new pilots<br/>
+</body>
+</html>

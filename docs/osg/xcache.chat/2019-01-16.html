@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jan 16, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Wed Jan 16, 2019 : #xcache (osg)</h3>
+<span style="color: #8d4b84"><span style="font-size: small">(11:48:03)</span> <b>kherner:</b></span> Hey everyone, apologies if this isn't the proper channel. We are hearing reports of multiple users at multiple sites being unable to access a couple of FIFE StashCache repos, namely <a href="http://dune.osgstorage.org">dune.osgstorage.org</a> and <a href="http://uboone.osgstorage.org">uboone.osgstorage.org</a>. I can access both of them from FNAL and at home without problem, so it seems to be some kind of site/location dependency. Their CVMFS configs (this is all stash + CVMFS) look very similar to mine, so I don't see any obvious issues.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:50:06)</span> <b>dweitzel:</b></span> Hi Ken.  I just debugged an issue that might be causing this today.  Let me guess, the accesses are at or near Chicago?<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(11:50:29)</span> <b>kherner:</b></span> Yes, one at Notre Dame, and supposedly the others are in the UK.<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(11:50:49)</span> <b>kherner:</b></span> I'd think the GeoIP would send them to BNL, but maybe not.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:50:54)</span> <b>dweitzel:</b></span> Not sure about the UK one.  But some of the internet2 caches are failing to respond.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:51:49)</span> <b>dweitzel:</b></span> We have begun using redirection to load balance between caches, but CVMFS doesn't handle failure when redirected to a failing host well.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:52:04)</span> <b>dweitzel:</b></span> I've messaged @efajardo, hopefully he can fix the caches.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:52:17)</span> <b>dweitzel:</b></span> And I have opened a bug report with CVMFS, so they can fix the redirection failures.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:52:27)</span> <b>dweitzel:</b></span> Short term, getting the caches back up and running is the solution.<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(11:52:29)</span> <b>kherner:</b></span> Basically the error is something like <pre>(<a href="http://dune.osgstorage.org">dune.osgstorage.org</a>) GeoAPI request  <a href="http://cvmfs-s1goc.opensciencegrid.org/cvmfs/dune.osgstorage.org/api/v1.0/geo/@proxy@/cvmfs-s1bnl.opensciencegrid.org,cvmfs-s1fnal.opensciencegrid.org,cvmfs-s1goc.opensciencegrid.org">http://cvmfs-s1goc.opensciencegrid.org/cvmfs/dune.osgstorage.org/api/v1.0/geo/@proxy@/cvmfs-s1bnl.opensciencegrid.org,cvmfs-s1fnal.opensciencegrid.org,cvmfs-s1goc.opensciencegrid.org</a> failed with error 6 [proxy connection problem]</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:52:49)</span> <b>dweitzel:</b></span> now that, I don't know.<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(11:52:51)</span> <b>kherner:</b></span> Then that repeats a few times<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(11:53:19)</span> <b>kherner:</b></span> After reordering them<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:53:22)</span> <b>dweitzel:</b></span> Error 6 is it could not DNS resolve something.<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(11:53:49)</span> <b>kherner:</b></span> And it's not limited to a single repo<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:54:00)</span> <b>dweitzel:</b></span> is that the only error?<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(11:54:05)</span> <b>kherner:</b></span> It was with CVMFS 2.5.0 if that matters<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:55:24)</span> <b>dweitzel:</b></span> Ken, can you send me more of those logs?<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(12:07:10)</span> <b>kherner:</b></span> Sure; I'll forward you the message<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(12:08:24)</span> <b>kherner:</b></span> Sorry for all the <a href="http://urldefense.proofpoint.com">urldefense.proofpoint.com</a> instances in the massage (our email server's way of de-fanging things that it thinks are links)<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:10:55)</span> <b>matyas:</b></span> I wrote a script to decode that stuff: <a href="http://pages.cs.wisc.edu/~matyas/utils/decodeurldefense">pages.cs.wisc.edu/~matyas/utils/decodeurldefense</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(13:02:39)</span> <b>efajardo:</b></span> hmmm @kherner I do not see the errors<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:03:53)</span> <b>efajardo:</b></span> Never mind I see the error but I do not understand it<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:15:43)</span> <b>efajardo:</b></span> @kherner it shoudl be fixed now<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:16:04)</span> <b>dweitzel:</b></span> ken's issue is different.<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:17:19)</span> <b>efajardo:</b></span> hmm ok<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:17:33)</span> <b>efajardo:</b></span> I do not see the issue<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:17:55)</span> <b>dweitzel:</b></span> If I had to guess Ken, I would say from the logs you sent me, I would blame the local squids.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:18:20)</span> <b>dweitzel:</b></span> GeoIP is before it starts talking to any of the stashcaches.<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:29:58)</span> <b>efajardo:</b></span> Well I do not have access to the logs :disappointed: but @kherner if you open a ticket I would be happy to look at it<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(13:38:12)</span> <b>kherner:</b></span> Sounds good, thanks<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(17:59:52)</span> <b>kherner:</b></span> @efajardo Ticket's in: <a href="https://support.opensciencegrid.org/a/tickets/8190">https://support.opensciencegrid.org/a/tickets/8190</a><br/>
+</body>
+</html>

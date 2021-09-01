@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Aug 11, 2020 : #general (osg)</title>
+</head>
+<body>
+<h3>Tue Aug 11, 2020 : #general (osg)</h3>
+<span style="color: #5a4592"><span style="font-size: small">(16:31:16)</span> <b>lmichael:</b></span> Do we know who runs the FNAL exec nodes?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:34:07)</span> <b>blin:</b></span> i would guess you're concerned about fermigrid nodes. maybe @tiradani? @kherner may be able to help out, too<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(16:35:22)</span> <b>kherner:</b></span> I can point you in the right direction perhaps, but I don't have admin powers.<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:36:10)</span> <b>blin:</b></span> ah yeah, that's what i meant :slightly_smiling_face:<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(16:37:24)</span> <b>burt:</b></span> What’s the issue?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:39:55)</span> <b>blin:</b></span> @lmichael ^^<br/>
+<span style="color: #de5f24"><span style="font-size: small">(16:57:45)</span> <b>tiradani:</b></span> @rynge and I have been going over some auth issues and slow transfers from the wisc squids, but from our side the issue seems to be at wisc.  Is this what you are asking about?<br/>
+<span style="color: #db3150"><span style="font-size: small">(17:04:51)</span> <b>christinalk:</b></span> I have a different user whose jobs are failing with this error:<br/><pre>/storage/local/data1/condor/execute/dir_32477/glide_kHbvYS/execute/dir_11078/condor_exec.exe: line 46: unzip: command not found<br/>/storage/local/data1/condor/execute/dir_32477/glide_kHbvYS/execute/dir_11078/condor_exec.exe: line 89: gatk: command not found</pre><br/>
+<span style="color: #db3150"><span style="font-size: small">(17:05:10)</span> <b>christinalk:</b></span> @tiradani we’re looking at our squids right now - it looks like they’ve been struggling across the board<br/>
+<span style="color: #de5f24"><span style="font-size: small">(17:06:03)</span> <b>tiradani:</b></span> There is a user that is pulling multi gigabyte files through them.  That may be the cause of the struggles.<br/>
+<span style="color: #db3150"><span style="font-size: small">(17:09:09)</span> <b>christinalk:</b></span> do you have the username? we don’t normally have people use squid for files larger than 1GB<br/>
+<span style="color: #db3150"><span style="font-size: small">(17:09:28)</span> <b>christinalk:</b></span> (Or the file URL?)<br/>
+<span style="color: #de5f24"><span style="font-size: small">(17:13:35)</span> <b>tiradani:</b></span> I don’t at the moment… I neglected to get that info when I was looking, I do know that the output filename on disk was <tt>r2018b.tar.gz</tt><br/>
+<span style="color: #de5f24"><span style="font-size: small">(17:13:48)</span> <b>tiradani:</b></span> Let me go dig through the CE logs and see if I can find out more<br/>
+<span style="color: #db3150"><span style="font-size: small">(17:15:39)</span> <b>christinalk:</b></span> no need! that was my suspicion<br/>
+<span style="color: #db3150"><span style="font-size: small">(17:15:46)</span> <b>christinalk:</b></span> That’s the matlab runtime.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(17:16:14)</span> <b>tiradani:</b></span> out of curiosity how big is the tarball total?  Last I looked it was 1.5GB and climbing<br/>
+<span style="color: #db3150"><span style="font-size: small">(17:16:18)</span> <b>christinalk:</b></span> 1.7GB<br/>
+<span style="color: #db3150"><span style="font-size: small">(17:16:23)</span> <b>christinalk:</b></span> which is larger than we normally allow<br/>
+<span style="color: #de5f24"><span style="font-size: small">(17:16:27)</span> <b>tiradani:</b></span> ok, so it was nearly done<br/>
+<span style="color: #de5f24"><span style="font-size: small">(17:16:37)</span> <b>tiradani:</b></span> but it was taking 4 hours to get to FNAL<br/>
+<span style="color: #db3150"><span style="font-size: small">(17:17:54)</span> <b>christinalk:</b></span> yeah, there’s multiple issues to address here. I think we had multiple users pulling that file (both locally and across OSG) and bad things were happening. we’re working on the squids but we also need to see if we can decrease that file size.<br/>
+<span style="color: #db3150"><span style="font-size: small">(17:18:49)</span> <b>christinalk:</b></span> do y’all have <tt>unzip</tt> installed on your nodes?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(17:23:32)</span> <b>tiradani:</b></span> We run all jobs in a docker container.  We do not seem to have unzip installed in the container.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(17:24:33)</span> <b>tiradani:</b></span> It is a pretty bare container.  We assume that the job will get all dependencies from CVMFS.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(17:26:53)</span> <b>tiradani:</b></span> Is there a list of software that a worker is expected to have in it?  If there is, we will will update our containers to match that list.<br/>
+<span style="color: #db3150"><span style="font-size: small">(17:29:06)</span> <b>christinalk:</b></span> I don’t think there is a list, but that would be a good project for us on the research facilitation team, maybe. For now I think we can come up with a workaround using gzip.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(17:30:33)</span> <b>tiradani:</b></span> Ok.  That does exist in the container.  If you do come up with a list, let me know.<br/>
+<span style="color: #db3150"><span style="font-size: small">(17:30:44)</span> <b>christinalk:</b></span> will do!<br/>
+</body>
+</html>

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jan 17, 2018 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Jan 17, 2018 : #software (osg)</h3>
+<span style="color: #16569E"><span style="font-size: small">(11:51:17)</span> <b>edquist:</b></span> It turns out having the java-devel package installed at runtime resolves the issue.<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:51:28)</span> <b>edquist:</b></span> In OSG 3.3 we always recommended people install both java and java-devel (via the <tt>osg-java7*</tt> compat packages) together for any java software, so it never came up there.<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:51:33)</span> <b>edquist:</b></span> For now I made a new build of hadoop with the java-devel requirement added to the <tt>hadoop-libhdfs</tt> subpackage, though I'm not sure if this requirement more properly belongs there or in <tt>gridftp-hdfs</tt><br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:57:29)</span> <b>jthiltges:</b></span> <b>@edquist</b> Interesting! From glancing at an osg33 globus-gridftp-server process, it's using <tt>/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.151-2.6.11.1.el7_4.x86_64/lib/tools.jar</tt> which is provided by <tt>java-1.7.0-openjdk-devel</tt>.<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:55:14)</span> <b>edquist:</b></span> Ok, I assume that the globus-gridftp-server isn't directly using that java lib, but something at a deeper level is..?  Grepping through the hadoop sources, I see some places that import things under <tt>com.sun.javadoc</tt> and <tt>com.sun.tools</tt>, which appear to correspond to classes from the <tt>tools.jar</tt> from <tt>java-1.7.0-openjdk-devel</tt>.  It's not clear to me which hadoop sub package ought to have the requirement for java-devel, but for now I'll leave it with <tt>hadoop-libhdfs</tt> unless anyone has other suggestions...<br/>
+</body>
+</html>

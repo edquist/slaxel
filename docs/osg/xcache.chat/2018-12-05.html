@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Dec 5, 2018 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Wed Dec 5, 2018 : #xcache (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(11:14:57)</span> <b>blin:</b></span> i see -- is the proper ownership of the cache dir noted in the documentation?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:18:19)</span> <b>matyas:</b></span> yes though it's not obvious<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:18:32)</span> <b>matyas:</b></span> "The cache server configuration assumes the disk used to cache data is mounted at <tt>/stash</tt> and owned by the<br/><tt>xrootd:xrootd</tt> user and group."<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:19:10)</span> <b>blin:</b></span> that's worded strangely<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:19:43)</span> <b>blin:</b></span> can users change the location of the cache dir?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:20:36)</span> <b>matyas:</b></span> yes<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:22:15)</span> <b>blin:</b></span> we should break it into steps<br/>1. Create a cache dir (e.g., <tt>/stash</tt>) owned by the <tt>xrootd</tt> user and group<br/>2. Configure stashcache to use the cache dir you created above: <tt>example config</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(11:23:45)</span> <b>blin:</b></span> separately, if a group wanted to manage their own area in stashcache, would that mean managing their own origin?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:25:13)</span> <b>matyas:</b></span> what do you mean?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:27:14)</span> <b>blin:</b></span> if i run a research group and i have data that's appropriate for stashcache, how do i get it in stashcache?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:27:31)</span> <b>blin:</b></span> do i have to run my own origin server?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:27:35)</span> <b>matyas:</b></span> yes<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:27:56)</span> <b>matyas:</b></span> not you, your site<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:29:49)</span> <b>blin:</b></span> what if i don't have a site? what if my use is all opportunistic in the OSG?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:31:21)</span> <b>matyas:</b></span> doesn't matter if you're opportunistic or not<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:31:37)</span> <b>matyas:</b></span> if you don't have an origin server to host your files, you can't use stashcache<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:32:17)</span> <b>blin:</b></span> but why is that tied to a site rather than a user group?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:32:26)</span> <b>blin:</b></span> other than the fact that an origin has to be physically hosted somewhere<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:32:55)</span> <b>matyas:</b></span> because users submit jobs from a site?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:33:04)</span> <b>matyas:</b></span> maybe osg-connect has an origin server, I don't know<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:33:35)</span> <b>matyas:</b></span> actually, it does: <a href="https://support.opensciencegrid.org/support/solutions/articles/12000002775-transferring-data-with-stashcache">https://support.opensciencegrid.org/support/solutions/articles/12000002775-transferring-data-with-stashcache</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(11:36:17)</span> <b>blin:</b></span> what about users of the OSG VO that aren't using osg connect? e.g. other submit hosts that flock into the OSG pool<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:36:38)</span> <b>blin:</b></span> <a href="http://flock.opensciencegrid.org/overview/">http://flock.opensciencegrid.org/overview/</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(11:37:20)</span> <b>matyas:</b></span> I don't know if we have any public origin servers that aren't osg-connect<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:38:12)</span> <b>dweitzel:</b></span> OSG connect is the public origin.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:38:34)</span> <b>dweitzel:</b></span> Nebraska doesn't have an origin (though, we could).  At least 1 UNL researcher uses osgconnect stash origin.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:39:25)</span> <b>blin:</b></span> ok so if i have research group that wants to use stashcache, i don't in fact need to host my own origin<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:39:39)</span> <b>dweitzel:</b></span> nope<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:39:58)</span> <b>dweitzel:</b></span> usually, just say create free account with osg-connect.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:41:04)</span> <b>blin:</b></span> so when do we encourage people to start their own origin?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:41:34)</span> <b>dweitzel:</b></span> It's kinda like "When do we encourage people to have their own VO", no clear cut answer.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:41:57)</span> <b>rynge:</b></span> . o O ( never? )<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:42:18)</span> <b>dweitzel:</b></span> but, I guess kinda the same questions.  If osg-connect doesn't work for them for some reason.  When the usage is so large, that osg-connect (storage) cannot handle it?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:43:04)</span> <b>rynge:</b></span> Right, or some mid/large project already have storage at their institution<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:44:49)</span> <b>blin:</b></span> yeah, that's what i'm trying to understand: when do we suggest people start up their own VO? Is a VO necessary for hosting an origin? What's "large usage"? Does that mean large working set size or large numbers of transfers or?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:45:32)</span> <b>matyas:</b></span> 2: no<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:46:41)</span> <b>dweitzel:</b></span> Or, lincoln sends a nasty email to you saying "We need our storage back!"<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:47:07)</span> <b>matyas:</b></span> I think it's for data set sizes in the 5-50 GB range<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:47:32)</span> <b>blin:</b></span> there are osg-connect stash size limits, right? i think i remember this coming up during the last user school<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:48:15)</span> <b>matyas:</b></span> actually, the page I linked said 500MB+<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:48:39)</span> <b>blin:</b></span> what's the upper limit, though?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:48:43)</span> <b>matyas:</b></span> so that's probably right. you should believe other people over me :slightly_smiling_face:<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:48:54)</span> <b>matyas:</b></span> well, we recommend 1 TB for the cache server<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:49:17)</span> <b>dweitzel:</b></span> working set size is in the TB range.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:49:23)</span> <b>blin:</b></span> but caches don't necessarily reflect an experiment's data working set size<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:50:36)</span> <b>blin:</b></span> ok, i guess it's not super relevant to what i'm trying to understand if you don't need a VO to host an origin<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:50:54)</span> <b>blin:</b></span> but for authenticated stashcache, do you need a VO? it looks like auth happens with VOMS FQANs, is that right?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:51:50)</span> <b>dweitzel:</b></span> Auth happens with DN's or VOMS FQAN, it can do either.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:51:54)</span> <b>dweitzel:</b></span> so, doesn't need a VO.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:56:40)</span> <b>blin:</b></span> in the VOMS FQAN instance, how does that work from a client perspective? is the pilot cert being used to do the stashcp? otherwise i don't know how the proxy is getting signed by the vo cert<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:58:41)</span> <b>bbockelm:</b></span> The pilot cert is used to do the stashcp unless the user provides a user proxy<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:59:21)</span> <b>blin:</b></span> and then we require the user's DN to be listed as an authorized user?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:59:55)</span> <b>bbockelm:</b></span> Correct.  The advantage of setting up your own VO is that you can sign group authorizations; otherwise, you need to list DNs manually.<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:00:08)</span> <b>blin:</b></span> yup<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:00:42)</span> <b>bbockelm:</b></span> Origin servers are needed when you outgrow the storage space provided by OSG-Connect -- or need to more directly control the authorizations.<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:00:58)</span> <b>blin:</b></span> and uhh, how does the latter work with GDPR?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:01:23)</span> <b>blin:</b></span> latter = listing authorized DNs<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:01:48)</span> <b>blin:</b></span> because we're planning on listing those in topology, right?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:02:38)</span> <b>matyas:</b></span> getting DNs requires auth<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:03:18)</span> <b>bbockelm:</b></span> 1.  We aren't in Europe.<br/>2.  GDPR states that one needs to have clear, informed consent and policy, not that people can't share data.<br/>3.  It's a different world once Derek gets SciTokens working on all this.<br/>4. We always listed DNs publicly but didn't list emails, no?  It's an arbitrary line but one I'm OK with.<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:06:40)</span> <b>matyas:</b></span> actually, DNs do show up in the virtual-organizations XML because it's for OASIS<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:07:33)</span> <b>blin:</b></span> ok that all makes sense<br/>
+</body>
+</html>

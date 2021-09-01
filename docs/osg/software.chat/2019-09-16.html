@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Sep 16, 2019 : #software (osg)</title>
+</head>
+<body>
+<h3>Mon Sep 16, 2019 : #software (osg)</h3>
+<span style="color: #7d414c"><span style="font-size: small">(08:46:21)</span> <b>bockjoo:</b></span> [root@osg ~]# rpm -qf $(which osg-installed-versions )<br/>osg-system-profiler-1.4.3-1.osg35.el7.noarch<br/>[root@osg ~]# osg-installed-versions<br/>wget download failed:<br/><a href="http://vdt.cs.wisc.edu/release-info/">http://vdt.cs.wisc.edu/release-info/</a>:<br/>2019-09-16 09:44:52 ERROR 404: Not Found.<br/>No URLs found in -.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(08:46:55)</span> <b>bockjoo:</b></span> This one is broken. I was looking for a command that shows an installed OSG version.<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:47:52)</span> <b>blin:</b></span> we got rid of osg-version as it didn't necessarily provide useful information<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:48:10)</span> <b>blin:</b></span> looks like we missed that script, thanks for the heads up<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:42:28)</span> <b>blin:</b></span> @bockjoo ticket created: <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-3822">https://opensciencegrid.atlassian.net/browse/SOFTWARE-3822</a><br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:12:18)</span> <b>bockjoo:</b></span> Thanks @blin!<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:01:00)</span> <b>blin:</b></span> @matyas this doesn't look great for our 3.4 tests (<a href="http://vdt.cs.wisc.edu/tests/20190916-1258/results.html">http://vdt.cs.wisc.edu/tests/20190916-1258/results.html</a>):<br/><pre><br/>--&gt; Finished Dependency Resolution<br/>Error: Package: gsi-openssh-server-7.4p1-2.3.osg34.el7.x86_64 (osg)<br/>           Requires: libglobus_usage.so.0()(64bit)<br/>           Available: globus-usage-5.0-1.el7.x86_64 (epel)<br/>               libglobus_usage.so.0()(64bit)<br/>Error: Package: globus-gridftp-server-progs-13.9-1.1.osg34.el7.x86_64 (osg)<br/>           Requires: libglobus_usage.so.0()(64bit)<br/>           Available: globus-usage-5.0-1.el7.x86_64 (epel)<br/>               libglobus_usage.so.0()(64bit)<br/>Error: Package: gsi-openssh-7.4p1-2.3.osg34.el7.x86_64 (osg)<br/>           Requires: libglobus_usage.so.0()(64bit)<br/>           Available: globus-usage-5.0-1.el7.x86_64 (epel)<br/>               libglobus_usage.so.0()(64bit)<br/>Error: Package: gsi-openssh-clients-7.4p1-2.3.osg34.el7.x86_64 (osg)<br/>           Requires: libglobus_usage.so.0()(64bit)<br/>           Available: globus-usage-5.0-1.el7.x86_64 (epel)<br/>               libglobus_usage.so.0()(64bit)<br/>Error: Package: globus-gridftp-server-13.9-1.1.osg34.el7.x86_64 (osg)<br/>           Requires: libglobus_usage.so.0()(64bit)<br/>           Available: globus-usage-5.0-1.el7.x86_64 (epel)<br/>               libglobus_usage.so.0()(64bit)<br/> You could try using --skip-broken to work around the problem<br/> You could try running: rpm -Va --nofiles --nodigest<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:01:15)</span> <b>blin:</b></span> looks like we may need to rebuild our globus packages against the new stuff in EPEL?<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:01:29)</span> <b>edquist:</b></span> oh dear<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:01:44)</span> <b>matyas:</b></span> yeah we need to update those pronto<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:02:09)</span> <b>matyas:</b></span> globus-usage got dropped<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:02:41)</span> <b>matyas:</b></span> so anything linked against libglobus_usage.so.0 needs to be recompiled<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:03:00)</span> <b>matyas:</b></span> updated I mean<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:03:00)</span> <b>blin:</b></span> and updated to the latest version?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:03:02)</span> <b>blin:</b></span> yeah<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:03:33)</span> <b>matyas:</b></span> actually, I'm not sure why it's failing though - it does say the old RPM is still available<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:03:54)</span> <b>matyas:</b></span> somebody want to verify that in Fermicloud?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:04:29)</span> <b>blin:</b></span> ah<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:04:37)</span> <b>blin:</b></span> <pre><br/>Package globus-usage is obsoleted by globus-common, but obsoleting package does not provide for requirements<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:04:51)</span> <b>blin:</b></span> that seems important<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:09:23)</span> <b>matyas:</b></span> ah<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:09:57)</span> <b>matyas:</b></span> ok well we need to fix it pronto, then. sorry I didn't put two and two together with this<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:11:22)</span> <b>blin:</b></span> so what do you think about pushing this onto the gct and adding the provides properly?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:12:59)</span> <b>matyas:</b></span> I doubt they'd accept it<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:13:09)</span> <b>matyas:</b></span> and it's not gonna fix it in time<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:13:34)</span> <b>matyas:</b></span> even if they merge and rebuild today, it will be 2 weeks before it makes it into epel stable<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:13:51)</span> <b>blin:</b></span> true<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:13:55)</span> <b>blin:</b></span> but why wouldn't they accept it?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:14:19)</span> <b>matyas:</b></span> because it wouldn't be true?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:14:38)</span> <b>matyas:</b></span> globus-common isn't going to provide that .so file anyway so it wouldn't work<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:16:34)</span> <b>blin:</b></span> duh<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:17:11)</span> <b>blin:</b></span> <b>@edquist</b> new item that jumped to the top of your todo list: <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-3828">https://opensciencegrid.atlassian.net/browse/SOFTWARE-3828</a><br/>
+<span style="color: #16569E"><span style="font-size: small">(15:19:24)</span> <b>edquist:</b></span> wooooo!<br/>
+</body>
+</html>

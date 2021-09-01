@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Sep 23, 2019 : #software (osg)</title>
+</head>
+<body>
+<h3>Mon Sep 23, 2019 : #software (osg)</h3>
+<span style="color: #a63024"><span style="font-size: small">(16:32:13)</span> <b>efajardo:</b></span> folks <b>@here</b><br/>
+<span style="color: #a63024"><span style="font-size: small">(16:32:20)</span> <b>efajardo:</b></span> can any of you tell me what I am doing wrong here<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:32:21)</span> <b>efajardo:</b></span> <a href="https://travis-ci.org/opensciencegrid/xcache/builds/588564505#L2229">https://travis-ci.org/opensciencegrid/xcache/builds/588564505#L2229</a><br/>
+<span style="color: #99a949"><span style="font-size: small">(16:33:19)</span> <b>dwd:</b></span> Makefile commands have to start with a tab character, not 8 spaces<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:33:59)</span> <b>efajardo:</b></span> I did<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:37:29)</span> <b>dwd:</b></span> What editor do you use?  Some editors convert tabs into spaces<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:45:28)</span> <b>efajardo:</b></span> emacs<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:56:34)</span> <b>dwd:</b></span> I don’t know what emacs does, can you confirm with something like od -c that there are tab characters only at the beginning of indented lines?<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:01:50)</span> <b>matyas:</b></span> that only counts for rules I think<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:02:06)</span> <b>matyas:</b></span> there's an extra backslash at the end of your definition for XROOTD_CONFIG<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:02:20)</span> <b>matyas:</b></span> <pre><br/>                 $(wildcard configs/stash-origin/xrootd/*) \<br/></pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(17:02:29)</span> <b>matyas:</b></span> it's the last one so it shouldn't have a backslash at the end<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:03:26)</span> <b>efajardo:</b></span> So this looks correct right<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:03:28)</span> <b>efajardo:</b></span> <pre>$<br/>LIBEXEC_FILES := src/xcache-reporter \$<br/>                 src/authfile-update \$<br/>                 src/renew-proxy$<br/>INSTALL_LIBEXEC_DIR := usr/libexec/xcache$<br/>XROOTD_CONFIG := $(wildcard configs/atlas-xcache/xrootd/*) \$<br/>^I^I $(wildcard configs/cms-xcache/xrootd/*) \$<br/>^I^I $(wildcard configs/stash-cache/xrootd/*) \$<br/>^I^I $(wildcard configs/xcache/xrootd/*) \$<br/>^I^I $(wildcard configs/xcache-redir/xrootd/*) \$<br/>^I^I$(wildcard configs/stash-origin/xrootd/*)$<br/>$<br/>$<br/></pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(17:03:42)</span> <b>efajardo:</b></span> I cat with <tt>-A</tt> to get all chars<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:04:01)</span> <b>matyas:</b></span> yeah that should work<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:04:36)</span> <b>dwd:</b></span> Yes, the tab requirement is only in rules, not variable assignments<br/>
+</body>
+</html>

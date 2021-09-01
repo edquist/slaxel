@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon May 6, 2019 : #syr-prp (osg)</title>
+</head>
+<body>
+<h3>Mon May 6, 2019 : #syr-prp (osg)</h3>
+<span style="color: #53b759"><span style="font-size: small">(14:08:58)</span> <b>isfiligoi:</b></span> @rynge What do you mean by “Draining”? Duncan &amp; Daniel are using their own submit node, so they should not be affected by anything OSG as a whole does<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:10:19)</span> <b>rynge:</b></span> We drained the frontend, as we could not have a mix of old an new glideins<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:10:32)</span> <b>rynge:</b></span> It was a scitoken requirement<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:10:36)</span> <b>isfiligoi:</b></span> ah<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:10:44)</span> <b>rynge:</b></span> It is coming back up now<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:31:37)</span> <b>rynge:</b></span> What submit host are you guys using? I still see auth problems with <tt><a href="http://sugwg-osg.phy.syr.edu">sugwg-osg.phy.syr.edu</a></tt><br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:40:24)</span> <b>dfinstad:</b></span> We are using <tt><a href="http://sugwg-osg.phy.syr.edu">sugwg-osg.phy.syr.edu</a></tt><br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:40:40)</span> <b>rynge:</b></span> Ok, so that has not been updated with the new DN<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:40:49)</span> <b>rynge:</b></span> Or at least not picked up the change<br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:46:52)</span> <b>dfinstad:</b></span> @efajardo were you able to handle this update for the sugwg-osg host previously?<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:52:24)</span> <b>efajardo:</b></span> hmm<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:52:33)</span> <b>efajardo:</b></span> I felt I did<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:53:27)</span> <b>efajardo:</b></span> <pre>[root@sugwg-scitokens ~]# condor_config_val  GSI_DAEMON_NAME<br/>, /DC=org/DC=incommon/C=US/postalCode=53706/ST=WI/L=Madison/street=1210 West Dayton Street/O=University of Wisconsin-Madison/OU=OCIS/CN=<a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a>, /DC=org/DC=incommon/C=US/ST=WI/L=Madison/O=University of Wisconsin-Madison/OU=OCIS/CN=<a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a></pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(14:53:50)</span> <b>efajardo:</b></span> ahh I fixed<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:54:03)</span> <b>efajardo:</b></span> <tt><a href="http://sugwg-scitokens.phy.syr.edu">sugwg-scitokens.phy.syr.edu</a></tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(14:57:04)</span> <b>efajardo:</b></span> @dfinstad I thought you were using <tt><a href="http://sugwg-scitokens.phy.syr.edu">sugwg-scitokens.phy.syr.edu</a></tt><br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:57:55)</span> <b>dfinstad:</b></span> we tried using that host first, but that host has a broken <tt>gfal-mkdir</tt> which made this workflow fail<br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:58:28)</span> <b>dfinstad:</b></span> now we’re using <tt><a href="http://sugwg-osg.phy.syr.edu">sugwg-osg.phy.syr.edu</a></tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(14:59:51)</span> <b>efajardo:</b></span> has very old configuration<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:59:53)</span> <b>efajardo:</b></span> OSG 3.4<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:00:01)</span> <b>efajardo:</b></span> I need to upgrade it to 3.4<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:11:53)</span> <b>efajardo:</b></span> @dfinstad can you tell me more aobut the gfal mkdir prbolem<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:11:57)</span> <b>efajardo:</b></span> on the other host?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:24:02)</span> <b>dfinstad:</b></span> I don’t know anything more about it unfortunately, just that the workflow I’m trying to run gave the following error:<br/><pre><br/>2019-04-25 16:21:34,089    INFO:  Starting transfers - attempt 1<br/>2019-04-25 16:21:36,174    INFO:  Tool found: gfal-mkdir   Version: 2.14.2   Path: /usr/bin/gfal-mkdir<br/>2019-04-25 16:21:36,174   ERROR:  X509 proxy file /tmp/x509up_u50001 does not exist. Maybe you forgot to initialize the proxy, or the submit host might be configured with MOUNT_UNDER_SCRATCH which can hide directories for local universe jobs.<br/></pre><br/>which @dabrown identified as a problem with <tt>gfal-mkdir</tt> on sugwg-scitokens<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:37:17)</span> <b>efajardo:</b></span> This sounds very familiar<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:37:26)</span> <b>efajardo:</b></span> @rynge this does ring a bell<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:44:39)</span> <b>rynge:</b></span> Yes, It is the problem you guys reported!<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:45:01)</span> <b>rynge:</b></span> In your condor config, set MOUNT_UNDER_SCRATCH=""<br/>
+<span style="color: #a63024"><span style="font-size: small">(18:08:59)</span> <b>efajardo:</b></span> thank you<br/>
+<span style="color: #a63024"><span style="font-size: small">(18:09:07)</span> <b>efajardo:</b></span> @dfinstad can oyu test again from<br/>
+<span style="color: #a63024"><span style="font-size: small">(18:09:17)</span> <b>efajardo:</b></span> `<a href="http://sugwg-scitokens.phy.syr.edu">sugwg-scitokens.phy.syr.edu</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(18:09:24)</span> <b>efajardo:</b></span> the gfal mk dir should fix this<br/>
+<span style="color: #a72f79"><span style="font-size: small">(18:31:53)</span> <b>dfinstad:</b></span> Sure, I’ll try that now<br/>
+<span style="color: #a72f79"><span style="font-size: small">(19:35:02)</span> <b>dfinstad:</b></span> The workflow failed at the same place with a different error:<br/><pre><br/>2019-05-06 19:42:52,296    INFO:  Starting transfers - attempt 1<br/>2019-05-06 19:42:54,426    INFO:  Tool found: gfal-mkdir   Version: 2.14.2   Path: /usr/bin/gfal-mkdir<br/>2019-05-06 19:42:54,428    INFO:  gfal-mkdir -p '<a href="gsiftp://sugwg-scitokens.phy.syr.edu/home/daniel.finstad/projects/pp_tests/sampler_comparison/pp_test_L1_only/local-site-scratch/work">gsiftp://sugwg-scitokens.phy.syr.edu/home/daniel.finstad/projects/pp_tests/sampler_comparison/pp_test_L1_only/local-site-scratch/work</a>'<br/>2019-05-06 19:42:54,744    INFO:  gfal-mkdir error: 13 (Permission denied) - globus_ftp_control: gss_init_sec_context failed globus_gsi_callback_module: Could not verify credential globus_gsi_callback_module: Error with signing policy globus_gsi_callback_module: Error in OLD GAA code: The subject of the certificate "/DC=org/DC=incommon/C=US/postalCode=13244-5040/ST=NY/L=Syracuse/street=900 South Crouse Ave/O=Syracuse University/OU=SUGWG/CN=<a href="http://sugwg-scitokens.phy.syr.edu">sugwg-scitokens.phy.syr.edu</a>" does not match the signing policies defined in /home/daniel.finstad/.globus/certificates/ba240aa8.signing_policy<br/></pre><br/>
+</body>
+</html>

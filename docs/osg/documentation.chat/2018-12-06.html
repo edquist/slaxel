@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Dec 6, 2018 : #documentation (osg)</title>
+</head>
+<body>
+<h3>Thu Dec 6, 2018 : #documentation (osg)</h3>
+<span style="color: #a63024"><span style="font-size: small">(13:58:46)</span> <b>efajardo:</b></span> I am going to get something for lunch but then I will be back for some doc focus :facepunch::skin-tone-4:<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:23:42)</span> <b>blin:</b></span> hey @efajardo i'm confused by your last comment<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:23:59)</span> <b>blin:</b></span> i don't know xrootd well enough<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:24:13)</span> <b>efajardo:</b></span> Xrootd alwayws allows <tt>/tmp</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(15:24:26)</span> <b>efajardo:</b></span> I think you have to actively deny it<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:24:39)</span> <b>blin:</b></span> isn't everything relative to oss.localroot though?<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:24:40)</span> <b>efajardo:</b></span> but I can change it to somehting in <tt>/storage</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(15:24:51)</span> <b>efajardo:</b></span> no <tt>oss.localroot</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(15:24:54)</span> <b>efajardo:</b></span> only matters for caches<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:25:00)</span> <b>efajardo:</b></span> <tt>oss.localroot</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(15:25:07)</span> <b>efajardo:</b></span> is where you store the cached files<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:25:10)</span> <b>efajardo:</b></span> but for gateways<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:25:14)</span> <b>efajardo:</b></span> it is all about exprot<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:26:06)</span> <b>efajardo:</b></span> ahh maybe I am wrong<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:26:10)</span> <b>blin:</b></span> so <tt>all.export</tt>?<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:26:19)</span> <b>efajardo:</b></span> I have only used it with caches<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:26:48)</span> <b>blin:</b></span> i'm just wondering, if you have <tt>all.export /storage</tt> and you have a <tt>/storage/tmp</tt>, how would xrootd differentiate between that dir and <tt>/tmp</tt>?<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:27:14)</span> <b>efajardo:</b></span> well export<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:27:23)</span> <b>efajardo:</b></span> is what are you allowed to<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:27:24)</span> <b>efajardo:</b></span> export<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:27:38)</span> <b>efajardo:</b></span> so <tt>localroot</tt> is where you start from<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:27:50)</span> <b>efajardo:</b></span> but you never use that in gateway<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:27:59)</span> <b>efajardo:</b></span> that will just make it more confusing<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:30:23)</span> <b>blin:</b></span> ok sure<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:30:56)</span> <b>blin:</b></span> but there's a difference between what xrootd exports and what the actual filesystem looks like<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:31:17)</span> <b>blin:</b></span> can you export multiple different folders<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:31:31)</span> <b>blin:</b></span> like<br/><pre><br/>all.export /storage<br/>all.export /morestorage<br/></pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(15:31:35)</span> <b>efajardo:</b></span> ohh yea<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:32:07)</span> <b>efajardo:</b></span> no there is no difference<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:32:13)</span> <b>efajardo:</b></span> as long as localroot is the same<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:32:20)</span> <b>efajardo:</b></span> if you are exportging storage<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:32:34)</span> <b>efajardo:</b></span> then you have to request files that start by /storage<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:32:43)</span> <b>blin:</b></span> so the underlying filesystem is exposed to the client?<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:32:48)</span> <b>efajardo:</b></span> and xrootd will look in the local mount of <tt>/storage</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(15:32:53)</span> <b>efajardo:</b></span> yea<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:32:56)</span> <b>blin:</b></span> ahhhh<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:32:57)</span> <b>blin:</b></span> ok<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:33:04)</span> <b>blin:</b></span> that's what i was missing<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:33:04)</span> <b>efajardo:</b></span> but that never happens<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:33:11)</span> <b>efajardo:</b></span> cause in this mode a gateway<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:33:13)</span> <b>efajardo:</b></span> it is always HDFS<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:33:15)</span> <b>efajardo:</b></span> or lustre<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:33:32)</span> <b>efajardo:</b></span> But if you check here<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:33:41)</span> <b>efajardo:</b></span> xrootd defaults to<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:33:43)</span> <b>efajardo:</b></span> <tt>xrootd.export /tmp lock</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(15:33:48)</span> <b>efajardo:</b></span> <a href="http://xrootd.org/doc/dev48/xrd_config.htm">http://xrootd.org/doc/dev48/xrd_config.htm</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:34:24)</span> <b>blin:</b></span> so in the HDFS/lustre case you're setting <tt>all.export /storage</tt> but <tt>/storage</tt> is relative to the HDFS root dir?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:34:46)</span> <b>blin:</b></span> with hdfs/lustre we're venturing into territory that i'm even more unfamiliar with lol<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:35:01)</span> <b>efajardo:</b></span> well basically<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:35:07)</span> <b>efajardo:</b></span> with all.export /storage<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:35:09)</span> <b>efajardo:</b></span> and nothing else<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:35:26)</span> <b>efajardo:</b></span> it will just go ahead in the usual linux dir into <tt>/storage</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:35:39)</span> <b>blin:</b></span> ok<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:36:14)</span> <b>efajardo:</b></span> I do not know with the multiple ways you can use<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:36:20)</span> <b>blin:</b></span> so when someone does an xrdcp they have to reference <tt>&lt;xrootd host&gt;:&lt;port&gt;//storage/etc/etc/</tt>?<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:36:26)</span> <b>efajardo:</b></span> yea<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:36:48)</span> <b>efajardo:</b></span> without localroot yea<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:43:09)</span> <b>efajardo:</b></span> See<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:43:10)</span> <b>efajardo:</b></span> <a href="http://xrootd.org/doc/dev48/ofs_config.htm">http://xrootd.org/doc/dev48/ofs_config.htm</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(15:43:20)</span> <b>efajardo:</b></span> oss.localroot path<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:57:05)</span> <b>blin:</b></span> hey edgar, we need to run fetch-crl on these xrootd servers, right?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:57:15)</span> <b>blin:</b></span> these xrootd servers =standalone/gateway<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:02:30)</span> <b>efajardo:</b></span> Welll<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:02:37)</span> <b>efajardo:</b></span> that is where all this rammifications come<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:02:45)</span> <b>efajardo:</b></span> only if you are doing authentication<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:02:48)</span> <b>efajardo:</b></span> via X509<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:03:12)</span> <b>efajardo:</b></span> so it would be better to place that in the xrootd-authetication<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:03:22)</span> <b>efajardo:</b></span> part of the doc<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:04:01)</span> <b>blin:</b></span> are there other ways people do auth for an xrootd door?<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:04:31)</span> <b>efajardo:</b></span> well Brian was doing now the thing the Scitokens and the Macaroon thigns might come<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:04:54)</span> <b>efajardo:</b></span> But you do not necesairly need to run authentication on an xrootd door<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:05:41)</span> <b>blin:</b></span> sure, you don't have to<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:05:46)</span> <b>blin:</b></span> but does anyone do that?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:06:06)</span> <b>blin:</b></span> do they just set it up as read-only access and set <tt>lr *</tt> or whatever the syntax is?<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:08:34)</span> <b>efajardo:</b></span> well<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:08:39)</span> <b>efajardo:</b></span> no<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:08:48)</span> <b>efajardo:</b></span> I think most folks do some sort of x509<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:08:53)</span> <b>efajardo:</b></span> with lcmaps<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:09:19)</span> <b>efajardo:</b></span> At least that is how i configure it for Terrence<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:10:00)</span> <b>dweitzel:</b></span> We do SciTokens and Macaroons.  Both are much different beasts than x509.  The configurations are documented on the WLCG twiki, but deployment is mostly in the testing phase.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:10:44)</span> <b>dweitzel:</b></span> Macroons is especially awkward.  Basically a token exchange.  You auth with x509 to the xrootd server and you get a token.  Then you use that token later to perform the actual transfer.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:10:56)</span> <b>dweitzel:</b></span> so you have to have both working.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:11:13)</span> <b>dweitzel:</b></span> SciTokens, at least you don't _need_ x509 working.<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:12:34)</span> <b>efajardo:</b></span> I think the fecth-crl should be included but in the auth xrootd page<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:12:38)</span> <b>efajardo:</b></span> section<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:12:59)</span> <b>blin:</b></span> yeah, sure<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:16:13)</span> <b>blin:</b></span> does <tt>xrootd@service</tt> work with an arbitrary <tt>service</tt> name on EL6?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:16:34)</span> <b>blin:</b></span> you'd have to create the service file, wouldn't you?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:20:23)</span> <b>matyas:</b></span> no, the @service is the name of a config file<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:20:36)</span> <b>matyas:</b></span> oh, el6. never mind<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:21:13)</span> <b>matyas:</b></span> for el6 it's not xrootd@service, just xrootd; you specify in some /etc/sysconfig file (IIRC) which instance(s) to run<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:21:37)</span> <b>blin:</b></span> though i guess none of this works on el6 anyway<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:21:49)</span> <b>efajardo:</b></span> @matyas is correct but I would hope no one tries to isntall this on el6<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:21:51)</span> <b>blin:</b></span> at least from an auth perspective: xrootd-lcmaps, scitokens, and macaroons all need el7<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:25:22)</span> <b>blin:</b></span> i'm ok with this being el7 only<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:27:41)</span> <b>efajardo:</b></span> Great<br/>
+</body>
+</html>

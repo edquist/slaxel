@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Dec 22, 2020 : #general (osg)</title>
+</head>
+<body>
+<h3>Tue Dec 22, 2020 : #general (osg)</h3>
+<span style="color: #5a4592"><span style="font-size: small">(06:41:31)</span> <b>lmichael:</b></span> Any reason we should check other sites for this same problem? How would we do a quick check on GPU-capable sites?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:08:17)</span> <b>blin:</b></span> @jdost321 may know. I think we'd only have to worry about GPU sites that support CMS + other VOs. I don't think there are many of them<br/>
+<span style="color: #385a86"><span style="font-size: small">(11:13:05)</span> <b>jdost321:</b></span> The probe jobs that caused issues at syracuse were submitting to all CMS supported GPU sites, but those have all since been stopped<br/>
+<span style="color: #a72f79"><span style="font-size: small">(11:15:43)</span> <b>andrew.melo:</b></span> Which might become Vanderbilt real soon -- have both LIGO and LSST folks wanting to start using their fairshare for central jobs<br/>
+<span style="color: #d58247"><span style="font-size: small">(13:02:45)</span> <b>essedore:</b></span> At the risk of pressing my luck and asking too many questions - I noticed that while the payload jobs seem to be running (I see FAHClient active)  there is no activity on the CPU or GPU.  Any chance the jobs are not picking up work from FAH?<br/>
+<span style="color: #d58247"><span style="font-size: small">(13:02:49)</span> <b>essedore:</b></span> <br/>
+<span style="color: #43761b"><span style="font-size: small">(13:04:48)</span> <b>blin:</b></span> @dweitzel ^^<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:10:14)</span> <b>dweitzel:</b></span> No worries.  Give me a few minutes, I will look up some completed GPU F@H jobs.  In my experience, it usually takes several minutes to receive work, but eventually they do.<br/>
+<span style="color: #d58247"><span style="font-size: small">(13:12:17)</span> <b>essedore:</b></span> Thanks Derek, I've been watching a few nodes since this morning (thinking that it might just take a while).<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:32:29)</span> <b>dweitzel:</b></span> We took some debugging off the general channel.  There was a bug in how we were setting up the F@H jobs.  F@H would try run X number of gpu jobs, where X = number of GPUs on the system.  I think what was happening is that it happily ran 1 job on the GPU it was allocated, then just stalled when it couldn't talk to the other GPUs.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:32:36)</span> <b>dweitzel:</b></span> New GPU jobs with the fix are now propagating.<br/>
+</body>
+</html>

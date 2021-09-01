@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jul 23, 2018 : #general (osg)</title>
+</head>
+<body>
+<h3>Mon Jul 23, 2018 : #general (osg)</h3>
+<span style="color: #99a949"><span style="font-size: small">(11:28:45)</span> <b>dwd:</b></span> Carsten, I think a two tier setup is sufficient, no sibling cloud needed. I would like to know more about the hardware architecture you’re dealing with, however.  So many squids should not be needed.  I usually recommend a smaller number of large squids at large sites.  At both Fermilab &amp; CERN we have 4 10gbit/s squid machines that handle everything quite easily, including CMS Frontier, and Frontier uses much more bandwidth than cvmfs.  How many compute nodes do you have, and how much bandwidth on your squid machines?<br/>
+<span style="color: #dc7dbb"><span style="font-size: small">(13:28:14)</span> <b>carsten.aulbert:</b></span> Hi Dave, at the moment, we have about 2500 compute nodes each with 1 or 3 Gb/s connected via top of rack switches to the non-blocking core switch. The machines I would like to use are NFS servers serving static data to the cluster connected via 2x10Gb/s to the core (LACP) - from these we have 37.<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:47:43)</span> <b>dwd:</b></span> For 2500 nodes I suggest starting with a much smaller number of squid machines, maybe about 4.  Increase the number of worker processes to 3 or 4, and see how that works.  A smaller number of squids will be easier to manage.  On the other hand, do each of these NFS servers have better connectivity to certain subnets?  Maybe if you just configured each client with a primary and a backup for the ones closest network-wise, then run just one squid worker process per NFS server, that could be a clean solution.  I would expect quite a light load on each squid then, with only about 70 nodes per squid.<br/>
+</body>
+</html>

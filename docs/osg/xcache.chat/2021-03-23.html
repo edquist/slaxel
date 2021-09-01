@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Mar 23, 2021 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Tue Mar 23, 2021 : #xcache (osg)</h3>
+<span style="color: #dd8527"><span style="font-size: small">(13:12:21)</span> <b>mtadel:</b></span> no clue ...indeed, I can not find announce emails on xrootd-dev<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:39:33)</span> <b>blin:</b></span> @ivukotic @didavila you guys are using 5.1.1 in your xcaches, right?<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(15:40:53)</span> <b>didavila:</b></span> not yet<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(15:41:01)</span> <b>didavila:</b></span> I have 5.1.0-rc6<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(15:43:06)</span> <b>didavila:</b></span> and just in 2 caches, and have rc7 in another one, the rest is 4.10<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:43:44)</span> <b>blin:</b></span> oof, we should probably start working on updating them all<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(15:44:03)</span> <b>didavila:</b></span> this week I’ll be updating the XRootD cluster of the T2<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(15:44:12)</span> <b>didavila:</b></span> next week I’ll do the caches<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(15:44:49)</span> <b>didavila:</b></span> I can update 1 cache today<br/>
+<span style="color: #de5f24"><span style="font-size: small">(16:25:45)</span> <b>justas.balcas:</b></span> @didavila I would suggest not to do that (without downtime) :wink:<br/>
+<span style="color: #de5f24"><span style="font-size: small">(16:26:15)</span> <b>justas.balcas:</b></span> 5.1.1 does not work on tier2 and seems issue is with ofs.authorize and /etc/xrootd/auth_file<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(16:26:18)</span> <b>didavila:</b></span> you’re talking about the T2, right?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(16:26:23)</span> <b>justas.balcas:</b></span> yep<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(16:26:36)</span> <b>didavila:</b></span> I just updated a server and looks good<br/>
+<span style="color: #de5f24"><span style="font-size: small">(16:26:38)</span> <b>justas.balcas:</b></span> xcache - not sure if we use ofs.authorize<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(16:26:43)</span> <b>didavila:</b></span> but thanks for the heads up<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(16:27:07)</span> <b>didavila:</b></span> what errror do you see?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(16:27:08)</span> <b>justas.balcas:</b></span> can you share your config with me?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(16:27:11)</span> <b>justas.balcas:</b></span> permission denied<br/>
+<span style="color: #de5f24"><span style="font-size: small">(16:27:41)</span> <b>justas.balcas:</b></span> while 4.x works out of the box, upgrading to 5.1.1 - permission denied<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:27:47)</span> <b>dweitzel:</b></span> 5.1.1 works at UNL (I know that doesn't help you much)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:27:48)</span> <b>dweitzel:</b></span> # rpm -q xrootd-server<br/>xrootd-server-5.1.1-1.1.osg35up.el7.x86_64<br/>
+<span style="color: #de5f24"><span style="font-size: small">(16:28:34)</span> <b>justas.balcas:</b></span> seems only my issue then (not sure why then)<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(16:28:50)</span> <b>didavila:</b></span> <pre>all.adminpath /var/spool/xrootd <br/>all.pidpath /run/xrootd <br/>oss.namelib /usr/lib64/libXrdCmsTfc.so file:/etc/xrootd/storage.xml?protocol=hadoop <br/>xrd.port 1094<br/>all.role server<br/>cms.allow host * <br/>xrd.network keepalive kaparms 10m,1m,5 <br/>xrd.timeout idle 60m <br/>ofs.ckslib * /usr/lib64/libXrdHdfs.so <br/>ofs.osslib /usr/lib64/libXrdHdfs.so <br/>xrootd.seclib libXrdSec.so <br/>sec.protocol /usr/lib64 gsi -certdir:/etc/grid-security/certificates -cert:/etc/grid-security/xrd/xrdcert.pem -key:/etc/grid-security/xrd/xrdkey.pem -crl:1 -authzfun:libXrdLcmaps.so -authzfunparms:lcmapscfg=/etc/lcmaps.db,loglevel=0,policy=authorize_only -gmapopt:10 -gmapto:0 <br/>acc.authdb /etc/xrootd/auth_file <br/>ofs.authorize 1 <br/>xrd.protocol http:1094 libXrdHttp.so <br/>http.cadir /etc/grid-security/certificates <br/>http.cert /etc/grid-security/xrd/xrdcert.pem <br/>http.key /etc/grid-security/xrd/xrdkey.pem <br/>http.secxtractor /usr/lib64/libXrdLcmaps.so <br/>http.exthandler xrdmacaroons libXrdMacaroons.so <br/>macaroons.secretkey /etc/xrootd/macaroon-secret <br/>ofs.authlib libXrdMacaroons.so <br/>http.header2cgi Authorization authz <br/>http.listingdeny yes <br/>http.staticpreload <a href="http://static/robots.txt">http://static/robots.txt</a> /etc/xrootd/ban-robots.txt <br/>all.sitename T2_US_UCSD <br/>xrd.report <a href="http://xrd-report.osgstorage.org:9931">xrd-report.osgstorage.org:9931</a> <br/>xrootd.monitor all auth flush 30s window 5s fstat 60 lfn ops xfr 5 dest redir fstat info user <a href="http://xrd-report.osgstorage.org:9930">xrd-report.osgstorage.org:9930</a> dest fstat info user <a href="http://xrd-mon.osgstorage.org:9930">xrd-mon.osgstorage.org:9930</a> <br/>all.adminpath /var/spool/xrootd <br/>all.pidpath /run/xrootd <br/>oss.localroot /hadoop <br/>http.exthandler xrdtpc libXrdHttpTPC.so <br/>all.export / <br/>xrootd.trace emsg login stall redirect <br/>all.manager <a href="http://redirector.t2.ucsd.edu:1213">redirector.t2.ucsd.edu:1213</a><br/>all.export / nostage <br/>xrd.report <a href="http://xrootd.t2.ucsd.edu:9931">xrootd.t2.ucsd.edu:9931</a> every 30s all sync <br/>xrootd.chksum max 2 md5 adler32 crc32 <br/>xrd.trace conn <br/>cms.trace all debug </pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:28:57)</span> <b>dweitzel:</b></span> there were some config differences that have to be changed when upgrading to 5.x<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(16:29:11)</span> <b>didavila:</b></span> we have <tt>*xroot*d-5.1.1-1.1.osg35up.el7.x86_64</tt><br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(16:30:27)</span> <b>didavila:</b></span> did you try increasing the lcmaps verbosity ?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(16:30:35)</span> <b>justas.balcas:</b></span> lcmaps works<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(16:30:54)</span> <b>didavila:</b></span> so the user get correctly mapped to the linux account?<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(16:31:02)</span> <b>didavila:</b></span> and the linux account exists?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:31:42)</span> <b>dweitzel:</b></span> 5.x introduced a different syntax for authlib, try setting the ofs.authlib line to:<br/><pre>ofs.authlib ++ libXrdMacaroons.so</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:31:47)</span> <b>dweitzel:</b></span> (That's what UNL has)<br/>
+<span style="color: #de5f24"><span style="font-size: small">(16:32:20)</span> <b>justas.balcas:</b></span> ofs.authlib ++ libXrdMacaroons.so libXrdAccSciTokens.so ?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(16:32:24)</span> <b>justas.balcas:</b></span> no need scitokens?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:32:44)</span> <b>dweitzel:</b></span> Our ordering (and I think ordering matters a little here) is:<br/><pre># Enable SciTokens-based mappings; if no token is present, then the GSI certificate will be used.<br/>ofs.authlib ++ libXrdAccSciTokens.so<br/>ofs.authlib ++ libXrdMacaroons.so</pre><br/>
+<span style="color: #de5f24"><span style="font-size: small">(16:36:36)</span> <b>justas.balcas:</b></span> NICE! Thanks - this fixed tier2<br/>
+<span style="color: #de5f24"><span style="font-size: small">(16:36:44)</span> <b>justas.balcas:</b></span> now need to look if fixes ceph<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:37:06)</span> <b>dweitzel:</b></span> great!  It's new syntax for "stacking" auth plugins.  We will need to advertise this to others.<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(16:37:49)</span> <b>didavila:</b></span> maybe this is needed only when more that 1 plugin is used?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:37:49)</span> <b>dweitzel:</b></span> @justas.balcas could you also respond to the xrootd issue that you fixed it with the new authlib syntax.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(16:38:09)</span> <b>justas.balcas:</b></span> I still need to test with ceph - but I will do<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:38:52)</span> <b>dweitzel:</b></span> @didavila maybe.  My understanding is that you have to stack, unless you want ONLY that auth plugin to work.  So if you specify Macaroons plugin, then only Macaroons will be used, it won't even try to look at the Authfile for GSI mappings.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:39:21)</span> <b>dweitzel:</b></span> you have to stack on top of the default, which is to use the GSI information to authorize the user with the Authfile.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:40:17)</span> <b>dweitzel:</b></span> The next question is, how can we advertise this to others so they don't hit the same thing.  I presume all the CMS Tier 2s will have the same issue?<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(16:40:49)</span> <b>didavila:</b></span> mmm…<br/>
+<span style="color: #de5f24"><span style="font-size: small">(16:40:59)</span> <b>justas.balcas:</b></span> osg install website?:))<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(16:41:04)</span> <b>didavila:</b></span> it looks like I can use both GSI and macaroons with my curent config<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:42:18)</span> <b>dweitzel:</b></span> When we were doing xcache testing with the new syntax, if I didn't specify the "++", then only scitokens auth would work, it wouldn't even look at the Authfile to realize that everything not under /ligo was world readable.<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(16:44:13)</span> <b>didavila:</b></span> weird<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(16:44:33)</span> <b>didavila:</b></span> for me it works just fine with either macaroons or GSI<br/>
+<span style="color: #de5f24"><span style="font-size: small">(16:54:35)</span> <b>justas.balcas:</b></span> @dweitzel do you know if this affects multiuser? Once I change to ++ for authlib - now I can list all dirs, copy file from, but if I want to use multiuser - that fails with the following:<br/><pre>Plugin loaded Multiuser v5.1.1 from fslib libXrdMultiuser-5.so<br/>------ Initializing the multi-user plugin.<br/>=====&gt; multiuser.umask 0022<br/>=====&gt; ofs.authlib ++ libXrdAccSciTokens.so<br/>=====&gt; ofs.authlib ++ libXrdMacaroons.so<br/>210323 14:54:23 3815349 multiuser_Config: Failed to load ++-5 ++-5: cannot open shared object file: No such file or directory<br/>210323 14:54:23 3815349 multiuser_Initialize: Encountered a runtime failure: Failed to configure multi-user plugin.<br/>210323 14:54:23 3815349 XrootdConfig: Unable to load file system via libXrdMultiuser.so<br/>210323 14:54:23 3815349 XrootdConfig: Unable to load file system wrapper from libXrdMultiuser.so</pre><br/>
+<span style="color: #de5f24"><span style="font-size: small">(16:54:50)</span> <b>justas.balcas:</b></span> looks multiuser plugin issue<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:58:44)</span> <b>dweitzel:</b></span> the multiuser does try to load other auth libraries "under" it...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:59:05)</span> <b>dweitzel:</b></span> what's the version of multiuser you are using?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(16:59:39)</span> <b>justas.balcas:</b></span> xrootd-multiuser.x86_64               0.5.0-1.osg35up.el7              @osg-upcoming-testing<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:01:31)</span> <b>dweitzel:</b></span> Bring up that error in the ticket.  I wonder what Andy will say.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:02:04)</span> <b>dweitzel:</b></span> The multi-user plugin is a bit heavy-handed.  But it had to be when it was written.  We will see if Andy has a good solution for this issue.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(17:02:18)</span> <b>justas.balcas:</b></span> done. Thanks!<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:04:55)</span> <b>blin:</b></span> i could've sworn that we fixed some of the <tt>++</tt> stuff in the packaging somewhere<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:07:13)</span> <b>blin:</b></span> ah yeah, we had to add it to the xcache packaging <a href="https://github.com/opensciencegrid/xcache/commit/4da85e03b9a67b546028331d13df78c8ad04b8f4">https://github.com/opensciencegrid/xcache/commit/4da85e03b9a67b546028331d13df78c8ad04b8f4</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:07:26)</span> <b>dweitzel:</b></span> We did in xcache.  I think justas is just using xrootd standalone (basically) for their Tier 2.<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:07:41)</span> <b>blin:</b></span> i thought @justas.balcas was using <tt>clustered</tt> mode?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:07:51)</span> <b>dweitzel:</b></span> ah, sorry, yeah, probably that.<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:08:35)</span> <b>blin:</b></span> yeah, we don't ship a config for that currently<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:09:14)</span> <b>blin:</b></span> we should think about fixing the standalone config, though. we do have:<br/><pre>   ofs.authlib libXrdMacaroons.so</pre><br/>
+<span style="color: #de5f24"><span style="font-size: small">(17:10:18)</span> <b>justas.balcas:</b></span> I overwrite my own config mode (clustered). I had issues in the past where parameters order is not honored - and was fastest fix :wink:<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:17:29)</span> <b>blin:</b></span> we should try to sort this out in packaging now that we have <tt>config.d/</tt> and report anything that doesn't respect ordering as a bug to the xrootd team<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:18:08)</span> <b>blin:</b></span> that way, we can handle syntax changes like this and you wouldn't have to worry about them<br/>
+</body>
+</html>

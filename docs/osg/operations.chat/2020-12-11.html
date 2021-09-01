@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Dec 11, 2020 : #operations (osg)</title>
+</head>
+<body>
+<h3>Fri Dec 11, 2020 : #operations (osg)</h3>
+<span style="color: #73769d"><span style="font-size: small">(09:33:27)</span> <b>tim.theisen:</b></span> @matyas Do we have any idea why the <a href="http://repo.opensciencegrid.org/cadist">repo.opensciencegrid.org/cadist</a> page has broken links to the OSG CA bundle?<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:34:24)</span> <b>matyas:</b></span> nope, and both Carl and I are pretty busy. Can we just create a JIRA ticket for this, turn off the cron job, and fix the link by hand for now?<br/>
+<span style="color: #73769d"><span style="font-size: small">(09:36:04)</span> <b>tim.theisen:</b></span> Sure. It was off for months and nobody noticed.<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:50:03)</span> <b>matyas:</b></span> OK, thanks. I'll make the JIRA ticket.<br/>
+<span style="color: #73769d"><span style="font-size: small">(09:52:24)</span> <b>tim.theisen:</b></span> So, I turned off the systemd timer and fixed up the web page. Thank you for making the ticket.<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:00:21)</span> <b>matyas:</b></span> making it right now; what's the path to the html file, so I can put it in the ticket?<br/>
+<span style="color: #73769d"><span style="font-size: small">(10:03:03)</span> <b>tim.theisen:</b></span> On repo is<br/><pre>[osgcollab@hcc-osg-repo ~]$ ls -l /usr/local/repo/cadist/index.html<br/>lrwxrwxrwx 1 root root 23 Dec 11 09:39 /usr/local/repo/cadist/index.html -&gt; 1.107IGTFNEW/INDEX.html</pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:45:01)</span> <b>bbockelm:</b></span> @jthiltges - getting a high priority interrupt from NSF.  Can you add an alias for <a href="http://map-itb.opensciencegrid.org">map-itb.opensciencegrid.org</a> at <a href="http://topology-itb.opensciencegrid.org">topology-itb.opensciencegrid.org</a> and, for map-itb, remove the request for X.509 auth?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(11:45:40)</span> <b>jthiltges:</b></span> I'll give it a try.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:46:47)</span> <b>dweitzel:</b></span> DNS is setup on cloudflare<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:47:25)</span> <b>bbockelm:</b></span> (we need the ITB link so Derek can potentially make some changes for someone to screenshot it into a presentation)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:48:56)</span> <b>bbockelm:</b></span> @jthiltges on success, can you immediately promote the app to the production namespace but _only_ for <a href="http://map.opensciencegrid.org">map.opensciencegrid.org</a>?  I.e., not topology?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(11:49:20)</span> <b>jthiltges:</b></span> Any reason this couldn't be a separate container?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:51:48)</span> <b>bbockelm:</b></span> I think we can have it be separate, yes.  But let's tackle that later.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(11:52:22)</span> <b>jthiltges:</b></span> I was thinking to just duplicate the existing osg-topology config, and set it up as map.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:00:32)</span> <b>bbockelm:</b></span> Right, that's what I meant.  I think if we only have the <tt><a href="http://map.opensciencegrid.org">map.opensciencegrid.org</a></tt> DNS entry changed over then the real topology is unaffected, right?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:19:16)</span> <b>jthiltges:</b></span> It's up-ish if you go directly to the URL. <a href="https://map-itb.opensciencegrid.org/map/iframe">https://map-itb.opensciencegrid.org/map/iframe</a><br/>I'm still working on the initial redirect.<br/>
+<blockquote>
+<span style="color: #e06b56"><span style="font-size: small">(12:26:29)</span> <b>jthiltges:</b></span> And broken for a bit until flux catches up. =[<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:34:37)</span> <b>bbockelm:</b></span> :slightly_smiling_face: Looks good!<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:39:17)</span> <b>jthiltges:</b></span> Hmm. Anything else needed? Should be able to point <a href="http://map.opensciencegrid.org">map.opensciencegrid.org</a> to it with CloudFlare?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:54:15)</span> <b>bbockelm:</b></span> I think we should only have <tt><a href="http://map.osg.org">map.osg.org</a></tt> changed over in DNS once we have an instance in the <tt>osg</tt> namespace.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:01:49)</span> <b>bbockelm:</b></span> oh - <a href="https://map-itb.opensciencegrid.org/map/iframe">https://map-itb.opensciencegrid.org/map/iframe</a> is now unhappy<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:05:40)</span> <b>jthiltges:</b></span> It was pointing at the itb branch of the topology for webhook testing. Let me put it back to master and see how it goes.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:19:27)</span> <b>jthiltges:</b></span> I've got an initial attempt at getting the map into the production namespace. Hung up on getting a certificate, which I can't debug further for rbac reasons. <a href="https://github.com/opensciencegrid/tiger-osg-config/blob/master/manifests/production/osg-topology/network.yaml">https://github.com/opensciencegrid/tiger-osg-config/blob/master/manifests/production/osg-topology/network.yaml</a><br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:22:28)</span> <b>jthiltges:</b></span> Hrm. Maybe my sealed secret is broken somewhere too? Not sure.<br/><pre>Name:                 osg-topology-75c65b9c77-wqsjb<br/>...<br/>Events:<br/>  Type     Reason       Age                    From               Message<br/>  ----     ------       ----                   ----               -------<br/>  Normal   Scheduled    6m14s                  default-scheduler  Successfully assigned osg/osg-topology-75c65b9c77-wqsjb to <a href="http://tiger0012.chtc.wisc.edu">tiger0012.chtc.wisc.edu</a><br/>  Warning  FailedMount  6m15s                  kubelet            MountVolume.SetUp failed for volume "osg-topology-secrets" : secret "osg-topology" not found<br/>  Warning  FailedMount  5m11s (x8 over 6m15s)  kubelet            MountVolume.SetUp failed for volume "osg-topology-cert" : secret "osg-topology-cert" not found</pre><br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:56:29)</span> <b>jthiltges:</b></span> It's up and running! (though google maps is unhappy because domain authorization)<br/><a href="https://map.osg.chtc.io/">https://map.osg.chtc.io/</a><br/>If it looks good to someone else (@dweitzel?), I think the next step is to point cloudflare at it.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:59:20)</span> <b>dweitzel:</b></span> I can fix cloudflare.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:59:40)</span> <b>dweitzel:</b></span> But are we ready to put it all in production? not sure yet<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:35:39)</span> <b>bbockelm:</b></span> Not yet.  Got some good screenshots out to folks.  Waiting to hear back if we need to rush out to production.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:36:05)</span> <b>bbockelm:</b></span> I would be OK with moving the current release version of <a href="http://map.opensciencegrid.org">map.opensciencegrid.org</a> (prior to today's hacking) into k8s.<br/>
+</blockquote>
+<span style="color: #3c8c69"><span style="font-size: small">(13:52:55)</span> <b>jpeterson:</b></span> @jthiltges  errors of newly deployed CEs:<br/><br/><pre>12/11/20 19:26:35 (D_ALWAYS) Connecting to CONDOR_VIEW_HOST <a href="http://collector1.opensciencegrid.org:9619">collector1.opensciencegrid.org:9619</a><br/>12/11/20 19:26:35 (D_ALWAYS:2) This process has a valid certificate &amp; key<br/>12/11/20 19:26:35 (D_ALWAYS) Condor GSI authentication failure<br/>GSS Major Status: Authentication Failed<br/>GSS Minor Status Error Chain:<br/>globus_gss_assist: Error during context initialization<br/>globus_gsi_gssapi: Unable to verify remote side's credentials<br/>globus_gsi_gssapi: SSL handshake problems: Couldn't do ssl handshake<br/>OpenSSL Error: s3_pkt.c:1493: in library: SSL routines, function ssl3_read_bytes: tlsv1 alert unknown ca SSL alert number 48<br/><br/>12/11/20 19:26:35 (D_ALWAYS) SECMAN: required authentication with &lt;129.93.175.54:9619&gt; failed, so aborting command UPDATE_SCHEDD_AD.</pre><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:53:17)</span> <b>jpeterson:</b></span> @blin ^<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(13:55:08)</span> <b>blin:</b></span> is this using <tt>fresh</tt>?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:55:46)</span> <b>blin:</b></span> ah, <tt>fresh</tt> doesn't have the updated cert package yet<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:55:48)</span> <b>blin:</b></span> let me push a new container<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:58:04)</span> <b>jpeterson:</b></span> hmm, this one isn’t even calling for a label.  will have to add that.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:09:22)</span> <b>jthiltges:</b></span> I'd missed an <tt>ensure =&gt; latest</tt> for osg-ca-certs on collector[12].osg.<br/>Package is updated, but I haven't restarted condor daemons. I hope that's not necessary?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:10:03)</span> <b>blin:</b></span> depends what the GSS cache expiration is set to<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:10:55)</span> <b>blin:</b></span> @jthiltges i think you can reset the cache by setting `<tt>GSS_ASSIST_GRIDMAP_CACHE_EXPIRATION = 0</tt> , reconfiguring, removing that config, then reconfiguring again<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:13:20)</span> <b>jthiltges:</b></span> Reconfig dance done! (It had the default of 30 minutes)<br/>
+</blockquote>
+<span style="color: #385a86"><span style="font-size: small">(13:54:06)</span> <b>jdost321:</b></span> My guess is an update of osg-ca-certs on the CE collectors to 1.90 could fix?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:54:28)</span> <b>bbockelm:</b></span> that SSL alert is on the client side, no?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:54:51)</span> <b>bbockelm:</b></span> Separate subject: Derek put together a sample status page here - <a href="https://opensciencegrid1.statuspage.io/">https://opensciencegrid1.statuspage.io/</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:55:01)</span> <b>bbockelm:</b></span> (requires JIRA login until we cough up the money for it)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:55:13)</span> <b>bbockelm:</b></span> It's ... nice.<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(13:56:30)</span> <b>B01GA370NNT:</b></span> <br/>
+<span style="color: #A82F2F"><span style="font-size: small">(13:56:30)</span> <b>B01GA370NNT:</b></span> <br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:56:43)</span> <b>dweitzel:</b></span> Slack integration is working<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(13:57:05)</span> <b>B01GA370NNT:</b></span> <br/>
+<span style="color: #385a86"><span style="font-size: small">(13:57:57)</span> <b>jdost321:</b></span> i never understand how to interpret condor logs about which side is complaining on GSI.. so the CE doesn't trust its own hostcert? won't we also have to get the CAs updated on the collector sides for it to properly publish?<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(13:59:44)</span> <b>blin:</b></span> not quite, this is the CE complaining about not recognizing the central collector's host cert<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:59:59)</span> <b>blin:</b></span> &gt; Unable to verify remote side's credentials<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:00:34)</span> <b>blin:</b></span> errr or maybe i'm wrong if brian thinks otherwise...<br/>
+</blockquote>
+<span style="color: #43761b"><span style="font-size: small">(13:58:05)</span> <b>blin:</b></span> wow so professional<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:59:53)</span> <b>bbockelm:</b></span> @jdost321 - actually, I think you may be right.  If this is the client, then the alert may be coming from the server.  FWIW, it's OpenSSL's bad error message, not HTCondor's.<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:01:03)</span> <b>jdost321:</b></span> or.. collectors got recent Let's Encrypt hostcerts certs too with the new issuer, i was envisioning the opposite..<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:01:44)</span> <b>blin:</b></span> i'm kicking off new container builds so the latest <tt>hosted-ce:fresh</tt> will have the new bundle<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:02:13)</span> <b>blin:</b></span> should be available when this finishes building: <a href="https://github.com/opensciencegrid/docker-hosted-ce/actions/runs/416189522">https://github.com/opensciencegrid/docker-hosted-ce/actions/runs/416189522</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:02:27)</span> <b>jpeterson:</b></span> what about stable?<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(14:02:45)</span> <b>cat:</b></span> The StatusPage thing is nice. We’ll need to think hard about what services end up there and how we define “operational”.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:02:50)</span> <b>jpeterson:</b></span> and which gets pulled if there isn’t a tag requested in the CE config?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:05:11)</span> <b>blin:</b></span> our tagging policy requires that <tt>fresh</tt> tags are tested by you guys before promoting to <tt>stable</tt> . <tt>stable</tt> is the default if not specified<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(14:07:50)</span> <b>B01GA370NNT:</b></span> <br/>
+<span style="color: #A82F2F"><span style="font-size: small">(14:08:56)</span> <b>B01GA370NNT:</b></span> <br/>
+<span style="color: #A82F2F"><span style="font-size: small">(14:09:19)</span> <b>B01GA370NNT:</b></span> <br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:10:08)</span> <b>dweitzel:</b></span> I think I'll turn off component notifications<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:16:05)</span> <b>jpeterson:</b></span> re-deployed CE shows up in collector now using fresh.<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(15:54:31)</span> <b>blin:</b></span> @jpeterson could you email me the sha digest of the hosted-ce container that you're using? i'll promote it to stable at the beginning of next week if things look ok over the weekend<br/>
+</blockquote>
+<span style="color: #385a86"><span style="font-size: small">(14:17:08)</span> <b>jdost321:</b></span> ok so in the end, CE collector was acting as server, got a recent Let's Encrypt with new issuer, ca-certs had to be updated on client side which in this case is the CE itself<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:38:18)</span> <b>bbockelm:</b></span> @jthiltges - I've been meaning to ask, how is the process going for picking apart the <tt><a href="http://repo.osg.org">repo.osg.org</a></tt> data?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:41:34)</span> <b>jthiltges:</b></span> Working on getting the mash pieces up and running. (And somewhat sidetracked with fixing issues in k8s topology that Carl found.)<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:42:27)</span> <b>matyas:</b></span> you're moving <a href="http://repo.osg.org">repo.osg.org</a> into kubernetes? how does that affect <a href="http://repo.gridcf.org">repo.gridcf.org</a>? IIRC they're on the same machine<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:44:21)</span> <b>jthiltges:</b></span> That's a good question! I'd say that <a href="http://repo.gridcf.org">repo.gridcf.org</a> will be an independent _thing_ to migrate. No point in putting them into the same container imho.<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:44:40)</span> <b>matyas:</b></span> ok. We scp stuff into that.<br/>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jun 2, 2021 : #batlab (chtc)</title>
+</head>
+<body>
+<h3>Wed Jun 2, 2021 : #batlab (chtc)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(09:45:59)</span> <b>tlmiller:</b></span> (The workflows are partly fragile because of the streaming i/o, partly because HTCondor doesn't represent restarting jobs all that well, and (partly) because of the streaming i/o, Metronome would have to figure that out on its own; it's a lot easier just to start a new run if we need to.)<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(09:50:09)</span> <b>tim:</b></span> @johnkn The Win8 box is failing tests because the testing condor often does not start up in the allotted time. So, something on the box is slowing things down. Could this be fixed by rebooting the box?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:50:49)</span> <b>johnkn:</b></span> not very likely.  I'll have a look<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:23:15)</span> <b>johnkn:</b></span> The Win8 box looks normal,  the drives on this machine are fairly small,  2 spindles, each 250ish Gb<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:24:10)</span> <b>johnkn:</b></span> I think these drives are just slow<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:24:42)</span> <b>gthain:</b></span> Kinda feel like all of our execute machines should be ssd-only by now<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:26:54)</span> <b>tlmiller:</b></span> Concur.  I'd almost like to just buy new Windows execute nodes, not even for the extra horsepower, but just to force us to reinstall and reconfigure everything cleanly.  (And ideally on a single large SSD.)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:27:07)</span> <b>tlmiller:</b></span> ... do we still care about building on anything other than Windows 10?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:28:12)</span> <b>johnkn:</b></span> The target os and the build os are unrelated on Windows.  but no, we don't care about any target other than win10<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:28:31)</span> <b>johnkn:</b></span> or windows server<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:28:37)</span> <b>tlmiller:</b></span> That might also make things easier.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:29:42)</span> <b>johnkn:</b></span> Until very recently we needed 2 windows build machines because of 64bit and 32bit builds,  but with 9.0 we dropped 32 bit.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:30:19)</span> <b>tlmiller:</b></span> We may still want multiple build/test machines because we know we don't scale well on Windows, but if they're identical, that's also nice.<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:31:53)</span> <b>gthain:</b></span> Surprised to learn that just this year, VC++ switched to being 64 bit itself<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:32:13)</span> <b>johnkn:</b></span> that's not true, you mean 64 bit only?<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:32:27)</span> <b>gthain:</b></span> (by default).  Apparently the 32 bit linker binary had problems generating large executalbes<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:22:39)</span> <b>johnkn:</b></span> I changed the win8 box so only one of the slots will match test runs<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:23:20)</span> <b>johnkn:</b></span> the builds seem to be completing in the same time as builds on the other windows boxes, but the test runs a much slower<br/>
+<span style="color: #d58247"><span style="font-size: small">(12:39:25)</span> <b>gthain:</b></span> That's odd.  One would think the builds would be more i/o bound than the tests<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:49:24)</span> <b>johnkn:</b></span> yeah.  there are two test runs and 1 build going right now, and the machine is CPU bound, not IO bound.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:49:29)</span> <b>johnkn:</b></span> not what I expected to see<br/>
+<span style="color: #d58247"><span style="font-size: small">(12:53:40)</span> <b>gthain:</b></span> will be interesting to see when there's just tests running<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:55:25)</span> <b>johnkn:</b></span> I'm a bit tempted to make it a single slot machine, but I think it would not keep up if I did so.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:56:32)</span> <b>johnkn:</b></span> If it ever goes Idle I'm going to try a reboot, but I don't think that will help.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:57:11)</span> <b>johnkn:</b></span> The Win10 box is behaving much better since I made it use a single spindle for everything<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:58:46)</span> <b>tlmiller:</b></span> That's the exact opposite of what I'd expect.  Weird.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:59:09)</span> <b>tlmiller:</b></span> Was that the box with write caching turned off on the second spindle?<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(13:03:27)</span> <b>tim:</b></span> I wouldn't bother to wait for idle time to reboot. So what if we miss a build from the Win8 box. I'll be using builds off the Win10 going forward.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:07:43)</span> <b>johnkn:</b></span> The Win8 box is reporting that write caching is disabled for both of the spindles, so I'm not sure that checkbox means anything for these scsi drives<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:08:24)</span> <b>johnkn:</b></span> The win10 shows it enabled for the system drive, but disabled for the execute drive.  that execute drive is the one I took offline<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:09:26)</span> <b>johnkn:</b></span> so yes, I told it to stop using the drive where write caching was disabled and things got better<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:09:54)</span> <b>johnkn:</b></span> but like I said. I'm no longer sure that write caching means anything for those devices<br/>
+<span style="color: #235e5b"><span style="font-size: small">(19:27:05)</span> <b>johnkn:</b></span> rebooted win8 box, only one slot now matches test runs.  we'll see how it goes.<br/>
+</body>
+</html>

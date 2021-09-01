@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Mar 23, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Mon Mar 23, 2020 : #software (osg)</h3>
+<span style="color: #de5f24"><span style="font-size: small">(16:07:11)</span> <b>justas.balcas:</b></span> Hi, Can you tell what is the difference between globus-gridftp-server-13.20-1.osg35.el7.x86_64 vs globus-gridftp-server.x86_64 0:13.11-1.1.osg35.el7 ? Since update I see the logs are not posted anymore under /var/log/gridftp.log file<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:08:22)</span> <b>blin:</b></span> @matyas ^^<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:09:10)</span> <b>matyas:</b></span> hm. looking<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:19:19)</span> <b>matyas:</b></span> here's what I'm looking at but nothing jumps out at me: <a href="https://github.com/gridcf/gct/compare/v6.2.20190226...v6.2.20190906">https://github.com/gridcf/gct/compare/v6.2.20190226...v6.2.20190906</a><br/>
+<span style="color: #de5f24"><span style="font-size: small">(16:20:04)</span> <b>justas.balcas:</b></span> Empty since update to 13-.20-1. Restart does not help …<br/><pre>[root@transfer-9 ~]# ll /var/log/gridftp.log*<br/>-rw-r--r--. 1 root root       0 Jan 30 03:43 /var/log/gridftp.log<br/>-rw-r--r--  1 root root 3927176 Jan 21 03:38 /var/log/gridftp.log-20200121<br/>-rw-r--r--  1 root root 3621233 Jan 22 03:27 /var/log/gridftp.log-20200122<br/>-rw-r--r--  1 root root 3940797 Jan 23 03:07 /var/log/gridftp.log-20200123<br/>-rw-r--r--  1 root root 2365324 Jan 24 03:38 /var/log/gridftp.log-20200124<br/>-rw-r--r--  1 root root 2395406 Jan 25 03:41 /var/log/gridftp.log-20200125<br/>-rw-r--r--  1 root root 2197033 Jan 26 03:47 /var/log/gridftp.log-20200126<br/>-rw-r--r--  1 root root 3263437 Jan 27 03:08 /var/log/gridftp.log-20200127<br/>-rw-r--r--  1 root root 3389813 Jan 28 03:15 /var/log/gridftp.log-20200128<br/>-rw-r--r--  1 root root 2861970 Jan 29 03:29 /var/log/gridftp.log-20200129<br/>-rw-r--r--  1 root root  792349 Jan 30 03:43 /var/log/gridftp.log-20200130</pre><br/>
+<span style="color: #de5f24"><span style="font-size: small">(16:20:11)</span> <b>justas.balcas:</b></span> Some option missing?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:20:16)</span> <b>blin:</b></span> are they being dumped into the system journal?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(16:22:17)</span> <b>justas.balcas:</b></span> no, they are not in system journal<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:27:16)</span> <b>matyas:</b></span> look for /etc/gridftp.conf... it should have these lines:<br/><pre>log_level ERROR,WARN,INFO,TRANSFER<br/>log_single /var/log/gridftp-auth.log<br/>log_transfer /var/log/gridftp.log</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(16:34:07)</span> <b>matyas:</b></span> actually, we moved that config to osg-gridftp<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:34:22)</span> <b>matyas:</b></span> do you have the rpm <tt>osg-gridftp</tt> installed?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(17:07:02)</span> <b>justas.balcas:</b></span> <pre>[root@transfer-9 ~]# cat /etc/gridftp.d/logging.conf<br/>log_level ERROR,WARN,INFO,TRANSFER<br/>log_single /var/log/gridftp-auth.log<br/>log_transfer /var/log/gridftp.log<br/>[root@transfer-9 ~]# yum list installed | grep osg-gridftp<br/>osg-gridftp.x86_64                   3.5-4.osg35.el7                   @osg<br/>osg-gridftp-hdfs.x86_64              3.5-4.osg35.el7                   @osg</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(17:10:36)</span> <b>efajardo:</b></span> <b>@here</b> , I am trying to make a test inside osg test but the command needs to be run with an enviorment variable<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:10:37)</span> <b>efajardo:</b></span> like<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:11:03)</span> <b>efajardo:</b></span> <tt>XrdSecGSISRVNAMES=* xrdcp -d3 -f -N <a href="root://localhost:1096//osgtest/PROTECTED/testfile0">root://localhost:1096//osgtest/PROTECTED/testfile0</a> -</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(17:14:13)</span> <b>matyas:</b></span> looks like <tt>core.system</tt> and <tt>core.check_system</tt> don't support setting the environment; we should add that<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:14:37)</span> <b>matyas:</b></span> in the meantime, if you set <tt>os.environ["XrdSecGSISRVNAMES"] = "*"</tt> before running the command, it should work<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:14:52)</span> <b>matyas:</b></span> the child process will inherit the environment of the parent<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:15:15)</span> <b>efajardo:</b></span> ahh thanks<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:15:28)</span> <b>efajardo:</b></span> so I guess same thing for <tt>X509_USER_PROXY</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(17:15:36)</span> <b>matyas:</b></span> yeah<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:21:44)</span> <b>matyas:</b></span> Justas, not sure what the problem is. I gotta go but can you email me and Brian the output from <tt>osg-system-profiler</tt>, <tt>/etc/gridftp.conf</tt>,  <tt>/etc/gridftp.d</tt> , and <tt>/etc/sysconfig/globus-gridftp-server</tt>? We can continue debugging tomorrow.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(17:24:37)</span> <b>justas.balcas:</b></span> Sure, will do soon<br/>
+<span style="color: #de5f24"><span style="font-size: small">(17:24:39)</span> <b>justas.balcas:</b></span> thanks!<br/>
+</body>
+</html>

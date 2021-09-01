@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jul 23, 2021 : #bockelman-group (chtc)</title>
+</head>
+<body>
+<h3>Fri Jul 23, 2021 : #bockelman-group (chtc)</h3>
+<span style="color: #99a949"><span style="font-size: small">(09:24:11)</span> <b>matyas:</b></span> @bbockelman I just realized Tuesday's during the hackathon. Is that still OK for doing the Expanse restart?<br/>
+<span style="color: #684b6c"><span style="font-size: small">(09:29:51)</span> <b>bbockelman:</b></span> Sure, especially as it should "just" be a restart.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(09:34:48)</span> <b>blin:</b></span> it'll be a 9.0.3 restart as well<br/>
+<span style="color: #99a949"><span style="font-size: small">(09:35:22)</span> <b>matyas:</b></span> also expanse is still using bosco 1.3<br/>
+<span style="color: #99a949"><span style="font-size: small">(09:36:04)</span> <b>matyas:</b></span> they're centos 8 though<br/>
+<span style="color: #4cc091"><span style="font-size: small">(09:38:18)</span> <b>blin:</b></span> do you know why?<br/>
+<span style="color: #99a949"><span style="font-size: small">(09:45:58)</span> <b>matyas:</b></span> That appears to be Jeff's change: <a href="https://github.com/opensciencegrid/hosted-ce-config/commit/21e62cb36defec2dadd80e3796deba935af8050b">https://github.com/opensciencegrid/hosted-ce-config/commit/21e62cb36defec2dadd80e3796deba935af8050b</a>. @jpeterson, do you remember why?<br/>
+<span style="color: #99a949"><span style="font-size: small">(09:47:33)</span> <b>matyas:</b></span> Also two more questions:<br/>1. Do Tanya and Steve know about the upcoming security release? Is it OK to mention it to them, or should I just say "condor upgrade"?<br/>2. What's the effect of the planned Thursday outages on running jobs? Will the CE freak out and kill things if it loses network for an hour?<br/>
+<span style="color: #4cc091"><span style="font-size: small">(10:20:06)</span> <b>blin:</b></span> (2) would be a question for Jaime. I think it might get mad, though<br/>
+<span style="color: #684b6c"><span style="font-size: small">(10:20:37)</span> <b>bbockelman:</b></span> I think "condor upgrade" is sufficient.<br/><br/>For (2), I do not expect the outage to affect running jobs.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:45:27)</span> <b>jpeterson:</b></span> @matyas that was back in March, I think we were having bosco build issues so we fixed it to a version, and haven’t really touched it since<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:47:24)</span> <b>matyas:</b></span> I figure if we're already having downtime for a condor upgrade, we should update bosco while we're at it<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:47:42)</span> <b>matyas:</b></span> wish we had another centos 8 submit node we could test with though<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:49:25)</span> <b>jpeterson:</b></span> Bridges2 and Expanse have Centos8 tarballs in the overrides files now.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:51:35)</span> <b>jpeterson:</b></span> <pre>PSC-Bridges2-CE1/hosted-ce.yaml:  #TarballURL: <a href="https://research.cs.wisc.edu/htcondor/bosco/1.3/bosco-1.3-x86_64_CentOS8.tar.gz">https://research.cs.wisc.edu/htcondor/bosco/1.3/bosco-1.3-x86_64_CentOS8.tar.gz</a><br/>PSC-Bridges2-CE1/hosted-ce.yaml:  #URL: <a href="https://research.cs.wisc.edu/htcondor/bosco/1.3/bosco-1.3-x86_64_CentOS8.tar.gz">https://research.cs.wisc.edu/htcondor/bosco/1.3/bosco-1.3-x86_64_CentOS8.tar.gz</a><br/>PSC-Bridges2-CE2/hosted-ce.yaml:  TarballURL: <a href="https://research.cs.wisc.edu/htcondor/tarball/9.0/9.0.1/daily/condor-9.0.1-20210502-x86_64_CentOS8-stripped.tar.gz">https://research.cs.wisc.edu/htcondor/tarball/9.0/9.0.1/daily/condor-9.0.1-20210502-x86_64_CentOS8-stripped.tar.gz</a><br/>PSC-Bridges2-CE2/hosted-ce.yaml:  URL: <a href="https://research.cs.wisc.edu/htcondor/tarball/9.0/9.0.1/daily/condor-9.0.1-20210502-x86_64_CentOS8-stripped.tar.gz">https://research.cs.wisc.edu/htcondor/tarball/9.0/9.0.1/daily/condor-9.0.1-20210502-x86_64_CentOS8-stripped.tar.gz</a><br/>SDSC-Expanse-CE1/hosted-ce.yaml:  TarballURL: <a href="https://research.cs.wisc.edu/htcondor/bosco/1.3/bosco-1.3-x86_64_CentOS8.tar.gz">https://research.cs.wisc.edu/htcondor/bosco/1.3/bosco-1.3-x86_64_CentOS8.tar.gz</a><br/>SDSC-Expanse-CE1/hosted-ce.yaml:  URL: <a href="https://research.cs.wisc.edu/htcondor/bosco/1.3/bosco-1.3-x86_64_CentOS8.tar.gz">https://research.cs.wisc.edu/htcondor/bosco/1.3/bosco-1.3-x86_64_CentOS8.tar.gz</a></pre><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:52:44)</span> <b>jpeterson:</b></span> yeah I figure with having to re-deploy every CE I would be checking through and cleaning up the bosco tarball setting, and checking on the scitoken settings as well.<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:54:11)</span> <b>matyas:</b></span> oh ok cool we can test that on Bridges as well<br/>
+</body>
+</html>

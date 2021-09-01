@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Mar 31, 2021 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Mar 31, 2021 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(08:20:53)</span> <b>blin:</b></span> yeah, the latest containers shouldn't be doing that<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:21:08)</span> <b>blin:</b></span> @rynge what's their <tt>/etc/supervisord.conf</tt> look like?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:13:46)</span> <b>andrew.melo:</b></span> I don't guess someones set up travis/gha or similar to spin up a condor instance before?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:27:08)</span> <b>blin:</b></span> what sort of thing are you looking to do?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:28:13)</span> <b>blin:</b></span> we do a bit of that here <a href="https://github.com/htcondor/htcondor-ce/blob/V5-branch/.github/workflows/build_and_test_rpms.yml">https://github.com/htcondor/htcondor-ce/blob/V5-branch/.github/workflows/build_and_test_rpms.yml</a> with refs to scripts here <a href="https://github.com/htcondor/htcondor-ce/tree/V5-branch/tests">https://github.com/htcondor/htcondor-ce/tree/V5-branch/tests</a><br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:29:22)</span> <b>andrew.melo:</b></span> Working on some scripts to build and tear down DAGs, and want something to hit during tests<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:33:08)</span> <b>matyas:</b></span> there might be stuff you can steal from <a href="https://github.com/dask/dask-jobqueue/pull/441">https://github.com/dask/dask-jobqueue/pull/441</a><br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:33:59)</span> <b>andrew.melo:</b></span> Nice, I'll see what I can nab from there. Thanks!<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:21:43)</span> <b>rynge:</b></span> @blin Re chameleon - feel free to move this discussion somewhere if you don't think this should be here<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:21:50)</span> <b>rynge:</b></span> I'm confused on how this ever worked<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:22:28)</span> <b>rynge:</b></span> It seems like we are not exporting env vars for condor_master to know that we are using a non-standard local dir<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:22:51)</span> <b>rynge:</b></span> So condor_master is restarting over and over again<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:26:53)</span> <b>blin:</b></span> agreed. we do have it working on tiger so i'm a little lost<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:28:09)</span> <b>blin:</b></span> and it certainly looks like logs are being written to the <tt>/tmp/osgvo-pilot</tt> dir<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:40:27)</span> <b>rynge:</b></span> Ok, so I now see how the config is being picked up<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:40:49)</span> <b>rynge:</b></span> Maybe it is my <tt>tail &amp;</tt> thing that is just masking the issue<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:41:03)</span> <b>rynge:</b></span> Is there a better way to put master/startd logs on stdout?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:43:08)</span> <b>matyas:</b></span> master yes, startd no; you can tell the master to print to stdout, but it closes FDs for its children so if the startd is started by the master, it can't print its logs to stdout<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:43:30)</span> <b>matyas:</b></span> there's a ticket for that somewhere...<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:43:49)</span> <b>rynge:</b></span> Ok, master might be enough<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:44:02)</span> <b>matyas:</b></span> pass <tt>-t</tt> on the command line<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:44:12)</span> <b>rynge:</b></span> Cool, thanks<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:44:42)</span> <b>matyas:</b></span> there's also an option to send logs to syslog but we haven't experimented with it yet<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:51:28)</span> <b>rynge:</b></span> Really what I'm looking for is a way to get the logs on stdout from supervisord<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:45:36)</span> <b>blin:</b></span> i think we could do that instead of throwing away the supervisor log but if what you're really after the condor logs, i'm not sure that's what you want<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:46:28)</span> <b>bbockelm:</b></span> I'm still curious if we can set the logfile to <tt>/proc/1/fds/0</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(12:48:12)</span> <b>matyas:</b></span> worth a shot though IIRC /proc is kinda flaky in some container environmtnts<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:48:58)</span> <b>matyas:</b></span> especially with user namespaces<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:51:39)</span> <b>bbockelm:</b></span> ah - indeed, I wonder if that's something that can get masked in k8s.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:32:28)</span> <b>blin:</b></span> hey <b>@edquist</b> from the thread on software-discuss, @justas.balcas saw these messages:<br/><pre>Should I worry about this?<br/>11:15:37 PDT Gratia: WARNING: voi "cms" listed for user "uscms4773" not found in (voi, VOc) table<br/>11:15:37 PDT Gratia: WARNING: voi "cms" listed for user "uscms4593" not found in (voi, VOc) table<br/>11:15:37 PDT Gratia: WARNING: voi "cms" listed for user "uscms3988" not found in (voi, VOc) table<br/>11:15:37 PDT Gratia: WARNING: voi "cms" listed for user "uscms5022" not found in (voi, VOc) table<br/>11:15:37 PDT Gratia: WARNING: voi "cms" listed for user "uscms3952" not found in (voi, VOc) table<br/>11:15:37 PDT Gratia: WARNING: voi "cms" listed for user "uscms1657" not found in (voi, VOc) table<br/>11:15:37 PDT Gratia: WARNING: voi "cms" listed for user "uscms5023" not found in (voi, VOc) table<br/>11:15:37 PDT Gratia: WARNING: voi "cms" listed for user "uscms1322" not found in (voi, VOc) table<br/>11:15:37 PDT Gratia: WARNING: voi "cms" listed for user "uscms4596" not found in (voi, VOc) table</pre><br/>are they of any concern?<br/>
+<span style="color: #16569E"><span style="font-size: small">(13:35:15)</span> <b>edquist:</b></span> hm<br/>
+<span style="color: #16569E"><span style="font-size: small">(13:36:01)</span> <b>edquist:</b></span> trying to remember if that has to do with the vo-client package<br/>
+<span style="color: #16569E"><span style="font-size: small">(13:38:48)</span> <b>edquist:</b></span> i am trying to remember where this mapfile comes from<br/>
+<span style="color: #16569E"><span style="font-size: small">(13:39:05)</span> <b>edquist:</b></span> /var/lib/osg/user-vo-map<br/>
+<span style="color: #16569E"><span style="font-size: small">(13:39:07)</span> <b>edquist:</b></span> i think<br/>
+<span style="color: #16569E"><span style="font-size: small">(13:41:09)</span> <b>edquist:</b></span> do you remember where this file comes from?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:43:42)</span> <b>matyas:</b></span> one of the subpackages from vo-client<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:43:46)</span> <b>matyas:</b></span> I think<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:46:10)</span> <b>matyas:</b></span> hm. maybe not<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:48:59)</span> <b>matyas:</b></span> I think it got generated by osg-configure from GUMS or edg-mkgridmap, neither of which are in use anymore<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:50:34)</span> <b>matyas:</b></span> so the file is pretty much a leftover<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:53:50)</span> <b>blin:</b></span> yeah, we don't generate it anymore. <b>@edquist</b> if it's missing, does it prevent record upload?<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:00:28)</span> <b>edquist:</b></span> i think it's just a warning,<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:00:38)</span> <b>edquist:</b></span> iiuc it's just a mapping<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:00:47)</span> <b>edquist:</b></span> from VOName to ReportableVOName<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:01:16)</span> <b>edquist:</b></span> if the VOName is in the table it sets the ReportableVOName accordingly<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:01:21)</span> <b>edquist:</b></span> otherwise it doesn't set ReportableVOName<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:01:59)</span> <b>edquist:</b></span> <a href="https://github.com/opensciencegrid/gratia-probe/blob/master/common/gratia/common/vo.py#L145-L151">https://github.com/opensciencegrid/gratia-probe/blob/master/common/gratia/common/vo.py#L145-L151</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:02:01)</span> <b>dweitzel:</b></span> ReportableVOName isn't really used anywhere.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:02:13)</span> <b>dweitzel:</b></span> at least in GRACC'land<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:11:31)</span> <b>blin:</b></span> hey @dwd do you have a particular reason why you prefer an RPM for <tt>osg-build</tt> vs using the scripts out of git?<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:12:25)</span> <b>dwd:</b></span> Don’t tools usually come in rpms?  That’s the way I have always used it<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:13:47)</span> <b>blin:</b></span> don't you know that all the cool kids run <tt>wget blah | sudo bash</tt>?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:14:20)</span> <b>blin:</b></span> but seriously, i've been using the git checkout for <tt>osg-build</tt> for quite some time now and adding the repo to my <tt>PATH</tt><br/>
+<span style="color: #16569E"><span style="font-size: small">(16:14:49)</span> <b>edquist:</b></span> the rpm is still useful<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:14:56)</span> <b>edquist:</b></span> it pulls in some rpm deps i think<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:14:58)</span> <b>edquist:</b></span> at least one<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:15:22)</span> <b>edquist:</b></span> &gt;don't you know that all the cool kids run <tt>wget blah | sudo bash</tt>?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:15:28)</span> <b>edquist:</b></span> i think you mean <tt>curl</tt><br/>
+<span style="color: #16569E"><span style="font-size: small">(16:15:38)</span> <b>edquist:</b></span> only us old farts use wget<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:16:14)</span> <b>blin:</b></span> yeah the plan is to keep the <tt>osg-build</tt> RPM as a metapackage that pulls in the deps but have folks use the scripts out of git<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:16:46)</span> <b>dwd:</b></span> Why is this package a special case?<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(16:25:21)</span> <b>blin:</b></span> because <tt>osg-build</tt> has a very small set of mostly internal users who know their way around the git CLI<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:26:56)</span> <b>blin:</b></span> i don't think the time we currently spend on tagging, packaging, and testing <tt>osg-build</tt> adds much value<br/>
+</blockquote>
+<span style="color: #16569E"><span style="font-size: small">(16:16:56)</span> <b>edquist:</b></span> i don't know if i like this plan<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:17:54)</span> <b>edquist:</b></span> the only thing i like to curl is up into my couch<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:25:21)</span> <b>blin:</b></span> because <tt>osg-build</tt> has a very small set of mostly internal users who know their way around the git CLI<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(16:25:21)</span> <b>blin:</b></span> because <tt>osg-build</tt> has a very small set of mostly internal users who know their way around the git CLI<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:26:56)</span> <b>blin:</b></span> i don't think the time we currently spend on tagging, packaging, and testing <tt>osg-build</tt> adds much value<br/>
+</blockquote>
+<span style="color: #99a949"><span style="font-size: small">(16:25:58)</span> <b>dwd:</b></span> Well I can adapt if that’s the way it has to be<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:27:16)</span> <b>edquist:</b></span> @dwd i am glad you replied to the email<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:27:33)</span> <b>edquist:</b></span> i only today signed up for software-discuss and apparently missed mat's email about jira<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:27:39)</span> <b>edquist:</b></span> which is depressing<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:27:57)</span> <b>edquist:</b></span> i don't know how well i will be able to function on the new interface<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:29:14)</span> <b>matyas:</b></span> <a href="https://github.com/go-jira/jira">https://github.com/go-jira/jira</a> might help a bit with that<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:32:49)</span> <b>edquist:</b></span> i should have added this to my career development goals for 2021<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:33:17)</span> <b>edquist:</b></span> develop a spiffy terminal interface for jira<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:37:06)</span> <b>edquist:</b></span> &gt;an RPM for <tt>osg-build</tt> vs using the scripts out of git<br/><br/>one reason is with an rpm you get a clean upgrade/uninstall path for a system-wide install, which you don't really get with make install<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:38:11)</span> <b>edquist:</b></span> (but yes, you can set your PATH and run the scripts out of a git checkout rather than a system-wide install)<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:38:23)</span> <b>blin:</b></span> that's why you don't bother with a make install and just muck with your path<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:38:43)</span> <b>blin:</b></span> or if you really want make install into a non-rootly dest dir<br/>
+</body>
+</html>

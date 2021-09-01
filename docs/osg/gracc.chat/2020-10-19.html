@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Oct 19, 2020 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Mon Oct 19, 2020 : #gracc (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(10:08:06)</span> <b>matyas:</b></span> @dweitzel, what happens if a ResourceGroup is marked as disabled (Disable: True) in topology? Does GRACC look at disabled entries? I'm looking at <a href="https://github.com/opensciencegrid/topology/pull/1393">https://github.com/opensciencegrid/topology/pull/1393</a>. Should we have marked the resources with Active:False instead?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:12:24)</span> <b>dweitzel:</b></span> Here's the URL it is using to query topology: <a href="https://my.opensciencegrid.org/rgsummary/xml?summary_attrs_showhierarchy=on&amp;summary_attrs_showwlcg=on&amp;summary_attrs_showservice=on&amp;summary_attrs_showfqdn=on&amp;summary_attrs_showvoownership=on&amp;summary_attrs_showcontact=on&amp;gip_status_attrs_showtestresults=on&amp;downtime_attrs_showpast=&amp;account_type=cumulative_hours&amp;ce_account_type=gip_vo&amp;se_account_type=vo_transfer_volume&amp;bdiitree_type=total_jobs&amp;bdii_object=service&amp;bdii_server=is-osg&amp;all_resources=on&amp;facility_sel%5B%5D=10009&amp;gridtype=on&amp;gridtype_1=on&amp;disable_value=1">https://my.opensciencegrid.org/rgsummary/xml?summary_attrs_showhierarchy=on&amp;summary_attrs_showwlcg=on&amp;summary_attrs_showservice=on&amp;summary_attrs_showfqdn=on&amp;summary_attrs_showvoownership=on&amp;summary_attrs_showcontact=on&amp;gip_status_attrs_showtestresults=on&amp;downtime_attrs_showpast=&amp;account_type=cumulative_hours&amp;ce_account_type=gip_vo&amp;se_account_type=vo_transfer_volume&amp;bdiitree_type=total_jobs&amp;bdii_object=service&amp;bdii_server=is-osg&amp;all_resources=on&amp;facility_sel%5B%5D=10009&amp;gridtype=on&amp;gridtype_1=on&amp;disable_value=1</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:20:11)</span> <b>matyas:</b></span> OK, so you look at both disabled and non-disabled resources. (You have disable_value=1 but not disable=on so it does nothing.)<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:20:51)</span> <b>matyas:</b></span> There's a bunch of arguments that don't do anything anymore by the way<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:22:46)</span> <b>dweitzel:</b></span> yeah, it's an old query.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:22:54)</span> <b>dweitzel:</b></span> I see mentions of GIP in there..<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:23:25)</span> <b>matyas:</b></span> plus all the summary_attrs stuff -- those do nothing since topology shows all the attributes<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:24:38)</span> <b>matyas:</b></span> I think you can reduce that down to <a href="https://my.opensciencegrid.org/rgsummary/xml?facility_sel%5B%5D=10009&amp;gridtype=on&amp;gridtype_1=on">https://my.opensciencegrid.org/rgsummary/xml?facility_sel%5B%5D=10009&amp;gridtype=on&amp;gridtype_1=on</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:25:11)</span> <b>matyas:</b></span> add <tt>&amp;downtime_attrs_showpast=</tt> if you're querying rgdowntime/xml instead of rgsummary/xml<br/>
+</body>
+</html>

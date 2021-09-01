@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Oct 2, 2019 : #general (osg)</title>
+</head>
+<body>
+<h3>Wed Oct 2, 2019 : #general (osg)</h3>
+<span style="color: #e96699"><span style="font-size: small">(15:35:45)</span> <b>lincoln:</b></span> hi HTCondor experts! does anyone have any experience with the <tt>-af</tt>  and <tt>-json</tt> flags?<br/><br/>I'm trying to get HTCondor to give me a limited set of ads for the schedd and the collector. on the schedd it seems to work:<br/><pre><br/>$ condor_q -af Owner JobStatus -json<br/>[<br/>{<br/>  "ClusterId": 118980,<br/>  "JobStatus": 1,<br/>  "Owner": "lincolnb",<br/>  "ProcId": 0<br/>}<br/>]<br/></pre><br/><br/>but something like <tt>condor_status -af Status -json</tt>, i get ALL THE ADS.. but only with the -json or -xml flags<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:36:43)</span> <b>lincoln:</b></span> (this is 8.9.1)<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:37:59)</span> <b>blin:</b></span> do you want limited attributes + all ads?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:38:04)</span> <b>blin:</b></span> or limited attributes + limited ads?<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:38:40)</span> <b>lincoln:</b></span> hrm, I am not sure of the difference, maybe that's where the problem is.<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:38:47)</span> <b>lincoln:</b></span> so if I run this without the <tt>json</tt>, I get this:<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:38:58)</span> <b>lincoln:</b></span> <pre><br/>[lincolnb@condor ~]$ condor_status -af State<br/>Owner<br/>Owner<br/>Unclaimed<br/>Claimed<br/>Claimed<br/>Claimed<br/>Claimed<br/>Claimed<br/>Claimed<br/>Claimed<br/>Unclaimed<br/></pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(15:39:04)</span> <b>lincoln:</b></span> how do i get that json-ified?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:39:31)</span> <b>blin:</b></span> ah, it looks like they're exclusive options for condor_status<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:39:44)</span> <b>lincoln:</b></span> ah<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:39:57)</span> <b>blin:</b></span> <pre><br/>[blin@lhcb-ce ~]$ condor_version<br/>$CondorVersion: 8.9.3 Aug 05 2019 BuildID: 477710 PackageID: 8.9.3-0.477710 $<br/>$CondorPlatform: x86_64_RedHat7 $<br/>[blin@lhcb-ce ~]$ condor_status -json -af machine<br/>Error:  arg 2 (-af) contradicts arg 1 (-json)<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:40:18)</span> <b>jpatton:</b></span> <tt>condor_status -json -attr Machine</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:40:30)</span> <b>blin:</b></span> whatttt<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:40:36)</span> <b>lincoln:</b></span> :thinking_face:<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:40:43)</span> <b>lincoln:</b></span> that works for me too<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:41:03)</span> <b>lincoln:</b></span> so i just need <tt>-attr</tt> instead of <tt>-af</tt> ?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:41:08)</span> <b>jpatton:</b></span> <tt>-attributes X,Y,...	Attributes to show in -xml or -long</tt> (and <tt>-json</tt> apparently)<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:42:18)</span> <b>jpatton:</b></span> I wonder if FW would consider <tt>-json -af ...</tt> working for <tt>condor_q</tt> a bug<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:42:30)</span> <b>blin:</b></span> yeah, i would think so<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:42:33)</span> <b>lincoln:</b></span> :slightly_smiling_face:<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:42:34)</span> <b>jpatton:</b></span> since <tt>-af</tt> is auto-format, not list of attrs, even though you pass it a list of attrs<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:43:12)</span> <b>lincoln:</b></span> don't take away my spacebar heating feature!<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:43:37)</span> <b>blin:</b></span> they give you different output, too. <tt>condor_q -json -af owner</tt> shows the cluster/proc ids in addition to the owner<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:43:47)</span> <b>blin:</b></span> using <tt>-attr owner</tt> instead just gives you the owner<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:45:15)</span> <b>jpatton:</b></span> :thinking_face: we should ask FW about this, sounds like it's trying to be smart about giving a useful projection<br/>
+</body>
+</html>

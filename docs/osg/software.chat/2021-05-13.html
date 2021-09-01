@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu May 13, 2021 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu May 13, 2021 : #software (osg)</h3>
+<span style="color: #73769d"><span style="font-size: small">(15:46:24)</span> <b>tim.theisen:</b></span> @matyas @blin I am looking to see if certificates updated. I see that on <a href="http://hcc-osg-software.unl.edu">hcc-osg-software.unl.edu</a> the script has run. However, the web page at <a href="https://repo.opensciencegrid.org/cadist/">https://repo.opensciencegrid.org/cadist/</a> has not updated. Any ideas?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:47:26)</span> <b>matyas:</b></span> those are no longer the same site -- <a href="http://repo.opensciencegrid.org">repo.opensciencegrid.org</a> is in kubernetes<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:47:49)</span> <b>blin:</b></span> hrm. how do we update the cadist pages, then?<br/>
+<span style="color: #73769d"><span style="font-size: small">(15:48:40)</span> <b>tim.theisen:</b></span> There is a repo-update-cadist package that has a systemd timer. Is it installed?<br/>
+<span style="color: #73769d"><span style="font-size: small">(15:49:14)</span> <b>tim.theisen:</b></span> Also, my scripts to copy tarballs would need to be updated. Luckily, we don't need tarballs for this release.<br/>
+<span style="color: #73769d"><span style="font-size: small">(15:49:33)</span> <b>tim.theisen:</b></span> Why can *anything* go right around here?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:49:40)</span> <b>matyas:</b></span> looks like repo-update-cadist runs every hour from cron<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:50:06)</span> <b>matyas:</b></span> (every hour on the hour)<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:50:07)</span> <b>jthiltges:</b></span> It should _just work_... and if not, it's probably my fault. :disappointed:<br/>
+<span style="color: #73769d"><span style="font-size: small">(15:50:29)</span> <b>tim.theisen:</b></span> It was reworked as a systemd timer. Let me check when I pushed.<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:50:55)</span> <b>matyas:</b></span> the container doesn't have systemd<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:51:03)</span> <b>matyas:</b></span> so it was re-reworked as a cron job<br/>
+<span style="color: #73769d"><span style="font-size: small">(15:51:48)</span> <b>tim.theisen:</b></span> I pushed at 3:00, so we are still within the hour. I just noticed that it fired on the old repo and the web page didn't update.<br/>
+<span style="color: #73769d"><span style="font-size: small">(15:51:59)</span> <b>tim.theisen:</b></span> So, it may show up soon.<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:52:01)</span> <b>matyas:</b></span> logs:<br/><pre>Thu Apr 15 18:29:10 UTC 2021 updated to new version 1.94NEW<br/>Thu Apr 15 18:29:25 UTC 2021 updated to new version 1.109IGTFNEW</pre><br/><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:53:01)</span> <b>blin:</b></span> those are old: we want 1.96/1.110<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:53:16)</span> <b>jthiltges:</b></span> tarballs should be pulled daily from <a href="https://vdt.cs.wisc.edu/tarball-client/">https://vdt.cs.wisc.edu/tarball-client/</a><br/>cadist is also updated daily<br/>crontabs: <a href="https://github.com/opensciencegrid/osg-repo-scripts/tree/master/docker">https://github.com/opensciencegrid/osg-repo-scripts/tree/master/docker</a><br/><br/>I believe both settings matched the previous production server, but I'll check.<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:53:19)</span> <b>matyas:</b></span> what happened ti 1.95?<br/>
+<span style="color: #73769d"><span style="font-size: small">(15:53:22)</span> <b>tim.theisen:</b></span> Yeah, the date is back in April.<br/>
+<span style="color: #73769d"><span style="font-size: small">(15:53:49)</span> <b>tim.theisen:</b></span> We had changes for osg-ca-certs after 1.95 was built.<br/>
+<span style="color: #73769d"><span style="font-size: small">(15:55:22)</span> <b>tim.theisen:</b></span> Good news about the tarball, I can take one step out of the release process. However, pulling cadist daily probably does not meet requirements, since it is security related.<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:55:42)</span> <b>matyas:</b></span> hourly<br/>
+<span style="color: #73769d"><span style="font-size: small">(15:56:39)</span> <b>tim.theisen:</b></span> John Thiltges said it was updated daily above :point_up:  Hourly is good.<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:58:19)</span> <b>matyas:</b></span> <pre>0 * * * * root flock -n /var/lock/repo-update-cadist /usr/bin/repo-update-cadist</pre><br/>
+<span style="color: #73769d"><span style="font-size: small">(15:58:52)</span> <b>tim.theisen:</b></span> Yes, at the top of the hour. Looks good to me.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:58:52)</span> <b>jthiltges:</b></span> Argh. You're right Mat! Thanks. (That's a parsing fail on my end.)<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:59:48)</span> <b>blin:</b></span> @tim.theisen once packages hit release, can you rebuild the containers? i have a half written update to the release docs that i should be able to finish soon<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(16:01:01)</span> <b>blin:</b></span> it's a simple process: select the latest run here <a href="https://github.com/opensciencegrid/docker-software-base/actions/workflows/build-container.yml">https://github.com/opensciencegrid/docker-software-base/actions/workflows/build-container.yml</a> then click the <tt>Re-run all jobs</tt>  button on the right<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:02:25)</span> <b>tim.theisen:</b></span> So, the package are in release. Do we have to worry about mirrors. Or can I push the button right after I push? @blin<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:02:44)</span> <b>blin:</b></span> let's just give it a try ¯\_(ツ)_/¯<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:03:05)</span> <b>blin:</b></span> we can see what the new containers have in them. we should probably disable mirrors for container builds<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:03:26)</span> <b>blin:</b></span> oh hey, we already do that!<br/><pre>    # Impatiently ignore the Yum mirrors<br/>    sed -i 's/\#baseurl/baseurl/; s/mirrorlist/\#mirrorlist/' \<br/>        /etc/yum.repos.d/osg*.repo &amp;&amp; \</pre><br/>
+<span style="color: #73769d"><span style="font-size: small">(16:03:49)</span> <b>tim.theisen:</b></span> I don't see the button mentioned. Do I have the proper access?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:03:58)</span> <b>blin:</b></span> hrm, i would think so but maybe not. one sec<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:04:57)</span> <b>tim.theisen:</b></span> I see <tt>build-docker-image</tt>, is that what you mean?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:05:08)</span> <b>blin:</b></span> oh yeah, you need to click the latest run<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:05:23)</span> <b>blin:</b></span> then you can re-run that specific one<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:05:52)</span> <b>tim.theisen:</b></span> Ok, Got it.<br/>
+</blockquote>
+<span style="color: #73769d"><span style="font-size: small">(16:00:36)</span> <b>tim.theisen:</b></span> Sorry, I didn't know about the server move. So, what about <a href="mailto:osgcollab@hcc-osg-software.unl.edu">osgcollab@hcc-osg-software.unl.edu</a> Is that a backup? just useless?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:01:38)</span> <b>matyas:</b></span> it's still used for <a href="http://repo.gridcf.org">repo.gridcf.org</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(16:02:10)</span> <b>matyas:</b></span> (we do sftp uploads to it so we couldn't really move that to kubernetes)<br/>
+<blockquote>
+<span style="color: #e06b56"><span style="font-size: small">(16:03:38)</span> <b>jthiltges:</b></span> Would it be horrible for the authoritative source for gridcf to be reachable via <a href="https://vdt.cs.wisc.edu">https://vdt.cs.wisc.edu</a> ?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:06:27)</span> <b>matyas:</b></span> that one serves stuff off of AFS and we need a token to write to that<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:07:47)</span> <b>matyas:</b></span> we can probably figure something out if we have to, though we'd rather have one of other gridcf members host it seeing as OSG wants to get out of the globus business...<br/>
+<span style="color: #e06b56"><span style="font-size: small">(16:07:48)</span> <b>jthiltges:</b></span> My ignorant thoughts: If there's already a mechanism to put OSG tarballs there, can the same way be used for gridcf data?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:08:51)</span> <b>matyas:</b></span> the tarballs are built (and scp'ed) by hand<br/>
+</blockquote>
+<span style="color: #73769d"><span style="font-size: small">(16:17:21)</span> <b>tim.theisen:</b></span> But mirroring the tarball from vdt doesn't drop in the current link. Why wasn't I informed when these things changed?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:21:33)</span> <b>matyas:</b></span> it should<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:21:55)</span> <b>matyas:</b></span> the link is created on repo itself<br/>
+<span style="color: #e06b56"><span style="font-size: small">(16:21:57)</span> <b>jthiltges:</b></span> My apologies for the poor communication. The latest symlinks should be automatically updated. (According to <tt>sort --version-sort</tt>)<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:21:58)</span> <b>matyas:</b></span> by the cron job<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:24:59)</span> <b>tim.theisen:</b></span> I see, I thought that it was just a mirror. Too many moving pieces today, thank you for reducing my confusion and concern.<br/>
+<blockquote>
+<span style="color: #e06b56"><span style="font-size: small">(16:36:22)</span> <b>jthiltges:</b></span> The goal for the k8s version of repo.osg was to make the contents reproducible. I.e. it's not the authoritative source. In the worst case if tiger ceph disappears, the repo.osg service can be restored with about 30 minutes of downloading (from koji, vdt, etc.)<br/>
+<span style="color: #e06b56"><span style="font-size: small">(16:38:55)</span> <b>jthiltges:</b></span> And sorry about the lack of communication. There was chatter in the operations channel, but I should have involved you directly.<br/>
+</blockquote>
+<span style="color: #c386df"><span style="font-size: small">(16:25:56)</span> <b>matyas:</b></span> ... and it looks like repo-update-cadist ran<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:26:14)</span> <b>matyas:</b></span> <pre>Thu May 13 21:00:14 UTC 2021 updated to new version 1.96NEW<br/>Thu May 13 21:00:24 UTC 2021 updated to new version 1.110IGTFNEW</pre><br/><br/>
+<span style="color: #e06b56"><span style="font-size: small">(16:29:37)</span> <b>jthiltges:</b></span> Just to mention the other notable change: rsync is now through <tt><a href="http://repo-rsync.opensciencegrid.org">repo-rsync.opensciencegrid.org</a></tt>.<br/>It's on a separate hostname to simplify the k8s config, as traefik cannot speak rsync.<br/>(We reviewed logs and notified sites using rsync)<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:31:14)</span> <b>matyas:</b></span> this is for the mirrors?<br/>
+<blockquote>
+<span style="color: #e06b56"><span style="font-size: small">(16:31:34)</span> <b>jthiltges:</b></span> Yes<br/>
+</blockquote>
+</body>
+</html>

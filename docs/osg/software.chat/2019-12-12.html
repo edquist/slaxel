@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Dec 12, 2019 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu Dec 12, 2019 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(09:35:50)</span> <b>blin:</b></span> yeah, the osg dist tag is only added in our build environment<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:36:00)</span> <b>blin:</b></span> so that's not strange<br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:26:18)</span> <b>jthiltges:</b></span> From a quick test, I was unable to replicate the missing symbol issue.<br/><pre>mock -r epel-7-x86_64 xrootd-4.11.0-1.osg35.el7.src.rpm</pre><br/>Then installed the following output RPMs:<br/>• xrootd-libs<br/>• xrootd-client-libs<br/>• xrootd-server<br/>• xrootd-server-libs<br/>xrootd starts OK with the command line above and the symbol is present:<br/><pre># nm -D /usr/lib64/libXrdServer.so.2 | grep _ZN9XrdOucTPC6tpcSgiE | c++filt<br/>                 U XrdOucTPC::tpcSgi</pre><br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:29:46)</span> <b>bockjoo:</b></span> Yeah, I was copying shared libs around, which is not a good idea.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:30:31)</span> <b>bockjoo:</b></span> After installing the rpms using the rpm -Uvh, I can find the symbol defined in libXrdUtils:<br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:30:34)</span> <b>bockjoo:</b></span> nm -D /usr/lib64/libXrdUtils.so.2 | grep  _ZN9XrdOucTPC6tpcSgiE | c++filt<br/>0000000000296520 D XrdOucTPC::tpcSgi<br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:30:54)</span> <b>bockjoo:</b></span> That's where the symbol is defined, I think.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:31:44)</span> <b>jthiltges:</b></span> Ah, you're right, yup.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:39:52)</span> <b>bockjoo:</b></span> -D option was key to the understanding. Thanks John! I was using strings because I had a habit of using nm -o command.<br/>
+</body>
+</html>

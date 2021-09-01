@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Aug 30, 2021 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Mon Aug 30, 2021 : #xcache (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(13:37:41)</span> <b>matyas:</b></span> hey folks, I'm stumped trying to get scitokens + multiuser working in our OSG tests.<br/>Here's our scitokens.conf:<br/><pre>[Global]<br/>audience = OSG_TEST<br/><br/>[Issuer /tmp]<br/>issuer = <a href="https://demo.scitokens.org/issue">https://demo.scitokens.org/issue</a><br/>base_path = /tmp<br/>map_subject = true</pre><br/>here's our Authfile:<br/><pre>u * /tmp a /usr/share/ r<br/>u = /tmp/@=/ a<br/>u xrootd /tmp a</pre><br/><br/>
+<span style="color: #c386df"><span style="font-size: small">(13:37:53)</span> <b>matyas:</b></span> here's our cconfig<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:39:09)</span> <b>dweitzel:</b></span> you've come to the right place!<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:39:12)</span> <b>matyas:</b></span> here's the _xrdcp_ command I'm trying to run:<br/><pre>xrdcp --debug 3 /usr/share/osg-test/test_gridftp_data.txt '<a href="root://osg-test.localdomain//tmp/tmpm8wucd91/copied_file.txt?auth=eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiIsImtpZCI6ImtleS1lczI1NiJ9.eyJhdWQiOiJPU0dfVEVTVCIsInZlciI6InNjaXRva2VuczoyLjAiLCJzY29wZSI6Ii90bXAiLCJleHAiOjE2MzAzNTA0OTEsInN1YiI6InZkdHRlc3QiLCJpc3MiOiJodHRwczovL2RlbW8uc2NpdG9rZW5zLm9yZyIsImlhdCI6MTYzMDM0Njg5MSwibmJmIjoxNjMwMzQ2ODkxLCJqdGkiOiI0YjZmZDNjZS05Y2I0LTQzYTgtOGEwZi02ODk4MDUyZmRhMDIifQ.Tr90ToseXAHCDHlTaYxe_7IBP4u1Sy52a7KEvrZ5iloQO3TcaaDbEFqTBqyDIQpEky3GlPJLpiAt3Qli1Au17g">root://osg-test.localdomain//tmp/tmpm8wucd91/copied_file.txt?auth=eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiIsImtpZCI6ImtleS1lczI1NiJ9.eyJhdWQiOiJPU0dfVEVTVCIsInZlciI6InNjaXRva2VuczoyLjAiLCJzY29wZSI6Ii90bXAiLCJleHAiOjE2MzAzNTA0OTEsInN1YiI6InZkdHRlc3QiLCJpc3MiOiJodHRwczovL2RlbW8uc2NpdG9rZW5zLm9yZyIsImlhdCI6MTYzMDM0Njg5MSwibmJmIjoxNjMwMzQ2ODkxLCJqdGkiOiI0YjZmZDNjZS05Y2I0LTQzYTgtOGEwZi02ODk4MDUyZmRhMDIifQ.Tr90ToseXAHCDHlTaYxe_7IBP4u1Sy52a7KEvrZ5iloQO3TcaaDbEFqTBqyDIQpEky3GlPJLpiAt3Qli1Au17g</a>'</pre><br/><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:39:55)</span> <b>dweitzel:</b></span> I think <tt>auth</tt> in your URL should be <tt>authz</tt> to match the line:<br/><pre>http.header2cgi Authorization authz </pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:40:45)</span> <b>dweitzel:</b></span> Also, your scope in the token needs to be <tt>read:/tmp</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(13:41:03)</span> <b>matyas:</b></span> well in this case I want to write<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:41:24)</span> <b>matyas:</b></span> the write is successful but the file is owned by xrootd instead of vdttest<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:41:27)</span> <b>dweitzel:</b></span> ah, well <tt>write:/tmp</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:41:47)</span> <b>dweitzel:</b></span> I hope the write isn't successful.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:41:51)</span> <b>dweitzel:</b></span> at least with tokens.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:42:12)</span> <b>dweitzel:</b></span> I suppose it would fallback to the authfile.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:42:29)</span> <b>matyas:</b></span> yeah the authfile is very permissive<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:42:53)</span> <b>matyas:</b></span> why does http.header2cgi matter if I'm using the root protocol?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:43:31)</span> <b>dweitzel:</b></span> It doesn't, I suppose.  But in XRootD, authz stuff is always in authz CGI element.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:45:25)</span> <b>dweitzel:</b></span> Also, since the file is being owned by the xrootd user, I would be willing to guess that it is failing the scitokens auth, and falling through to the other chained auth methods.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:47:01)</span> <b>matyas:</b></span> yeah that was my guess<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:33:53)</span> <b>matyas:</b></span> no luck. Can I crank up the logging on auth? I see nothing in the debug output that suggests it's even trying scitokens<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:39:11)</span> <b>dweitzel:</b></span> I'm not sure about cranking up logging just for auth.  Do you see it mention scitokens in the startup?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:40:49)</span> <b>matyas:</b></span> <pre>Config continuing with file /etc/xrootd/config.d/50-osg-scitokens.cfg ...<br/>ofs.authlib ++ libXrdAccSciTokens.so config=/etc/xrootd/scitokens.conf </pre><br/><br/>
+<span style="color: #c386df"><span style="font-size: small">(15:41:33)</span> <b>matyas:</b></span> or you mean in the logs? let me look...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:42:16)</span> <b>dweitzel:</b></span> There should be another line about scitokens reading in the config, I think.<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:47:15)</span> <b>matyas:</b></span> xrootd logs<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:51:03)</span> <b>dweitzel:</b></span> Don't know if it matters, but I think scitokens is enabled twice, in 50-osg-scitokens.cfg and 10-osg-test.cfg<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:51:33)</span> <b>dweitzel:</b></span> same with multiuser<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:52:40)</span> <b>dweitzel:</b></span> When scitokens plugins starts, it should always output something like<br/><pre>Parsing configuration file: &lt;file&gt;</pre><br/>
+</body>
+</html>

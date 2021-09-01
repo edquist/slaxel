@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Dec 5, 2019 : #general (osg)</title>
+</head>
+<body>
+<h3>Thu Dec 5, 2019 : #general (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(08:37:58)</span> <b>blin:</b></span> @lmichael i thought you wanted projects to be <tt>&lt;INSTITUTION&gt;_&lt;PI LAST NAME&gt;</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(08:38:08)</span> <b>blin:</b></span> why should this project be any different?<br/>
+<span style="color: #5a4592"><span style="font-size: small">(09:14:09)</span> <b>lmichael:</b></span> (1) Because we want to be able to map back to the CHTC project, and (2) at least one of the last names that would be applicable in this case (because Wisconsin has so many OSG users compared to other campuses) would be a duplicate.<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:15:03)</span> <b>blin:</b></span> we should think about just using the convention for all other projects<br/>
+<span style="color: #5a4592"><span style="font-size: small">(09:15:41)</span> <b>lmichael:</b></span> I guess I’m realizing we may need to expand to <tt>&lt;INSTITUTION&gt;_&lt;UNIQUEID&gt;</tt>, where we default UNIQUEID to to PILastName, but can accommodate Wisconsin and other campuses (in the future) who already have their own mapping scheme.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(11:02:29)</span> <b>lmichael:</b></span> So , we would keep the OSG Connect default to <tt>&lt;INSTITUTION&gt;_&lt;PILastName&gt;</tt> for all of the same reasons as before; even there, we have agreed to make exceptions when the researchers really care to.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(11:04:53)</span> <b>lmichael:</b></span> It will be much easier for Wisconsin and other campuses to insert their own project names than to manage an additional library, for themselves. We could even end up handling the &lt;INSTITUTION&gt; part, which, by another perspective, allows us to easily avoid collisions between campuses (versus if it’s left out, as is currently the case for HCC).<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:15:04)</span> <b>lincoln:</b></span> TBH it sounds like it may be best just to do xsede-style(?) unique identifiers for the projects that don't try to encode anything into them and then keep the mapping external. then you don't have to try to cram everything into the project name. projects can just be PI-123456789 and leave it at that<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:15:05)</span> <b>lincoln:</b></span> ¯\_(ツ)_/¯<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:16:59)</span> <b>matyas:</b></span> please no<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:17:23)</span> <b>lincoln:</b></span> why not?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:17:24)</span> <b>blin:</b></span> how do xsede users specify which projects their workflow belongs to?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:19:26)</span> <b>blin:</b></span> our system's particularly messy because we don't do any authorization outside of our the osg connect login nodes and users have to manually enter their project names<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:19:40)</span> <b>lincoln:</b></span> no idea<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:20:28)</span> <b>lincoln:</b></span> well, on connect the wrapper reads their project name out of a file<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:20:33)</span> <b>lincoln:</b></span> and injects the +ProjectName classad into the job<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:20:41)</span> <b>lincoln:</b></span> they don't strictly have to remember what it is<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:21:15)</span> <b>blin:</b></span> i don't mind the idea of unique IDs for projects on the backend but i think it just displaces complications onto the user-facing frontend<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:21:26)</span> <b>blin:</b></span> can't people be part of multiple projects?<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:21:40)</span> <b>lincoln:</b></span> it is allowed, but i don't know how common it is<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:21:55)</span> <b>lincoln:</b></span> its probably &lt;1% of users<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:22:01)</span> <b>blin:</b></span> probably<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:22:11)</span> <b>cnweaver:</b></span> Users belonging to multiple projects should be orthogonal to what the projects are named.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:23:08)</span> <b>blin:</b></span> eh, not if the users have to manually override the project<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:23:48)</span> <b>blin:</b></span> there'd have to be another frontend piece that would map unique project names to something that's human readable<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:24:16)</span> <b>blin:</b></span> human readable and meaningful to the researcher**<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:24:29)</span> <b>cnweaver:</b></span> Right they wouldn't be unreadable, just not meaningful.<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:24:59)</span> <b>lincoln:</b></span> arguably having weird corner cases on the existing schema is both less machine readable and less human readable :slightly_smiling_face:<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:25:34)</span> <b>blin:</b></span> well yeah, i think our current setup is probably the worst of both worlds<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:26:32)</span> <b>cnweaver:</b></span> I assure you that there are worse systems out there (Compute Canada).<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:29:08)</span> <b>blin:</b></span> but yeah, i think there are two issues that we have to fix surrounding this 1) enforcing project authz for all submit hosts for VOs that require projects and 2) providing a meaningful selection of projects to users (collisions are probably fine here?)<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:29:40)</span> <b>blin:</b></span> how do the osg connect submit hosts set up projects for the users?<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:29:52)</span> <b>lincoln:</b></span> projects map onto unix groups<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:30:01)</span> <b>lincoln:</b></span> and we have a wrapper that does some checking when they go to submit<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:30:19)</span> <b>lincoln:</b></span> I would really like a 'native' HTCondor solution to #1<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:30:32)</span> <b>blin:</b></span> user maps!<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:30:34)</span> <b>lincoln:</b></span> maintaining a wrapper sucks and is brittle<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:30:50)</span> <b>lincoln:</b></span> ive heard that phrase before but i have no idea what it is or how it works<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:31:05)</span> <b>blin:</b></span> <a href="https://htcondor.readthedocs.io/en/stable/misc-concepts/classad-mechanism.html#index-72">https://htcondor.readthedocs.io/en/stable/misc-concepts/classad-mechanism.html#index-72</a><br/>
+<span style="color: #e96699"><span style="font-size: small">(11:31:44)</span> <b>lincoln:</b></span> okay i see a function signature<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:32:06)</span> <b>lincoln:</b></span> can you put it in little words for me? :slightly_smiling_face:<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:32:56)</span> <b>blin:</b></span> yeah, so for this specific case you can have mapfiles that will return a list of projects that each user belongs to<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:33:09)</span> <b>blin:</b></span> and i believe you can set a default one, too<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:33:52)</span> <b>lincoln:</b></span> so we would need to compose/maintain a mapfile on the login nodes?<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:33:54)</span> <b>lincoln:</b></span> we could do that<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:34:21)</span> <b>lincoln:</b></span> how do users change projects then?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:35:15)</span> <b>blin:</b></span> i think it could probably be done similarly by specifying ProjectName in their submit file<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:35:34)</span> <b>rynge:</b></span> Just to make this problem worse: it would be great if could also enforce projectnames on hosts we do not maintain, like flocking ones!<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:35:48)</span> <b>cnweaver:</b></span> I think the thing that's really needed is to enforce that the job has a classad attached which corresponds to a group to which the user really belongs.<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:36:10)</span> <b>cnweaver:</b></span> It's good for the user to be able to specify a choice, but the user's input shouldn't be trusted.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:36:46)</span> <b>blin:</b></span> this would just be used on the authz side and you would set submit requirements such that the ProjectName of a job for a specific users has to be one of the projects that the userMap returns<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:37:45)</span> <b>blin:</b></span> <tt>SUBMIT_REQUIREMENTS = "ProjectName in userMap(project-user-mapping, Owner)"</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(11:37:47)</span> <b>blin:</b></span> or some such thing<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:39:08)</span> <b>blin:</b></span> @rynge i think a mapfile makes this process a lot easier. however it would mean that unix users would have to match across submit hosts, i.e. <tt>brian</tt> on submit1 doesn't correspond to me while <tt>brian</tt> on submit2 corresponds to @bbockelm<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:39:10)</span> <b>lincoln:</b></span> would there be a way to set a default project so users don't have to set ProjectName though?<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(11:45:13)</span> <b>blin:</b></span> you could probably do a submit transform that basically says "if projectname isn't defined by the user, use the first project in the list from the usermap"<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:45:51)</span> <b>lincoln:</b></span> nice thatd be great<br/>
+</blockquote>
+<span style="color: #e85d72"><span style="font-size: small">(11:39:15)</span> <b>cnweaver:</b></span> How would the project-user-mapping be updated? I.e. is it necessary to restart condor to load a new one?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:40:12)</span> <b>rynge:</b></span> unix users do not match - that is really a feature of our flocking setup (sites can maintain their own user spaces)<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(11:47:47)</span> <b>blin:</b></span> if that's the case then i think we're completely screwed on enforcing projects for hosts that we don't maintain<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:48:06)</span> <b>blin:</b></span> because in some way the admins will have to maintain the user-project mapping<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:31:07)</span> <b>rynge:</b></span> Right, unless we package something up in the software stack<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:34:23)</span> <b>blin:</b></span> i can't see how that would save us -- any type of mapping we ship would be prescriptive<br/>
+</blockquote>
+<span style="color: #43761b"><span style="font-size: small">(11:40:12)</span> <b>blin:</b></span> i forget if a reconfig reloads the mapping, i'd have to check<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:42:43)</span> <b>lincoln:</b></span> if it requires a restart i think that'd be a nonstarter but we could make a feature request :slightly_smiling_face:<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:44:29)</span> <b>blin:</b></span> fwiw, it just appears to require a reconfig<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:56:35)</span> <b>blin:</b></span> @lincoln here's a proof-of-concept config:<br/><pre>[<a href="mailto:blin@fermicloud068.fnal.gov">blin@fermicloud068.fnal.gov</a> ~]$ cat /etc/condor/config.d/99-usermap.conf <br/>SCHEDD_CLASSAD_USER_MAP_NAMES = $(SCHEDD_CLASSAD_USER_MAP_NAMES) PROJECTS<br/>CLASSAD_USER_MAPFILE_PROJECTS = /etc/condor/projects<br/><br/>SUBMIT_REQUIREMENT_NAMES = $(SUBMIT_REQUIREMENT_NAMES) CheckProject<br/>SUBMIT_REQUIREMENT_CheckProject = ProjectName isnt undefined &amp;&amp; regexp(ProjectName, userMap("PROJECTS", Owner))<br/>SUBMIT_REQUIREMENT_CheckProject_REASON = strcat("Must specify +ProjectName to one of: ", userMap("PROJECTS", Owner))<br/>[<a href="mailto:blin@fermicloud068.fnal.gov">blin@fermicloud068.fnal.gov</a> ~]$ cat /etc/condor/projects<br/> * blin compsci,physics,atmosci</pre><br/><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:57:48)</span> <b>blin:</b></span> i'm not sure if we can ship around user -&gt; project mappings, though. That may be a breach of user privacy but @lmichael would know the answer to that<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:57:51)</span> <b>lincoln:</b></span> rad<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:58:04)</span> <b>lincoln:</b></span> ship around to who?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:58:16)</span> <b>blin:</b></span> say as part of the packaging<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:58:25)</span> <b>lincoln:</b></span> which packaging though? im confused<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:59:09)</span> <b>blin:</b></span> like in the <tt>osg-flock</tt> metapackage<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:06:40)</span> <b>blin:</b></span> (p.s. the above requirements and whatnot need to be tightened up so i wouldn't copy it verbatim anywhere...)<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:07:57)</span> <b>lincoln:</b></span> oic<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:08:26)</span> <b>lincoln:</b></span> probably doesn't need to be packaged as such anyhow though right? the user would be dependent on the system<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:09:24)</span> <b>blin:</b></span> well yeah, my dream is to enforce project membership for all OSG VO submit hosts<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:10:11)</span> <b>blin:</b></span> but if each submit host can manage their own user namespaces as they see fit, i think that's just a pipe dream<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:38:49)</span> <b>lincoln:</b></span> sounds like an HTCondor feature request then :slightly_smiling_face: couldn't the collector or negotiator be responsible for this hypothetically?<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(13:43:32)</span> <b>blin:</b></span> if this is possible, that would mean that users many not be aware that they submitted to the wrong project or whatever until up to a full negotation cycle<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:45:49)</span> <b>lincoln:</b></span> ah yeah thats true. thats gross :confused:<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:46:20)</span> <b>blin:</b></span> i could ask around the condor team for ideas, though<br/>
+</blockquote>
+<span style="color: #e96699"><span style="font-size: small">(13:39:19)</span> <b>lincoln:</b></span> just generally thinking the <tt>flock</tt> host is where this stuff all ultimately has to be mediated<br/>
+<span style="color: #5a4592"><span style="font-size: small">(13:40:03)</span> <b>lmichael:</b></span> So, this has gone down a design hole. At this point Miron and Frank want a solution that will work tomorrow (really, by next week when I email the CHTC users whose jobs should go to Cancer Computer).<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:42:33)</span> <b>blin:</b></span> yeah, this is definitely a tangent but i think we need to have this discussion because projects are broken in pretty fundamental ways<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:42:38)</span> <b>blin:</b></span> and our interface is user hostile<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:42:55)</span> <b>lincoln:</b></span> :thumbsup:<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:43:36)</span> <b>lincoln:</b></span> I think at the end of the day we're just talking about string comparisons to make this work for cancer computer<br/>
+<span style="color: #5a4592"><span style="font-size: small">(13:43:42)</span> <b>lmichael:</b></span> So, it seems like my prior set of three tasks is hinging on what I should tell the CHTC users to add to their jobs for ProjectName. I can go with “Wisconsin_BMIGitter” instead of “Wisconsin_BMI_Gitter”, but I don’t have a worry that we’ll end up with continually lengthening names and numbers of underscores. If we want to have any enforecment/capability around ProjectNames on institutional submit nodes, we’ll need to avoid duplicates, and I think we’ll need  to have an institution identifier in the project name to help with that AND with identifiability of the project name.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(13:44:37)</span> <b>lmichael:</b></span> ^edited<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:44:54)</span> <b>blin:</b></span> the project name is up to you, <tt>Wisconsin_BMIGitter</tt> vs <tt>Wisconsin_BMI_Gitter</tt> is all the same to me<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:46:47)</span> <b>blin:</b></span> whatever's easiest to read<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:50:16)</span> <b>blin:</b></span> so @lmichael does this all need to be done by tomorrow...? we're going to need time to configure the frontend<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:50:40)</span> <b>matyas:</b></span> What needs to be done for the frontend?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:51:05)</span> <b>matyas:</b></span> I thought the whitelist was on the flock host?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:51:32)</span> <b>blin:</b></span> if this is for CHTC users, the flock host = glidein2<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:52:30)</span> <b>matyas:</b></span> ah. I think I see the line<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:53:03)</span> <b>matyas:</b></span> <tt>&lt;match match_expr... (        GLIDEIN_Site =!= "CancerComputer" || TARGET.ProjectName =?= "MedPhysics_Fain"      )...</tt> ?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:55:32)</span> <b>blin:</b></span> yeah i think so?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:26:25)</span> <b>matyas:</b></span> ok... should I go for it, or do I need to wait for something first? What's ProjectName going to be on the CHTC end?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:29:13)</span> <b>blin:</b></span> you'll probably want to use <tt>stringListMember</tt> like @rynge is using here: <a href="https://github.com/opensciencegrid/osg-flock/blob/master/flock.opensciencegrid.org/frontend-template.xml#L23">https://github.com/opensciencegrid/osg-flock/blob/master/flock.opensciencegrid.org/frontend-template.xml#L23</a>. and I imagine @lmichael will submit a PR to topology for the project<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:29:50)</span> <b>blin:</b></span> i'm curious what we do for project enforcement here. @lmichael or @christinalk probably know<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:30:12)</span> <b>matyas:</b></span> will the ProjectName here be the same as on the OSG end? There is no project by the name "MedPhysics_Fain" registered in topology for example.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:30:51)</span> <b>blin:</b></span> and i always forget the proper steps for updating frontend config, @efajardo /@rynge would know details<br/>
+<span style="color: #5a4592"><span style="font-size: small">(14:40:44)</span> <b>lmichael:</b></span> I just need to be able to email the users by next week; front-end can wait, but let’s talk tomorrow at/after the CHTC staff meeting?<br/>
+<span style="color: #5a4592"><span style="font-size: small">(14:41:51)</span> <b>lmichael:</b></span> It looks like I’ll have to first send research descriptions to Cancer Computer to get their ‘verbal’ whitelist (right @rynge?), so I may start with asking the researchers for those details and then we’ve got time before we tell them to start adding stuff to their submit files.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:42:05)</span> <b>rynge:</b></span> I think that is right<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:42:38)</span> <b>rynge:</b></span> There shouldn't really be anything extra for the users - the glideins will look like any other<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:43:20)</span> <b>matyas:</b></span> OK... let me know. Actually it should probably be put into an RT ticket so we can remember it for later<br/>
+<span style="color: #5a4592"><span style="font-size: small">(14:45:53)</span> <b>lmichael:</b></span> On another note: There are currently :zero: unclaimed tickets!<br/>
+</body>
+</html>

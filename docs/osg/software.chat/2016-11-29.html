@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Nov 29, 2016 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue Nov 29, 2016 : #software (osg)</h3>
+<span style="color: #bd9336"><span style="font-size: small">(12:41:51)</span> <b>mkandes:</b></span> @blin, if I have not added a local-gridmap-file to my /etc/edg-mkgridmap.conf, should there be any DNs automatically generated and placed in /etc/grid-security/grid-mapfile when I run edg-mkgridmap? e.g., such as the pilot DNs for the VOs I left uncommented in edg-mkgridmap.conf?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:58:59)</span> <b>blin:</b></span> @mkandes : yea, it should be full of DNs even without a local-gridmap-file<br/>
+<span style="color: #bd9336"><span style="font-size: small">(13:00:27)</span> <b>mkandes:</b></span> Hmm. Is there a way to test if I am able to contact the voms servers of the VOs? I'm guessing when I run edg-mkgridmap, my instance is unable to contact them and get the DNs or something.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:01:15)</span> <b>bbockelm:</b></span> I trust <tt>edg-mkgridmap</tt> about as far as I can throw it - what are you using it for?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(13:04:18)</span> <b>mkandes:</b></span> I'm trying to stand-up a HTCondor-CE for testing. So I'm working my way through documentation. It was my understanding that edg-mkgridmap was easier to setup and configure for authorization ... so I started down this route.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(13:04:32)</span> <b>mkandes:</b></span> First time setting up a CE myself.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:05:04)</span> <b>bbockelm:</b></span> Gotcha.  Yes, you would expect running that command result in a very well-populated edg-mkgridmap.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:05:14)</span> <b>bbockelm:</b></span> What VOs are you missing?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(13:06:49)</span> <b>mkandes:</b></span> my /etc/grid-security/grid-mapfile is blank. I have CMS and MIS VOs authorized, e.g. in /var/lib/osg/supported-vo-list, /var/lib/osg/user-vo-map<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:07:22)</span> <b>bbockelm:</b></span> what entries do you have uncommented in <tt>edg-mkgridmap.conf</tt>?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(13:07:52)</span> <b>mkandes:</b></span> # USER-VO-MAP mis MIS -- 6 -- Rob Quick (<a href="mailto:rquick@iupui.edu">rquick@iupui.edu</a>)    <br/>group <a href="vomss://voms.grid.iu.edu:8443/voms/mis">vomss://voms.grid.iu.edu:8443/voms/mis</a> mis<br/>
+<span style="color: #bd9336"><span style="font-size: small">(13:08:11)</span> <b>mkandes:</b></span> # USER-VO-MAP cms CMS -- 11 -- (<a href="mailto:uscms-ops@fnal.gov">uscms-ops@fnal.gov</a>)      <br/>group <a href="vomss://voms2.cern.ch:8443/voms/cms">vomss://voms2.cern.ch:8443/voms/cms</a> uscms01<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:09:17)</span> <b>bbockelm:</b></span> MIS one looks correct<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:10:00)</span> <b>blin:</b></span> anything in <tt>/var/log/edg-mkgridmap.log</tt>?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:10:01)</span> <b>bbockelm:</b></span> You should be able to run it by hand with <tt>--verbose</tt> added.  That'd be the next step I take.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(13:11:18)</span> <b>mkandes:</b></span> Okay, thanks. I'll poke around in the *.log and try running with --verbose. I assume there is a netorking/communication issue somewhere since I'm running on an Openstack instance.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(13:13:32)</span> <b>mkandes:</b></span> voms search(<a href="https://voms.grid.iu.edu:8443/voms/mis/services/VOMSCompatibility?method=getGridmapUsers">https://voms.grid.iu.edu:8443/voms/mis/services/VOMSCompatibility?method=getGridmapUsers</a>): configure certs failed: /etc/grid-security/hostcert.pem file does not exist: No such file or directory<br/><br/>voms search(<a href="https://voms2.cern.ch:8443/voms/cms/services/VOMSCompatibility?method=getGridmapUsers">https://voms2.cern.ch:8443/voms/cms/services/VOMSCompatibility?method=getGridmapUsers</a>): configure certs failed: /etc/grid-security/hostcert.pem file does not exist: No such file or directory<br/>
+<span style="color: #bd9336"><span style="font-size: small">(13:13:42)</span> <b>mkandes:</b></span> Forgot to get my certs setup.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:14:06)</span> <b>blin:</b></span> aha<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:14:25)</span> <b>blin:</b></span> you can set up certs with <tt>osg-ca-generator</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:15:58)</span> <b>blin:</b></span> though i guess it depends if you want to actually have a factory submit to your CE: it creates a self-signed CA and a hostcert off of that<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:16:29)</span> <b>blin:</b></span> if you just plan on setting up a standalone CE it should be good enough<br/>
+<span style="color: #bd9336"><span style="font-size: small">(13:18:24)</span> <b>mkandes:</b></span> Well, I was using SOFTWARE-2542 as an opportunity to setup and configure an HTCondor-CE and see if I could get GOC-ITB factory to submit to it for me as a more end-to-end test. So it sounds like I'll have to use the other pki tools to get a temporary cert say under MIS.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:18:48)</span> <b>blin:</b></span> yea, you'll need a legit hostcert in that case<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:19:18)</span> <b>blin:</b></span> sarah made you an ITB gridadmin for MIS, right?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(13:19:20)</span> <b>mkandes:</b></span> Okay, I think I know how to do that. Is there anything else in particular that I should be testing for SOFTWARE-2542?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(13:19:43)</span> <b>mkandes:</b></span> Yes, I have MIS-ITB privileges<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:21:04)</span> <b>blin:</b></span> there was a linked ticket: SOFTWARE-2539<br/>
+<span style="color: #bd9336"><span style="font-size: small">(13:22:23)</span> <b>mkandes:</b></span> Okay, gotchya. I see that now.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:18:19)</span> <b>mkandes:</b></span> @blin, so I've run into another roadblock I'm a bit confused about ... the CE daemons don trust itself ...<br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:18:21)</span> <b>mkandes:</b></span> 11/29/16 23:13:25 PERMISSION DENIED to <a href="mailto:osg-software-2542-el7-htcondor-ce.ucsd.edu@daemon.opensciencegrid.org">osg-software-2542-el7-htcondor-ce.ucsd.edu@daemon.opensciencegrid.org</a> from host 10.128.3.123 for command 60008 (DC_CHILDALIVE), access level DAEMON: reason: DAEMON authorization policy contains no matching ALLOW entry for this request; identifiers used for this host: 10.128.3.123,host-10-128-3-123.openstacklocal, hostname size = 1, original ip address = 10.128.3.123<br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:19:17)</span> <b>mkandes:</b></span> I'm guessing I need to put my hostcert DN in the /etc/condor-ce/condor_mapfile?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:21:11)</span> <b>mkandes:</b></span> And I'm a bit confused about the default domain @daemon.opensciencegrid.org<br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:21:22)</span> <b>mkandes:</b></span> Is that just a place holder?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:24:39)</span> <b>blin:</b></span> nope, it's not just a placeholder, it's how the CE manages permissions for daemons<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:24:46)</span> <b>blin:</b></span> what's your host cert DN look like?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:25:48)</span> <b>mkandes:</b></span> "/DC=org/DC=opensciencegrid/O=Open Science Grid/OU=Services/CN=<a href="http://osg-software-2542-el7-htcondor-ce.ucsd.edu">osg-software-2542-el7-htcondor-ce.ucsd.edu</a>"<br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:26:18)</span> <b>mkandes:</b></span> So I guess the problem may be that condor-ce thinks my hostname is host-10-128-3-123.openstacklocal<br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:26:52)</span> <b>mkandes:</b></span> DN/hostnames need to match?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:28:52)</span> <b>blin:</b></span> yea, DN and hostnames do need to match<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:29:19)</span> <b>blin:</b></span> at least from condor's perspective<br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:59:43)</span> <b>bbockelm:</b></span> (But there is a knob to override the host name detection logic if you'd like)<br/>
+</body>
+</html>

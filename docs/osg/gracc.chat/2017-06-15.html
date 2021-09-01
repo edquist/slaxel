@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jun 15, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Thu Jun 15, 2017 : #gracc (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(11:22:27)</span> <b>dweitzel:</b></span> @kretzke I need some help debugging missing jobs in kibana.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:23:08)</span> <b>dweitzel:</b></span> We have gratia probe records that show 6 jobs being submitted to the collector, but only 3 show up in Kibana.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:23:30)</span> <b>dweitzel:</b></span> I've grepped through the collector log, and that looks ok.  It shows receiving all 6 jobs.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:23:37)</span> <b>dweitzel:</b></span> <a href="https://paste.fedoraproject.org/paste/MHfDrExVckGqGyuWdkil0w">https://paste.fedoraproject.org/paste/MHfDrExVckGqGyuWdkil0w</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:01:14)</span> <b>kretzke:</b></span> @dweitzel this is concerning. Seem to be losing records from every update from that probe <a href="https://gracc.opensciencegrid.org/dashboard/db/probe-record-rate?orgId=1&amp;var-Probe=condor:red-gw1.unl.edu&amp;from=1497344408747&amp;to=1497348010244">https://gracc.opensciencegrid.org/dashboard/db/probe-record-rate?orgId=1&amp;var-Probe=condor:red-gw1.unl.edu&amp;from=1497344408747&amp;to=1497348010244</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:01:24)</span> <b>kretzke:</b></span> <pre>Jun 13 09:02:16 gratiav2-1.novalocal dockerd[23184]: time="2017-06-13T09:02:16Z" level=info msg="received multiupdate" bundlesize=4 from="condor:<a href="http://red-gw1.unl.edu">red-gw1.unl.edu</a>" <br/>Jun 13 09:17:18 gratiav2-1.novalocal dockerd[23184]: time="2017-06-13T09:17:18Z" level=info msg="received multiupdate" bundlesize=7 from="condor:<a href="http://red-gw1.unl.edu">red-gw1.unl.edu</a>" <br/>Jun 13 09:36:37 gratiav2-1.novalocal dockerd[23184]: time="2017-06-13T09:36:37Z" level=info msg="received multiupdate" bundlesize=12 from="condor:<a href="http://red-gw1.unl.edu">red-gw1.unl.edu</a>" <br/>Jun 13 09:54:35 gratiav2-1.novalocal dockerd[23184]: time="2017-06-13T09:54:35Z" level=info msg="received multiupdate" bundlesize=9 from="condor:<a href="http://red-gw1.unl.edu">red-gw1.unl.edu</a>" </pre><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:01:51)</span> <b>kretzke:</b></span> (gracc should have bundlesize-1 records per update)<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:02:56)</span> <b>kretzke:</b></span> <tt>condor:<a href="http://SUBMIT.MIT.EDU">SUBMIT.MIT.EDU</a></tt> matches over the same period<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:10:25)</span> <b>kretzke:</b></span> fifebatch1 agrees too. so it’s probably something about those records. can you get the histories for them? possible they are getting treated as duplicates?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:14:23)</span> <b>dweitzel:</b></span> Yeah, we can even probably get the XML that is sent.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:14:27)</span> <b>dweitzel:</b></span> what would be useful for you?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:18:15)</span> <b>kretzke:</b></span> XML would be great. Could just look over one of the missing jobs, see if anything stands out<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:19:08)</span> <b>kretzke:</b></span> Could fire up a gracc-dev stack and feed them in, with debugging enabled on the collector and/or logstash<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:19:10)</span> <b>dweitzel:</b></span> @jthiltges could you grab the full classad for a missing job.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:20:07)</span> <b>jthiltges:</b></span> @dweitzel I'll take a look<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:21:41)</span> <b>kretzke:</b></span> I thought <tt>@version</tt> would increase if there were duplicates, but that doesn’t seem to be the case<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:25:48)</span> <b>kretzke:</b></span> I don’t see any errors that would point to Elasticsearch rejecting the records for some reason<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:35:31)</span> <b>dweitzel:</b></span> Yeah, I think LocalJobId is one of the attributes that is being hashed, right?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:35:35)</span> <b>dweitzel:</b></span> so they should be unique.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:36:36)</span> <b>kretzke:</b></span> no, every field you’d think is an identifier is excluded.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:38:02)</span> <b>kretzke:</b></span> oh, nevermind, you’re right.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:38:06)</span> <b>dweitzel:</b></span> is this current: <a href="https://github.com/opensciencegrid/gracc-docker/blob/master/gracc-stash-raw/logstash.conf#L45">https://github.com/opensciencegrid/gracc-docker/blob/master/gracc-stash-raw/logstash.conf#L45</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:38:08)</span> <b>dweitzel:</b></span> right<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:38:34)</span> <b>dweitzel:</b></span> ProbeName + LocalJobId should make this pretty unqiue.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:38:45)</span> <b>dweitzel:</b></span> let alone everything else.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:49:44)</span> <b>dweitzel:</b></span> @kretzke ok, oddness.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:49:58)</span> <b>dweitzel:</b></span> The jobs so far that we can find have bene "removed"<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:50:19)</span> <b>dweitzel:</b></span> @dweitzel uploaded a file: <a href="https://opensciencegrid.slack.com/files/dweitzel/F5UDM8B8A/-.txt">Untitled</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:52:55)</span> <b>kretzke:</b></span> <tt>    &lt;Processors urwg:metric="max"&gt;ifThenElse(WantWholeNode is true, !isUndefined(TotalCpus) ? TotalCpus : JobCpus,OriginalCpus)&lt;/Processors&gt;</tt> that’s not right<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:53:03)</span> <b>dweitzel:</b></span> yeah, thats not right at all.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:53:12)</span> <b>dweitzel:</b></span> reading into the condor_meter now.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:53:49)</span> <b>kretzke:</b></span> well, see if “good” jobs are the same, may be a separate issue since in logstash we coerce <tt>Processors</tt> to <tt>integer</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:54:15)</span> <b>dweitzel:</b></span> would logstash complain in the logs about that?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:55:25)</span> <b>kretzke:</b></span> yeah it should (if it gave up on trying to convert it), but the logstash logs are empty… also concerning<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:01:13)</span> <b>dweitzel:</b></span> so I mucked around with it... when using whole node, we are not saving how many "actual cpus" are being used in the job classad.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:01:29)</span> <b>dweitzel:</b></span> we just have this expression, which is only valid when compared with the worker node classad.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:01:36)</span> <b>dweitzel:</b></span> I need to talk to @blin<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:21:10)</span> <b>dweitzel:</b></span> I think we need 2 changes.  The CE needs to save the number of CPUs used by the job in the job classad.  And... the gratia probe needs to be updated to extract that saved value.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:36:52)</span> <b>kretzke:</b></span> interestingly, that record made it through a gracc-dev stack fine, and ended up quarantined due to missing <tt>StartTime</tt>. They are not in the gracc quarantine though (first thing I checked).<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:46:06)</span> <b>kretzke:</b></span> oh, actually it is (twice, in fact…). kibana is using <tt>@received</tt> for the time, which isn’t set, since <tt>EndTime</tt> is missing<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:46:57)</span> <b>kretzke:</b></span> direct search finds it though<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:55:23)</span> <b>dweitzel:</b></span> So that job I gave above, it's in the quarentine?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:01:42)</span> <b>kretzke:</b></span> yep<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:02:00)</span> <b>dweitzel:</b></span> Have a link?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:12:49)</span> <b>kretzke:</b></span> here’s a bunch <a href="https://gracc.opensciencegrid.org/kibana/app/kibana#/discover?_g=()&amp;_a=(columns:!(_source),index:'gracc.osg.raw*quarantine',interval:auto,query:(query_string:(analyze_wildcard:!f,query:'ProbeName:%22condor:red-gw1.unl.edu%22')),sort:!(EndTime,desc))">https://gracc.opensciencegrid.org/kibana/app/kibana#/discover?_g=()&amp;_a=(columns:!(_source),index:'gracc.osg.raw*quarantine',interval:auto,query:(query_string:(analyze_wildcard:!f,query:'ProbeName:%22condor:red-gw1.unl.edu%22')),sort:!(EndTime,desc))</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(16:30:29)</span> <b>efajardo:</b></span> Dear <b>@channel</b> experts. I have a question: I used to be ablet osee here <a href="https://gracc.opensciencegrid.org/dashboard/db/payload-jobs-summary?from=1496957391813&amp;to=1497562191813&amp;orgId=1&amp;var-VOName=All&amp;var-Project=LIGO&amp;var-Facility=NIKHEF-ELPROD&amp;var-User=All&amp;var-ExitCode=All&amp;var-Probe=All&amp;var-interval=1d&amp;panelId=4&amp;fullscreen">https://gracc.opensciencegrid.org/dashboard/db/payload-jobs-summary?from=1496957391813&amp;to=1497562191813&amp;orgId=1&amp;var-VOName=All&amp;var-Project=LIGO&amp;var-Facility=NIKHEF-ELPROD&amp;var-User=All&amp;var-ExitCode=All&amp;var-Probe=All&amp;var-interval=1d&amp;panelId=4&amp;fullscreen</a> the user running but now I only see N/A<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:31:57)</span> <b>kretzke:</b></span> that uses <tt>CommonName</tt>, which only some probes report. Gratia used to add it if it was missing, GRACC currently does not.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:32:19)</span> <b>kretzke:</b></span> dashboard should probably be changed to use <tt>DN</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(16:34:03)</span> <b>efajardo:</b></span> hmm But this used to work<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:35:33)</span> <b>kretzke:</b></span> because we shut gratia off in April<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:40:09)</span> <b>efajardo:</b></span> ok an any chance to bring this functionality back?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:56:09)</span> <b>kretzke:</b></span> probably. Feel free to opine in <a href="https://jira.opensciencegrid.org/projects/GRACC/issues/GRACC-106">https://jira.opensciencegrid.org/projects/GRACC/issues/GRACC-106</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(17:43:55)</span> <b>efajardo:</b></span> thank you<br/>
+</body>
+</html>

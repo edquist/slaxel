@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jun 25, 2020 : #facilitation (osg)</title>
+</head>
+<body>
+<h3>Thu Jun 25, 2020 : #facilitation (osg)</h3>
+<span style="color: #db3150"><span style="font-size: small">(15:05:32)</span> <b>christinalk:</b></span> I have someone who wants to use rosetta<br/>
+<span style="color: #db3150"><span style="font-size: small">(15:05:51)</span> <b>christinalk:</b></span> I vaguely recall that this is something users have to download + install themselves b/c you have to register to download it?<br/>
+<span style="color: #db3150"><span style="font-size: small">(15:06:04)</span> <b>christinalk:</b></span> is that true? does anyone have any current knowledge/tips for running rosetta?<br/>
+<span style="color: #5a4592"><span style="font-size: small">(16:12:16)</span> <b>lmichael:</b></span> yes, you need to register and download it. However, I have recently heard of instances where Rosetta was convinced to say yes to cluster-wide/module-based installation. But, we can’t put it into a public container.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:21:06)</span> <b>rynge:</b></span> @christinalk COVID19_Stanford_Das is running Rosetta<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:21:12)</span> <b>rynge:</b></span> They ship a tarball with each job<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:21:19)</span> <b>rynge:</b></span> But the submit file is simple<br/>
+<span style="color: #5a4592"><span style="font-size: small">(16:21:50)</span> <b>lmichael:</b></span> Rosetta tarballs can be big, but they can also be cut down (which Greg did for COVID19_RepertoireTCell)<br/>
+<span style="color: #db3150"><span style="font-size: small">(16:22:17)</span> <b>christinalk:</b></span> okay, so process is to download a copy of rosetta + then just ship the tarball w/ each job?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:22:38)</span> <b>rynge:</b></span> Yes<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:23:42)</span> <b>rynge:</b></span> <pre>universe    = vanilla     <br/><br/># if you want a more consitent OS, uncomment the following two lines and you will<br/># always get a RHEL 7 system<br/>Requirements =  OSGVO_OS_STRING == "RHEL 7" &amp;&amp; has_avx == True<br/>#Requirements = HAS_SINGULARITY<br/>#+SingularityImage = "/cvmfs/singularity.opensciencegrid.org/opensciencegrid/osgvo-el7:latest"<br/>Environment = MY_SEED=$(SEED)<br/><br/>transfer_input_files = rosetta.tar.gz<br/># leave transfer_output_files undefined to get all created files back<br/>#transfer_output_files = <br/><br/>executable  = job-wrapper.sh<br/>arguments   = farna_rebuild_$(Cluster).$(Process).out -run:constant_seed=true -run:jran $(MY_SEED)   <br/>log         = job.log<br/>output      = job.$(Cluster).$(Process).out<br/>error       = job.$(Cluster).$(Process).error<br/><br/>request_cpus    = 1 <br/>request_memory = ifthenelse(isundefined(NumJobStarts) || NumJobStarts &lt; 2, 4000, 10000)<br/>request_disk    = 4GB<br/><br/># Optional: if a job fails, you can put it in a special HTCondor "held" state<br/># which will leave the job in the queue. You can then release it to try again<br/># (done automatically 3 times in this example). This is a useful feature if you<br/># want to see prolematic jobs.<br/>#on_exit_hold = (ExitBySignal == True) || (ExitCode != 0)<br/>PeriodicRelease = ((CurrentTime - EnteredCurrentStatus) &gt; 300) &amp;&amp;(NumJobStarts &lt; 3)<br/><br/># You can change the "1" to get as many jobs as you want submitted at once. If <br/># you want paramater passing, see:<br/># <a href="https://support.opensciencegrid.org/support/solutions/articles/12000062019--large-scale-computation-with-htcondor-s-queue-command-">https://support.opensciencegrid.org/support/solutions/articles/12000062019--large-scale-computation-with-htcondor-s-queue-command-</a><br/>queue SEED from seeds</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:23:53)</span> <b>rynge:</b></span> This one has two special-sauces:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:24:20)</span> <b>rynge:</b></span> Precomputed seeds and a increase memory requests in case of multiple failures<br/>
+<span style="color: #5a4592"><span style="font-size: small">(16:24:36)</span> <b>lmichael:</b></span> does rosetta need the AVX?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:24:44)</span> <b>rynge:</b></span> Turns out the code exploded on some seeds and we wanted to be able to retry over and over again<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:25:18)</span> <b>rynge:</b></span> This one did, but I guess that depends on where you compile it<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:25:24)</span> <b>rynge:</b></span> This user also runs a custom version<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:27:14)</span> <b>rynge:</b></span> I bet for a regular Rosetta users, you can get away with standard memory request, no precomputed seeds and maybe factoring out the avx requirement<br/>
+<span style="color: #5a4592"><span style="font-size: small">(17:04:22)</span> <b>lmichael:</b></span> @christinalk you may want to bug Greg Thain. I bet he went more generic (no AVX, etc.).<br/>
+<span style="color: #db3150"><span style="font-size: small">(17:06:05)</span> <b>christinalk:</b></span> will do<br/>
+</body>
+</html>

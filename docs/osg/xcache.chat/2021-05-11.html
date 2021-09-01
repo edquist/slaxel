@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue May 11, 2021 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Tue May 11, 2021 : #xcache (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(09:53:53)</span> <b>dweitzel:</b></span> I wonder why async io doesn't work with multiuser?  He mentioned that we can turn it off from the plugin, but he's looking at what XRootD version that was available.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:57:47)</span> <b>andrew.melo:</b></span> HAs someone looked to see what performance difference (if any) there is between async and non-async?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:58:29)</span> <b>dweitzel:</b></span> I'm sure, but I'm not sure where :slightly_smiling_face:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:24:46)</span> <b>dweitzel:</b></span> I'll ask around.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:22:19)</span> <b>dweitzel:</b></span> @andrew.melo I asked Andy:<br/>&gt; Generally, async I/O actually costs you for a number of reasons which is why the default will be off in 5.2.0 except for proxy servers.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:22:32)</span> <b>dweitzel:</b></span> Also, he doesn't know of any studies of performance.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:22:33)</span> <b>andrew.melo:</b></span> Interesting<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:22:43)</span> <b>dweitzel:</b></span> I'll forward the rather long email I got from him.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:23:30)</span> <b>andrew.melo:</b></span> For direct posix AIO, I could seeing it be absolutely terrible, but if the async I/O is provided by a filesystem plugin that isn't braindead, I feel like you could have it Do The Right Thing<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:23:36)</span> <b>andrew.melo:</b></span> but yeah, i'm curious to see<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:24:14)</span> <b>dweitzel:</b></span> It sounds like XRootD uses the glibc AIO, which is terrible?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:24:38)</span> <b>andrew.melo:</b></span> YEah, that's a catastrophe<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:24:50)</span> <b>andrew.melo:</b></span> but an OSS plugin (forget which acronym) wouldn't need to if the client library provides the functionality<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:31:22)</span> <b>bbockelm:</b></span> glibc AIO is indeed a catastrophe.  The new approach is <tt>io_uring</tt> (which is coming around nicely).<br/>
+</body>
+</html>

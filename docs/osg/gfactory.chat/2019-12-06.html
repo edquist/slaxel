@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Dec 6, 2019 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Fri Dec 6, 2019 : #gfactory (osg)</h3>
+<span style="color: #a63024"><span style="font-size: small">(10:42:10)</span> <b>efajardo:</b></span> <b>@here</b><br/>
+<span style="color: #a63024"><span style="font-size: small">(10:42:18)</span> <b>efajardo:</b></span> I need some help with debugging something at NIKHEF<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:42:29)</span> <b>efajardo:</b></span> I know they have upated to the latest kernel in all their worker nodes<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:42:40)</span> <b>efajardo:</b></span> but if I check a pilot<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:42:49)</span> <b>efajardo:</b></span> `CondorPlatform = “$CondorPlatform: x86_64_RedHat6 $”<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:43:06)</span> <b>efajardo:</b></span> so how is it that if it landed on a rhel7 node condor platform is 6?<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:43:17)</span> <b>efajardo:</b></span> or is it that the NIKHEF folks have a mix of nodes?<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:45:19)</span> <b>efajardo:</b></span> in fact the choosing of the tarball is just plain wrong check this out<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:45:25)</span> <b>efajardo:</b></span> <pre>condor_status -af LSB_DESCRIPTION | sort | uniq -c<br/>      1 CentOS Linux release 7.5.1804 (Core) <br/>    261 CentOS Linux release 7.6.1810 (Core) <br/>     64 CentOS Linux release 7.7.1908 (Core)<br/>     63 CentOS release 6.10 (Final)<br/>     81 Red Hat Enterprise Linux Server release 6.8 (Santiago)<br/>      2 Red Hat Enterprise Linux Server release 7.6 (Maipo)<br/>     44 Scientific Linux release 6.10 (Carbon)<br/>      1 Scientific Linux release 6.6 (Carbon)<br/>      8 Scientific Linux release 7.3 (Nitrogen)<br/>      3 Scientific Linux release 7.6 (Nitrogen)<br/>     83 Scientific Linux release 7.7 (Nitrogen)<br/>     40 UNKNOWN</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(10:45:35)</span> <b>efajardo:</b></span> mos of the pilots lan on red hat 7 machines<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:46:00)</span> <b>efajardo:</b></span> but condor platform is always<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:46:02)</span> <b>efajardo:</b></span> red hat 6<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:46:04)</span> <b>efajardo:</b></span> <pre>condor_status -af CondorPlatform | sort | uniq -c<br/>    647 $CondorPlatform: x86_64_RedHat6 $</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(10:46:25)</span> <b>efajardo:</b></span> I consider this fix to be  an extremly high priority<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:46:38)</span> <b>efajardo:</b></span> specially now that we want to run pilots with condor 8.9 and I would imagine CMS wants do it too<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:49:56)</span> <b>matyas:</b></span> what does the kernel have to do with it?<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:50:20)</span> <b>efajardo:</b></span> nothing I am just saying<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:50:39)</span> <b>efajardo:</b></span> the nodes are landing in redhat 7<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:50:41)</span> <b>efajardo:</b></span> the pilots are walways grabbign redhat 6 tarballs<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:50:42)</span> <b>efajardo:</b></span> this needs to be changed ASAP<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:51:28)</span> <b>matyas:</b></span> what does <tt>condor_status -af CondorPlatform OpSysAndVer | sort | uniq -c</tt> show?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:52:11)</span> <b>matyas:</b></span> (that one's detected at runtime, right?)<br/>
+<span style="color: #dd8527"><span style="font-size: small">(10:53:15)</span> <b>marcom:</b></span> And it depends also on what the factory ops are setting. For some sites they always send rhel6 tarballs<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:56:36)</span> <b>matyas:</b></span> Oh yeah we should stop sending rhel6 tarballs to rhel7 hosts -- sometimes that breaks other things like file transfer plugins (because of shared library differences)<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:56:51)</span> <b>matyas:</b></span> we ran into that issue at wisconsin<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:00:41)</span> <b>efajardo:</b></span> Yes I agree<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:01:00)</span> <b>efajardo:</b></span> that shortcut to send rhel6 tarballs to rhel7 hosts has to be fixed ASAP<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:01:24)</span> <b>efajardo:</b></span> <pre>condor_status -af CondorPlatform OpSysAndVer | sort | uniq -c<br/>    785 $CondorPlatform: x86_64_RedHat6 $ CentOS7<br/>     19 $CondorPlatform: x86_64_RedHat6 $ "CentOS7"<br/>      3 $CondorPlatform: x86_64_RedHat6 $ SL6</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(11:01:32)</span> <b>efajardo:</b></span> @matyas :top:<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:02:22)</span> <b>efajardo:</b></span> Not only that we want to test condor 8.9. I am surprised CMS has not asked for this yet<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:02:56)</span> <b>efajardo:</b></span> What is the logic<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:03:00)</span> <b>efajardo:</b></span> if I have in the FE<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:03:13)</span> <b>efajardo:</b></span> CONDOR_VERSION = Y<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:03:24)</span> <b>efajardo:</b></span> and that versio nis only availabe for rhel7<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:03:31)</span> <b>efajardo:</b></span> and the pilot lands on a rhel6 node<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:03:34)</span> <b>efajardo:</b></span> will the pilot die?<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:03:40)</span> <b>efajardo:</b></span> will it try a default ?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:04:09)</span> <b>blin:</b></span> so i'm just catching up on this -- is this a factory configuration issue?<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:04:51)</span> <b>efajardo:</b></span> Yes but is one we have been able to get awwy with for several years<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:05:07)</span> <b>efajardo:</b></span> and now we have to disentangle it<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:05:41)</span> <b>efajardo:</b></span> I would imagine that this involves renaming all the condor tarballs in al lthe factories to follow the gwms convention<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:06:03)</span> <b>efajardo:</b></span> but there is a wrinkle<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:06:12)</span> <b>efajardo:</b></span> I have to check the code<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:06:47)</span> <b>efajardo:</b></span> but I do not remember what happens if the FE requests a version of CONDOR tarballs and that version is not available for the OS of the worker node<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:06:53)</span> <b>blin:</b></span> could you turn this into a freshdesk ticket and assign the glideinwms group?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:07:31)</span> <b>blin:</b></span> and CC someone from the gwms team (@marcom), myself, and probably @bbockelm<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:07:47)</span> <b>efajardo:</b></span> ok<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:09:16)</span> <b>blin:</b></span> are you going to attend the ops meeting today?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:09:21)</span> <b>blin:</b></span> that'd be a good time to bring this up, too<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:09:50)</span> <b>matyas:</b></span> Coulda sworn that when Wisconsin ran into it we fixed it at the frontend<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:10:09)</span> <b>efajardo:</b></span> yes I will attend<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:11:16)</span> <b>matyas:</b></span> <pre>&lt;attr name="CONDOR_OS" glidein_publish="False" job_publish="False" parameter="True" type="string" value="auto"/&gt;<br/>      &lt;attr name="CONDOR_VERSION" glidein_publish="False" job_publish="False" parameter="True" type="string" value="8.8.x"/&gt;</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(11:11:20)</span> <b>matyas:</b></span> sound familiar?<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:11:27)</span> <b>efajardo:</b></span> yes<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:12:03)</span> <b>efajardo:</b></span> But that leaves a wrinkle<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:12:42)</span> <b>matyas:</b></span> such as how do you select 8.9 for el7 and 8.8 for el6?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:13:12)</span> <b>matyas:</b></span> is there a value="latest" or something for CONDOR_VERSION?<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:13:35)</span> <b>efajardo:</b></span> Ok I created<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:13:46)</span> <b>efajardo:</b></span> no there is DEFAULT<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:13:57)</span> <b>efajardo:</b></span> or someting like that<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:14:54)</span> <b>efajardo:</b></span> but that is controlled in the factory side<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:16:30)</span> <b>efajardo:</b></span> there is nothing such as latest<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:16:39)</span> <b>efajardo:</b></span> But you can awlwyas request it<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:16:59)</span> <b>efajardo:</b></span> I am testing auto now<br/>
+</body>
+</html>

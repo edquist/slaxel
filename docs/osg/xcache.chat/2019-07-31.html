@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jul 31, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Wed Jul 31, 2019 : #xcache (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(10:36:56)</span> <b>blin:</b></span> hey @efajardo we were looking at the ligo registration config and noticed that only the HCC cache is allowed to cache LIGO data:<br/><pre><br/>DataFederations:<br/>  StashCache:<br/>    Namespaces:<br/>      /user/ligo:<br/>        - FQAN:/osg/ligo<br/>      /gwdata:<br/>        - PUBLIC<br/>    AllowedOrigins:<br/>      - CIT_LIGO_ORIGIN<br/>    AllowedCaches:<br/>      - HCC-Stash<br/></pre><br/>is this actually true?<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:22:43)</span> <b>efajardo:</b></span> nop<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:23:05)</span> <b>efajardo:</b></span> I am not sure where that is coming from<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:23:32)</span> <b>efajardo:</b></span> I just did a test against UCSD cache<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:23:41)</span> <b>efajardo:</b></span> <pre>X509_USER_PROXY=/tmp/pilot_proxy time gfal-copy -vf <a href="https://stashcache.t2.ucsd.edu:8444/user/ligo/frames/O3/hoft/H1/H-H1_HOFT_C00-12390/H-H1_HOFT_C00-1239093248-4096.gwf">https://stashcache.t2.ucsd.edu:8444/user/ligo/frames/O3/hoft/H1/H-H1_HOFT_C00-12390/H-H1_HOFT_C00-1239093248-4096.gwf</a> file:///dev/null<br/>Copying 1308492071 bytes <a href="https://stashcache.t2.ucsd.edu:8444/user/ligo/frames/O3/hoft/H1/H-H1_HOFT_C00-12390/H-H1_HOFT_C00-1239093248-4096.gwf">https://stashcache.t2.ucsd.edu:8444/user/ligo/frames/O3/hoft/H1/H-H1_HOFT_C00-12390/H-H1_HOFT_C00-1239093248-4096.gwf</a> =&gt; file:///dev/null</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:28:55)</span> <b>blin:</b></span> i think that means that the CIT_LIGO_ORIGIN isn't running the <tt>stash-origin-authfile</tt> service<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:29:33)</span> <b>blin:</b></span> do you manage that on behalf of stuart or?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:32:05)</span> <b>blin:</b></span> because the generated auth file for private data looks like: <a href="https://topology.opensciencegrid.org/stashcache/origin-authfile?fqdn=origin.ligo.caltech.edu">https://topology.opensciencegrid.org/stashcache/origin-authfile?fqdn=origin.ligo.caltech.edu</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:37:28)</span> <b>efajardo:</b></span> no<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:37:34)</span> <b>efajardo:</b></span> so the CIT_LIGO_ORIGIN<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:37:36)</span> <b>efajardo:</b></span> is for public data<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:37:52)</span> <b>efajardo:</b></span> the private LIGO Origin is at UNL managed by UNL folks<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:38:00)</span> <b>efajardo:</b></span> I have zero access to either one<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:41:33)</span> <b>blin:</b></span> @jthiltges do you manage the UNL origin?<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:41:50)</span> <b>efajardo:</b></span> <b>@here</b> I have a problem with the CNAF stasthscache<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:41:55)</span> <b>efajardo:</b></span> they are getting this<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:42:01)</span> <b>efajardo:</b></span> <pre># /usr/libexec/xcache/authfile-update —cache<br/><br/>Usage: authfile-update --cache|--origin<br/>Environment variables used:<br/>CACHE_FQDN        FQDN used for cache authfile query (default <a href="http://ds-914.cr.cnaf.infn.it">ds-914.cr.cnaf.infn.it</a>)<br/>ORIGIN_FQDN       FQDN used for origin authfile query (default <a href="http://ds-914.cr.cnaf.infn.it">ds-914.cr.cnaf.infn.it</a>)<br/>TOPOLOGY          Topology server to get the data from (default <a href="https://topology.opensciencegrid.org">https://topology.opensciencegrid.org</a>)<br/><br/></pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:42:20)</span> <b>efajardo:</b></span> but the FQAN they registered is <a href="https://github.com/opensciencegrid/topology/blob/master/topology/INFN-T1/INFN-T1/INFN-T1CachingInfrastructure.yaml#L29">https://github.com/opensciencegrid/topology/blob/master/topology/INFN-T1/INFN-T1/INFN-T1CachingInfrastructure.yaml#L29</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:42:24)</span> <b>efajardo:</b></span> <tt><a href="http://xcache.cr.cnaf.infn.it">xcache.cr.cnaf.infn.it</a></tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:42:32)</span> <b>efajardo:</b></span> do you know a way around htis?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:42:55)</span> <b>jthiltges:</b></span> @blin I have access to it, and can help. I'd trust @marian and @dweitzel's knowledge much further than my own.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:43:38)</span> <b>jthiltges:</b></span> @efajardo Are they using an em-dash rather than <tt>--</tt> ?<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:43:49)</span> <b>marian:</b></span> what they are getting, @efajardo?<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:43:58)</span> <b>marian:</b></span> isn't there typo in command?<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:44:04)</span> <b>marian:</b></span> <tt>--</tt> vs <tt>-</tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(12:44:18)</span> <b>marian:</b></span> ah, @jthiltges beat me on that one :slightly_smiling_face:<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:46:05)</span> <b>marian:</b></span> could be issue with reverse lookup?<br/><pre><br/>$ host <a href="http://xcache.cr.cnaf.infn.it">xcache.cr.cnaf.infn.it</a><br/><a href="http://xcache.cr.cnaf.infn.it">xcache.cr.cnaf.infn.it</a> has address 131.154.130.130<br/>$ host 131.154.130.130<br/>130.130.154.131.in-addr.arpa domain name pointer <a href="http://ds-102-11-18.cr.cnaf.infn.it">ds-102-11-18.cr.cnaf.infn.it</a>.<br/></pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(12:46:16)</span> <b>marian:</b></span> ^ ?<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:46:35)</span> <b>efajardo:</b></span> but that is not exactly an issue<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:46:39)</span> <b>efajardo:</b></span> it seems an issue<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:46:53)</span> <b>efajardo:</b></span> with <tt> /usr/libexec/xcache/authfile-update</tt> and aliases<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:47:05)</span> <b>marian:</b></span> what's the error<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:47:22)</span> <b>marian:</b></span> it launches from systemd timer, right?<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:48:01)</span> <b>efajardo:</b></span> <pre>Usage: authfile-update --cache|--origin<br/>Environment variables used:<br/>CACHE_FQDN        FQDN used for cache authfile query (default <a href="http://ds-914.cr.cnaf.infn.it">ds-914.cr.cnaf.infn.it</a>)<br/>ORIGIN_FQDN       FQDN used for origin authfile query (default <a href="http://ds-914.cr.cnaf.infn.it">ds-914.cr.cnaf.infn.it</a>)<br/>TOPOLOGY          Topology server to get the data from (default <a href="https://topology.opensciencegrid.org">https://topology.opensciencegrid.org</a>)</pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(12:48:08)</span> <b>marian:</b></span> (as a side note I'd worry also about improper network registration)<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:48:35)</span> <b>efajardo:</b></span> this is what they sent me<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:48:38)</span> <b>marian:</b></span> but they call command with <tt>-</tt> instead of <tt>--</tt>, is it in the image?<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:48:59)</span> <b>efajardo:</b></span> ahh<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:49:03)</span> <b>marian:</b></span> so they call it with wrong syntax<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:50:24)</span> <b>efajardo:</b></span> ahh ok<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:50:25)</span> <b>efajardo:</b></span> thanks<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:47:50)</span> <b>matyas:</b></span> looks like they have a unicode emdash instead of <tt>--</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(13:48:13)</span> <b>matyas:</b></span> oh marian already answered<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:56:23)</span> <b>efajardo:</b></span> But my question was<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:56:39)</span> <b>efajardo:</b></span> would it be a problem cause the FQAN it finds is <tt><a href="http://ds-914.cr.cnaf.infn.it">ds-914.cr.cnaf.infn.it</a></tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(13:56:45)</span> <b>efajardo:</b></span> that does not match the alais in topology<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:56:49)</span> <b>efajardo:</b></span> do I get this right?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:57:38)</span> <b>blin:</b></span> yeah, they wouldn't get an appropriate authfile<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:57:57)</span> <b>blin:</b></span> so they should fix the reverse lookup<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:58:56)</span> <b>matyas:</b></span> or set the env var?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:59:26)</span> <b>matyas:</b></span> export CACHE_FQDN=whatever<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:00:44)</span> <b>jthiltges:</b></span> Handy for stash-cache-authfile.service to include an EnvironmentFile?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:01:27)</span> <b>jthiltges:</b></span> Also, from a quick glance, looks like authfile-update uses the system's hostname, rather than DNS.<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:25:40)</span> <b>blin:</b></span> @efajardo frank mentioned on the ac/staff call today that CMS XCache lazy caches full files: if someone requests a portion of the file, CMS XCache will immediately pull down the requested blocks and then at a later time when it's not as busy, will pull down the full file<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:25:47)</span> <b>blin:</b></span> is that true and if so, what config controls it?<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:27:46)</span> <b>efajardo:</b></span> I think Frank did not get it right. So there are two options here<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:27:48)</span> <b>efajardo:</b></span> 1.<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:28:01)</span> <b>efajardo:</b></span> pfc.prefetch<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:28:20)</span> <b>efajardo:</b></span> so how many blocks to fetch in advance althrough only some blocks of a file were cached before<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:28:47)</span> <b>efajardo:</b></span> 2.<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:28:58)</span> <b>efajardo:</b></span> <tt>pfc.ram       24g</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(16:29:08)</span> <b>efajardo:</b></span> This one is a output buffer<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:29:24)</span> <b>efajardo:</b></span> which when full it means the cache becomes a passthrough memmory<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:50:02)</span> <b>blin:</b></span> mmk, thanks<br/>
+</body>
+</html>

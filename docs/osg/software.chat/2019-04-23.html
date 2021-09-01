@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Apr 23, 2019 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue Apr 23, 2019 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(11:38:21)</span> <b>blin:</b></span> @matyas @dweitzel does osg-configure do any configuration of BOSCO blahp configuration?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:38:48)</span> <b>dweitzel:</b></span> Yes<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:39:06)</span> <b>dweitzel:</b></span> It calls bosco_cluster with appropriate arguments. <br/>
+<span style="color: #43761b"><span style="font-size: small">(11:40:09)</span> <b>blin:</b></span> does it configure all the proxy delegation/limiting as required?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:40:20)</span> <b>blin:</b></span> is there a way to set other vars in the blah config as well?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:40:43)</span> <b>blin:</b></span> namely: <a href="https://github.com/opensciencegrid/BLAH/blob/v1_18_bosco/config/blah.config.template#L102-L103">https://github.com/opensciencegrid/BLAH/blob/v1_18_bosco/config/blah.config.template#L102-L103</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:41:08)</span> <b>dweitzel:</b></span> No, I don’t think it does anything with that configuration. <br/>
+<span style="color: #43761b"><span style="font-size: small">(11:42:19)</span> <b>blin:</b></span> hrmph<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:42:56)</span> <b>blin:</b></span> a related question: how does bosco handle local config changes to the blah config when updating the local blahp installation?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:43:24)</span> <b>blin:</b></span> one thing we're thinking about doing for the blahp unification is renaming batch_gahp stuff back to blahp<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:16:27)</span> <b>dweitzel:</b></span> What is this local blah?  In bosco, there is only a remote blah <br/>
+<span style="color: #43761b"><span style="font-size: small">(12:16:55)</span> <b>blin:</b></span> yeah, sorry that's what i meant<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:38:42)</span> <b>dweitzel:</b></span> well, it will overwrite whatever is there.<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:39:40)</span> <b>blin:</b></span> oh, that's annoying<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:39:49)</span> <b>blin:</b></span> so we can't do any local site customizations like for the batch system tool binpaths?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:42:03)</span> <b>dweitzel:</b></span> you certainly can.  but on the next call to <tt>bosco_cluster --add...</tt>, it will overwrite the changes.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:42:29)</span> <b>dweitzel:</b></span> and <tt>bosco_cluster --add</tt> is called when Bosco is enabled in <tt>osg-configure</tt>.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:43:02)</span> <b>dweitzel:</b></span> though, you can do what we discussed at HOW.  Enabled Bosco the first time in osg-configure, and then disable it.  Then osg-configure will not overwrite anything.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:57:49)</span> <b>blin:</b></span> man that's janky<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:04:04)</span> <b>dweitzel:</b></span> indeed.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:04:37)</span> <b>dweitzel:</b></span> wish we could do some proper package management, but then again, it's installing something on a remote machine without root.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:08:17)</span> <b>bbockelm:</b></span> can we not drop a state file (local and/or remote) and prevent osg-configure from clobbering things at least?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:12:10)</span> <b>blin:</b></span> we already have some state indicating that osg-configure ran from the CE POV:<br/><pre><br/>$ condor_ce_config_val OSG_CONFIGURED<br/>true<br/></pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:13:35)</span> <b>dweitzel:</b></span> Should this state be bosco specific?  I can imagine scenarios where the admin configures things, runs osg-configure, then starts configuring the bosco components.  But I'm not sure how likely that is.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:14:23)</span> <b>bbockelm:</b></span> Actually, is the right thing to do to capture the customization on the CE side and clobber each time?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:15:00)</span> <b>dweitzel:</b></span> that would probably be ideal.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:15:09)</span> <b>blin:</b></span> yeah, i'm starting to think that we want to do as much on the CE side as possible and rsync things over to the head node<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:15:27)</span> <b>blin:</b></span> i.e. WN setup, CA/CRLs, blahp installation<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:15:37)</span> <b>bbockelm:</b></span> That way the CE can be under puppet control and result in an identical setup if reinstalled.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:26:06)</span> <b>blin:</b></span> well either way, knowing that bosco doesn't support remote blahp config changes makes a rename from batch_gahp back to blahp easier<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(14:27:47)</span> <b>zalak:</b></span> <b>@here</b> I was trying to send out an announcement using osg-notify and I got this error<br/><br/><tt>***<br/>FQDN: <a href="http://osgannouncesystem.cacr.iu.edu">osgannouncesystem.cacr.iu.edu</a><br/>IPv4: 129.79.49.11<br/>IPv4 is public? True<br/>IPv4 is ours? False<br/>Reverse FQDN: <a href="http://osgannouncesystem.cacr.iu.edu">osgannouncesystem.cacr.iu.edu</a> (match)<br/>***<br/>Refusing to send email without hostname/public DNS match.<br/>For more info, see:<br/>  <a href="https://opensciencegrid.org//operations/services/sending-announcements/">https://opensciencegrid.org//operations/services/sending-announcements/</a></tt><br/>
+<span style="color: #df3dc0"><span style="font-size: small">(14:56:22)</span> <b>zalak:</b></span> DNS forward and reverse lookups are also looks correct.<br/><br/>[localadm@osgannouncesystem topology]$ hostname<br/><a href="http://osgannouncesystem.cacr.iu.edu">osgannouncesystem.cacr.iu.edu</a><br/>[localadm@osgannouncesystem topology]$ host <a href="http://osgannouncesystem.cacr.iu.edu">osgannouncesystem.cacr.iu.edu</a><br/><a href="http://osgannouncesystem.cacr.iu.edu">osgannouncesystem.cacr.iu.edu</a> has address 129.79.49.11<br/>[localadm@osgannouncesystem topology]$ host 129.79.49.11<br/>11.49.79.129.in-addr.arpa domain name pointer <a href="http://osgannouncesystem.cacr.iu.edu">osgannouncesystem.cacr.iu.edu</a>.<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(14:56:44)</span> <b>zalak:</b></span> Does anyone know the issue?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:58:08)</span> <b>matyas:</b></span> <b>@edquist</b>, looks like you wrote that part of the code. Can you help Zalak?<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:58:33)</span> <b>edquist:</b></span> ooh, i've been summoned!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:59:10)</span> <b>bbockelm:</b></span> Looks like it's failing on checking whether the public IP address is the IP address of one of the local network interfaces.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:59:23)</span> <b>bbockelm:</b></span> I.e., does 129.79.49.11 appear in <tt>ip addr list</tt>?<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(15:00:23)</span> <b>zalak:</b></span> @bbockelm yes, 129.79.0.0/16 is there.<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:00:44)</span> <b>edquist:</b></span> qhat code is this?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:00:50)</span> <b>bbockelm:</b></span> no, does 129.79.49.11 appear?<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:00:51)</span> <b>edquist:</b></span> *what<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(15:03:37)</span> <b>zalak:</b></span> @bbockelm no.<br/><br/>My bad, I thought you were asking whether the IP (129.79.49.11) is in the whitelist for SPF.<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:14:21)</span> <b>marco.mascheroni:</b></span> @dweitzel I was debugging some issues at WSU with @blin who has asked me to follow up with you here. The starting point is: <a href="https://opensciencegrid.atlassian.net/projects/GFACTOPS/issues/GFACTOPS-1486?filter=allopenissues">https://opensciencegrid.atlassian.net/projects/GFACTOPS/issues/GFACTOPS-1486?filter=allopenissues</a><br/><br/>The CE submit the job, the jobs is running on the submit node. However the job stays idle on the CE and eventually times out and goes to held.<br/><br/>The hypothesis is that they updated pbs and now pbs_status is not working anymore. We were trying to run it by hand. We left with this command returning the wrong path (it's what pbs_status does to figure out qstat location AFAIU):<br/><br/><pre><br/>[osg@warrior ~]$ /bin/bash -c 'source /wsu/home/groups/osg/bosco/glite/bin/blah_load_config.sh &amp;&amp; echo $pbs_binpath/qstat'<br/>++ '[' x '!=' x -a -d /bin ']'<br/>++ '[' -d /opt/glite/bin ']'<br/>++ blah_bin_directory=/usr/bin<br/>++ '[' -r '' ']'<br/>++ '[' -r /opt/glite/etc/batch_gahp.config ']'<br/>++ '[' -r /etc/batch_gahp.config ']'<br/>+ echo /qstat<br/>/qstat<br/></pre><br/><br/>where  ~/bosco/glite/bin/blah_load_config.sh is:<br/><br/><pre><br/>set -x<br/>if [ "x$BLAHPD_LOCATION" != "x" -a -d "${BLAHPD_LOCATION}/bin" ]; then<br/>  blah_bin_directory="${BLAHPD_LOCATION}/bin"<br/>elif [ -d "${GLITE_LOCATION:-/opt/glite}/bin" ]; then<br/>  blah_bin_directory="${GLITE_LOCATION:-/opt/glite}/bin"<br/>else<br/>  blah_bin_directory="/usr/bin"<br/>fi<br/># Let blah_bin_directory be overridden in the config file.<br/>if [ -r "$BLAHPD_CONFIG_LOCATION" ]; then<br/>  . $BLAHPD_CONFIG_LOCATION<br/>elif [ -r "${GLITE_LOCATION:-/opt/glite}/etc/batch_gahp.config" ]; then<br/>  . ${GLITE_LOCATION:-/opt/glite}/etc/batch_gahp.config<br/>elif [ -r "${BLAHPD_LOCATION}/etc/batch_gahp.config" ]; then<br/>#   This will default to /etc/batch_gahp.config if BLAHPD_LOCATION is unset.<br/>  . ${BLAHPD_LOCATION}/etc/batch_gahp.config<br/>fi<br/></pre><br/><br/>It looks like neither GLITE_LOCATION nor BLAHPD_LOCATION are set. do you know where they are set/to which value?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:17:44)</span> <b>dweitzel:</b></span> short answer: no, I don't know.<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:19:39)</span> <b>marco.mascheroni:</b></span> Ok,I can try to set it to ~/bosco/glite, but I wonder if/what environment I am missing to be able to replicate pbs_status by hand<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:20:02)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:20:48)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:21:01)</span> <b>marco.mascheroni:</b></span> (that's /var/tmp/qstat_cache_osg/pbs_status.log)<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:21:29)</span> <b>marco.mascheroni:</b></span> that's pbs pro, it's using the options for plain pbs I guess<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:23:05)</span> <b>dweitzel:</b></span> there's config for pbs_pro.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:23:17)</span> <b>dweitzel:</b></span> maybe you already have that set.<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:23:41)</span> <b>marco.mascheroni:</b></span> yeah<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:23:49)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:23:56)</span> <b>marco.mascheroni:</b></span> is this the correct output?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:24:02)</span> <b>dweitzel:</b></span> looks good to me.<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:24:08)</span> <b>marco.mascheroni:</b></span> k<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:24:13)</span> <b>marco.mascheroni:</b></span> then that's what I did<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:24:20)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:24:27)</span> <b>marco.mascheroni:</b></span> short circuited the if because<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:24:43)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:25:02)</span> <b>marco.mascheroni:</b></span> this does not contain PBSPro<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:25:10)</span> <b>dweitzel:</b></span> ah, they're not putting PBSPro in the version anymore...<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:25:35)</span> <b>marco.mascheroni:</b></span> Also, notice the '-fx' in place of what was before<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:25:49)</span> <b>marco.mascheroni:</b></span> I'll send a test job<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:28:06)</span> <b>marco.mascheroni:</b></span> Looks better now, the job is running on the CE!<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:30:19)</span> <b>marco.mascheroni:</b></span> I'll let you guys open the ticket and provice a proper fix. Let me know if you want me to test something out<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:34:26)</span> <b>blin:</b></span> yeah, i'm checking in with our other PBS Pro site to see if <tt>-fH</tt> or <tt>-fx</tt> works for them as well<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:35:34)</span> <b>blin:</b></span> and once again, another annoyance with the differing blahp versions where condor is using an old check for pbs pro<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:35:39)</span> <b>blin:</b></span> cc: <b>@edquist</b><br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:37:26)</span> <b>marco.mascheroni:</b></span> k, I am off for today. Pretty sure the pilots are failing some validation as well, but for today it's enough<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:37:52)</span> <b>edquist:</b></span> @zalak - it sounds like the public ip addr in question (129.79.49.11) is not listed as belonging to any of the net interfaces.  We actually ran into this exact issue before:<br/><a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-3389?focusedCommentId=351762&amp;page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-351762">https://opensciencegrid.atlassian.net/browse/SOFTWARE-3389?focusedCommentId=351762&amp;page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-351762</a><br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:38:05)</span> <b>marco.mascheroni:</b></span> -fH does not work for me IIUC @blin<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:39:57)</span> <b>blin:</b></span> ah, i see the difference in the output now<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:39:58)</span> <b>blin:</b></span> thanks<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:40:30)</span> <b>edquist:</b></span> @&lt;font size="3"&gt;blin do you want me to look into something with this blahp question?&lt;/font&gt;<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:40:42)</span> <b>edquist:</b></span> @blin do you want me to look into something with this blahp question?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:41:22)</span> <b>blin:</b></span> yeah, can you start prepping a PR or whatever updating the condor version of the blahp + any OSG patches they're missing?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:41:29)</span> <b>blin:</b></span> we can handle the batch_gahp renaming stuff later<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:42:38)</span> <b>edquist:</b></span> sure there isn't a JIRA ticket for this yet is there?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:44:31)</span> <b>blin:</b></span> the blahp unification ticket?<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:46:54)</span> <b>edquist:</b></span> ok<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:47:13)</span> <b>edquist:</b></span> i was thinking something specifically for the condor side, but sure that works<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:43:24)</span> <b>bbockelm:</b></span> Hi<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:43:38)</span> <b>bbockelm:</b></span> So... there's still a pretty large amount of work waiting on the XRootD 4.9.1 release.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:43:47)</span> <b>bbockelm:</b></span> what's the latest on that?  @tim.theisen?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:49:36)</span> <b>blin:</b></span> i think xrootd 4.9.1 is ready for the release this week<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:49:46)</span> <b>blin:</b></span> xcache still has quite a few tickets that need to be tested<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:49:54)</span> <b>bbockelm:</b></span> who owns them?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:50:12)</span> <b>bbockelm:</b></span> (have a JIRA query I can look at?)<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:50:15)</span> <b>blin:</b></span> @marian and @jthiltges<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:50:35)</span> <b>blin:</b></span> <a href="https://opensciencegrid.atlassian.net/issues/?filter=15254">https://opensciencegrid.atlassian.net/issues/?filter=15254</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(17:37:30)</span> <b>marian:</b></span> yeah, we aim to tackle remaining xcache tix until tomorrow<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:44:52)</span> <b>blin:</b></span> how close are we?<br/>
+</body>
+</html>

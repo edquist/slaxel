@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Apr 28, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Fri Apr 28, 2017 : #gracc (osg)</h3>
+<span style="color: #3c8c69"><span style="font-size: small">(09:37:37)</span> <b>kretzke:</b></span> adventures in legacy code volume 283: <tt>CommonName</tt> was added by the Gratia collector for 99% of records<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:38:54)</span> <b>dweitzel:</b></span> ugh.  How was it derived?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:40:06)</span> <b>kretzke:</b></span> in the most complicated way they could come up with I think. more than I can copy-paste anyways<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:40:45)</span> <b>kretzke:</b></span> derived from DN, with some other cases<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:42:56)</span> <b>kretzke:</b></span> <a href="https://sourceforge.net/p/gratia/svn/HEAD/tree/trunk/collector/gratia-services/net/sf/gratia/storage/JobUsageRecordUpdater.java#l276">https://sourceforge.net/p/gratia/svn/HEAD/tree/trunk/collector/gratia-services/net/sf/gratia/storage/JobUsageRecordUpdater.java#l276</a><br/>
+<span style="color: #902d59"><span style="font-size: small">(09:44:45)</span> <b>tanya:</b></span> and GRACC plots are templating by CommonName<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:48:38)</span> <b>kretzke:</b></span> that’s an easy fix: remove the user-level template and graphs, should probably be using kibana or a filter at that point<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:49:47)</span> <b>kretzke:</b></span> user is too high-cardinality for templates imo<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:50:21)</span> <b>dweitzel:</b></span> ok, so CommonName is for now not being set?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:50:42)</span> <b>dweitzel:</b></span> is CommonName used in the hash generating for the unqiue-ness in ES?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:51:08)</span> <b>dweitzel:</b></span> We can always replay the records.  But if CommonName is used in the hash generating, it's going to be a bit more difficult?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:53:51)</span> <b>kretzke:</b></span> good question. it’s not <pre>            excl_keys = ['RecordId','CreateTime','GlobalUsername','LocalUserId',<br/>                      'VOName','ReportableVOName','CommonName','SiteName','Grid',<br/>                      'RawXML','type','@timestamp','@received','@version']</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:54:17)</span> <b>dweitzel:</b></span> awesome.  So we can just replay records when we have the CommonName stuff back?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:54:25)</span> <b>dweitzel:</b></span> that should make it easy then.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:56:09)</span> <b>kretzke:</b></span> yeah. have to decide how CommonName should be handled now<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:59:11)</span> <b>kretzke:</b></span> I still hate Friday mornings, but at least today Ceph is behaving itself!<br/>
+<span style="color: #aba727"><span style="font-size: small">(09:59:21)</span> <b>sbhat:</b></span> *knock on wood*<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:59:30)</span> <b>kretzke:</b></span> I like to live dangerously<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:12:21)</span> <b>kretzke:</b></span> unless someone screams, I’m not taking any immediate action on CommonName… need to discuss how much of Gratia’s behavior we want to keep and how<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:12:38)</span> <b>bbockelm:</b></span> CommonName was effectively used as a simple way to get pretty printed version of the user's name.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:12:57)</span> <b>bbockelm:</b></span> Can we just have a derived display name of some sort?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:13:20)</span> <b>bbockelm:</b></span> "This is for reports Name"?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:13:42)</span> <b>kretzke:</b></span> for the general case? probably not<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:14:33)</span> <b>bbockelm:</b></span> ( @dweitzel @marian - Ken Bloom was requesting in the CMS management Slack that we have more links to GRACC from OSG web presences.  Can you sprinkle them in the twiki and file a ticket with GOC?  Did they ever finish our prior ticket on linking to docs?$<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:20:44)</span> <b>marian:</b></span> They had changes in the plan plan on Tuesday's upgrade window ... I do we have example? True is there could be things in the twiki pointing to gratiaweb still, but should not be on OSG web<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:22:42)</span> <b>marian:</b></span> nevermind, will figure with Ken, have him on chat<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:22:53)</span> <b>marian:</b></span> examples ...<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:23:18)</span> <b>bbockelm:</b></span> I don't think there are old links, I think there are no links from the project home page.<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:39:40)</span> <b>marian:</b></span> yes, got it from him ...<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:40:30)</span> <b>marian:</b></span> we can certainly add ... but we never had links for gratiaweb either it seems ... so all good, just thought first we've forgot on something during transition<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:44:41)</span> <b>marian:</b></span> So I'm suggesting three places where to add GRACC link:<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:44:50)</span> <b>marian:</b></span> 1) osg main home page<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:45:04)</span> <b>marian:</b></span> 2) <a href="http://support.opensciencegrid.org">support.opensciencegrid.org</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(10:45:14)</span> <b>marian:</b></span> 3) OSG TWiki<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:45:52)</span> <b>marian:</b></span> somewhere where people can find it easily and that it doesn't distract other content<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:04:22)</span> <b>kretzke:</b></span> well shoot, guess I never imported the transfer summaries… <a href="https://gracc.opensciencegrid.org/dashboard/db/site-transfer-summary?orgId=1&amp;from=1454284800000&amp;to=1485907200000&amp;var-interval=$__auto_interval&amp;var-site=All">https://gracc.opensciencegrid.org/dashboard/db/site-transfer-summary?orgId=1&amp;from=1454284800000&amp;to=1485907200000&amp;var-interval=$__auto_interval&amp;var-site=All</a><br/>
+</body>
+</html>

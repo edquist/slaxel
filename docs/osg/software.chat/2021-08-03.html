@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Aug 3, 2021 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue Aug 3, 2021 : #software (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(15:52:53)</span> <b>matyas:</b></span> Hi @hufnagel, I'm trying to run pilots that have singularity support on Stampede2, using mountrepo from cvmfsexec kind of like what you were doing in here: <a href="https://indico.fnal.gov/event/22127/contributions/194936/attachments/133940/165414/frontera_cms.pdf">https://indico.fnal.gov/event/22127/contributions/194936/attachments/133940/165414/frontera_cms.pdf</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(15:54:41)</span> <b>matyas:</b></span> Problem is, the images that I'm trying to run are themselves inside CVMFS.<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:57:22)</span> <b>matyas:</b></span> I have the mount location in the var $CVMFS_BASE. When I try to do<br/><pre>$ singularity exec ${CVMFS_BASE}/singularity.opensciencegrid.org/.images/91/12a221e67a037614cddf1f875f510c3600ce36fc4dafb133ff15a16663380b   echo hi</pre><br/>(that long hash is what the <tt>osgvo-el7:latest</tt> image resolves to), I get the error<br/><pre>    ERROR  : Failed to change current working directory: Permission denied</pre><br/><br/>
+<span style="color: #c386df"><span style="font-size: small">(15:58:00)</span> <b>matyas:</b></span> did you run into this problem?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:27:07)</span> <b>hufnagel:</b></span> We don't use images from singularity at Stampede2. I created a squashfs container based on the docker container that is the source of our default CMS cvmfs image and used that.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:29:13)</span> <b>hufnagel:</b></span> I *think* we also tried to use the default CMS cvmfs image directly, but from what I remember it didn't work since with the mountrepo command you can't mount cvmfs in /cvmfs and that seems to be required to be able to run the images on cvmfs directly.<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:39:23)</span> <b>matyas:</b></span> so you made a .sif file and saved it under $HOME or $WORK, and set that as the default image in your frontend config?<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:39:59)</span> <b>matyas:</b></span> (or something along those lines)<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:42:58)</span> <b>matyas:</b></span> (not sure what you mean by squashfs container -- is that a single file? how do you make one?)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:46:22)</span> <b>hufnagel:</b></span> <tt>singularity build --fix-perms --sandbox /data/cvmfs/build_cvmfs <a href="docker://cmssw/cms:rhel7">docker://cmssw/cms:rhel7</a></tt><br/><tt>mksquashfs /data/cvmfs/build_cvmfs cms.cern.ch.squashfs -no-recovery -no-progress</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:47:05)</span> <b>hufnagel:</b></span> Basically that, although this was originally only a small part of a build setup to generate squashfs images with OS and cvmfs inside the image.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:47:56)</span> <b>hufnagel:</b></span> Which turned out to be a dead end due to the way CMS software was (un)organized in cvmfs, there was no good way to limit what needed to be included and the images just became too large.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:48:21)</span> <b>hufnagel:</b></span> But I reused that part to just create a simple squashfs image with just the OS when I needed it for Stampede2.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:48:39)</span> <b>hufnagel:</b></span> There might be an easier way to create a native sif image from docker.<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:54:11)</span> <b>matyas:</b></span> How did you get the pilot to advertise that it has singularity support? Did you specify the path to your squashfs image in the frontend config?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:57:22)</span> <b>hufnagel:</b></span> That part was implemented by the HEPCloud team, we basically had to change the CMS frontend scripts that handle singularity support (this predated the gWMS builtin singularity support) and change things to a) use the container we build and placed on Stampede2 scratch and b) change the cvmfs bind mount so that inside singularity cvmfs was in the correct /cvmfs location. Not sure how we would/will accomplish this with the gWMS builtin singularity support, we haven't switched to that yet.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:58:52)</span> <b>hufnagel:</b></span> Steven Timm would be the person to ask if you want more details.<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:00:55)</span> <b>matyas:</b></span> how do you keep the gWMS built in singularity scripts from running?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:01:48)</span> <b>hufnagel:</b></span> I have no idea, but if it's not off by default I assume we switched it off.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:05:30)</span> <b>hufnagel:</b></span> Somehow. Again, Steve would be the person to ask about details.<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:31:49)</span> <b>matyas:</b></span> ok. Thanks!<br/>
+</body>
+</html>

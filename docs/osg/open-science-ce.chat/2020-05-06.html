@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed May 6, 2020 : #open-science-ce (osg)</title>
+</head>
+<body>
+<h3>Wed May 6, 2020 : #open-science-ce (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(11:25:12)</span> <b>matyas:</b></span> hey @lincoln, I'm trying to test a condor bug we found on the open science ce on river and need to get an external IP address. I've got a Service definition that says<br/><pre>apiVersion: v1<br/>kind: Service<br/>metadata:<br/>  name: opensci-mstest<br/>  labels:<br/>    app: opensci-mstest<br/>spec:<br/>  type: LoadBalancer<br/>  externalTrafficPolicy: "Local"<br/>  ports:<br/>  - name: htcondor<br/>    port: 9618<br/>    targetPort: htcondor<br/>    protocol: TCP<br/>  loadBalancerIP: 192.168.30.13<br/>  selector:<br/>    app: opensci-mstest</pre><br/>but when I do <tt>kubectl describe service</tt> , I get <tt>Failed to allocate IP for "osg-covid19/opensci-mstest": "192.168.30.13" is not allowed in config</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(11:25:52)</span> <b>matyas:</b></span> any ideas?<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:29:04)</span> <b>lincoln:</b></span> uh, that's weird<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:29:10)</span> <b>lincoln:</b></span> loadBalancerIP looks wrong<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:29:19)</span> <b>lincoln:</b></span> that's a RFC1918  internal range?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:29:33)</span> <b>matyas:</b></span> hm.<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:29:52)</span> <b>lincoln:</b></span> maybe leave it blank and it'll assign one? :slightly_smiling_face:<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:32:06)</span> <b>matyas:</b></span> yeah that seems to work. So if I want the same IP next time, what should I use? The value of <tt>LoadBalancer Ingress</tt> from <tt>kubectl describe service</tt>?<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:34:55)</span> <b>cnweaver:</b></span> Yes I think so, this is also what should be shown in the <tt>EXTERNAL-IP</tt> column with a <tt>kubectl get service</tt>.<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:02:35)</span> <b>matyas:</b></span> that works. Thanks!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:26:31)</span> <b>bbockelm:</b></span> @lincoln - the above triggered my brain.  What (if anything) do you guys do in terms of DNS integration?  If the IP address changes for Mat when the container is recreated, does "magic" update DNS accordingly?<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:27:31)</span> <b>lincoln:</b></span> there are some things we could do.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:27:43)</span> <b>lincoln:</b></span> I don't think we are doing them currently but I'd have to think back and try to remember :slightly_smiling_face:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:28:45)</span> <b>bbockelm:</b></span> Particularly, I'm curious if there's anything that integrates nicely with CloudFlare.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:29:53)</span> <b>lincoln:</b></span> at one point we were using a tool for this to set DNS records w/ AWS<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:30:01)</span> <b>lincoln:</b></span> no idea about CloudFlare.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:30:34)</span> <b>bbockelm:</b></span> All the leads I could find end up with their nifty tunneling software.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:31:01)</span> <b>lincoln:</b></span> <a href="https://github.com/kubernetes-sigs/external-dns">https://github.com/kubernetes-sigs/external-dns</a> this is what we were using<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:31:17)</span> <b>lincoln:</b></span> which claims it supports CloudFlare in the readme<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:33:19)</span> <b>lincoln:</b></span> so if the service object stays the same but the container is recreated, then the IP shouldn't change, btw<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:33:48)</span> <b>lincoln:</b></span> also fwiw SLATE sets some of its own DNS records in our AWS for applications I believe.. @cnweaver am i lying?<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:34:00)</span> <b>lincoln:</b></span> I know we set DNS records for ingress controllers<br/>
+<span style="color: #e85d72"><span style="font-size: small">(14:35:34)</span> <b>cnweaver:</b></span> We do not set records for individual applications, although it's something we have vaguely discussed that we could do.<br/>
+<span style="color: #e85d72"><span style="font-size: small">(14:36:04)</span> <b>cnweaver:</b></span> At the moment we just make the wildcard record for the ingress controller, which can support an arbitrary number of applications, if they are able to use ingress.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:36:16)</span> <b>lincoln:</b></span> got it<br/>
+<span style="color: #e85d72"><span style="font-size: small">(14:37:00)</span> <b>cnweaver:</b></span> Definitely something we could do, perhaps by keying off of an annotation on the service object.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:37:25)</span> <b>lincoln:</b></span> sounds like then we have a working mechanism for setting DNS entries but nothing in the server today outside of our special use case with ingress controllers<br/>
+<span style="color: #e85d72"><span style="font-size: small">(14:39:38)</span> <b>cnweaver:</b></span> Indeed, the API server knows how to talk to Route53 to make any records it wants, it just only gets used for registering clusters. Simple enough to add to installing/restarting an application, I think.<br/>
+</body>
+</html>

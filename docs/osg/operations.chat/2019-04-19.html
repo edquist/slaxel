@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Apr 19, 2019 : #operations (osg)</title>
+</head>
+<body>
+<h3>Fri Apr 19, 2019 : #operations (osg)</h3>
+<span style="color: #e23f99"><span style="font-size: small">(12:26:56)</span> <b>marco.mascheroni:</b></span> @jlstephen @lincoln is port 80 open on the new hosts (24-29). In particular I am looking at ce26 right now<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:30:31)</span> <b>lincoln:</b></span> I don't think so<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:30:34)</span> <b>lincoln:</b></span> Is it needed?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(12:35:37)</span> <b>marco.mascheroni:</b></span> I need it for certbot, to create a new hostcert<br/>
+<span style="color: #e23f99"><span style="font-size: small">(12:35:50)</span> <b>marco.mascheroni:</b></span> and possibly to renew it in the future<br/>
+<span style="color: #ea2977"><span style="font-size: small">(12:50:56)</span> <b>jlstephen:</b></span> doesn't look like they do<br/>
+<span style="color: #ea2977"><span style="font-size: small">(12:51:00)</span> <b>jlstephen:</b></span> i can add it<br/>
+<span style="color: #ea2977"><span style="font-size: small">(12:52:53)</span> <b>jlstephen:</b></span> done<br/>
+<span style="color: #385a86"><span style="font-size: small">(17:13:40)</span> <b>jdost321:</b></span> @lincoln @blin I tried restarting the AMNH ( hosted-ce22) condor ce, still nothing. Why might the collector only be picking up localhost as the ip? <pre>condor_status<br/>Error: communication error<br/>CEDAR:6001:Failed to connect to &lt;127.0.0.1:11000?sock=collector</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(17:14:16)</span> <b>blin:</b></span> how about <tt>condor_ce_status</tt>?<br/>
+<span style="color: #385a86"><span style="font-size: small">(17:14:32)</span> <b>jdost321:</b></span> returns nothing, but doesn't fail<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:14:37)</span> <b>blin:</b></span> (hosted CEs dont run a local condor schedd/collector)<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:14:42)</span> <b>blin:</b></span> err how about <tt>condor_ce_status -any</tt><br/>
+<span style="color: #385a86"><span style="font-size: small">(17:14:48)</span> <b>jdost321:</b></span> <pre>condor_ce_status -any<br/>MyType             TargetType         Name                                     <br/><br/>Collector          None               My Pool - localhost@localhost</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(17:15:10)</span> <b>blin:</b></span> that's not great. my guess is auth issues<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:15:33)</span> <b>blin:</b></span> what does hostname return? we've had problems with that before, esp after restart of the VMs<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:15:52)</span> <b>blin:</b></span> otherwise i'd look in <tt>/var/log/condor-ce/{Master,Sched}Log</tt><br/>
+<span style="color: #385a86"><span style="font-size: small">(17:16:21)</span> <b>jdost321:</b></span> <pre>hostname<br/>hosted-ce22.localdomain</pre><br/>
+<span style="color: #385a86"><span style="font-size: small">(17:16:57)</span> <b>jdost321:</b></span> looks like this has been done manually before in the history, i can run it again <pre>hostnamectl set-hostname <a href="http://hosted-ce22.grid.uchicago.edu">hosted-ce22.grid.uchicago.edu</a></pre><br/>
+<span style="color: #385a86"><span style="font-size: small">(17:17:06)</span> <b>jdost321:</b></span> but @lincoln why does this happen?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:17:22)</span> <b>blin:</b></span> yeah, this keeps happening and we have no idea why<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:17:51)</span> <b>blin:</b></span> we should make sure to bring this up in the ops call next week and put this in the notes<br/>
+<span style="color: #385a86"><span style="font-size: small">(17:18:24)</span> <b>jdost321:</b></span> looking better <pre>condor_ce_status -any<br/>MyType             TargetType         Name                                                                 <br/><br/>Collector          None               My Pool - hosted-ce22.grid.uchicago.edu@h                            <br/>Scheduler          None               <a href="http://hosted-ce22.grid.uchicago.edu">hosted-ce22.grid.uchicago.edu</a>                                        <br/>DaemonMaster       None               <a href="http://hosted-ce22.grid.uchicago.edu">hosted-ce22.grid.uchicago.edu</a>                                        <br/>Job_Router         None               <a href="mailto:htcondor-ce@hosted-ce22.grid.uchicago.edu">htcondor-ce@hosted-ce22.grid.uchicago.edu</a></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(17:19:20)</span> <b>blin:</b></span> seeing any jobs with <tt>condor_ce_q</tt>?<br/>
+<span style="color: #385a86"><span style="font-size: small">(17:19:37)</span> <b>jdost321:</b></span> yep, just got 4 idle<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:19:58)</span> <b>blin:</b></span> nice<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:20:18)</span> <b>blin:</b></span> thanks for taking a look<br/>
+<span style="color: #385a86"><span style="font-size: small">(17:20:47)</span> <b>jdost321:</b></span> no problem, it's midnight on fri for Marco, i didn't expect he'd be able to loo<br/>
+<span style="color: #385a86"><span style="font-size: small">(17:20:49)</span> <b>jdost321:</b></span> look<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:21:03)</span> <b>blin:</b></span> i was just about to ask you to before you started<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:21:15)</span> <b>blin:</b></span> because i got reamed by miron about AMNH<br/>
+<span style="color: #385a86"><span style="font-size: small">(17:30:17)</span> <b>jdost321:</b></span> :disappointed: sorry brian.<br/>
+</body>
+</html>

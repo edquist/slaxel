@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Dec 13, 2016 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Tue Dec 13, 2016 : #gracc (osg)</h3>
+<span style="color: #A82F2F"><span style="font-size: small">(09:54:05)</span> <b>B167BCLN5:</b></span> <br/>
+<span style="color: #A82F2F"><span style="font-size: small">(10:22:02)</span> <b>B167BCLN5:</b></span> <br/>
+<span style="color: #902d59"><span style="font-size: small">(13:32:24)</span> <b>tanya:</b></span> i've updated the ticket for anomalies : some wall hours *2 during random period of time<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:02:01)</span> <b>kretzke:</b></span> sounds like duplicate records. we changed the checksum scheme at some point, maybe some records had the old checksum<br/>
+<span style="color: #902d59"><span style="font-size: small">(14:40:42)</span> <b>tanya:</b></span> i could check if there are actually just duplicates<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(14:50:27)</span> <b>B167BCLN5:</b></span> <br/>
+<span style="color: #A82F2F"><span style="font-size: small">(15:03:11)</span> <b>B167BCLN5:</b></span> <br/>
+<span style="color: #A82F2F"><span style="font-size: small">(15:04:09)</span> <b>B167BCLN5:</b></span> <br/>
+<span style="color: #A82F2F"><span style="font-size: small">(15:32:02)</span> <b>B167BCLN5:</b></span> <br/>
+<span style="color: #902d59"><span style="font-size: small">(16:59:03)</span> <b>tanya:</b></span> duplicate records<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:01:19)</span> <b>kretzke:</b></span> raw?<br/>
+<span style="color: #902d59"><span style="font-size: small">(17:08:36)</span> <b>tanya:</b></span> yep - updating ticket<br/>
+<span style="color: #902d59"><span style="font-size: small">(17:14:51)</span> <b>tanya:</b></span> i have updated the ticket, do you need me to try to figure out why checksum is different?<br/>
+<span style="color: #902d59"><span style="font-size: small">(17:15:08)</span> <b>tanya:</b></span> i've an example of identical jobs with different checksums<br/>
+<span style="color: #902d59"><span style="font-size: small">(17:15:41)</span> <b>tanya:</b></span> how would you do clean up - it might be not an only time<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:20:54)</span> <b>kretzke:</b></span> yes, next we need to figure out why and that will tell us how to find these duplicates<br/>
+<span style="color: #902d59"><span style="font-size: small">(17:21:35)</span> <b>tanya:</b></span> do you remember based on what you have built checksum?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:24:12)</span> <b>kretzke:</b></span> the checksum algorithm hasn’t changed since June <a href="https://github.com/opensciencegrid/gracc-raw/blame/master/gracc-raw.conf#L61">https://github.com/opensciencegrid/gracc-raw/blame/master/gracc-raw.conf#L61</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:24:46)</span> <b>kretzke:</b></span> effectively same as Gratia - checksum all fields except certain ones (same list is excluded)<br/>
+<span style="color: #902d59"><span style="font-size: small">(17:24:50)</span> <b>tanya:</b></span> i don't see any difference in RawXML<br/>
+<span style="color: #902d59"><span style="font-size: small">(17:24:57)</span> <b>tanya:</b></span> but checksum is different<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:25:44)</span> <b>kretzke:</b></span> what about the json? I suspect a field got added<br/>
+<span style="color: #902d59"><span style="font-size: small">(17:26:52)</span> <b>tanya:</b></span> mac-124281:~ tlevshin$ diff b1 b2<br/>1c1<br/>&lt; @received	June 13th 2016, 23:00:56.771<br/>---<br/>&gt; @received	July 1st 2016, 13:27:15.710<br/>104c104<br/>&lt; t_id	32c7a54bb33ffbcf8b4c3c32f6dcb521<br/>---<br/>&gt; t_id	2511e031bd8ca76b08c69d335e2d96d8<br/>108,110c108,110<br/>&lt; tchecksum	32c7a54bb33ffbcf8b4c3c32f6dcb521<br/>&lt; #lag_time	7945258.771<br/>&lt; #lag_time_hr	2207.016<br/>---<br/>&gt; tchecksum	2511e031bd8ca76b08c69d335e2d96d8<br/>&gt; #lag_time	9466037.71<br/>&gt; #lag_time_hr	2629.455<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:29:22)</span> <b>kretzke:</b></span> ah, well June 13th is old enough it may have changed in production after that. it will be probably just be a matter of deleting records with <tt>@received</tt> older than some date<br/>
+<span style="color: #902d59"><span style="font-size: small">(17:30:29)</span> <b>tanya:</b></span> could we query by @recieved ?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:30:33)</span> <b>kretzke:</b></span> yes<br/>
+<span style="color: #902d59"><span style="font-size: small">(17:39:29)</span> <b>tanya:</b></span> 190K records<br/>
+<span style="color: #902d59"><span style="font-size: small">(17:42:22)</span> <b>tanya:</b></span> it is wrong because it is just for nova<br/>
+<span style="color: #902d59"><span style="font-size: small">(17:44:00)</span> <b>tanya:</b></span> 21,625,688 hits<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(19:51:26)</span> <b>kretzke:</b></span> @tanya 21million hits for what search?<br/>
+<span style="color: #902d59"><span style="font-size: small">(23:09:54)</span> <b>tanya:</b></span> for all records with @received &lt;June13 for FY2016. I didn’t check 2015. The plot is added to Jira ticket<br/>
+</body>
+</html>

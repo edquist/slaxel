@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Aug 9, 2017 : #osg-rmacc17 (osg)</title>
+</head>
+<body>
+<h3>Wed Aug 9, 2017 : #osg-rmacc17 (osg)</h3>
+<span style="color: #e7392d"><span style="font-size: small">(12:07:59)</span> <b>bala:</b></span> not sure what changed in the condor_submit script at <a href="http://training.osgconnect.net">training.osgconnect.net</a>, job submission fails now (worked an hour ago).<br/>
+<span style="color: #e7392d"><span style="font-size: small">(12:08:01)</span> <b>bala:</b></span> $ condor_submit tutorial01.submit <br/>  File “/usr/local/bin/condor_submit”, line 248<br/>    print ‘==‘, arg<br/>             ^<br/>SyntaxError: invalid syntax<br/>
+<span style="color: #e7392d"><span style="font-size: small">(12:11:16)</span> <b>bala:</b></span> I don’t see any change with condor_submit file itself<br/>
+<span style="color: #e7392d"><span style="font-size: small">(12:11:18)</span> <b>bala:</b></span> $ ls -l /usr/local/bin/condor_submit <br/>-rwxr-xr-x 1 root root 10124 Feb 22 17:06 /usr/local/bin/condor_submit<br/>
+<span style="color: #e7392d"><span style="font-size: small">(12:37:06)</span> <b>bala:</b></span> Direct execution of condor_submit works fine. <pre>$ /usr/bin/condor_submit ScalingUp-PythonCals.submit <br/>Submitting job(s)..........<br/>10 job(s) submitted to cluster 2993.<br/></pre><br/>
+<span style="color: #5b89d5"><span style="font-size: small">(12:39:47)</span> <b>sthapa:</b></span> I’ll look at it<br/>
+<span style="color: #e7392d"><span style="font-size: small">(12:40:34)</span> <b>bala:</b></span> ok. also, job submission from login01 and login02 are fine. the problem exists only on <a href="http://training.osgconnect.net">training.osgconnect.net</a><br/>
+<span style="color: #5b89d5"><span style="font-size: small">(12:41:15)</span> <b>sthapa:</b></span> how are you invoking condor?  Do you have any modules loaded?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(12:41:33)</span> <b>bala:</b></span> ah, ok. yes, python-3.4<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(12:42:05)</span> <b>sthapa:</b></span> the script isn’t python 3 compatible<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(12:42:19)</span> <b>sthapa:</b></span> do you need the python3 module loaded?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:42:32)</span> <b>rynge:</b></span> Can we maybe just change the #! ?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(12:43:12)</span> <b>bala:</b></span> not really, but the scalingup-python is based on 3.4<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:43:59)</span> <b>rynge:</b></span> I meant on the condor_submit wrapper. If it has a specific Python it should use, just make #! use that version instead of the env crap.<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:47:25)</span> <b>briedel:</b></span> is someone changing the file?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(12:47:59)</span> <b>bala:</b></span> no, i just loaded python/3,4 in my shell that caused the error.<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:48:08)</span> <b>briedel:</b></span> yes<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:48:15)</span> <b>briedel:</b></span> cause the condor wrapper is stupid<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:48:27)</span> <b>briedel:</b></span> is someone editing it right now?<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:48:48)</span> <b>briedel:</b></span> anyway<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:48:53)</span> <b>briedel:</b></span> i fixed it<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:49:39)</span> <b>rynge:</b></span> Isn't that centrally maintained? Puppet maybe?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(12:49:55)</span> <b>bala:</b></span> yeah, it works now.<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:50:48)</span> <b>lincoln:</b></span> we should probably never ever have #!/bin/env python in anything<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:50:58)</span> <b>lincoln:</b></span> only explicitly call python2 or python3<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:51:21)</span> <b>lincoln:</b></span> im pretty sure there was a PEP about this<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:51:21)</span> <b>briedel:</b></span> there are two versions<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:51:30)</span> <b>briedel:</b></span> one that is python3 and one that is python2<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:51:39)</span> <b>briedel:</b></span> cause reasons<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:51:41)</span> <b>lincoln:</b></span> so why does loading python/3.4 break stuff<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:51:54)</span> <b>briedel:</b></span> because the training host has the python2 version<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:52:03)</span> <b>lincoln:</b></span> why do we call #!/bin/env python<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:52:11)</span> <b>lincoln:</b></span> in the python2 version<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:52:15)</span> <b>lincoln:</b></span> i assume thats the case<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:52:18)</span> <b>briedel:</b></span> yeah we do<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:52:23)</span> <b>briedel:</b></span> and also in the python3 version<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:52:27)</span> <b>briedel:</b></span> cause i dunno<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:52:27)</span> <b>lincoln:</b></span> sigh<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:52:54)</span> <b>lincoln:</b></span> okay, i'm going to fix it then<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:53:05)</span> <b>briedel:</b></span> in puppet?<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:53:06)</span> <b>lincoln:</b></span> yes<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:53:09)</span> <b>briedel:</b></span> okay<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:53:23)</span> <b>briedel:</b></span> i really need to get a hold of brian and talk to him about hte job transform stuff<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:53:23)</span> <b>lincoln:</b></span> unless someone can give me a damn good reason for not doing python2 / python3 explicitly<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:53:37)</span> <b>briedel:</b></span> there is none<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:53:55)</span> <b>lincoln:</b></span> python deployment is the gift that keeps on giving<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:53:56)</span> <b>briedel:</b></span> we are killing this script as soon as i have the job transformed figured out<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:54:16)</span> <b>lincoln:</b></span> lets rewrite everything in go :wink:<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:54:27)</span> <b>briedel:</b></span> i am not against it<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:54:31)</span> <b>briedel:</b></span> just will take me 6 months<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:54:34)</span> <b>lincoln:</b></span> kidding<br/>
+<span style="color: #e7392d"><span style="font-size: small">(12:56:58)</span> <b>bala:</b></span> +1 for go (disclosure: i don’t know go)<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:57:06)</span> <b>lincoln:</b></span> haha<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(13:04:17)</span> <b>sthapa:</b></span> the current recommendation from the python devs is to use python2 or python3 in the #! line so let’s just change that and make life easier<br/>
+<span style="color: #2b6836"><span style="font-size: small">(13:05:55)</span> <b>rwg:</b></span> q: will we be able to run $ connect histogram (or equiv) and see a distribution of jobs on sites?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(13:06:47)</span> <b>rwg:</b></span> can someone be a hero and implement this correctly?  it demonstrates a central concept of distributed computing<br/>
+<span style="color: #965d1b"><span style="font-size: small">(13:14:04)</span> <b>briedel:</b></span> @rwg yes, see <a href="https://swc-osg-workshop.github.io/OSG-UserTraining-RMACC17/novice/DHTC/08-condor_annex.html">https://swc-osg-workshop.github.io/OSG-UserTraining-RMACC17/novice/DHTC/08-condor_annex.html</a> in "Where did jobs run?<br/>"<br/>
+<span style="color: #965d1b"><span style="font-size: small">(13:14:42)</span> <b>briedel:</b></span> i can replace with with a script if the command is too much<br/>
+<span style="color: #965d1b"><span style="font-size: small">(14:34:59)</span> <b>briedel:</b></span> @rwg i created <tt>job_histogram</tt> command on the training host for people<br/>
+<span style="color: #965d1b"><span style="font-size: small">(14:35:21)</span> <b>briedel:</b></span> it is a simple bash script that runs the command that we talk about in the tutorial<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:37:00)</span> <b>rwg:</b></span> Great<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:47:39)</span> <b>bala:</b></span> we need to remove the old condor logs, else the condor_history would pull data from old logs. For example, osguser99 has a history of about 150 jobs. (many of them are old from previous workshop)<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:48:29)</span> <b>bala:</b></span> <pre> $ job_histogram <br/>Val          |Ct (Pct)     Histogram<br/>MWT2-COREOS  |101 (84.17%) +++++++++++++++++++++++++++++++++++++++++++++++++++++<br/>MWT2         |7 (5.83%)    ++++<br/>IIT_CE1      |5 (4.17%)    +++<br/>UColorado_HEP|2 (1.67%)    ++<br/>UCSDT2       |2 (1.67%)    ++<br/>Nebraska     |1 (0.83%)    +<br/>SPRACE       |1 (0.83%)    +<br/>GLOW         |1 (0.83%)    +<br/></pre><br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:48:46)</span> <b>bala:</b></span> <pre> $ whoami<br/>osguser99<br/></pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:49:25)</span> <b>dweitzel:</b></span> just remove the /var/log/condor/history* files.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:49:31)</span> <b>dweitzel:</b></span> (or move them somewhere else)<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:50:51)</span> <b>bala:</b></span> <pre> $ ls -F /var/log/condor/his*<br/>ls: cannot access /var/log/condor/his*: No such file or directory</pre><br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:51:04)</span> <b>bala:</b></span> <pre>$ ls -F /var/log/condor/*.old<br/>/var/log/condor/CollectorLog.old   /var/log/condor/ProcLog.old<br/>/var/log/condor/NegotiatorLog.old  /var/log/condor/SchedLog.old<br/></pre><br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:51:11)</span> <b>bala:</b></span> maybe move the *.old files?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:51:47)</span> <b>bala:</b></span> <pre>$ ls -l /var/log/condor/*.old<br/>-rw-r--r-- 1 condor condor 10485909 Jul  3 13:10 /var/log/condor/CollectorLog.old<br/>-rw-r--r-- 1 condor condor 10485939 Aug  9 14:15 /var/log/condor/NegotiatorLog.old<br/>-rw-r--r-- 1 root   root    1000108 Aug  9 10:07 /var/log/condor/ProcLog.old<br/>-rw-r--r-- 1 condor condor 10485964 Aug  5 17:37 /var/log/condor/SchedLog.old<br/></pre><br/>
+<span style="color: #965d1b"><span style="font-size: small">(14:55:53)</span> <b>briedel:</b></span> updated the tutorial to use <tt>job_histogram</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:04:14)</span> <b>dweitzel:</b></span> k<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:04:24)</span> <b>dweitzel:</b></span> @bala it's in the spool directory, /var/lib/condor/spool/<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:04:40)</span> <b>dweitzel:</b></span> I was in the wrong location.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:05:11)</span> <b>dweitzel:</b></span> Just don't remove the <tt>job_queue.log</tt><br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:06:23)</span> <b>bala:</b></span> ah, ok. good you cautioned me about job_queue.log :slightly_smiling_face:<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:25:12)</span> <b>bala:</b></span> ok, tutorial command also needs that #! line. failed with loaded python/3.4<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:25:31)</span> <b>bala:</b></span> <pre> $ tutorial annex<br/>  File "/usr/local/bin/tutorial", line 109<br/>    except Exception, e:<br/>                    ^<br/>SyntaxError: invalid syntax<br/></pre><br/>
+<span style="color: #965d1b"><span style="font-size: small">(15:30:36)</span> <b>briedel:</b></span> fixed<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:32:18)</span> <b>bala:</b></span> works now<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:34:01)</span> <b>bala:</b></span> <pre> $ job_histogram <br/>Not enough data to produce a histogram.<br/></pre><br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:34:21)</span> <b>bala:</b></span> any ideas how long it takes to populate the history file at /var/lib/condor/spool<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:35:10)</span> <b>bala:</b></span> ( i already completed about 30 jobs)<br/>
+<span style="color: #965d1b"><span style="font-size: small">(15:37:44)</span> <b>briedel:</b></span> 100 i think<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:38:06)</span> <b>bala:</b></span> ah, ok. let me run some more.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:52:06)</span> <b>bala:</b></span> more than 1k now, still no history. should there be an empty history file to write the completed jobs?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:52:24)</span> <b>bala:</b></span> i see job data in /var/lib/condor/spool/job_queue.log<br/>
+<span style="color: #965d1b"><span style="font-size: small">(15:56:42)</span> <b>briedel:</b></span> yeah look at the <tt>history</tt> file though<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:58:09)</span> <b>lincoln:</b></span> did your restart condor after deleting the old histyory file?<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:58:58)</span> <b>lincoln:</b></span> if the <tt>condor</tt> user doesn't have permissions to create the history file you may need to restart condor or do it for condor<br/>
+<span style="color: #965d1b"><span style="font-size: small">(15:59:17)</span> <b>briedel:</b></span> @bala can you submit some jobs?<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:59:19)</span> <b>lincoln:</b></span> <tt>touch history &amp;&amp; chown condor: history</tt><br/>
+<span style="color: #965d1b"><span style="font-size: small">(15:59:25)</span> <b>briedel:</b></span> yeah already on it<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:00:35)</span> <b>bala:</b></span> ah, doing now<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:00:44)</span> <b>bala:</b></span> submitting jobs now<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:01:58)</span> <b>bala:</b></span> <pre> $ job_histogram <br/>Val          |Ct (Pct)     Histogram<br/>CIT_CMS_T2   |112 (57.44%) +++++++++++++++++++++++++++++++++++++++++++++++++++++<br/>MWT2-COREOS  |30 (15.38%)  ++++++++++++++<br/>MWT2         |13 (6.67%)   +++++++<br/>BNL-ATLAS    |12 (6.15%)   ++++++<br/>IIT_CE1      |11 (5.64%)   ++++++<br/>UColorado_HEP|9 (4.62%)    +++++<br/>NUMEP_CE     |6 (3.08%)    +++<br/>FIU_HPCOSG_CE|2 (1.03%)    + </pre><br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:02:01)</span> <b>bala:</b></span> ```<br/>
+<span style="color: #965d1b"><span style="font-size: small">(16:02:02)</span> <b>briedel:</b></span> okay history is being filled<br/>
+</body>
+</html>

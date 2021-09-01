@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed May 31, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Wed May 31, 2017 : #gracc (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(10:16:54)</span> <b>dweitzel:</b></span> These "N/A" and Unknown Projectnames are getting out of hand.  I'm going to take some time today to implement what we spoke about earlier.  If ProjectName = "N/A", set ProjectName = VOName<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:17:04)</span> <b>dweitzel:</b></span> @dweitzel uploaded a file: <a href="https://opensciencegrid.slack.com/files/dweitzel/F5MBBJY0P/pasted_image_at_2017_05_31_10_16_am.png">Pasted image at 2017-05-31, 10:16 AM</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:17:21)</span> <b>dweitzel:</b></span> Most of these "N/A" are fife, btw.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:18:27)</span> <b>dweitzel:</b></span> <a href="https://gracc.opensciencegrid.org/kibana/app/kibana#/visualize/create?type=table&amp;indexPattern=gracc.osg.summary&amp;_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-30d,mode:quick,to:now))&amp;_a=(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!f,query:'ProjectName:%22N%2FA%22%20AND%20ResourceType:Payload')),uiState:(vis:(params:(sort:(columnIndex:2,direction:desc)))),vis:(aggs:!((enabled:!t,id:'1',params:(field:CoreHours),schema:metric,type:sum),(enabled:!t,id:'2',params:(field:DN,order:desc,orderBy:'1',size:1000),schema:bucket,type:terms),(enabled:!t,id:'3',params:(field:VOName,order:desc,orderBy:'1',size:1000),schema:bucket,type:terms)),listeners:(),params:(perPage:100,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))">https://gracc.opensciencegrid.org/kibana/app/kibana#/visualize/create?type=table&amp;indexPattern=gracc.osg.summary&amp;_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-30d,mode:quick,to:now))&amp;_a=(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!f,query:'ProjectName:%22N%2FA%22%20AND%20ResourceType:Payload')),uiState:(vis:(params:(sort:(columnIndex:2,direction:desc)))),vis:(aggs:!((enabled:!t,id:'1',params:(field:CoreHours),schema:metric,type:sum),(enabled:!t,id:'2',params:(field:DN,order:desc,orderBy:'1',size:1000),schema:bucket,type:terms),(enabled:!t,id:'3',params:(field:VOName,order:desc,orderBy:'1',size:1000),schema:bucket,type:terms)),listeners:(),params:(perPage:100,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:09:26)</span> <b>bbockelm:</b></span> is there something @kherner can help out with with the N/A from FIFE?<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(15:10:27)</span> <b>kherner:</b></span> Why would they be showing up in the projects table though?<br/>
+<span style="color: #aba727"><span style="font-size: small">(15:17:25)</span> <b>sbhat:</b></span> @dweitzel : We'd also need to re-run the project-gathering module then<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(15:17:26)</span> <b>kherner:</b></span> I think @dweitzel's idea would work<br/>
+<span style="color: #aba727"><span style="font-size: small">(15:17:42)</span> <b>sbhat:</b></span> sorry - project-info gathering module<br/>
+<span style="color: #aba727"><span style="font-size: small">(15:18:18)</span> <b>sbhat:</b></span> unless we're okay with records having no project info for one summarization cycle (15 minutes for the last week of records, right?)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:20:46)</span> <b>dweitzel:</b></span> I think the ProjectName = VOName would happen before the project info gathering?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:21:06)</span> <b>dweitzel:</b></span> My question, is should it be before or after corrections?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:21:36)</span> <b>kretzke:</b></span> after<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:21:55)</span> <b>dweitzel:</b></span> Ok, so VOName will be corrected, then be set to ProjectName.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:22:04)</span> <b>dweitzel:</b></span> Then ProjectName corrections would not happen in this case.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:23:19)</span> <b>kretzke:</b></span> erp…<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:26:28)</span> <b>kretzke:</b></span> oh well, it’s a fallback anyways<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:43:50)</span> <b>dweitzel:</b></span> I could run corrections twice?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:44:02)</span> <b>dweitzel:</b></span> it's pretty light weight, right?<br/>
+<span style="color: #aba727"><span style="font-size: small">(15:56:36)</span> <b>sbhat:</b></span> ah - you're right about the order of ops for project names.  I thought that there were some records with <tt>ProjectName = N/A</tt> but that had <tt>RawProjectName</tt>s.  My mistake<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:58:11)</span> <b>kretzke:</b></span> sure, it might have some interesting side effects if there’s some “corrected” names that in turn have a correction (I recall seeing some oddness with microboone/uboone/microboo). keep iterating until it hits a stable solution? heh<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:46:47)</span> <b>dweitzel:</b></span> I saw a few alerts on GRACC head node temporary outage. Anyone see anything?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:48:16)</span> <b>kretzke:</b></span> yep, got a notice that grafana was down, couldn’t access it for a few minutes<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:50:34)</span> <b>dweitzel:</b></span> But back up now?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:50:43)</span> <b>dweitzel:</b></span> How's the disk IO?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:52:08)</span> <b>kretzke:</b></span> yeah, looks fine now. there were a couple io slowdowns across the cluster <a href="https://gracc.opensciencegrid.org/dashboard/db/grace-system-nodes?refresh=1m&amp;orgId=1&amp;from=1496263411883&amp;to=1496267093221">https://gracc.opensciencegrid.org/dashboard/db/grace-system-nodes?refresh=1m&amp;orgId=1&amp;from=1496263411883&amp;to=1496267093221</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:53:56)</span> <b>dweitzel:</b></span> Yeah  sys admin warned me today if possible slowdowns as the cluster slowly rebalances. <br/>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Sat May 7, 2016 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Sat May 7, 2016 : #gracc (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(10:29:04)</span> <b>bbockelm:</b></span> Hi @kretzke - I noticed a significant amount of hcc-grace’s capacity is going to <tt>fifebatch-jobs</tt>, marvel, and <tt>fifebatch-slots</tt>.  Is there something (like an update rate) that can be adjusted downward?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:29:46)</span> <b>bbockelm:</b></span> We’re setting around 2.7k updates / sec and the writes are starting to drown out the reads<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:30:54)</span> <b>bbockelm:</b></span> we might want to partition the <tt>fife</tt> activity to a separate volume if that’s the irreducible load.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:45:47)</span> <b>bbockelm:</b></span> sigh.  Well, that went … not well.  @kretzke @dweitzel - turns out, <tt>rpm -e elasticsearch</tt> is not the same as <tt>rpm -q elasticsearch</tt>.  I think I fixed everything.  Might be worth poking at the odds-n-ends.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:59:21)</span> <b>dweitzel:</b></span> Who gave him root? :)<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:08:30)</span> <b>kretzke:</b></span> one thing I’d like to do is reduce the marvel update rate, it’s pretty crazy right now. that requires a cluster reboot through<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:09:28)</span> <b>kretzke:</b></span> @bbockelm: gratiav2-1 is a client node, so you can't screw things up too bad there :simple_smile:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:09:44)</span> <b>bbockelm:</b></span> I did change the marvel rate to 60s.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:09:56)</span> <b>bbockelm:</b></span> <tt>curl -XPUT localhost:9200/_cluster/settings -d '{"persistent": {"marvel.agent.interval": "60s"} }’</tt><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:11:21)</span> <b>kretzke:</b></span> ah, ok. did you add it to elasticsearch.yml too?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:12:01)</span> <b>bbockelm:</b></span> nope.  I was hoping that’s what <tt>persistent</tt> meant<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:12:11)</span> <b>bbockelm:</b></span> (since there’s also a <tt>transient</tt> option)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:12:55)</span> <b>bbockelm:</b></span> What about the <tt>fifebatch-jobs</tt> index?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:16:09)</span> <b>kretzke:</b></span> ah, yeah, persistent applies across reboots<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:18:21)</span> <b>kretzke:</b></span> I don’t have an immediate answer. rate is higher than I’d expect<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:18:45)</span> <b>bbockelm:</b></span> Is that a historical log or the current view?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:19:07)</span> <b>bbockelm:</b></span> (I ask because there’s only one index, not an index per day)<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:20:57)</span> <b>kretzke:</b></span> It’s both at the moment. documents get updated as job status changes, so I can’t partition by day. completed jobs could, and I’m working on an archival process<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:21:27)</span> <b>bbockelm:</b></span> ah - so, I do something similar for OSG / GLOW / LIGO.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:22:20)</span> <b>bbockelm:</b></span> I keep a field I call <tt>DataCollectionDate</tt> that records either when the job finished or when the queue snapshot was taken.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:22:56)</span> <b>bbockelm:</b></span> I simply follow it up with a query to nuke jobs that crossed day partitions.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:23:50)</span> <b>kretzke:</b></span> ah, yeah I have a similar timestamp.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:24:05)</span> <b>kretzke:</b></span> I have to get going. cluster looks healthy :simple_smile:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:25:03)</span> <b>bbockelm:</b></span> :simple_smile: If you can figure out how to tweak downward the fifebatch update rate, I’d appreciate it.  I want to demo this to a few folks at the retreat next week and having The Snappy would be good.<br/>
+</body>
+</html>

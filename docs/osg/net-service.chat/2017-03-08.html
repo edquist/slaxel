@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Mar 8, 2017 : #net-service (osg)</title>
+</head>
+<body>
+<h3>Wed Mar 8, 2017 : #net-service (osg)</h3>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:04:22)</span> <b>smckee:</b></span> @efajardo let me know if you have issues logging into psds0<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:07:49)</span> <b>efajardo:</b></span> I just tried and I am good<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:09:51)</span> <b>efajardo:</b></span> Allright so there was something not added to<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:10:56)</span> <b>efajardo:</b></span> <tt>/etc/rsv/metrics/org.osg.general.perfsonar-simple.conf</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(13:11:05)</span> <b>efajardo:</b></span> which were implemented and documented on the ticket<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:11:10)</span> <b>efajardo:</b></span> but they were not added to production.<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:11:19)</span> <b>efajardo:</b></span> Basically things worked fine<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:11:31)</span> <b>efajardo:</b></span> the missing conf knobs where this<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:11:42)</span> <b>efajardo:</b></span> <pre>allowedMQEvents = ntp-delay,ntp-dispersion,ntp-jitter,ntp-offset,ntp-stratum,time-error-estimates,packet-duplicates,packet-reorders,packet-loss-rate,packet-trace,packet\<br/>-retransmits,throughput,throughput-subintervals,path-mtu,failures,packet-count-sent,packet-count-lost,histogram-owdelay,histogram-ttl<br/>mq-max-message-size = 10000</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(13:12:13)</span> <b>efajardo:</b></span> but this one was not a problem since the probes had good defaults since <tt>allowedMQEvents</tt> defaulted to the <tt>allowedEvents</tt><br/>
+<span style="color: #684b6c"><span style="font-size: small">(13:30:52)</span> <b>hayashis:</b></span> @smckee dev instance of MCA loaded *all* hosts from LS. <a href="https://soichi7.ppa.iu.edu/mca/#!/hosts/">https://soichi7.ppa.iu.edu/mca/#!/hosts/</a><br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:31:09)</span> <b>smckee:</b></span> Thanks!<br/>
+<span style="color: #684b6c"><span style="font-size: small">(13:31:47)</span> <b>hayashis:</b></span> I've noticed there is some UI performance issue with the host dropdown, so I need to fix this to handle larger number of hosts..<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:32:03)</span> <b>smckee:</b></span> Thanks @efajardo, good to have the right config in place<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(14:34:35)</span> <b>smckee:</b></span> Hi @efajardo ... publication to CERN via psds0 went down.  Are you updating there?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(14:34:49)</span> <b>smckee:</b></span> <a href="https://perfsonar-itb.grid.iu.edu/WLCGperfSONAR/check_mk/index.py?start_url=%2FWLCGperfSONAR%2Fcheck_mk%2Fview.py%3Fhost%3Dpsds0%26service%3Dproc_rsv%26site%3DWLCGperfSONAR%26view_name%3Dservice">https://perfsonar-itb.grid.iu.edu/WLCGperfSONAR/check_mk/index.py?start_url=%2FWLCGperfSONAR%2Fcheck_mk%2Fview.py%3Fhost%3Dpsds0%26service%3Dproc_rsv%26site%3DWLCGperfSONAR%26view_name%3Dservice</a><br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(14:35:21)</span> <b>smckee:</b></span> <a href="https://mig-graphite.cern.ch/grafana/dashboard/file/client.json?fullscreen&amp;panelId=1&amp;var-client=perfsonar-summary-packet-loss-rate&amp;from=now-6h&amp;to=now">https://mig-graphite.cern.ch/grafana/dashboard/file/client.json?fullscreen&amp;panelId=1&amp;var-client=perfsonar-summary-packet-loss-rate&amp;from=now-6h&amp;to=now</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(14:37:40)</span> <b>efajardo:</b></span> nop<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:37:42)</span> <b>efajardo:</b></span> let me check<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:39:12)</span> <b>efajardo:</b></span> Opps the probes were not updated I got confused by the version numbering<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:39:15)</span> <b>efajardo:</b></span> but now they are.<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:39:34)</span> <b>efajardo:</b></span> now they are running the same as ITB <tt>rsv-perfsonar-1.2.1-1.</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(14:39:44)</span> <b>efajardo:</b></span> it just did not happen during hte last production update window<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(14:40:52)</span> <b>smckee:</b></span> OK, but I still see 0 RSV processes on pds0<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(14:41:10)</span> <b>smckee:</b></span> Will take a bit to come back I guess?<br/>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Apr 16, 2021 : #software (osg)</title>
+</head>
+<body>
+<h3>Fri Apr 16, 2021 : #software (osg)</h3>
+<span style="color: #674b1b"><span style="font-size: small">(12:23:38)</span> <b>rynge:</b></span> I upgrade my pool to HTCondor 9.0. @bbockelm the trust domain bit me again - I didn't follow instructions exactly like provided (surprise!), but I think that setting is confusing / difficult to debug<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:24:27)</span> <b>rynge:</b></span> I also ended up needing a <tt>SEC_DEFAULT_AUTHENTICATION_METHODS</tt> and some <tt>SEC_READ_*</tt> settings<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:24:36)</span> <b>rynge:</b></span> <pre>TRUST_DOMAIN = <a href="http://scitech.isi.edu">scitech.isi.edu</a><br/>SEC_DEFAULT_AUTHENTICATION_METHODS = IDTOKENS, FS<br/>SEC_READ_AUTHENTICATION = OPTIONAL<br/>SEC_READ_ENCRYPTION = OPTIONAL<br/>SEC_READ_INTEGRITY = OPTIONAL</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:25:19)</span> <b>rynge:</b></span> Other than that, it just <tt>use security:recommended_v9_0</tt> - I love it!<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:27:17)</span> <b>briedel:</b></span> CVMFS config question:<br/>Does it make sense to the use the <tt>|</tt> here<br/><tt>CVMFS_HTTP_PROXY='<a href="http://frontier-squid02.rc.fas.harvard.edu:3128">http://frontier-squid02.rc.fas.harvard.edu:3128</a>|<a href="http://frontier-squid03.rc.fas.harvard.edu:3128">http://frontier-squid03.rc.fas.harvard.edu:3128</a>|<a href="http://frontier-squid04.rc.fas.harvard.edu:3128">http://frontier-squid04.rc.fas.harvard.edu:3128</a>;<a href="http://frontier-squid01.rc.fas.harvard.edu:3128">http://frontier-squid01.rc.fas.harvard.edu:3128</a>;DIRECT'</tt><br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:27:54)</span> <b>briedel:</b></span> i think it would make more sense to replace the <tt>|</tt> with <tt>;</tt> and have CVMFS decide which squid to use<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:28:40)</span> <b>briedel:</b></span> the <tt>squid02-04</tt> are closer to the compute machines than <tt>squid01</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:31:25)</span> <b>dweitzel:</b></span> Here's the docs: <a href="https://cvmfs.readthedocs.io/en/stable/cpt-configure.html#proxy-lists">https://cvmfs.readthedocs.io/en/stable/cpt-configure.html#proxy-lists</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:31:43)</span> <b>dweitzel:</b></span> The <tt>|</tt> is good for equally close proxies.  CVMFS will choose one of them at random.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:32:03)</span> <b>dweitzel:</b></span> Proxy groups are separated by the <tt>;</tt>, it will go in order for the groups.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:08:00)</span> <b>bbockelm:</b></span> @rynge - I'm confused by <tt>SEC_DEFAULT_AUTHENTICATION_METHODS</tt>; unset should be fine, no?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:08:41)</span> <b>rynge:</b></span> I think it tried to pick up GSI then<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:08:46)</span> <b>rynge:</b></span> Is taht in the default list?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:10:48)</span> <b>bbockelm:</b></span> Shouldn't it just fail and move on?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:14:10)</span> <b>rynge:</b></span> Maybe so, but it makes my log ugly... :slightly_smiling_face:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:15:21)</span> <b>rynge:</b></span> SEC_READ_* was a surprise to me - I couldn't run condor_status as a regular user without it<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:18:54)</span> <b>bbockelm:</b></span> Yeah, that is a sore point still.  I think we probably want ANONYMOUS auth enabled by default for read of the collector.<br/>
+<blockquote>
+<span style="color: #c386df"><span style="font-size: small">(14:21:56)</span> <b>matyas:</b></span> probably the explanation for <a href="https://opensciencegrid.atlassian.net/browse/HTCONDOR-422">https://opensciencegrid.atlassian.net/browse/HTCONDOR-422</a> too?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:27:56)</span> <b>bbockelm:</b></span> You say permission issues - is it that or authentication issues?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:28:45)</span> <b>matyas:</b></span> Ugh, I should have pasted the logs. Yeah they're authentication issues.<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:31:49)</span> <b>matyas:</b></span> <pre>[submituser@b6eafbf79dcf ~]$ condor_status<br/>Error: communication error<br/>AUTHENTICATE:1003:Failed to authenticate with any method<br/>AUTHENTICATE:1004:Failed to authenticate using PASSWORD<br/>AUTHENTICATE:1004:Failed to authenticate using IDTOKENS<br/>AUTHENTICATE:1004:Failed to authenticate using FS</pre><br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:55:00)</span> <b>rynge:</b></span> Looks the same<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:27:10)</span> <b>bbockelm:</b></span> @matyas - could you test adding <tt>ANONYMOUS</tt> to the client methods and the read methods for the collector?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:12:57)</span> <b>matyas:</b></span> That does fix condor_status, but now the exec node can't connect<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:16:36)</span> <b>matyas:</b></span> uh it showed up after I ran condor_reconfig on the exec node<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:16:45)</span> <b>bbockelm:</b></span> interesting.<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:17:15)</span> <b>matyas:</b></span> my 3 node smoke test is using pool password btw<br/>
+</blockquote>
+</body>
+</html>

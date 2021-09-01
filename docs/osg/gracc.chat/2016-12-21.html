@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Dec 21, 2016 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Wed Dec 21, 2016 : #gracc (osg)</h3>
+<span style="color: #3c8c69"><span style="font-size: small">(09:39:45)</span> <b>kretzke:</b></span> config file said it hadn’t changed since August, idk<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:41:14)</span> <b>kretzke:</b></span> well this is interesting… you can’t do a wildcard search against a numeric now, e.g. <tt>Processors:*</tt>. You can do a range, e.g. <tt>Processors:[0 TO *]</tt><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:41:41)</span> <b>kretzke:</b></span> or even <tt>Processors:[* TO *]</tt><br/>
+<span style="color: #aba727"><span style="font-size: small">(10:18:59)</span> <b>sbhat:</b></span> previous messages redacted:  I was able to search for Site:*<br/>
+<span style="color: #aba727"><span style="font-size: small">(10:19:06)</span> <b>sbhat:</b></span> is that a new Lucene thing, or just ES?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:55:00)</span> <b>kretzke:</b></span> not sure. "Removed support for fuzzy queries on numeric, date and ip fields, use range queries instead.”  <a href="https://www.elastic.co/guide/en/elasticsearch/reference/5.0/breaking_50_search_changes.html#_changes_to_queries">https://www.elastic.co/guide/en/elasticsearch/reference/5.0/breaking_50_search_changes.html#_changes_to_queries</a><br/>
+<span style="color: #A82F2F"><span style="font-size: small">(11:47:16)</span> <b>B167BCLN5:</b></span> <br/>
+<span style="color: #A82F2F"><span style="font-size: small">(15:20:40)</span> <b>B167BCLN5:</b></span> <br/>
+<span style="color: #A82F2F"><span style="font-size: small">(15:22:43)</span> <b>B167BCLN5:</b></span> <br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:25:56)</span> <b>dweitzel:</b></span> @kretzke new gracc-request release.  Are you currently re-summarizing?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:26:09)</span> <b>dweitzel:</b></span> Wondering how disruptive it would be to update underneath you.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:30:23)</span> <b>kretzke:</b></span> no, re-summarization finished last night, took about 1hr/year<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:34:11)</span> <b>dweitzel:</b></span> wow, that's really good.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:34:37)</span> <b>kretzke:</b></span> yeah, ES5 does seem to index faster<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(15:35:36)</span> <b>B167BCLN5:</b></span> <br/>
+<span style="color: #A82F2F"><span style="font-size: small">(15:37:42)</span> <b>B167BCLN5:</b></span> <br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:15:06)</span> <b>kretzke:</b></span> currently re-indexing the itb indices with Njobs and NodeCount remapped<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:15:31)</span> <b>kretzke:</b></span> interestingly the reindex api seems to be running on all the indices in parallel<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:24:17)</span> <b>dweitzel:</b></span> yay!<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:25:37)</span> <b>kretzke:</b></span> averaging 1kHz<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:27:02)</span> <b>kretzke:</b></span> 10 days to do the main indices at that rate<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:28:27)</span> <b>kretzke:</b></span> also, I deleted a bunch of old closed indices and freed up 7 TB<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(16:55:45)</span> <b>B167BCLN5:</b></span> <br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:59:12)</span> <b>kretzke:</b></span> itb finished. kicked off transfer reindex. new records (osg and osg-transfer) are going into indices with new mappings<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(18:00:36)</span> <b>kretzke:</b></span> I added <tt>gracc.osg.raw1-2016.12</tt> to the <tt>gracc.osg.raw-2016.12</tt> alias, so everything _should_ keep working. unless something is using <tt>gracc.osg.raw0-*</tt> instead of <tt>gracc.osg.raw-*</tt>...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(20:32:01)</span> <b>dweitzel:</b></span> I the request was using raw0<br/>
+<span style="color: #235e5b"><span style="font-size: small">(20:33:29)</span> <b>dweitzel:</b></span> I updated the configuration of graccreq on <a href="http://gracc.osg.org">gracc.osg.org</a><br/>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Oct 23, 2018 : #operations (osg)</title>
+</head>
+<body>
+<h3>Tue Oct 23, 2018 : #operations (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(11:43:30)</span> <b>matyas:</b></span> @dweitzel, we'd like to have <b>@edquist</b>’s automerge webhook live on a different machine than the rest of the webapp. can you set up a new vm for it, with apache and mod_wsgi?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:44:12)</span> <b>matyas:</b></span> we don't need an <a href="http://opensciencegrid.org">opensciencegrid.org</a> domain since it's not for user consumption<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:44:38)</span> <b>dweitzel:</b></span> and it can be a stupid small VM?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:44:42)</span> <b>matyas:</b></span> yeah<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:47:15)</span> <b>dweitzel:</b></span> is this something that we can run on some free hosting provider?  Heroku, or equivalent?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:47:34)</span> <b>dweitzel:</b></span> less for me / ops to maintain.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:47:44)</span> <b>matyas:</b></span> only if they give us ssh and root<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:47:54)</span> <b>dweitzel:</b></span> ah, you need SSH?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:48:18)</span> <b>dweitzel:</b></span> doesn't it just send a message back to github to "OK, merge"?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:49:37)</span> <b>matyas:</b></span> I mean I just want to be able to directly log in to set up &amp; config it<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:27:50)</span> <b>dweitzel:</b></span> But... do you "need" to?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:57:23)</span> <b>matyas:</b></span> not "need" just we're behind schedule with this thing and don't want to have to figure out Heroku<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:57:33)</span> <b>matyas:</b></span> also a bit of persistent storage would be nice<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:58:01)</span> <b>matyas:</b></span> not much, just enough for a few git clones of the topology and contact repos<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:24:44)</span> <b>dweitzel:</b></span> Sure, small VM coming up.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:24:51)</span> <b>dweitzel:</b></span> same logins as topology?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:24:59)</span> <b>matyas:</b></span> yeah<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:25:02)</span> <b>matyas:</b></span> thanks<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:25:23)</span> <b>dweitzel:</b></span> any preference on hostname?  Probably put it under *.<a href="http://opensciencegrid.org">opensciencegrid.org</a> domain for consistency<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:26:29)</span> <b>matyas:</b></span> topology-webhook<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:29:41)</span> <b>blin:</b></span> is there a way to see the DNs that are being used to access the webapp?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:30:00)</span> <b>dweitzel:</b></span> I assume you mean the topology webapp?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:31:17)</span> <b>dweitzel:</b></span> And no, I don't see that the DN is logged.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:33:21)</span> <b>blin:</b></span> dang it, ok. Is there a config knob we can set to log that info?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:33:31)</span> <b>matyas:</b></span> I think we could just add a log line to the webapp<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:33:37)</span> <b>matyas:</b></span> why do you want it?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:34:39)</span> <b>blin:</b></span> for the contact cleanup<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:34:58)</span> <b>matyas:</b></span> you want to see if any unaffiliated people accessed the webapp?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:35:04)</span> <b>blin:</b></span> originally i was going to remove all contacts that aren't associated with a resource or VO<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:35:09)</span> <b>matyas:</b></span> er. unaffiliated w/ resources, vos, projects?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:35:20)</span> <b>blin:</b></span> but i know for a fact that at least GGUS needs to make auth'ed queries as well<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:35:31)</span> <b>blin:</b></span> and they wouldn't be associated with a resource/VO<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:35:34)</span> <b>matyas:</b></span> so?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:35:39)</span> <b>matyas:</b></span> they don't need to be in the contacts db<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:35:44)</span> <b>matyas:</b></span> they just need to have a valid cert<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:36:05)</span> <b>matyas:</b></span> willing to be that ggus's cron job is not in our contacts db<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:36:15)</span> <b>blin:</b></span> err, iirc we cross reference the certs against what's in our contacts db<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:36:48)</span> <b>matyas:</b></span> hm<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:37:12)</span> <b>matyas:</b></span> ok, you might be right<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:38:03)</span> <b>matyas:</b></span> ok, I can add a logging line to _get_authorized() in the webapp. that should do it<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:38:34)</span> <b>blin:</b></span> sounds good to me<br/>
+</body>
+</html>

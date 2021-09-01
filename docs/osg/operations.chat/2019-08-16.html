@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Aug 16, 2019 : #operations (osg)</title>
+</head>
+<body>
+<h3>Fri Aug 16, 2019 : #operations (osg)</h3>
+<span style="color: #99a949"><span style="font-size: small">(21:28:01)</span> <b>dwd:</b></span> <b>@here</b> I/O operations are stuck on <a href="http://oasis-replica.opensciencegrid.org">oasis-replica.opensciencegrid.org</a>.  Cvmfs operations are frozen.  Can anybody here move the alias in Cloudflare to <a href="http://hcc-cvmfs2.unl.edu">hcc-cvmfs2.unl.edu</a>, or access the console of <a href="http://hcc-cvmfs.unl.edu">hcc-cvmfs.unl.edu</a> to reboot it?<br/>
+<span style="color: #99a949"><span style="font-size: small">(21:28:27)</span> <b>dwd:</b></span> I could try to reboot it myself but I’m not sure it will succeed<br/>
+<span style="color: #99a949"><span style="font-size: small">(21:29:12)</span> <b>dwd:</b></span> Actually the read operations are working, the most important things, it’s writes that are stuck.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(21:30:42)</span> <b>jthiltges:</b></span> I can probably poke the server in an hour.<br/>
+<span style="color: #99a949"><span style="font-size: small">(21:33:27)</span> <b>dwd:</b></span> If we could get the alias moved that would be best so we could diagnose what is going wrong, but we have to get the right people.  I know Derek can do it but I don’t remember who else<br/>
+<span style="color: #235e5b"><span style="font-size: small">(21:34:14)</span> <b>dweitzel:</b></span> Give me 1 minute. <br/>
+<span style="color: #99a949"><span style="font-size: small">(21:34:26)</span> <b>dwd:</b></span> Oh cool, you’re here.<br/>
+<span style="color: #99a949"><span style="font-size: small">(21:36:16)</span> <b>dwd:</b></span> Slack says you’re away<br/>
+<span style="color: #235e5b"><span style="font-size: small">(21:37:10)</span> <b>dweitzel:</b></span> Ok, I swapped oasis-replica and oasis-replica-itb<br/>
+<span style="color: #235e5b"><span style="font-size: small">(21:37:11)</span> <b>dweitzel:</b></span> that ok?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(21:37:28)</span> <b>dweitzel:</b></span> oasis-replica -&gt; <a href="http://hcc-cvmfs2.unl.edu">hcc-cvmfs2.unl.edu</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(21:37:36)</span> <b>dweitzel:</b></span> oasis-replica-itb -&gt; <a href="http://hcc-cvmfs.unl.edu">hcc-cvmfs.unl.edu</a><br/>
+<span style="color: #99a949"><span style="font-size: small">(21:38:25)</span> <b>dwd:</b></span> Yeah sure<br/>
+<span style="color: #99a949"><span style="font-size: small">(21:38:44)</span> <b>dwd:</b></span> Thanks!<br/>
+<span style="color: #d1707d"><span style="font-size: small">(21:39:40)</span> <b>gattebury:</b></span> @dwd Did you still want <a href="http://hcc-cvmfs.unl.edu">hcc-cvmfs.unl.edu</a> forcefully rebooted? Or would you prefer it left alone for debugging purposes — I can reboot, but not spend time debugging tonight.<br/>
+<span style="color: #99a949"><span style="font-size: small">(22:11:40)</span> <b>dwd:</b></span> Let’s leave it as-is for debugging<br/>
+<span style="color: #99a949"><span style="font-size: small">(22:16:54)</span> <b>dwd:</b></span> I’m seeing 100% cpu on systemd-journald, and lots of list_del corruption errors in journalctl -f<br/>
+<span style="color: #99a949"><span style="font-size: small">(22:18:02)</span> <b>dwd:</b></span> Very similar to <a href="https://github.com/zfsonlinux/zfs/issues/9068">https://github.com/zfsonlinux/zfs/issues/9068</a><br/>
+<span style="color: #99a949"><span style="font-size: small">(22:24:45)</span> <b>dwd:</b></span> I think that’s all the information we’ll be able to get from it, anybody can reboot whenever convenient<br/>
+<span style="color: #d1707d"><span style="font-size: small">(22:37:12)</span> <b>gattebury:</b></span> Well, rebooted — but it’s kernel panic’ing immediately. I’ll poke more tomorrow.<br/>
+<span style="color: #99a949"><span style="font-size: small">(22:44:30)</span> <b>dwd:</b></span> It might have been my fault, because after I said to go ahead and reboot I did a yum update, including a new kernel.  It had gotten through all the Updating steps and Installing the kernel, but hadn’t finished the Cleanup steps.<br/>
+<span style="color: #99a949"><span style="font-size: small">(22:46:16)</span> <b>dwd:</b></span> <br/>
+<span style="color: #53b759"><span style="font-size: small">(23:29:54)</span> <b>marian:</b></span> good move folks with swapping aliases for oasis host for the weekend, thanks Derek!<br/>
+</body>
+</html>

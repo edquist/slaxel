@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Apr 20, 2017 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Thu Apr 20, 2017 : #gfactory (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(10:57:11)</span> <b>blin:</b></span> @jdost321 about jira summary pages: if you go to the project page and click the project icon, it brings up an activity summary. you can also switch it to a ticket statistic view<br/>
+<span style="color: #bd9336"><span style="font-size: small">(14:22:57)</span> <b>mkandes:</b></span> @rynge: I had to fix a few issues with the Openstack setup at Jetstream. But I think they're all worked out now. Let me know if you see any problems with your test jobs running. I've also submitted some basic sleep jobs factory ops test frontend. Looks like glideins are running.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:51:00)</span> <b>rynge:</b></span> @mkandes Ok, I'm still waiting for glideins<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:41:15)</span> <b>rynge:</b></span> @mkandes Ok, got glideins<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:41:27)</span> <b>rynge:</b></span> In general the job worked, but /cvmfs is not working<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:42:00)</span> <b>mkandes:</b></span> Hmmm. What do you see on the job side? I'll have a look at the instance.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:53:23)</span> <b>rynge:</b></span> ls -l /cvmfs/oasis.opensciencegrid.org/<br/>ls: cannot access /cvmfs/oasis.opensciencegrid.org/: No such file or directory<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:53:35)</span> <b>rynge:</b></span> None of them are mounted<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:03:48)</span> <b>mkandes:</b></span> I think I forgot to "systemctl enable autofs" in my worker node build script. So when new image booted it didn't start? After a "service autofs restart", I see cvmfs mounted again ....<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:03:49)</span> <b>mkandes:</b></span> [root@osg-jetstream-worker-1 centos]# ls -l /cvmfs/oasis.opensciencegrid.org/<br/>total 111<br/>drwxrwxr-x  2 cvmfs cvmfs 4096 Jan 17  2016 atlas<br/>drwxrwxr-x  2 cvmfs cvmfs 4096 May 20  2014 auger<br/>drwxr-xr-x  8 cvmfs cvmfs 4096 May 14  2015 belle<br/>drwxr-xr-x  2 cvmfs cvmfs 4096 May 14  2015 cmssoft<br/>drwxrwxr-x  5 cvmfs cvmfs 4096 Jan 15  2016 csiu<br/>drwxr-xr-x  2 cvmfs cvmfs 4096 Jan 10 17:16 current<br/>drwxrwxr-x  3 cvmfs cvmfs 4096 May 14  2015 enmr<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:07:37)</span> <b>mkandes:</b></span> I'll fix this in the image config, boot a new instance, and double check autofs mounts cvmfs.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:56:37)</span> <b>mkandes:</b></span> @rynge: Okay, image fixed. New worker node instance booted up. Can you send another set of test jobs through? For some reason, factory ops test frontend isn't generating glidein requests.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:57:16)</span> <b>rynge:</b></span> Hang on<br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:10:17)</span> <b>mkandes:</b></span> Okay, so far everything looks good on my side ...<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:22:04)</span> <b>rynge:</b></span> @mkandes Sorry - forgot about this conversation. Yes, my job looked good as well<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:22:10)</span> <b>rynge:</b></span> Production ready?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(18:59:23)</span> <b>mkandes:</b></span> I think so. @jdost321 @marian When you get the chance, can you push the OSG_US_XSEDE_Jetstream entry into the production factory configurations?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:00:06)</span> <b>mkandes:</b></span> @rynge Once the entry is in production, I'll boot up a few more instances. I only have one full-sized worker node up right now.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(19:00:19)</span> <b>rynge:</b></span> Cool!<br/>
+<span style="color: #53b759"><span style="font-size: small">(19:50:05)</span> <b>marian:</b></span> Will take a look when kids are in bed and let you know<br/>
+</body>
+</html>

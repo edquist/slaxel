@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jan 16, 2018 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue Jan 16, 2018 : #software (osg)</h3>
+<span style="color: #16569E"><span style="font-size: small">(14:16:10)</span> <b>edquist:</b></span> @jthiltges, do you think the dlopen() could be failing even if all the .so deps are satisfied? (according to ldd)<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:18:11)</span> <b>jthiltges:</b></span> I would guess that call is fine. Maybe <tt>strace -f -p [gridftp server pid]</tt> then run the copy test and see if anything unusual shows up in the output?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:19:11)</span> <b>jthiltges:</b></span> Regarding the environment variables, looks like we have the same settings on our osg33 gridftp servers and things are working OK.<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:20:01)</span> <b>edquist:</b></span> ok<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:20:03)</span> <b>edquist:</b></span> thanks!<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:26:06)</span> <b>jthiltges:</b></span> From a quick glance at the source, I'm guessing that the repeated <tt>osg</tt> in the error message is not pointing to an issue by itself. Just two layers of error messages.<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:46:48)</span> <b>edquist:</b></span> Yeah, in <tt>globus_i_gfs_data_init()</tt>, the value <tt>osg</tt> gets loaded from the config setting <tt>load_dsi_module</tt> (as pasted above), and is passed directly into <tt>globus_i_gfs_data_new_dsi()</tt> ... the repeated <tt>osg</tt> is the same value, once from the outer <tt>globus_i_gfs_data_init()</tt> and once from the more specific error message from <tt>globus_i_gfs_data_new_dsi()</tt>.  (So it's just mentioned twice for a single error.)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:47:27)</span> <b>bbockelm:</b></span> There's always <tt>LD_DEBUG=all</tt> that you can set to debug things.<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:49:13)</span> <b>edquist:</b></span> is that for the globus-gridftp-server process?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:57:45)</span> <b>bbockelm:</b></span> yeah - well, I'd do something like <tt>LD_DEBUG=all gridftp-hdfs-debug</tt> -- libld's going to spit out to stderr IIRC.  The man pages cover it.<br/>
+</body>
+</html>

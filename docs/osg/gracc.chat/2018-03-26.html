@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Mar 26, 2018 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Mon Mar 26, 2018 : #gracc (osg)</h3>
+<span style="color: #965d1b"><span style="font-size: small">(12:08:04)</span> <b>briedel:</b></span> @briedel uploaded a file: <a href="https://opensciencegrid.slack.com/files/U1DNMH7SS/F9VMRBS3T/screen_shot_2018-03-26_at_12.07.46.png">Screen Shot 2018-03-26 at 12.07.46.png</a><br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:08:31)</span> <b>briedel:</b></span> could someone enlighten me why we dont have proper month bins? i am guessing we are group things into 30 day intervals<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:22:06)</span> <b>kretzke:</b></span> @marian are you still maintaining dashboards? looks like the interval isn’t being set properly in the queries, it’s set to auto but should be <tt>$interval</tt><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:24:22)</span> <b>kretzke:</b></span> I went ahead and fixed the Payload Jobs Summary dashboard @briedel<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:25:11)</span> <b>marian:</b></span> Hi Kevin, I'll take a look shortly ... which dashboards in particular? is should  have been auto for long time then, I don't recall changing it<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:25:26)</span> <b>briedel:</b></span> @kretzke many thanks<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:26:06)</span> <b>kretzke:</b></span> seems to be a problem in many, I see it in VO summary and site summary<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:26:58)</span> <b>marian:</b></span> it could be then since update couple months ago then which turned it to <tt>auto</tt> if it was <tt>$interval</tt> before<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:29:18)</span> <b>kretzke:</b></span> so grafana broke it? that does sound familiar…<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:35:59)</span> <b>marian:</b></span> yeah, that is my guess, grafana update<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:41:49)</span> <b>kretzke:</b></span> seems like a bug then, if “auto” is supposed to be the same as <tt>$interval</tt> when an interval template is included, yet they have different alignment behavior<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:45:16)</span> <b>kretzke:</b></span> that’s bizarre, when set to <tt>auto</tt> it does use 30d even when 1M is selected in the template <tt>"date_histogram":{"interval":"30d",</tt><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:46:24)</span> <b>kretzke:</b></span> whereas setting it to <tt>$interval</tt> it uses 1M <tt>"date_histogram":{"interval":"1M"</tt><br/>
+</body>
+</html>

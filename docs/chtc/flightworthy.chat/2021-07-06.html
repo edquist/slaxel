@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jul 6, 2021 : #flightworthy (chtc)</title>
+</head>
+<body>
+<h3>Tue Jul 6, 2021 : #flightworthy (chtc)</h3>
+<span style="color: #9b3b45"><span style="font-size: small">(16:31:32)</span> <b>jfrey:</b></span> Do we have a writeup on how to compile and view the condor docs locally? I’m adding a new section and want to make sure I have it right before making it go live.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:32:57)</span> <b>tlmiller:</b></span> Wasn't TimT/ToddT adding that magic to the build containers?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:33:54)</span> <b>tlmiller:</b></span> (<tt>cd docs; make clean; make html</tt> and point your browser at that part of the local tree, assuming all the tools are properly set up.)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:43:17)</span> <b>johnkn:</b></span> <pre>set PYTHONDONTWRITEBYTECODE=true<br/>%PYDIR%\Scripts\sphinx-build.exe %GITREPO%\docs docs<br/>start docs\index.html</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:44:05)</span> <b>johnkn:</b></span> were PYDIR is the path to python, and GITREPO is the path to your git clone, and the bare docs is the output dir<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:44:22)</span> <b>johnkn:</b></span> (because you don't want to build docs in source, right?)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:44:51)</span> <b>johnkn:</b></span> PYTHONDONTWRITEBYTECODE is necessary to keep python from polluting your sources with byte code<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:49:08)</span> <b>jfrey:</b></span> Thanks. I’ll try that out<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(17:31:54)</span> <b>tim:</b></span> <b>@here</b> I have posted on the htcondor-fw email list a draft release announcement and a plea for input on what to include. Please take a look and respond.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:33:41)</span> <b>johnkn:</b></span> Fix windows installer bug that caused install to fail when install location was not C:\Condor<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(17:43:47)</span> <b>tim:</b></span> Thank you.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:44:08)</span> <b>johnkn:</b></span> quite a few bugs reported by users, it's hard to know exactly what to highlight.<br/>533 (query-krb) was reported by DESY, for instance, but is it important enough to hilight?  I don't know.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(17:46:30)</span> <b>tim:</b></span> Yes, we have many bugs that people are looking for the solution. But, which ones? Also, I really don't know how important is munge. And the condor_shadow problem was discovered locally but may have implications for some. I am only sure about the FIPS 104-2 approved security functions.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:47:17)</span> <b>johnkn:</b></span> personally I would not mention the shadow memory use or munge<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:49:09)</span> <b>johnkn:</b></span> I think singularity jobs not going on hold when the singularity test fails is worth mentioning.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:50:40)</span> <b>johnkn:</b></span> maybe the first class submit keywords for scitokens<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:51:20)</span> <b>johnkn:</b></span> and gpu_discovery now recognising capability 8.6 devices<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:52:25)</span> <b>johnkn:</b></span> I think 498 was reported by a user (startd-cron line length), Matt knows.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(17:53:39)</span> <b>tim:</b></span> Yes, 498 was reported by a user. They have a work-around. But, I think it is rather painful.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(17:56:28)</span> <b>tim:</b></span> gpu_discovery got the wrong number of cores per Compute Unit. But, I don't know how much impact that has.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(17:58:11)</span> <b>tim:</b></span> <pre>- HTCondor can be set up to use only FIPS 140-2 approved security functions<br/>- Fixed Windows installer to work when the install location isn't C:\Condor<br/>- If the singularity test fails, the job goes idle rather than getting held<br/>- Added first class submit keywords for SciTokens<br/>- Startd and Sched cron jobs can now produce up to 64k bytes of output</pre><br/>
+<span style="color: #bb86b7"><span style="font-size: small">(17:58:26)</span> <b>tim:</b></span> For now. I'll see if there are other suggestions.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(20:18:38)</span> <b>jfrey:</b></span> No luck with building the manual html inside our build containers. I tried both CentOS7 and CentOS8 and each was missing some sphinx dependencies.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(20:51:00)</span> <b>tim:</b></span> The build containers just have enough to build the man pages. I build the manual on my laptop.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(20:51:32)</span> <b>tim:</b></span> I whip up something tomorrow that should work for you.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(22:06:10)</span> <b>tim:</b></span> @jfrey You are using very old build container images. Take a look at nmi_tools/nmi_build_platforms and pick a recent one.<br/>
+</body>
+</html>

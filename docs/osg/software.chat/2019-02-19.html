@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Feb 19, 2019 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue Feb 19, 2019 : #software (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(08:11:26)</span> <b>bbockelm:</b></span> @blin - small correction to the above.  SiteDB is currently being replaced by CRIC, which is the same folks as AGIS (but with a different name).  Stephan Lammel has been helping out with that.<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:01:41)</span> <b>blin:</b></span> sure but they haven't actually made the move yet<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:02:27)</span> <b>bbockelm:</b></span> SiteDB is effectively in read-only mode.  It also doesn't integrate with external sources like CRIC does.<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:04:23)</span> <b>blin:</b></span> ah ok<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:04:24)</span> <b>blin:</b></span> good to know<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:55:13)</span> <b>efajardo:</b></span> <b>@here</b> my <tt>/DC=org/DC=opensciencegrid/O=Open Science Grid/OU=People/CN=Edgar Mauricio Fajardo Hernandez 2020</tt> expired should I get a CERN cert ? Specially for koji?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:55:48)</span> <b>matyas:</b></span> yeah we accept CERN certs in koji<br/>
+<span style="color: #99a949"><span style="font-size: small">(10:56:49)</span> <b>dwd:</b></span> And CILogon Basic CA<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:03:21)</span> <b>efajardo:</b></span> Ok<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:03:24)</span> <b>efajardo:</b></span> So this is<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:03:26)</span> <b>efajardo:</b></span> <tt>/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=efajardo/CN=722781/CN=Edgar Fajardo Hernandez</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(11:03:28)</span> <b>efajardo:</b></span> my new one<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:05:40)</span> <b>matyas:</b></span> ok, updated<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:06:04)</span> <b>matyas:</b></span> clear cache &amp; cookies in the browser if you're having trouble with the web interface<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:07:36)</span> <b>efajardo:</b></span> Where are the instructions<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:07:43)</span> <b>efajardo:</b></span> for what I need to do in my build machine?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:09:35)</span> <b>matyas:</b></span> if you're using a grid proxy i don't think you'll need to do anything<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:09:54)</span> <b>matyas:</b></span> otherwise stick your cert and key in your ~/.globus directory and rerun osg-koji setup<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:10:26)</span> <b>efajardo:</b></span> Ahh it works with .pem not .p12?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:12:15)</span> <b>matyas:</b></span> yeah<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:12:45)</span> <b>efajardo:</b></span> hmm ok<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:16:06)</span> <b>efajardo:</b></span> thanks<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:16:07)</span> <b>efajardo:</b></span> it works<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:16:09)</span> <b>efajardo:</b></span> <pre>Created /home/efajardo/.osg-koji/client.crt from /home/efajardo/.globus/usercert.pem and /home/efajardo/.globus/userkey.pem<br/><br/>Setup is done. You may verify that you can log in via the command-line<br/>tools by running:<br/><br/>    osg-koji list-permissions --mine<br/><br/>If you authenticate with a proxy, be sure to have a valid one first.<br/>If using voms-proxy-init, be sure to request an RFC proxy (pass -rfc).<br/><br/>[0915] efajardo@cabinet-10-10-1 ~$ osg-koji list-permissions --mine<br/>repo<br/>software-team<br/></pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(11:17:13)</span> <b>efajardo:</b></span> @matyas can you review the contacts PR?<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:17:20)</span> <b>efajardo:</b></span> Should I make a PR to udpate my DN too?<br/>
+<span style="color: #73769d"><span style="font-size: small">(11:19:55)</span> <b>tim.theisen:</b></span> I use the .p12 file with grid-prox-init. It works just fine.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:21:15)</span> <b>matyas:</b></span> apparently even though it's not mentioned in either the globus documentation or the manpage for grid-proxy-init, you can use a p12 file called ~/.globus/usercred.p12 and it will use that<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:24:37)</span> <b>matyas:</b></span> .... and it's not in the source code either<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:24:49)</span> <b>blin:</b></span> probably openssl magic<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:25:29)</span> <b>matyas:</b></span> Tim, do <tt>env | grep X509</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(11:26:59)</span> <b>matyas:</b></span> oh never mind. it's there as <tt>X509_DEFAULT_PKCS12_FILE</tt> which is used in <tt>globus_gsi_system_config.c</tt>...<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:28:40)</span> <b>matyas:</b></span> it's completely undocumented but if grid-proxy-init can't find your credentials and you run it with <tt>-debug</tt> it prints <pre><br/>Error: Couldn't find valid credentials to generate a proxy.<br/>       grid_proxy_init.c:535: globus_sysconfig: Error with certificate filename: The user cert could not be found in: <br/>1) env. var. X509_USER_CERT<br/>2) $HOME/.globus/usercert.pem<br/>3) $HOME/.globus/usercred.p12</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:57:47)</span> <b>dweitzel:</b></span> @matyas how did you create that ticket for the koji CNAME?  I'm just curious why it says "created by phone"<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:58:42)</span> <b>matyas:</b></span> I used the web interface -- I went to New -&gt; Ticket<br/>
+</body>
+</html>

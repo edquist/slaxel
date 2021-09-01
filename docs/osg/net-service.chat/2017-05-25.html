@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu May 25, 2017 : #net-service (osg)</title>
+</head>
+<body>
+<h3>Thu May 25, 2017 : #net-service (osg)</h3>
+<span style="color: #4ec0d6"><span style="font-size: small">(08:08:42)</span> <b>smckee:</b></span> Yes, I am not sure of the cause but it starts OK and then all the probes disappear eventually...<br/>
+<span style="color: #9e3997"><span style="font-size: small">(08:24:02)</span> <b>thomlee:</b></span> Good morning.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:39:49)</span> <b>smckee:</b></span> Hi Tom,  just sent email about IPv6 on psds1 and psds2<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:40:13)</span> <b>smckee:</b></span> From perfsonar2 I can ping6 to <a href="http://psds.grid.iu.edu">psds.grid.iu.edu</a> but not to psds1 or psds2?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:44:30)</span> <b>smckee:</b></span> (forgot to do @thomlee !)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:09:53)</span> <b>thomlee:</b></span> Well, first of all, <a href="http://psds.grid.iu.edu">psds.grid.iu.edu</a> is a CNAME to <a href="http://vip-psds.grid.iu.edu">vip-psds.grid.iu.edu</a>, which is an LVS ensemble that lvs[12].<a href="http://grid.iu.edu">grid.iu.edu</a> listen on. It's not a real machine.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:10:06)</span> <b>thomlee:</b></span> You are not getting responses from any of the psds* machines.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:11:40)</span> <b>thomlee:</b></span> The question is why, but the fact is that whatever it is, it isn't a difference between psds1, psds2, and other psds machines.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:15:05)</span> <b>thomlee:</b></span> now, when I do ifconfig on psds0, I see no IPv6 information, suggesting that something has turned IPv6 off on that host again.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:16:12)</span> <b>thomlee:</b></span> This makes me suspect Puppet.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:18:41)</span> <b>thomlee:</b></span> OK yes, apparently I used Puppet to disable IPv6 on all psds* hosts as part of <a href="https://ticket.opensciencegrid.org/27653">https://ticket.opensciencegrid.org/27653</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:19:18)</span> <b>thomlee:</b></span> I have changed those rules to reenable IPv6 so it will be enabled again once that runs everywhere (30 minutes or less)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:19:38)</span> <b>thomlee:</b></span> I manually ran it on psds0 and it is responding to pings so that should do it!<br/>
+<span style="color: #a63024"><span style="font-size: small">(18:31:20)</span> <b>efajardo:</b></span> @smckee can you please in itb again:<pre>service rsv stop<br/>yum updated rsv-perfsonar --enablerepo=osg-testing<br/>service rsv start</pre><br/>
+</body>
+</html>

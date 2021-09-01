@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Nov 3, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue Nov 3, 2020 : #software (osg)</h3>
+<span style="color: #73769d"><span style="font-size: small">(09:08:08)</span> <b>tim.theisen:</b></span> So, I was testing installing osg-wn-client with the new gfal2 and I noticed that it brings in igtf-ca-certs. I thought it would have brought in osg-ca-certs.<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:39:52)</span> <b>matyas:</b></span> If you swap out the ca certs package (i.e. <tt>yum swap igtf-ca-certs osg-ca-certs</tt> ), are dependencies still satisfied?<br/>
+<span style="color: #73769d"><span style="font-size: small">(09:42:25)</span> <b>tim.theisen:</b></span> Yup, the dependency is on <tt>grid-certificates &gt;= 7</tt> and both <tt>igtf-ca-certs</tt> and <tt>osg-ca-certs</tt> provide that. yum just happens to pick <tt>igtf-ca-certs</tt>.<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(09:47:01)</span> <b>cat:</b></span> I thought our installation instructions said to install your certs first, so that you can explicitly pick which one you want.<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:47:06)</span> <b>matyas:</b></span> ^^ this<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:47:45)</span> <b>matyas:</b></span> I wonder if we should add something on how to safely replace them if you installed the wrong ones.<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(09:47:59)</span> <b>cat:</b></span> … or change your mind, or …<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(09:48:18)</span> <b>cat:</b></span> No need to be judgmental about the reason for change.<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:48:50)</span> <b>matyas:</b></span> sure<br/>
+<span style="color: #73769d"><span style="font-size: small">(09:49:30)</span> <b>tim.theisen:</b></span> I thought that it would pick osg-ca-certs because it started with osg- like osg-wn-client. I had to put something in condor to pick blahp over condor-externals. yum is just a mystery.<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(09:50:16)</span> <b>cat:</b></span> Fair enough, but in this case I believe that we want installers to make and execute a _conscious_ decision.<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:52:54)</span> <b>matyas:</b></span> "name starts with..." is pretty late in a long list of tiebreakers<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:54:25)</span> <b>matyas:</b></span> ok, maybe not that late.<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:54:26)</span> <b>matyas:</b></span> <a href="http://yum.baseurl.org/wiki/CompareProviders.html">http://yum.baseurl.org/wiki/CompareProviders.html</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:00:45)</span> <b>matyas:</b></span> Google didn't find that page; you should bookmark it.<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:09:17)</span> <b>matyas:</b></span> I missed the gfal fire yesterday... so one of the plugins for gfal2 in EPEL was compiled against xrootd 5?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:09:50)</span> <b>matyas:</b></span> Is xrootd 5 in EPEL?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:09:53)</span> <b>blin:</b></span> yes<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:10:36)</span> <b>matyas:</b></span> So if you disable the OSG repos, you can install xrootd and gfal successfully?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:11:10)</span> <b>blin:</b></span> or enable <tt>osg-upcoming</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:19:11)</span> <b>matyas:</b></span> right<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:19:56)</span> <b>matyas:</b></span> and we're going to solve this by shipping that gfal plugin in 3.5 ourselves?<br/>
+<span style="color: #73769d"><span style="font-size: small">(11:58:14)</span> <b>tim.theisen:</b></span> I got two freshdesk tickets asking for some StashCache namespaces for icecube. Who handles this type of request?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:00:22)</span> <b>matyas:</b></span> I merged Vlad's PR<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:00:44)</span> <b>matyas:</b></span> er, for topology<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:00:57)</span> <b>matyas:</b></span> I'll take a look<br/>
+<span style="color: #dd8527"><span style="font-size: small">(20:18:10)</span> <b>marcom:</b></span> Testing osg-wn-client on centos8 I realized that yum-priorities is not available. This causes xrootd and gfal2 tp be picked from epel.<br/>
+<span style="color: #dd8527"><span style="font-size: small">(20:26:42)</span> <b>marcom:</b></span> Any way to enable yum priorities on centos8?<br/>According to the OSG documentation (<a href="https://opensciencegrid.org/docs/common/yum/">https://opensciencegrid.org/docs/common/yum/</a>) it is already in yum, but I have "plugins=1" i the [main] section of yum.conf and the packages from epel are preferred even if it has lower priority (98 vs 99).<br/>
+<span style="color: #dd8527"><span style="font-size: small">(20:56:38)</span> <b>marcom:</b></span> Also disabling epel and installing manually the dependencies there seems to be problems with the gfal2-plugin-xrootd. On centos8 also the one in OSG 3.5 seems to require Xrootd 5:<br/># yum install  --enablerepo=PowerTools  --enablerepo=osg-testing  gfal2-all-2.18.1-1.osg35.el8<br/>Failed to set locale, defaulting to C.UTF-8<br/>Last metadata expiration check: 0:07:25 ago on Wed Nov  4 02:45:41 2020.<br/>Error:<br/> Problem: package gfal2-all-2.18.1-1.osg35.el8.x86_64 requires gfal2-plugin-xrootd(x86-64) = 2.18.1-1.osg35.el8, but none of the providers can be installed<br/>  - conflicting requests<br/>  - nothing provides libXrdCl.so.3()(64bit) needed by gfal2-plugin-xrootd-2.18.1-1.osg35.el8.x86_64<br/>  - nothing provides libXrdPosix.so.3()(64bit) needed by gfal2-plugin-xrootd-2.18.1-1.osg35.el8.x86_64<br/>  - nothing provides libXrdUtils.so.3()(64bit) needed by gfal2-plugin-xrootd-2.18.1-1.osg35.el8.x86_64<br/>
+<span style="color: #dd8527"><span style="font-size: small">(20:57:23)</span> <b>marcom:</b></span> Note that epel.repo is disabled and gfal2-plugin-xrootd is from osg35.el8<br/>
+<span style="color: #dd8527"><span style="font-size: small">(20:59:18)</span> <b>marcom:</b></span> Probably that happened because during the build process priorities did not work and xrootd was picked from epel.<br/>
+<span style="color: #dd8527"><span style="font-size: small">(22:04:39)</span> <b>marcom:</b></span> Googling around I found that there may be a bug in the dependency solver: <a href="https://bugzilla.redhat.com/show_bug.cgi?id=1733582">https://bugzilla.redhat.com/show_bug.cgi?id=1733582</a><br/>The content seems to refer to old versions but the solution suggested works:<br/><pre># dnf copr enable rpmsoftwaremanagement/dnf-nightly<br/># dnf update libsolv<br/># dnf copr disable rpmsoftwaremanagement/dnf-nightly</pre><br/>
+<span style="color: #dd8527"><span style="font-size: small">(22:06:48)</span> <b>marcom:</b></span> It updated libsolv from 0.7.7-1.el8 to 0.7.16-1.el8 and it seems to use priorities, e.g. to install xrootd-client. Still the osg-wn-client is broken.<br/>
+</body>
+</html>

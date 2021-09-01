@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Feb 22, 2019 : #operations (osg)</title>
+</head>
+<body>
+<h3>Fri Feb 22, 2019 : #operations (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(10:45:06)</span> <b>dweitzel:</b></span> @rynge new SciTokens support will require new version of HTCondor on the glideins.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:45:18)</span> <b>rynge:</b></span> Yeah, just saw<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:45:30)</span> <b>rynge:</b></span> What version are we going with?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:45:54)</span> <b>dweitzel:</b></span> Newest of the newest should work.  is 8.8.1 released yet?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:46:15)</span> <b>dweitzel:</b></span> yup, on Wed.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:46:15)</span> <b>dweitzel:</b></span> :slightly_smiling_face:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:46:27)</span> <b>rynge:</b></span> :slightly_smiling_face: Ok, so step one would be to get the tarball into the factories<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:46:35)</span> <b>dweitzel:</b></span> yup!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:46:44)</span> <b>dweitzel:</b></span> who do I poke about that?  @jdost321 @marian?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:46:51)</span> <b>rynge:</b></span> Yeah<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:47:31)</span> <b>rynge:</b></span> <pre><br/>The<br/>certificates replacing them will have a different format that are only<br/>supported by HTCondor-CE version 3.2.0 or later. <br/></pre><br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:47:42)</span> <b>rynge:</b></span> Is that only affecting HTCondor-CE? What about my flocking hosts?<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(10:48:59)</span> <b>blin:</b></span> i think it should only be relevant to CEs but it depends how you do authz between the flocking hosts and the frontend collector<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:49:36)</span> <b>dweitzel:</b></span> Is the underlying problem the <tt>condor_mapfile</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:49:38)</span> <b>dweitzel:</b></span> or something else?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:49:53)</span> <b>blin:</b></span> yup, it's the condor_mapfile<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:50:46)</span> <b>blin:</b></span> basically host certs are used for internal CE daemon authZ<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:51:16)</span> <b>blin:</b></span> so we had to add something to the top of it to map host certs with VOMS attr to a user instead of a daemon<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:43:56)</span> <b>efajardo:</b></span> I am more concerned when these ones expire:<br/><br/><pre>[1043] root@osg-ligo-1 /etc/grid-security/vomsCerts# openssl x509 -in vomscert.pem -noout -subject -enddate<br/>subject= /DC=org/DC=opensciencegrid/O=Open Science Grid/OU=Services/CN=<a href="http://voms1.opensciencegrid.org">voms1.opensciencegrid.org</a><br/>notAfter=Jun  2 16:24:14 2019 GMT</pre><br/>Should start ordring new ones and update the lsc files?<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:44:16)</span> <b>efajardo:</b></span> Glow will be in same situation<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:44:22)</span> <b>efajardo:</b></span> as well as LIGO and GLueX<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:47:28)</span> <b>blin:</b></span> OSG VO is fine, we have an InCommon cert here: <a href="https://github.com/opensciencegrid/osg-vo-config/blob/master/vomsdir/osg/voms.opensciencegrid.org.lsc">https://github.com/opensciencegrid/osg-vo-config/blob/master/vomsdir/osg/voms.opensciencegrid.org.lsc</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:47:32)</span> <b>blin:</b></span> and i have that cert lying around<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:47:44)</span> <b>blin:</b></span> but yeah, there are a bunch of other VOMS certs that we need to contact VOs about<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:47:46)</span> <b>blin:</b></span> working on it<br/>
+</blockquote>
+<span style="color: #53b759"><span style="font-size: small">(10:47:58)</span> <b>marian:</b></span> <a href="mailto:osg-gfactory-support@physics.ucsd.edu">osg-gfactory-support@physics.ucsd.edu</a> or Freshdesk, pls<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:48:22)</span> <b>marian:</b></span> requesting new tarball in and matching tarball thingy bit ... (don't recall what we set there atm)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:49:09)</span> <b>dweitzel:</b></span> sent<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:49:45)</span> <b>marian:</b></span> did you send email?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:49:52)</span> <b>dweitzel:</b></span> yup<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:50:05)</span> <b>marian:</b></span> looks like my factory folder had last email from February 19, that stinks...<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:45:55)</span> <b>blin:</b></span> @marco.mascheroni @efajardo i'll handle tim wright's latest email<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:02:14)</span> <b>marco.mascheroni:</b></span> I just saw your reply here, we crossfired emails :slightly_smiling_face:<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:13:29)</span> <b>blin:</b></span> oh well<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:56:36)</span> <b>efajardo:</b></span> I was away with some Immigration stuff<br/>
+</body>
+</html>

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Mar 3, 2020 : #operations (osg)</title>
+</head>
+<body>
+<h3>Tue Mar 3, 2020 : #operations (osg)</h3>
+<span style="color: #e06b56"><span style="font-size: small">(11:21:25)</span> <b>jthiltges:</b></span> Regarding Tim's question on LetsEncrypt certificate reissuing, I'd downloaded the list and didn't see any issues for OSG or UNL: <a href="https://letsencrypt.org/caaproblem/">https://letsencrypt.org/caaproblem/</a><br/><br/><a href="http://gracc.opensciencegrid.org">gracc.opensciencegrid.org</a> was listed, but testing shows it's unaffected<br/><br/>What other domains should be checked? (And somebody should probably re-check my work, just in case!)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:22:15)</span> <b>dweitzel:</b></span> Expand on gracc being listed, but unaffected.  I'm confused.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:22:43)</span> <b>dweitzel:</b></span> any osgconnect* hosts affected?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(11:22:49)</span> <b>jthiltges:</b></span> gracc was issued an affected certificate, but the certificate is not currently in use<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:23:24)</span> <b>dweitzel:</b></span> ok<br/>
+<span style="color: #e06b56"><span style="font-size: small">(11:27:58)</span> <b>jthiltges:</b></span> Nothing for osgconnect.<br/><pre>$ zgrep osgconnect caa-rechecking-incident-affected-serials.txt.gz<br/>$ zgrep opensciencegrid caa-rechecking-incident-affected-serials.txt.gz<br/>serial 03e16e4e531b75f2d65ae89d7933ffbc37ea 1853788 dcd58c50335c4a1065fea63b46656b4c7fb340c32fe563832a2679ee1ccb2c5a names: [<a href="http://gracc.opensciencegrid.org">gracc.opensciencegrid.org</a> <a href="http://hcc-gracc.unl.edu">hcc-gracc.unl.edu</a>] missing CAA checking results for <a href="http://gracc.opensciencegrid.org">gracc.opensciencegrid.org</a> at 2019-12-18 17:29:11.441787337 +0000 UTC<br/>serial 03289a57978371954388215b212b772d20bd 1853788 dcd58c50335c4a1065fea63b46656b4c7fb340c32fe563832a2679ee1ccb2c5a names: [<a href="http://gracc.opensciencegrid.org">gracc.opensciencegrid.org</a> <a href="http://hcc-gracc.unl.edu">hcc-gracc.unl.edu</a>] missing CAA checking results for <a href="http://gracc.opensciencegrid.org">gracc.opensciencegrid.org</a> at 2020-02-17 03:34:05.899033419 +0000 UTC</pre><br/><pre>$ curl -XPOST -d 'fqdn=<a href="http://gracc.opensciencegrid.org">gracc.opensciencegrid.org</a>' <a href="https://unboundtest.com/caaproblem/checkhost">https://unboundtest.com/caaproblem/checkhost</a><br/>The certificate currently available on <a href="http://gracc.opensciencegrid.org">gracc.opensciencegrid.org</a> is OK. It is not one of the certificates affected by the Let's Encrypt CAA rechecking problem. Its serial number is 04be13f4a43aabde5d04e2d1c036b35ddc20</pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(15:53:50)</span> <b>lincoln:</b></span> Thanks for checking that for us @jthiltges<br/>
+</body>
+</html>

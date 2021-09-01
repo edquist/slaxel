@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jun 22, 2021 : #flightworthy (chtc)</title>
+</head>
+<body>
+<h3>Tue Jun 22, 2021 : #flightworthy (chtc)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(09:09:38)</span> <b>johnkn:</b></span> The concern is that they might be written into the job_queue.log across multiple lines.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:45:16)</span> <b>johnkn:</b></span> The new feature to add <tt>use_scitoken</tt> as a first class submit command is targeted at 9.0.2<br/>Shouldn't this be a 9.1 feature?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:46:27)</span> <b>coatsworth:</b></span> Does anybody know how exactly <tt>condor_status</tt> determines the different ad types in the collector? I assumed it was just looking at the <tt>MyType</tt> attribute but that doesn't seem to be enough.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:47:10)</span> <b>johnkn:</b></span> It doesn't really care about ad type.   It sends different commands to fetch ads from different tables in the collector.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:54:05)</span> <b>coatsworth:</b></span> I'm working on a test where I'm filling up the collector with dummy ads and then querying for them by ad type. The ads are clearly in there, and I've added attributes (MyType, Name, etc.) to make them look real, but querying by ad type is still returning nothing.<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:10:14)</span> <b>zmiller:</b></span> @coatsworth run <tt>condor_status -any</tt> and see what you get back?  Or (and this will be a lot of output perhaps) <tt>condor_status -any -l</tt> and inspect the full ads.<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:13:06)</span> <b>zmiller:</b></span> @johnknadding <tt>use_scitoken</tt> definitely sounds like devel series.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:13:59)</span> <b>johnkn:</b></span> @coatsworth, what command are you using to put the ads in the collector?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:14:57)</span> <b>coatsworth:</b></span> @johnkn I'm doing this from python with <tt>collector.advertise()</tt>. When I do a general query for ads they all show up.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:15:16)</span> <b>johnkn:</b></span> Different advertise commands put ads in different tables int the collector.  <tt>condor_status -any</tt> looks at all the tables, the other commands look at a single table.<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:15:48)</span> <b>zmiller:</b></span> @coatsworth @johnkn I guess this is where we make a slack thread to keep this semi-reasonable?<br/>
+<blockquote>
+<span style="color: #ea2977"><span style="font-size: small">(10:16:15)</span> <b>zmiller:</b></span> Heyo!<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:18:52)</span> <b>coatsworth:</b></span> Hey hey! @johnkn I didn't realize the collector was table-based. I'm in the LIGO call right now but I'll try after the meeting with <tt>command_str</tt> set.<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:19:13)</span> <b>zmiller:</b></span> There is a <tt>-generic</tt> option even to condor_status.<br/>
+</blockquote>
+<span style="color: #235e5b"><span style="font-size: small">(10:15:53)</span> <b>johnkn:</b></span> Have a look at the collector log to see what command the collector is seeing for that.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:17:19)</span> <b>johnkn:</b></span> looks like by default the generic table is used.<br/><pre>    void advertise(list ads, const std::string &amp;command_str="UPDATE_AD_GENERIC", bool use_tcp=true)</pre><br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:57:19)</span> <b>coatsworth:</b></span> Thanks @johnkn! I got it working. Turns out I needed to set the <tt>command_str</tt> argument, but some ad types also expected certain attributes to be set. Anyway, new Ornithology python collector query test is all done now :slightly_smiling_face:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:59:59)</span> <b>johnkn:</b></span> Hmm.  does the collector have any ads that were not injected by python?   or is the test really a test for python advertise?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:00:10)</span> <b>johnkn:</b></span> and just badly named?<br/>
+<span style="color: #ea2977"><span style="font-size: small">(12:02:31)</span> <b>zmiller:</b></span> <b>@here</b> somebody made changes in V9_0-branch that don't cleanly merge to master:<br/><br/><pre>% git merge V9_0-branch<br/>Auto-merging src/condor_tests/CMakeLists.txt<br/>CONFLICT (content): Merge conflict in src/condor_tests/CMakeLists.txt<br/>Automatic merge failed; fix conflicts and then commit the result.</pre><br/><br/>
+<span style="color: #ea2977"><span style="font-size: small">(12:08:48)</span> <b>zmiller:</b></span> I pushed changes to <tt>docs/admin-manual/security.rst</tt> which should cleanly merge... I don't want to be responsibly for the other changes.<br/>
+<span style="color: #d58247"><span style="font-size: small">(12:11:58)</span> <b>gthain:</b></span> There was a conflict last night in src/condor_test/CMakeLists.txt which I merged<br/>
+<span style="color: #ea2977"><span style="font-size: small">(12:12:59)</span> <b>zmiller:</b></span> Something is amiss...<br/><br/><pre>% git checkout master<br/>Switched to branch 'master'<br/>% <br/>% git pull<br/>Already up-to-date.<br/>% <br/>% git merge V9_0-branch<br/>Auto-merging src/condor_tests/CMakeLists.txt<br/>CONFLICT (content): Merge conflict in src/condor_tests/CMakeLists.txt<br/>Automatic merge failed; fix conflicts and then commit the result.</pre><br/>
+<span style="color: #d58247"><span style="font-size: small">(12:17:15)</span> <b>gthain:</b></span> I'll push a fix, one moment...<br/>
+<span style="color: #ea2977"><span style="font-size: small">(12:20:47)</span> <b>zmiller:</b></span> Feel free to merge security.rst as well, it should be a clean merge.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:31:23)</span> <b>tlmiller:</b></span> Merge complete (and pushed).<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:34:25)</span> <b>coatsworth:</b></span> @johnkn This was originally a test for collector query, then Greg suggested we also do the advertise. I think I'm going to put the other collector tests in there and rename it to test_python_bindings_collector.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:13:02)</span> <b>jcpatton:</b></span> @coatsworth so we have this <tt>{&lt;insert submit description here&gt;}</tt> syntax now for inline submit files in DAGs, is there a way to escape those <tt>{}</tt> characters if instead someone wants to actually use <tt>{}</tt> characters in a submit file name? (sadly this is a thing)<br/>
+<blockquote>
+<span style="color: #e0a729"><span style="font-size: small">(15:26:15)</span> <b>iross:</b></span> &gt; someone wants to actually use <tt>{}</tt> characters in a submit file name?<br/>:scream:<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:38:06)</span> <b>jcpatton:</b></span> yep<br/>
+</blockquote>
+<span style="color: #674b1b"><span style="font-size: small">(15:21:10)</span> <b>coatsworth:</b></span> @jcpatton I don't think so, let me check...<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:29:07)</span> <b>coatsworth:</b></span> @jcpatton I was wrong, it does work. You can use the <tt>{</tt> and <tt>}</tt> characters anywhere in the inline submit description without escapes. It parses this just like a regular submit file up until it sees a line that only contains the closing <tt>}</tt><br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:39:15)</span> <b>jcpatton:</b></span> but what if the file name does have matching pairs of <tt>{</tt> and <tt>}</tt>?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:42:11)</span> <b>jcpatton:</b></span> <tt>{networkUUID=dd7618b2-2bc8-4260-a8dc-c9cb96874308}{dateTime=20210622133343}.submit</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:48:13)</span> <b>johnkn:</b></span> I take it wrapping the submit filename in quotes does not work?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:50:46)</span> <b>johnkn:</b></span> Hmm.  reading the code.  I think this will parse as an inline submit<br/><pre>JOB "{"<br/>   executable = foo<br/>}</pre><br/><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:50:50)</span> <b>johnkn:</b></span> I'd call that a bug.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:51:45)</span> <b>johnkn:</b></span> It should be possible to do this.<br/><pre>JOB "{blah}.submit"</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:51:51)</span> <b>johnkn:</b></span> but it looks like it is not.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(16:20:25)</span> <b>tannenba:</b></span> @gthain @jfrey @johnkn @coatsworth @tim @tlmiller @zmiller You have stale tickets, please address them ASAP!!! <a href="https://opensciencegrid.atlassian.net/secure/Dashboard.jspa?selectPageId=11620">https://opensciencegrid.atlassian.net/secure/Dashboard.jspa?selectPageId=11620</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:21:50)</span> <b>coatsworth:</b></span> I need a code reviewer for HTCONDOR-511, it's dead easy and should take 30 seconds, anybody interested?<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(16:23:02)</span> <b>tim:</b></span> @coatsworth: I'll take it.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:23:22)</span> <b>coatsworth:</b></span> @tim Thank you, coming your way<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:35:38)</span> <b>johnkn:</b></span> HTCONDOR-498 needs a reviewer<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(17:13:15)</span> <b>jfrey:</b></span> I’ll trade you for reviewing HTCONDOR-507<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(17:16:51)</span> <b>jfrey:</b></span> I also need a reviewer for HTCONDOR-270<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(17:17:19)</span> <b>jfrey:</b></span> And HTCONDOR-526<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:08:21)</span> <b>johnkn:</b></span> Ill take 507 and 526<br/>
+</body>
+</html>

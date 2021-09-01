@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Apr 29, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Apr 29, 2020 : #software (osg)</h3>
+<span style="color: #a63024"><span style="font-size: small">(10:48:25)</span> <b>efajardo:</b></span> Hi <b>@here</b><br/>
+<span style="color: #a63024"><span style="font-size: small">(10:48:31)</span> <b>efajardo:</b></span> anyone understand why this fials<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:48:32)</span> <b>efajardo:</b></span> <a href="https://travis-ci.org/github/opensciencegrid/xrootd-lcmaps/builds/680722440">https://travis-ci.org/github/opensciencegrid/xrootd-lcmaps/builds/680722440</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(10:48:33)</span> <b>efajardo:</b></span> ?<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:52:48)</span> <b>edquist:</b></span> looks like there are some errors in the raw log<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:52:53)</span> <b>edquist:</b></span> though it doesn't end with it<br/>
+<span style="color: #99a949"><span style="font-size: small">(10:53:11)</span> <b>dwd:</b></span> Important error was<br/><pre>Error: No Package found for xrootd-server-devel &gt;= 1:4.12.0-0</pre><br/><br/>
+<span style="color: #a63024"><span style="font-size: small">(10:56:28)</span> <b>efajardo:</b></span> ohh my bad :man-facepalming::skin-tone-4: I tend to look at the bottom nto the top<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:59:26)</span> <b>efajardo:</b></span> THough I see:<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:59:28)</span> <b>efajardo:</b></span> <pre>Available Packages<br/>xrootd-server-devel.x86_64                                                   1:4.12.0-0.rc1.osg35.el7                                                   osg-development</pre><br/>
+<span style="color: #99a949"><span style="font-size: small">(12:58:18)</span> <b>dwd:</b></span> @efajardo maybe the release 0.rc1 is considered to be older than 0<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:03:54)</span> <b>matyas:</b></span> shouldn't be. Let me look.<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:04:43)</span> <b>efajardo:</b></span> Well I did this same thing for others xrootd- plugins<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:04:57)</span> <b>efajardo:</b></span> so I think is just travis not using the development repo when building from the osg-build container<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:17:43)</span> <b>matyas:</b></span> yep, you're right<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:18:01)</span> <b>matyas:</b></span> in fact, it's not looking at _any_ OSG repos when building from the osg-build container. OS and EPEL only.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:18:50)</span> <b>matyas:</b></span> so the CI won't work for versions of xrootd that aren't in EPEL yet<br/>
+<span style="color: #e85d72"><span style="font-size: small">(17:09:00)</span> <b>cnweaver:</b></span> I'm trying to use <a href="https://github.com/opensciencegrid/docker-xrootd-standalone">https://github.com/opensciencegrid/docker-xrootd-standalone</a> and running into some issues. The part where things really seem to go wrong in the xrootd log is:<br/><pre>200429 21:36:25 834 XrdConfig: Unable to read config file /etc/xrootd/xrootd-standalone.cfg; invalid argument<br/>200429 21:36:25 834 XrdConfig: Unable to create home directory //stash-cache; permission denied<br/>------ xrootd stash-cache@xrootd-7d46cd556-m4rb5:-1 initialization failed.</pre><br/>
+<span style="color: #e85d72"><span style="font-size: small">(17:09:39)</span> <b>cnweaver:</b></span> Does anyone (maybe @efajardo ?) have a suggestion what this is about?<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:10:23)</span> <b>efajardo:</b></span> <tt>Unable to read config file /etc/xrootd/xrootd-standalone.cfg</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(17:10:28)</span> <b>efajardo:</b></span> seems very odd<br/>
+<span style="color: #e85d72"><span style="font-size: small">(17:10:40)</span> <b>cnweaver:</b></span> Agreed!<br/>
+<span style="color: #e85d72"><span style="font-size: small">(17:10:58)</span> <b>cnweaver:</b></span> The file is, of course, present, and the contents seemed normal enough.<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:11:01)</span> <b>efajardo:</b></span> try<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:11:33)</span> <b>efajardo:</b></span> <tt>sudo -u xrootd -c /etc/xrootd/xrootd-standalone.cfg -k fifo -n standalone -k 10 -s /var/run/xrootd/xrootd-standalone.pid -l /var/log/xrootd/xrootd.log -b</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(17:12:03)</span> <b>efajardo:</b></span> inside the container<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:12:03)</span> <b>bbockelm:</b></span> “Invalid argument” sounds like a standard posix translation of EINVAL.<br/>
+<span style="color: #e85d72"><span style="font-size: small">(17:14:09)</span> <b>cnweaver:</b></span> The container doesn't have sudo, but I can <tt>su xrootd</tt>. What exactly is the command to be run then?<br/>
+<span style="color: #e85d72"><span style="font-size: small">(17:14:37)</span> <b>cnweaver:</b></span> I assume that <tt>-c</tt> isn't meant for <tt>sudo</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(17:15:41)</span> <b>efajardo:</b></span> soory<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:15:47)</span> <b>efajardo:</b></span> it should be then<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:15:59)</span> <b>efajardo:</b></span> <pre>sudo -u xrootd xrootd -c /etc/xrootd/xrootd-standalone.cfg -k fifo -n standalone -k 10 -s /var/run/xrootd/xrootd-standalone.pid -l /var/log/xrootd/xrootd.log -b</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(17:16:06)</span> <b>efajardo:</b></span> so basically runs as user xrootd<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:16:21)</span> <b>efajardo:</b></span> <tt>/usr/bin/xrootd -c /etc/xrootd/xrootd-standalone.cfg -k fifo -n standalone -k 10 -s /var/run/xrootd/xrootd-standalone.pid -l /var/log/xrootd/xrootd.log -b</tt><br/>
+<span style="color: #e85d72"><span style="font-size: small">(17:16:37)</span> <b>cnweaver:</b></span> Okay, that was my guess.<br/>
+<span style="color: #e85d72"><span style="font-size: small">(17:17:23)</span> <b>cnweaver:</b></span> That writes a different log file, but with basically equivalent contents:<br/><pre>200429 22:15:33 860 Starting on Linux 4.15.0<br/>Copr.  2004-2012 Stanford University, xrd version v4.12.0-rc1<br/>Config warning: this hostname, xrootd-df8bc786f-v9tlg, is registered without a domain qualification.<br/>++++++ xrootd standalone@xrootd-df8bc786f-v9tlg initialization started.<br/>Config using configuration file /etc/xrootd/xrootd-standalone.cfg<br/>=====&gt; all.adminpath /var/spool/xrootd<br/>=====&gt; continue /etc/xrootd/config.d/<br/>Config continuing with file /etc/xrootd/config.d/10-common-site-local.cfg ...<br/>Config continuing with file /etc/xrootd/config.d/10-xrootd-lcmaps.cfg ...<br/>Config continuing with file /etc/xrootd/config.d/40-osg-standalone.cfg ...<br/>=====&gt; xrd.port 1094<br/>=====&gt; xrd.trace conn<br/>=====&gt; xrd.network keepalive kaparms 10m,1m,5<br/>=====&gt; xrd.timeout idle 60m<br/>Config continuing with file /etc/xrootd/config.d/40-xrootd-lcmaps.cfg ...<br/>Config continuing with file /etc/xrootd/config.d/50-osg-http.cfg ...<br/>=====&gt; xrd.protocol http:1094 libXrdHttp.so<br/>Config continuing with file /etc/xrootd/config.d/50-osg-monitoring.cfg ...<br/>200429 22:15:33 860 XrdStream: Variable resourcename is undefined.<br/>200429 22:15:33 860 XrdConfig: sitename value not specified<br/>=====&gt; xrd.report <a href="http://xrd-report.osgstorage.org:9931">xrd-report.osgstorage.org:9931</a><br/>Config continuing with file /etc/xrootd/config.d/50-osg-paths.cfg ...<br/>=====&gt; all.adminpath /var/spool/xrootd<br/>Config continuing with file /etc/xrootd/config.d/50-osg-tpc.cfg ...<br/>Config continuing with file /etc/xrootd/config.d/90-osg-standalone-paths.cfg ...<br/>200429 22:15:33 860 XrdConfig: Unable to read config file /etc/xrootd/xrootd-standalone.cfg; invalid argument<br/>200429 22:15:33 860 XrdConfig: Unable to create home directory //standalone; permission denied</pre><br/>
+<span style="color: #e85d72"><span style="font-size: small">(17:18:09)</span> <b>cnweaver:</b></span> The unset variables are my fault, but appear not to be fatal errors?<br/>
+<span style="color: #e85d72"><span style="font-size: small">(17:36:37)</span> <b>cnweaver:</b></span> I'm actually a bit confused about that too; I have created (mounted into the container) /etc/xrootd/config.d/10-site-variables.cfg following the instructions, but it isn't mentioned in the log, and although I tried setting <tt>sitename</tt> and <tt>resourcename</tt> in it, I still get the complaints that they are not defined.<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:56:44)</span> <b>efajardo:</b></span> can you upload the full log @cnweaver<br/>
+<span style="color: #e85d72"><span style="font-size: small">(17:57:40)</span> <b>cnweaver:</b></span> The text above is the full contents of /var/log/xrootd/standalone/xrootd.log<br/>
+<span style="color: #e85d72"><span style="font-size: small">(17:58:38)</span> <b>cnweaver:</b></span> Oops, except the last line:<br/><tt>------ xrootd standalone@xrootd-df8bc786f-v9tlg:1094 initialization failed.</tt><br/>
+</body>
+</html>

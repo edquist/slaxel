@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Dec 22, 2016 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Thu Dec 22, 2016 : #gfactory (osg)</h3>
+<span style="color: #53b759"><span style="font-size: small">(09:57:03)</span> <b>marian:</b></span> Hi Guys ... just curious, did we agree for some support model over the Christmas? Seems like everybody is on holidays between Dec 24 and Jan 2nd ... who is keeping an eye on things in case something goes terribly wrong?<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:57:42)</span> <b>marian:</b></span> (sorry if I missed this detail in case we talked about it on the call yesterday)<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(11:15:11)</span> <b>sthapa:</b></span> Hi, two questions for  you guys<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(11:15:56)</span> <b>sthapa:</b></span> first, OSG_US_Stanford_Proclus is seeing glideins failing because by the time they start running, the proxies have less than 12 hours remaining<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(11:17:03)</span> <b>sthapa:</b></span> primarily because the glideins are idle in the queue for too long.  The root problem is that bosco-ce doesn’t have a good way to send updated proxies to the glideins.  Can the site parameters in the factory get tweaked to help with this?<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(11:17:55)</span> <b>sthapa:</b></span> Looking at the ce queue, it looks like there are 150 running jobs and 200 idle jobs right now so that’s probably not optimal<br/>
+<span style="color: #bd9336"><span style="font-size: small">(11:28:36)</span> <b>mkandes:</b></span> @marian: I believe @jdost321 is planning on keeping a eye of things next week at least at a minimal level.<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:32:20)</span> <b>marian:</b></span> sounds good<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:33:04)</span> <b>marian:</b></span> I'll be in town so if anyone would terribly need my assistance send me and email or even text: <a href="tel:630-824-7158">630-824-7158</a><br/>
+<span style="color: #bd9336"><span style="font-size: small">(11:34:20)</span> <b>mkandes:</b></span> Same: <a href="tel:(619)246-7242">(619) 246-7242</a><br/>
+<span style="color: #bd9336"><span style="font-size: small">(11:34:42)</span> <b>mkandes:</b></span> @sthapa: Taking a look at it now.<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(11:35:36)</span> <b>sthapa:</b></span> Thanks Marty, the current setting looks like there’s 175 running jobs and 50 maxidle<br/>
+<span style="color: #bd9336"><span style="font-size: small">(11:45:07)</span> <b>mkandes:</b></span> @sthapa: The only two good options I can think of here are to go back to a smaller core count on the glideins OR reduce the requested max wall clock time, e.g. moving from 48 hours to 24 hours could help get the glideins started faster. Did you have something else in mind?<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(11:46:37)</span> <b>sthapa:</b></span> The second option seems preferable in order to maximize the opportunistic 8 core slots available.  But what about reducing 	DefaultPerFrontendMaxIdle, DefaultPerFrontendMaxGlideins, PerEntryMaxGlideins, or PerEntryMaxIdle ?<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(11:48:12)</span> <b>sthapa:</b></span> Maybe a combination of the two: reducing requested wall clock to promote faster turnaround and the other settings to reduce queue depth on the CE ?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(11:49:54)</span> <b>mkandes:</b></span> Reducing the queue depth could help as well, if you think the problem is we're competing with ourselves too much.<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(11:50:43)</span> <b>sthapa:</b></span> the only jobs running on the CE are from the factory and we are the primary cluster users right now<br/>
+<span style="color: #bd9336"><span style="font-size: small">(11:51:35)</span> <b>mkandes:</b></span> Okay, I'll try a combination of the two. Reducing to 24 hour wall clocks, lowering glidein numbers.<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(11:51:38)</span> <b>sthapa:</b></span> we’re limited to 1200 cores but that’s pretty much it in regards to limtis<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(11:52:19)</span> <b>sthapa:</b></span> alright, as long as we’re claiming all the available slots, I’m fine with reducing the numbers<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(11:55:47)</span> <b>sthapa:</b></span> the max running jobs can probably be reduced to 150 since we’ll never get 175 running jobs on the cluster with the current sge quota limits<br/>
+<span style="color: #bd9336"><span style="font-size: small">(11:56:56)</span> <b>mkandes:</b></span> Okay, sounds good.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(12:44:28)</span> <b>mkandes:</b></span> Okay, changes in place on on factories.<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(14:34:01)</span> <b>sthapa:</b></span> thanks<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:11:36)</span> <b>klarson1:</b></span> i was told there may be a ticket coming for gpgrid entry changes.  i am out next week and i'm not sure if anyone is going to be actively doing changes like this on the ucsd side anyway.  can we possibly wait until the new year to make the change so the factories are not out of sync?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:19:12)</span> <b>mkandes:</b></span> @klarson1: Yeah, we can hold off on any changes, if that's what you want. Can you comment on the ticket about holding off until the new year?<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(16:20:11)</span> <b>kherner:</b></span> The ticket may come in sooner than that<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(16:20:39)</span> <b>kherner:</b></span> But personally I think we're much better off keeping the factories in sync, even if it means waiting until Jan<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:21:20)</span> <b>mkandes:</b></span> Well, if changes come in today/tomorrow, @klarson1 , will you be able to sync up?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:21:52)</span> <b>mkandes:</b></span> I can handle changes on GOC/SDSC factories.<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(16:23:53)</span> <b>kherner:</b></span> FNAL is on a half day of work tomorrow, so it depends on whether @klarson1 can get to it in the morning or not.<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(16:24:13)</span> <b>kherner:</b></span> But I can open the ticket right now if you want<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:24:15)</span> <b>klarson1:</b></span> i'm out tomorrow<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:24:19)</span> <b>klarson1:</b></span> and i'm leaving soon<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:25:43)</span> <b>mkandes:</b></span> Okay, well, then we'll have to wait until next year. Krista, maybe you can remind us in the first Factory Ops meeting of the year on Jan 4th since that'll be the first day we're all back.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:25:53)</span> <b>klarson1:</b></span> sure<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:26:02)</span> <b>mkandes:</b></span> Cool, thanks.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:26:29)</span> <b>klarson1:</b></span> i had wanted to make sure you all knew that if you made a change it prob wouldn't get done here until jan :slightly_smiling_face:<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:26:46)</span> <b>klarson1:</b></span> so thought it would be better to wait.  we can talk in the new year.  thanks!<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(16:29:30)</span> <b>kherner:</b></span> Do you want me to open the ticket and then you can just write that it will happen in Jan?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:33:37)</span> <b>mkandes:</b></span> @kherner: If you want to open ticket, we can make a note of it.<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(16:38:44)</span> <b>kherner:</b></span> on it<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(16:40:06)</span> <b>kherner:</b></span> <a href="https://ticket.opensciencegrid.org/32187">https://ticket.opensciencegrid.org/32187</a><br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:41:05)</span> <b>mkandes:</b></span> Cool, thanks.<br/>
+</body>
+</html>

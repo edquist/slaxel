@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Feb 25, 2016 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu Feb 25, 2016 : #software (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(15:21:48)</span> <b>matyas:</b></span> @dweitzel: ping<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:25:24)</span> <b>dweitzel:</b></span> hi<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:26:31)</span> <b>matyas:</b></span> are you getting osg-configure's source code from the github mirror?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:26:39)</span> <b>dweitzel:</b></span> yes<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:28:09)</span> <b>matyas:</b></span> if you want to use github, you can get osg-configure's specfile from opensciencegrid/Software-Redhat<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:28:50)</span> <b>dweitzel:</b></span> yeah, ok.  Still though, I would like the spec file to go into the source code, especially since software is the owner of both.  Also, it makes testing more difficult.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:29:40)</span> <b>dweitzel:</b></span> currently, I am trying to setup travic-ci with osg-configure to continuously check my changes.  My latest problem is that <tt>setup.py install</tt> installs osg-configure in /usr/bin, while the tests expect it at /usr/sbin<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:29:57)</span> <b>dweitzel:</b></span> <a href="https://travis-ci.org/djw8605/osg-configure">https://travis-ci.org/djw8605/osg-configure</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(15:29:59)</span> <b>matyas:</b></span> use the makefiel<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:30:03)</span> <b>matyas:</b></span> *Makefile<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:30:52)</span> <b>matyas:</b></span> the problem with putting the spec file in with the source is that I'd need to keep it in sync with what's in the native/redhat tree<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:31:21)</span> <b>matyas:</b></span> I suppose I could fix that by turning osg-configure into a pass-through RPM<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:55:48)</span> <b>dweitzel:</b></span> ok, using the makefile fixed the build, though still failing, I assume due to existing problems? <a href="https://travis-ci.org/djw8605/osg-configure/jobs/111860494#L1976">https://travis-ci.org/djw8605/osg-configure/jobs/111860494#L1976</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(15:56:25)</span> <b>matyas:</b></span> those are new to me<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:59:15)</span> <b>matyas:</b></span> I'll take a look around the source. osg-configure tests are finicky.<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:49:31)</span> <b>matyas:</b></span> it's a problem with the tests, not with the code<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:51:33)</span> <b>matyas:</b></span> the gip config module is supposed to check and reject configs with a <tt>Subcluster CHANGEME</tt> section, but those checks don't run if you don't have a CE installed<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:51:45)</span> <b>matyas:</b></span> so you can ignore that one<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:53:03)</span> <b>dweitzel:</b></span> ignoring failed tests! blasphemy!<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:03:58)</span> <b>matyas:</b></span> you could also do a "yum install osg-htcondor-ce" before running them<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:04:39)</span> <b>matyas:</b></span> I'll fix them eventually -&gt; <a href="https://jira.opensciencegrid.org/browse/SOFTWARE-2224">https://jira.opensciencegrid.org/browse/SOFTWARE-2224</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:07:10)</span> <b>dweitzel:</b></span> ok, i’ll add the osg-htcondor-ce to list of packages to install before running the tests.<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:37:25)</span> <b>matyas:</b></span> FYI, sooner or later we're going to migrate osg-configure and the other stuff in the svn/software area to github<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:38:00)</span> <b>matyas:</b></span> at that point, we'll reconvert osg-configure from SVN to Git using something nicer so that tags become tags, etc.<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:39:10)</span> <b>matyas:</b></span> You may end up with an upstream rebase problem, then. I'll try and work with you to make that less painful.<br/>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Oct 5, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Mon Oct 5, 2020 : #software (osg)</h3>
+<span style="color: #73769d"><span style="font-size: small">(11:45:30)</span> <b>tim.theisen:</b></span> @matyas I had two intermittent failures with HTCondor builds on EL8. Somehow the param_table doesn't get built right?<br/><a href="https://koji.opensciencegrid.org/koji/taskinfo?taskID=322652">https://koji.opensciencegrid.org/koji/taskinfo?taskID=322652</a><br/><a href="https://koji.opensciencegrid.org/koji/taskinfo?taskID=322662">https://koji.opensciencegrid.org/koji/taskinfo?taskID=322662</a><br/><br/>I couldn't locate the problem. Any ideas?<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:47:37)</span> <b>edquist:</b></span> it looks like <tt>$FEATURE$</tt> strings are not getting substituted<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:48:01)</span> <b>edquist:</b></span> or however var substitutions work<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:48:12)</span> <b>edquist:</b></span> for param_info_tables.h<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:49:38)</span> <b>edquist:</b></span> but it looks like the _first_ error is<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:49:45)</span> <b>edquist:</b></span> <pre><br/>/builddir/build/BUILD/condor-8.9.9/src/condor_utils/param_info_tables.h:1198:53: error: expected primary-expression before 'const'  static const int_value def_CCB_SERVER_READ_BUFFER = const string_value def_SCHEDD_CRON_NAME = { "", PARAM_TYPE_STRING };<br/></pre><br/>
+<span style="color: #16569E"><span style="font-size: small">(11:50:41)</span> <b>edquist:</b></span> what is that <tt>const</tt> doing there on the rhs of <tt>=</tt> anyway?<br/>
+<span style="color: #73769d"><span style="font-size: small">(12:01:13)</span> <b>tim.theisen:</b></span> Yes, it's odd. There is dropout or overwrite in the param table.<br/>
+<span style="color: #73769d"><span style="font-size: small">(12:03:42)</span> <b>tim.theisen:</b></span> @blin These two VMU test runs of identical packages produced intermittent failures of HTCondor CE? I couldn't find a smoking gun.<br/><a href="https://osg-sw-submit.chtc.wisc.edu/tests/20201004-0935/results.html">https://osg-sw-submit.chtc.wisc.edu/tests/20201004-0935/results.html</a><br/><a href="https://osg-sw-submit.chtc.wisc.edu/tests/20201004-1511/results.html">https://osg-sw-submit.chtc.wisc.edu/tests/20201004-1511/results.html</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:10:44)</span> <b>efajardo:</b></span> <b>@here</b> I see the TPC tests don’t run in the <tt>ALL</tt> categoery of <tt>osg-tested-internal</tt> cause they need <tt>x509-scitoken-issuer</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:10:49)</span> <b>efajardo:</b></span> which comes from <tt>osg-contrib</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:11:07)</span> <b>efajardo:</b></span> how can we make the nightlies run with <tt>osg-contrib</tt> enabled?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:12:54)</span> <b>matyas:</b></span> we have one-off hacks for these packages... apparently we had one for x509-scitokens-issuer too, but we were getting it from development, not contrib<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:12:56)</span> <b>matyas:</b></span> ugh<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:14:29)</span> <b>matyas:</b></span> I'll make a PR to fix<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:15:22)</span> <b>efajardo:</b></span> In which repo you make the PR<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:15:28)</span> <b>efajardo:</b></span> cause I might want to change somethign else too<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:15:38)</span> <b>matyas:</b></span> osg-test<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:16:02)</span> <b>efajardo:</b></span> no but in which repo are these yamls that are used in the nightlies<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:18:17)</span> <b>matyas:</b></span> wait, it's in both development and contrib<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:18:48)</span> <b>matyas:</b></span> <a href="http://repo.opensciencegrid.org/osg/3.5/el7/development/x86_64/">http://repo.opensciencegrid.org/osg/3.5/el7/development/x86_64/</a> &lt;- and the version in development is 0.8.0 which is newer than 0.5.3 in contrib<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:19:43)</span> <b>matyas:</b></span> The yamls are in this repo: <a href="https://github.com/opensciencegrid/vm-test-runs">https://github.com/opensciencegrid/vm-test-runs</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(12:20:35)</span> <b>matyas:</b></span> but the hack to install x509-scitokens-issuer out of development is in osg-test: <a href="https://github.com/opensciencegrid/osg-test/blob/master/osgtest/tests/special_install.py#L45-L47">https://github.com/opensciencegrid/osg-test/blob/master/osgtest/tests/special_install.py#L45-L47</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(12:22:27)</span> <b>matyas:</b></span> which is broken because if we have "osg-tested-internal" in the package list then it doesn't _technically_ have "xrootd-scitokens" in the package list, which means that if statement won't trigger<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:24:31)</span> <b>efajardo:</b></span> ahh i see<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:24:41)</span> <b>efajardo:</b></span> can I modify<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:24:46)</span> <b>efajardo:</b></span> the default runs for the xrootd plugins<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:24:49)</span> <b>efajardo:</b></span> so it incldues both<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:24:54)</span> <b>efajardo:</b></span> <pre>- x509-scitokens-issuer-client<br/>- osg-xrootd-standalone</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(12:26:35)</span> <b>matyas:</b></span> try it out first but sure<br/>
+</body>
+</html>

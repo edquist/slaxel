@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jan 12, 2017 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Thu Jan 12, 2017 : #xcache (osg)</h3>
+<span style="color: #674b1b"><span style="font-size: small">(09:09:56)</span> <b>rynge:</b></span> Morning. We are seeing a few stashcp issues<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:09:58)</span> <b>rynge:</b></span> One:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:10:04)</span> <b>rynge:</b></span> ERROR:root:Error posting to ES: &lt;urlopen error [Errno 111] Connection refused&gt;<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:10:15)</span> <b>rynge:</b></span> Seems to not affect anything though<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:10:19)</span> <b>rynge:</b></span> Second:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:10:26)</span> <b>rynge:</b></span> Slow transfers at SU<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:10:46)</span> <b>rynge:</b></span> For example: Stats: Total 4 transfers, 2.2 GB transferred in 878 seconds. Rate: 2.5 MB/s (20.2 Mb/s)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:12:21)</span> <b>dweitzel:</b></span> Yeah, that posting to ES failure is because that host probably isn't back up.  I'll poke illija<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:27:44)</span> <b>dweitzel:</b></span> @rynge Yeah, that does seem slow.  I'm not sure about the transfers.  Nothing obvious wrong.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:28:34)</span> <b>rynge:</b></span> ok<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:28:39)</span> <b>rynge:</b></span> thanks for checking<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:48:30)</span> <b>bbockelm:</b></span> @dweitzel - can we better manage the timeouts / stderr printouts on this failure?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:49:02)</span> <b>dweitzel:</b></span> On the connection refused error?<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:49:28)</span> <b>lincoln:</b></span> @dweitzel can you give me the hostname it's trying to post to?<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:49:39)</span> <b>lincoln:</b></span> has this been updated from our old ES to the new one?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:49:39)</span> <b>bbockelm:</b></span> yeah (and/or anything else that can go wrong with TCP connections)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:49:52)</span> <b>dweitzel:</b></span> @lincoln  <a href="http://uct2-collectd.mwt2.org:9951/">http://uct2-collectd.mwt2.org:9951/</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:50:36)</span> <b>dweitzel:</b></span> As error messages in the OSG go, I thought this one was actually pretty good.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:50:45)</span> <b>dweitzel:</b></span> though, not a high bar.<br/>
+<span style="color: #84b22f"><span style="font-size: small">(10:18:24)</span> <b>ivukotic:</b></span> I am  looking at the issue. should be back up shortly<br/>
+<span style="color: #84b22f"><span style="font-size: small">(10:18:49)</span> <b>ivukotic:</b></span> I also see that we’ll need new mapping for both summary and detailed stream data.<br/>
+<span style="color: #84b22f"><span style="font-size: small">(10:18:55)</span> <b>ivukotic:</b></span> will do it today<br/>
+<span style="color: #84b22f"><span style="font-size: small">(10:23:21)</span> <b>ivukotic:</b></span> stashcp collector is back up<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:27:08)</span> <b>bbockelm:</b></span> @dweitzel - if it doesn't require the user to take action, we should downgrade to a "WARNING" instead of "ERROR".  We also should timestamp messages that go to the logs.<br/>
+</body>
+</html>

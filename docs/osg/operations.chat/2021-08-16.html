@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Aug 16, 2021 : #operations (osg)</title>
+</head>
+<body>
+<h3>Mon Aug 16, 2021 : #operations (osg)</h3>
+<span style="color: #A82F2F"><span style="font-size: small">(09:07:15)</span> <b>B01GA370NNT:</b></span> <br/>
+<span style="color: #53b759"><span style="font-size: small">(11:19:35)</span> <b>marian:</b></span> @didavila, does that escaped chars version need to go into the factory condor_mapfile? I added it just plain when we spoke on Friday:<br/><pre>GSI "^/DC=org/DC=incommon/C=US/ST=California/L=La Jolla/O=University of California, San Diego/CN=<a href="http://uclhc-fe-1.t2.ucsd.edu">uclhc-fe-1.t2.ucsd.edu</a>" feuclhc</pre><br/>and, I thought escaped version isn't necessary, or is it and under which circumstances?<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(11:22:19)</span> <b>didavila:</b></span> I don’t think so @marian since that seems to be working just fine<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(11:22:30)</span> <b>didavila:</b></span> I see pilots connecting to the pool<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:26:32)</span> <b>marian:</b></span> ok, so why on your end?<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(11:28:01)</span> <b>didavila:</b></span> that’s a good question I have no answer for ..<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:38:33)</span> <b>matyas:</b></span> if the incoming cert doesn't have any VOMS attributes then you don't need to worry about the comma<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:41:23)</span> <b>matyas:</b></span> and otherwise the only punctuation that's a special character are the periods in <tt><a href="http://uclhc-fe-1.t2.ucsd.edu">uclhc-fe-1.t2.ucsd.edu</a></tt> but since a <tt>.</tt>  matches any character (including a literal <tt>.</tt>) it will still match the incoming cert<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:42:41)</span> <b>matyas:</b></span> (it's just that it would too much -- e.g. it would match <tt><a href="http://uclhc-fe-1Xt2Xucsd.edu">uclhc-fe-1Xt2Xucsd.edu</a></tt> ... but what are the chances that a cert would come in with that FQDN?)<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(11:48:39)</span> <b>B01GA370NNT:</b></span> <br/>
+<span style="color: #8d4b84"><span style="font-size: small">(14:43:32)</span> <b>kherner:</b></span> Any ideas on why the JOB_TOKENS environment variable would have quotes as part of the string when most other variables do not? See  <a href="https://support.opensciencegrid.org/a/tickets/67820">https://support.opensciencegrid.org/a/tickets/67820</a>.<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:23:20)</span> <b>jdost321:</b></span> Hi @kherner poking around that entry reminded me of something "special"<br/><pre>Adding requirements as asked here <a href="https://support.opensciencegrid.org/a/tickets/65965">https://support.opensciencegrid.org/a/tickets/65965</a> . Also, submitting to a Batch system, no CE</pre><br/>
+<span style="color: #385a86"><span style="font-size: small">(15:23:47)</span> <b>jdost321:</b></span> JOB_TOKENS env var is being propagated all the way to the pilot from submission for this entry only, and not others I spot checked for DUNE<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:24:04)</span> <b>jdost321:</b></span> its simply not set in other entries at all in the WN environment..<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:24:23)</span> <b>jdost321:</b></span> i wonder if the site not having a proper CE is letting in env vars we don't expect to keep around past submission<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(15:26:14)</span> <b>kherner:</b></span> Could be<br/>
+</body>
+</html>

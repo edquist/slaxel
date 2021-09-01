@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jun 16, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Fri Jun 16, 2017 : #gracc (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(11:06:53)</span> <b>dweitzel:</b></span> @kretzke on the backups.  Is there any possibility that the file exists in dcache, but doesn't show up in an <tt>uberftp -ls</tt>?  I can run the backup, and it verifies that the file is there, even downloads it and checksums it to make sure it's correct.  But it's not in the ls output.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:12:14)</span> <b>kretzke:</b></span> well that’s bizarre<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:13:52)</span> <b>dweitzel:</b></span> Is there somewhere I can open a ticket for this?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:14:40)</span> <b>dweitzel:</b></span> The command I am using:<br/><pre><br/>uberftp -ls <a href="gsiftp://fndca1.fnal.gov/pnfs/fs/usr/fermigrid/gratia/gracc-jobs-raw">gsiftp://fndca1.fnal.gov/pnfs/fs/usr/fermigrid/gratia/gracc-jobs-raw</a><br/></pre><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:20:43)</span> <b>kretzke:</b></span> I see it’s showing up now. I’ll ask the dCache folks if this is normal<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:21:40)</span> <b>kretzke:</b></span> you transferred it around 11, right? I don’t see anything particularly notable happening then<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:23:27)</span> <b>dweitzel:</b></span> yeah<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:23:39)</span> <b>dweitzel:</b></span> I still don't see it.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:24:41)</span> <b>kretzke:</b></span> not this? <pre>uberftp -ls <a href="gsiftp://fndca1.fnal.gov:2811/pnfs/fnal.gov/usr/fermigrid/gratia/gracc-jobs-raw/gracc-2017-06-15.tar.gz">gsiftp://fndca1.fnal.gov:2811/pnfs/fnal.gov/usr/fermigrid/gratia/gracc-jobs-raw/gracc-2017-06-15.tar.gz</a><br/>-r--------  1 gratia     gratia        290261695 Jun 16 10:57 gracc-2017-06-15.tar.gz</pre><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:25:23)</span> <b>kretzke:</b></span> (/pnfs/fs works too)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:27:55)</span> <b>dweitzel:</b></span> I can't see it if I just <tt>ls</tt> the directory.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:28:06)</span> <b>dweitzel:</b></span> but indeed, it is there if I <tt>ls</tt> it directly.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:29:42)</span> <b>kretzke:</b></span> I do <pre>uberftp -ls <a href="gsiftp://fndca1.fnal.gov:2811/pnfs/fs/usr/fermigrid/gratia/gracc-jobs-raw">gsiftp://fndca1.fnal.gov:2811/pnfs/fs/usr/fermigrid/gratia/gracc-jobs-raw</a> | grep 2017-06-15<br/>-r--------  1 gratia     gratia        290261695 Jun 16 10:57 gracc-2017-06-15.tar.gz</pre><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:29:53)</span> <b>kretzke:</b></span> files are listed in an odd order though<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:31:35)</span> <b>kretzke:</b></span> half of june is listed in the middle of april<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:41:32)</span> <b>dweitzel:</b></span> oh, you're right<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:41:34)</span> <b>dweitzel:</b></span> weird.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:41:44)</span> <b>dweitzel:</b></span> well then, nvm<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:17:30)</span> <b>dweitzel:</b></span> ok @kretzke another mystery job.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:17:41)</span> <b>dweitzel:</b></span> It looks ok on our end, but not showing up in kibana.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:18:13)</span> <b>dweitzel:</b></span> JobId 446995 from <tt>condor:<a href="http://red-gw1.unl.edu">red-gw1.unl.edu</a></tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:21:45)</span> <b>dweitzel:</b></span> @dweitzel uploaded a file: <a href="https://opensciencegrid.slack.com/files/dweitzel/F5V7ESC13/full_xml.txt">Full XML</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:22:13)</span> <b>dweitzel:</b></span> (I had the job id wrong above, 446995 is correct)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:24:54)</span> <b>bbockelm:</b></span> Indeed - picking from a random assortment of removed jobs in HTCondor, I don't see any in Kibana.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:27:49)</span> <b>kretzke:</b></span> no, you won’t, because they don’t have an <tt>EndTime</tt>. they wouldn’t be in Gratia either afaik<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:28:46)</span> <b>bbockelm:</b></span> I think they would - Gratia would calculate the <tt>EndTime</tt><br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:30:16)</span> <b>bbockelm:</b></span> These jobs aren't in the quarantine index though?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:30:33)</span> <b>kretzke:</b></span> shouldn’t the probe do that?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:31:21)</span> <b>bbockelm:</b></span> Doesn't appear to, but we unfortunately need to deal with the probes that exist...<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:31:45)</span> <b>bbockelm:</b></span> :disappointed: yeah, these all appear to be missing from quarantine too<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:31:51)</span> <b>kretzke:</b></span> actually it’s in the main index <a href="https://gracc.opensciencegrid.org/kibana/app/kibana#/doc/gracc.osg.raw-*/gracc.osg.raw3-2017.06/JobUsageRecord?id=5e3b70db942f3e35b7252ba9f4a8436e&amp;_g=(filters:!(),refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-15m,mode:quick,to:now))">https://gracc.opensciencegrid.org/kibana/app/kibana#/doc/gracc.osg.raw-*/gracc.osg.raw3-2017.06/JobUsageRecord?id=5e3b70db942f3e35b7252ba9f4a8436e&amp;_g=(filters:!(),refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-15m,mode:quick,to:now))</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:32:34)</span> <b>kretzke:</b></span> doesn’t show up since, again, it’s missing <tt>EndTime</tt><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:33:31)</span> <b>kretzke:</b></span> you can find it in dev tools <pre>GET gracc.osg.raw-2017.06/_search<br/>{<br/>  "query": {<br/>    "match": {<br/>      "LocalJobId":"446995"<br/>    }<br/>  }<br/>}</pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:34:08)</span> <b>bbockelm:</b></span> So why doesn't it show up here: <a href="https://gracc.opensciencegrid.org/kibana/app/kibana?#/discover?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-30d,mode:quick,to:now))&amp;_a=(columns:!(_source),index:'gracc.osg.raw-*',interval:auto,query:(query_string:(analyze_wildcard:!f,query:'GlobalJobId:condor.red-gw1.unl.edu%23446995.0%231494223999')),sort:!(EndTime,desc))">https://gracc.opensciencegrid.org/kibana/app/kibana?#/discover?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-30d,mode:quick,to:now))&amp;_a=(columns:!(_source),index:'gracc.osg.raw-*',interval:auto,query:(query_string:(analyze_wildcard:!f,query:'GlobalJobId:condor.red-gw1.unl.edu%23446995.0%231494223999')),sort:!(EndTime,desc))</a> ?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:35:03)</span> <b>kretzke:</b></span> see above.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:35:21)</span> <b>bbockelm:</b></span> what determines what shows up in the Kibana indexes?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:36:06)</span> <b>bbockelm:</b></span> Ah - <tt>EndTime</tt> is what ES is using to determine the date of the record.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:36:07)</span> <b>kretzke:</b></span> @kretzke uploaded a file: <a href="https://opensciencegrid.slack.com/files/kretzke/F5VV1JX8F/pasted_image_at_2017_06_16_02_35_pm.png">index pattern settings</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:36:15)</span> <b>bbockelm:</b></span> :slightly_smiling_face: I was about 2 seconds ahead of you.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:36:26)</span> <b>bbockelm:</b></span> Ok, sounds like we get to write a new tool then.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:36:55)</span> <b>dweitzel:</b></span> Should the collector fix this?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:37:37)</span> <b>kretzke:</b></span> no, stash agent, maybe some day in the future the collector will be gone<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:37:57)</span> <b>bbockelm:</b></span> Nifty - LogStash can do those sort of corrections?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:38:17)</span> <b>kretzke:</b></span> ruby filter can do just about anything<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:38:33)</span> <b>bbockelm:</b></span> <a href="https://github.com/opensciencegrid/gracc-tools/tree/master/gracc-correct">https://github.com/opensciencegrid/gracc-tools/tree/master/gracc-correct</a> &lt;- in the meantime, I think we also get to make a friend for <tt>gracc-correct</tt>.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:39:57)</span> <b>kretzke:</b></span> yesterday I started on a quick change to quarantine records missing <tt>EndTime</tt>, and make sure <tt>@received</tt> is set<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:40:56)</span> <b>bbockelm:</b></span> yeah, unfortunately, we can't quarantine them.  We'll need to correct them.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:41:40)</span> <b>dweitzel:</b></span> ok, so periodic stash agent or logstash?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:42:39)</span> <b>bbockelm:</b></span> I like:<br/>1.  LogStash for new records.<br/>2.  Correction of old records.<br/>3.  Fix the Damned Probe for the future.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:43:15)</span> <b>bbockelm:</b></span> Note that the Damned Probe will be tricky as it might produce EndDates that are in the future.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:43:48)</span> <b>bbockelm:</b></span> (<tt>StartTime</tt> refers to the _last_ start time)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:44:17)</span> <b>bbockelm:</b></span> so, how should we split up the work?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:44:44)</span> <b>dweitzel:</b></span> I can write the correction of old records.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:44:52)</span> <b>dweitzel:</b></span> <b>@edquist</b> for fixing the damned probe?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:45:00)</span> <b>bbockelm:</b></span> @dweitzel - more importantly, did someone file a ticket with the WLCG to tell them to hold off finalizing the May reports?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:45:10)</span> <b>dweitzel:</b></span> nope, no one has filed anything.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:45:18)</span> <b>bbockelm:</b></span> ugh.  That needs to go in ASAP.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:45:36)</span> <b>bbockelm:</b></span> and it should come from OSG since it potentially affects all HTCondor-based sites<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:46:46)</span> <b>kretzke:</b></span> I vote logstash quarantines the records, then some process goes through the quarantine and tries to fix what it can on some interval. Better separation of responsibilities, and keeps us from filling logstash with a million edge cases<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:47:38)</span> <b>kretzke:</b></span> that process would basically be the same as fixing old records, except you’re reading and writing to different indices<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:47:49)</span> <b>bbockelm:</b></span> (How many other corner cases are there?)<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:48:01)</span> <b>kretzke:</b></span> a million<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:48:29)</span> <b>kretzke:</b></span> aka who the f knows<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:49:01)</span> <b>bbockelm:</b></span> Well, let's tackle this as soon as we can.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:50:21)</span> <b>bbockelm:</b></span> @dweitzel - can you have John or Garhan file a GGUS ticket?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:50:28)</span> <b>dweitzel:</b></span> yeah<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:50:41)</span> <b>bbockelm:</b></span> (and CC me on the ticket...)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:51:59)</span> <b>dweitzel:</b></span> Can we submit an OSG ticket that propagates to GGUS?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:52:18)</span> <b>dweitzel:</b></span> John and I don't know how to submit GGUS tickets.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:52:26)</span> <b>bbockelm:</b></span> yeah, an OSG ticket is fine.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:59:07)</span> <b>bbockelm:</b></span> (Also, we need to be very aggressive about filing a ticket, even if it's a placeholder and we don't know the reason -- waiting 4 days is too long)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:02:41)</span> <b>dweitzel:</b></span> already filed.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:14:24)</span> <b>bbockelm:</b></span> Yup - and I CC'd the right folks<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:14:49)</span> <b>bbockelm:</b></span> Ok, how quickly can we make the corrections?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:15:32)</span> <b>dweitzel:</b></span> Writing the script now.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:19:43)</span> <b>dweitzel:</b></span> @kretzke when I'm updating the <tt>EndTime</tt>, do I need to also update the <tt>@timestamp</tt>?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:19:56)</span> <b>kretzke:</b></span> yes<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:20:05)</span> <b>dweitzel:</b></span> anything else to update?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:20:21)</span> <b>kretzke:</b></span> don’t think so<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:21:22)</span> <b>kretzke:</b></span> to prepare it for un-quarantining records you could remove the <tt>Quarantine</tt> field if it exists<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:21:40)</span> <b>dweitzel:</b></span> ok.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:25:07)</span> <b>bbockelm:</b></span> If StartTime+WallDuration is in the future and received exists, then should we change EndTime to received and then subtract WallDuration to get a new StartTime?<br/>
+<blockquote>
+<span style="color: #3c8c69"><span style="font-size: small">(15:45:26)</span> <b>kretzke:</b></span> bbockelm: I guess that seems reasonable…<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:45:52)</span> <b>kretzke:</b></span> trying to put this into a logstash filter<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:47:09)</span> <b>bbockelm:</b></span> Since Gratia used to do this at the record level, we probably only have to reprocess a month?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:50:15)</span> <b>kretzke:</b></span> hopefully. should verify that removed records exist before 4/25<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:43:31)</span> <b>kretzke:</b></span> if there’s no starttime or endtime, should we use @received as endtime? at that point there should be nothing to quarantine<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:48:03)</span> <b>kretzke:</b></span> so downside of changing StartTime based on @received is we could get duplicates<br/>
+</blockquote>
+<span style="color: #9e3997"><span style="font-size: small">(15:26:55)</span> <b>bbockelm:</b></span> Does any of this affect duplicate detection?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:27:15)</span> <b>dweitzel:</b></span> @kretzke was just going ask the same thing about duplicate detection.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:28:25)</span> <b>kretzke:</b></span> shit<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:30:00)</span> <b>kretzke:</b></span> <tt>EndTime</tt> is in the hash, yeah.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:30:23)</span> <b>dweitzel:</b></span> if it's submitted again without EndTime, we're fine.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:30:31)</span> <b>dweitzel:</b></span> if it's submitted again, with EndTime, there's a duplicate.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:31:14)</span> <b>kretzke:</b></span> yep. you could send the record back through rabbitmq or the collector and delete it<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:32:48)</span> <b>kretzke:</b></span> if we add a method to calculate EndTime to logstash then we just need a script that finds all records missing EndTime, sends them to the collector, and deletes them. I think I have something 90% there<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:33:29)</span> <b>dweitzel:</b></span> Ok, @kretzke go!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:33:48)</span> <b>dweitzel:</b></span> I have the start of a script, but if you have something 90% there, and that sounds like a much better solution.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:34:11)</span> <b>bbockelm:</b></span> Let's not delete the records immediately... can we just move them to quarantine?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:35:46)</span> <b>bbockelm:</b></span> We should be paranoid packrats of data!<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:35:52)</span> <b>kretzke:</b></span> probably. or just leave them there for now, since they won’t show up in any queries. well, maybe some query out there is not using EndTime…<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:36:20)</span> <b>dweitzel:</b></span> all the ones I've written use <tt>@timestamp</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:36:33)</span> <b>dweitzel:</b></span> But bucket on EndTime<br/>
+</body>
+</html>

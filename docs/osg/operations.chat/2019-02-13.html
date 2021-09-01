@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Feb 13, 2019 : #operations (osg)</title>
+</head>
+<body>
+<h3>Wed Feb 13, 2019 : #operations (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(09:45:36)</span> <b>dweitzel:</b></span> @marian SBN has been ready to replicate to the stratum 1's for a while.  If it isn't, then we need to do some debugging as to why.<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:48:40)</span> <b>blin:</b></span> hey @marco.mascheroni there were some questions about the wayne state university hosted CE (<a href="http://pearc-ce-2.grid.uchicago.edu">pearc-ce-2.grid.uchicago.edu</a>)<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:48:45)</span> <b>blin:</b></span> could you look into its status?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:03:08)</span> <b>marco.mascheroni:</b></span> I have glideins running for osg, held for ligo (probably saomething went wrong with the homedir accident and I forgot to fix it)<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:07:31)</span> <b>blin:</b></span> but there aren't any registered cores: <a href="http://gfactory-1.t2.ucsd.edu/factory/monitor/factoryStatus.html?entry=OSG_US_WSU_GRID_ce2&amp;frontend=total&amp;infoGroup=running&amp;elements=StatusRunningCores,ClientCoresTotal,ClientCoresRunning,ClientCoresIdle,&amp;rra=0&amp;window_min=0&amp;window_max=0&amp;timezone=-6">http://gfactory-1.t2.ucsd.edu/factory/monitor/factoryStatus.html?entry=OSG_US_WSU_GRID_ce2&amp;frontend=total&amp;infoGroup=running&amp;elements=StatusRunningCores,ClientCoresTotal,ClientCoresRunning,ClientCoresIdle,&amp;rra=0&amp;window_min=0&amp;window_max=0&amp;timezone=-6</a><br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:39:49)</span> <b>marco.mascheroni:</b></span> @jdost321 pinged me about the same thing, seems it was failing the OS check<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:39:59)</span> <b>marco.mascheroni:</b></span> he should have fixed it<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:47:13)</span> <b>blin:</b></span> where'd he fix that?<br/>
+<span style="color: #385a86"><span style="font-size: small">(10:48:04)</span> <b>jdost321:</b></span> I changed GLIDEIN_REQUIRED_OS to "any" in the entry<br/>
+<span style="color: #385a86"><span style="font-size: small">(10:48:09)</span> <b>jdost321:</b></span> that will disable the OS check<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:48:28)</span> <b>blin:</b></span> ah ok, i see your commit<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:48:52)</span> <b>blin:</b></span> thanks<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:30:55)</span> <b>marco.mascheroni:</b></span> For the LSU SuperMIC hostedCE, I am getting this:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:31:02)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:31:34)</span> <b>marco.mascheroni:</b></span> I see bosco is putting tje #PBS -l nodes=1:ppn=1 directive in the submit file<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:31:57)</span> <b>marco.mascheroni:</b></span> is it also putting something for using the wholenode?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:34:20)</span> <b>dweitzel:</b></span> what's in the bl_* file you submitted?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:36:46)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:39:17)</span> <b>dweitzel:</b></span> nope, nothing in that says anything about whole nodes.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:39:34)</span> <b>dweitzel:</b></span> sounds like that cluster requires you to say "ppn=20" for all jobs?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:39:45)</span> <b>marco.mascheroni:</b></span> yes<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:39:49)</span> <b>marco.mascheroni:</b></span> it works if I set it<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:41:17)</span> <b>marco.mascheroni:</b></span> hope it is not the number of cores<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:41:35)</span> <b>dweitzel:</b></span> ppn = processors per node.<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:41:54)</span> <b>marco.mascheroni:</b></span> yes v<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:41:55)</span> <b>marco.mascheroni:</b></span> <a href="https://www.osc.edu/supercomputing/batch-processing-at-osc/pbs-directives-summary">https://www.osc.edu/supercomputing/batch-processing-at-osc/pbs-directives-summary</a><br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:42:02)</span> <b>marco.mascheroni:</b></span> does not look right<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:42:18)</span> <b>dweitzel:</b></span> what doesn't look right?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:42:20)</span> <b>marco.mascheroni:</b></span> unless I set GLIDEIN_CPU = 20 in the factory<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:42:25)</span> <b>dweitzel:</b></span> ah, ok.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:42:39)</span> <b>dweitzel:</b></span> so set that.  Or change the default route in the ce.<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:42:40)</span> <b>marco.mascheroni:</b></span> maybe that's the way to go<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:42:52)</span> <b>dweitzel:</b></span> every cluster is a special snowflake!<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:43:01)</span> <b>marco.mascheroni:</b></span> ehehe yeah<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:47:21)</span> <b>marco.mascheroni:</b></span> what's the right way to set ppn=20?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:47:39)</span> <b>marco.mascheroni:</b></span> should I create a pbs_local_submit_attributes.sh<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:48:07)</span> <b>blin:</b></span> local submit attr are only useful for additive changes<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:48:16)</span> <b>blin:</b></span> it can't change things already set by the blahp<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:49:06)</span> <b>marco.mascheroni:</b></span> ok<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:49:46)</span> <b>marco.mascheroni:</b></span> thre is this       N) bls_opt_hostsmpsize="$OPTARG";;<br/>in blah_common_submit_functions.sh<br/>that seems related<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:50:17)</span> <b>dweitzel:</b></span> @blin would know more about the htcondor-ce route to make that happen.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:50:31)</span> <b>dweitzel:</b></span> but it would have something to do with editing the job router's variable <tt>eval_set_remote_SMPGranularity</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:51:52)</span> <b>dweitzel:</b></span> I think by setting <tt>default_xcount</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(11:52:02)</span> <b>blin:</b></span> i would add <tt>set_default_xcount = 20;</tt> to the route<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:52:45)</span> <b>blin:</b></span> you could set this in the condor config so that it gets applied to all routes:<br/><tt>JOB_ROUTER_DEFAULTS = $(JOB_ROUTER_DEFAULTS) [set_default_xcount = 20;]</tt><br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:53:26)</span> <b>marco.mascheroni:</b></span> Could I do the same by setting xcount directly in the factory? I mean if I set the NUM_CPUS there I should probably set there the xcount.<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:54:09)</span> <b>marco.mascheroni:</b></span> If I just set it in the route the factory will think I sent a 1 cpu glidein but it's a 20 one. And the frontend calculations will be off<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:54:25)</span> <b>marco.mascheroni:</b></span> ok, anyway I'll try that<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:55:31)</span> <b>blin:</b></span> sure, setting it in the factory works, too<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:56:13)</span> <b>blin:</b></span> though i'm concerned about your assertion that this /has/ to be done in the factory<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:56:38)</span> <b>blin:</b></span> it kinda defeats the purpose of the admin to adjust their site config when necessary<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:58:08)</span> <b>marco.mascheroni:</b></span> the xcore no, but the GLIDEIN_CPU I am afraid so. I can probably test it out, but we need to avoid that we start a pilot that takes 20 cores and only advertize 1 Cpu<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:02:02)</span> <b>blin:</b></span> hey @marco.mascheroni are you going to add the LSU CE to the spreadsheet?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:02:12)</span> <b>marco.mascheroni:</b></span> yes, once I am done<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:02:44)</span> <b>blin:</b></span> ok sounds good<br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:02:47)</span> <b>marco.mascheroni:</b></span> I also plan to document that I needed to set xcount to 20 in a jira and put the jirs in the spreadsheed<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:02:53)</span> <b>blin:</b></span> let us know if you need help with topology registration<br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:03:06)</span> <b>marco.mascheroni:</b></span> that was planned for tomorrow :slightly_smiling_face:<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:03:07)</span> <b>blin:</b></span> sure, sounds good to me<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:10:53)</span> <b>marco.mascheroni:</b></span> For the WSU hosted CE with the wrong CRL, I fixed it. There was a missing crontab and it was still trying to retrieve the CRLs from indiana<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:11:21)</span> <b>blin:</b></span> :disappointed:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:11:24)</span> <b>marco.mascheroni:</b></span> I should probably double check all the hostedCE... I usually do not look at the registered cores but just at the runnign pilots<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:11:34)</span> <b>blin:</b></span> what an incredibly awful system we've put into place<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:11:41)</span> <b>marco.mascheroni:</b></span> I bet there are others that were borken and I did not notice<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:11:47)</span> <b>blin:</b></span> yeah, exactly<br/>
+<span style="color: #e23f99"><span style="font-size: small">(16:18:20)</span> <b>marco.mascheroni:</b></span> Question for LSU SuperMIC again. What is the best way of setting an environment variable, say: export X509_CERT_DIR=/home/ligouser/osg-wn-client/etc/grid-security/certificates ?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:20:47)</span> <b>blin:</b></span> new CE, right?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:21:01)</span> <b>blin:</b></span> there's a local.ini file in /etc/osg/config.d, i'd add it to that<br/>
+<span style="color: #e23f99"><span style="font-size: small">(16:21:25)</span> <b>marco.mascheroni:</b></span> ok<br/>
+<span style="color: #e23f99"><span style="font-size: small">(16:21:29)</span> <b>marco.mascheroni:</b></span> thx<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:21:36)</span> <b>blin:</b></span> <tt>40-localsettings.ini</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:21:57)</span> <b>blin:</b></span> use that, drop the export, and run osg-configure -c<br/>
+</body>
+</html>

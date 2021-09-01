@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Sep 24, 2019 : #operations (osg)</title>
+</head>
+<body>
+<h3>Tue Sep 24, 2019 : #operations (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(11:38:18)</span> <b>matyas:</b></span> Which ports do you need open for flocking? The docs just say 'you need the ability to open firewall ports'<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:39:27)</span> <b>rynge:</b></span> 9618 as along as you keep the default config with sharedport<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:40:14)</span> <b>rynge:</b></span> Do you want me to take this page down: <a href="https://support.opensciencegrid.org/support/solutions/articles/12000056360-submit-node-flocking-to-osg">https://support.opensciencegrid.org/support/solutions/articles/12000056360-submit-node-flocking-to-osg</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(11:40:20)</span> <b>matyas:</b></span> no not yet<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:40:26)</span> <b>rynge:</b></span> Ok<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:40:29)</span> <b>matyas:</b></span> it has more info than <a href="https://opensciencegrid.org/docs/submit/osg-flock/">https://opensciencegrid.org/docs/submit/osg-flock/</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:40:56)</span> <b>rynge:</b></span> One change I want: the GSI and the PASSWORD auth should be list as two different options<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:41:01)</span> <b>rynge:</b></span> Option 1: GSI<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:41:08)</span> <b>rynge:</b></span> Option 2: PASSWORD<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:41:15)</span> <b>rynge:</b></span> They just need to pick one<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:43:45)</span> <b>matyas:</b></span> Why does the auth system on their side matter?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:44:22)</span> <b>rynge:</b></span> This is the method the use to authenticate with the cm<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:44:29)</span> <b>rynge:</b></span> <a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:44:36)</span> <b>rynge:</b></span> We allow both<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:44:43)</span> <b>matyas:</b></span> how can they use pool password for that? Do they send you the password?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:44:51)</span> <b>rynge:</b></span> Yes<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:45:05)</span> <b>rynge:</b></span> This is why we want to switch to TOKEN :slightly_smiling_face:<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:45:09)</span> <b>matyas:</b></span> I didn't know you could have multiple pool passwords<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:45:14)</span> <b>rynge:</b></span> You can't<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:45:20)</span> <b>rynge:</b></span> They have to use the one we provide<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:45:32)</span> <b>rynge:</b></span> But that is fine, as most cases these are standalone submit hosts<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:45:32)</span> <b>matyas:</b></span> oh, you send _them_ the pool password<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:45:35)</span> <b>rynge:</b></span> Not existing pools<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:45:49)</span> <b>rynge:</b></span> Sorry, yes, we send it to them.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:46:28)</span> <b>rynge:</b></span> We have only used a couple of times - this is a fallout from the OSG CA going away<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:51:21)</span> <b>bbockelm:</b></span> @rynge - everything on the collector is based on &gt;= 8.9.2, right?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:51:39)</span> <b>bbockelm:</b></span> could we prototype a submit host using a TOKEN?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:56:06)</span> <b>rynge:</b></span> Yes, that is the plan<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:56:10)</span> <b>rynge:</b></span> Just need to find some time<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:41:59)</span> <b>matyas:</b></span> Do we have a doc on how to set up a standalone submit host?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:55:14)</span> <b>rynge:</b></span> @matyas I think the idea was to make <tt>osg-flock</tt> bring in everything<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:59:31)</span> <b>matyas:</b></span> So if you already have a submit node, you install osg-flock on top of it and configure all the gratia and auth stuff, and if you don't already have a submit node, you install osg-flock and configure all the gratia and auth stuff?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:00:35)</span> <b>rynge:</b></span> I think that is how it *should* work - not sure if that is how it actually works today<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:00:41)</span> <b>rynge:</b></span> We used to have them set up condor first<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:19:24)</span> <b>matyas:</b></span> What do we point them at for instructions on how to set up condor?<br/>
+</body>
+</html>

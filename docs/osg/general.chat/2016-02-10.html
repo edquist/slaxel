@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Feb 10, 2016 : #general (osg)</title>
+</head>
+<body>
+<h3>Wed Feb 10, 2016 : #general (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(22:25:09)</span> <b>bbockelm:</b></span> @lincoln @rynge - I’ve been thinking: would it make sense to have a <tt>~/software</tt> subdirectory for each user (heavily quota’d) that is automatically rsync’d to OASIS?  Similar to how we currently run Stash?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(22:25:32)</span> <b>bbockelm:</b></span> other than explaining there’s likely a 2-hour propagation delay, seems doable.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(22:42:02)</span> <b>rynge:</b></span> For it to really be helpful, it needs to be the same path. A lot of software is crappy enough that it can not be relocated easily<br/>
+<span style="color: #9e3997"><span style="font-size: small">(22:42:34)</span> <b>bbockelm:</b></span> that could be done through bind mount sugar on the login host, right?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(22:43:02)</span> <b>rynge:</b></span> We have talked about having /cvmfs/.../osg/user/$USER mounted somehow which would do that<br/>
+<span style="color: #9e3997"><span style="font-size: small">(22:43:03)</span> <b>bbockelm:</b></span> (hm… actually, probably symlinks)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(22:43:32)</span> <b>rynge:</b></span> Symlink might not work. The software might dereference it<br/>
+<span style="color: #674b1b"><span style="font-size: small">(22:44:01)</span> <b>rynge:</b></span> A VM without CVMFS would work (and that is how we build our modules software)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(22:44:40)</span> <b>rynge:</b></span> Or maybe some fuse/automounter magic, but I'm not sure if we could actually mount something on top of a cvmfs mount<br/>
+<span style="color: #9e3997"><span style="font-size: small">(22:46:15)</span> <b>bbockelm:</b></span> yeah, that’s why I was thinking of bind mounts.  I bet I could deduce the appropriate automounter magic to get just one subdirectory of /cvmfs to be “real” and not CVMFS.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(22:48:57)</span> <b>rynge:</b></span> Dave D. has told me in the past that the rsync can be tricky<br/>
+<span style="color: #674b1b"><span style="font-size: small">(22:49:07)</span> <b>rynge:</b></span> But I don't know why<br/>
+<span style="color: #9e3997"><span style="font-size: small">(22:49:30)</span> <b>bbockelm:</b></span> definitely - but I’m thinking in the “better than nothing” category.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(22:49:54)</span> <b>rynge:</b></span> Yeah - he was thinking about maybe making a safe rsync wrapper/tool<br/>
+<span style="color: #9e3997"><span style="font-size: small">(22:50:17)</span> <b>bbockelm:</b></span> well, we were discussing about having users run that directly.  I’m now thinking “good ol’ condor-cron job"<br/>
+<span style="color: #674b1b"><span style="font-size: small">(22:51:00)</span> <b>rynge:</b></span> Yes, probably easier to just use one admin credential and trying to have users authenticate<br/>
+<span style="color: #9e3997"><span style="font-size: small">(22:51:36)</span> <b>bbockelm:</b></span> that’s what we do with <tt><a href="http://stash.osgstorage.org">stash.osgstorage.org</a></tt>.  You just lose the transaction safety, which I’m sure users can’t even spell :wink:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(22:51:48)</span> <b>rynge:</b></span> :simple_smile:<br/>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Oct 20, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue Oct 20, 2020 : #software (osg)</h3>
+<span style="color: #a63024"><span style="font-size: small">(09:21:32)</span> <b>efajardo:</b></span> <b>@here</b> one more question<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:21:36)</span> <b>efajardo:</b></span> in here<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:21:37)</span> <b>efajardo:</b></span> <a href="https://osg-sw-submit.chtc.wisc.edu/tests/20201019-1943/results.html">https://osg-sw-submit.chtc.wisc.edu/tests/20201019-1943/results.html</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(09:21:44)</span> <b>efajardo:</b></span> What does this mean?<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:21:46)</span> <b>efajardo:</b></span> <tt>/mnt/user/run-job: /sbin/osg-test: /usr/bin/python: bad interpreter: No such file or directory</tt><br/>
+<span style="color: #16569E"><span style="font-size: small">(09:21:55)</span> <b>edquist:</b></span> whew!<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:22:05)</span> <b>edquist:</b></span> it means /usr/bin/python does not exist<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:22:33)</span> <b>edquist:</b></span> i didn't know that was possible<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:23:20)</span> <b>edquist:</b></span> which log file  do you see this in?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:26:10)</span> <b>blin:</b></span> sometimes the VM doesn't come up in a great state<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:26:32)</span> <b>matyas:</b></span> it's EL8 so /usr/bin/python missing is normal<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:26:34)</span> <b>blin:</b></span> though, i suspect that we have a python3 incompat there because it happens for all EL8<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:26:45)</span> <b>blin:</b></span> strange that we're just now seeing that, though<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:26:54)</span> <b>matyas:</b></span> I think I missed a substitution somewhere...<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:28:32)</span> <b>edquist:</b></span> &gt;it's EL8 so /usr/bin/python missing is normal<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:28:36)</span> <b>edquist:</b></span> mind=blown<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:31:36)</span> <b>matyas:</b></span> Well it's either /usr/bin/python2 or /usr/bin/python3... pick one.<br/>I think there's an RPM called "python-unversioned-command" that presumably creates a /usr/bin/python-&gt;python3 symlink<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:30:40)</span> <b>efajardo:</b></span> well but my question is rhel8<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:30:46)</span> <b>efajardo:</b></span> tests were working yesterday<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:30:48)</span> <b>efajardo:</b></span> so what changed?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:32:36)</span> <b>blin:</b></span> that's a good question. i don't think VMs got rebuilt<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:32:46)</span> <b>matyas:</b></span> nope, that happens over the weekend.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:33:31)</span> <b>matyas:</b></span> no commits to osg-test or vm-test-runs<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:33:57)</span> <b>blin:</b></span> well, it's using edgar's master branch<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:34:33)</span> <b>blin:</b></span> which appears to be old? <a href="https://github.com/efajardo/osg-test">https://github.com/efajardo/osg-test</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(11:34:39)</span> <b>blin:</b></span> that's probably the issue<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:41:52)</span> <b>efajardo:</b></span> nop<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:42:40)</span> <b>efajardo:</b></span> <pre>[0942] efajardo@test-012 ~/osg-test$ git merge upstream/master<br/>Already up-to-date.</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(11:43:18)</span> <b>efajardo:</b></span> <a href="https://github.com/efajardo/osg-test">https://github.com/efajardo/osg-test</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(11:43:28)</span> <b>efajardo:</b></span> <tt>This branch is even with opensciencegrid:master.</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(11:44:14)</span> <b>blin:</b></span> sure but github was ~70 commits out of date just a few minutes ago<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:44:40)</span> <b>blin:</b></span> i'd try rekicking the test and use opensciencegrid:master<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:44:49)</span> <b>efajardo:</b></span> Let me try again<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:45:19)</span> <b>efajardo:</b></span> I will try to get a centos 8 VM for Terrence so I can run these tests locally<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:49:11)</span> <b>matyas:</b></span> python-unversioned-command seems to be a fedora thing, not a centos thing btw<br/>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jun 8, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Thu Jun 8, 2017 : #gracc (osg)</h3>
+<span style="color: #e7392d"><span style="font-size: small">(10:52:26)</span> <b>bala:</b></span> In here “<a href="https://gracc.opensciencegrid.org/dashboard/db/payload-jobs-summary?orgId=1&amp;from=1493653353628&amp;to=1496331753628&amp;var-VOName=All&amp;var-Project=ConnectTrain&amp;var-Facility=All&amp;var-User=All&amp;var-ExitCode=All&amp;var-Probe=All&amp;var-interval=1d">https://gracc.opensciencegrid.org/dashboard/db/payload-jobs-summary?orgId=1&amp;from=1493653353628&amp;to=1496331753628&amp;var-VOName=All&amp;var-Project=ConnectTrain&amp;var-Facility=All&amp;var-User=All&amp;var-ExitCode=All&amp;var-Probe=All&amp;var-interval=1d</a>”<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:52:32)</span> <b>bala:</b></span> I see two VO’s<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:52:47)</span> <b>bala:</b></span> OSG and OSG Connect. I guess both are same and need to be merged.<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:13:25)</span> <b>ian_cancercomputer:</b></span> Hi @kretzke , so i got the factory to change my CE's resource name yesterday; GRACC seems to now be in even more limbo though wrt. CancerComputer_Hotel_CE (new) vs CancerComputer_Miron_CE (old) ; things like the 'Project Summary' show the stats as 'Unknown' now, while it still seems like nothing is accumulating against the new name.  I'm fairly sure this isn't a gracc issue directly but I was wondering if you could do another query to see what else I might need to request be updated/changed?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:22:14)</span> <b>rynge:</b></span> @ian_cancercomputer We might have to update the project filter<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:22:16)</span> <b>rynge:</b></span> Let me look<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:25:32)</span> <b>ian_cancercomputer:</b></span> Thanks Mats..  FYI i just dropped all the queued/inactive jobs in my CE's queue to refresh it with new ones, the newly queued jobs still list the new name so I'm going to enquire on my ticket with the factory to see what's up<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:25:38)</span> <b>rynge:</b></span> Actually, project filter still looks good. We use the Sitename and that is still "CancerComputer" it seems<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:26:25)</span> <b>ian_cancercomputer:</b></span> Is that a direct filter or does it only match the facility or resource names listed in OIM?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:27:06)</span> <b>rynge:</b></span> It is a direct filter. For the OSG VO it is set in the glideinwms frontend configuration<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:27:35)</span> <b>rynge:</b></span> <a href="https://github.com/opensciencegrid/osg-flock/blob/master/osg-flock.grid.iu.edu/frontend.xml#L23">https://github.com/opensciencegrid/osg-flock/blob/master/osg-flock.grid.iu.edu/frontend.xml#L23</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:27:45)</span> <b>rynge:</b></span> That is just a fyi<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:28:20)</span> <b>rynge:</b></span> So, yeah, your question is probably still something you should ask factory ops<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:28:39)</span> <b>ian_cancercomputer:</b></span> Thanks for that link to the code!    hm.  ok, well, this wasn't happening until today:  <a href="https://gracc.opensciencegrid.org/dashboard/db/project-summary?orgId=1&amp;var-interval=$__auto_interval&amp;var-project=SPLINTER&amp;var-type=Payload">https://gracc.opensciencegrid.org/dashboard/db/project-summary?orgId=1&amp;var-interval=$__auto_interval&amp;var-project=SPLINTER&amp;var-type=Payload</a>  .. the one after 'GLOW' on the middle graph, currently shown as 'Unknown', is CancerComputer.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:32:15)</span> <b>rynge:</b></span> Interesting - @kretzke should be able to help<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:35:47)</span> <b>kretzke:</b></span> hm. Looks like the factory is updated <pre> condor_status -any -pool <a href="http://gfactory-1.t2.ucsd.edu">gfactory-1.t2.ucsd.edu</a> -constraint 'glideinmytype=="glidefactory"&amp;&amp;glidein_site=="CancerComputer"' -af glidein_site glidein_resourcename<br/>CancerComputer CancerComputer_Hotel_CE</pre><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:36:44)</span> <b>kretzke:</b></span> but records coming into GRACC still show <tt>Host_description:CancerComputer_Miron_CE</tt><br/>
+<span style="color: #e96699"><span style="font-size: small">(11:36:56)</span> <b>ian_cancercomputer:</b></span> my version:  condor_ce_status -constraint 'glidein_site=="CancerComputer"' -af glidein_site glidein_resourcename   ..still shows _Miron_<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:42:24)</span> <b>kretzke:</b></span> hm, I don’t know what condor_ce_status queries<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:47:38)</span> <b>kretzke:</b></span> I can answer why “unknown” is now showing up in GRACC: facility, site, etc are queried from OIM, based on the Host_description (in the case of payloads) when records are summarized (most GRACC interfaces show daily summary records instead of raw records). To make sure latent records get included, we re-summarize the past week every fifteen minutes, and the past year daily. Unfortunately, now there is no <tt>CancerComputer_Miron_CE</tt> in OIM for it to get info from. Name changes have always been ugly business :disappointed:<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:50:29)</span> <b>ian_cancercomputer:</b></span> ok, so condor_ce_status (the way I ran it at least) is only querying running jobs, which all started before the change at the factory.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:51:41)</span> <b>kretzke:</b></span> I need to check, but I _think_ that if there was a *disabled* <tt>CancerComputer_Miron_CE</tt> resource, GRACC would still get the right information.<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:51:55)</span> <b>ian_cancercomputer:</b></span> I wonder if I should make an OIM record for _Miron_CE and mark it dead somehow, just to keep the name in the system..<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:52:07)</span> <b>kretzke:</b></span> :slightly_smiling_face:<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:58:12)</span> <b>kretzke:</b></span> yes, it appears we do include disabled resources in the query to OIM, so that should work<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:01:30)</span> <b>ian_cancercomputer:</b></span> OK, fingers crossed that should help everything to make sense.  Thanks again!<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:03:40)</span> <b>kretzke:</b></span> np. I’ll check that it got updated in 15 minutes<br/>
+<span style="color: #aba727"><span style="font-size: small">(14:15:13)</span> <b>sbhat:</b></span> we're still not seeing CancerComputer_Miron_CE show up, right?<br/>
+<span style="color: #aba727"><span style="font-size: small">(14:16:40)</span> <b>sbhat:</b></span> I *think* that's because of the caching that the gracc summary agent does for OIM info<br/>
+<span style="color: #aba727"><span style="font-size: small">(14:17:30)</span> <b>sbhat:</b></span> it refreshes daily, and the last refresh was at 10:47 a.m. CDT.  I checked the cache file, and indeed there's no CancerComputer_Miron_CE in there.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:18:17)</span> <b>ian_cancercomputer:</b></span> ...i don't think I added it back to OIM prior to that deadline today.<br/>
+<span style="color: #aba727"><span style="font-size: small">(14:18:17)</span> <b>sbhat:</b></span> from the slack chat, it looks like you added CancerComputer_Miron_CE back in around noon today - is that right @ian_cancercomputer ?<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:18:27)</span> <b>ian_cancercomputer:</b></span> yes, that's about right.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:18:41)</span> <b>ian_cancercomputer:</b></span> Tomorrow then it should be re-listed?<br/>
+<span style="color: #aba727"><span style="font-size: small">(14:18:47)</span> <b>sbhat:</b></span> yes<br/>
+<span style="color: #aba727"><span style="font-size: small">(14:18:56)</span> <b>sbhat:</b></span> at least the past week of records should show up with it correct<br/>
+<span style="color: #aba727"><span style="font-size: small">(14:19:10)</span> <b>sbhat:</b></span> I know it's somewhere in this chat history, but I can't remember how often we summarize back a year<br/>
+<span style="color: #aba727"><span style="font-size: small">(14:19:16)</span> <b>sbhat:</b></span> I think it's every week<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:19:21)</span> <b>ian_cancercomputer:</b></span> perfect.  and with any luck the records should be starting to switch over to _Hotel_CE soon too.<br/>
+<span style="color: #aba727"><span style="font-size: small">(14:19:34)</span> <b>sbhat:</b></span> oh no - daily<br/>
+<span style="color: #aba727"><span style="font-size: small">(14:19:36)</span> <b>sbhat:</b></span> we do the past year daily<br/>
+<span style="color: #aba727"><span style="font-size: small">(14:19:46)</span> <b>sbhat:</b></span> exactly<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:20:17)</span> <b>***ian_cancercomputer:</b></span> hasn't come to his cluster's 1 year anniversary yet, so there wont be anything prior to that 1 year<br/>
+<span style="color: #aba727"><span style="font-size: small">(14:20:26)</span> <b>sbhat:</b></span> :thumbsup:<br/>
+<span style="color: #aba727"><span style="font-size: small">(14:23:42)</span> <b>sbhat:</b></span> (oh - my mistake.  I didn't convert time zones properly.  It was at 11:47 CDT that the cache file refreshed.  16:47 UTC)<br/>
+<span style="color: #aba727"><span style="font-size: small">(14:34:51)</span> <b>sbhat:</b></span> @ian_cancercomputer :  Just to make sure, I manually flushed the cache file<br/>
+<span style="color: #aba727"><span style="font-size: small">(14:35:12)</span> <b>sbhat:</b></span> I can see records starting to show up with CancerComputer_Miron_CE info now<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:35:17)</span> <b>ian_cancercomputer:</b></span> @sbhat thanks!!<br/>
+<span style="color: #aba727"><span style="font-size: small">(14:35:46)</span> <b>sbhat:</b></span> if you check <a href="https://gracc.opensciencegrid.org/dashboard/db/project-summary?orgId=1&amp;var-interval=$__auto_interval&amp;var-project=SPLINTER&amp;var-type=Payload">https://gracc.opensciencegrid.org/dashboard/db/project-summary?orgId=1&amp;var-interval=$__auto_interval&amp;var-project=SPLINTER&amp;var-type=Payload</a><br/>
+<span style="color: #aba727"><span style="font-size: small">(14:36:08)</span> <b>sbhat:</b></span> you should see that the "Unknown" site entries stop a week ago<br/>
+<span style="color: #aba727"><span style="font-size: small">(14:36:18)</span> <b>sbhat:</b></span> (since that's how far back this past resummarization ran)<br/>
+<span style="color: #aba727"><span style="font-size: small">(14:36:37)</span> <b>sbhat:</b></span> the rest of them should disappear when the yearly run happens<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:36:54)</span> <b>kretzke:</b></span> yup, last week shows CCHDV<br/>
+<span style="color: #aba727"><span style="font-size: small">(14:37:40)</span> <b>sbhat:</b></span> no problem - I was curious to make sure it was behaving how we expected it to<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:41:38)</span> <b>ian_cancercomputer:</b></span> This is much better, thanks a lot!  So will the historical (older than 1 week) data eventually sync up?  I can see CancerComputer_Miron_CE history listed in the non-OIM site summary for instance.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:42:24)</span> <b>kretzke:</b></span> yeah, the rest will get done overnight (I think midnight UTC?)<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:45:37)</span> <b>kretzke:</b></span> @marian were you following that? main thing to note is that if someone wants to change a resource name, they should add a new resource in oim rather than renaming the existing one (which should be disabled). then both names will get picked up by gracc<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:46:41)</span> <b>marian:</b></span> just got to computer 30mins ago, wasn't on the channel for the whole day (sick leave)<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:46:53)</span> <b>marian:</b></span> need to document this<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:48:00)</span> <b>kretzke:</b></span> yeah, probably need to pass that along to GOC<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:58:40)</span> <b>ian_cancercomputer:</b></span> There's a litle bit of a conflict there with the twiki entry on OIM, but not much.  I attempted to add a comment to that effect earlier today but it seems write/comment access on twiki isn't for just anybody<br/>
+<span style="color: #aba727"><span style="font-size: small">(15:23:29)</span> <b>sbhat:</b></span> @ian_cancercomputer it looks like CancerComputer_Miron_CE is listed as not disabled.  Could you please mark it as disabled?  GRACC should still grab the relevant info from that entry<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:29:05)</span> <b>ian_cancercomputer:</b></span> @sbhat I looked through OIM and didn't see an option to do this myself; i did enquire on the ticket that was generated on its creation though to see what the admins thought about disabling it; either way it seems to be up to GOC to do?<br/>
+<span style="color: #aba727"><span style="font-size: small">(15:29:25)</span> <b>sbhat:</b></span> Ah - that may be the case<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:29:28)</span> <b>ian_cancercomputer:</b></span> I can set it into near-infinite downtime....<br/>
+<span style="color: #aba727"><span style="font-size: small">(15:29:39)</span> <b>sbhat:</b></span> lol<br/>
+</body>
+</html>

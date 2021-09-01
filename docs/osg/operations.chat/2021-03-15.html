@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Mar 15, 2021 : #operations (osg)</title>
+</head>
+<body>
+<h3>Mon Mar 15, 2021 : #operations (osg)</h3>
+<span style="color: #a63024"><span style="font-size: small">(10:39:40)</span> <b>paschos:</b></span> <b>@here</b> we have a number of jobs from spt failing transfers from workers at uconn. before I go digging into it is anyone aware of any issues there on any of their CEs?<br/>
+<span style="color: #5a4592"><span style="font-size: small">(11:04:25)</span> <b>lmichael:</b></span> We’ve got a slew of user-reported issues with Stash-dependent file transfers and singularity issues. Talking about it now.<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:12:15)</span> <b>lincoln:</b></span> There was again a Stash issue over the weekend. There is still bad data in PG 36.37a7 that is causing OSDs to crash. I've offlined the disks that may be responsible. I recompiled Ceph from source over the weekend with the offending code commented out, but alas I only get segmentation faults :slightly_smiling_face:<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:16:00)</span> <b>lincoln:</b></span> as I've mentioned a number of times now, the Ceph cluster is becoming more unstable as time goes on. I've spent the last 3 weekends in a row cleaning up issues.<br/><br/>I am looking into copying the data from /public elsewhere (17TB), and we'll separately need to deal with /collab (65T).<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:22:07)</span> <b>lincoln:</b></span> I am trying some new things this week, namely totally removing the OSDs that are crashing and letting the (hopefully only good) data copy to new OSDs<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:23:12)</span> <b>dweitzel:</b></span> solar flares!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:23:22)</span> <b>dweitzel:</b></span> Sorry though lincoln<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:24:13)</span> <b>lincoln:</b></span> more like cache tiering is unstable and now RH just doesn't want to support it anymore :slightly_smiling_face:<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:24:34)</span> <b>lincoln:</b></span> the good news is that we don't have to use it, when we rebuild Ceph.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:38:52)</span> <b>dweitzel:</b></span> Are things down "enough" to put an outage on the status page?<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:51:43)</span> <b>lincoln:</b></span> they aren't down at all right now<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:54:30)</span> <b>dweitzel:</b></span> ok, that's what I like to hear!<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:57:14)</span> <b>lincoln:</b></span> <pre>    pgs:     2806023/5082159673 objects degraded (0.055%)<br/>             726361/5082159673 objects misplaced (0.014%)<br/>             46864 active+clean<br/>             178   active+undersized+degraded+remapped+backfill_wait<br/>             24    active+remapped+backfill_wait<br/>             16    active+undersized+remapped+backfill_wait<br/>             13    active+undersized+degraded+remapped+backfilling<br/>             9     active+clean+inconsistent<br/>             1     active+undersized+remapped+backfilling<br/><br/>  io:<br/>    client:   5.2 MiB/s rd, 5.7 MiB/s wr, 26 op/s rd, 6 op/s wr<br/>    recovery: 88 MiB/s, 85 objects/s<br/>    cache:    1 op/s promote<br/><br/>  progress:<br/>    Rebalancing after osd.310 marked out<br/>      [=====================.........]<br/>    Rebalancing after osd.171 marked out<br/>      [===========================...]</pre><br/>FWIW<br/>
+<span style="color: #5a4592"><span style="font-size: small">(12:10:11)</span> <b>lmichael:</b></span> @lincoln Do we have a plan for rebuilding Ceph? Can you communicate it (and rough durations of steps) to myself and @bbockelm? Or are is there already a timeline for the rebuild?<br/><br/>Basically, how can we help define and prioritize the long-term fix so that you (and our users) will get some relief?<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:10:47)</span> <b>lincoln:</b></span> need hardware first<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:11:04)</span> <b>lincoln:</b></span> almost all of the existing hardware is out of warranty<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:11:13)</span> <b>lincoln:</b></span> so it's probably not going to be for a little while<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:11:28)</span> <b>lincoln:</b></span> we are getting quotes but I don't have a timeline as yet.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(12:12:45)</span> <b>lmichael:</b></span> :+1:Good to know the quotes are happening!<br/>
+</body>
+</html>

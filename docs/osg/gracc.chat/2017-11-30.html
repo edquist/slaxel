@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Nov 30, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Thu Nov 30, 2017 : #gracc (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(12:02:21)</span> <b>dweitzel:</b></span> @kretzke could you look into why the collector is going so slow?  I expected it to be fine today, and the backlog is down.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:02:29)</span> <b>dweitzel:</b></span> But I see "response-time" in the 100's of seconds.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:02:47)</span> <b>dweitzel:</b></span> (I know the broker is still a little slow)<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:05:56)</span> <b>kretzke:</b></span> looking, but I think you answered the question<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:07:13)</span> <b>dweitzel:</b></span> I wouldn't expect it to take 100's of seconds to publish records though.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:29:28)</span> <b>kretzke:</b></span> looks like the bottleneck is in opening a channel to publish the bundle to<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:30:20)</span> <b>dweitzel:</b></span> interesting.  I was under the impression that channels were light weight.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:33:41)</span> <b>kretzke:</b></span> yeah, me too<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:41:33)</span> <b>kretzke:</b></span> delivery confirmations are pretty slow too, taking ~10s for 100 records<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:16:14)</span> <b>dweitzel:</b></span> Ok, I'm going to "ask for forgiveness" and burst the broker to a higher paid tier for a few hours.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:34:04)</span> <b>dweitzel:</b></span> ok, processing is much faster now.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:35:50)</span> <b>kretzke:</b></span> cool. Maybe once the backlog is through you can drop it back down.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:37:54)</span> <b>dweitzel:</b></span> Already dropped it down.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:38:00)</span> <b>dweitzel:</b></span> any reason to believe the backlog is still there?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:38:09)</span> <b>dweitzel:</b></span> I saw the message rate go down.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:42:20)</span> <b>kretzke:</b></span> ah, no looks like the job collector is keeping up mostly. transfer collector is falling behind though<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:59:36)</span> <b>dweitzel:</b></span> and now we're back to overloading the broker.<br/>
+</body>
+</html>

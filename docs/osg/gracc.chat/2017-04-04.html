@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Apr 4, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Tue Apr 4, 2017 : #gracc (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(09:58:30)</span> <b>dweitzel:</b></span> Ok, GRACC design choices for the group.  How do we want to handle backup transfers?  Should we create a host cert for gracc, then use that to handle the transfers?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:58:47)</span> <b>dweitzel:</b></span> and who has the ability to create a host cert for the <a href="http://opensciencegrid.org">opensciencegrid.org</a> domain?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:00:03)</span> <b>kretzke:</b></span> yes, I already acquired one, and it’s registered with enstore<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:00:18)</span> <b>dweitzel:</b></span> ah, great.  Where is it located on gracc?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:00:27)</span> <b>dweitzel:</b></span> i didn't see it in /etc/grid-security<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:02:21)</span> <b>kretzke:</b></span> ok, it’s there now<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:02:36)</span> <b>kretzke:</b></span> please see GRACC-59 for details<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:05:46)</span> <b>kretzke:</b></span> and to answer your questions, anyone can _request_ and <a href="http://opensciencegrid.org">opensciencegrid.org</a> cert, just need to get it approved by one of the grid admins  <a href="https://oim.opensciencegrid.org/oim/gridadmin">https://oim.opensciencegrid.org/oim/gridadmin</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:13:18)</span> <b>kretzke:</b></span> authorization to dCache &amp; Enstore is done by adding the DN to their “special snowflake” mapping file<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:15:14)</span> <b>dweitzel:</b></span> Any idea how to checksum the files to make sure they are correctly transferred?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:16:57)</span> <b>kretzke:</b></span> copy it back?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:18:37)</span> <b>dweitzel:</b></span> I suppose.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:18:41)</span> <b>dweitzel:</b></span> :slightly_smiling_face:<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:19:09)</span> <b>kretzke:</b></span> browse the globus-url-copy help, may be some option in there<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:19:33)</span> <b>dweitzel:</b></span> yeah, I don't think the globus-url-copy can do checksums.  Though, it can with the <tt>-sync</tt> option, but I don't really want to sync.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:19:46)</span> <b>dweitzel:</b></span> no raw "checksum" cmd.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:21:26)</span> <b>kretzke:</b></span> there’s other options besides gridftp as well. If you’re feeling really brave <a href="http://www.fnal.gov/docs/products/enstore/PublicdCacheHowTo.pdf">http://www.fnal.gov/docs/products/enstore/PublicdCacheHowTo.pdf</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:22:23)</span> <b>dweitzel:</b></span> eh<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:40:43)</span> <b>dweitzel:</b></span> and... we have backups!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:45:46)</span> <b>dweitzel:</b></span> I'll document them now.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:46:40)</span> <b>dweitzel:</b></span> Does the system we are storing this onto care about file sizes?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:47:01)</span> <b>kretzke:</b></span> bigger is better<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:47:20)</span> <b>dweitzel:</b></span> ok, so 180MB files are not big enough?<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(11:48:02)</span> <b>kherner:</b></span> That ought to be OK<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:48:16)</span> <b>kretzke:</b></span> that’s fine. writing a couple files per day means the tape will exceed its mount limit long before running out of space in any case<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(11:48:21)</span> <b>kherner:</b></span> much less than that starts to get a little iffy<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:48:58)</span> <b>dweitzel:</b></span> ok.  There's currently a bug in the archive which causes a memory leak.  Once I get that fixed, I suspect the final file size will be ~400-500MB per day.<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(13:03:20)</span> <b>B14K7UVU4:</b></span> <br/>
+<span style="color: #A82F2F"><span style="font-size: small">(13:03:39)</span> <b>B14K7UVU4:</b></span> <br/>
+<span style="color: #A82F2F"><span style="font-size: small">(13:03:55)</span> <b>B14K7UVU4:</b></span> <br/>
+<span style="color: #A82F2F"><span style="font-size: small">(13:03:57)</span> <b>B14K7UVU4:</b></span> <br/>
+<span style="color: #A82F2F"><span style="font-size: small">(13:10:36)</span> <b>B14K7UVU4:</b></span> <br/>
+<span style="color: #A82F2F"><span style="font-size: small">(13:10:36)</span> <b>B14K7UVU4:</b></span> <br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:12:07)</span> <b>dweitzel:</b></span> Attempting restore (gracc should ignore the records, since they are just duplicates)<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(13:17:51)</span> <b>B14K7UVU4:</b></span> <br/>
+<span style="color: #A82F2F"><span style="font-size: small">(13:17:51)</span> <b>B14K7UVU4:</b></span> <br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:21:10)</span> <b>dweitzel:</b></span> not even a bump in the Disk IO time really.  Why didn't we get rid of this scrubbing before!<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:23:13)</span> <b>kretzke:</b></span> because cleanliness is next to godliness?<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(13:29:15)</span> <b>B14K7UVU4:</b></span> <br/>
+<span style="color: #A82F2F"><span style="font-size: small">(13:29:41)</span> <b>B14K7UVU4:</b></span> <br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:30:28)</span> <b>kretzke:</b></span> can we move the travis notification to #gracc-notifications?<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(13:42:52)</span> <b>B14K7UVU4:</b></span> <br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:43:02)</span> <b>dweitzel:</b></span> Yes.  Also, backup docs are up: <a href="https://opensciencegrid.github.io/gracc/dev-docs/backups/">https://opensciencegrid.github.io/gracc/dev-docs/backups/</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:43:08)</span> <b>dweitzel:</b></span> and, backup &amp; restore works.<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(13:45:24)</span> <b>B14K7UVU4:</b></span> <br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:50:22)</span> <b>kretzke:</b></span> thanks. looks good<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:53:18)</span> <b>dweitzel:</b></span> removed an integration from this channel: <a href="https://opensciencegrid.slack.com/services/B14K7UVU4">Travis CI</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:54:36)</span> <b>dweitzel:</b></span> removed an integration from this channel: <a href="https://opensciencegrid.slack.com/services/B167BCLN5">github</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:02:03)</span> <b>bbockelm:</b></span> @kretzke @tanya - <a href="https://ticket.opensciencegrid.org/33334">https://ticket.opensciencegrid.org/33334</a> did this get routed correctly?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:02:23)</span> <b>bbockelm:</b></span> I thought IU, not FNAL, controlled <a href="http://osg.org">osg.org</a> domains?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:04:01)</span> <b>bbockelm:</b></span> (could be wrong...)<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:06:09)</span> <b>kretzke:</b></span> it went to FNAL since Gratia was picked as a resource. GOC does control the domain<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:07:10)</span> <b>kretzke:</b></span> I grabbed the ticket in SNOW, and will sit on it until GOC closes it. looks like the right people are on CC now<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:13:44)</span> <b>dweitzel:</b></span> @kretzke I don't see anything obviously wrong with <b>@edquist</b> queries.  I am continuing to debug.<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:21:25)</span> <b>edquist:</b></span> is there a new login for kibana?  the old unlt2 one doesn't seem to work<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:25:29)</span> <b>dweitzel:</b></span> it shouldn't require a login at all. <a href="https://gracc.opensciencegrid.org/kibana/app/kibana#/discover?_g=()">https://gracc.opensciencegrid.org/kibana/app/kibana#/discover?_g=()</a> ?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:26:41)</span> <b>edquist:</b></span> ok, i was clicking around and for some reason it popped up an auth box<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:26:51)</span> <b>edquist:</b></span> i'm just trying to set a range for start time to<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:27:47)</span> <b>edquist:</b></span> something more than a couple weeks ago<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:28:16)</span> <b>edquist:</b></span> to make sure there are actually older transfers summary records there<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:28:54)</span> <b>dweitzel:</b></span> as far as I can tell, there are summary records all the way back to Jan. 1.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:28:56)</span> <b>dweitzel:</b></span> of this year.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:29:05)</span> <b>dweitzel:</b></span> (and I'm re-summarizing more now)<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:30:43)</span> <b>kretzke:</b></span> is this really supposed to be a bucket? <a href="https://github.com/edquist/osg-display-data/blob/GRACC-18/src/osg_display/gratia_datasource.py#L90">https://github.com/edquist/osg-display-data/blob/GRACC-18/src/osg_display/gratia_datasource.py#L90</a><br/>
+<span style="color: #16569E"><span style="font-size: small">(16:31:14)</span> <b>edquist:</b></span> ew!<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:31:24)</span> <b>edquist:</b></span> no i suppose that is supposed to be a metric<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:31:29)</span> <b>edquist:</b></span> hmm!  :0<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:31:53)</span> <b>kretzke:</b></span> job queries too<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:32:13)</span> <b>edquist:</b></span> interesting<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:32:24)</span> <b>edquist:</b></span> thanks for pointing that out<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:33:54)</span> <b>edquist:</b></span> it's... so obvious now  :stuck_out_tongue:<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:35:20)</span> <b>edquist:</b></span> will re-run shortly<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:36:58)</span> <b>kretzke:</b></span> everything is obvious in hindsight, that’s why I code backwards<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:38:05)</span> <b>edquist:</b></span> yesssssssssssss<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:38:25)</span> <b>edquist:</b></span> doesn't look like the images look any better though<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:39:31)</span> <b>edquist:</b></span> actually<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:40:17)</span> <b>edquist:</b></span> yeah i had the .metric() followed by .bucket() in there since very early for the non-transfers.  i'm starting to wonder if maybe there was actually a reason for it...<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:41:38)</span> <b>marian:</b></span> @marian uploaded a file: <a href="https://opensciencegrid.slack.com/files/marian/F4UDUGFT5/screenshot-osg-ticket.png">screenshot-osg-ticket.png</a> and commented: perhaps we need also figure who is recipient when ticket like 33334 is opened ... see that I assigned it to "Gratia (collector issues)" while other ticket GOC-33335<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:43:12)</span> <b>marian:</b></span> and probably create new support unit called "GRACC (all the things)" and remove Gratia* support units  ... @bbockelm?<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:45:17)</span> <b>marian:</b></span> (didn't finish sentence for GOC-33335, wanted to say 33335 was assigned to "Gratia Web" and was received correctly by Indiana folks)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:45:46)</span> <b>dweitzel:</b></span> <b>@edquist</b> actually, metrics are not like buckets.  You don't next them, see: <a href="https://github.com/opensciencegrid/gracc-request/blob/master/src/graccreq/transfer_summary.py#L85">https://github.com/opensciencegrid/gracc-request/blob/master/src/graccreq/transfer_summary.py#L85</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(16:46:07)</span> <b>marian:</b></span> though, I put in cc by reason at least Scott Teige to 33334, but FNAL reacted earlier Scott may have seen it probably<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:46:15)</span> <b>dweitzel:</b></span> Also, <b>@edquist</b> Printing out the results, I don't see how it could be 0.  Weird.<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:48:33)</span> <b>edquist:</b></span> @dweitzel, which results are you referring to?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:48:59)</span> <b>dweitzel:</b></span> I just copy / pasted your code into a test python script, and printed everything out to stdout.<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:49:16)</span> <b>edquist:</b></span> what was 0?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:49:18)</span> <b>dweitzel:</b></span> your transfers daily had a bunch of 0's.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:49:24)</span> <b>dweitzel:</b></span> the graphs you posted.<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:49:24)</span> <b>edquist:</b></span> ah<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:49:30)</span> <b>dweitzel:</b></span> I don't see any zeros.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:50:07)</span> <b>dweitzel:</b></span> Is it possible that <tt>cachedresultslist</tt> has some zeros?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:51:03)</span> <b>dweitzel:</b></span> Are you blowing away the cache files each time you re-run this?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:52:16)</span> <b>edquist:</b></span> no actually i don't know too much about where the cache files live... let's see...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:53:23)</span> <b>dweitzel:</b></span> it's in some tempdir, named <tt>dailydatasource.b</tt><br/>
+<span style="color: #16569E"><span style="font-size: small">(16:54:19)</span> <b>edquist:</b></span> yeah<br/><br/>    cache_data_file_name = os.path.join(tmpdir, "monthlydatasource.b")<br/>    cache_count_file_name = os.path.join(tmpdir, "monthlydatasourcecount.b")<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:54:33)</span> <b>edquist:</b></span> tmpdir=tempfile.gettempdir()<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:55:02)</span> <b>dweitzel:</b></span> do you have files in /tmp with those names?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:55:07)</span> <b>edquist:</b></span> oh<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:55:09)</span> <b>edquist:</b></span> sad<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:55:14)</span> <b>edquist:</b></span> yeah,<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:55:19)</span> <b>edquist:</b></span> i misinterpreted that<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:55:28)</span> <b>edquist:</b></span> i thought it was making a new tempdir every run<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:55:34)</span> <b>dweitzel:</b></span> nope<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:55:40)</span> <b>edquist:</b></span> i guess gettempdir() is just returning /tmp  :confused:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:55:51)</span> <b>dweitzel:</b></span> yup, just looked up the API myself.<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:56:06)</span> <b>edquist:</b></span> this is good<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:56:12)</span> <b>edquist:</b></span> i'll blow them away this time<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:58:35)</span> <b>edquist:</b></span> well who knew<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:58:39)</span> <b>edquist:</b></span> no zeroes this time<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:58:43)</span> <b>dweitzel:</b></span> yay!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:58:50)</span> <b>dweitzel:</b></span> look about right?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:59:01)</span> <b>edquist:</b></span> taking a look<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:59:11)</span> <b>edquist:</b></span> (i don't know whether to :slightly_smiling_face: or :disappointed: )<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:59:24)</span> <b>dweitzel:</b></span> well, if it works, :slightly_smiling_face:<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:04:51)</span> <b>edquist:</b></span> well i do feel a little dumb about the caching thing  :stuck_out_tongue:<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:04:57)</span> <b>edquist:</b></span> they look a lot better<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:05:13)</span> <b>edquist:</b></span> pretty much they match or at least tell the same story --<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:05:26)</span> <b>edquist:</b></span> the only big exception is cpu_hours_hourly<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:06:29)</span> <b>edquist:</b></span> those seem to be off by a factor<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:06:34)</span> <b>edquist:</b></span> or something<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:07:30)</span> <b>kretzke:</b></span> wall duration vs cpu duration?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:07:46)</span> <b>dweitzel:</b></span> It looks like the original gratia didn't take in effect # of cpus.  Looking at the Mysql query.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:08:11)</span> <b>dweitzel:</b></span> There's no <tt>Cores</tt> in the Mysql query.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:08:33)</span> <b>dweitzel:</b></span> Check to make sure I'm right, but I think the daily hours has always been off by a factor.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:08:37)</span> <b>dweitzel:</b></span> and now we're doing it right?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:09:15)</span> <b>dweitzel:</b></span> @kretzke it's wall duration.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:11:06)</span> <b>kretzke:</b></span> ah, yep<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:15:21)</span> <b>edquist:</b></span> sooooooo<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:15:35)</span> <b>edquist:</b></span> old report was wrong, new report is right?<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:15:40)</span> <b>edquist:</b></span> er, graphs<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:17:47)</span> <b>kretzke:</b></span> 4e6 (approximate daily average from both graphs) /24 ~= 167000<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:17:54)</span> <b>kretzke:</b></span> which is what GRACC says<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:19:21)</span> <b>edquist:</b></span> i'm making an <tt>images</tt> branch in github, since updating the images in the GRACC-18 ticket is kind of annoying<br/><a href="https://github.com/edquist/osg-display-data/tree/images">https://github.com/edquist/osg-display-data/tree/images</a><br/><br/>here's the current difference for cpu_hours_hourly<br/><a href="https://raw.githubusercontent.com/edquist/osg-display-data/images/out-gracc/cpu_hours_hourly.png">https://raw.githubusercontent.com/edquist/osg-display-data/images/out-gracc/cpu_hours_hourly.png</a><br/><a href="https://raw.githubusercontent.com/edquist/osg-display-data/images/out-gratia/cpu_hours_hourly.png">https://raw.githubusercontent.com/edquist/osg-display-data/images/out-gratia/cpu_hours_hourly.png</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:20:25)</span> <b>kretzke:</b></span> yes, the gratia hourly numbers are wrong, any way you look at it<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:30:59)</span> <b>edquist:</b></span> is it just the cpu_hours_hourly that are messed up?  because the daily and monthly ones match<br/><br/><a href="https://raw.githubusercontent.com/edquist/osg-display-data/images/out-gratia/cpu_hours_daily.png">https://raw.githubusercontent.com/edquist/osg-display-data/images/out-gratia/cpu_hours_daily.png</a><br/><a href="https://raw.githubusercontent.com/edquist/osg-display-data/images/out-gracc/cpu_hours_daily.png">https://raw.githubusercontent.com/edquist/osg-display-data/images/out-gracc/cpu_hours_daily.png</a><br/><br/><a href="https://raw.githubusercontent.com/edquist/osg-display-data/images/out-gratia/cpu_hours_monthly.png">https://raw.githubusercontent.com/edquist/osg-display-data/images/out-gratia/cpu_hours_monthly.png</a><br/><a href="https://raw.githubusercontent.com/edquist/osg-display-data/images/out-gracc/cpu_hours_monthly.png">https://raw.githubusercontent.com/edquist/osg-display-data/images/out-gracc/cpu_hours_monthly.png</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:31:18)</span> <b>bbockelm:</b></span> For the OSG-Display - having a happy squiggly line counts the most<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:32:15)</span> <b>kretzke:</b></span> :shipit:<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:34:03)</span> <b>edquist:</b></span> .............<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:34:22)</span> <b>edquist:</b></span> right...<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:36:07)</span> <b>edquist:</b></span> i'm just trying to understand why the wall vs cpu cores (or whatever) issue is only showing up different with cpu_hours_hourly and not for _daily or _monthly<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:36:37)</span> <b>kretzke:</b></span> different queries… the daily and monthly correctly used Cores<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:37:11)</span> <b>kretzke:</b></span> <a href="https://github.com/edquist/osg-display-data/blob/master/src/osg_display/gratia_datasource.py#L162">https://github.com/edquist/osg-display-data/blob/master/src/osg_display/gratia_datasource.py#L162</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:37:32)</span> <b>kretzke:</b></span> <a href="https://github.com/edquist/osg-display-data/blob/master/src/osg_display/gratia_datasource.py#L289">https://github.com/edquist/osg-display-data/blob/master/src/osg_display/gratia_datasource.py#L289</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:37:44)</span> <b>kretzke:</b></span> <a href="https://github.com/edquist/osg-display-data/blob/master/src/osg_display/gratia_datasource.py#L442">https://github.com/edquist/osg-display-data/blob/master/src/osg_display/gratia_datasource.py#L442</a><br/>
+<span style="color: #16569E"><span style="font-size: small">(17:38:13)</span> <b>edquist:</b></span> ah, yup that explains it<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:38:31)</span> <b>edquist:</b></span> ok<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:38:37)</span> <b>edquist:</b></span> i am satisfied<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:41:21)</span> <b>edquist:</b></span> and we are also happy with using <tt>CoreHours</tt> in gracc now, right?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:43:34)</span> <b>kretzke:</b></span> yes<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:46:30)</span> <b>edquist:</b></span> ok<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:46:41)</span> <b>edquist:</b></span> thanks guys!<br/>
+<span style="color: #16569E"><span style="font-size: small">(19:35:54)</span> <b>edquist:</b></span> PS: regarding this:<br/>&gt; is this really supposed to be a bucket? <a href="https://github.com/edquist/osg-display-data/blob/GRACC-18/src/osg_display/gratia_datasource.py#L90">https://github.com/edquist/osg-display-data/blob/GRACC-18/src/osg_display/gratia_datasource.py#L90</a><br/><br/>so today i did make the change to 'fix' that:<br/><a href="https://github.com/edquist/osg-display-data/commit/dbc595f3bf4f69699a2801f3367d39cb3bc583d0">https://github.com/edquist/osg-display-data/commit/dbc595f3bf4f69699a2801f3367d39cb3bc583d0</a><br/><br/>but it appears the data returned (and graphs generated) are actually identical before and after that change.  So, somehow the following two seem to return the same thing:<br/><br/><tt>elasticsearch_dsl.Search(...).query(...).aggs.bucket(...).metric(...).bucket(...)</tt><br/><tt>elasticsearch_dsl.Search(...).query(...).aggs.bucket(...).metric(...).metric(...)</tt><br/><br/>(which gives me some peace of mind, because i thought for sure the way i had it was taken from some example on the doc site ... but whatever, the latter makes more sense to me now so that's the one we'll use.)<br/>
+<span style="color: #16569E"><span style="font-size: small">(19:37:19)</span> <b>edquist:</b></span> Anyways the graphs seem to be what we want now<br/>
+</body>
+</html>

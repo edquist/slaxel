@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Mar 12, 2019 : #net-service (osg)</title>
+</head>
+<body>
+<h3>Tue Mar 12, 2019 : #net-service (osg)</h3>
+<span style="color: #4ec0d6"><span style="font-size: small">(10:02:51)</span> <b>smckee:</b></span> @dweitzel, the new "Number of iterations" graphic looks useful.   I just checked the <a href="http://hepsonar2.ph.liv.ac.uk">hepsonar2.ph.liv.ac.uk</a> host.   Data is still flowing from the old RSV perfSONAR and that host is fine in terms of check_mk psetf checks.   Any idea why it would be "hung"?   Looks like last time it got data was around 11:30 UTC today<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:48:16)</span> <b>dweitzel:</b></span> good question.  From the logs, it last "got" data at "Mar 12 07:31:36"<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:48:41)</span> <b>dweitzel:</b></span> For some reason, <tt>lsof</tt> doesn't give me the information I expected for the process.  Maybe with docker, <tt>lsof</tt> doesn't work?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:50:16)</span> <b>dweitzel:</b></span> I suppose it's in TCP timeout hell?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:03:50)</span> <b>smckee:</b></span> I would guess we need to fix the TCP timeout if it is hours long.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:09:20)</span> <b>dweitzel:</b></span> ok, using <tt>nsenter</tt>, I was able to see that it's connected.<br/><pre><br/>tcp        0      0 172.18.0.2:33122        138.253.60.82:80        ESTABLISHED 897446/python<br/></pre><br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:09:45)</span> <b>smckee:</b></span> So connected for hours, but no data ?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:10:01)</span> <b>dweitzel:</b></span> ¯\_(ツ)_/¯<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:10:07)</span> <b>dweitzel:</b></span> looks like it.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:10:35)</span> <b>smckee:</b></span> I think we need to catch this type of software failure somehow.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:10:46)</span> <b>smckee:</b></span> Can you kill that connection and see if it recovers?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:24:10)</span> <b>dweitzel:</b></span> since we have timeouts now, I should add a counter to count the timeouts.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:24:32)</span> <b>dweitzel:</b></span> though, we can tell if it's &gt;10 minutes, it's a timeout.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(14:24:33)</span> <b>smckee:</b></span> Yes, otherwise we won't know it is happening (or at least how much it is happening)<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(14:40:21)</span> <b>smckee:</b></span> Interesting...the thread count on psrsv jumped way up:   <a href="https://psetf.opensciencegrid.org/etf/check_mk/index.py?start_url=%2Fetf%2Fpnp4nagios%2Findex.php%2Fgraph%3Fhost%3Dpsrsv%26srv%3DNumber_of_threads%26theme%3Dmultisite%26baseurl%3D..%2Fcheck_mk%2F">https://psetf.opensciencegrid.org/etf/check_mk/index.py?start_url=%2Fetf%2Fpnp4nagios%2Findex.php%2Fgraph%3Fhost%3Dpsrsv%26srv%3DNumber_of_threads%26theme%3Dmultisite%26baseurl%3D..%2Fcheck_mk%2F</a><br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(14:40:31)</span> <b>smckee:</b></span> Still climbing...<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(14:49:26)</span> <b>smckee:</b></span> @dweitzel just got an email alert on the collector queue<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(14:49:28)</span> <b>smckee:</b></span> [Alerting] PerfSonar Collector Queues alert<br/>Metric name<br/>Value<br/>stomp-subscription-0Ks28rvwGUIMLouaJF1lHA<br/>10294.727<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:05:41)</span> <b>dweitzel:</b></span> I don't think I was cleaning up the threads correctly...<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(15:25:21)</span> <b>smckee:</b></span> You must have done something about it since it dropped the threads back down...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:25:48)</span> <b>dweitzel:</b></span> yup, put a new version up that handled the threads better.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:26:05)</span> <b>dweitzel:</b></span> now it's a waiting game to make sure I caught all the corner cases.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:26:37)</span> <b>dweitzel:</b></span> you may see little bumps in threads every 5 minutes.  Those are the "timeout" threads.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:42:38)</span> <b>dweitzel:</b></span> Re-worked some things.  Now have "errors" per hour on the dashboard, with the correct links to ETF<br/>
+<span style="color: #a63024"><span style="font-size: small">(18:53:12)</span> <b>efajardo:</b></span> @dweitzel ping me here if any advise on corner cases is needed<br/>
+<span style="color: #a63024"><span style="font-size: small">(18:53:18)</span> <b>efajardo:</b></span> I have dealt with a bunch of them<br/>
+</body>
+</html>

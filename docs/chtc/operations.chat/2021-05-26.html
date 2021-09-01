@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed May 26, 2021 : #operations (chtc)</title>
+</head>
+<body>
+<h3>Wed May 26, 2021 : #operations (chtc)</h3>
+<span style="color: #e7392d"><span style="font-size: small">(17:07:48)</span> <b>ckoch5:</b></span> I’m going with no, given the need for tmux<br/>
+<blockquote>
+<span style="color: #3c989f"><span style="font-size: small">(2021-05-27 09:40:11)</span> <b>wiscmoate:</b></span> @ckoch5 I mean, feel free to take the text and adapt it elsewhere, but the wiki shouldn't be seen by users<br/>
+<span style="color: #3c989f"><span style="font-size: small">(2021-05-27 09:40:32)</span> <b>wiscmoate:</b></span> I don't think you'll break anything -<br/>
+<span style="color: #3c989f"><span style="font-size: small">(2021-05-27 09:41:11)</span> <b>wiscmoate:</b></span> Always a good chance for me to be wrong, but I can't think of what could get broken<br/>
+<span style="color: #3c989f"><span style="font-size: small">(2021-05-27 09:41:24)</span> <b>wiscmoate:</b></span> You won't be running as root or anything<br/>
+<span style="color: #e7392d"><span style="font-size: small">(2021-05-27 09:45:53)</span> <b>ckoch5:</b></span> I guess my question is more about security + process management<br/>
+<span style="color: #e7392d"><span style="font-size: small">(2021-05-27 09:46:46)</span> <b>ckoch5:</b></span> Are the instructions (as they stand) sufficiently secure from outsiders<br/>
+<span style="color: #e7392d"><span style="font-size: small">(2021-05-27 09:47:03)</span> <b>ckoch5:</b></span> and do we need automated cleanup processes<br/>
+<span style="color: #e7392d"><span style="font-size: small">(2021-05-27 09:47:14)</span> <b>ckoch5:</b></span> and is this lightweight enough for the head node<br/>
+<span style="color: #3c989f"><span style="font-size: small">(2021-05-27 09:51:28)</span> <b>wiscmoate:</b></span> &gt; I guess my question is more about security + process management<br/>Security I'll need to review a bit closer.  Process management could obviously be better.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(2021-05-27 09:52:27)</span> <b>wiscmoate:</b></span> &gt; Are the instructions (as they stand) sufficiently secure from outsiders<br/>Well, the firewall will prevent outsiders from connecting to X11fb or X11VNC.  The risk is really people who are able to log into the host.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(2021-05-27 09:53:07)</span> <b>wiscmoate:</b></span> &gt; and do we need automated cleanup processes<br/>Meaning something to kill X11fb and X11VNC processes that have gone on too long?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(2021-05-27 09:53:34)</span> <b>wiscmoate:</b></span> &gt; and is this lightweight enough for the head node<br/>Good question;  I don't know, have not yet looked at CPU and memory use.<br/>
+</blockquote>
+<span style="color: #e7392d"><span style="font-size: small">(16:47:09)</span> <b>ckoch5:</b></span> is that VNC guide something I can/should adapt for users to use?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:45:44)</span> <b>ckoch5:</b></span> @wiscmoate I’m going through your VNC guide and am 100% sure I”m going to break something. :concernfroge:<br/>
+<span style="color: #e7392d"><span style="font-size: small">(13:39:35)</span> <b>ckoch5:</b></span> agreement from me!<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:22:57)</span> <b>wiscmoate:</b></span> Yeah, the UI looks daunting<br/>
+<span style="color: #2b6836"><span style="font-size: small">(13:22:56)</span> <b>jcpatton:</b></span> but I haven’t googled too deep yet<br/>
+<span style="color: #2b6836"><span style="font-size: small">(13:22:40)</span> <b>jcpatton:</b></span> and I don’t know how to adjust a dashboard to change which index pattern it’s using<br/>
+<span style="color: #2b6836"><span style="font-size: small">(13:22:24)</span> <b>jcpatton:</b></span> right :disappointed:<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:22:04)</span> <b>wiscmoate:</b></span> Hm, looks like my dashboard is trying to pull from <tt>chtc-2020-*</tt><br/>
+<span style="color: #2b6836"><span style="font-size: small">(13:18:40)</span> <b>jcpatton:</b></span> No… there should be data… if you’re not already, make sure you’re using the <tt>chtc-*</tt> index pattern?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:17:34)</span> <b>wiscmoate:</b></span> @jcpatton no emergency;  I was looking through the kibana interface at <a href="http://accounting.chtc.wisc.edu">accounting.chtc.wisc.edu</a>, and I'm not seeing any data.  Is this a result of the revamping you've been doing?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(10:38:53)</span> <b>wiscmoate:</b></span> @tjslauson correct<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(10:35:14)</span> <b>tjslauson:</b></span> @wiscmoate am I understanding this right?  condor_schedd writes to <tt>/path/to/logs/SchedLog</tt>, then at some point it rotates its own log out to <tt>/path/to/logs/SchedLog.old</tt>, then logrotate notices the <tt>.old</tt> file on its next run, moves it to <tt>/path/to/logs/old/</tt> and manages compression / deletion from there?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(10:24:30)</span> <b>wiscmoate:</b></span> That means logrotate will be handed 1 GiB schedd logs rather than 4 GiB schedd logs<br/>
+<span style="color: #3c989f"><span style="font-size: small">(10:23:33)</span> <b>wiscmoate:</b></span> @jfrey @tim @tjslauson Here's the action I took to try to avoid <tt>/var/log</tt> filling up on <tt><a href="http://ucsbsubmit.chtc.wisc.edu">ucsbsubmit.chtc.wisc.edu</a></tt> again:<br/><pre># ucsbsubmit has a smaller /var/log than most submit nodes at 8<br/># GiB.  Rotate logs sooner (1 GiB rather than 4 GiB) to avoid<br/># the situation where they become too big to stage for<br/># compression.<br/>MAX_SCHEDD_LOG = 1 Gb</pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:07:32)</span> <b>tlmiller:</b></span> And to make sure that unauthorized personnel can't open the cover, you should require two keys to unlock it. ;)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:06:52)</span> <b>tlmiller:</b></span> (Also: sorry to hear about your phone dying!)<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:06:48)</span> <b>gthain:</b></span> i.e. two factors<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:06:44)</span> <b>gthain:</b></span> You need a nuclear-missile launch control style plastic cover for the fob button that you need to lift up before pressing the button<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:06:35)</span> <b>tlmiller:</b></span> Well, it's good to know there's a working service for resync.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:06:10)</span> <b>tlmiller:</b></span> AFAIK, there's no limit on how many of the "emergency" codes you can generate.<br/>
+<span style="color: #99a949"><span style="font-size: small">(10:06:08)</span> <b>matyas:</b></span> the CS VPN now also requires 2FA<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:05:57)</span> <b>tlmiller:</b></span> Yeah, I highly recommend printing out the "emergency" codes and keeping _those_ in the bag, and just leaving the token wherever you're going to need it.<br/>
+<blockquote>
+<span style="color: #4cc091"><span style="font-size: small">(10:10:04)</span> <b>blin:</b></span> heh, i had just found my emergency codes. printing them's a good idea<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:11:03)</span> <b>tlmiller:</b></span> They don't last forever, which I guess is sensible, but annoying.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:11:14)</span> <b>tlmiller:</b></span> ... I may need to print out some new ones, now that I've mentioned that.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(10:12:12)</span> <b>blin:</b></span> oh haha, yeah mine are all long expired :facepalm:<br/>
+<span style="color: #4cc091"><span style="font-size: small">(10:12:14)</span> <b>blin:</b></span> sigh<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:12:30)</span> <b>tlmiller:</b></span> Doesn't all this make you feel so much safer? ;)<br/>
+</blockquote>
+<span style="color: #4cc091"><span style="font-size: small">(10:05:34)</span> <b>blin:</b></span> yeah, the resyncing process had me generate 3 tokens on the fob to verify it<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:04:57)</span> <b>tlmiller:</b></span> I guess it's not time-based, then.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(10:04:42)</span> <b>wiscmoate:</b></span> wow, didn't know that<br/>
+<span style="color: #4cc091"><span style="font-size: small">(10:04:30)</span> <b>blin:</b></span> apparently<br/>&gt;  Your device may stop working if the button is pressed too many times without the passcode being used.<br/>so I had to resync it. that'll teach me to keep my fob in a bag?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(10:04:14)</span> <b>wiscmoate:</b></span> Nice<br/>
+<span style="color: #4cc091"><span style="font-size: small">(10:04:09)</span> <b>blin:</b></span> osg-sw-submit but i got it to work!<br/>
+<span style="color: #3c989f"><span style="font-size: small">(10:03:39)</span> <b>wiscmoate:</b></span> @blin which host are you trying to log into?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(10:03:17)</span> <b>wiscmoate:</b></span> (shib pre-dated duo by a bit, at least as far as UW Madison is concerned)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:03:05)</span> <b>tlmiller:</b></span> Try logging in with token again to see if it works now anyway? :)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:02:38)</span> <b>tlmiller:</b></span> (Huh.  Apparently duo and shib have integration, rather than are-the-same-thing.  Goes to show what I know.)<br/>
+<span style="color: #4cc091"><span style="font-size: small">(10:02:07)</span> <b>blin:</b></span> i haven't been able to get the CS VPN to work in the past<br/>
+<span style="color: #4cc091"><span style="font-size: small">(10:01:58)</span> <b>blin:</b></span> just tried re-registering my FOB and got<br/>&gt;  You entered a token that is already registered to you.<br/>:exploding_head:<br/>
+<span style="color: #3c989f"><span style="font-size: small">(10:01:00)</span> <b>wiscmoate:</b></span> We've made all SSH connections coming from CS VPN duo-exempt, at least in theory<br/>
+<span style="color: #3c989f"><span style="font-size: small">(10:00:40)</span> <b>wiscmoate:</b></span> @blin can you use the CS VPN?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:00:05)</span> <b>tlmiller:</b></span> (Yeah, I'd assumed duo was Shibboleth under the covers.  Could be wrong about that.)<br/>
+<span style="color: #3c989f"><span style="font-size: small">(09:59:47)</span> <b>wiscmoate:</b></span> (which is configured by <tt>/etc/duo/pam_duo.conf</tt>)<br/>
+<span style="color: #4cc091"><span style="font-size: small">(09:59:25)</span> <b>blin:</b></span> registration requires my other dead 2FA device but IIRC there's a way to get emergency codes<br/>
+<span style="color: #3c989f"><span style="font-size: small">(09:59:23)</span> <b>wiscmoate:</b></span> (@tlmiller whatever magic is in the <tt>/usr/lib64/security/pam_duo.so</tt> pam module)<br/>
+<span style="color: #4cc091"><span style="font-size: small">(09:59:06)</span> <b>blin:</b></span> oh, i don't think my fob's registered at this point<br/>
+<span style="color: #3c989f"><span style="font-size: small">(09:58:31)</span> <b>wiscmoate:</b></span> @blin where are you trying to log into?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:57:37)</span> <b>tlmiller:</b></span> (I thought the whole point of Shibboleth was single-sign-on.)<br/>
+<span style="color: #4cc091"><span style="font-size: small">(09:57:36)</span> <b>blin:</b></span> argh, that's not working...kinda wish i didn't log out now lol<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:57:23)</span> <b>tlmiller:</b></span> (Oh?  What's SSH doing, then?)<br/>
+<span style="color: #3c989f"><span style="font-size: small">(09:57:12)</span> <b>wiscmoate:</b></span> (As far as I know Shibboleth is web interface only)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:56:42)</span> <b>tlmiller:</b></span> (I mean, AFAIK, the ssh connection is supposed to be wired into Shibboleth too, but...)<br/>
+<span style="color: #4cc091"><span style="font-size: small">(09:56:04)</span> <b>blin:</b></span> lol, thanks for the translation. it's worked before, let me try again<br/>
+<span style="color: #3c989f"><span style="font-size: small">(09:55:41)</span> <b>wiscmoate:</b></span> :arrow_up:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:55:33)</span> <b>tlmiller:</b></span> By which I assume he means, "Can you use the dongle to log into <a href="http://my.wisc.edu">my.wisc.edu</a>?"<br/>
+<span style="color: #3c989f"><span style="font-size: small">(09:55:06)</span> <b>wiscmoate:</b></span> Negative @blin, I use the dongle and have no issue.  Can you use the dongle to authenticate against Shibboleth?<br/>
+<span style="color: #4cc091"><span style="font-size: small">(09:54:06)</span> <b>blin:</b></span> sooo my phone died and i'm trying to figure out 2FA SSH with a dongle. are there any tricks to it? because I can't seem to get it to work with SSH password followed by the dongle code<br/>
+<span style="color: #3c989f"><span style="font-size: small">(09:51:48)</span> <b>wiscmoate:</b></span> It was probably in the middle of compressing <tt>/var/log/condor/old/SchedLog.old.2021_05_25_12</tt> and ran out of space<br/>
+<span style="color: #3c989f"><span style="font-size: small">(09:50:28)</span> <b>wiscmoate:</b></span> Most of our submit nodes have 64 GiB<br/>
+<span style="color: #3c989f"><span style="font-size: small">(09:50:17)</span> <b>wiscmoate:</b></span> Biggest problem is that <tt>/var/log</tt> only has 8GiB allocated to it<br/>
+<span style="color: #3c989f"><span style="font-size: small">(09:47:52)</span> <b>wiscmoate:</b></span> logrotate should be pruning -<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(09:22:13)</span> <b>tjslauson:</b></span> the 4GB log in there now was one level up yesterday<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(09:22:00)</span> <b>tjslauson:</b></span> ah, looks like the latest log rotated in there<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(09:19:43)</span> <b>tim:</b></span> The lion's share of the space is taken up by /var/log/condor/old. There are log files in that directory that are over 2 years old. Perhaps some of that can be pruned.<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(09:17:24)</span> <b>tjslauson:</b></span> I'm not sure what to make of large schedd logs, though, because iirc HTCondor doesn't want system tools managing log rotation.  @wiscmoate?<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(09:14:56)</span> <b>tjslauson:</b></span> yup - monitoring caught this and notified us over the weekend.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(09:11:33)</span> <b>jfrey:</b></span> The /var/log partition on <a href="http://ucsbsubmit.chtc.wisc.edu">ucsbsubmit.chtc.wisc.edu</a> is full.<br/>
+</body>
+</html>

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Mar 18, 2021 : #operations (osg)</title>
+</head>
+<body>
+<h3>Thu Mar 18, 2021 : #operations (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(12:13:11)</span> <b>blin:</b></span> @jpeterson @u0928244 with <a href="https://github.com/slateci/slate-catalog/pull/454">https://github.com/slateci/slate-catalog/pull/454</a> and <a href="https://github.com/opensciencegrid/docker-compute-entrypoint/pull/9">https://github.com/opensciencegrid/docker-compute-entrypoint/pull/9</a> we've added the ability to override the Bosco tarball that's being installed by the Hosted CE. you'll want to add the following to your values and redeploy:<br/><pre>ContainerTags:<br/>  HostedCE: release</pre><br/>and<br/><pre>BoscoOverrides:<br/>  URL: &lt;OS dependent URL&gt;</pre><br/>where <tt>&lt;OS dependent URL&gt;</tt> is the link to one of the following tarballs <a href="https://research.cs.wisc.edu/htcondor/bosco/1.3/">https://research.cs.wisc.edu/htcondor/bosco/1.3/</a>, based on the OS of the _remote_ login node<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:14:58)</span> <b>jpeterson:</b></span> so that URL goes in with the GitEndpoint and such&gt;<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:16:47)</span> <b>jpeterson:</b></span> ie<br/><pre>119 BoscoOverrides:<br/>120   #choose different tarball<br/>121   URL: <a href="https://research.cs.wisc.edu/htcondor/bosco/1.3/bosco-1.3-x86_64_CentOS8.tar.gz">https://research.cs.wisc.edu/htcondor/bosco/1.3/bosco-1.3-x86_64_CentOS8.tar.gz</a><br/>122<br/>123   Enabled: true<br/>124   GitEndpoint: "git@github.com:opensciencegrid/hosted-ce-config.git"<br/>12</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:17:40)</span> <b>blin:</b></span> yup. looking at it, we should probably rename <tt>URL</tt> to <tt>TarballUrl</tt>  or something<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:17:57)</span> <b>blin:</b></span> got a preference?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:18:05)</span> <b>jpeterson:</b></span> more descriptive is good<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:20:20)</span> <b>blin:</b></span> ok new PR incoming @u0928244<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:22:11)</span> <b>blin:</b></span> <a href="https://github.com/slateci/slate-catalog/pull/455">https://github.com/slateci/slate-catalog/pull/455</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:22:18)</span> <b>blin:</b></span> @jpeterson i landed on <tt>TarballURL</tt><br/>
+<span style="color: #619a4f"><span style="font-size: small">(12:54:11)</span> <b>u0928244:</b></span> Merged now<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:18:35)</span> <b>blin:</b></span> alright @jpeterson you can update your values to use <tt>TarballURL</tt><br/>
+</body>
+</html>

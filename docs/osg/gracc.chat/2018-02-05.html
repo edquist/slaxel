@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Feb 5, 2018 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Mon Feb 5, 2018 : #gracc (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(13:44:20)</span> <b>bbockelm:</b></span> <b>@here</b> - what's the punchlist to get the pS data into GRACC?<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:45:02)</span> <b>marian:</b></span> I think it's finally tweaked as of couple hours ago and happily running in -itb host<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:45:23)</span> <b>marian:</b></span> can move it to gracc production host tomorrow if all runs ok till then?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:45:38)</span> <b>bbockelm:</b></span> Sounds great!<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:45:44)</span> <b>marian:</b></span> assuming you're talking abou perfsonnar-collectors<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:46:43)</span> <b>marian:</b></span> it still sends data to UChicago ES, though<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:46:43)</span> <b>marian:</b></span> does it stay like that?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:47:23)</span> <b>bbockelm:</b></span> You mean, the pS-collector runs on GRACC infrastructure but sends data only to UChicago ES (not the GRACC ES?)<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:47:31)</span> <b>marian:</b></span> yes<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:47:51)</span> <b>bbockelm:</b></span> gotcha - indeed, we want to have a copy of the pS-collector that sends data to GRACC ES.<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:48:49)</span> <b>marian:</b></span> that part is actually hardcoded inside image<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:49:31)</span> <b>marian:</b></span> inside .py code ... could we request make it configurable?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:51:10)</span> <b>bbockelm:</b></span> yup.  Or just send a PR maybe?  With <tt>docker-compose</tt>, we can have MWT2 defaults overridden via env var.<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:53:07)</span> <b>marian:</b></span> I actually run it from docker-compose, so one more var with ES URL in .env sounds good to me<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:54:49)</span> <b>marian:</b></span> so would be goal to run two containers then? one with data being sent to UChicago ES and another container sending data to GRACC ES?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:02:25)</span> <b>bbockelm:</b></span> Correct.  I'm thinking two different docker-compose with distinct .env files.<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:04:12)</span> <b>marian:</b></span> yes, same<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:04:48)</span> <b>marian:</b></span> though, for the message bus I'd use same user and vhost<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:06:09)</span> <b>marian:</b></span> (well we have different user from Ilija's already, so I mean using our user 'pscollect' for those intances but common vhost osg-nma)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:36:21)</span> <b>bbockelm:</b></span> well, we want to be able to subscribe to the same topic.<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:45:52)</span> <b>marian:</b></span> debugging further, Iljia is saying he doesn't see all the streams so some collector may not run properly or something... checking with him<br/>
+</body>
+</html>

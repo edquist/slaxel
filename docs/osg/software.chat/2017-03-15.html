@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Mar 15, 2017 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Mar 15, 2017 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(15:53:36)</span> <b>blin:</b></span> @jdost321 i believe the blahp service stays alive as long as the user has jobs in the queue that are managed by the condor gridmanager<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:53:51)</span> <b>blin:</b></span> though i'm not sure that's the answer you're looking for<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:58:41)</span> <b>mkandes:</b></span> @jdost321 : What was the problem at LIGO site here?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:58:44)</span> <b>mkandes:</b></span> - Helped Edgar debug pilots going held at LIGO_US_Caltech_ldas-grid<br/>* Due to HTCondor-CE regression in HTCondor 8.6, in case anyone sees <br/>this somewhere else, held reason looks like:<br/>     4565546.9   feligo          3/13 15:21 HTCondor-CE held job due to<br/>no matching routes, route job limit, or route failure threshold; see <br/>'HTCondor-CE Troubleshooting Guide'<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:59:29)</span> <b>mkandes:</b></span> @blin: Was the troubleshooting guide updated on how to deal with this error? SOFTWARE-2539<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:59:38)</span> <b>mkandes:</b></span> Doesn't seem like it.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:59:43)</span> <b>mkandes:</b></span> at first glance.<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:00:24)</span> <b>blin:</b></span> SOFTWARE-2539? it doesn't look like that issue exists<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:00:50)</span> <b>mkandes:</b></span> <a href="https://jira.opensciencegrid.org/browse/SOFTWARE-2539">https://jira.opensciencegrid.org/browse/SOFTWARE-2539</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:01:39)</span> <b>blin:</b></span> ah, typo on my end, my b<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:02:09)</span> <b>blin:</b></span> i could add it to my list of sections to update<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:02:20)</span> <b>blin:</b></span> it's a tough section to write because that hold message is a bit of a catch-all<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:02:30)</span> <b>blin:</b></span> where the most common causes are the ones listed in the hold reason<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:02:50)</span> <b>blin:</b></span> basically the job router was crashing silently due to a bug in condor<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:03:12)</span> <b>blin:</b></span> and that was manifesting in the jobs never being routed<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:03:29)</span> <b>mkandes:</b></span> Is this for a particular CE version?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:04:15)</span> <b>blin:</b></span> well you'll only see that specific message after a certain version of the CE but no, it affects versions of condor &lt; 8.4.11-1.1 and condor &lt; 8.6.1<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:04:52)</span> <b>mkandes:</b></span> Okay, well, I'll have the site admin try to have a look around then,<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:06:43)</span> <b>blin:</b></span> i messed up the version numbers, updated in my above comment<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:15:50)</span> <b>jdost321:</b></span> sorry i was just assuming it was related to the regression Tim T mentioned on the software call, and Edgar suggested it was the same. I guess that was 2539<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:19:54)</span> <b>jdost321:</b></span> @blin regarding condor ce, I'm not sure we're talking about the same thing, but I am not sure what the blahp is or what side it runs on. It looks like even though we have N running jobs from the pilot for a given user, yes, we see a condor_c-gahp process stick around until all their jobs complete. however it doesn't look like there's a long lived TCP connection between c-gahp and CE that lasts the lifetime of the job, like we used to see for the gram CE<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:21:05)</span> <b>jdost321:</b></span> my assumption was under the hood the c-gahps make short TCP connections to query the CE periodically, but don't leave a long lasting one open?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:21:47)</span> <b>blin:</b></span> the blahp is the batch_gahp. it takes grid universe jobs from the CE and submits/monitors them to/on the backend batch system using native tools e.g. qsub, wstat<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:22:00)</span> <b>jdost321:</b></span> ok.. i think thats the other side i don't care about<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:22:05)</span> <b>jdost321:</b></span> i'm more talking factory -&gt; condor ce<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:22:36)</span> <b>blin:</b></span> ah, i see<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:22:49)</span> <b>blin:</b></span> i'd have to ask jaime about it<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:22:56)</span> <b>blin:</b></span> let me see if i can catch him before he leaves for the day<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:23:06)</span> <b>jdost321:</b></span> ok, that would be great, thanks!<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:25:23)</span> <b>blin:</b></span> jaime says yes, it's periodic<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:25:57)</span> <b>blin:</b></span> defaults to 1 min, controlled by <a href="http://research.cs.wisc.edu/htcondor/manual/v8.4/3_3Configuration.html#27052">http://research.cs.wisc.edu/htcondor/manual/v8.4/3_3Configuration.html#27052</a> for querying status of jobs<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:26:03)</span> <b>jdost321:</b></span> ok, only reason i wanted to know, is it makes it harder for us to track down ipv6 tcp connections to ce's when they are being used, whenever we look they already finished<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:27:32)</span> <b>blin:</b></span> ah yes, i wonder if ipv6 connections are logged at all in the <tt>GridmanagerLog</tt>s<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:28:15)</span> <b>jdost321:</b></span> so, the next question, we have evidence to suggest maybe the cgahps don't appear to respect the settings: ENABLE_IPV6 = True PREFER_IPV4 = False<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:28:43)</span> <b>jdost321:</b></span> we're dual stacked on the itb side, and CERN has some CEs that are dual stacked. they want us to try forcing ipv6 communication to prove it works to their ce<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:28:59)</span> <b>jdost321:</b></span> so we put those vars in our condor config, but it still seems to be preferring ipv4:<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:29:05)</span> <b>jdost321:</b></span> tcp        0      0 129.79.53.24:16416          188.185.164.231:9619        TIME_WAIT   -<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:29:31)</span> <b>jdost321:</b></span> the 188 is ther CERN CE<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:29:37)</span> <b>jdost321:</b></span> but see they have ipv6 ip as well:<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:29:38)</span> <b>jdost321:</b></span> host  <a href="http://ce504.cern.ch">ce504.cern.ch</a><br/><a href="http://ce504.cern.ch">ce504.cern.ch</a> has address 188.185.164.231<br/><a href="http://ce504.cern.ch">ce504.cern.ch</a> has IPv6 address 2001:1459:301:4b::100:e1<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:30:23)</span> <b>jdost321:</b></span> factory condor version:<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:30:24)</span> <b>jdost321:</b></span> condor_version<br/>$CondorVersion: 8.4.9 Sep 29 2016 $<br/>$CondorPlatform: X86_64-CentOS_6.8 $<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:30:31)</span> <b>jdost321:</b></span> i'm not sure about CERN CE condor version<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:30:53)</span> <b>bbockelm:</b></span> Look at how it connects to the collector versus the schedd.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:31:17)</span> <b>bbockelm:</b></span> Is the schedd advertising a IPv4 address in the CEs collector?<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:32:55)</span> <b>jdost321:</b></span> is this what you're asking for?<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:32:57)</span> <b>jdost321:</b></span> condor_status -pool <a href="http://ce504.cern.ch:9619">ce504.cern.ch:9619</a> -schedd -af addressv1<br/>{[ p="primary"; a="188.185.164.231"; port=9619; n="Internet"; spid="547410_ef5e_3"; noUDP=true; ], [ p="IPv4"; a="188.185.164.231"; port=9619; n="Internet"; spid="547410_ef5e_3"; noUDP=true; ], [ p="IPv6"; a="2001:1459:301:4b::100:e1"; port=9619; n="Internet"; spid="547410_ef5e_3"; noUDP=true; ]}<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:43:28)</span> <b>jdost321:</b></span> so i caught it doing a condor_q, on netstat, ipv4<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:43:41)</span> <b>jdost321:</b></span> condor_q -name <a href="http://ce504.cern.ch">ce504.cern.ch</a> -pool <a href="http://ce504.cern.ch:9619">ce504.cern.ch:9619</a><br/><br/><br/>-- Schedd: <a href="http://ce504.cern.ch">ce504.cern.ch</a> : &lt;188.185.164.231:9619?...<br/> ID      OWNER            SUBMITTED     RUN_TIME ST PRI SIZE CMD<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:43:46)</span> <b>jdost321:</b></span> netstat:<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:43:47)</span> <b>jdost321:</b></span> tcp        0      0 129.79.53.24:6870           188.185.164.231:9619        ESTABLISHED 3635346/condor_q<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:46:27)</span> <b>jdost321:</b></span> same idea w/ the condor status<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:46:30)</span> <b>jdost321:</b></span> tcp        0      0 2001:18e8:2:6::13c:6098     2001:1459:301:4b::100::9619 ESTABLISHED 3636832/condor_stat<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:46:49)</span> <b>jdost321:</b></span> so.. the initial contact to collector is ipv6, but then condor hands the ipv4 schedd address back?<br/>
+</body>
+</html>

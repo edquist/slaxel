@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Aug 10, 2018 : #software (osg)</title>
+</head>
+<body>
+<h3>Fri Aug 10, 2018 : #software (osg)</h3>
+<span style="color: #e96699"><span style="font-size: small">(10:34:21)</span> <b>lincoln:</b></span> are the HTCondor Python bindings all happy and good under Python 3.x?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:36:36)</span> <b>blin:</b></span> i believe there are builds that work with python 3.x. @tim.theisen can speak to the details<br/>
+<span style="color: #73769d"><span style="font-size: small">(11:34:10)</span> <b>tim.theisen:</b></span> The python bindings in the 8.7 series is good with respect to python 3. (You can also get them via pip.)<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:54:28)</span> <b>blin:</b></span> @dwd what kind of problems did we run into when using <tt>&gt;=</tt> version requirements with the CVMFS packages?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:56:18)</span> <b>blin:</b></span> it seems to me like we can do a little more work to really determine if interfaces are changing between the packages and thus require a new minimum version<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:56:58)</span> <b>dwd:</b></span> One I mentioned: we forget to update osg-oasis.  Another is that people would sometimes update cvmfs without updating cvmfs-config-osg or osg-oasis, and they end up with a too-old config<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:58:11)</span> <b>dwd:</b></span> If people know what they’re doing and want to test different combinations, they can always remove osg-oasis<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:59:33)</span> <b>blin:</b></span> well, the key issue isn't that osg-oasis isn't getting updated, it's just a metapackage<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:00:19)</span> <b>blin:</b></span> the goal is just to have compatible cvmfs/cvmfs-config-osg versions, right?<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:01:38)</span> <b>dwd:</b></span> That’s the primary goal but I also have a goal of getting people to have the latest stuff.  Using ‘=’ is ideal in my opinion, because users don’t even need to remember that the package exists, they can just update cvmfs.<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:02:15)</span> <b>blin:</b></span> if a newer version of cvmfs is incompatible with older versions of cvmfs-config-osg or cvmfs-x509-helper, and both those packages aren't necessary to run cvmfs, then i would think an <tt>obsoletes</tt> for older versions of cvmfs-config-osg/cvmfs-x509-helper would be most appropriate<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:03:42)</span> <b>dwd:</b></span> I don’t want to have to modify the cvmfs .spec file just for that.  Obsoletes has its own problems too.  I don’t see any downside to using ‘=’<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:04:26)</span> <b>blin:</b></span> you're forced to update the packages in lockstep if you have osg-oasis installed<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:04:43)</span> <b>dwd:</b></span> Perfect, that’s what I want<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:05:03)</span> <b>blin:</b></span> no other osg metapackages do this<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:05:26)</span> <b>dwd:</b></span> Maybe they should<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:06:25)</span> <b>blin:</b></span> definitely not<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:06:41)</span> <b>blin:</b></span> we don't force our users to update lockstep<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:06:41)</span> <b>dwd:</b></span> Or maybe the other metapackages have different characteristics.  Does anybody try to update just one package in them without the others?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:07:25)</span> <b>blin:</b></span> sure and we always want to give people the option of updating sets of packages piecemeal if they so choose<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:08:07)</span> <b>blin:</b></span> for example, if there's a security issue in the blahp and we fix it, we don't also force them to update their condor version to the very latest<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:09:12)</span> <b>blin:</b></span> otherwise the packager is adding a requirement that has no basis in the actual software requirements<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:14:39)</span> <b>dwd:</b></span> In this case there’s one primary package that everybody thinks of, “cvmfs”, and they forget about the 2 other tiny but important packages that go with it (plus the tiny metapackage).  I want all of them to go together with the latest version.  It’s part of the big complaint I have with rpms compared to deb; deb handles dependent versions much better.   Let’s not worry about it unless we get a serious user complaint.  I can’t imagine somebody complaining about having to update cvmfs-x509-helper because they updated cvmfs.<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:41:08)</span> <b>blin:</b></span> that can be solved by having the <tt>=</tt> version requirements in the smaller dependent packages<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:43:48)</span> <b>dwd:</b></span> I’m not sure which problem you mean that that would solve, but if you had each of them require a specific cvmfs package, then they would both need to be updated every time cvmfs changes, which is more often.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:45:11)</span> <b>bbockelm:</b></span> hey - we actually have a policy on this that we've gone through before.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:45:32)</span> <b>bbockelm:</b></span> Basically, if there's a known technical reason for a versioned dependency, we'll do a <tt>&gt;=</tt><br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:46:04)</span> <b>bbockelm:</b></span> So if we know <tt>osg-oasis</tt> configuration is incompatible with <tt>cvmfs-x509-helper</tt> 0.9, then we may write <tt>Requires: cvmfs-x509-helper &gt;= 1.0</tt>.<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:46:23)</span> <b>dwd:</b></span> I believe the policy is wrong for this case<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:46:46)</span> <b>bbockelm:</b></span> I think this particular case illustrates why such a policy is useful, no?<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:46:52)</span> <b>dwd:</b></span> No<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:46:55)</span> <b>dwd:</b></span> why?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:47:15)</span> <b>bbockelm:</b></span> can we hand test RPMs of <tt>cvmfs-x509-helper</tt> to testers?<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:47:28)</span> <b>dwd:</b></span> Sure, along with an osg-oasis<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:47:56)</span> <b>dwd:</b></span> Or they can remove osg-oasis<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:48:35)</span> <b>bbockelm:</b></span> But then people get in the habit of removing <tt>osg-oasis</tt>.  It becomes a hindrance, and they are more likely to try to hand-install dependencies.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:49:17)</span> <b>bbockelm:</b></span> I don't see any overwhelming reason why <tt>osg-oasis</tt> metapackage should behave differently from our other metapackages.<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:50:43)</span> <b>dwd:</b></span> I went through the reasons above: it is small, people upgrade cvmfs and they don’t get the other packages, and developers forget to update osg-oasis<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:51:47)</span> <b>dwd:</b></span> It’s a support nightmare when people don’t update cvmfs-config-osg<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:52:50)</span> <b>bbockelm:</b></span> Yeah, but the policy handles that case.  If there's something relevant in <tt>cvmfs-config-osg</tt> that requires updates to be in lockstep, we can require that.  It's just that we request the no versioned dependency unless there's a technical reason.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:53:20)</span> <b>bbockelm:</b></span> It's a support nightmare we chose as a tradeoff for increased flexibility.<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:53:27)</span> <b>dwd:</b></span> So if somebody does yum update cvmfs, how will they get the corresponding cvmfs-config-osg<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:53:58)</span> <b>bbockelm:</b></span> And we do say that we only support a consistent set of packages, so if people ask for help, requesting an update of things is a valid response.<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:54:35)</span> <b>dwd:</b></span> I don’t think the flexibility is needed or worth it for this case<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:55:13)</span> <b>bbockelm:</b></span> If there's something in <tt>cvmfs</tt> that a more recent requires <tt>cvmfs-config-osg</tt> - as in, <tt>cvmfs</tt> breaks if an old <tt>cvmfs-config-osg</tt> is installed - then I'd expect the dependency be put in the CVMFS spec.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:57:38)</span> <b>bbockelm:</b></span> I understand that, but looking across all our metapackages, I'd like to have it for consistency with the other <tt>osg-*</tt> packages.  If it is problematic, feel free to highlight the problems (issues, Slack discussions) when they pop up and we can re-evaluate.  There's no policy we can't change.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:58:15)</span> <b>bbockelm:</b></span> (I'm not saying we should go tweak the packages on a Friday afternoon, but I want to inform thinking on the subject going forward...)<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:59:18)</span> <b>blin:</b></span> i think we'd actually want the version dependency in the <tt>cvmfs-config-osg</tt> requiring a version of <tt>cvmfs</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:59:38)</span> <b>blin:</b></span> since presumably you can install <tt>cvmfs</tt> without needing the osg config<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:02:06)</span> <b>dwd:</b></span> I also don’t want to have to modify the cvmfs spec file if it can be avoided.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:02:56)</span> <b>bbockelm:</b></span> (that'd actually be an argument I'd by better than "support nightmare" since I can quantify the impact much better)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:03:54)</span> <b>bbockelm:</b></span> So, there's a lot of knowledge captured here about the cvmfs + related RPMs.  However, it's after lunch on a Friday afternoon in August -- can we copy/paste some of it into a ticket so we can iterate a bit more precisely?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:04:28)</span> <b>bbockelm:</b></span> I fear Slack isn't the greatest mechanism for precise tuning of the approach.<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:06:13)</span> <b>dwd:</b></span> How about Brian L make a ticket since he’s the one who noticed a potential problem, and we can restate the pros &amp; cons there.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:11:27)</span> <b>blin:</b></span> sure<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:11:57)</span> <b>blin:</b></span> i'll add you/brian as watchers<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:12:07)</span> <b>dwd:</b></span> These are the minimal requirements I’d like to see: 1) every time somebody does “yum install osg-oasis” they get the latest version of all 4 packages.  2) after osg-oasis is installed, anytime somebody does “yum install cvmfs” and there’s a new cvmfs version, they get the latest version of all 4 packages.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(13:15:07)</span> <b>tiradani:</b></span> Just throwing my 2 cents in here…  I much prefer the OSG way even for CVMFS.  We already got bit by changes to configs (without our knowledge) stored in OASIS and had to come up with a work around.<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:15:35)</span> <b>dwd:</b></span> You’re referring to changes in the config repository?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(13:15:42)</span> <b>tiradani:</b></span> yup<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:15:51)</span> <b>dwd:</b></span> That’s independent of this discussion<br/>
+<span style="color: #de5f24"><span style="font-size: small">(13:16:08)</span> <b>tiradani:</b></span> I know, but in this discussion are rpms with the name “config” in them<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:19:27)</span> <b>dwd:</b></span> Well there are usually things in the config rpm that go along with a cvmfs release so it should always be upgraded when you update cvmfs, and cvmfs should always be upgraded when you upgrade the config rpm.  The only  package of the 4 that I can concede might be worth independently upgrading is cvmfs-x509-helper.  People might want to upgrade that without the others.<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:30:03)</span> <b>dwd:</b></span> There’s actually very little left in cvmfs-config-osg rpm, it has only 3 small files.  Almost all the config is in the config repository<br/>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue May 26, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue May 26, 2020 : #software (osg)</h3>
+<span style="color: #a63024"><span style="font-size: small">(10:47:30)</span> <b>efajardo:</b></span> is there software meeting today?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:48:28)</span> <b>matyas:</b></span> nope<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:49:16)</span> <b>efajardo:</b></span> ahh ok<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(11:51:48)</span> <b>didavila:</b></span> Hey <b>@here</b>, I see a freshdesk ticket 2 weeks old for the contact registration of Andrew Speer, but I see him already listed in topology contacts, did someone forget to ping back to the ticket or close it?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:52:34)</span> <b>blin:</b></span> that's very nice of you to not git blame me :stuck_out_tongue:<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:52:43)</span> <b>matyas:</b></span> lol<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:53:47)</span> <b>blin:</b></span> i could've sworn i followed up on that but i guess i dropped the ball on it. strange that this is the first time it's coming up, though<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:54:54)</span> <b>blin:</b></span> i don't recall seeing this in the support ticket list the past 2 weeks and i would think that @matyas or @tim.theisen would've noticed it<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:56:57)</span> <b>blin:</b></span> i followed up and closed it, thanks for the ping<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(11:57:09)</span> <b>didavila:</b></span> np, thanks<br/>
+<span style="color: #73769d"><span style="font-size: small">(11:58:10)</span> <b>tim.theisen:</b></span> I noticed it on Friday, but you we gone for the day.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:12:24)</span> <b>rynge:</b></span> I gave you guys <a href="https://support.opensciencegrid.org/a/tickets/65032">https://support.opensciencegrid.org/a/tickets/65032</a> - sounds like a HTCondor site issue, but not sure<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:16:39)</span> <b>blin:</b></span> yeah it sounds like it<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:16:54)</span> <b>blin:</b></span> we should probably be passing that off to the htcondor team<br/>
+<span style="color: #7d414c"><span style="font-size: small">(12:23:14)</span> <b>bockjoo:</b></span> Can somebody tell me what this means? "WARNING: container does not have /.singularity.d/actions/exec,"<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:25:13)</span> <b>rynge:</b></span> Yeah, that is harmless. It comes from the conversion of Docker to Singularity images<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:45:24)</span> <b>efajardo:</b></span> <b>@here</b> I was building <tt>xrootd-lcmaps</tt> for el8. The build failed cause lcmaps was not built for el8 then I build it for el8 and it was successful <tt>	lcmaps-1.6.6-1.12.osg35.el8</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(14:45:45)</span> <b>efajardo:</b></span> so now I am building the <tt>lcmaps-plugins-basic</tt> but It fails with<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:45:51)</span> <b>efajardo:</b></span> <pre>DEBUG util.py:621:  Error: <br/>DEBUG util.py:621:   Problem: package lcmaps-devel-1.6.6-1.12.osg35.el8.x86_64 requires lcmaps(x86-64) = 1.6.6-1.12.osg35.el8, but none of the providers can be installed<br/>DEBUG util.py:621:    - conflicting requests<br/>DEBUG util.py:621:    - nothing provides lcmaps-plugins-basic needed by lcmaps-1.6.6-1.12.osg35.el8.x86_64<br/>DEBUG util.py:621:    - nothing provides lcmaps-plugins-verify-proxy &gt;= 1.5.9-1.1 needed by lcmaps-1.6.6-1.12.osg35.el8.x86_64<br/>DEBUG util.py:621:    - nothing provides lcmaps-plugins-voms &gt;= 1.7.1-1.1 needed by lcmaps-1.6.6-1.12.osg35.el8.x86_64<br/>DEBUG util.py:623:  (try to add '--skip-broken' to skip uninstallable packages or '--nobest' to use not only best candidate packages)</pre><br/><br/>
+<span style="color: #a63024"><span style="font-size: small">(14:46:13)</span> <b>efajardo:</b></span> so why is lcmaps-plugins-baic<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:46:23)</span> <b>efajardo:</b></span> complaining about not finding <tt>lcmaps-plugins-basic</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(14:50:35)</span> <b>matyas:</b></span> there's a circular dependency here<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:50:46)</span> <b>dwd:</b></span> lcmaps-plugins-basic has to be built before lcmaps is installed, because lcmaps.spec contains “Requires: lcmaps-plugins-basic”<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:50:58)</span> <b>matyas:</b></span> but lcmaps-plugins-basic buildrequires lcmaps-devel<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:51:05)</span> <b>matyas:</b></span> which requires lcmaps<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:52:30)</span> <b>efajardo:</b></span> but I built lcmaps-devl and lcmaps for el8<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:52:49)</span> <b>matyas:</b></span> lcmaps doesn't buildrequire lcmaps-plugins-basic, just requires it<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:52:54)</span> <b>dwd:</b></span> They can build, but not install<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:54:32)</span> <b>matyas:</b></span> I suggest:<br/>1. Comment out <tt>Requires: lcmaps-plugins-basic</tt> from lcmaps and rebuild<br/>2. Build lcmaps-plugins-basic<br/>3. Uncomment <tt>Requires: lcmaps-plugins-basic</tt>  from lcmaps and rebuild<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:57:20)</span> <b>dwd:</b></span> I see I tried to move out the dependencies to an osg-lcmaps metapackage in 2013, then immediately backed it out “for now”, and it never did happen.<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:58:32)</span> <b>dwd:</b></span> Do the same for the Requires of the other plugins while you’re at it.<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:03:54)</span> <b>efajardo:</b></span> thanks @matyas that worked.  I did it for all plugins like @dwd suggested now I need to go in the cod and see why this fails<br/><pre>/builddir/build/BUILD/xrootd-lcmaps-1.7.7/src/GlobusSupport.cc: In member function 'void {anonymous}::CertStore::reload()':<br/>/builddir/build/BUILD/xrootd-lcmaps-1.7.7/src/GlobusSupport.cc:318:17: error: invalid use of incomplete type 'X509_STORE' {aka 'struct x509_store_st'}<br/>     m_cert_store-&gt;check_issued = globus_gsi_callback_check_issued;<br/>                 ^~<br/>In file included from /usr/include/openssl/x509.h:15,<br/>                 from /usr/include/globus/globus_gsi_system_config.h:28,<br/>                 from /builddir/build/BUILD/xrootd-lcmaps-1.7.7/src/GlobusSupport.cc:7:<br/>/usr/include/openssl/ossl_typ.h:129:16: note: forward declaration of 'X509_STORE' {aka 'struct x509_store_st'}<br/> typedef struct x509_store_st X509_STORE;<br/>                ^~~~~~~~~~~~~<br/>make[2]: *** [CMakeFiles/XrdLcmaps.dir/build.make:118: CMakeFiles/XrdLcmaps.dir/src/GlobusSupport.cc.o] Error 1<br/>make[2]: *** Waiting for unfinished jobs....<br/>make[2]: Leaving directory '/builddir/build/BUILD/xrootd-lcmaps-1.7.7'<br/>make[1]: Leaving directory '/builddir/build/BUILD/xrootd-lcmaps-1.7.7'<br/>make[1]: *** [CMakeFiles/Makefile2:71: CMakeFiles/XrdLcmaps.dir/all] Error 2<br/>make: *** [Makefile:133: all] Error 2<br/>error: Bad exit status from /var/tmp/rpm-tmp.vd5W0o (%buil</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(17:06:23)</span> <b>matyas:</b></span> Based on where the error is, looks like an openssl 1.1.1 compat issue<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:11:21)</span> <b>efajardo:</b></span> can I do a BuildRequires openssl 1.1.0?<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:20:34)</span> <b>matyas:</b></span> Try BuildRequires: compat-openssl10<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:29:19)</span> <b>matyas:</b></span> wait, those are just the runtime libraries<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:30:13)</span> <b>matyas:</b></span> You'd need "compat-openssl10-devel" ... and what google pretty much tells me is that it's not going to be in RHEL 8<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:30:31)</span> <b>matyas:</b></span> I think we need to fix xrootd-lcmaps to compile with openssl 1.1.1<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:30:40)</span> <b>bbockelm:</b></span> I’d suggest fixing the LCMAPS code. OpenSSL now hides the struct variables so you have to manipulate everything via public functions.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:31:14)</span> <b>bbockelm:</b></span> There’s a very modest number of lines of code - ifdef for newer OpenSSL<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:36:39)</span> <b>dwd:</b></span> Maybe we need an update from upstream.  I know that lcmaps is supposed to support all the latest OpenSSL variations.<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:37:43)</span> <b>dwd:</b></span> But this is xrootd-lcmaps?  I don’t know about its status w.r.t. openssl versions<br/>
+<span style="color: #de5f24"><span style="font-size: small">(17:42:35)</span> <b>justas.balcas:</b></span> Hi, why xrootd-cmstfc is available only in osg-contrib? Any reasons for not inside release?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:52:29)</span> <b>blin:</b></span> per <a href="https://opensciencegrid.org/technology/policy/software-release/">https://opensciencegrid.org/technology/policy/software-release/</a>, it's because OSG doesn't officially support it<br/>
+<span style="color: #de5f24"><span style="font-size: small">(18:11:21)</span> <b>justas.balcas:</b></span> thanks<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:00:42)</span> <b>efajardo:</b></span> @bbockelm could you point me to an example or what I can start to make those changes?<br/>
+</body>
+</html>

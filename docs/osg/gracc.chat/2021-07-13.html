@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jul 13, 2021 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Tue Jul 13, 2021 : #gracc (osg)</h3>
+<span style="color: #902d59"><span style="font-size: small">(09:06:35)</span> <b>tanya:</b></span> @bbockelm - yes, it is not using glideinwms and not managed by OSG, OSG collects probe information, and pushes it to ES at CERN. So it is aware of the site and collects job info (but not pilot data). I am meeting today with Steve and Dirk to try to decide what to do. A question to @dweitzel - for WLCG accounting what data are pushed, pilot or jobs? When you do summarization do you do for both streams of data?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:28:17)</span> <b>dweitzel:</b></span> Only pilot job information is pushed to WLCG. <br/>
+<span style="color: #902d59"><span style="font-size: small">(11:14:47)</span> <b>tanya:</b></span> @blin - i thought we have pushed all needed info but it is not in ES: <a href="https://gracc.opensciencegrid.org/kibana/app/discover#/?_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-7d,to:now))&amp;_a=(columns:!(OIM_WLCGAPELNormalFactor,OIM_Facility,VOName,OIM_ResourceGroup,OIM_Resource),filters:!(),index:'373839d0-634f-11eb-a078-6f5db37402b1',interval:auto,query:(language:lucene,query:'OIM_Resource:*Expanse*%20OR%20OIM_Resource:*Frontera*'),sort:!())">https://gracc.opensciencegrid.org/kibana/app/discover#/?_g=(filters:!(),refreshInterval:(pause:!t,v[…]se*%20OR%20OIM_Resource:*Frontera*'),sort:!())</a><br/>
+<span style="color: #902d59"><span style="font-size: small">(11:15:08)</span> <b>tanya:</b></span> OIM_WLCGAPELNormalFactor is not set up<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:16:02)</span> <b>blin:</b></span> sorry, what's not in ES?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:16:21)</span> <b>blin:</b></span> at that link i see records for Frontera/Expanse<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:17:07)</span> <b>tanya:</b></span> OIM_WLCGAPELNormalFactor<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:17:16)</span> <b>tanya:</b></span> is still ‘-’<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:17:49)</span> <b>tanya:</b></span> we have updated topology with the ApelNormalFactor for all HPC but NERSC<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:18:57)</span> <b>tanya:</b></span> i assumed that it would be picked up during summarization e.g - compare to Nebraska: <a href="https://gracc.opensciencegrid.org/kibana/app/discover#/?_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-7d,to:now))&amp;_a=(columns:!(OIM_WLCGAPELNormalFactor,OIM_Facility,VOName,OIM_ResourceGroup,OIM_Resource),filters:!(),index:'373839d0-634f-11eb-a078-6f5db37402b1',interval:auto,query:(language:lucene,query:'OIM_Resource:*Nebraska*'),sort:!())">https://gracc.opensciencegrid.org/kibana/app/discover#/?_g=(filters:!(),refreshInterval:(pause:!t,v[…]ene,query:'OIM_Resource:*Nebraska*'),sort:!())</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(11:24:10)</span> <b>blin:</b></span> hrm, i think it's because you have <tt>InteropAccounting: false</tt> but Derek/@marian are the experts on what gets taken into account for the gracc-apel reporting<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:24:17)</span> <b>blin:</b></span> one sec, i can try to find the source<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:24:33)</span> <b>tanya:</b></span> but the attribute is set<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:25:01)</span> <b>tanya:</b></span> you don’t need to report it to WLCG but i assume it would be used for summarization when it is set<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:30:40)</span> <b>tanya:</b></span> it looks like Derek is sick, so I would wait for him to recover but US CMS needs to be able to see normalized HPCs contribution, so if it impossible now we need to figure out what else needs to be done in order to see that. I see also CPUDuration, it is unclear to me is it already normalized or it is raw CPU and the script that reports to WLCG is doing calculation using ApelFactor but never stores it in gracc ES<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:35:30)</span> <b>blin:</b></span> i think it may be "raw" and the normalization happens with the monthly gracc-apel processing<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:36:35)</span> <b>dweitzel:</b></span> Sick, but not dead :stuck_out_tongue_winking_eye:. I don’t see any WLCG info in the topology registration: <a href="https://github.com/opensciencegrid/topology/blob/master/topology/University%20of%20Texas%20at%20Austin/Texas%20Advanced%20Computing%20Center/TACC-Frontera.yaml">https://github.com/opensciencegrid/topology/blob/master/topology/University%20of%20Texas%20at%20Austin/Texas%20Advanced%20Computing%20Center/TACC-Frontera.yaml</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:37:19)</span> <b>dweitzel:</b></span> All numbers in gracc are raw and not normalized. Normalization only happens just before sending to WLCG. <br/>
+<span style="color: #43761b"><span style="font-size: small">(11:37:19)</span> <b>blin:</b></span> oh! it's in the squid resource<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:38:21)</span> <b>dweitzel:</b></span> Moving the WLCG segment will update the records. In 24 hours after the cached topology xml expires on the summarizers<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:40:06)</span> <b>tanya:</b></span> this is in Frontera.yaml:<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:40:06)</span> <b>tanya:</b></span> WLCGInformation:<br/>      APELNormalFactor: 21<br/>      InteropAccounting: false<br/>      InteropMonitoring: false<br/>      KSI2KMax: 0<br/>      KSI2KMin: 0<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:40:20)</span> <b>blin:</b></span> yeah, it's under the wrong stanza. it's associated with the squid server<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:40:23)</span> <b>blin:</b></span> i'll submit a PR to fix it<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:40:32)</span> <b>blin:</b></span> (YAML can be annoying like that)<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:40:56)</span> <b>tanya:</b></span> hold on let me check the others<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:41:14)</span> <b>blin:</b></span> i also fixed up expanse<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:41:31)</span> <b>tanya:</b></span> why VO owenership is related to squid?<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:42:16)</span> <b>tanya:</b></span> and check Stampede<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:42:19)</span> <b>blin:</b></span> every resource can specify VO ownership but that particular data is probably just stale<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:42:39)</span> <b>tanya:</b></span> there VOOwnership is related to OSG_US_TACC_STAMPEDE2<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:43:03)</span> <b>tanya:</b></span> that what i thought and put it at the same level as VOOwnership<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:44:33)</span> <b>blin:</b></span> for stampede2, there are two VOOwnerships specified, one for the old CE and one for the squid<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:44:51)</span> <b>tanya:</b></span> and it looks like I missed Bridges<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:46:09)</span> <b>blin:</b></span> yup, i got it<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:46:27)</span> <b>blin:</b></span> <b>@edquist</b> could you look over and merge this PR? <a href="https://github.com/opensciencegrid/topology/pull/1941">https://github.com/opensciencegrid/topology/pull/1941</a><br/>
+<span style="color: #16569E"><span style="font-size: small">(11:48:06)</span> <b>edquist:</b></span> here comes trouble<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:49:15)</span> <b>tanya:</b></span> @blin - did you fix all of them or just expanse?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:49:30)</span> <b>blin:</b></span> all of them<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:57:11)</span> <b>edquist:</b></span> @blin - so just to confirm, you want to move WLCG info from<br/><br/>PSC-Bridges-CE1 -&gt; PSC-Bridges2-CE1<br/>SDSC-Expanse -&gt; SDSC-Expanse-CE1<br/>TACC-Frontera-Squid -&gt; TACC-Frontera-CE1<br/>OSG_US_TACC_STAMPEDE2 -&gt; TACC-Stampede2<br/><br/>
+<span style="color: #16569E"><span style="font-size: small">(11:57:18)</span> <b>edquist:</b></span> are these as intended?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:57:29)</span> <b>blin:</b></span> yup<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:57:41)</span> <b>edquist:</b></span> resource names<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:57:45)</span> <b>edquist:</b></span> _not confusing at all_<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:57:50)</span> <b>edquist:</b></span> ;)<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:57:52)</span> <b>edquist:</b></span> thanks!<br/>
+<span style="color: #902d59"><span style="font-size: small">(12:03:48)</span> <b>tanya:</b></span> thanks <b>@edquist</b><br/>
+<span style="color: #902d59"><span style="font-size: small">(12:07:16)</span> <b>tanya:</b></span> @dweitzel - i am glad that you are alive! Could we talk about this WLCG script and the possibility to include the calculated number in the document when you are fully recovered? I will also confirm with Frank that it is what he really wants. I think the idea was to see normalized HPC resources contributions in GRACC (or at least in Kibana) but not to report them to WLCG yet. Maybe he will be ok that we could switch the flag and it will be magically reported to WLCG at some point.<br/>
+</body>
+</html>

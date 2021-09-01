@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Apr 8, 2020 : #open-science-ce (osg)</title>
+</head>
+<body>
+<h3>Wed Apr 8, 2020 : #open-science-ce (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(08:17:24)</span> <b>blin:</b></span> hrm, he's saying pilots are getting killed by the "batch system"<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:30:25)</span> <b>blin:</b></span> i do see jobs from ce1 now, though<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:31:19)</span> <b>blin:</b></span> <pre># condor_status -submitter -pool <a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a> | grep ce1<br/><a href="mailto:group_opportunistic.COVID19_WeNMR.submituser@ce1.opensciencegrid.org">group_opportunistic.COVID19_WeNMR.submituser@ce1.opensciencegrid.org</a>                      <a href="http://ce1.opensciencegrid.org">ce1.opensciencegrid.org</a>                  39          0          0<br/>                     <a href="mailto:group_opportunistic.COVID19_WeNMR.submituser@ce1.opensciencegrid.org">group_opportunistic.COVID19_WeNMR.submituser@ce1.opensciencegrid.org</a>         39          0          0</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:44:13)</span> <b>rynge:</b></span> Ok, I'm seeing work as well<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:46:07)</span> <b>rynge:</b></span> Is anybody interacting with them regarding the killed pilots?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:46:15)</span> <b>blin:</b></span> yup, i'm working on it<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:46:22)</span> <b>blin:</b></span> i think it's because CEs don't allow job restarts<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:47:01)</span> <b>blin:</b></span> i've got a fix but i'm making sure they're cool with me killing all the pilots before making changes<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:47:35)</span> <b>rynge:</b></span> OK, also ensure you are setting good request_memory / request_disk values<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:47:50)</span> <b>blin:</b></span> speaking of:<br/>@lincoln @cnweaver one of the next things we want to do is preserve jobs between instances. what's the state of persistent storage in SLATE?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:48:19)</span> <b>blin:</b></span> keeping in mind that the instance is running on river<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:50:17)</span> <b>rynge:</b></span> @blin That is some crazy logic for request_memory<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:51:04)</span> <b>lincoln:</b></span> @blin SLATE doesn't make any requirements or recommendations for persistent storage. Applications should _generally_ not expect it.<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:51:05)</span> <b>lincoln:</b></span> however<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:51:20)</span> <b>lincoln:</b></span> you could definitely make a knob for the user to put into the application .. if you have persistent storage.. blah<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:51:48)</span> <b>lincoln:</b></span> i believe we have an NFS provisioner and a regular localvolumeprovider on River<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:53:01)</span> <b>blin:</b></span> so can we use river's persistent storage or is this better off not being a SLATE app?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:53:44)</span> <b>blin:</b></span> also, could you approve and merge this PR? <a href="https://github.com/slateci/slate-catalog/pull/267">https://github.com/slateci/slate-catalog/pull/267</a><br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:36:50)</span> <b>cnweaver:</b></span> @blin You can use persistent storage, I think the main thing is that you must treat it as an optional feature that you may not be able to turn on in some environments.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:37:28)</span> <b>blin:</b></span> ok, cool. do you have any SLATE examples using persistent storage that i can crib off of?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:37:39)</span> <b>blin:</b></span> @rynge do OSG VO pilots have hard walltime limits?<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:38:25)</span> <b>cnweaver:</b></span> We have a number of examples, but they're pretty much all external charts we forked, so I'm not sure if any of them are very simple or very examplary. Let me take a quick look. . .<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:40:38)</span> <b>cnweaver:</b></span> Hm, it took me a few more minutes of thinking to remember back to the last time we were in Madison, and why this won't solve your problem.<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:41:17)</span> <b>cnweaver:</b></span> You can _use_ a PV, but your claim will get blown away along with the rest of your objects when the chart is cleaned up.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:41:33)</span> <b>blin:</b></span> ah damn it<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:41:57)</span> <b>blin:</b></span> is there a way to create a PV separately from the instance and allow our chart to use it?<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:42:19)</span> <b>cnweaver:</b></span> Yes, but there is no way to manage that lifetime properly.<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:42:43)</span> <b>cnweaver:</b></span> It would consist entirely of going behind SLATE's back/outside its permissions model.<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:43:33)</span> <b>cnweaver:</b></span> We had talked about implementing this in a manner similar to secrets, which deal with the exact same thing.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:43:42)</span> <b>rynge:</b></span> We have no walltime limits, but remember preemption<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:44:03)</span> <b>rynge:</b></span> A small number of your jobs will be killed<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:47:08)</span> <b>cnweaver:</b></span> PVs are much uglier to deal with because there are so many possible options: Some are created only when a claim is made, and live only as long as the claim (NFS), some can only be claimed a single time and then are ruined (local), some may outlive a claim but can only have one claim against them at a time (anything the user sets to ReadWriteOnce). As a result, I don't see a clear path to what SLATE could generally do to manage a PV (what NFS requires is outright destructive for local volumes).<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:49:31)</span> <b>cnweaver:</b></span> Actually, that wasn't quite correct, local and NFS look kind of similar in that once you've made a claim you need to keep that claim alive, so that's probably the 'handle' object that SLATE would manage.<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:51:18)</span> <b>cnweaver:</b></span> It's definitely a big feature to add; I think I would need at least a full week of development time (&gt;=2 weeks of wall time the way things are going lately) to put a dent in getting it done.<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:52:34)</span> <b>cnweaver:</b></span> As something to do right now, if you need this urgently, I would suggest building into your chart an optional PVC name, and leaving unspecified where the PVC comes from.<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:53:14)</span> <b>cnweaver:</b></span> Where it would come from in the short term, would be either your backchannel to Lincoln, or the direct access we gave you on River.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:55:36)</span> <b>blin:</b></span> ok, that sounds like a decent short term plan for now<br/>
+</body>
+</html>

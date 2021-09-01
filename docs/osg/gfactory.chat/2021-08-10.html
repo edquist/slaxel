@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Aug 10, 2021 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Tue Aug 10, 2021 : #gfactory (osg)</h3>
+<span style="color: #5a4592"><span style="font-size: small">(09:39:52)</span> <b>lmichael:</b></span> Not sure I’m in the right place. We’re currently seeing a lot of the following error in the OSPool. Any way to all-out prevent it? What’s going on?<br/><pre>cp: cannot overwrite directory 'condor/lib' with non-directory</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(11:32:36)</span> <b>matyas:</b></span> @lmichael I'm running into that message in my Stampede2 experiments but that's a weird environment so I figured it was just me. (Don't worry, no user jobs are allowed to run on Stampede2 right now.) Three questions:<br/>1. Is it just noise, or is it causing issues (e.g. preventing jobs from starting)?<br/>2. Are there any other nearby error messages?<br/>3. Is it only happening with Singularity jobs?<br/>
+<span style="color: #5a4592"><span style="font-size: small">(12:27:36)</span> <b>lmichael:</b></span> 1. It’s just noise, as far as I can tell, but it shows up in the user’s stderr(!) and is just one such statement that makes users incorrectly suspect failures of their jobs. Many users expect to see error files of size ‘0’, and go into troubleshooting mode when they see otherwise.<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(12:59:54)</span> <b>blin:</b></span> could you open a freshdesk ticket for this?<br/>
+</blockquote>
+<span style="color: #5a4592"><span style="font-size: small">(12:28:03)</span> <b>lmichael:</b></span> 2/3. Where I’ve seen it, it accompanies a singularity warning of some sort. but I haven’t looked extensively.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(12:28:44)</span> <b>lmichael:</b></span> Our OSG School learners are super confused by it and asking, which means our regular users just don’t feel like they’ve got the open communication line to ask, but it’s probably just as annoying to them to figure out on their own that it’s meaningless to job success.<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:28:48)</span> <b>matyas:</b></span> yeah we'll have to do a #1-ectomy in general<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:38:36)</span> <b>matyas:</b></span> we'll need to come up with and implement a standard for recording and retrieving job wrapper debug info without polluting the user's own output/error files<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:42:29)</span> <b>matyas:</b></span> anyway I don't have an answer for you right now, but thanks for letting me know it's not just me; I'm poking around the OSG job wrapper code anyway for my Stampede2 work so as long as I'm in there, I can investigate.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:43:24)</span> <b>rynge:</b></span> I suspect it has to do with the chirp binary copying, but I didn't see it myself yet<br/>
+</body>
+</html>

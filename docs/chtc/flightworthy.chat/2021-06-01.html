@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jun 1, 2021 : #flightworthy (chtc)</title>
+</head>
+<body>
+<h3>Tue Jun 1, 2021 : #flightworthy (chtc)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(10:08:35)</span> <b>johnkn:</b></span> Can I get a reviewer on a doc ticket?  HTCONDOR-432 - removal of &lt;DAEMON&gt;_EXPRS from the manual.<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:10:45)</span> <b>gthain:</b></span> I can take it<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:50:25)</span> <b>johnkn:</b></span> Thanks<br/>
+<span style="color: #3c989f"><span style="font-size: small">(10:59:04)</span> <b>wiscmoate:</b></span> @tlmiller @tim <a href="http://batlatb.chtc.wisc.edu">batlatb.chtc.wisc.edu</a> is now running HTCondor 9.1.0<br/>
+<span style="color: #d58247"><span style="font-size: small">(11:44:01)</span> <b>gthain:</b></span> In reviewing HTCONDOR-432, I discovered <tt>condor_examples/master_wrapper</tt>which is part of the "mini-rpm" (?)<br/>
+<span style="color: #d58247"><span style="font-size: small">(11:44:10)</span> <b>gthain:</b></span> Can we remove this, and any related files?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:58:31)</span> <b>johnkn:</b></span> I wondered about that myself.  I have no idea..<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:03:07)</span> <b>matyas:</b></span> what is it?<br/>
+<span style="color: #d58247"><span style="font-size: small">(12:06:34)</span> <b>gthain:</b></span> It's a python script that starts the condor_master, and is part of the "drone" rpm, whatever that is<br/>
+<span style="color: #d58247"><span style="font-size: small">(12:07:06)</span> <b>gthain:</b></span> I don't want to just <tt>git rm</tt> it, as there are a few other dangling references to the drone rpm which I'd like to remove at the same time, assuming we can get rid of it<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:07:41)</span> <b>matyas:</b></span> I think condor-drone was a Nate Yehle thing -- @wiscmoate do you remember it?<br/>
+<span style="color: #d58247"><span style="font-size: small">(12:10:27)</span> <b>gthain:</b></span> where "mini rpm" and "drone rpm" are related somehow.  Maybe one was an earlier name for the other?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(12:11:53)</span> <b>wiscmoate:</b></span> I've no memory of condor-drone, but it definitely sounds like Nate Yehle nomenclature<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:28:50)</span> <b>matyas:</b></span> I think it was an RPM for setting up a preconfigured CHTC exec node or something<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:30:58)</span> <b>matyas:</b></span> try looking for it in the old el6 puppet config<br/>
+<span style="color: #d58247"><span style="font-size: small">(12:31:55)</span> <b>gthain:</b></span> Like a ghost pool ?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:31:14)</span> <b>wiscmoate:</b></span> @matyas not seeing anything about it in EL6 puppet<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:40:19)</span> <b>matyas:</b></span> try doing <tt>git log -S drone</tt> (-S searches for strings that were added or removed)<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:47:16)</span> <b>wiscmoate:</b></span> <pre>-node '<a href="http://glow-c168.cs.wisc.edu">glow-c168.cs.wisc.edu</a>' { #drone submit install testinclude ::chtc::exec::sl63::x86_64::2360,::smartd::satascan</pre><br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:47:54)</span> <b>wiscmoate:</b></span> <pre>+node '<a href="http://glow-c168.cs.wisc.edu">glow-c168.cs.wisc.edu</a>' { #drone submit install testinclude ::chtc::exec::sl63::x86_64::2360,::smartd::satascan</pre><br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:48:02)</span> <b>wiscmoate:</b></span> Those are the only signs<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:48:17)</span> <b>matyas:</b></span> I got nothing ¯\_(ツ)_/¯<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:49:09)</span> <b>wiscmoate:</b></span> Nate wasn't consistent at committing his changes, so who knows what we're not seeing<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:49:45)</span> <b>matyas:</b></span> oh jeez I found it in the condor source tree<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:49:56)</span> <b>matyas:</b></span> ... it was deleted in 2012<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:50:07)</span> <b>matyas:</b></span> <pre>-#This Condor package is intended to install on worker node where <br/>-#Condor binaries can be accessed via a shared file system.</pre><br/>
+<span style="color: #99a949"><span style="font-size: small">(13:51:07)</span> <b>matyas:</b></span> so it's not a thing anymore<br/>
+<span style="color: #d58247"><span style="font-size: small">(13:54:34)</span> <b>gthain:</b></span> But not completely deleted...<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:55:59)</span> <b>matyas:</b></span> sometimes the stinger stays in you?<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(13:58:54)</span> <b>tim:</b></span> I think it is probably safe to delete. I know of nothing currently using it.<br/>
+<span style="color: #d58247"><span style="font-size: small">(14:00:11)</span> <b>gthain:</b></span> there are reference in condor_examples/condor.sysconfig<br/>
+<span style="color: #d58247"><span style="font-size: small">(14:00:23)</span> <b>gthain:</b></span> condor_examples/condor_sysconfig.drone.patch<br/>
+<span style="color: #d58247"><span style="font-size: small">(14:00:37)</span> <b>gthain:</b></span> and other places<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(14:03:53)</span> <b>tim:</b></span> condor.sysconfig is no longer used and can be deleted. Same with associate patch file. (condor.sysconfig is for the old init system and all supported platforms use systemd.) Also, condor.sysconfig never had a role when using the native packaging tools instead of CPack.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:21:34)</span> <b>jcpatton:</b></span> in 9.1.0, output and error *should* or *should not* be transferred back to the submit directory (or spool?) if a job goes on hold?<br/>
+<blockquote>
+<span style="color: #2b6836"><span style="font-size: small">(15:25:30)</span> <b>jcpatton:</b></span> <br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:25:32)</span> <b>jcpatton:</b></span> This job did not have its output or error transferred back to the directory the user submitted from when it went on hold.<br/>
+</blockquote>
+<span style="color: #99a949"><span style="font-size: small">(15:52:18)</span> <b>matyas:</b></span> anyone here know what a <tt>GridJobId</tt> classad attribute is or where it comes from?<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:53:20)</span> <b>matyas:</b></span> it's supposed to look like<br/><pre>GridJobId = "condor <a href="http://fermicloud116.fnal.gov">fermicloud116.fnal.gov</a> <a href="http://fermicloud116.fnal.gov:9619">fermicloud116.fnal.gov:9619</a> 128.0"</pre><br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:52:11)</span> <b>jfrey:</b></span> That job attribute is set by the gridmanager daemon for grid universe jobs once the job has been submitted to the remote scheduler.<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:55:55)</span> <b>matyas:</b></span> we're seeing some history files for routed jobs where it's <tt>undefined</tt><br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:59:19)</span> <b>jfrey:</b></span> What version of Condor?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:59:53)</span> <b>jfrey:</b></span> Before 8.8.11, GridJobId was cleared when a job completed.<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:00:49)</span> <b>matyas:</b></span> uh<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:01:04)</span> <b>matyas:</b></span> our accounting system parses GridJobId<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:01:38)</span> <b>matyas:</b></span> and has been doing that since forever<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(17:01:49)</span> <b>jfrey:</b></span> It only happened for some scheduler types.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(17:02:20)</span> <b>jfrey:</b></span> It didn’t happen for grid-type batch.<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:02:25)</span> <b>matyas:</b></span> ah<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(17:02:35)</span> <b>jfrey:</b></span> But for grid-type condor, it would before 8.8.11.<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:02:57)</span> <b>matyas:</b></span> I see. This is <tt>batch slurm</tt><br/>
+<span style="color: #9b3b45"><span style="font-size: small">(17:03:41)</span> <b>jfrey:</b></span> What is the JobStatus attribute for these jobs? Could they have been removed without being successfully submitted to slurm?<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:11:35)</span> <b>matyas:</b></span> <pre>$HTCondorCEVersion: 5.1.1 $<br/>$CondorVersion: 9.0.1 May 18 2021 PackageID: 9.0.1-1 $<br/>$CondorPlatform: X86_64-CentOS_7.9 $</pre><br/>3 -- we've been debugging the accounting by condor_rm'ing jobs (to get history files), but there have been completed jobs and all of them have and undefined GridJobId<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:17:57)</span> <b>matyas:</b></span> I can ask for the admin's GridManagerLog; any debug options to turn on?<br/>
+<span style="color: #4cc091"><span style="font-size: small">(17:18:10)</span> <b>blin:</b></span> @jfrey  We expect the routed job to have <tt>GridJobId</tt>. IIRC, it's the only attribute that we can use to connect the condor job id to the local batch id <a href="https://htcondor.github.io/htcondor-ce/v5/troubleshooting/common-issues/#non-htcondor-batch-systems">https://htcondor.github.io/htcondor-ce/v5/troubleshooting/common-issues/#non-htcondor-batch-systems</a><br/>
+<span style="color: #9b3b45"><span style="font-size: small">(17:52:26)</span> <b>jfrey:</b></span> For the gridmanager log, having GRIDMANAGER_DEBUG=D_FULLDEBUG would be very helpful.<br/>
+</body>
+</html>

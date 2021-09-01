@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Feb 23, 2017 : #general (osg)</title>
+</head>
+<body>
+<h3>Thu Feb 23, 2017 : #general (osg)</h3>
+<span style="color: #e96699"><span style="font-size: small">(10:26:34)</span> <b>ian_cancercomputer:</b></span> Hey all -- so I saw a thing on the osg-sites ML about selinux; would this be a place to discuss about that or is #osg-software more appropriate?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:31:27)</span> <b>matyas:</b></span> it's cool, ask away. i think all the people that would answer it are on both channels anyway<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:37:55)</span> <b>ian_cancercomputer:</b></span> nice.  So anyways, i was just wanting to check on the status of that.  My CE has selinux disabled because it interfered way too much with all of the daemon operations, but so far the WN's still have it enabled enforcing/targetted without any noticable issues.<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:41:04)</span> <b>matyas:</b></span> as far as we know, the only osg software that doesn't currently work with selinux in enforcing mode is condor / htcondor-ce<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:44:05)</span> <b>matyas:</b></span> we talked about setting the condor daemons in permissive mode (while leaving the rest of the system in enforcing mode) but i don't know if that was actually implemented in condor 8.4.11<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:46:18)</span> <b>matyas:</b></span> i _personally_ wouldn't run it at all on a WN (i.e. i would put it in disabled mode) because of the performance loss, but i'm not a sysadmin<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:47:13)</span> <b>***matyas:</b></span> looks<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:47:26)</span> <b>matyas:</b></span> yep, 8.4.11 runs with all the daemons in permissive mode<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:52:03)</span> <b>ian_cancercomputer:</b></span> I was running it permissive back in august and it ws still getting blocked left and right.  I'll give it another test next week or so<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:52:26)</span> <b>ian_cancercomputer:</b></span> a lot of the blocks I recall were RSV related too though, i thought..<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:52:40)</span> <b>ian_cancercomputer:</b></span> anyhow, will test and submit logs.<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:55:27)</span> <b>ian_cancercomputer:</b></span> regarding the performance overhead, i've noticed that my WNs are only at about 70-75% load, that wouldn't be due to selinux slowing things down would it? ie selunix overhead should be increasing the load i see rather than decreasing it right?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:58:27)</span> <b>matyas:</b></span> I don't know if selinux performance is reflected in load statistics. It's running in the kernel, not as a separate process, so the "visible" effect would be syscalls taking a little bit longer to complete<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:02:52)</span> <b>ian_cancercomputer:</b></span> syscalls are in the system load stats though, and they're still sitting at practically zero, so i'll go with no then..<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:21:51)</span> <b>ian_cancercomputer:</b></span> Mátyás, what's your SELINUXTYPE set to when running permissive?  targetted, minimum, or mls?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:32:51)</span> <b>matyas:</b></span> targeted<br/>
+<span style="color: #e0a729"><span style="font-size: small">(15:04:49)</span> <b>kylegross:</b></span> @gfarr - Have you been able to do your gridadmin request yet?<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(15:12:41)</span> <b>gfarr:</b></span> not yet<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(15:12:41)</span> <b>gfarr:</b></span> sorry<br/>
+<span style="color: #e0a729"><span style="font-size: small">(15:14:34)</span> <b>kylegross:</b></span> that’s fine.  no rush on my part :slightly_smiling_face:<br/>
+<span style="color: #e0a729"><span style="font-size: small">(15:14:40)</span> <b>kylegross:</b></span> Just was checking in.<br/>
+</body>
+</html>

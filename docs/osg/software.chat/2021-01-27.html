@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jan 27, 2021 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Jan 27, 2021 : #software (osg)</h3>
+<span style="color: #a63024"><span style="font-size: small">(15:11:31)</span> <b>efajardo:</b></span> The <tt>stable</tt> tage of stashcache has old certificates<br/><br/><pre>[root@stashcache-amsterdam-7dd64db84c-2srjf xrootd]# rpm -qv osg-ca-certs<br/>osg-ca-certs-1.89-1.osg35.el7.noarch</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(15:11:40)</span> <b>efajardo:</b></span> thus it fails when contacting the redirector<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:12:14)</span> <b>efajardo:</b></span> <pre>[2021-01-27 19:31:11.596617 +0000][Error  ][TlsMsg            ] [] TLS error rc=-1 ec=1 (error_ssl) errno=0.<br/>[2021-01-27 19:31:11.596730 +0000][Error  ][TlsMsg            ] Failed to do TLS connect: Unable to connect to <a href="http://redirector.osgstorage.org">redirector.osgstorage.org</a>; error_ssl<br/>[2021-01-27 19:31:11.596762 +0000][Error  ][AsyncSock         ] [p22@redirector.osgstorage.org:1094.0] Socket error while handshaking: [ERROR] TLS error<br/>[2021-01-27 19:31:11.596872 +0000][Error  ][PostMaster        ] [p22@redirector.osgstorage.org:1094] elapsed = 0, pConnectionWindow = 120 seconds.<br/>[2021-01-27 19:31:12.108738 +0000][Error  ][TlsMsg            ] [] TLS error rc=-1 ec=1 (error_ssl) errno=0.<br/>[2021-01-27 19:31:12.108847 +0000][Error  ][TlsMsg            ] Failed to do TLS connect: Unable to connect to <a href="http://redirector.osgstorage.org">redirector.osgstorage.org</a>; error_ssl<br/>[2021-01-27 19:31:12.108879 +0000][Error  ][AsyncSock         ] [p22@redirector.osgstorage.org:1094.0] Socket error while handshaking: [ERROR] TLS error<br/>[2021-01-27 19:31:12.108994 +0000][Error  ][PostMaster        ] [p22@redirector.osgstorage.org:1094] elapsed = 1, pConnectionWindow = 120 seconds.<br/>[2021-01-27 19:31:12.109027 +0000][Info   ][PostMaster        ] [p22@redirector.osgstorage.org:1094] Attempting reconnection in 119 seconds.<br/>[2021-01-27 19:31:12.854793 +0000][Error  ][TlsMsg            ] [] TLS error rc=-1 ec=1 (error_ssl) errno=0.<br/>[2021-01-27 19:31:12.854939 +0000][Error  ][TlsMsg            ] Failed to do TLS connect: Unable to connect to <a href="http://redirector.osgstorage.org">redirector.osgstorage.org</a>; error_ssl<br/>[2021-01-27 19:31:12.854987 +0000][Error  ][AsyncSock         ] [p0@redirector.osgstorage.org:1094.0] Socket error while handshaking: [ERROR] TLS error<br/>[2021-01-27 19:31:12.855109 +0000][Error  ][PostMaster        ] [p0@redirector.osgstorage.org:1094] elapsed = 0, pConnectionWindow = 120 seconds.<br/>[2021-01-27 19:31:13.367448 +0000][Error  ][TlsMsg            ] [] TLS error rc=-1 ec=1 (error_ssl) errno=0.<br/>[2021-01-27 19:31:13.367570 +0000][Error  ][TlsMsg            ] Failed to do TLS connect: Unable to connect to <a href="http://redirector.osgstorage.org">redirector.osgstorage.org</a>; error_ssl<br/>[2021-01-27 19:31:13.367602 +0000][Error  ][AsyncSock         ] [p0@redirector.osgstorage.org:1094.0] Socket error while handshaking: [ERROR] TLS error<br/>[2021-01-27 19:31:13.367721 +0000][Error  ][PostMaster        ] [p0@redirector.osgstorage.org:1094] elapsed = 1, pConnectionWindow = 120 seconds.<br/>[2021-01-27 19:31:13.367753 +0000][Info   ][PostMaster        ] [p0@redirector.osgstorage.org:1094] Attempting reconnection in 119 seconds</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(15:12:20)</span> <b>efajardo:</b></span> and the <tt>fresh</tt> tag is broken<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:17:58)</span> <b>blin:</b></span> how's <tt>fresh</tt> broken?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:18:47)</span> <b>dweitzel:</b></span> is it rotten?... I'll see myself out.<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:19:31)</span> <b>blin:</b></span> we have <tt>fresh-&lt;TIMESTAMP&gt;</tt>  tags that you can try out<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:27:28)</span> <b>efajardo:</b></span> the pod keeps restarting with <tt>fresh</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(15:27:32)</span> <b>efajardo:</b></span> I cannot even <tt>ssh</tt> into it<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:27:56)</span> <b>efajardo:</b></span> It mean supervisor dies whiel starting<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:28:04)</span> <b>efajardo:</b></span> do you want me to dig more @blin?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:28:51)</span> <b>blin:</b></span> could you dump the statup logs here?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:29:49)</span> <b>blin:</b></span> does the redirector have an LE cert?<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:30:23)</span> <b>efajardo:</b></span> yes it does have an LE cert<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:30:29)</span> <b>efajardo:</b></span> I guess the pod is restarting too fast<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:30:32)</span> <b>efajardo:</b></span> <pre>stashcache-amsterdam-6d96cc59d6-69dht    1/1     Running   3          100s    10.244.35.56     <a href="http://fiona-r-uva.vlan7.uvalight.net">fiona-r-uva.vlan7.uvalight.net</a>               &lt;none&gt;           &lt;none&gt;</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(15:32:12)</span> <b>efajardo:</b></span> but I cannot get any logs out of it<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:32:13)</span> <b>efajardo:</b></span> <pre>kubectl logs -n osg-services stashcache-amsterdam-6d96cc59d6-69dht<br/>VERBOSE(0) Download error <a href="http://crl-ncsa.ncsa-security.net/myproxy2013.crl">http://crl-ncsa.ncsa-security.net/myproxy2013.crl</a>: timed out after 10s</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:35:10)</span> <b>blin:</b></span> try this tag <tt><a href="tel:202101030130">20210103-0130</a></tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(15:36:44)</span> <b>efajardo:</b></span> This one<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:36:46)</span> <b>efajardo:</b></span> <tt>opensciencegrid/stash-cache:fresh-20210103-0130</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(15:36:49)</span> <b>efajardo:</b></span> or<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:36:56)</span> <b>efajardo:</b></span> <tt>opensciencegrid/stash-cache:20210103-0130</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:36:57)</span> <b>blin:</b></span> nope, without <tt>fresh-</tt>, sorry<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:37:01)</span> <b>blin:</b></span> yeah the second one<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:39:46)</span> <b>efajardo:</b></span> same problem<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:39:48)</span> <b>efajardo:</b></span> <tt>stashcache-amsterdam-7ff77568bb-vg888    0/1     Completed   2          2m20s   10.244.35.61     <a href="http://fiona-r-uva.vlan7.uvalight.net">fiona-r-uva.vlan7.uvalight.net</a>               &lt;none&gt;           &lt;none&gt;</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(15:39:56)</span> <b>efajardo:</b></span> supervisor is failing fast<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:40:32)</span> <b>blin:</b></span> supervisor or the supervisor startup script?<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:41:10)</span> <b>efajardo:</b></span> I cannot tell<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:41:32)</span> <b>efajardo:</b></span> The logs do not tell me much<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:41:33)</span> <b>efajardo:</b></span> <pre>kubectl logs -n osg-services stashcache-amsterdam-7ff77568bb-vg888<br/>ERROR CRL verification failed for DarkMatterPrivateRootCAG4/0 (DarkMatterPrivateRootCAG4)<br/>VERBOSE(0) DarkMatterPrivateRootCAG4/0: CRL has nextUpdate time in the past</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:44:34)</span> <b>blin:</b></span> what's your <tt>XC_ROOTDIR</tt> set to?<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:45:09)</span> <b>efajardo:</b></span> <pre>        - name: XC_ROOTDIR<br/>          value: /xcache</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:48:34)</span> <b>blin:</b></span> i think i have a fix<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:49:30)</span> <b>blin:</b></span> @efajardo <a href="https://github.com/opensciencegrid/docker-xcache/pull/63">https://github.com/opensciencegrid/docker-xcache/pull/63</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:59:51)</span> <b>blin:</b></span> once this workflow finishes, new <tt>fresh</tt> should be available <a href="https://github.com/opensciencegrid/docker-xcache/actions/runs/516344102">https://github.com/opensciencegrid/docker-xcache/actions/runs/516344102</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(16:56:34)</span> <b>efajardo:</b></span> that fixed it @blin<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:56:59)</span> <b>blin:</b></span> great, sorry for the trouble<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:57:13)</span> <b>efajardo:</b></span> tdo you mind promoting this<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:57:19)</span> <b>efajardo:</b></span> <tt>Image ID:       <a href="docker-pullable://opensciencegrid/stash-cache@sha256:d261242cd3f08039283028f7bf338d3e95d77714d7832be8ef0297a4b218cb4b">docker-pullable://opensciencegrid/stash-cache@sha256:d261242cd3f08039283028f7bf338d3e95d77714d7832be8ef0297a4b218cb4b</a></tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(16:57:21)</span> <b>efajardo:</b></span> to stable?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:58:05)</span> <b>blin:</b></span> yeah i'll run it by @tim.theisen<br/>
+<span style="color: #73769d"><span style="font-size: small">(17:00:01)</span> <b>tim.theisen:</b></span> Looks like it is needed and tested. Promote it to stable.<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:00:27)</span> <b>matyas:</b></span> do we need to go through and promote pretty much everything that uses certs?<br/>
+<span style="color: #73769d"><span style="font-size: small">(17:00:33)</span> <b>tim.theisen:</b></span> Any other containers need this fix?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:06:49)</span> <b>blin:</b></span> maybe the cms-xcache/stash-origin containers<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:11:48)</span> <b>blin:</b></span> @efajardo do you have any <tt>cms-xcache</tt> containers using a more recent tag than <tt>stable</tt>?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:13:56)</span> <b>blin:</b></span> <tt>hosted-ce</tt> could use a bump, too, but we need verification from @jpeterson /@jdost321 that the latest <tt>fresh</tt> works for them<br/>
+<span style="color: #a63024"><span style="font-size: small">(20:41:46)</span> <b>efajardo:</b></span> I have a cms-xcache using the fresh tag<br/>
+<span style="color: #a63024"><span style="font-size: small">(20:41:55)</span> <b>efajardo:</b></span> because of this PR<br/>
+<span style="color: #a63024"><span style="font-size: small">(20:42:32)</span> <b>efajardo:</b></span> <a href="https://github.com/opensciencegrid/docker-xcache/pull/62">https://github.com/opensciencegrid/docker-xcache/pull/62</a><br/>
+</body>
+</html>

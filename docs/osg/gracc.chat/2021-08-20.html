@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Aug 20, 2021 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Fri Aug 20, 2021 : #gracc (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(11:21:55)</span> <b>matyas:</b></span> How can I tell if a job ran on a specific resource? I'm trying to figure out if some jobs ran on JetStream but I don't know what to filter on. (I'm looking at the <a href="https://gracc.opensciencegrid.org/d/000000037/payload-jobs-summary?orgId=1&amp;var-ReportableVOName=All&amp;var-Project=All&amp;var-Facility=All&amp;var-User=All&amp;var-ExitCode=All&amp;var-Probe=All&amp;var-interval=1d">Payload Jobs Summary</a> page -- is that the wrong one?)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:22:30)</span> <b>dweitzel:</b></span> A specific job?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:22:33)</span> <b>dweitzel:</b></span> Do you have a jobid?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:22:36)</span> <b>dweitzel:</b></span> Submit host?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:22:45)</span> <b>matyas:</b></span> submit host actually. <a href="http://xd-submit0000.chtc.wisc.edu">xd-submit0000.chtc.wisc.edu</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:23:35)</span> <b>dweitzel:</b></span> For specific jobs, you will have to drill down to the "raw" data, which is not available in the grafana GRACC pages.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:23:44)</span> <b>dweitzel:</b></span> So just a submit host?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:24:06)</span> <b>dweitzel:</b></span> But if you don't, here is the page just for that submit host:<br/><a href="https://gracc.opensciencegrid.org/d/000000037/payload-jobs-summary?orgId=1&amp;var-ReportableVOName=All&amp;var-Project=All&amp;var-Facility=All&amp;var-User=All&amp;var-ExitCode=All&amp;var-Probe=condor:xd-submit0000.chtc.wisc.edu&amp;var-interval=1d">https://gracc.opensciencegrid.org/d/000000037/payload-jobs-summary?orgId=1&amp;var-Reportable[…]Probe=condor:xd-submit0000.chtc.wisc.edu&amp;var-interval=1d</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:24:16)</span> <b>dweitzel:</b></span> (set the Probe filter to the submit host)<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:24:25)</span> <b>matyas:</b></span> jobs from that submit host to one of the jetstream resources<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:24:58)</span> <b>matyas:</b></span> of which there appear to be multiple<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:25:10)</span> <b>dweitzel:</b></span> Indeed, jetstream is at what, TACC and IU?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:25:16)</span> <b>matyas:</b></span> yeah<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:25:26)</span> <b>dweitzel:</b></span> It looks like we graph by Facility, not by resource.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:25:54)</span> <b>dweitzel:</b></span> Might have to look at the summary records in kibana.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:28:43)</span> <b>dweitzel:</b></span> Here's a really long link with your answer:<br/><a href="https://gracc.opensciencegrid.org/kibana/app/visualize#/create?type=table&amp;indexPattern=373839d0-634f-11eb-a078-6f5db37402b1&amp;_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-7d,to:now))&amp;_a=(filters:!(),linked:!f,query:(language:kuery,query:'ProbeName:*xd-submit0000.chtc.wisc.edu'),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(field:CoreHours),schema:metric,type:sum),(enabled:!t,id:'2',params:(field:OIM_Resource,missingBucket:!f,missingBucketLabel:Missing,order:desc,orderBy:'1',otherBucket:!f,otherBucketLabel:Other,size:1000),schema:bucket,type:terms)),params:(perPage:30,percentageCol:'',showMetricsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'',type:table))">https://gracc.opensciencegrid.org/kibana/app/visualize#/create?type=table&amp;indexPattern=373839d0-634f[…]tion:!n),totalFunc:sum),title:'',type:table))</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:28:59)</span> <b>dweitzel:</b></span> 8k core hours on TACC-Jetstream-Backfill<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:29:37)</span> <b>matyas:</b></span> in the last 7 days?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:29:57)</span> <b>dweitzel:</b></span> Yup, that's the time range I put in the link above.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:30:05)</span> <b>dweitzel:</b></span> you can of course expand it.  It's in the top right.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:31:39)</span> <b>matyas:</b></span> that feels like a lot<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:32:25)</span> <b>dweitzel:</b></span> Says 	2,307 jobs<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:32:28)</span> <b>dweitzel:</b></span> <a href="https://gracc.opensciencegrid.org/kibana/app/visualize#/create?type=table&amp;indexPattern=373839d0-634f-11eb-a078-6f5db37402b1&amp;_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-7d,to:now))&amp;_a=(filters:!(),linked:!f,query:(language:kuery,query:'ProbeName:*xd-submit0000.chtc.wisc.edu'),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(field:CoreHours),schema:metric,type:sum),(enabled:!t,id:'2',params:(field:OIM_Resource,missingBucket:!f,missingBucketLabel:Missing,order:desc,orderBy:'1',otherBucket:!f,otherBucketLabel:Other,size:1000),schema:bucket,type:terms),(enabled:!t,id:'3',params:(field:Njobs),schema:metric,type:sum)),params:(perPage:30,percentageCol:'',showMetricsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'',type:table))">https://gracc.opensciencegrid.org/kibana/app/visualize#/create?type=table&amp;indexPattern=373839d0-634f[…]tion:!n),totalFunc:sum),title:'',type:table))</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(11:35:58)</span> <b>matyas:</b></span> OK I guess that sounds believeable, but dang.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:40:55)</span> <b>blin:</b></span> that's through the backfill containers. is that what you're looking for Mat?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:41:48)</span> <b>matyas:</b></span> Mats says that's our general allocation on JetStream.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:42:12)</span> <b>matyas:</b></span> Also it answers the boolean question "has ever run on JetStream from xd-submit0000"<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:43:03)</span> <b>matyas:</b></span> thanks Derek!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:44:14)</span> <b>dweitzel:</b></span> Glad I could help!<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:47:20)</span> <b>kretzke:</b></span> @blin <b>@edquist</b> we just found out the hard way that the dCache-transfer probe (and other probes using <tt>common2</tt>lib) does not run under python 3, since it tries to <tt>import hotshot</tt> (a profiling library, who knew). I’ll be sending a PR. You want a Jira issue or something?<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(16:52:02)</span> <b>blin:</b></span> PR's fine, we can turn it into a Jira ticket on our end<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:54:17)</span> <b>kretzke:</b></span> OK. Hopefully it’s just that import… first I have to figure out how to test this beast.<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:54:48)</span> <b>blin:</b></span> it's good to know that there's a user of <tt>common2</tt>, though!<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:55:55)</span> <b>kretzke:</b></span> couple enstore probes, and lsf. Anybody actually still running lsf?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:56:33)</span> <b>blin:</b></span> we may actually be getting a new LSF site soon!<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:56:53)</span> <b>kretzke:</b></span> alrighty then<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:57:35)</span> <b>blin:</b></span> though in 3.6 we're moving everyone over to accounting probes that query the CE directly!<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:59:37)</span> <b>kretzke:</b></span> :thinking_face: hmm. Sounds good, but then I have a feeling someone’s going to yell at me about something missing<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:01:13)</span> <b>kretzke:</b></span> Here at least most of our jobs don’t go through a CE afaik.<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:01:43)</span> <b>blin:</b></span> i'd be very very curious about how the heck accounting works then<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:02:26)</span> <b>blin:</b></span> because afaik, batch system probes only work if they cross-ref the VO info from the CE job<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:07:26)</span> <b>kretzke:</b></span> I’m not sure, I need to refresh myself. Let me look into it a bit.<br/>
+</blockquote>
+<span style="color: #16569E"><span style="font-size: small">(16:47:37)</span> <b>edquist:</b></span> wah wah<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:47:45)</span> <b>edquist:</b></span> sorry Kevo<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:48:20)</span> <b>edquist:</b></span> common2 never got much love in the python3 transition, i guess<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:48:30)</span> <b>kretzke:</b></span> have I ever mentioned how much I hate Python?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:48:38)</span> <b>edquist:</b></span> Oh!<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:48:42)</span> <b>edquist:</b></span> maybe not??<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:48:51)</span> <b>edquist:</b></span> i take it you are more a fan of perl then?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:49:05)</span> <b>edquist:</b></span> (or Bash?  Or C?)<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:49:08)</span> <b>kretzke:</b></span> oh, well I do. Ah those were the days.<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:50:18)</span> <b>edquist:</b></span> personally i think of Python3 as a mandatory mistake<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:50:52)</span> <b>edquist:</b></span> ("mandatory" according to somebody other than me)<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:51:10)</span> <b>kretzke:</b></span> that’s a fair assessment. BDFLs are human too<br/>
+</body>
+</html>

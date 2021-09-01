@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Apr 2, 2020 : #open-science-ce (osg)</title>
+</head>
+<body>
+<h3>Thu Apr 2, 2020 : #open-science-ce (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(09:53:58)</span> <b>blin:</b></span> @dweitzel @bbockelm i did some major reorg of the doc and added explicit step-by-step instructions: <a href="https://github.com/opensciencegrid/docs/pull/685">https://github.com/opensciencegrid/docs/pull/685</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:11:42)</span> <b>blin:</b></span> @matyas i'm going to set up the A record to point at an IP on the osgcc cluster first so I can do validate the CE part of the app: <a href="https://support.opensciencegrid.org/a/tickets/64710">https://support.opensciencegrid.org/a/tickets/64710</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:11:56)</span> <b>matyas:</b></span> cool<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:12:08)</span> <b>blin:</b></span> once things look ok on my end, we can switch it over to an IP at river<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:31:44)</span> <b>blin:</b></span> @matyas i think you're gonna need to recreate the token secrets<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:32:18)</span> <b>matyas:</b></span> did they get deleted?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:34:02)</span> <b>blin:</b></span> nope, they just don't have the key that the deployment is expecting (<tt>token</tt> instead of <tt>condor_token</tt>). run these commands:<br/><pre>slate secret create --group osg-covid19 --cluster uchicago-river-v2 --from-file condor_token=&lt;PATH TO TOKEN&gt; ce1.opensciencegrid.org-submit-token<br/>slate secret create --group chtc-osg --cluster osgcc --from-file condor_token=&lt;PATH TO TOKEN&gt; ce1.opensciencegrid.org-submit-token</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:35:32)</span> <b>matyas:</b></span> what's the "ce1.opensciencegrid.org-submit-token" part? I didn't need it last time<br/>
+<span style="color: #e85d72"><span style="font-size: small">(10:36:07)</span> <b>cnweaver:</b></span> That looks like the name the secret should be given in Kubernetes<br/>
+<span style="color: #e85d72"><span style="font-size: small">(10:36:50)</span> <b>cnweaver:</b></span> (And if we previously let you make a secret with no name, it sounds like a bug in our input validation)<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:37:29)</span> <b>matyas:</b></span> slate secret create auth-token-secret --from-file token=<tt>pwd</tt>/token --group osg-covid19 --cluster uchicago-river-v2 gave me no errors<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:37:38)</span> <b>matyas:</b></span> oh wait<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:37:44)</span> <b>matyas:</b></span> I had put the name first in that one<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:37:49)</span> <b>matyas:</b></span> ("auth-token-secret")<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:39:10)</span> <b>blin:</b></span> yeah, the issue with your command is that you set the key to <tt>token</tt> containing the token itself. the deployment expects the token to be in <tt>condor_token</tt> so it fails to start<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:39:56)</span> <b>matyas:</b></span> ok. But the values file is definitely expecting <tt>auth-token-secret</tt> as the name, not <tt>ce1.opensciencegrid.org-submit-token</tt><br/>
+<span style="color: #e85d72"><span style="font-size: small">(10:40:59)</span> <b>cnweaver:</b></span> You can of course change the name used in the values file. I'll leave it to the two of you to fight out which name you want to use. :)<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:41:10)</span> <b>blin:</b></span> lol, yeah, exactly<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:41:43)</span> <b>blin:</b></span> the values.yaml is just the default and you are expected to modify at least some of the variables for a specific instance<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:42:38)</span> <b>blin:</b></span> we can keep it <tt>auth-token-secret</tt> but you'll have to delete the old secrets<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:43:26)</span> <b>matyas:</b></span> ok, I didn't realize I was supposed to modify _that_ one. Template could use some tweaking I guess<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:44:29)</span> <b>blin:</b></span> oh yeah, the app needs a lot of cleanup love in general but that's something we can do after the deadline :smile:<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:45:01)</span> <b>matyas:</b></span> is there a way to do <tt>slate secret delete</tt> and specify the _name_ instead of the _id_?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:45:09)</span> <b>matyas:</b></span> alternatively, can I overwrite a secret?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:45:31)</span> <b>blin:</b></span> nope, i think for instance and secret commands you need to specify the ID<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:45:44)</span> <b>blin:</b></span> not sure if you can overwrite, you could try it ¯\_(ツ)_/¯<br/>
+<span style="color: #e85d72"><span style="font-size: small">(10:45:58)</span> <b>cnweaver:</b></span> Yes, the commands take the ID because you can have two secrets with the same name on differerent clusters.<br/>
+<span style="color: #e85d72"><span style="font-size: small">(10:46:23)</span> <b>cnweaver:</b></span> We don't currently support overwriting, although if there's a use for it we could add it.<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:47:09)</span> <b>matyas:</b></span> I want to write a script that updates a token?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:47:27)</span> <b>matyas:</b></span> without parsing the output of <tt>slate secret list</tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(10:49:31)</span> <b>marian:</b></span> :wave:<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:50:16)</span> <b>matyas:</b></span> hey Marian<br/>
+<span style="color: #e85d72"><span style="font-size: small">(10:53:16)</span> <b>cnweaver:</b></span> Hm, okay. I'll have to think about the exact ramifications of replacing the contents of a secret, but it shouldn't be hard to implement.<br/>
+<span style="color: #e85d72"><span style="font-size: small">(10:53:59)</span> <b>cnweaver:</b></span> Otherwise, we don't rcommend parsing the default <tt>slate</tt> output, but we support <tt>slate --output json</tt> for uses like that.<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:59:26)</span> <b>matyas:</b></span> don't worry, I hate parsing too :slightly_smiling_face:<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:00:28)</span> <b>matyas:</b></span> Successfully installed application open-science-ce as instance osg-covid19-open-science-ce-ce1 with ID instance_-NLA3ATN9F0<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:00:50)</span> <b>blin:</b></span> i imagine you're running into similar issues that i am<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:01:01)</span> <b>matyas:</b></span> well, I don't see a deployment on river<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:01:05)</span> <b>matyas:</b></span> if that's the issue<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:01:05)</span> <b>blin:</b></span> you can check with <tt>slate instance info ...</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(11:01:28)</span> <b>blin:</b></span> i'm working on a PR for some of the issues<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:01:51)</span> <b>blin:</b></span> one weird thing that's come up again is that the <tt>_helpers.tpl</tt> doesn't seem to be working (@cnweaver)<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:02:15)</span> <b>cnweaver:</b></span> Not working how?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:02:51)</span> <b>matyas:</b></span> says it's running for me<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:02:51)</span> <b>blin:</b></span> here's the error:<br/><pre>[2020-04-02T15:21:44Z - 2020-04-02T15:22:48Z] FailedMount: MountVolume.SetUp failed for volume "blin-condor-configuration" : configmap "blin-condor-configuration" not found (x8)</pre><br/>and the only place we reference condor-configuration is here:<br/><pre>./open-science-ce/templates/deployment.yaml\074:      - name: {{ template "open-science-ce.name" . }}-condor-configuration<br/>./open-science-ce/templates/deployment.yaml\076:          name: {{ template "open-science-ce.name" . }}-condor-configuration</pre><br/><br/>
+<span style="color: #43761b"><span style="font-size: small">(11:03:20)</span> <b>blin:</b></span> and the relevant bit of our tpl:<br/><pre>{{/*<br/>Expand the name of the chart.<br/>*/}}<br/>{{- define "open-science-ce.name" -}}<br/>{{- default .Chart.Name .Values.Instance | trunc 63 | trimSuffix "-" -}}<br/>{{- end -}}</pre><br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:04:19)</span> <b>cnweaver:</b></span> And I assume you set <tt>Instance: blin</tt>?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:05:30)</span> <b>blin:</b></span> hrm...maybe it's working now?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:05:38)</span> <b>blin:</b></span> but yeah, <tt>Instance: blin</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(11:08:03)</span> <b>blin:</b></span> upon app restart i see these errors again under <tt>Events</tt> from <tt>./slate instance info</tt><br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:08:19)</span> <b>cnweaver:</b></span> The template looks like it's behaving as expected; if <tt>.Values.Instance</tt> is set it will use that, otherwise it will use the default of <tt>.Chart.Name</tt>. You did set an Instance, so that's getting pasted together with <tt>-condor-configuration</tt><br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:08:55)</span> <b>cnweaver:</b></span> What is the configmap actually called?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:10:27)</span> <b>blin:</b></span> ah ok, i think i misunderstood the template then<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:10:41)</span> <b>blin:</b></span> because the configMap is <tt>open-science-ce-{{ .Values.Instance }}-htcondor-ce-configuration</tt><br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:11:23)</span> <b>cnweaver:</b></span> Ah yes, you'll need to construct the name in the same way in both places.<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:11:43)</span> <b>cnweaver:</b></span> Is that a bug in the original chart we gave you?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:14:58)</span> <b>blin:</b></span> i think so, i don't recall changing it from the condor-submit incubator app<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:15:16)</span> <b>blin:</b></span> oh wait, i guess we did change it<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:15:25)</span> <b>blin:</b></span> ¯\_(ツ)_/¯<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:17:07)</span> <b>cnweaver:</b></span> I think I see what happened; one of your templates was using the pattern in the osg-hosted-ce chart, and the other was like the condor-submit chart, which are different.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:17:32)</span> <b>matyas:</b></span> mine seems to be running. How can I shell into it?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:18:22)</span> <b>blin:</b></span> you have direct access to river, right? you'll have to do it via kubectl<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:18:40)</span> <b>blin:</b></span> SLATE doesn't give you shell access<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:18:44)</span> <b>matyas:</b></span> ah it's in a different namespace<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:18:47)</span> <b>cnweaver:</b></span> Indeed.<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:19:37)</span> <b>cnweaver:</b></span> I assume you didn't keep the sshd stuff from the condor-submit chart, in which case <tt>kubectl exec</tt> would be the only way.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:20:45)</span> <b>blin:</b></span> yeah, we got rid of the sssd stuff<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:20:58)</span> <b>blin:</b></span> @cnweaver could you merge this? <a href="https://github.com/slateci/slate-catalog/pull/251">https://github.com/slateci/slate-catalog/pull/251</a><br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:22:03)</span> <b>cnweaver:</b></span> Merged<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:23:35)</span> <b>matyas:</b></span> looks like I don't have the privs?<br/><pre>% kubectl exec --namespace slate-group-osg-covid19 -it open-science-ce-ce1-6d6444b65b-zcfz2 --container osg-submit bash<br/>Error from server (Forbidden): pods "open-science-ce-ce1-6d6444b65b-zcfz2" is forbidden: User "osg-covid19" cannot create resource "pods/exec" in API group "" in the namespace "slate-group-osg-covid19"</pre><br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:24:16)</span> <b>cnweaver:</b></span> Yeah, it looks like Lincoln gave you rights to another namespace to play around in, but not your namespace allocated by SLATE.<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:24:31)</span> <b>cnweaver:</b></span> We can tweak the RBAC to allow this.<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:25:37)</span> <b>cnweaver:</b></span> One thing I would note is that you might not want to be deploying through SLATE at an early stage of development like this, since it puts you under the full access restrictions, makes you submit changes to our catalog, etc.<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:27:57)</span> <b>lincoln:</b></span> sorry, been heads down in something else<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:27:59)</span> <b>lincoln:</b></span> that is correct<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:28:15)</span> <b>lincoln:</b></span> your namespace on RIVER for interactive deployments is <tt>osg-covid19</tt> while SLATE is in the namespace <tt>slate-group-osg-covid19</tt><br/>
+<span style="color: #e96699"><span style="font-size: small">(11:28:19)</span> <b>lincoln:</b></span> but we can definitely open up the RBAC<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:28:31)</span> <b>blin:</b></span> do you have helm installed on river so mat can you use it?<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:28:39)</span> <b>lincoln:</b></span> helm3 doesnt need to be installed<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:28:46)</span> <b>lincoln:</b></span> there's no serverside component anymore<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:29:40)</span> <b>cnweaver:</b></span> (Even with helm 2 you would have been free to put tiller in your own namespace, but helm 3 is much nicer in this regard.)<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:31:08)</span> <b>matyas:</b></span> maybe we should run this in osgcc for now, then?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:31:17)</span> <b>matyas:</b></span> We still need to figure out the networking issue<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:31:28)</span> <b>blin:</b></span> i'd use river + helm there<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:32:38)</span> <b>blin:</b></span> there are some potential network issues on osgcc<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:33:04)</span> <b>matyas:</b></span> we couldn't get the network working on river either<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:33:06)</span> <b>lincoln:</b></span> whenever we're ready to start troubleshooting I'll set aside time<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:36:51)</span> <b>blin:</b></span> @matyas the open-science-ce in master is broken. this commit fixes it so you should apply this locally: <a href="https://github.com/brianhlin/slate-catalog/commit/ef6ede3f40fbe7fe1b859859cb3d72c674a6af56">https://github.com/brianhlin/slate-catalog/commit/ef6ede3f40fbe7fe1b859859cb3d72c674a6af56</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(11:37:21)</span> <b>blin:</b></span> (i'm in the middle of some work so I'm not ready to submit the PR yet)<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:37:34)</span> <b>matyas:</b></span> ah I see<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:49:00)</span> <b>lincoln:</b></span> are things in a state where i can dive into this in the next hour and try to get the networking debugged?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:01:29)</span> <b>matyas:</b></span> not yet<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:05:03)</span> <b>blin:</b></span> higher prio class in k8s = better prio, right?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:06:12)</span> <b>blin:</b></span> and my init containers are stuck in PodInitializing -- is there a way to figure out why?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:16:47)</span> <b>matyas:</b></span> kubectl describe pod<br/>
+<span style="color: #e85d72"><span style="font-size: small">(12:17:47)</span> <b>cnweaver:</b></span> It doesn't seem to have much to say about it?<br/>
+<span style="color: #e85d72"><span style="font-size: small">(12:18:02)</span> <b>cnweaver:</b></span> There is still some <tt>MountVolume.SetUp failed for volume "open-science-ce-ce1-configuration" : configmap "open-science-ce-ce1-configuration" not found</tt>, though.<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:19:04)</span> <b>blin:</b></span> yeah, <tt>kubectl describe pod</tt> doesn't give me anything interesting :disappointed:<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:19:31)</span> <b>blin:</b></span> oh wait nvm!<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:20:32)</span> <b>matyas:</b></span> yeah in some places we call that <tt>open-science-ce-{{.Values.Instance}}-configuration</tt> and some places <tt>open-science-ce-{{.Values.Instance}}-condor-configuration</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(12:20:37)</span> <b>matyas:</b></span> in the deployment<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:24:00)</span> <b>matyas:</b></span> <a href="https://github.com/matyasselmeci/slate-catalog/commit/3531ad8c8dc3bc5ccf877e37d5dbefd26fb69257">https://github.com/matyasselmeci/slate-catalog/commit/3531ad8c8dc3bc5ccf877e37d5dbefd26fb69257</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:36:20)</span> <b>blin:</b></span> PR incoming that fixes all of that<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:37:13)</span> <b>blin:</b></span> <a href="https://github.com/slateci/slate-catalog/pull/252">https://github.com/slateci/slate-catalog/pull/252</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(12:48:35)</span> <b>matyas:</b></span> ok, so I have a thing up and running on river using osg-covid19 namespace and the helm chart<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:51:03)</span> <b>lincoln:</b></span> :thumbsup:<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:51:09)</span> <b>lincoln:</b></span> but no networky?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:51:52)</span> <b>matyas:</b></span> yeah<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:52:02)</span> <b>matyas:</b></span> <pre>% kubectl get service<br/>NAME                  TYPE           CLUSTER-IP     EXTERNAL-IP       PORT(S)                                      AGE<br/>open-science-ce-ce1   LoadBalancer   10.109.47.92   192.170.236.216   9619:31478/TCP,9618:30820/TCP,80:30838/TCP   3m27s</pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(13:09:43)</span> <b>lincoln:</b></span> alright<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:09:45)</span> <b>blin:</b></span> it looks like the condor uid/gid aren't static<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:10:03)</span> <b>lincoln:</b></span> do you want to leave that one running, or should i fire up my own copy?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:11:00)</span> <b>matyas:</b></span> whichever's easier<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:12:27)</span> <b>matyas:</b></span> you can get the values I'm using from <a href="https://pages.cs.wisc.edu/~matyas/k8s.tar.gz">https://pages.cs.wisc.edu/~matyas/k8s.tar.gz</a> , in <tt>slate/ce1.values.yaml</tt><br/>
+<span style="color: #de5f24"><span style="font-size: small">(13:18:48)</span> <b>tiradani:</b></span> The online docs for selecting covid-19 work say to set <tt>set_AcctGroup = "covid19";</tt> but it appears that if you use <tt>/etc/osg/uid_table.txt</tt> or <tt>/etc/osg/extattr_table.txt</tt> the job router will overwrite the accounting group.  Is that expected?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(13:19:10)</span> <b>tiradani:</b></span> looking at <a href="https://opensciencegrid.org/docs/compute-element/covid-19/">https://opensciencegrid.org/docs/compute-element/covid-19/</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:20:33)</span> <b>blin:</b></span> hrm, the router defaults have <tt>eval_set_AccountingGroup</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:20:40)</span> <b>blin:</b></span> i thought AcctGroup played nicely with it<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:21:03)</span> <b>blin:</b></span> could you send your routes + your uid_table.txt and extattr_table.txt?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(13:21:56)</span> <b>tiradani:</b></span> here?  or email?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(13:22:18)</span> <b>tiradani:</b></span> I’ll tar them and email them<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:23:40)</span> <b>blin:</b></span> :+1:<br/>
+<span style="color: #de5f24"><span style="font-size: small">(13:25:31)</span> <b>tiradani:</b></span> also, I don’t know if it matters or not, the CE is still an OSG 3.4 CE.  We are in the middle of the 3.4 -&gt; 3.5 migration but haven’t gotten to the CE’s yet.<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(14:28:21)</span> <b>blin:</b></span> hey i'm just getting around to looking at the route<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:29:33)</span> <b>blin:</b></span> i see that you're using <tt>eval_set_AccountingGroup</tt> in the COVID route<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:29:57)</span> <b>blin:</b></span> did you start using that when <tt>set_AcctGroup</tt> didn't work?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:48:07)</span> <b>blin:</b></span> i was able to reproduce it<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:48:07)</span> <b>blin:</b></span> fixing<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:48:30)</span> <b>tiradani:</b></span> sorry, didn’t see this thread… we started with <tt>set_AcctGroup</tt><br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:50:06)</span> <b>tiradani:</b></span> the <tt>eval_</tt> statement was our workaround<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:50:58)</span> <b>blin:</b></span> yup, that's the way to do it<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:51:07)</span> <b>blin:</b></span> thanks for pointing that out<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:51:17)</span> <b>blin:</b></span> we even had a discussion about it in the original PR but chose the wrong one :anguished:<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:52:08)</span> <b>tiradani:</b></span> ok, no problem!  just wanted to make sure we were doing the correct thing and the docs were correct!<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:52:13)</span> <b>tiradani:</b></span> thank you!<br/>
+</blockquote>
+<span style="color: #43761b"><span style="font-size: small">(13:26:20)</span> <b>blin:</b></span> what version of condor are you on?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(13:27:14)</span> <b>tiradani:</b></span> 8.8.8<br/>
+<span style="color: #de5f24"><span style="font-size: small">(13:28:26)</span> <b>tiradani:</b></span> email sent<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:29:02)</span> <b>lincoln:</b></span> ok had a minor fire to put out, im looking at this now Mat<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:29:42)</span> <b>matyas:</b></span> no worries<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:26:30)</span> <b>matyas:</b></span> @lincoln any luck?<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:26:44)</span> <b>lincoln:</b></span> sorry, other fires came up :disappointed: ive got a tmux window open for it :slightly_smiling_face:<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:27:01)</span> <b>lincoln:</b></span> my suspicion was that the service is somehow detached from the deployment<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:28:00)</span> <b>lincoln:</b></span> so<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:28:05)</span> <b>lincoln:</b></span> bash-5.0# nmap 192.168.37.193 -p 9618<br/>Starting Nmap 7.80 ( <a href="https://nmap.org">https://nmap.org</a> ) at 2020-04-02 19:27 UTC<br/>Nmap scan report for 192-168-37-193.open-science-ce-ce1.osg-covid19.svc.cluster.local (192.168.37.193)<br/>Host is up (0.00038s latency).<br/><br/>PORT     STATE SERVICE<br/>9618/tcp open  condor<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:28:11)</span> <b>lincoln:</b></span> that's the .. pod's IP<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:28:47)</span> <b>lincoln:</b></span> the cluster IP is 10.109.47.92<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:29:57)</span> <b>lincoln:</b></span> <pre>[root@river-c001 ~]# kubectl get service -n osg-covid19<br/>NAME                  TYPE           CLUSTER-IP     EXTERNAL-IP       PORT(S)                                      AGE<br/>open-science-ce-ce1   LoadBalancer   10.109.47.92   192.170.236.216   9619:31478/TCP,9618:30820/TCP,80:30838/TCP   104m<br/><br/>bash-5.0# nmap 10.109.47.92 -p 9618<br/>Starting Nmap 7.80 ( <a href="https://nmap.org">https://nmap.org</a> ) at 2020-04-02 19:29 UTC<br/>Nmap scan report for open-science-ce-ce1.osg-covid19.svc.cluster.local (10.109.47.92)<br/>Host is up (0.00024s latency).<br/><br/>PORT     STATE    SERVICE<br/>9618/tcp filtered condor<br/><br/>Nmap done: 1 IP address (1 host up) scanned in 0.41 seconds<br/>bash-5.0# nmap 192.170.236.216 -p 9618<br/>Starting Nmap 7.80 ( <a href="https://nmap.org">https://nmap.org</a> ) at 2020-04-02 19:29 UTC<br/>Nmap scan report for open-science-ce-ce1.osg-covid19.svc.cluster.local (192.170.236.216)<br/>Host is up (0.00024s latency).<br/><br/>PORT     STATE    SERVICE<br/>9618/tcp filtered condor</pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(14:39:41)</span> <b>lincoln:</b></span> OK @matyas I see the problem with another service, so indeed it's probably iptables screwyness. I'm trying to fix now<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:41:37)</span> <b>lincoln:</b></span> flushing the firewall fixed it on my test instance<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:41:46)</span> <b>lincoln:</b></span> (well, my test instance of grafana using the load balancer)<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:41:56)</span> <b>lincoln:</b></span> anyhow let me try this on your running one, if that works ill go through and restart them all one by one<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:17:05)</span> <b>lincoln:</b></span> im doing a rolling restart.. will take a bit of time<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:17:14)</span> <b>lincoln:</b></span> over halfway done tho<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:20:00)</span> <b>matyas:</b></span> in the meantime, what's the IP I should give to @rynge to add to his whitelist? the LoadBalancer ip, 192.170.236.216?<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:21:05)</span> <b>lincoln:</b></span> yeah lets roll with .216<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:24:17)</span> <b>matyas:</b></span> Mats, can you add that?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:44:41)</span> <b>blin:</b></span> @matyas are you settled on using 192.170.236.216?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:45:29)</span> <b>matyas:</b></span> I put that in Networking.RequestIP<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:45:38)</span> <b>blin:</b></span> cool, i'll update the A record for that<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:46:10)</span> <b>blin:</b></span> i've gotten pretty far on the CE bits<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:46:17)</span> <b>matyas:</b></span> as long as we run it on river, we can get that IP regardless of whether we run it through SLATE or not, right?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:46:23)</span> <b>matyas:</b></span> yeah I saw all your commits<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:46:52)</span> <b>blin:</b></span> but i'm running into submission failures because of reverse lookup issues<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:47:06)</span> <b>lincoln:</b></span> right i think so<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:47:13)</span> <b>lincoln:</b></span> so we do need reverse lookup?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:47:39)</span> <b>blin:</b></span> i think we do. let's try it out on river first<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:47:47)</span> <b>blin:</b></span> i suspect reverse lookup at least<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:48:10)</span> <b>blin:</b></span> i'm using an IP address that's got records in the OSG and CHTC DNS<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:48:50)</span> <b>blin:</b></span> and when I use <tt>condor_ce_trace</tt> against the OSG FQDN, it complains it can't find the CHTC FQDN in the CE collector :anguished:<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:49:05)</span> <b>blin:</b></span> could just be a limitation of <tt>condor_ce_trace</tt> though<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:57:18)</span> <b>matyas:</b></span> I just noticed the schedd can't open job_queue.log in the submit container because of the condor userid thing<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:58:33)</span> <b>matyas:</b></span> we should standardize the condor user in our containers<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:59:13)</span> <b>blin:</b></span> yup, i did that for both the submit and CE container<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:59:28)</span> <b>blin:</b></span> though there is one issue with the chart that prevents you from getting the latest CE container :anguished:<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:59:40)</span> <b>matyas:</b></span> the imagePullPolicy?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:00:01)</span> <b>blin:</b></span> sorta. we're pulling the wrong image for one of the init containers<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:00:06)</span> <b>blin:</b></span> PR incoming<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:00:31)</span> <b>blin:</b></span> err, that is if github wants to cooperate =/<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:01:16)</span> <b>matyas:</b></span> is the PR for slate-catalog? maybe I can try it out locally<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:01:32)</span> <b>blin:</b></span> yeah<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:01:36)</span> <b>blin:</b></span> <pre>Author:     Brian Lin &lt;<a href="mailto:brianhlin@gmail.com">brianhlin@gmail.com</a>&gt;<br/>AuthorDate: Thu Apr 2 15:05:27 2020 -0500<br/>Commit:     Brian Lin &lt;<a href="mailto:brianhlin@gmail.com">brianhlin@gmail.com</a>&gt;<br/>CommitDate: Thu Apr 2 15:05:46 2020 -0500<br/><br/>Parent:     85dbf40 Merge pull request #252 from brianhlin/open-science-ce.add-queue-superuser<br/>Merged:     SOFTWARE-3960.only-support-single-remote master open-science-ce.add-queue-superuser<br/>Contained:  open-science-ce.use-htcondor-ce-container<br/><br/>Use HTCondor-CE container for the logging sidecar<br/><br/>1 file changed, 1 insertion(+), 1 deletion(-)<br/>incubator/open-science-ce/open-science-ce/templates/deployment.yaml | 2 +-<br/><br/>modified   incubator/open-science-ce/open-science-ce/templates/deployment.yaml<br/>@@ -81,7 +81,7 @@ spec:<br/>           mountPath: /var/lib/condor/spool<br/>       {{ if .Values.HTTPLogger.Enabled }}<br/>       - name: logging-sidecar-init<br/>-        image: opensciencegrid/hosted-ce:fresh<br/>+        image: opensciencegrid/htcondor-ce:fresh<br/>         imagePullPolicy: Always<br/>         command: ['/bin/chown','condor:condor','/var/log/condor-ce']<br/>         volumeMounts:</pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(16:02:19)</span> <b>lincoln:</b></span> just FYI- github seems to be busted at the moment<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:02:21)</span> <b>lincoln:</b></span> <a href="https://www.githubstatus.com/">https://www.githubstatus.com/</a><br/>
+<span style="color: #e96699"><span style="font-size: small">(16:02:28)</span> <b>lincoln:</b></span> i know i'm certainly seeing some timeouts<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:03:30)</span> <b>blin:</b></span> yup<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:05:38)</span> <b>rynge:</b></span> @matyas More importantly than my whitelist, you need to ensure the schedd advertises its external IP. Setting <tt>NETWORK_INTERFACE = 192.170.236.216</tt> might do it<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:05:50)</span> <b>rynge:</b></span> Currently, I see:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:05:53)</span> <b>rynge:</b></span> <pre>AddressV1 = "{[ p=\"primary\"; a=\"192.168.37.200\"; port=9618; n=\"Internet\"; alias=\"open-science-ce-ce1-6fb55c687b-pkhpq\"; spid=\"schedd_501_3909_3\"; noUDP=true; ], [ p=\"IPv4\"; a=\"192.168.37.200\"; port=9618; n=\"Internet\"; alias=\"open-science-ce-ce1-6fb55c687b-pkhpq\"; spid=\"schedd_501_3909_3\"; noUDP=true; ]}"</pre><br/><br/>
+<span style="color: #c386df"><span style="font-size: small">(16:07:50)</span> <b>matyas:</b></span> ok, I'll try that by hand. @blin, if that works, can you do the helm template voodoo to put that in the condor config if Networking.RequestIP is set?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:08:07)</span> <b>blin:</b></span> sure<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:11:32)</span> <b>blin:</b></span> i don't think <tt>NETWORK_INTERFACE</tt> is what we want, though?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:11:37)</span> <b>blin:</b></span> because the container isn't aware of that IP<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:12:11)</span> <b>rynge:</b></span> Ok, I thought that is what I did last time on Amazon, but I might be wrong<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:12:30)</span> <b>blin:</b></span> i feel like there's another knob that we want, one sec<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:15:01)</span> <b>blin:</b></span> i think we want <tt>TCP_FORWARDING_HOST</tt><br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:16:31)</span> <b>rynge:</b></span> Ah, that sounds familiar!<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:17:09)</span> <b>rynge:</b></span> Try that and let me know when you have restarted, and I will check the collector again<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:17:52)</span> <b>blin:</b></span> quick, someone merge before github craps the bed again! <a href="https://github.com/slateci/slate-catalog/pull/253">https://github.com/slateci/slate-catalog/pull/253</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(16:19:18)</span> <b>matyas:</b></span> that breaks condor_q<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:19:41)</span> <b>matyas:</b></span> actually it breaks talking to the master<br/>
+<span style="color: #e85d72"><span style="font-size: small">(16:19:51)</span> <b>cnweaver:</b></span> So you don't want it merged?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:19:58)</span> <b>matyas:</b></span> yeah let's not<br/>
+<span style="color: #e85d72"><span style="font-size: small">(16:20:07)</span> <b>cnweaver:</b></span> Okay<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:20:17)</span> <b>matyas:</b></span> # condor_q<br/><br/>-- Failed to fetch ads from: &lt;192.168.17.214:36447?alias=open-science-ce-ce1-6b54666bbb-cn2wg&gt; : open-science-ce-ce1-6b54666bbb-cn2wg<br/>SECMAN:2007:Failed to end classad message.<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:20:32)</span> <b>matyas:</b></span> 192.168.17.214 is _not_ the external IP I defined<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:21:09)</span> <b>matyas:</b></span> ... it's the ip for eth0<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:22:14)</span> <b>blin:</b></span> what breaks condor_q exactly?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:22:40)</span> <b>matyas:</b></span> TCP_FORWARDING_HOST<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:22:50)</span> <b>blin:</b></span> try <tt>NETWORK_INTERFACE</tt> instead i guess?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:23:07)</span> <b>matyas:</b></span> no that breaks too<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:23:44)</span> <b>matyas:</b></span> _then_ it tries to connect to the external IP but the container isn't aware of it<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:23:48)</span> <b>blin:</b></span> if you're running condor_q locally, i would expect it to try to talk over eth0<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:24:06)</span> <b>matyas:</b></span> it also breaks condor_restart<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:24:40)</span> <b>blin:</b></span> i would ping greg on this<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:25:59)</span> <b>rynge:</b></span> Did you do a full restart?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:26:13)</span> <b>rynge:</b></span> I'm surprised by the IP in <tt>- Failed to fetch ads from: &lt;192.168.17.214:36447?alias=open ...</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(16:26:37)</span> <b>matyas:</b></span> yeah I killed the master<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:29:01)</span> <b>rynge:</b></span> Not sure - I would look at the MasterLog and see if there is anything interesting in there<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:29:40)</span> <b>rynge:</b></span> I probably won't be helpful here though - so maybe wait for Greg<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:29:49)</span> <b>blin:</b></span> also ping greg, because i'm sure he's solved this before<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:40:56)</span> <b>lincoln:</b></span> doesn't this work in Chris's submit host?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:45:30)</span> <b>blin:</b></span> i'm not sure how, honestly<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:46:43)</span> <b>lincoln:</b></span> paging doctor @cnweaver<br/>
+<span style="color: #e85d72"><span style="font-size: small">(16:48:47)</span> <b>cnweaver:</b></span> Hm, let me see if I can wrap my head around what's going on here.<br/>
+<span style="color: #e85d72"><span style="font-size: small">(16:49:36)</span> <b>cnweaver:</b></span> Which daemons are in this particular container?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:49:55)</span> <b>matyas:</b></span> ok, I think this combination worked:<br/><pre>TCP_FORWARDING_HOST = 192.170.236.216<br/>PRIVATE_NETWORK_NAME = $(UID_DOMAIN)<br/>PRIVATE_NETWORK_INTERFACE = $(IP_ADDRESS)</pre><br/><br/>
+<span style="color: #c386df"><span style="font-size: small">(16:50:08)</span> <b>matyas:</b></span> where .236.216 is the LoadBalancer IP<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:51:42)</span> <b>rynge:</b></span> Hmm, I don't see it registering<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:52:35)</span> <b>rynge:</b></span> <tt>128.135.158.240</tt> &lt;--- @lincoln is that yours?<br/>
+<span style="color: #e85d72"><span style="font-size: small">(16:52:37)</span> <b>cnweaver:</b></span> I never used any fancy settings like that; however, I also never used LoadBalancer.<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:52:41)</span> <b>lincoln:</b></span> Yes<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:52:48)</span> <b>lincoln:</b></span> i mean, that's one of our IPs.<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:52:51)</span> <b>lincoln:</b></span> not RIVER though<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:53:10)</span> <b>rynge:</b></span> Ok, somehting is registered as <tt>localhost</tt> from that IP<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:53:18)</span> <b>lincoln:</b></span> hrm, ok<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:53:22)</span> <b>lincoln:</b></span> i will check it out<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:53:35)</span> <b>lincoln:</b></span> ah, that's <tt>connect-provisioner-test</tt> :slightly_smiling_face:<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:53:48)</span> <b>lincoln:</b></span> i stopped condor on it<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:54:02)</span> <b>rynge:</b></span> Looks like it has the hold multi-schedd config as well<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:54:14)</span> <b>lincoln:</b></span> that node is in a.. strange state.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:57:18)</span> <b>rynge:</b></span> @matyas Ok, anything in the logs now about reporting to <a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a>?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:58:22)</span> <b>matyas:</b></span> nope<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:59:45)</span> <b>matyas:</b></span> 04/02/20 21:58:58 Will use TCP to update collector <a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a> &lt;192.170.227.251:9618?alias=<a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a>&gt;<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:01:17)</span> <b>rynge:</b></span> What about the SchedLog?<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:01:48)</span> <b>matyas:</b></span> that is the schedlog<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:03:21)</span> <b>matyas:</b></span> I submitted a job and saw this:<br/><pre>04/02/20 22:02:23 Attempting to send update via TCP to collector <a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a> &lt;192.170.227.251:9618?alias=<a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a>&gt;<br/>04/02/20 22:02:23 Sent ad to flocked collector <a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a> for submituser@open-science-ce-ce1-6b54666bbb-cn2wg Hit=1 Tot=1 Idle=1 Run=0</pre><br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:04:07)</span> <b>rynge:</b></span> Ok, now I see it!<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:04:52)</span> <b>rynge:</b></span> IP looks good!<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:05:11)</span> <b>rynge:</b></span> <pre>$ telnet 192.170.236.216 9618<br/>Trying 192.170.236.216...<br/>telnet: connect to address 192.170.236.216: Connection refused</pre><br/><br/>
+<span style="color: #c386df"><span style="font-size: small">(17:05:41)</span> <b>matyas:</b></span> @lincoln?<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:05:49)</span> <b>lincoln:</b></span> :confused:<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:05:54)</span> <b>lincoln:</b></span> well, connection refused is new.<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:06:02)</span> <b>lincoln:</b></span> something is actively saying 'no' :slightly_smiling_face:<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:06:13)</span> <b>lincoln:</b></span> rather than the packets just being dropped<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:06:37)</span> <b>lincoln:</b></span> I need to write down some notes from what I was working on just now but let me look here in a min<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:07:00)</span> <b>rynge:</b></span> Other than that things looks better. The negotiator is trying to schedule your jobs<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:07:05)</span> <b>rynge:</b></span> <pre>04/02/20 17:05:56     Failed to connect to submituser@open-science-ce-ce1-6b54666bbb-cn2wg (&lt;192.170.236.216:9618?PrivAddr=%3c192.168.17.214:9618%3fsock%3dschedd_999_cf33_3%3e&amp;PrivNet=open-science-ce-ce1-6b54666bbb-cn2wg&amp;addrs=192.170.236.216-9618&amp;alias=open-science-ce-ce1-6b54666bbb-cn2wg&amp;noUDP&amp;sock=schedd_999_cf33_3&gt;)</pre><br/><br/>
+<span style="color: #c386df"><span style="font-size: small">(17:07:51)</span> <b>matyas:</b></span> btw should I be able to ping the external IP from within the container?<br/>
+<span style="color: #e85d72"><span style="font-size: small">(17:09:46)</span> <b>cnweaver:</b></span> I'm not sure if ping will work with all of the network magic going on.<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:11:27)</span> <b>matyas:</b></span> I get 'no route to host' when I try telnet to 9618<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:11:55)</span> <b>blin:</b></span> interesting. telnet on 9619 works ok<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:12:07)</span> <b>matyas:</b></span> from which container?<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:12:56)</span> <b>matyas:</b></span> ... wait, it works from mine too<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:12:58)</span> <b>matyas:</b></span> wtf??<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:13:14)</span> <b>lincoln:</b></span> you shouldn't be able to ping<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:13:29)</span> <b>lincoln:</b></span> icmp is not web 3.0!!! aaahhhhh!!!<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:13:40)</span> <b>lincoln:</b></span> you need gRPC!! or something!!<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:14:22)</span> <b>lincoln:</b></span> <pre><br/>[17:14] <a href="http://uct2-int.mwt2.org">uct2-int.mwt2.org</a>:~ $ nmap 192.170.236.216 -p 9618,9619,80 -Pn<br/><br/>Starting Nmap 6.40 ( <a href="http://nmap.org">http://nmap.org</a> ) at 2020-04-02 17:14 CDT<br/>Nmap scan report for 192.170.236.216<br/>Host is up (0.00036s latency).<br/>PORT     STATE  SERVICE<br/>80/tcp   closed http<br/>9618/tcp closed condor<br/>9619/tcp open   unknown</pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(17:14:40)</span> <b>lincoln:</b></span> so those ports are not listening but they aren't dropped, either.<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:17:36)</span> <b>lincoln:</b></span> maybe 80 is intentionally closed?<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:17:41)</span> <b>lincoln:</b></span> I assume that's for Let's Encrypt challenges<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:18:48)</span> <b>matyas:</b></span> isn't that our logging sidecar?<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:19:49)</span> <b>lincoln:</b></span> no, that's 8080<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:20:26)</span> <b>lincoln:</b></span> OK, in your yaml<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:20:30)</span> <b>lincoln:</b></span> I don't see anything that looks like this<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:21:06)</span> <b>lincoln:</b></span> <pre>ports:<br/>  containerPort: 9618<br/>  name: htcondor<br/>  protocol: TCP</pre><br/><br/>
+<span style="color: #43761b"><span style="font-size: small">(17:21:29)</span> <b>blin:</b></span> aha!<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:21:37)</span> <b>lincoln:</b></span> You've exposed 8080 for the logging sidecar (but no associated Service object for that)<br/>and you've exposed 9619 + 80 for the CE<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:21:38)</span> <b>blin:</b></span> good catch!<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:22:15)</span> <b>lincoln:</b></span> I try to balance the snark and actual usefulness in equal measure :slightly_smiling_face:<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:24:19)</span> <b>blin:</b></span> though i feel like it'd be nice if we didn't have to advertise that port to the world<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:28:44)</span> <b>matyas:</b></span> hm. Now I can't auth to <a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(17:30:26)</span> <b>blin:</b></span> with a load balancer, is there no other IP that containers can use to talk to each other within a pod?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:32:51)</span> <b>rynge:</b></span> @matyas Error?<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:33:21)</span> <b>matyas:</b></span> <pre>04/02/20 22:32:13 Will return to DC to continue authentication..<br/>04/02/20 22:32:13 PASSWORD: entered authenticate_continue, state==100<br/>04/02/20 22:32:13 PW: Server receiving 1.<br/>04/02/20 22:32:13 Received: -1, 0(), 0<br/>04/02/20 22:32:13 PW: Server received ERROR from client, propagating<br/>04/02/20 22:32:13 PW: Server sending.<br/>04/02/20 22:32:13 In server_send: -1.04/02/20 22:32:13 Server send '', '', 0 0 0<br/>04/02/20 22:32:13 PASSWORD: leaving authenticate_continue, state==101, return=204/02/20 22:32:13 AUTHENTICATE: auth would still block<br/>04/02/20 22:32:13 Will return to DC to continue authentication..<br/>04/02/20 22:32:13 PASSWORD: entered authenticate_continue, state==101<br/>04/02/20 22:32:13 PW: Server receiving 2.<br/>04/02/20 22:32:13 Error from client.<br/>04/02/20 22:32:13 PASSWORD: leaving authenticate_continue, state==101, return=0<br/>04/02/20 22:32:13 AUTHENTICATE: do_authenticate is 0.<br/>04/02/20 22:32:13 AUTHENTICATE: method -1 (TOKEN) failed.<br/>04/02/20 22:32:13 AUTHENTICATE: can still try these methods: FS,TOKEN<br/>04/02/20 22:32:13 HANDSHAKE: in handshake(my_methods = 'FS,TOKEN')<br/>04/02/20 22:32:13 HANDSHAKE: handshake() - i am the server<br/>04/02/20 22:32:13 HANDSHAKE: client sent (methods == 0)<br/>04/02/20 22:32:13 HANDSHAKE: i picked (method == 0)<br/>04/02/20 22:32:13 HANDSHAKE: client received (method == 0)<br/>04/02/20 22:32:13 AUTHENTICATE: no available authentication methods succeeded!<br/>04/02/20 22:32:13 DC_AUTHENTICATE: required authentication of 192.170.227.251 failed: AUTHENTICATE:1003:Failed to authenticate with any method|AUTHENTICATE:1004:Failed to authenticate using TOKEN|AUTHENTICATE:1004:Failed to authenticate using FS|FS:1004:Unable to lstat(/tmp/FS_XXX627NM5)</pre><br/>
+<span style="color: #e85d72"><span style="font-size: small">(17:34:10)</span> <b>cnweaver:</b></span> @blin You should still get a cluster IP which you can use within the cluster only.<br/>
+<span style="color: #e85d72"><span style="font-size: small">(17:34:32)</span> <b>cnweaver:</b></span> On the other hand, the LoadBalancer IP is public, so what would stop you from using it?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:35:36)</span> <b>blin:</b></span> ah well i was going to see that we don't need 9618 open to the world but that may not be the case for the startd's reporting back to the submit host<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:37:00)</span> <b>rynge:</b></span> I see some "key already exists" messages<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:37:12)</span> <b>rynge:</b></span> I suspect it is just a leftover<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:37:50)</span> <b>rynge:</b></span> It looks like it is the negotiator causing those errors<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:38:25)</span> <b>rynge:</b></span> <pre>04/02/20 17:38:08 SECMAN: failed to create session &lt;192.170.236.216:9618?PrivAddr=%3c192.168.35.156:9618%3fsock%3dschedd_568_2de2_3%3e&amp;PrivNet=open-science-ce-ce1-5bd796976b-drplh&amp;addrs=192.170.236.216-9618&amp;alias=open-science-ce-ce1-5bd796976b-drplh&amp;noUDP&amp;sock=schedd_568_2de2_3&gt;#1585866288#18 (key already exists).</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:39:17)</span> <b>rynge:</b></span> Maybe just wait a registration cycle and see if that key gets refreshed<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:43:10)</span> <b>matyas:</b></span> Here's the most recent attempt<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:48:29)</span> <b>blin:</b></span> these seem like the relevant buts but i'm not sure what they mean<br/><pre>04/02/20 22:41:03 AUTHENTICATE: will try to use 2048 (TOKEN)<br/>04/02/20 22:41:03 AUTHENTICATE: do_authenticate is 1.<br/>04/02/20 22:41:03 PW.<br/>04/02/20 22:41:03 Will return to DC to continue authentication..<br/>04/02/20 22:41:03 PASSWORD: entered authenticate_continue, state==100<br/>04/02/20 22:41:03 PW: Server receiving 1.<br/>04/02/20 22:41:03 Received: -1, 0(), 0<br/>04/02/20 22:41:03 PW: Server received ERROR from client, propagating<br/>04/02/20 22:41:03 PW: Server sending.<br/>04/02/20 22:41:03 In server_send: -1.<br/>04/02/20 22:41:03 Server send '', '', 0 0 0<br/>04/02/20 22:41:03 PASSWORD: leaving authenticate_continue, state==101, return=2<br/>04/02/20 22:41:03 AUTHENTICATE: auth would still block<br/>04/02/20 22:41:03 Will return to DC to continue authentication..<br/>04/02/20 22:41:03 PASSWORD: entered authenticate_continue, state==101<br/>04/02/20 22:41:03 PW: Server receiving 2.<br/>04/02/20 22:41:03 Error from client.<br/>04/02/20 22:41:03 PASSWORD: leaving authenticate_continue, state==101, return=0<br/>04/02/20 22:41:03 AUTHENTICATE: do_authenticate is 0.<br/>04/02/20 22:41:03 AUTHENTICATE: method -1 (TOKEN) failed.</pre><br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:48:35)</span> <b>rynge:</b></span> Do you have <tt>SEC_ENABLE_MATCH_PASSWORD_AUTHENTICATION</tt> set to true?<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:50:18)</span> <b>matyas:</b></span> here's all the SEC stuff<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:53:25)</span> <b>blin:</b></span> so yes<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:55:37)</span> <b>rynge:</b></span> Can you show me your actual config files?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:56:43)</span> <b>rynge:</b></span> One difference is that we do have mutual tokens for OSG Connect (flock can query the connect schedds), but I'm fairly sure BrianB told me that was not necessary<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:56:54)</span> <b>rynge:</b></span> @bbockelm Right?<br/>
+</body>
+</html>

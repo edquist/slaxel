@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Aug 16, 2021 : #operations (chtc)</title>
+</head>
+<body>
+<h3>Mon Aug 16, 2021 : #operations (chtc)</h3>
+<span style="color: #e7392d"><span style="font-size: small">(09:56:39)</span> <b>ckoch5:</b></span> How can we see all concurrency limits set on the pool? <tt>condor_config_val -dump | grep -i concur</tt> doesn’t show any of the software ones that I think we have configured.<br/>
+<blockquote>
+<span style="color: #9f69e7"><span style="font-size: small">(09:57:07)</span> <b>lmichael:</b></span> @gthain may know?<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:04:27)</span> <b>gthain:</b></span> You'd need to run that on the cm, or point condor_config_val at that negotiator<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:05:23)</span> <b>gthain:</b></span> <pre>$ hostname<br/><a href="http://cm3000.chtc.wisc.edu">cm3000.chtc.wisc.edu</a><br/>[gthain@cm3000 ~]$ condor_config_val -dump | grep -i _limit<br/>ANSYS_LIMIT = 100<br/>ANSYS_RESEARCH_LIMIT = 20<br/>CGROUP_MEMORY_LIMIT_POLICY = none<br/>CLAIM_RECYCLING_CONSIDER_LIMITS = true<br/>COMSOL_PHYSICS_LIMIT = 2<br/>CONCURRENCY_LIMIT_DEFAULT = 2308032<br/>DAGMAN_REMOVE_JOBS_AFTER_LIMIT_CHANGE = false<br/>FASTMATCH_NEGOTIATOR.CONCURRENCY_LIMIT_DEFAULT = 1<br/>GPULAB_NEGOTIATOR.CONCURRENCY_LIMIT_DEFAULT = <br/>GPULAB_NEGOTIATOR.CONCURRENCY_LIMIT_DEFAULT_GPULAB_INTERACTIVE = 1<br/>GPULAB_NEGOTIATOR.CONCURRENCY_LIMIT_DEFAULT_GPULAB_LONG = 1<br/>GPULAB_NEGOTIATOR.CONCURRENCY_LIMIT_DEFAULT_GPULAB_MEDIUM = 10<br/>GPULAB_NEGOTIATOR.CONCURRENCY_LIMIT_DEFAULT_GPULAB_MEDIUMSHORT = 20<br/>GRIDMANAGER_JM_EXIT_LIMIT = 30<br/>JMAG_LIMIT = 80<br/>LONGJOB_LIMIT = 2000<br/>LUMERICAL_LIMIT = 3<br/>NEGOTIATOR.CONCURRENCY_LIMIT_DEFAULT = 1<br/>SEC_IMPERSONATION_TOKEN_LIMITS = <br/>SEC_TOKEN_REQUEST_LIMITS = <br/>SSEC_FTP_LIMIT = 30</pre><br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:10:48)</span> <b>ckoch5:</b></span> Ah, limit is the keyword to search for<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:10:49)</span> <b>ckoch5:</b></span> thanks<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:12:43)</span> <b>johnkn:</b></span> &lt;sigh&gt;   <tt>condor_config_val -dump _limit</tt><br/>you don't need to grep unless you want to pattern match on the value rather than the knob name.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(13:08:25)</span> <b>ckoch5:</b></span> thanks @johnkn!<br/>
+</blockquote>
+</body>
+</html>

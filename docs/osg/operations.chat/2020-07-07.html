@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jul 7, 2020 : #operations (osg)</title>
+</head>
+<body>
+<h3>Tue Jul 7, 2020 : #operations (osg)</h3>
+<span style="color: #e06b56"><span style="font-size: small">(12:40:49)</span> <b>jthiltges:</b></span> It's a minor thing, but there's some SSL intermediate issues for koji.osg: <a href="https://www.ssllabs.com/ssltest/analyze.html?d=koji.opensciencegrid.org&amp;hideResults=on">https://www.ssllabs.com/ssltest/analyze.html?d=koji.opensciencegrid.org&amp;hideResults=on</a>  @matyas<br/>The chain is out of order and could probably use the USERTrust intermediate. <a href="https://censys.io/certificates/68b9c761219a5b1f0131784474665db61bbdb109e00f05ca9f74244ee5f5f52b">https://censys.io/certificates/68b9c761219a5b1f0131784474665db61bbdb109e00f05ca9f74244ee5f5f52b</a><br/>(Yes, I'm a terrible person who uses koji directly, rather than using the osg build tools.)<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:44:58)</span> <b>matyas:</b></span> Nothing wrong with using koji directly.<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:45:12)</span> <b>matyas:</b></span> So should adding that one cert to the chain be sufficient?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:47:51)</span> <b>jthiltges:</b></span> I believe so, yes!<br/>Right now, the USERTrust one shows up as "Extra download" in the "Certification paths".<br/>And the intermediate ordering is a minor thing, and webserver dependent. Some are top down, others are bottom up. I usually just try one, and see if SSL Labs says it's wrong. :stuck_out_tongue_closed_eyes:<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:53:48)</span> <b>jthiltges:</b></span> Also, I'm trying out the <tt>hcc-el8</tt> koji target. It's building fine (thanks!), but the dist macro seems to be expanding to <tt>osg35</tt> rather than <tt>hcc</tt>.<br/><a href="http://koji.opensciencegrid.org/koji/taskinfo?taskID=317980">http://koji.opensciencegrid.org/koji/taskinfo?taskID=317980</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(16:40:24)</span> <b>matyas:</b></span> whoops, didn't see your message. Let me look...<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:48:31)</span> <b>matyas:</b></span> You'll need to build a buildsys-macros package with the appropriate macros for hcc-el8-testing<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:48:48)</span> <b>matyas:</b></span> (I don't know what those are but here's what you have for el7: <a href="https://koji.opensciencegrid.org/koji/buildinfo?buildID=5471">https://koji.opensciencegrid.org/koji/buildinfo?buildID=5471</a>)<br/>
+<span style="color: #e06b56"><span style="font-size: small">(16:49:56)</span> <b>jthiltges:</b></span> I'll give it a try. Thank you!<br/>
+</body>
+</html>

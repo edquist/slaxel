@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jun 10, 2021 : #operations (chtc)</title>
+</head>
+<body>
+<h3>Thu Jun 10, 2021 : #operations (chtc)</h3>
+<span style="color: #e7392d"><span style="font-size: small">(11:57:23)</span> <b>ckoch5:</b></span> can anyone remind me why this doesn’t work?<br/><pre>condor_status -pool <a href="http://glidein-cm.chtc.wisc.edu">glidein-cm.chtc.wisc.edu</a></pre><br/>
+<span style="color: #e7392d"><span style="font-size: small">(11:57:40)</span> <b>ckoch5:</b></span> I feel like I ran into issues querying the glidein cm before but can’t remember what they were. :stuck_out_tongue_winking_eye:<br/>
+<span style="color: #4cc091"><span style="font-size: small">(12:16:46)</span> <b>blin:</b></span> i think it technically requires GSI credentials or something<br/>
+<span style="color: #e7392d"><span style="font-size: small">(12:19:45)</span> <b>ckoch5:</b></span> :sob:<br/>
+<span style="color: #e7392d"><span style="font-size: small">(12:20:07)</span> <b>ckoch5:</b></span> I just want to see what slots we have available on the OSG so I can help someone temporarily block their jobs from running somewhere.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(12:20:19)</span> <b>ckoch5:</b></span> maybe I’ll just check from OSG Connect instead. :joy:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:23:46)</span> <b>johnkn:</b></span> Can you login to glidein-cm?  that would use FS auth.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(12:25:29)</span> <b>ckoch5:</b></span> ooh, that worked! thanks @johnkn<br/>
+<span style="color: #4cc091"><span style="font-size: small">(13:58:17)</span> <b>blin:</b></span> hey, we need to start accepting GLOW/OSG gwms pilots into the condor pool through lhcb-ce: how many cores/how much ram per core should we tell the factory to request?<br/>
+<blockquote>
+<span style="color: #4bbe2e"><span style="font-size: small">(16:26:01)</span> <b>tjslauson:</b></span> for the curious Slacker, we talked about this and settled on 1 core / 2GB RAM for now<br/>
+</blockquote>
+<span style="color: #e7392d"><span style="font-size: small">(15:54:01)</span> <b>ckoch5:</b></span> is there a way to bump an HTC homedir quota manually outside of the puppet config?<br/>
+<blockquote>
+<span style="color: #4bbe2e"><span style="font-size: small">(16:07:08)</span> <b>tjslauson:</b></span> the next place after <tt>chtcuserapp_data</tt> that you could do this is... another Puppet data source.  :wink:<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(16:08:42)</span> <b>tjslauson:</b></span> it might be possible to tell our puppets not to manage a particular quota on a case-by-case basis?  but it'd take a little bit of time for me to become more familiar with that.<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(16:08:49)</span> <b>tjslauson:</b></span> what's the use case here?<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(16:10:08)</span> <b>tjslauson:</b></span> alternatively, if you don't mind Puppet managing the quota and you just want it on a system faster, we can do that by hand.<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(16:10:16)</span> <b>tjslauson:</b></span> @ckoch5 ^^<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:32:07)</span> <b>ckoch5:</b></span> I’m changing a user’s quota permanently but want to do a quick fix now so she can copy back a software tarball from an interactive job<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(16:34:06)</span> <b>tjslauson:</b></span> for <tt>okada2</tt> on submit2?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:35:54)</span> <b>ckoch5:</b></span> yup. :grin:<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(16:39:20)</span> <b>tjslauson:</b></span> done<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(16:40:32)</span> <b>tjslauson:</b></span> they should have a little over 10G free space to do that copy now<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:41:22)</span> <b>ckoch5:</b></span> kk<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:54:06)</span> <b>ckoch5:</b></span> I think all is well. :slightly_smiling_face: thank  you<br/>
+</blockquote>
+<span style="color: #9e3997"><span style="font-size: small">(15:54:32)</span> <b>tlmiller:</b></span> Puppet controls machines _and_ admins. ;)<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:59:39)</span> <b>jcpatton:</b></span> are any of our (CHTC) execute machines behind NAT or do they all have public IPs?<br/>
+<blockquote>
+<span style="color: #4bbe2e"><span style="font-size: small">(16:05:17)</span> <b>tjslauson:</b></span> all the places running CHTC startds that I'm aware of have public IPs.  If we're running startds in any other place (i.e. containers), IDK the network config there.<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(16:05:38)</span> <b>tjslauson:</b></span> got a problematic match?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(16:09:41)</span> <b>jcpatton:</b></span> no, we have a user doing web scraping and getting rate limited<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(16:11:40)</span> <b>tjslauson:</b></span> ah.  Any chance a bunch of the scrapes are happening from slots colocated on one machine (one IP)?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(16:11:47)</span> <b>jcpatton:</b></span> yep.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(2021-06-11 10:49:11)</span> <b>ckoch5:</b></span> they could use ioheavy to land on different servers. :joy:<br/>
+<span style="color: #2b6836"><span style="font-size: small">(2021-06-11 10:50:27)</span> <b>jcpatton:</b></span> That's what I'm going with after finding first where they plan to scrape.. so we don't get campus locked out of something critical<br/>
+<span style="color: #e7392d"><span style="font-size: small">(2021-06-11 10:52:07)</span> <b>ckoch5:</b></span> fair<br/>
+</blockquote>
+</body>
+</html>

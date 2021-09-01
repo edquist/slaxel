@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jun 2, 2021 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Jun 2, 2021 : #software (osg)</h3>
+<span style="color: #a72f79"><span style="font-size: small">(13:39:53)</span> <b>andrew.melo:</b></span> Is it possible to build static versions of the xrootd client library? A quick grep -i for "static" in the various CMake files shows nothing<br/>
+<span style="color: #16569E"><span style="font-size: small">(13:59:24)</span> <b>edquist:</b></span> maybe it doesn't have an option for it; you could always try doing a <tt>export CXXFLAGS=-static</tt> before running <tt>cmake</tt> and see if that works<br/>
+<blockquote>
+<span style="color: #a72f79"><span style="font-size: small">(14:28:56)</span> <b>andrew.melo:</b></span> XRootD has C++ classes in the public API, so depending on which C++ ABI you're using, links fail. Very annoyingly, the WLCG builds use the non-standard ABI on C7, so it's just a mess. If I can pull in the XrdCl .a into my library, then the c++ abi changes are "internal" to my library and go away<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:17:32)</span> <b>bbockelm:</b></span> @andrew.melo - at least the security plugins are explicitly dlopen'd.  That means you might be able to load the client but then crash on authentication (just speculating).<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:18:23)</span> <b>andrew.melo:</b></span> My thought (?) was to link XrdCl.so statically and let the rest be standard shared libs<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:18:51)</span> <b>andrew.melo:</b></span> But if they're passing std::string around between different shared libs then I'm back in the same place....<br/>
+<span style="color: #a72f79"><span style="font-size: small">(17:06:59)</span> <b>andrew.melo:</b></span> hm ... is there a straight C wrapper around the xrootd library?<br/>
+</blockquote>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Aug 5, 2016 : #general (osg)</title>
+</head>
+<body>
+<h3>Fri Aug 5, 2016 : #general (osg)</h3>
+<span style="color: #e0a729"><span style="font-size: small">(07:12:31)</span> <b>kylegross:</b></span> @lincoln: you used the command line tools?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(08:18:57)</span> <b>bbockelm:</b></span> @lincoln: also, you owe DigiCert $10.<br/>
+<span style="color: #e0a729"><span style="font-size: small">(08:20:39)</span> <b>kylegross:</b></span> Interesting tidbit, @bbockelm , they didn’t charge us.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(08:21:02)</span> <b>bbockelm:</b></span> Ok.  @lincoln - you owe me $10, and I swear I’ll pay it to DigiCert.<br/>
+<span style="color: #e0a729"><span style="font-size: small">(08:21:07)</span> <b>kylegross:</b></span> which I found a bit shocking.<br/>
+<span style="color: #e0a729"><span style="font-size: small">(08:21:14)</span> <b>kylegross:</b></span> yeah… Lincoln owes someone some money<br/>
+<span style="color: #e96699"><span style="font-size: small">(08:49:36)</span> <b>lincoln:</b></span> Lol, okay<br/>
+<span style="color: #e96699"><span style="font-size: small">(08:49:57)</span> <b>lincoln:</b></span> This is the worst big bounty ever FYI <br/>
+<span style="color: #9e3997"><span style="font-size: small">(08:50:35)</span> <b>bbockelm:</b></span> (it’s about as fun when you report a bug, then someone assigns it to you…)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(08:50:45)</span> <b>bbockelm:</b></span> FYI - have I shown you my new shiny toy: <a href="http://singularity.lbl.gov/">http://singularity.lbl.gov/</a> ?<br/>
+<span style="color: #e96699"><span style="font-size: small">(08:52:06)</span> <b>lincoln:</b></span> I have seen this toy<br/>
+<span style="color: #e96699"><span style="font-size: small">(08:52:47)</span> <b>lincoln:</b></span> Compiled it, convertered a LXD container to a rootfs image, ran cat under singularity, declared success <br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:00:13)</span> <b>bbockelm:</b></span> So, if you pull from master, you can <tt>singularity shell /cvmfs/cernvm-prod.cern.ch/cvm3/</tt><br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:00:36)</span> <b>bbockelm:</b></span> my hope is to start getting built-in HTCondor support and ditch <tt>glexec</tt>.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:03:10)</span> <b>bbockelm:</b></span> even better, with the git master + new kernel, it doesn’t even need to be <tt>setuid</tt>.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:03:57)</span> <b>bbockelm:</b></span> You could have all your jobs chroot’d into cvmfs, using a binary distributed via cvmfs.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(09:29:34)</span> <b>tiradani:</b></span> @bbockelm: how does this help you ditch glexec?  From what I read, it merely runs as the invoking user.   You still need something like glexec to switch to the correct user.  Or am I missing something?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:29:59)</span> <b>bbockelm:</b></span> It runs as the invoking user *but* provides fairly complete isolation to the payload process.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:30:17)</span> <b>bbockelm:</b></span> Can’t access the pilot certificate, logs, see the pilot processes, etc, etc.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:30:43)</span> <b>bbockelm:</b></span> Doesn’t allow the payload to read or write to files outside its <tt>$_CONDOR_SCRATCH_DIR</tt>.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(09:31:20)</span> <b>tiradani:</b></span> got it, thanks!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:33:21)</span> <b>bbockelm:</b></span> Having the same UID - but keeping separation - helps the pilot immensely in cleanup (can <tt>SIGKILL</tt> the payload, for example) of files and processes.  It also means that pool accounts are not needed on the worker node and the worker node doesn’t need to interact with GUMS.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(09:35:43)</span> <b>tiradani:</b></span> all very attractive features<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(10:19:01)</span> <b>kherner:</b></span> Yes, lots to like there<br/>
+</body>
+</html>

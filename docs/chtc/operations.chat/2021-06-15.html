@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jun 15, 2021 : #operations (chtc)</title>
+</head>
+<body>
+<h3>Tue Jun 15, 2021 : #operations (chtc)</h3>
+<span style="color: #e7392d"><span style="font-size: small">(11:53:48)</span> <b>ckoch5:</b></span> the quota command is taking a long time to return on submit3…<br/>
+<blockquote>
+<span style="color: #4bbe2e"><span style="font-size: small">(12:46:26)</span> <b>tjslauson:</b></span> I've run out of time to look at this for now, but I saw an error or two that made it seem like there could be an open file count problem?  when I went for a closer look, <tt>lsof</tt> wasn't responding (quickly).<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(12:46:52)</span> <b>tjslauson:</b></span> I did a quick <tt>find</tt> over <tt>/proc</tt> for open file descriptors, which suggested 5 digits of open files... that doesn't seem like too big a problem? ¯\_(ツ)_/¯<br/>
+</blockquote>
+<span style="color: #4bbe2e"><span style="font-size: small">(13:24:07)</span> <b>tjslauson:</b></span> @lmichael @ckoch5 and anyone else interested, the server gremlins are very present today.  We saw over a dozen hosts in 2360/3370a go down earlier this afternoon.  I'll be able to give you a better idea of what went down once we've sorted through the mess.<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(13:26:04)</span> <b>tjslauson:</b></span> initially, it looks like the server providing <tt>/squid</tt> to submit nodes, a docker cache, and a high-mem node went down.  Dumbo's also down.<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(13:26:31)</span> <b>tjslauson:</b></span> most of the rest are regular exec nodes<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(13:26:38)</span> <b>tjslauson:</b></span> more info later :)<br/>
+<span style="color: #e7392d"><span style="font-size: small">(13:27:43)</span> <b>ckoch5:</b></span> gremlins ahoy<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(15:02:58)</span> <b>tjslauson:</b></span> ok, most or all things should be running again.  I suspect our gremlin today was a power spike in the CS building.  All told, about 2 dozen servers in our CS server rooms were hit.<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(15:03:51)</span> <b>tjslauson:</b></span> let's hope the gremlin didn't invite company!<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:14:07)</span> <b>ckoch5:</b></span> ^^ @jcpatton George emailed about squid being down see Tim’s comment above<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(15:18:39)</span> <b>tjslauson:</b></span> and lmk if you have any questions @jcpatton<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:19:11)</span> <b>jcpatton:</b></span> thanks<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:57:30)</span> <b>ckoch5:</b></span> @tjslauson how long for you to block endemann jobs from running on the build nodes?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:57:41)</span> <b>ckoch5:</b></span> I think his unzips are causing other people’s packages to install slowly<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(15:57:58)</span> <b>tjslauson:</b></span> a couple minutes, I think<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:58:05)</span> <b>ckoch5:</b></span> okay, that would be great. :smile:<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(16:03:24)</span> <b>tjslauson:</b></span> I dropped <tt>START = ($(START)) &amp;&amp; (Owner != "endemann")</tt> down onto each of the build nodes<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(16:03:31)</span> <b>tjslauson:</b></span> haven't vacated any of his jobs yet<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(16:03:38)</span> <b>tjslauson:</b></span> you want to do it, or me?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:04:46)</span> <b>ckoch5:</b></span> please vacate!!<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:04:51)</span> <b>ckoch5:</b></span> thank you. :pray:<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(16:08:59)</span> <b>lmichael:</b></span> @tjslauson guessing that the servers down explain the squid issues, but users should be able to release jobs? @ckoch5 should we notify all users via email that they can do so if they see the relevant hold reason?<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(16:11:00)</span> <b>tjslauson:</b></span> @ckoch5 duly vacated (hooray, I'm learning! :smile:)<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(16:11:46)</span> <b>tjslauson:</b></span> @lmichael yup, the squid origin server is back up and should be serving well.  I checked on the <tt>/squid</tt> NFS mounts on our submit servers after doing that and they looked to have all come back healthily.<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(16:12:04)</span> <b>tjslauson:</b></span> i.e. any squid job failures from this afternoon should be good to be released.<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(16:18:50)</span> <b>lmichael:</b></span> @ckoch5 @jcpatton or can/should WE release all jobs held or this reason? Looks like holdreasoncode 12 and holdreasonsubcode 0, but I don’t know if the latter is restrictive enough. Currently checking …<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(16:23:48)</span> <b>lmichael:</b></span> I’m releasing jobs on submit2, wasn’t that many to verify and release.<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(16:29:53)</span> <b>lmichael:</b></span> Did the same on submit1, moving onto submit3,4. We can tell people on other submit servers who write in to just release.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:30:18)</span> <b>ckoch5:</b></span> @tjslauson I don’t know if the change you made took<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:30:22)</span> <b>ckoch5:</b></span> endemann is back<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(16:30:25)</span> <b>tjslauson:</b></span> hmmmm.<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(16:30:27)</span> <b>tjslauson:</b></span> ok<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:32:42)</span> <b>ckoch5:</b></span> I vacated him in a kludgey way again fornow<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:32:56)</span> <b>ckoch5:</b></span> basically, I think his unzipping of the Matlab runtime is making Tomoko’s package installation go super slowly<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(16:34:36)</span> <b>tjslauson:</b></span> wondering if I messed up the comparison operator... I'm not familiar with what to expect from different classad fields yet<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(16:41:18)</span> <b>tjslauson:</b></span> ah, these are being considered "dual layer", aren't they?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:42:16)</span> <b>ckoch5:</b></span> ah, maybe<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:43:59)</span> <b>ckoch5:</b></span> and Chris is definitely backfilling<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(16:45:02)</span> <b>tjslauson:</b></span> ok, let's see if that keeps him off<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:45:15)</span> <b>ckoch5:</b></span> I just kicked his jobs off again<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:45:19)</span> <b>ckoch5:</b></span> so I hope so. :smile:<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(16:45:21)</span> <b>tjslauson:</b></span> so did I :joy:<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:45:29)</span> <b>ckoch5:</b></span> :handshake:<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(16:46:02)</span> <b>tjslauson:</b></span> I set <tt>SLOT_TYPE_2_START</tt> this time instead of <tt>START</tt><br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(16:46:54)</span> <b>tjslauson:</b></span> so if what I wrote is what I meant this time, he can still come in with jobs marked as build<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:51:55)</span> <b>ckoch5:</b></span> looks good so far<br/>
+</body>
+</html>

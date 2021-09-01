@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jun 9, 2021 : #general (osg)</title>
+</head>
+<body>
+<h3>Wed Jun 9, 2021 : #general (osg)</h3>
+<span style="color: #9f69e7"><span style="font-size: small">(15:49:39)</span> <b>mtwest2718:</b></span> Not sure if this Q belongs on this channel but what OS are most folks running in the OSG? My guess is some flavour of RHEL but figured I'd ask.  Is it used for both your bare-metal server installs as well as your VMs?<br/>
+<blockquote>
+<span style="color: #a72f79"><span style="font-size: small">(15:52:43)</span> <b>andrew.melo:</b></span> We're centos7 across the board except for when vendors require something different<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:53:04)</span> <b>andrew.melo:</b></span> A few C8 test systems<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:56:47)</span> <b>jthiltges:</b></span> Pretty much same for Nebraska. Mostly CentOS 7, with one cluster recently upgraded to CentOS 8.<br/>And now in something of a wait-and-see pattern to see where support goes for CentOS 8.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(16:05:37)</span> <b>justas.balcas:</b></span> At Caltech - 30% (~100nodes) already moved to CentOS8 (Mainly due to Ceph). Rest keeping CentOS 7 - until we have guidance from experiment/osg ;)<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:11:58)</span> <b>lincoln:</b></span> same at Chicago<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:19:10)</span> <b>andrew.melo:</b></span> We're messing with rocky so far, fwiw<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:39:33)</span> <b>matyas:</b></span> how is it?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:40:37)</span> <b>andrew.melo:</b></span> Seems to be alright for now. Needed to update CFEngine to detect that rocky was a variant of RHEL was the biggest thing. The real trick will be to see what happens with C8 moves to Stream and how much people will be able to keep synchronized<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:44:53)</span> <b>bbockelm:</b></span> <pre>OS Breakdown and number of glideins with 0 jobs started:<br/><br/>              Total 0-jobs<br/>  RHEL 6       3296      9<br/>  RHEL 7      36207    155<br/>  RHEL 8       1625     11<br/>  UBUNTU 18       1      0<br/>  UBUNTU 20      11      2</pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:45:18)</span> <b>bbockelm:</b></span> The "0-job" column is not relevant to the discussion but the first two are.<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:48:52)</span> <b>matyas:</b></span> a lot of these are running in containers though<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:49:16)</span> <b>matyas:</b></span> by that I mean the OS version is the version of the OS inside the container, not of the host<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:53:20)</span> <b>lincoln:</b></span> the "yet another EL variant" thing is always painful<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:53:42)</span> <b>matyas:</b></span> did anybody try Alma?<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:54:27)</span> <b>lincoln:</b></span> we had $VENDOR refuse to update a tool to add what was probably a one-line hack for Scientific Linux. I changed /etc/redhat-release to say CentOS and it magically worked :upside_down_face:<br/>
+<span style="color: #a72f79"><span style="font-size: small">(17:16:36)</span> <b>andrew.melo:</b></span> We're going to be boned by IBM/Redhat doing that with GPFS, I'm sure<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:57:04)</span> <b>rynge:</b></span> The "RHEL" part of the table BrianB posted is a group of RHEL-based OSes. It includes RH, CentOS, SL, ...<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:00:00)</span> <b>rynge:</b></span> That breakdown is also from our default images, and we can dial those to whatever we want. However, this is what the user sees via containers, not what the actual site runs as infrastructure<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(20:59:12)</span> <b>timm:</b></span> Fermilab almost completely Scientific Linux 7 now, will use Centos 8 Stream for near term for things that need some rhel8-like things.  FermiCloud one of early adopters on centos8 front both hypervisors and vms. 95% of all jobs running in singularity containers, all jobs on site also wrapped in Docker.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(2021-06-10 00:07:21)</span> <b>andrew.melo:</b></span> Any inside knowledge if FNAL will revive Sl8? That's the thing tripping us up <br/>
+<span style="color: #9f69e7"><span style="font-size: small">(2021-06-10 08:15:58)</span> <b>mtwest2718:</b></span> I saw that Fedora has CoreOS, which is supposedly designed for running containers.<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(2021-06-10 08:41:40)</span> <b>timm:</b></span> If you have a Fermilab login the slides Glenn Cooper showed re. the future of linux at Fermilab are here:  <a href="https://indico.fnal.gov/event/48916/contributions/213627/attachments/142523/179954/Linux-options.pptx">https://indico.fnal.gov/event/48916/contributions/213627/attachments/142523/179954/Linux-options.pptx</a><br/>
+<span style="color: #9f69e7"><span style="font-size: small">(2021-06-10 09:08:36)</span> <b>mtwest2718:</b></span> Don't need a Fermilab login to read the pptx, thankfully, because that was useful.<br/>
+</blockquote>
+</body>
+</html>

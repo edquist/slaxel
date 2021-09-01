@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Aug 30, 2016 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Tue Aug 30, 2016 : #gracc (osg)</h3>
+<span style="color: #A82F2F"><span style="font-size: small">(08:30:34)</span> <b>B167BCLN5:</b></span> <br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:57:50)</span> <b>bbockelm:</b></span> <a href="https://gracc.opensciencegrid.org/dashboard/db/gracc-payload-summary">https://gracc.opensciencegrid.org/dashboard/db/gracc-payload-summary</a> &lt;- can someone change the default time range to 14 days?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:58:53)</span> <b>kretzke:</b></span> done<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:01:19)</span> <b>kretzke:</b></span> actually, I went ahead and replaced it with the summary-based version<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:04:50)</span> <b>kretzke:</b></span> ps, you’ve had a pending invite to make an account since 2/26 :wink: sent a new one<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:12:55)</span> <b>dweitzel:</b></span> @kretzke should we update to the newest gracc-request so we can get today’s summaries?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:13:08)</span> <b>dweitzel:</b></span> I can do it.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:13:40)</span> <b>dweitzel:</b></span> it also adds ProbeName, which should be used for ID.  But we would probably have to delete the index and re-summarize.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:13:49)</span> <b>dweitzel:</b></span> which would take ~20 min or so.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:15:53)</span> <b>bbockelm:</b></span> @kretzke - would it be possible to do Google integration instead?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:16:15)</span> <b>bbockelm:</b></span> (I don't necessarily need another username / password in this lifetime...)<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:18:58)</span> <b>kretzke:</b></span> @bbockelm  I’ll look into it. I’m a big fan of LastPass myself<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:19:19)</span> <b>bbockelm:</b></span> yeah - but google account integration is even lazier than LastPass.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:21:17)</span> <b>kretzke:</b></span> @dweitzel yeah I guess we should. there’s a number of breaking changes coming up soon, but since re-summarizing is cheap we might as well<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:25:16)</span> <b>dweitzel:</b></span> ok, I’ll update gracc-request.  Can you update the logstash configuration and delete the index?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:26:58)</span> <b>kretzke:</b></span> sure. I’ll actually send it to <tt>gracc.osg.summary2-2016</tt> and update the alias<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:28:58)</span> <b>dweitzel:</b></span> I think that’s in the logstash configuration.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:29:03)</span> <b>kretzke:</b></span> yep<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:29:09)</span> <b>dweitzel:</b></span> I’m not sure where the config is.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:29:42)</span> <b>kretzke:</b></span> I got it (it’s in /etc/gracc/gracc-store-summary.osg.conf<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:31:01)</span> <b>dweitzel:</b></span> ok, thanks<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:31:36)</span> <b>kretzke:</b></span> should be ready to go. just run <tt>sudo systemctl start gracc-store-summary</tt> after requests is updated<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:31:50)</span> <b>dweitzel:</b></span> ok, ran<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:39:31)</span> <b>kretzke:</b></span> looks good!  <a href="https://gracc.opensciencegrid.org/dashboard/db/gracc-payload-summary">https://gracc.opensciencegrid.org/dashboard/db/gracc-payload-summary</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:40:45)</span> <b>kretzke:</b></span> I guess we should also do the previous week<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:47:40)</span> <b>kretzke:</b></span> for now I’ve put in a filter alias that pulls in the rest of 2016 up to 8/23 from summary1<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:48:02)</span> <b>kretzke:</b></span> (mainly just to see if I could, it’s a handy trick)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:52:17)</span> <b>dweitzel:</b></span> ok, I’ll start resummarizing and sending it to the normal logstash.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:52:46)</span> <b>dweitzel:</b></span> it’ll probably produce duplicate records.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:52:53)</span> <b>dweitzel:</b></span> since you are doing that alias.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:56:46)</span> <b>dweitzel:</b></span> @kretzke there’s a ton of un’ackd messages on queued on the gracc.osg.summary queue.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:56:53)</span> <b>dweitzel:</b></span> I can’t tell of logstash is working.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:01:58)</span> <b>kretzke:</b></span> yeah, I’ll remove the alias. it is slowly draining the queue.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:02:11)</span> <b>dweitzel:</b></span> yeah, I stopped the re-summarization.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:02:18)</span> <b>dweitzel:</b></span> is elasticsearch just backed up?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:02:40)</span> <b>dweitzel:</b></span> I’m afraid to restart the re-summarization<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:04:16)</span> <b>kretzke:</b></span> not at the moment. I limited logstash to two workers to limit the load it puts on elasticsearch<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:06:01)</span> <b>dweitzel:</b></span> ok, I’m not sure it can keep up with the re-summarization<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:06:52)</span> <b>kretzke:</b></span> it can’t - but that’s why there’s a queue<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:07:49)</span> <b>dweitzel:</b></span> ok, I’ll start the re-summarization.  I was going to do all of 2016.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:09:23)</span> <b>kretzke:</b></span> it’s only 100K records, won’t be a problem for rabbitmq. I’ve seen raw queues hit 500K when elasticsearch was down<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:09:57)</span> <b>dweitzel:</b></span> ok<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:20:48)</span> <b>kretzke:</b></span> well, more like 1 million… guess summary1 was a partial. I can up the # workers and see how it goes<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:21:19)</span> <b>dweitzel:</b></span> we’re through march, and at 500k<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:21:19)</span> <b>kretzke:</b></span> btw, I have monitoring for the summary queue on <a href="https://gracc.opensciencegrid.org/dashboard/db/gracc-osg-monitor">https://gracc.opensciencegrid.org/dashboard/db/gracc-osg-monitor</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:22:59)</span> <b>kretzke:</b></span> upped to 4 workers (from 1 actually)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:24:49)</span> <b>dweitzel:</b></span> what was it set to initially?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:25:46)</span> <b>kretzke:</b></span> it defaults to # cores I think, so 8<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:29:36)</span> <b>dweitzel:</b></span> hum… seems to be going a lot slower than it was last time we re-summarized.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:29:58)</span> <b>dweitzel:</b></span> it used to consume several thousand messages a second.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:30:07)</span> <b>dweitzel:</b></span> now, it’s ~1000 every 30 seconds.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:36:00)</span> <b>kretzke:</b></span> -2 has been hitting io saturation <a href="https://gracc.opensciencegrid.org/dashboard/db/grace-system-monitoring-disk?from=now-1h&amp;to=now">https://gracc.opensciencegrid.org/dashboard/db/grace-system-monitoring-disk?from=now-1h&amp;to=now</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:37:21)</span> <b>kretzke:</b></span> -5 earlier. so elasticsearch is likely throttling the connections <a href="https://gracc.opensciencegrid.org/dashboard/db/grace-elasticsearch-monitor?panelId=133&amp;fullscreen&amp;from=now-1h&amp;to=now">https://gracc.opensciencegrid.org/dashboard/db/grace-elasticsearch-monitor?panelId=133&amp;fullscreen&amp;from=now-1h&amp;to=now</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:42:28)</span> <b>dweitzel:</b></span> ok, just over 1million messages in queue.  Just finished all the sending.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:47:49)</span> <b>kretzke:</b></span> now -3<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:47:59)</span> <b>dweitzel:</b></span> interesting...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:48:11)</span> <b>dweitzel:</b></span> it’s 1 at a time.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:49:13)</span> <b>kretzke:</b></span> yeah, generally<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:52:26)</span> <b>dweitzel:</b></span> If I’m reading that disk usage graphs.  The IOPS are spectacularly bad.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:57:04)</span> <b>kretzke:</b></span> it’s the average over a minute<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:58:18)</span> <b>kretzke:</b></span> ah, and those graphs only show one data disk<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:58:30)</span> <b>dweitzel:</b></span> oh<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:58:55)</span> <b>dweitzel:</b></span> also, there is some scrubbing going on on Ceph.  More than should be, but it should complete in ~10 minutes.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:03:40)</span> <b>kretzke:</b></span> ok, now it shows all the mounts. much better!<br/>
+</body>
+</html>

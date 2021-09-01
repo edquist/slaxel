@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Feb 17, 2021 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Feb 17, 2021 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(09:25:41)</span> <b>blin:</b></span> <b>@edquist</b> the blahp spec has a lot of GSI BuildRequires in there, did you patch them out?<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:25:55)</span> <b>edquist:</b></span> oooooh<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:25:59)</span> <b>edquist:</b></span> definitely not<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:26:39)</span> <b>edquist:</b></span> i did not have it in mind that we would need to remove gsi from the blahp<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:26:50)</span> <b>edquist:</b></span> i take it that is something we want to do?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:34:55)</span> <b>blin:</b></span> we need to remove GSI from _everything_<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:42:32)</span> <b>matyas:</b></span> there's no flag to keep xrootd from compiling the GSI plugin but<br/>1. there are no globus dependencies<br/>2. we can rm the plugin after it's been built<br/>is that sufficient?<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:45:05)</span> <b>edquist:</b></span> in that case, if i don't get it on the first try, i am thinking to make a separate ticket for blahp.osg36 w/o gsi.  maybe we'll be able to do it with a single configure flag but i am not sure<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:48:55)</span> <b>bbockelm:</b></span> @matyas - we'll definitely need to keep the GSI support in XRootD.  The goal is to remove <tt>globus-*</tt>; it'll be a long time before we can remove <tt>*gsi*</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(09:49:47)</span> <b>matyas:</b></span> does that mean we'll keep building voms?<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(10:12:53)</span> <b>blin:</b></span> @bbockelm ^^. I assumed not and that we could drop voms-clients-cpp from the osg-wn-client (fyi <b>@edquist</b>)<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:17:25)</span> <b>matyas:</b></span> voms has no globus dependencies<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:18:05)</span> <b>blin:</b></span> sure but there's no reason to have voms in a stack without VOMS proxies<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:18:50)</span> <b>matyas:</b></span> IIRC we'll still need VOMS proxies for the VO frontends<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:19:08)</span> <b>blin:</b></span> nope, they'll use scitokens<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:19:19)</span> <b>matyas:</b></span> it will take a while for that to happen though<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:19:40)</span> <b>matyas:</b></span> does that mean frontends won't be able to update to 3.6 until they have an issuer set up and everything?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:19:42)</span> <b>blin:</b></span> sure and they'll continue to use 3.5<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:19:53)</span> <b>blin:</b></span> yup<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:20:32)</span> <b>matyas:</b></span> ... I predict 3.5 will have a long support lifetime (like 3.4 did)<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:21:00)</span> <b>blin:</b></span> possibly<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:21:44)</span> <b>blin:</b></span> i suspect that the compute side can hit our feb '22 globus eol, though<br/>
+</blockquote>
+<span style="color: #16569E"><span style="font-size: small">(10:00:51)</span> <b>edquist:</b></span> so for the blahp we want to get rid of globus stuff - does that also imply glexec?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:02:57)</span> <b>matyas:</b></span> definitely glexec<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:03:51)</span> <b>edquist:</b></span> definitely get rid of glexec you mean?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:03:56)</span> <b>matyas:</b></span> yeah<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:04:06)</span> <b>edquist:</b></span> it just seems to be pretty tangled into it<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:04:09)</span> <b>matyas:</b></span> surprised it's still in there; OSG stopped supporting glexec in 3.4 (maybe even 3.3)<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:04:18)</span> <b>edquist:</b></span> ok<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:05:19)</span> <b>matyas:</b></span> if actually deleting the code will take too long, perhaps you can get away with just disabling it?<br/>
+</body>
+</html>

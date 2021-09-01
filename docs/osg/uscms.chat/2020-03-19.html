@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Mar 19, 2020 : #uscms (osg)</title>
+</head>
+<body>
+<h3>Thu Mar 19, 2020 : #uscms (osg)</h3>
+<span style="color: #7d414c"><span style="font-size: small">(07:14:39)</span> <b>bockjoo:</b></span> -bash-4.2$ telnet -6 <a href="http://cmsio.rc.ufl.edu">cmsio.rc.ufl.edu</a> 2811<br/>Trying 2620:104:1f:1000::2...<br/>telnet: connect to address 2620:104:1f:1000::2: Connection timed out<br/>
+<span style="color: #7d414c"><span style="font-size: small">(07:14:50)</span> <b>bockjoo:</b></span> -bash-4.2$ telnet -4 <a href="http://cmsio.rc.ufl.edu">cmsio.rc.ufl.edu</a> 2811<br/>Trying 128.227.221.216...<br/>Connected to <a href="http://cmsio.rc.ufl.edu">cmsio.rc.ufl.edu</a>.<br/>Escape character is '^]'.<br/>220 <a href="http://cmsio6.rc.ufl.edu">cmsio6.rc.ufl.edu</a> GridFTP Server 13.11 (gcc64, 1550490409-0) [Grid Community Toolkit 6.2] ready.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(07:15:05)</span> <b>bockjoo:</b></span> By default, CERN machines use ipv6:<br/>
+<span style="color: #7d414c"><span style="font-size: small">(07:15:31)</span> <b>bockjoo:</b></span> -bash-4.2$ telnet <a href="http://cmsio.rc.ufl.edu">cmsio.rc.ufl.edu</a> 2811<br/>Trying 2620:104:1f:1000::2...<br/>
+<span style="color: #d1707d"><span style="font-size: small">(08:05:48)</span> <b>gattebury:</b></span> See the same thing from Nebraska to <a href="http://cmsio.rc.ufl.edu">cmsio.rc.ufl.edu</a> as another datapoint — for both I2 and ESnet paths. Can you do that from another v6 <a href="http://ufl.edu">ufl.edu</a> host on the same network? Or is v6 broken on the host itself?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(08:48:48)</span> <b>bockjoo:</b></span> Its ipv6 2811 forwarding is not functioning.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(08:49:24)</span> <b>bockjoo:</b></span> I don't have access to the network so Yu Fu is looking into the issue.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(12:19:46)</span> <b>justas.balcas:</b></span> network? isnt enough keepalived/servers fix? We did 0 on the network changes for ipv6 virtual<br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:09:42)</span> <b>bockjoo:</b></span> I know nothing about our load balancer, nor do I have access at the moment. But if I put only one server behind <a href="http://cmsio.rc.ufl.edu">cmsio.rc.ufl.edu</a> (load balancer), telnet -6 <a href="http://cmsio.rc.ufl.edu">cmsio.rc.ufl.edu</a> 2811 works. No other servers. That working server is also PhEDEx agent and we have put its public interface under MTU=1500.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:10:02)</span> <b>bockjoo:</b></span> I am wondering if I have to change MTU=1500 for the other servers.<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:29:48)</span> <b>smithnp:</b></span> our MTU is 9000...  I do know I have to have 2 virtual servers configured in the load balancer, one for v4 and v6, with the list of back-end hosts also configured respectively.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:32:28)</span> <b>andrew.melo:</b></span> &gt; I know nothing about our load balancer, nor do I have access at the moment. But if I put only one server behind <a href="http://cmsio.rc.ufl.edu">cmsio.rc.ufl.edu</a> (load balancer),<br/>I can't parse these sentences together<br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:48:56)</span> <b>andrew.melo:</b></span> Are peeople using the same xrootd for both remote reads and file transfers?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:44:55)</span> <b>bbockelm:</b></span> yup, for the most part.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(17:05:07)</span> <b>bockjoo:</b></span> MTU was not the source. Still looking for an answer why only one server is working, not the others.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(17:08:21)</span> <b>bockjoo:</b></span> You can follow more details from this GGUS ticket : <a href="https://ggus.eu/index.php?mode=ticket_info&amp;ticket_id=145991">https://ggus.eu/index.php?mode=ticket_info&amp;ticket_id=145991</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(18:05:03)</span> <b>matyas:</b></span> @matyas has left the channel<br/>
+<span style="color: #7d414c"><span style="font-size: small">(18:18:14)</span> <b>bockjoo:</b></span> <pre>2620:104:1f:1000::2/128        ::                         !n   256 0     0 lo</pre><br/>loopback was missing.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(19:00:56)</span> <b>bockjoo:</b></span> -bash-4.2$ gfal-ls -v <a href="davs://cmsio5.rc.ufl.edu:1094/store/unmerged/SAM/">davs://cmsio5.rc.ufl.edu:1094/store/unmerged/SAM/</a><br/>gfal-ls error: 13 (Permission denied) - Result Authentication error, reached maximum number of attempts after 1 attempts<br/>
+<span style="color: #7d414c"><span style="font-size: small">(19:01:17)</span> <b>bockjoo:</b></span> it intermittently fails from worker nodes.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(19:03:43)</span> <b>andrew.melo:</b></span> are your voms-mapfile s and Authfiles and lcmaps.db files all synced?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(19:07:13)</span> <b>bockjoo:</b></span> Nothing changed. I think this is something to do with the file system.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(19:07:37)</span> <b>andrew.melo:</b></span> If it's intermittant, I'd suspect that different nodes were configured differently *shrug*<br/>
+<span style="color: #a72f79"><span style="font-size: small">(19:07:42)</span> <b>andrew.melo:</b></span> what does the xrootd log say there?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(19:09:36)</span> <b>bockjoo:</b></span> It's just hilrarious.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(19:09:37)</span> <b>bockjoo:</b></span> -bash-4.2$ gfal-ls -v <a href="davs://cmsio4.rc.ufl.edu:1094/store/unmerged/SAM/">davs://cmsio4.rc.ufl.edu:1094/store/unmerged/SAM/</a><br/>gfal-ls error: 113 (No route to host) - Domain name resolution failed<br/>
+<span style="color: #7d414c"><span style="font-size: small">(19:09:45)</span> <b>bockjoo:</b></span> cmsio5 is the redirector.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(19:09:51)</span> <b>bockjoo:</b></span> cmsio4 is the server.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(19:10:10)</span> <b>bockjoo:</b></span> This is a piece of junk.<br/>
+<span style="color: #d1707d"><span style="font-size: small">(19:52:20)</span> <b>gattebury:</b></span> Is this all the well-known keepalived stuff others have done for years, or something else? I recall someone mentioning F5 hardware appliances @ UFL once. Mostly just curious, not offering a solution — it’d be useful to know I think.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(20:02:50)</span> <b>bockjoo:</b></span> We have some load balancer called slb. I think yes it is equivalent to keepalived. That issue is solved by adding ipv6 loopback to the gridftp servers.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(20:03:23)</span> <b>bockjoo:</b></span> gfal-rm command that fails with davs is something different.<br/>
+<span style="color: #d1707d"><span style="font-size: small">(20:04:12)</span> <b>gattebury:</b></span> ahh… the A10 one, not the F5 one. Letters and numbers are hard :slightly_smiling_face:<br/><br/>Yeah, I parsed it fully after I typed that - the v6 connectivity indeed looks good now.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(20:10:12)</span> <b>bockjoo:</b></span> gfal-ls <a href="davs://cmsio8.rc.ufl.edu:1094/store/unmerged/SAM/">davs://cmsio8.rc.ufl.edu:1094/store/unmerged/SAM/</a> is less stable than<br/>
+<span style="color: #7d414c"><span style="font-size: small">(20:10:39)</span> <b>bockjoo:</b></span> gfal-ls <a href="root://cmsio8.rc.ufl.edu:1094/store/unmerged/SAM/">root://cmsio8.rc.ufl.edu:1094/store/unmerged/SAM/</a><br/>
+<span style="color: #7d414c"><span style="font-size: small">(20:11:09)</span> <b>bockjoo:</b></span> Namely, davs protocol breaks more freqeuntly than root protocol.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(20:24:28)</span> <b>bockjoo:</b></span> It looks like <a href="http://xrootd.t2.ucsd.edu:9930">xrootd.t2.ucsd.edu:9930</a> is not working and that's failing xrootd restart. Which xrootd monitor are we supposed to report?<br/>
+<span style="color: #d1707d"><span style="font-size: small">(20:27:46)</span> <b>gattebury:</b></span> The two lines we have are:<br/><pre>xrd.report <a href="http://xrootd.t2.ucsd.edu:9931">xrootd.t2.ucsd.edu:9931</a> every 30s all sync<br/>xrootd.monitor all auth flush 30s window 5s fstat 60 lfn ops xfr 5 dest files io info user <a href="http://xrootd.t2.ucsd.edu:9930">xrootd.t2.ucsd.edu:9930</a> dest fstat info user <a href="http://xrd-mon.osgstorage.org:9930">xrd-mon.osgstorage.org:9930</a></pre><br/>
+<span style="color: #d1707d"><span style="font-size: small">(20:30:14)</span> <b>gattebury:</b></span> I don’t think anything with <a href="http://xrootd.t2.ucsd.edu">xrootd.t2.ucsd.edu</a> should make it fail to start for you — all the monitoring is just UDP based, there’s no handshake or 2 way communication (I think)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(20:44:52)</span> <b>dweitzel:</b></span> correct, all udp packets sent into the ether<br/>
+<span style="color: #235e5b"><span style="font-size: small">(21:17:12)</span> <b>dweitzel:</b></span> (kidding)<br/>
+<span style="color: #7d414c"><span style="font-size: small">(21:20:24)</span> <b>bockjoo:</b></span> All the bull that I described turns out to be due to some DNS issue. So many issues a day.<br/>
+</body>
+</html>

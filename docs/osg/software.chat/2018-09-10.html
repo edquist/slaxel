@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Sep 10, 2018 : #software (osg)</title>
+</head>
+<body>
+<h3>Mon Sep 10, 2018 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(11:59:42)</span> <b>blin:</b></span> @dweitzel thoughts about moving the blahp to the opensciencegrid github org?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:59:48)</span> <b>blin:</b></span> (@matyas)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:32:07)</span> <b>dweitzel:</b></span> sounds good to me.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:17:05)</span> <b>bbockelm:</b></span> whelp, we're running a bleeding edge Xrootd.  Turns out, there's significant blood loss at Nebraska....<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:17:52)</span> <b>bbockelm:</b></span> To quote @jthiltges, "We're reaching the point where the gridftp servers need SSDs just to dump the corefiles in a reasonable amount of time."<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:18:19)</span> <b>bbockelm:</b></span> (on the upside, there hasn't been a crash in at least a few minutes for the latest, latest combination packages.<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(14:18:32)</span> <b>sthapa:</b></span> is this xrootd + http patches?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:19:07)</span> <b>bbockelm:</b></span> Nah, even more recent than that - basically master (in order to pick up new HTTP features)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:19:19)</span> <b>bbockelm:</b></span> the <tt>xrootd-lcmaps</tt> fixes look to have caused a lot of the issues.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:19:57)</span> <b>bbockelm:</b></span> <b>@edquist</b> @blin ^^^ this is the single mutex patches from John.  We should really get those out the door asap.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:20:35)</span> <b>blin:</b></span> i'm confused, are you saying that the mutex patches /fixes/ the issues that you guys are having?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:21:03)</span> <b>bbockelm:</b></span> yup. Well, fixes the issues that aren't related to running <tt>master</tt>.<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:18:02)</span> <b>marian:</b></span> folks, I'm getting this doing --scratch build:<br/><pre><br/> &gt;&gt; Got error from server: database outage<br/> &gt;&gt; Retrying in 20 seconds<br/></pre><br/>an it cycles forever ... not that I have other build error like:<br/><pre><br/>DEBUG util.py:435:  Getting requirements for xrootd-hdfs-2.1.2-1.osg34.el6.src<br/>DEBUG util.py:435:   --&gt; 1:xrootd-devel-4.8.4-2.osg34.el6.x86_64<br/>DEBUG util.py:435:   --&gt; 1:xrootd-server-devel-4.8.4-2.osg34.el6.x86_64<br/>DEBUG util.py:435:   --&gt; cmake-2.8.12.2-4.el6.x86_64<br/>DEBUG util.py:435:  Error: No Package found for /usr/include/hdfs.h<br/></pre><br/>help?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:23:11)</span> <b>matyas:</b></span> didn't we stop shipping xrootd-hdfs for el6?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:24:17)</span> <b>blin:</b></span> yeah, the build should stop with a message, iirc<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:24:22)</span> <b>blin:</b></span> or maybe that was gridftp-hdfs?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:24:51)</span> <b>matyas:</b></span> haven't we stopped shipping anything hdfs for el6?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:25:41)</span> <b>blin:</b></span> yes<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:26:38)</span> <b>bbockelm:</b></span> yesbut.  Seems there are a few cases where we want the FUSE client on SL6, so it may be something we need to revisit.<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(2018-09-12 13:05:39)</span> <b>blin:</b></span> so <tt>hadoop-hdfs-fuse</tt>? Who needs it and why?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2018-09-12 13:56:04)</span> <b>bbockelm:</b></span> yup.  Basically, CMS's Plan A was to switch their production and analysis release to SL7 this year.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2018-09-12 13:56:19)</span> <b>bbockelm:</b></span> That didn't make it in the end, meaning there are many login hosts that are still based on SL6.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2018-09-12 13:56:48)</span> <b>bbockelm:</b></span> For data nodes and transfer servers - we should stick with SL7.<br/>
+<span style="color: #43761b"><span style="font-size: small">(2018-09-12 13:56:54)</span> <b>blin:</b></span> hrm, like notre dame<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2018-09-12 13:57:14)</span> <b>bbockelm:</b></span> Right.  We were even unable to kill off our local SL6 "login and compile" node.<br/>
+<span style="color: #43761b"><span style="font-size: small">(2018-09-12 13:57:31)</span> <b>blin:</b></span> is there a timeline for getting this released?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2018-09-12 13:58:06)</span> <b>bbockelm:</b></span> what release?  the physics software?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2018-09-12 13:58:35)</span> <b>bbockelm:</b></span> it was a swing-and-a-miss in 2018, so 2019 at the earliest.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2018-09-12 13:59:03)</span> <b>bbockelm:</b></span> (I note that we run <tt>hadoop-hdfs-2.6.0+cdh5.12.1+2540-1.cdh5.12.1.p0.3.el6.x86_64</tt> on our login host ... no clue where @jthiltges got that from)<br/>
+<span style="color: #43761b"><span style="font-size: small">(2018-09-12 13:59:34)</span> <b>blin:</b></span> nah, i meant getting hdfs built on EL6<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2018-09-12 14:00:24)</span> <b>bbockelm:</b></span> I would suggest to "pray and compile" (or is that "compile and pray"?) to see whether it's broken or mostly working on EL6, then build a release timeline around that.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2018-09-12 14:00:55)</span> <b>bbockelm:</b></span> CMS could use it immediately, but I bet we'd schedule it fairly differently if it's a minor task or a major one.<br/>
+<span style="color: #43761b"><span style="font-size: small">(2018-09-12 14:02:04)</span> <b>blin:</b></span> ugh, iirc, we haven't bothered with EL6 because it was failing pretty spectacularly<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2018-09-12 14:02:24)</span> <b>bbockelm:</b></span> let's find the ticket and re-read it.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2018-09-12 14:02:40)</span> <b>bbockelm:</b></span> another option would be to do a one-off of using Cloudera's binary RPM.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2018-09-12 14:02:48)</span> <b>bbockelm:</b></span> (assuming that's what UNL did)<br/>
+<span style="color: #e06b56"><span style="font-size: small">(2018-09-12 14:04:19)</span> <b>jthiltges:</b></span> Yup, we're using Cloudera's build for the hadoop client on EL6 (on <a href="http://t3.unl.edu">t3.unl.edu</a>)  (<a href="https://archive.cloudera.com/cdh5/redhat/6/x86_64/cdh/5.12.1/RPMS/x86_64/">https://archive.cloudera.com/cdh5/redhat/6/x86_64/cdh/5.12.1/RPMS/x86_64/</a>)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2018-09-12 14:04:55)</span> <b>bbockelm:</b></span> I would specifically not ship the datanode if possible.<br/>
+<span style="color: #43761b"><span style="font-size: small">(2018-09-12 14:05:37)</span> <b>blin:</b></span> <b>@edquist</b> ^^<br/>
+<span style="color: #16569E"><span style="font-size: small">(2018-09-12 14:39:59)</span> <b>edquist:</b></span> Are we talking about re-packaging cloudera's hadoop for el6?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2018-09-12 14:49:15)</span> <b>bbockelm:</b></span> yeah - where did we leave off on that?<br/>
+<span style="color: #16569E"><span style="font-size: small">(2018-09-12 14:53:20)</span> <b>edquist:</b></span> I'm digging around in old JIRA tickets<br/>
+<span style="color: #16569E"><span style="font-size: small">(2018-09-12 14:53:36)</span> <b>edquist:</b></span> I see here: <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-2906">https://opensciencegrid.atlassian.net/browse/SOFTWARE-2906</a><br/>
+<span style="color: #16569E"><span style="font-size: small">(2018-09-12 14:53:57)</span> <b>edquist:</b></span> - hadoop 2.6.0 from Cloudera now builds for us on el7, though it probably needs cleanup<br/>- it doesn't build on el6 currently, as it requires protobuf 2.5.0, which i haven't been able to build for el6 yet<br/>
+<span style="color: #16569E"><span style="font-size: small">(2018-09-12 14:54:25)</span> <b>edquist:</b></span> that was from 2017/10/26<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2018-09-12 14:54:27)</span> <b>bbockelm:</b></span> What if you simply import the binary protobuf RPM?<br/>
+<span style="color: #16569E"><span style="font-size: small">(2018-09-12 14:55:41)</span> <b>edquist:</b></span> we can give it a try..!<br/>
+<span style="color: #16569E"><span style="font-size: small">(2018-09-12 15:15:35)</span> <b>edquist:</b></span> @bbockelm, there does not seem to be a protobuf rpm in the cdh repos<br/>
+<span style="color: #16569E"><span style="font-size: small">(2018-09-12 15:15:41)</span> <b>edquist:</b></span> do you know where we might find one?<br/>
+<span style="color: #16569E"><span style="font-size: small">(2018-09-12 15:16:40)</span> <b>edquist:</b></span> do we think it's safe to import from here?<br/>
+<span style="color: #16569E"><span style="font-size: small">(2018-09-12 15:16:42)</span> <b>edquist:</b></span> <a href="http://rpm.pbone.net/index.php3/stat/4/idpl/27937177/dir/scientific_linux_6/com/protobuf-compiler-2.5.0-10.el6.x86_64.rpm.html">http://rpm.pbone.net/index.php3/stat/4/idpl/27937177/dir/scientific_linux_6/com/protobuf-compiler-2.5.0-10.el6.x86_64.rpm.html</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(2018-09-12 15:17:17)</span> <b>bbockelm:</b></span> @jthiltges - where did ours come from?<br/>
+<span style="color: #16569E"><span style="font-size: small">(2018-09-12 15:19:04)</span> <b>edquist:</b></span> <a href="http://vault.centos.org/centos/7/os/Source/SPackages/protobuf-2.5.0-8.el7.src.rpm">http://vault.centos.org/centos/7/os/Source/SPackages/protobuf-2.5.0-8.el7.src.rpm</a><br/>
+<span style="color: #16569E"><span style="font-size: small">(2018-09-12 15:19:09)</span> <b>edquist:</b></span> CentOS 7<br/>
+<span style="color: #16569E"><span style="font-size: small">(2018-09-12 15:19:15)</span> <b>edquist:</b></span> (it's in the OS)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2018-09-12 15:19:31)</span> <b>bbockelm:</b></span> Can we take it directly from SL?<br/>
+<span style="color: #16569E"><span style="font-size: small">(2018-09-12 15:20:21)</span> <b>edquist:</b></span> oh you mean where did your protobuf 2.5.0 el6 rpm come from - that i don't know<br/>
+<span style="color: #16569E"><span style="font-size: small">(2018-09-12 15:20:43)</span> <b>edquist:</b></span> we (I) failed to rebuild the OS protobuf 2.5.0 for el6<br/>
+<span style="color: #16569E"><span style="font-size: small">(2018-09-12 15:21:08)</span> <b>edquist:</b></span> Presumably we can't use the el7 rpm for el6...<br/>
+<span style="color: #e06b56"><span style="font-size: small">(2018-09-12 15:23:10)</span> <b>jthiltges:</b></span> I assume it's just a buildrequires. We just used the CDH binaries at Nebraska, and I can't find that Cloudera published their protobuf RPM. =[<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2018-09-12 15:28:59)</span> <b>bbockelm:</b></span> how about this guy: <a href="http://mirror.grid.uchicago.edu/pub/linux/scientific/6x/external_products/maven/x86_64/protobuf-2.5.0-10.el6.x86_64.rpm">http://mirror.grid.uchicago.edu/pub/linux/scientific/6x/external_products/maven/x86_64/protobuf-2.5.0-10.el6.x86_64.rpm</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(2018-09-12 15:29:21)</span> <b>bbockelm:</b></span> @lincoln ^^^ can we even trust these "mirror.grid" guys?<br/>
+<span style="color: #e96699"><span style="font-size: small">(2018-09-12 15:29:44)</span> <b>lincoln:</b></span> i wouldn't<br/>
+<span style="color: #e96699"><span style="font-size: small">(2018-09-12 15:30:28)</span> <b>lincoln:</b></span> are you referring to the external products or the lack of HTTPS? :slightly_smiling_face:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2018-09-12 15:30:42)</span> <b>bbockelm:</b></span> meh.  Mostly people from the south side of Chicago<br/>
+<span style="color: #e96699"><span style="font-size: small">(2018-09-12 15:31:47)</span> <b>lincoln:</b></span> ah, a Cubs fan I see.<br/>
+<span style="color: #16569E"><span style="font-size: small">(2018-09-12 15:37:20)</span> <b>edquist:</b></span> all sorts of goodies in there<br/>
+<span style="color: #e96699"><span style="font-size: small">(2018-09-12 15:39:13)</span> <b>lincoln:</b></span> come on down to lincoln's discount data dump. 2 RPMs for 1 special!<br/>
+</blockquote>
+<span style="color: #53b759"><span style="font-size: small">(15:28:37)</span> <b>marian:</b></span> oh ... I saw we have built for el6 by Carl for instance: <a href="https://koji.chtc.wisc.edu/koji/buildinfo?buildID=11994">https://koji.chtc.wisc.edu/koji/buildinfo?buildID=11994</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(15:28:58)</span> <b>marian:</b></span> also BrianB did recently ... in hcc repo, though<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:30:25)</span> <b>marian:</b></span> so do just --el7 for now?<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:32:46)</span> <b>marian:</b></span> with --scratch --el7 I still get:<br/><pre><br/>278695 build (osg-el7, xrootd-hdfs-2.1.2-1.osg.el7.src.rpm): free<br/>278695 build (osg-el7, xrootd-hdfs-2.1.2-1.osg.el7.src.rpm): free -&gt; open (<a href="http://kojibuilder1.chtc.wisc.edu">kojibuilder1.chtc.wisc.edu</a>)<br/>  278696 buildArch (xrootd-hdfs-2.1.2-1.osg.el7.src.rpm, x86_64): free<br/> &gt;&gt; Got error from server: database outage<br/> &gt;&gt; Retrying in 20 seconds<br/></pre><br/>in circles...<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:33:56)</span> <b>matyas:</b></span> the db appears to be running a little slow<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:34:12)</span> <b>matyas:</b></span> doesn't look like anything's actually broken though<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:36:15)</span> <b>marian:</b></span> ¯\_(ツ)_/¯<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:36:38)</span> <b>matyas:</b></span> yeah we've been getting those more and more recently<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:37:12)</span> <b>marian:</b></span> so just wait until it pass through?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:37:31)</span> <b>matyas:</b></span> yeah pretty much<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:37:35)</span> <b>marian:</b></span> ok<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:38:29)</span> <b>marian:</b></span> thanks for pointing that out, @matyas... I wasn't sure where is a problem<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:44:38)</span> <b>marian:</b></span> so I've got my scratch build <tt>xrootd-hdfs</tt> for --el7 done ... so what about --el6, @bbockelm?<br/>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jul 14, 2017 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Fri Jul 14, 2017 : #gfactory (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(09:19:52)</span> <b>blin:</b></span> is there any way to turn on <tt>STARTER_DEBUG = D_SECURITY</tt> for pilots that are running at a specific site?<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:14:16)</span> <b>marian:</b></span> yeah, I think there is option we can add inside entry point<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:14:39)</span> <b>marian:</b></span> which entry in particular?<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:22:32)</span> <b>marian:</b></span> @klarson1: did you say you use condor 8.6.x for FNAL factory? how do you deploy it? I guess you don't use osg repos for that?<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:26:39)</span> <b>marian:</b></span> thing is I've tried Madison repo htcondor-stable where 8.6 is available but it creates some rpms conflicts when doing <tt>yum update condor-*</tt> ... so I wonder if you have any painless way how you do it at FNAL?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:28:07)</span> <b>klarson1:</b></span> we moved to using the madison repos a while back.  what conflicts do you see?  maybe that will remind me what we did.  if it's blahp, we just remove it<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:37:41)</span> <b>marian:</b></span> yeah, blahp dependency<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:38:56)</span> <b>marian:</b></span> --&gt; Processing Dependency: libclassad.so.7()(64bit) for package: blahp-1.18.29.bosco-1.osg33.el6.x86_64<br/>---&gt; Package condor-external-libs.x86_64 0:8.7.2-1.el6 will be installed<br/>--&gt; Finished Dependency Resolution<br/>Error: Package: blahp-1.18.29.bosco-1.osg33.el6.x86_64 (@osg)<br/>           Requires: libclassad.so.7()(64bit)<br/>           Removing: condor-classads-8.4.11-1.1.osg33.el6.x86_64 (@osg)<br/>               libclassad.so.7()(64bit)<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:40:21)</span> <b>marian:</b></span> can you do for me <tt>rpm -qa | grep condor-*</tt> on your factory please?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:44:12)</span> <b>klarson1:</b></span> [root@cmsgwms-factory ~]# rpm -qa | grep condor-*<br/>condor-procd-8.4.9-1.el6.x86_64<br/>condor-classads-8.4.9-1.el6.x86_64<br/>glideinwms-condor-common-config-3.2.14.1-1.osg33.el6.noarch<br/>condor-external-libs-8.4.9-1.el6.x86_64<br/>condor-cream-gahp-8.4.9-1.el6.x86_64<br/>glideinwms-glidecondor-tools-3.2.14.1-1.osg33.el6.noarch<br/>condor-8.4.9-1.el6.x86_64<br/>glideinwms-factory-condor-3.2.14.1-1.osg33.el6.noarch<br/>condor-bosco-8.4.9-1.el6.x86_64<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:44:38)</span> <b>klarson1:</b></span> i vaguely remember something with bosco, maybe i also had to uninstall that as well?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:45:00)</span> <b>klarson1:</b></span> let me look through my notes, maybe i wrote it down :slightly_smiling_face:<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:45:00)</span> <b>marian:</b></span> looking further seems like condor-bosco brings blahp staff ... I see condor-bosco rpm installed on GOC-ITB, GOC production and SDSC production factories, not at CERN production factory...<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:46:19)</span> <b>marian:</b></span> but you have 8.4.x ... not 8.6.x?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:46:32)</span> <b>klarson1:</b></span> oh sorry!  wrong factory<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:47:01)</span> <b>klarson1:</b></span> one sec<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:51:58)</span> <b>klarson1:</b></span> condor-procd-8.6.4-1.el6.x86_64<br/>condor-cream-gahp-8.6.4-1.el6.x86_64<br/>condor-classads-8.6.4-1.el6.x86_64<br/>condor-python-8.6.4-1.el6.x86_64<br/>condor-8.6.4-1.el6.x86_64<br/>glideinwms-condor-common-config-3.3.2-1.osgup.el6.noarch<br/>condor-bosco-8.6.4-1.el6.x86_64<br/>glideinwms-factory-condor-3.3.2-1.osgup.el6.noarch<br/>condor-external-libs-8.6.4-1.el6.x86_64<br/>glideinwms-glidecondor-tools-3.3.2-1.osgup.el6.noarch<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:53:35)</span> <b>marian:</b></span> so that you all have from htcondor-stable repo?<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:53:42)</span> <b>marian:</b></span> ah...<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:53:44)</span> <b>klarson1:</b></span> yes<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:53:50)</span> <b>klarson1:</b></span> a mirror of it at fnal at least<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:53:52)</span> <b>marian:</b></span> osgup for some<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:54:41)</span> <b>klarson1:</b></span> the glideinwms stuff is not what we are running in production in OSG, this is the hepcloud factory which needed dev gwms series code<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:54:42)</span> <b>blin:</b></span> marian, that conflict is because the OSG 3.3 version of the blahp is built against condor 8.4.x<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:55:03)</span> <b>blin:</b></span> you should make sure to include the blahp in your <tt>yum update</tt> command so you get the OSG 3.4 version that's built against 8.6<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:55:20)</span> <b>marian:</b></span> oO ... but that all runs at Krista's case for gWMS 3.3.2 ... I don't think we're that far in production factories, we use 3.2.19!<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:55:56)</span> <b>marian:</b></span> I'm not sure we wanna risk such route of updates<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:56:44)</span> <b>marian:</b></span> what's the critical path for having 8.6.x with gWMS 3.2.19? can someone remind me? IPv6 condor fixes?<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:57:43)</span> <b>marian:</b></span> well there is always way include this and exclude that ... but we sort of break smooth 'update' process for the next update cycle, I'm afraid ...<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:58:06)</span> <b>marian:</b></span> not sure if that's what @jdost321 wants, I doubt he does ...<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:02:31)</span> <b>blin:</b></span> gwms 3.2.19 + condor 8.6.x + corresponding blahp should all work. you shouldn't need to exclude anything<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:03:20)</span> <b>marian:</b></span> I understand that, but having trouble without much tricks get to update on osg3.3 node<br/>
+<span style="color: #e7392d"><span style="font-size: small">(11:03:31)</span> <b>klarson1:</b></span> isn't the issue is moving to osg3.4 - that's a whole other set of possible changes?<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:04:47)</span> <b>marian:</b></span> yeah, I suggested to move node to osg3.4 but that requires change request in place for GOC people and wait for their schedule etc<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:05:18)</span> <b>marian:</b></span> can ask GOC staff, though ...<br/>
+<span style="color: #e7392d"><span style="font-size: small">(11:07:47)</span> <b>klarson1:</b></span> maybe the upgrade to 8.6 needs to coincide with the osg3.4 upgrade then.  we are going to have to move to it at some point :slightly_smiling_face:<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:16:46)</span> <b>marian:</b></span> yeah, that'll be smooth way I believe<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:11:30)</span> <b>rynge:</b></span> For what it is worth, the OSG VO frontend was upgraded to OSG 3.4, HTCondor 8.6.3 and gwms 3.2.19<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:11:37)</span> <b>rynge:</b></span> No issues as far as we can tell<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:12:02)</span> <b>rynge:</b></span> We just went to OSG 3.4, and did an upgrade<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:57:58)</span> <b>marian:</b></span> ah, so have you just changed repo destination pointing to 3.4 and ran yum update ... ?<br/>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jul 31, 2018 : #general (osg)</title>
+</head>
+<body>
+<h3>Tue Jul 31, 2018 : #general (osg)</h3>
+<span style="color: #a72f79"><span style="font-size: small">(11:53:52)</span> <b>andrew.melo:</b></span> Derek -- I'll try to find that link later this afternoon.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(11:54:28)</span> <b>andrew.melo:</b></span> For the initial sync, we've got a couple hundred GB we're wanting to move over. Does the login node have a 10g link? (or, also, can the storage keep up)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:00:28)</span> <b>dweitzel:</b></span> I don't think oasis is designed for several hundred GB of data.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:02:18)</span> <b>andrew.melo:</b></span> :disappointed:<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:02:22)</span> <b>briedel:</b></span> depends on how much of said data you access<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:02:36)</span> <b>briedel:</b></span> some of the cvmfs repos are 100s of GB<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:03:06)</span> <b>andrew.melo:</b></span> It's only software installations, but per-cpu-arctechture<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:03:22)</span> <b>dweitzel:</b></span> We're just talking about the oasis repo.<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:03:48)</span> <b>briedel:</b></span> there is only X86 on OSG, what other architectures are you trying to support?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:05:38)</span> <b>andrew.melo:</b></span> Well, revisions, sandybridge, haswell, etc..<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:05:44)</span> <b>andrew.melo:</b></span> Not sure of what the proper term is for that<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:06:09)</span> <b>briedel:</b></span> why do you need such fine grained control?<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:06:13)</span> <b>ian_cancercomputer:</b></span> chip-tuned might make a bit more sense, terminology-wise..<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:06:36)</span> <b>briedel:</b></span> or supported instruction sets<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:07:43)</span> <b>briedel:</b></span> what are you running andrew?<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:07:52)</span> <b>briedel:</b></span> blas?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:08:19)</span> <b>andrew.melo:</b></span> A whole mess of things, it's your typical university HPC center - <a href="https://www.vanderbilt.edu/accre/">https://www.vanderbilt.edu/accre/</a><br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:08:44)</span> <b>briedel:</b></span> we already have a bunch of code in OASIS<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:08:49)</span> <b>briedel:</b></span> in the module system<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:08:51)</span> <b>ian_cancercomputer:</b></span> On a side-note, how're you building these images?  there are de-tuning compilation options you can specify to gcc so it'll run on more generic chipsets while still working with advanced instructions when available..<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:09:59)</span> <b>andrew.melo:</b></span> It's all via easybuild<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:10:15)</span> <b>andrew.melo:</b></span> Lemme explain our reasoning for wanting to use CVMFS and it'll make more sense<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:10:48)</span> <b>briedel:</b></span> i mean it just seems like you would want to have your own subrepo<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:10:58)</span> <b>briedel:</b></span> cause it will otherwise be a huge pain<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:12:40)</span> <b>briedel:</b></span> (at least how it used to be set up, @dweitzel can correct me)<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:38:47)</span> <b>andrew.melo:</b></span> We currently have a large easybuild installation area on GPFS, and we also have a ~decent-sized (50 nodes now, but growing) Mesos+Spark cluster who are using multi-GB docker images.<br/><br/>1) We currently pay (a lot) for GPFS licenses, but a lot of our groups aren't using GPFS for anything but to load the software installations - We could save a lot of money by not installing GPFS across our whole fleet of nodes, but we need a way for the software to get to each host. (Our CMS group, for instance, has recently completed deleting GPFS from all their nodes, since all the software is provided by CVMFS). We've also had the absolute worst time recently with GPFS' performance, so it can sometimes take 15-20 minutes to load Matlab<br/>2) Our Mesos cluster has bad latency times when someone starts up a job with an image that doesn't currently exist. Not only does it take a decent bit of time to load these large images, while that's happening, it impacts the i/o of other tasks on the same nodes (who might be spooling shuffle blocks to disk)<br/>3) Like a lot of HPC centers, there's a lot of demand from our users to be able to use elastic resources. e.g. if they need something done ASAP and are willing to pay. Or, some users have large desktop machines attached to equipment in their lab, and they want to have the same software environment that they'd get locally.<br/><br/>For (1) and (3), CVMFS is a natural distribution choice. For (2), we could either shrink the images by using the CVMFS docker graphdriver (which loads the layers from CVMFS) or having the images themselves be thin, and just re-using the modules install we have there<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:40:57)</span> <b>ian_cancercomputer:</b></span> I'm no expert, but it sounds like you'd just want to set up a CVMFS stratum-0 repo of your own, no?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:41:21)</span> <b>andrew.melo:</b></span> I'd rather not!<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:41:36)</span> <b>andrew.melo:</b></span> I thought that's the whole point of having a shared service..<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:43:22)</span> <b>andrew.melo:</b></span> @dweitzel I think what I ran into was within here <a href="https://osg-docs.readthedocs.io/en/latest/Other/cvmfs/">https://osg-docs.readthedocs.io/en/latest/Other/cvmfs/</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:45:54)</span> <b>dweitzel:</b></span> ok, that's not the osg docs.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:46:10)</span> <b>dweitzel:</b></span> and I have deleted that (apparently it was my early testing of the osg docs)<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:47:30)</span> <b>andrew.melo:</b></span> Yeah, I think some search of "osg" and "cvmfs" pulled that up<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:47:48)</span> <b>blin:</b></span> we really should have @dwd weigh in on your use case @andrew.melo<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:48:14)</span> <b>andrew.melo:</b></span> That's fair. I asked a few times if there was size limitations and never got a response<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:51:08)</span> <b>bbockelm:</b></span> @andrew.melo - how dynamic is the code?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:51:15)</span> <b>andrew.melo:</b></span> If I need to go through and provision a stratum-0, then a stratum-1 (?), it's gonna jam this project up a good while.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:51:21)</span> <b>bbockelm:</b></span> I.e., does it change by gigabytes per day?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:51:25)</span> <b>andrew.melo:</b></span> Oh no<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:51:55)</span> <b>andrew.melo:</b></span> Easybuild has releases every 6 months or so, and then we might add an extra package occasionally by user request<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:52:11)</span> <b>ian_cancercomputer:</b></span> do stratum-0's need to provision their own stratum-1's or can one apply to have the existing network of stratum-1's subscribe to it?<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:52:14)</span> <b>briedel:</b></span> the stratum-0 takes a day to setup, and all you need as far as i can tell is VM with 2 TB of disk<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:52:33)</span> <b>briedel:</b></span> you dont need your own stratum-1<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:52:49)</span> <b>bbockelm:</b></span> so, at hundreds of GBs, it might be a pain to do in the central repository (<tt>/cvmfs/oasis.opensciencegrid.org/accre</tt>).  Might be easier to do your own repository server @ Vandy.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:53:40)</span> <b>bbockelm:</b></span> The files still get hosted / delivered on the OSG Stratum-1 network, but you manage who can login and publish things.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:53:42)</span> <b>andrew.melo:</b></span> I'm sure I could stand up a stratum-0 in an afternoon, but that's different than standing one up in config-management, so we could replace it if we needed to. It's that last 5% that takes all the time<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:54:09)</span> <b>bbockelm:</b></span> Here's the link for setting up your own repo: <a href="https://opensciencegrid.org/docs/data/external-oasis-repos/">https://opensciencegrid.org/docs/data/external-oasis-repos/</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:54:19)</span> <b>bbockelm:</b></span> I'm sure you've seen this one: <a href="https://opensciencegrid.org/docs/data/update-oasis/">https://opensciencegrid.org/docs/data/update-oasis/</a> ?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:54:43)</span> <b>andrew.melo:</b></span> Yeah, I've seen both those, but then I ran across this <a href="https://opensciencegrid.org/docs/other/install-cvmfs-stratum1/">https://opensciencegrid.org/docs/other/install-cvmfs-stratum1/</a> too<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:55:03)</span> <b>briedel:</b></span> you dont need a stratum1<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:55:31)</span> <b>andrew.melo:</b></span> Well yeah, I know that now, but as someone not real well-versed in CVMFS, that's not entirely clear -- particularly if you're also reading the upstream CVMFS docs<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:27:08)</span> <b>bbockelm:</b></span> :slightly_smiling_face: send a PR?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:28:31)</span> <b>andrew.melo:</b></span> Maybe the guy who doesn't undertand how things work shouldn't be putting his understanding on paper :slightly_smiling_face:<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:30:54)</span> <b>blin:</b></span> i find that's the best way to get people to pay attention to a PR :slightly_smiling_face:<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:31:49)</span> <b>blin:</b></span> people like correcting other people<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:31:57)</span> <b>andrew.melo:</b></span> lol, like the gentoo one that put <tt>rm -rf /</tt> in a couple popular packages.. though I guess that wasn't a PR, per-se<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:38:57)</span> <b>bbockelm:</b></span> Yeah, you hear about bikeshedding wars, not documentation-writing-wars.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:39:21)</span> <b>bbockelm:</b></span> fwiw - since ACCRE is registered in topology with OASIS enabled, it looks like you just need to login and do your first publication.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:40:15)</span> <b>andrew.melo:</b></span> Grrrrr. my cert expired at some point and I didn't propagate it like a dummy (the new one, not the expired one)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:41:08)</span> <b>bbockelm:</b></span> that one I can't help with!<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:42:03)</span> <b>andrew.melo:</b></span> It's time for my annual "google for the right options to make openssl split a .p12 into two .pem" move<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:43:37)</span> <b>bbockelm:</b></span> another reason we should move all this crap to CILogon -- you can just register your SSH key and be done with it.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:46:20)</span> <b>bbockelm:</b></span> <a href="https://opensciencegrid.org/docs/security/user-certs/#certificate-formats">https://opensciencegrid.org/docs/security/user-certs/#certificate-formats</a> &lt;~ fwiw<br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:50:04)</span> <b>andrew.melo:</b></span> I use homeshick to store all my dotfiles, I'm going to (finally) make a little script to fix this<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:54:00)</span> <b>andrew.melo:</b></span> Whee. Got my first publication in!<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:57:10)</span> <b>andrew.melo:</b></span> Once I run <tt>osg-oasis-update</tt>, when the job completes running, dos that mean the staging area can be modified again?<br/>
+<span style="color: #965d1b"><span style="font-size: small">(16:25:42)</span> <b>briedel:</b></span> Yes<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:30:38)</span> <b>andrew.melo:</b></span> Nice<br/>
+<span style="color: #99a949"><span style="font-size: small">(21:19:36)</span> <b>dwd:</b></span> @andrew.melo The copy from the staging area does not happen right away.  You can modify it again, but you may end up with a partial update.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(21:20:02)</span> <b>andrew.melo:</b></span> gotcha. so I should block until I see the files locally just to be sure?<br/>
+<span style="color: #99a949"><span style="font-size: small">(21:25:09)</span> <b>dwd:</b></span> You can do condor_q on the oasis-login machine and when the publish is done you can start modifying the staging area again.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(21:25:44)</span> <b>andrew.melo:</b></span> Gotcha. That's easy enough<br/>
+<span style="color: #99a949"><span style="font-size: small">(21:26:01)</span> <b>dwd:</b></span> I am on vacation right now so missed most of the conversation today.  I saw that I was pinged at 11:47 but it seems like most of the questions were answered — is there still something you’d like my advice on?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(21:26:48)</span> <b>andrew.melo:</b></span> I thiiink I'm all set, at least for the basic functionality. I'll need to change some symlinks from relative to absolute<br/>
+<span style="color: #99a949"><span style="font-size: small">(21:27:09)</span> <b>dwd:</b></span> A couple of hundred gigabytes in the oasis repo shouldn’t be too much for it to handle, but usually the user/publisher experience is much better on your own local stratum-0 VM<br/>
+<span style="color: #a72f79"><span style="font-size: small">(21:28:46)</span> <b>andrew.melo:</b></span> I'll keep that in consideration<br/>
+<span style="color: #99a949"><span style="font-size: small">(21:28:52)</span> <b>dwd:</b></span> ok<br/>
+<span style="color: #99a949"><span style="font-size: small">(21:28:57)</span> <b>dwd:</b></span> TTYL<br/>
+<span style="color: #a72f79"><span style="font-size: small">(21:29:05)</span> <b>andrew.melo:</b></span> thanks!<br/>
+<span style="color: #a72f79"><span style="font-size: small">(21:29:09)</span> <b>andrew.melo:</b></span> enjoy your vacation<br/>
+</body>
+</html>

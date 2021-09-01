@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Mar 29, 2017 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Wed Mar 29, 2017 : #xcache (osg)</h3>
+<span style="color: #674b1b"><span style="font-size: small">(12:11:45)</span> <b>rynge:</b></span> Maybe a new stashcp error?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:11:48)</span> <b>rynge:</b></span> stashcp '/user/agladstein/public/macsswig_simsaj_1490131658/04/D6/outputs-98376.tar.gz' '/storage/local/data1/condor/execute/dir_813126/glide_L1LVQb/execute/dir_876486/pegasus.4wZrm4'<br/>2017-03-29 01:06:39,605    INFO:  [FATAL] Connection error<br/>Traceback (most recent call last):<br/>  File "/cvmfs/oasis.opensciencegrid.org/osg/modules/stashcp/4.1.1/bin/stashcp", line 329, in &lt;module&gt;<br/>    main()<br/>  File "/cvmfs/oasis.opensciencegrid.org/osg/modules/stashcp/4.1.1/bin/stashcp", line 323, in main<br/>    doStashCpSingle(sourceFile=source, destination=destination, cache=cache, debug=args.debug)<br/>  File "/cvmfs/oasis.opensciencegrid.org/osg/modules/stashcp/4.1.1/bin/stashcp", line 29, in doStashCpSingle<br/>    fileSize = int(re.findall(r"Size:   \d+", xrdfs)[0].split(":   ")[1])<br/>IndexError: list index out of range<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:05:45)</span> <b>dweitzel:</b></span> nope, that looks like same old, same old.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:08:52)</span> <b>rynge:</b></span> Seems scalability related - we are seeing it more when we have a lot of connections<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:09:16)</span> <b>dweitzel:</b></span> that could indicate that stash is being overwhelmed.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:09:41)</span> <b>dweitzel:</b></span> I have a pull request, the new version should fix this:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:09:42)</span> <b>dweitzel:</b></span> <a href="https://github.com/opensciencegrid/StashCache/pull/53/files#diff-ff9c9c6c902644a8b1cd16bf7d3a56f0R29">https://github.com/opensciencegrid/StashCache/pull/53/files#diff-ff9c9c6c902644a8b1cd16bf7d3a56f0R29</a><br/>
+<span style="color: #e96699"><span style="font-size: small">(13:11:31)</span> <b>lincoln:</b></span> lets see<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:12:03)</span> <b>lincoln:</b></span> at least at the origin level, we look ok<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:12:17)</span> <b>lincoln:</b></span> @lincoln uploaded a file: <a href="https://opensciencegrid.slack.com/files/lincoln/F4S9CD479/pasted_image_at_2017_03_29_02_12_pm.png">Pasted image at 2017-03-29, 2:12 PM</a><br/>
+<span style="color: #e96699"><span style="font-size: small">(13:12:56)</span> <b>lincoln:</b></span> very little traffic in general @ the origin<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:13:53)</span> <b>lincoln:</b></span> not a lot of open connections either, at least not right now<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:18:51)</span> <b>rynge:</b></span> Ok, I seem to see a lot of these errors<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:22:30)</span> <b>rynge:</b></span> Another one:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:22:32)</span> <b>rynge:</b></span> 2017-03-29 00:36:55,648    INFO:  Run: [ERROR] Server responded with an error: [3005] Unable to open /user/agladstein/public/macsswig_simsaj_1490131658/05/F3/outputs-73000.tar.gz; too many open files<br/><br/>WARNING:root:XrdCP from cache failed on <a href="root://stash.osgconnect.net">root://stash.osgconnect.net</a>, pulling from origin<br/>Run: [ERROR] Server responded with an error: [3005] Unable to open /user/agladstein/public/macsswig_simsaj_1490131658/05/F3/outputs-73000.tar.gz; too many open files<br/><br/>ERROR:root:stashcp failed after 3 attempts<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:26:15)</span> <b>lincoln:</b></span> lemme check the xrd logs<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:26:48)</span> <b>lincoln:</b></span> <pre><br/>[root@stash xrootd]# /etc/init.d/xrootd status<br/>[default] xrootd dead but pid file exists<br/></pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(13:26:49)</span> <b>lincoln:</b></span> nailed it<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:26:55)</span> <b>rynge:</b></span> I'm heading out for lunch - will be back in 30 mins<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:26:56)</span> <b>rynge:</b></span> Heh<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:27:00)</span> <b>lincoln:</b></span> wonder if it dumped core<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:27:26)</span> <b>lincoln:</b></span> well, thing to do.. put <a href="http://stash.osgconnect.net">stash.osgconnect.net</a> on EL7 and have systemd autorestart it<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:29:04)</span> <b>lincoln:</b></span> whats the recommended XRootD version on the origin?<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(13:37:22)</span> <b>kherner:</b></span> @dweitzel Did you get a chance yet to set up <a href="http://uboone.osgstorage.org">uboone.osgstorage.org</a> and <a href="http://mu2e.ogstorage.org">mu2e.ogstorage.org</a>? Someone was asking about it the other day.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:40:31)</span> <b>dweitzel:</b></span> nope, on my docket for this week.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:55:26)</span> <b>rynge:</b></span> @lincoln so xrootd is up again?<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:57:16)</span> <b>lincoln:</b></span> should be<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:57:26)</span> <b>lincoln:</b></span> errors go away?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:58:30)</span> <b>rynge:</b></span> Still checking<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:58:44)</span> <b>rynge:</b></span> Can you keep an eye on that log file?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:00:01)</span> <b>rynge:</b></span> $ stashcp -d '/user/agladstein/public/macsswig_simsaj_1490131658/00/E4/outputs-75961.tar.gz' /tmp<br/>DEBUG:root:Trying geoip site of: <a href="http://cvmfs-s1bnl.opensciencegrid.org:8000/cvmfs/oasis.opensciencegrid.org">http://cvmfs-s1bnl.opensciencegrid.org:8000/cvmfs/oasis.opensciencegrid.org</a><br/>DEBUG:root:Querying for closest cache: <a href="http://cvmfs-s1bnl.opensciencegrid.org:8000/cvmfs/oasis.opensciencegrid.org/api/v1.0/geo/@proxy@/stash.osgconnect.net,xrd-cache-1.t2.ucsd.edu,mwt2-stashcache.campuscluster.illinois.edu,hcc-stash.unl.edu,osgxroot.usatlas.bnl.gov">http://cvmfs-s1bnl.opensciencegrid.org:8000/cvmfs/oasis.opensciencegrid.org/api/v1.0/geo/@proxy@/stash.osgconnect.net,xrd-cache-1.t2.ucsd.edu,mwt2-stashcache.campuscluster.illinois.edu,hcc-stash.unl.edu,osgxroot.usatlas.bnl.gov</a><br/>DEBUG:root:Got error code 200 from <a href="http://cvmfs-s1bnl.opensciencegrid.org:8000/cvmfs/oasis.opensciencegrid.org">http://cvmfs-s1bnl.opensciencegrid.org:8000/cvmfs/oasis.opensciencegrid.org</a><br/>DEBUG:root:Got response ['1', '3', '4', '5', '2']<br/>DEBUG:root:Returning closest cache: <a href="root://stash.osgconnect.net">root://stash.osgconnect.net</a><br/>DEBUG:root:Checking size of file.<br/>DEBUG:root:Size of the file /user/agladstein/public/macsswig_simsaj_1490131658/00/E4/outputs-75961.tar.gz is 1655<br/>DEBUG:root:Using Cache <a href="root://stash.osgconnect.net">root://stash.osgconnect.net</a><br/>DEBUG:root:Checking if the CVMFS file exists: /cvmfs/stash.osgstorage.org/user/agladstein/public/macsswig_simsaj_1490131658/00/E4/outputs-75961.tar.gz<br/>DEBUG:root:Succesfully copied file from CVMFS!<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:00:05)</span> <b>rynge:</b></span> Seems like it is working<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:00:23)</span> <b>rynge:</b></span> But why do we do all the xrootd stuff first, and then decide to pick it up from CVMFS?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:00:33)</span> <b>rynge:</b></span> Shouldn't the logic be to check CVMFS first?<br/>
+</body>
+</html>

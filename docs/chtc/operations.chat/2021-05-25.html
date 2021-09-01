@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue May 25, 2021 : #operations (chtc)</title>
+</head>
+<body>
+<h3>Tue May 25, 2021 : #operations (chtc)</h3>
+<span style="color: #e7392d"><span style="font-size: small">(15:09:57)</span> <b>ckoch5:</b></span> thank you. this would be a good mini student project if we don’t get around to it<br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:09:06)</span> <b>wiscmoate:</b></span> @ckoch5 here's the web address for the <tt>get_quotas</tt> script if you care -&gt; <a href="https://git.chtc.wisc.edu/?p=unprivileged_scripts.git;a=blob;f=quotas/cephfs/get_quotas;h=a42944b2d30fcc1b4c5ede69358a9ea4616663d0;hb=HEAD">https://git.chtc.wisc.edu/?p=unprivileged_scripts.git;a=blob;f=quotas/cephfs/get_quotas;h=a42944b2d30fcc1b4c5ede69358a9ea4616663d0;hb=HEAD</a><br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:07:26)</span> <b>wiscmoate:</b></span> We aren't using SSDs currently<br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:07:08)</span> <b>wiscmoate:</b></span> We *do* use rrdcached, but i'm guessing it's a disk throughput issue<br/>
+<blockquote>
+<span style="color: #385a86"><span style="font-size: small">(21:02:09)</span> <b>kcramer:</b></span> Looking at the aggregate graphs shows it does hit at least 95% (probably aggregated over 10-30s depending on the config). Might want to check the underlying raid volume, should be raid0 iirc, but no idea how many disks off hand.<br/>
+</blockquote>
+<span style="color: #3c989f"><span style="font-size: small">(15:06:20)</span> <b>wiscmoate:</b></span> So probably not a CPU problem;  here's the ganglia graphs of <a href="http://ganglia.chtc.wisc.edu">ganglia.chtc.wisc.edu</a> itself -&gt; <a href="https://ganglia.chtc.wisc.edu/?r=day&amp;cs=&amp;ce=&amp;m=cpu_report&amp;c=CHTC&amp;h=ganglia3000.chtc.wisc.edu&amp;tab=m&amp;vn=&amp;tz=&amp;hide-hf=false&amp;mc=2&amp;z=medium&amp;metric_group=ALLGROUPS">https://ganglia.chtc.wisc.edu/?r=day&amp;cs=&amp;ce=&amp;m=cpu_report&amp;c=CHTC&amp;h=ganglia3000.chtc.wisc.edu&amp;tab=m&amp;vn=&amp;tz=&amp;hide-hf=false&amp;mc=2&amp;z=medium&amp;metric_group=ALLGROUPS</a><br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:01:55)</span> <b>wiscmoate:</b></span> Could be an <tt>htop</tt> resolution problem though<br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:01:40)</span> <b>wiscmoate:</b></span> @tannenba FYI, when I run <tt>htop</tt> on <a href="http://ganglia.chtc.wisc.edu">ganglia.chtc.wisc.edu</a> and then load up a Miron view I don't see all 8 CPUs plateau<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:57:29)</span> <b>wiscmoate:</b></span> But the file is already being populated by puppet, it just copies it from its repository<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:57:08)</span> <b>wiscmoate:</b></span> I'd be all about it if it was like, 5+ files<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:55:46)</span> <b>matyas:</b></span> TBH your call -- I figured putting things in an RPM lets you just stick it in puppet<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:55:02)</span> <b>wiscmoate:</b></span> If you guys want to put it in an RPM I won't fight it<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:54:40)</span> <b>wiscmoate:</b></span> I'll fool with the root PATH<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:53:43)</span> <b>wiscmoate:</b></span> Thank you,<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(14:53:35)</span> <b>lmichael:</b></span> @wiscmoate Reminder to jump to <a href="https://uwmadison.zoom.us/j/94114847728">https://uwmadison.zoom.us/j/94114847728</a> for team pic right now!<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:53:21)</span> <b>wiscmoate:</b></span> We do, but it seems somewhat heavy-handed, especially when the script is currently being continuous integrated<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:50:03)</span> <b>matyas:</b></span> do we have a place to host the RPMs? shouldn't be too hard to stick it in an RPM<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:47:48)</span> <b>wiscmoate:</b></span> Scripts that don't come from RPMs can be expected to be in <tt>/usr/local/blah</tt><br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:47:29)</span> <b>wiscmoate:</b></span> No, that's pretty muchly the perfect directory for it<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(14:47:11)</span> <b>lmichael:</b></span> Should we put <tt>get_quotas</tt> somewhere else that wouldn’t require a <tt>PATH</tt> change?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:46:45)</span> <b>wiscmoate:</b></span> @lmichael it's possible and not necessarily bad, we just haven't messed with root <tt>PATH</tt> yet<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:46:14)</span> <b>wiscmoate:</b></span> @ckoch5 <tt><a href="mailto:gitolite@git.chtc.wisc.edu">gitolite@git.chtc.wisc.edu</a>:unprivileged_scripts</tt> , <tt>quotas/cephfs/get_quotas</tt><br/>
+<span style="color: #9f69e7"><span style="font-size: small">(14:44:51)</span> <b>lmichael:</b></span> Would also be nice to get <tt>/usr/local/bin</tt> on-path for <tt>sudo</tt>. Or is that bad/not possible?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:44:33)</span> <b>ckoch5:</b></span> @wiscmoate or @tjslauson do you know?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:44:25)</span> <b>ckoch5:</b></span> I know Jess wrote the original script but I’m not sure where it originates<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:44:13)</span> <b>ckoch5:</b></span> so something else to fix. :slightly_smiling_face:<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:44:08)</span> <b>ckoch5:</b></span> (if you don’t have a quota set)<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:43:40)</span> <b>ckoch5:</b></span> The output should be<br/><pre>N/A N/A 0 2</pre><br/>
+<span style="color: #9f69e7"><span style="font-size: small">(14:43:23)</span> <b>lmichael:</b></span> Ah. Now I set a quota for myself:<br/><pre>[lmichael@transfer2000 lmichael]$ get_quotas /staging/lmichael<br/>Path               Quota(GB)  Items  Disk_Usage(GB)  Items_Usage<br/>/staging/lmichael  10         100    2.32831e-08     2</pre><br/>So, yes, still a bug when no quota set.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:42:43)</span> <b>ckoch5:</b></span> which is (arguably) another bug<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:42:33)</span> <b>ckoch5:</b></span> you do, they’re just in the wrong columns<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(14:42:20)</span> <b>lmichael:</b></span> No, but shouldn’t I still get a tally for Disk_Usage(GB) and Items_Usage?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:42:11)</span> <b>ckoch5:</b></span> that’s what you’ll see if you don’t have a quota set.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:42:03)</span> <b>ckoch5:</b></span> do you have a quota?<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(14:41:47)</span> <b>lmichael:</b></span> Still broken:<br/><pre>[lmichael@transfer2000 lmichael]$ ls -lht<br/>total 512<br/>-rw-rw-r-- 1 lmichael lmichael 25 May 25 14:41 file_test<br/>[lmichael@transfer2000 lmichael]$ get_quotas /staging/lmichael<br/>Path               Quota(GB)  Items  Disk_Usage(GB)  Items_Usage<br/>/staging/lmichael  0          2</pre><br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:41:19)</span> <b>wiscmoate:</b></span> But yeah, it should work when she runs it on her own staging directory<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:40:49)</span> <b>wiscmoate:</b></span> That way the path gets resolved in your environment<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:40:40)</span> <b>wiscmoate:</b></span> @lmichael <tt>sudo $(which get_quotas) /staging/mfrayer</tt><br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:40:09)</span> <b>ckoch5:</b></span> she should be able to run <tt>get_quotas /staging/mfrayer</tt><br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:40:01)</span> <b>wiscmoate:</b></span> I mean, the script should probably say "Error: directory not found"<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(14:39:53)</span> <b>lmichael:</b></span> but what about mfrayer?<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(14:39:22)</span> <b>lmichael:</b></span> lol. no.<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(14:39:05)</span> <b>tjslauson:</b></span> different question - do you have a staging directory?<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(14:39:00)</span> <b>lmichael:</b></span> <pre>[lmichael@transfer2000 ~]$ get_quotas /staging/lmichael<br/>Path               Quota(GB)  Items  Disk_Usage(GB)  Items_Usage<br/>/staging/lmichael</pre><br/>
+<span style="color: #9f69e7"><span style="font-size: small">(14:38:51)</span> <b>lmichael:</b></span> above<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(14:37:53)</span> <b>tjslauson:</b></span> what was the exact command you used to check your staging quotas?<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(14:37:15)</span> <b>lmichael:</b></span> And can we get <tt>get_quotas</tt> on-path for <tt>sudo</tt>, so that RCFs can check user quotas, too?<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(14:36:56)</span> <b>tjslauson:</b></span> hrm<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(14:36:41)</span> <b>lmichael:</b></span> I just tried on my own /staging/lmichael location, as myself (see above).<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(14:36:21)</span> <b>tjslauson:</b></span> they can if they own the path they're pointing at<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:36:20)</span> <b>wiscmoate:</b></span> They should be able to -<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(14:36:09)</span> <b>lmichael:</b></span> Point is that a regular user needs to be able to check their own quota, and they currently can’t.<br/><a href="https://chtc.cs.wisc.edu/file-avail-largedata.shtml">https://chtc.cs.wisc.edu/file-avail-largedata.shtml</a><br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:35:23)</span> <b>wiscmoate:</b></span> Root doesn't have <tt>/usr/local/bin</tt> in its path<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(14:35:19)</span> <b>tjslauson:</b></span> <br/>
+<span style="color: #9f69e7"><span style="font-size: small">(14:35:02)</span> <b>lmichael:</b></span> did.<br/><pre>[lmichael@transfer2000 ~]$ sudo get_quotas /staging/mfrayer<br/>sudo: get_quotas: command not found<br/>[lmichael@transfer2000 ~]$ get_quotas /staging/lmichael<br/>Path               Quota(GB)  Items  Disk_Usage(GB)  Items_Usage<br/>/staging/lmichael</pre><br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:33:37)</span> <b>wiscmoate:</b></span> Or try it on files you own<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:33:15)</span> <b>wiscmoate:</b></span> @lmichael try sudo<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:32:48)</span> <b>wiscmoate:</b></span> I mean, right, the gmond collects the data, passes it to the gmetad, and the ganglia web interface renders it (or that's my understanding)<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(14:32:41)</span> <b>lmichael:</b></span> @tjslauson it appears that get_quotas on <a href="http://transfer.chtc.wisc.edu">transfer.chtc.wisc.edu</a> exists but is broken<br/><pre>[lmichael@transfer2000 ~]$ get_quotas /staging/mfrayer<br/>Path              Quota(GB)  Items  Disk_Usage(GB)  Items_Usage<br/>/staging/mfrayer</pre><br/>Can we fix so that our online guide is accurate? <a href="https://chtc.cs.wisc.edu/file-avail-largedata.shtml">https://chtc.cs.wisc.edu/file-avail-largedata.shtml</a><br/>
+<span style="color: #5a4592"><span style="font-size: small">(14:32:10)</span> <b>tannenba:</b></span> Is the gmond used for displaying data via the web (i.e. queries), or only collecting data?  The slowdown seems to be the former (generating the graphs).  Even looking at the 1hr resolution, data collection looks acceptable....<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:30:54)</span> <b>wiscmoate:</b></span> It's a concern, but not something that's been discussed as a priority yet<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:30:39)</span> <b>wiscmoate:</b></span> There are usually gaps at the highest resolution level (like when you pick "hour" timeframe)<br/>
+<span style="color: #5a4592"><span style="font-size: small">(14:30:14)</span> <b>tannenba:</b></span> Gotcha....  Well, at least it is still working (i.e. at least it is still collecting data decently.... no big data gaps that I can notice....(<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:29:46)</span> <b>wiscmoate:</b></span> Our ganglia configuration has never been so uniform, which is maybe not great when they're all pointed at the same gmond<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:29:18)</span> <b>wiscmoate:</b></span> Definitely no resources have been taken away or downgraded.  Number of hosts reporting to the gmond had definitely changed as we've migrated to EL7<br/>
+<span style="color: #5a4592"><span style="font-size: small">(14:28:23)</span> <b>tannenba:</b></span> Perhaps, but pool size has not really changed over the past year and yet ganglia has significantly slowed down.... wondering if the memory allocated to the ganglia VM is less, or it moved from SSD to spinning rust, or whatnot....<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:26:04)</span> <b>wiscmoate:</b></span> @tannenba Overloaded, I suspect.  All ~1200 hosts and condor_gangliad reporting to one gmond<br/>
+<blockquote>
+<span style="color: #c386df"><span style="font-size: small">(14:38:05)</span> <b>eturatsinze:</b></span> @wiscmoate something we can try to get our ganglia to perform better: I've been thinking about a distributed structure, where we would have a ganglia instance in each DC and they would all report to one master instance. This way we wouldn't have 1000+ hosts reporting to once instance<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:58:18)</span> <b>wiscmoate:</b></span> That would be great<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:59:28)</span> <b>wiscmoate:</b></span> Team video is going on at <a href="https://uwmadison.zoom.us/j/94114847728">https://uwmadison.zoom.us/j/94114847728</a><br/>
+</blockquote>
+<span style="color: #5a4592"><span style="font-size: small">(14:19:06)</span> <b>tannenba:</b></span> So, given the current talk in HTCondor Week, I peeked in at graphs on <a href="http://ganglia.chtc.wisc.edu">ganglia.chtc.wisc.edu</a>.  It is working, but really slow.  Like 30 to 90 seconds to bring up the "Miron View".  Any ideas?<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:04:36)</span> <b>matyas:</b></span> thanks<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:04:19)</span> <b>wiscmoate:</b></span> @matyas :arrow_up:<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:04:10)</span> <b>wiscmoate:</b></span> <pre>[moate@hpc004 ~]$ sudo nmap -sS -p 9841 <a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a><br/><br/>Starting Nmap 6.40 ( <a href="http://nmap.org">http://nmap.org</a> ) at 2021-05-25 14:04 CDT<br/>Nmap scan report for <a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a> (192.170.227.251)<br/>Host is up (0.0062s latency).<br/>PORT     STATE SERVICE<br/>9841/tcp open  unknown<br/><br/>Nmap done: 1 IP address (1 host up) scanned in 0.52 seconds</pre><br/>
+<span style="color: #99a949"><span style="font-size: small">(14:02:35)</span> <b>matyas:</b></span> I don't have a login on it<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:52:41)</span> <b>matyas:</b></span> <a href="http://hpc004.chtc.wisc.edu">hpc004.chtc.wisc.edu</a>, <a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a>:9841<br/>
+<span style="color: #684b6c"><span style="font-size: small">(13:51:27)</span> <b>bbockelman:</b></span> @matyas - can you send an example worker hostname, server hostname, and port # ?   Should be straightforward to reproduce if it's a TCP connectivity issue as it appears from the logs.<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(13:39:36)</span> <b>tjslauson:</b></span> there shouldn't be any outbound customizations on any HPC machine here<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:38:29)</span> <b>wiscmoate:</b></span> Tim could have something in a test branch, but doubtful<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:38:02)</span> <b>wiscmoate:</b></span> I just grepped through our puppet .yaml files, and saw only rules to tell puppet not to delete libvirt and kubernetes <tt>OUTPUT</tt> rules<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:34:56)</span> <b>wiscmoate:</b></span> I'm 99% certain that we do no outbound firewalling<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:33:29)</span> <b>matyas:</b></span> @tjslauson do we have any sort of outbound firewall on the hpc exec nodes? Our glideins are having trouble reaching <a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a> (the port is some random number from 9700 to 9899)<br/>
+<span style="color: #e7392d"><span style="font-size: small">(11:16:37)</span> <b>ckoch5:</b></span> I just wasn’t sure what to look for for the morgan (aos) partition<br/>
+<span style="color: #e7392d"><span style="font-size: small">(11:16:26)</span> <b>ckoch5:</b></span> probably so I can see them, but I tend to use -a anyway<br/>
+<span style="color: #e7392d"><span style="font-size: small">(11:16:16)</span> <b>ckoch5:</b></span> I don’t know. :joy:<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(11:07:15)</span> <b>tjslauson:</b></span> you're in a bunch of the <tt>slurm_partition_</tt> UNIX groups - is it so you can submit to all the partitions, or so you can see them by default?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(11:05:12)</span> <b>ckoch5:</b></span> got it. thanks!<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(11:04:24)</span> <b>tjslauson:</b></span> they've each got a UNIX group named for them<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(11:04:15)</span> <b>tjslauson:</b></span> <tt>morgan</tt> is Dane Morgan's, <tt>wrf_server</tt> is Michael Morgan's<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:33:02)</span> <b>ckoch5:</b></span> is the <tt>morgan</tt> partition in the cluster the one that belongs to *Michael* (not Dane) Morgan? And which unix group <tt>slurm_*</tt> is associated with it? the wrf_server one?<br/>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Mar 29, 2019 : #scitokens (osg)</title>
+</head>
+<body>
+<h3>Fri Mar 29, 2019 : #scitokens (osg)</h3>
+<span style="color: #8f4a2b"><span style="font-size: small">(08:22:05)</span> <b>dabrown:</b></span> @bbockelm I'm running into a problem where my schedd is being overwhelmed with file transfers.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(08:22:11)</span> <b>dabrown:</b></span> <br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(08:22:28)</span> <b>dabrown:</b></span> The load average is over 100 mostly with shadows pushing data down network sockets.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(08:23:31)</span> <b>dabrown:</b></span> If I strace one of the processes in <tt>D</tt> state, I see<br/><pre><br/>sendto(9, "u0\304\277h\354\362~&gt;\257\332?D\212';pL\270?\264si\7\315\274\337? \317\333]"..., 65536, 0, NULL, 0) = 65536<br/>read(13, "\231}\224\300\n\266\350\277\335R\255\222\345\10\342\277\366\336E\301\331b\321\277\5\2334P\325\247\343\277"..., 65536) = 65536<br/>sendto(9, "\231}\224\300\n\266\350\277\335R\255\222\345\10\342\277\366\336E\301\331b\321\277\5\2334P\325\247\343\277"..., 65536, 0, NULL, 0) = 65536<br/>read(13, "D\2121z\3533\343\277|\3 \312\357\177\345\277|,\223@\270h\323?\242\340kk\255\231\311\277"..., 65536) = 65536<br/>sendto(9, "D\2121z\3533\343\277|\3 \312\357\177\345\277|,\223@\270h\323?\242\340kk\255\231\311\277"..., 65536, 0, NULL, 0) = 65536<br/>read(13, "\346\10\2025\300\275\312\277Q18\363:\6\350\277\234\211@\313v\351\302?\340~$\212*m\214\277"..., 65536) = 65536<br/>sendto(9, "\346\10\2025\300\275\312\277Q18\363:\6\350\277\234\211@\313v\351\302?\340~$\212*m\214\277"..., 65536, 0, NULL, 0) = 65536<br/>read(13, "vP%\250r\311\303?\216\320?\5\1\265\353\277\302{\26\ry\361\350\277:\213\311p\22a\354\277"..., 65536) = 65536<br/></pre><br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(08:23:39)</span> <b>dabrown:</b></span> so it doesn't look like disk i/o<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(08:25:52)</span> <b>dabrown:</b></span> Ah, I see what's going on...<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(08:39:00)</span> <b>dabrown:</b></span> Is there a way to figure out what file condor is transferring?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:20:27)</span> <b>dweitzel:</b></span> What is the file handle 13 in that case. <br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:20:32)</span> <b>dweitzel:</b></span> If you do a lsof <br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:20:47)</span> <b>dweitzel:</b></span> Is it a network socket or file ?<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(13:11:05)</span> <b>dabrown:</b></span> @dweitzel I think I've figured out what is going on. My pool is doing transfers from the schedd (and back I think) to the nodes over the public network instead of the private one. This works, but goes through our VPN which throttles things.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(13:11:22)</span> <b>dabrown:</b></span> No one has noticed before, as no one has tried to do these large transfers using condor file i/o<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(13:11:32)</span> <b>dabrown:</b></span> But I think the problem has always been there.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(13:12:03)</span> <b>dabrown:</b></span> I think this is a mismatch between<br/><pre><br/>[root@CRUSH-SUGWG-10-5-138-6 ~]# condor_config_val -dump | grep -i private<br/>PRIVATE_NETWORK_INTERFACE = <br/>PRIVATE_NETWORK_NAME = $(FULL_HOSTNAME)<br/></pre><br/>and<br/><pre><br/>[dbrown@sugwg-condor ~]$ condor_config_val -dump | grep -i private<br/>PRIVATE_NETWORK_INTERFACE = 10.5.2.4<br/>PRIVATE_NETWORK_NAME = SU_ITS<br/></pre><br/>I think the nodes need to have<br/><pre><br/>PRIVATE_NETWORK_NAME = SU_ITS<br/>PRIVATE_NETWORK_INTERFACE = $(NETWORK_INTERFACE)<br/></pre><br/>so that they talk to the schedd over the 10.x address without going through the VPNs.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:37:05)</span> <b>dweitzel:</b></span> @dabrown I thought you were using transfer plugins.  They don't transfer through the schedd.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(19:08:38)</span> <b>dabrown:</b></span> @dweitzel these were checkpoint files that are currently going over regular condor file i/o until I get 6.9.1 installed. The input and output is going over the stash plugin.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(19:14:45)</span> <b>dweitzel:</b></span> Ah, ok. Yup. Makes sense. <br/>
+<span style="color: #235e5b"><span style="font-size: small">(19:15:18)</span> <b>dweitzel:</b></span> Condor has throttles for that. But if it’s gotten better with your changes. Or you are ok with the load, then no worries. <br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:18:58)</span> <b>bbockelm:</b></span> Duncan: to be clear, even in 8.9.1, we don't have checkpoints going over file transfer plugins.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:19:14)</span> <b>bbockelm:</b></span> I think we agreed this sounded like a good feature but we weren't sure what would happen if we enabled this...<br/>
+</body>
+</html>

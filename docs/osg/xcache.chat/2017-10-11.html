@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Oct 11, 2017 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Wed Oct 11, 2017 : #xcache (osg)</h3>
+<span style="color: #8d4b84"><span style="font-size: small">(15:16:46)</span> <b>kherner:</b></span> @dweitzel Do you see any sync errors in <a href="http://des.osgstorage.org">des.osgstorage.org</a> on your end? I have a DES user who overwrote an existing file, but after &gt; 24 hours he still sees the old version of the file in cvmfs. A direct dCache read gives the new file though.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:18:04)</span> <b>dweitzel:</b></span> Do you know the name of the file?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:18:13)</span> <b>dweitzel:</b></span> I can grep through the logs.  Nothing obvious though.<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(15:51:57)</span> <b>kherner:</b></span> It is /cvmfs/des.osgstorage.org/stash/kuropat/scripts/MySoft.tgz<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:17:35)</span> <b>dweitzel:</b></span> Ok, few things.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:17:54)</span> <b>dweitzel:</b></span> 1. The scanning did find the size mismatch, and rescanned the file and uploaded the new file to CVMFS<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:18:15)</span> <b>dweitzel:</b></span> 2. The caches don't care about this though.  The cache that he is using is probably pulling the old version.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:18:45)</span> <b>dweitzel:</b></span> 3. I'm surprised  the user is not seeing CVMFS errors.  The file shouldn't match the checksums anymore, therefore, CVMFS shouldn't be happy.<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(16:24:32)</span> <b>kherner:</b></span> He was seeing I/O errors.<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(16:25:02)</span> <b>kherner:</b></span> What's the solution in that case? Can a user force a cache update?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:25:11)</span> <b>dweitzel:</b></span> nope<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:25:15)</span> <b>dweitzel:</b></span> needs to rename the file.<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(16:26:35)</span> <b>kherner:</b></span> Oh... can one change the name back later after an intervening update?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:26:51)</span> <b>dweitzel:</b></span> nope<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:26:59)</span> <b>dweitzel:</b></span> The cache doesn't "expire".<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:27:14)</span> <b>dweitzel:</b></span> XRootD caches are LRU, with no time expiration as far as I know.<br/>
+</body>
+</html>

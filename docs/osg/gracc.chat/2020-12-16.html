@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Dec 16, 2020 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Wed Dec 16, 2020 : #gracc (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(09:34:23)</span> <b>blin:</b></span> hey @dweitzel i'm a little confused why we have "UConn - Cedar" and "cedar" showing up in the site dropdown of <a href="https://gracc.opensciencegrid.org/d/000000079/site-summary?orgId=1">https://gracc.opensciencegrid.org/d/000000079/site-summary?orgId=1</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(09:35:28)</span> <b>blin:</b></span> it looks like it's all from payload records but i'm struggling to find them in kibana. I've tried looking for "cedar" in the OIM facility, site, resource group, and resource with no luck: <a href="https://gracc.opensciencegrid.org/kibana/goto/c5107829cbf9960004bc2dcecfe1b734">https://gracc.opensciencegrid.org/kibana/goto/c5107829cbf9960004bc2dcecfe1b734</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(09:36:07)</span> <b>blin:</b></span> what am i missing?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:43:40)</span> <b>dweitzel:</b></span> Looking<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:45:48)</span> <b>dweitzel:</b></span> Does IceCube have a cluster named "Cedar"?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:46:21)</span> <b>dweitzel:</b></span> OIM_Site:"Cedar" Reports a Cedar cluster exclusively from icecube submit hosts: <a href="https://gracc.opensciencegrid.org/kibana/goto/69f028b2a08f39ce4976a46f420291a6">https://gracc.opensciencegrid.org/kibana/goto/69f028b2a08f39ce4976a46f420291a6</a><br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(10:07:08)</span> <b>blin:</b></span> any idea about the <tt>UConn - Cedar</tt> entries?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:33:25)</span> <b>dweitzel:</b></span> UConn-CEDAR is coming exclusively from <a href="http://scosg16.jlab.org">scosg16.jlab.org</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:33:32)</span> <b>dweitzel:</b></span> Some local jobs running there?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:49:03)</span> <b>blin:</b></span> the <tt>UConn-CEDAR</tt> records look like they stop coming in after Dec 5 -- which lines up kinda nicely with the factory changing their config on Dec 4<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:49:30)</span> <b>blin:</b></span> i suspect that we can fixup those records -- i'll create a ticket<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:03:35)</span> <b>blin:</b></span> <a href="https://opensciencegrid.atlassian.net/browse/OPS-93">https://opensciencegrid.atlassian.net/browse/OPS-93</a><br/>
+</blockquote>
+<span style="color: #43761b"><span style="font-size: small">(10:05:09)</span> <b>blin:</b></span> ha! no idea. maybe @dschultz knows?<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(10:07:18)</span> <b>dschultz:</b></span> yes, IceCube has a Cedar cluster (from Canada)<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:09:23)</span> <b>blin:</b></span> run by Compute Canada? if so, it's probably the same as the one GlueX is using<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(10:09:29)</span> <b>dschultz:</b></span> yes<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:32:21)</span> <b>blin:</b></span> @dweitzel damn case sensitivity<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:34:36)</span> <b>blin:</b></span> it looks like the <tt>Host description</tt> is set to <tt>Cedar</tt> but the factory config sets all the <tt>GLIDEIN_*</tt> attrs as <tt>ComputeCanada-Cedar</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:35:47)</span> <b>blin:</b></span> the old <tt>cedar</tt> config was in there until Dec 4 so i'm surprised to see new records with the old cedar stuff<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:00:46)</span> <b>dweitzel:</b></span> Is it "special sauce" icecube glideins?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:13:57)</span> <b>blin:</b></span> yeah maybe, i'm poking around the GLOW FE<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:38:05)</span> <b>blin:</b></span> @dschultz do you know if there's any special config sauce on <tt><a href="http://sub-simprod.icecube.wisc.edu">sub-simprod.icecube.wisc.edu</a></tt> for Cedar? I'm not seeing anything in the GLOW FE<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(11:38:55)</span> <b>dschultz:</b></span> only that Cedar is going through IceCube's pyglideins, not through gWMS<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:40:06)</span> <b>dweitzel:</b></span> ^ "special sauce"<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:41:02)</span> <b>dweitzel:</b></span> For the pyglideins, how do you determine how to set GLIDEIN_ResourceName in the pilot?<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(11:49:20)</span> <b>dschultz:</b></span> as far as I can tell, that isn't set (though there are similar classads like <tt>GLIDEIN_Site</tt> and <tt>GLIDEIN_SiteResource</tt>)<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(11:49:41)</span> <b>dschultz:</b></span> I've been meaning to clean up sites/resources for a while, but it's always been very low priority<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:50:20)</span> <b>dweitzel:</b></span> GLIDEIN_Site also works.<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(11:51:12)</span> <b>dschultz:</b></span> so GLIDEIN_Site is set by the site admin to whatever they want<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:53:48)</span> <b>blin:</b></span> ah, so the cedar folks set it?<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(11:57:02)</span> <b>dschultz:</b></span> the person managing the cedar pyglidein instance does.  which happens to be an IceCube member in Alberta with an account on Cedar<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:06:27)</span> <b>blin:</b></span> ah ok, could you reach out to them and ask them to set that to <tt>GLIDEIN_Site</tt> to <tt>CompputeCanada-Cedar</tt> instead? we're getting some duplication in our GRACC dashboards because we officially added them as a site on our side<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(12:10:50)</span> <b>dschultz:</b></span> I asked, and they said they would change that soon<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:21:53)</span> <b>blin:</b></span> perfect, thanks!<br/>
+</body>
+</html>

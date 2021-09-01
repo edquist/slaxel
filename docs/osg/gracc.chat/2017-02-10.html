@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Feb 10, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Fri Feb 10, 2017 : #gracc (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(15:16:52)</span> <b>dweitzel:</b></span> what a great thing to do on a friday afternoon.  We are doing maintenance on anvil at Nebraska.  We just live migrated gratiav2-4 node to another physical host.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:16:58)</span> <b>dweitzel:</b></span> If you couldn't tell, then we did it right!<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:25:04)</span> <b>***kretzke:</b></span> looks carefully at the monitoring<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:26:09)</span> <b>kretzke:</b></span> I don’t see anything, so good job! friday afternoon maintenance :sweat_smile:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:27:49)</span> <b>rynge:</b></span> Looking at my inbox, it looks like UNL works all weekend, every weekend. Friday is probably like any other weekday for anybody else.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:30:05)</span> <b>dweitzel:</b></span> :disappointed:<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:58:54)</span> <b>kretzke:</b></span> @dweitzel did you guys just do something to -1?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:59:04)</span> <b>dweitzel:</b></span> nope.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:00:34)</span> <b>kretzke:</b></span> hm. grafana and prometheus both crashed in the last five minutes<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:03:51)</span> <b>dweitzel:</b></span> any idea why?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:04:10)</span> <b>dweitzel:</b></span> did ES crash?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:06:28)</span> <b>kretzke:</b></span> systemd sent them SIGPIPE, apparently since journald restarted<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:06:56)</span> <b>dweitzel:</b></span> @kretzke any idea why suddenly the whole cluster had a huge spike in load?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:07:06)</span> <b>dweitzel:</b></span> about 20 min after the migration?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:11:25)</span> <b>kretzke:</b></span> all the nodes were in iowait <a href="https://gracc.opensciencegrid.org/dev/dashboard/db/data-nodes?var-interval=10s&amp;var-host=gratiav2-1&amp;var-host=gratiav2-2&amp;var-host=gratiav2-3&amp;var-host=gratiav2-4&amp;var-host=gratiav2-5">https://gracc.opensciencegrid.org/dev/dashboard/db/data-nodes?var-interval=10s&amp;var-host=gratiav2-1&amp;var-host=gratiav2-2&amp;var-host=gratiav2-3&amp;var-host=gratiav2-4&amp;var-host=gratiav2-5</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:12:05)</span> <b>dweitzel:</b></span> hum....<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:14:11)</span> <b>kretzke:</b></span> network glitch?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:20:44)</span> <b>kretzke:</b></span> <tt>Feb 10 21:57:06 gratiav2-1.novalocal systemd[1]: systemd-journald.service watchdog timeout (limit 3min)!</tt><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:20:58)</span> <b>kretzke:</b></span> "This is known issue. If your I/O is painfully slow and journald is blocked in some system call waiting for I/O request to complete then it can miss to send watchdog ping and will be SIGABRT'ed by systemd.”<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:21:40)</span> <b>kretzke:</b></span> so network or ceph<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:24:16)</span> <b>dweitzel:</b></span> hum..., but all is ok again?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:26:11)</span> <b>kretzke:</b></span> yes<br/>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Feb 26, 2016 : #software (osg)</title>
+</head>
+<body>
+<h3>Fri Feb 26, 2016 : #software (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(08:26:08)</span> <b>dweitzel:</b></span> @matyas: the build now works for EL6, but not EL7.  <a href="https://travis-ci.org/djw8605/osg-configure/builds/111883233">https://travis-ci.org/djw8605/osg-configure/builds/111883233</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(08:26:20)</span> <b>dweitzel:</b></span> It’s an issue with /var/lock on systemd managed systems.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(08:26:26)</span> <b>dweitzel:</b></span> Condor should really fix that.<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:03:44)</span> <b>lincoln:</b></span> hi<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:03:48)</span> <b>lincoln:</b></span> whats the state of SL7 support?<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:09:36)</span> <b>lincoln:</b></span> i.e., is anyone actually using OSG 3.3 on SL7?<br/>
+<span style="color: #d1707d"><span style="font-size: small">(10:13:20)</span> <b>gattebury:</b></span> we’ve got a few hosts (only a few) that are CentOS 7 and OSG 3.3 — squid servers being the first to come to mind<br/>
+<span style="color: #d1707d"><span style="font-size: small">(10:13:23)</span> <b>gattebury:</b></span> nothing using condor though<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:32:40)</span> <b>lincoln:</b></span> ya cool<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:33:00)</span> <b>lincoln:</b></span> ima build some SL7 workers.<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:54:10)</span> <b>matyas:</b></span> @dweitzel: the RPMs shouldn't fail to install, though<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:54:36)</span> <b>dweitzel:</b></span> yeah, they do in a docker environment, because systemd hasn’t created /var/lock<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:55:00)</span> <b>matyas:</b></span> ah, I see<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:55:26)</span> <b>dweitzel:</b></span> only condor and gratia fail to install because of this.<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:56:24)</span> <b>matyas:</b></span> htcondor-ce<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:56:30)</span> <b>matyas:</b></span> so we can fix that one ourselves<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:57:23)</span> <b>matyas:</b></span> can you pre-create it in the tests, though?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:57:48)</span> <b>matyas:</b></span> also, is there a better way to fix it than to just stick this in the %files section:<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:58:04)</span> <b>matyas:</b></span> %dir %{_localstatedir}/lock<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:59:20)</span> <b>dweitzel:</b></span> well, I think you’re suppose to do something with systemd.  Like put something in a tempfiles.d ?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:59:31)</span> <b>dweitzel:</b></span> Yes, I can pre-create it in the tests though.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:42:30)</span> <b>matyas:</b></span> totally separate subject: can you put line continuations in xrootd config files?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:43:34)</span> <b>matyas:</b></span> e.g. there is this monster line in the xrood install docs:<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:43:37)</span> <b>matyas:</b></span> sec.protocol /usr/lib64 gsi -certdir:/etc/grid-security/certificates -cert:/etc/grid-security/xrd/xrdcert.pem -key:/etc/grid-security/xrd/xrdkey.pem -crl:3 -authzfun:libXrdLcmaps.so -authzfunparms:--osg,--lcmapscfg,/etc/xrootd/lcmaps.cfg,--loglevel,0|useglobals --gmapopt:2 --gmapto:0<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:43:55)</span> <b>matyas:</b></span> is there some way I can break it up into multiple lines?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:49:44)</span> <b>dweitzel:</b></span> That’s probably a question for @marian<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:51:29)</span> <b>marian:</b></span> Not sure, would try \<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:51:46)</span> <b>marian:</b></span> As line separator<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:06:58)</span> <b>bbockelm:</b></span> My bet is no.  <tt>:set wrap</tt> in vim?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:26:22)</span> <b>matyas:</b></span> do you know what the InstallXrootd doc looks like printed?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:26:36)</span> <b>bbockelm:</b></span> :poop:<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:26:36)</span> <b>matyas:</b></span> unreadable because it's in size 3 just to fit THAT ONE LINE<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:26:54)</span> <b>***matyas:</b></span> sighs<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:27:27)</span> <b>bbockelm:</b></span> can xrootd do macros?<br/>
+</body>
+</html>

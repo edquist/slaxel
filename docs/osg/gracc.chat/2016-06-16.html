@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jun 16, 2016 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Thu Jun 16, 2016 : #gracc (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(07:53:29)</span> <b>bbockelm:</b></span> @dweitzel: can you tackle the disk stuff today?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:46:56)</span> <b>dweitzel:</b></span> Adding more disk?  Sure. <br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:47:36)</span> <b>kretzke:</b></span> I’m running some numbers to give us an idea what we might need<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:50:45)</span> <b>kretzke:</b></span> Transferring the active history (about a year) from Gratia will need up to 10 TB. A lot of that is in the transfer database since FNAL dCache was pushing 4-5 mil records/day alone.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:52:30)</span> <b>kretzke:</b></span> Now it sends hourly summaries, so rate is well under 1 mil/day. Current rate puts us around 3 TB/year for GRACC<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:57:05)</span> <b>kretzke:</b></span> other stuff about 1TB, mostly from Brian’s scrapers. I’ve been pruning FIFE logs after one month so that usage won’t grow much<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:03:07)</span> <b>kretzke:</b></span> so I think adding another 2-3TB per node would be good at this point<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:05:08)</span> <b>kretzke:</b></span> oh yeah, there was talk of loading in all the old Gratia archives at some point. Very rough guess that would be another 10TB<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:51:12)</span> <b>dweitzel:</b></span> Ok, 2-3 TB per node.  Should we think about adding another node?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:51:28)</span> <b>dweitzel:</b></span> Should I also add a new volume to the head node?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:59:21)</span> <b>kretzke:</b></span> more nodes wouldn’t hurt of course, but I don’t know that it’s necessary. load on the data nodes is around 50% typically.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:02:47)</span> <b>dweitzel:</b></span> What about the head node?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:03:11)</span> <b>kretzke:</b></span> yeah, we should also do a volume for snapshots. if we want to backup everything that’s going to need to be minimum half the expected size of the cluster (I think everything has 1 replica right now)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:03:56)</span> <b>dweitzel:</b></span> well, that’s gonna be big :disappointed:<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:06:11)</span> <b>kretzke:</b></span> yep. maybe for now we do something smallish while developing a backup solution?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:08:25)</span> <b>kretzke:</b></span> Bo and I met with the data storage folks here last week to start developing an idea for what backups we’d want.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:08:36)</span> <b>dweitzel:</b></span> ok<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:09:50)</span> <b>kretzke:</b></span> taking snapshots and putting them in enstore sounds like a good idea, but yeah, if the cluster is so big that we can’t practically take a snapshot then we need to do something else<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:11:33)</span> <b>kretzke:</b></span> maybe we table that for now, and I can explore that more on ITB<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:12:48)</span> <b>dweitzel:</b></span> ok, I have 3-3TB volumes ready.  Attaching now.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:32:48)</span> <b>dweitzel:</b></span> do you see the new volumes?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:33:00)</span> <b>kretzke:</b></span> yep /dev/vdc. adding them now<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:34:12)</span> <b>kretzke:</b></span> think I’m going to do a full cluster restart for this… :eek:<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:03:50)</span> <b>kretzke:</b></span> setting cluster read-only<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:18:23)</span> <b>kretzke:</b></span> restarting<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:41:27)</span> <b>kretzke:</b></span> cluster is back up, all primary shards are recovered. it will be yellow for a while while reallocating replicas. hopefully those will go to the new volumes, I see some usage already<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:44:07)</span> <b>dweitzel:</b></span> great!<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:30:40)</span> <b>kretzke:</b></span> oh, one other change I implemented today was switching the default scripting language to expression. this probably only really impacts grafana (so now derived values can be plotted)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:31:55)</span> <b>bbockelm:</b></span> Lucene expressions?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:32:37)</span> <b>kretzke:</b></span> yeah<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:33:52)</span> <b>kretzke:</b></span> it’s Groovy by default, but also by default Groovy is disabled in queries since it’s not sandboxed.<br/>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jun 28, 2021 : #batlab (chtc)</title>
+</head>
+<body>
+<h3>Mon Jun 28, 2021 : #batlab (chtc)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(11:46:14)</span> <b>johnkn:</b></span> Greg and I have been investing the stuck windows build machines.  on exec-11 it looks like condor started before the network stack was fully initialized. it has the wrong IP address<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:46:36)</span> <b>johnkn:</b></span> And the child daemons are restarting continuously.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:03:37)</span> <b>johnkn:</b></span> Ok.  retarted Condor on the Windows boxen and the master's picked up the correct IPs this time. Jobs are now running. there<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:15:25)</span> <b>coatsworth:</b></span> Hey, question about our new test-on-a-branch workflow. I tried this for the first time last week by adding a <tt>build-HTCONDOR-546</tt> tag to my branch and pushing it up to the git repo. Everything seemed to run fine: <a href="https://batlab.chtc.wisc.edu/results/run-details.php?runid=546972">https://batlab.chtc.wisc.edu/results/run-details.php?runid=546972</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:16:40)</span> <b>coatsworth:</b></span> Now I need to run a new test on that branch, so I deleted the old tag (locally and remotely), added a new one and pushed it up. This time the workspace build never started.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:18:27)</span> <b>coatsworth:</b></span> The only problem that came up was when deleting the remote tag, I got the following error <tt>remote: fatal: bad object 0000000000000000000000000000000000000000</tt> although it went on to say the tag was deleted. Everything else seemed to work fine. Has anybody else had any luck running tests after deleting and reinserting a tag?<br/>
+<blockquote>
+<span style="color: #bb86b7"><span style="font-size: small">(12:44:04)</span> <b>tim:</b></span> @coatsworth This bad object error is expected. Nothing to worry about here.<br/>
+</blockquote>
+<span style="color: #9e3997"><span style="font-size: small">(12:22:53)</span> <b>tlmiller:</b></span> Hash <a href="https://github.com/htcondor/htcondor/commit/da8b46782d8ae97bb387edb45e9534948b6b139b">da8b467</a> ?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:23:31)</span> <b>tlmiller:</b></span> [<a href="https://github.com/htcondor/htcondor/tree/build-HTCONDOR-546">https://github.com/htcondor/htcondor/tree/build-HTCONDOR-546</a>]<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:23:42)</span> <b>tlmiller:</b></span> Maybe github never saw your tag move?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:26:00)</span> <b>tlmiller:</b></span> (Hrm.  Actually, maybe _my_ copy of the repo doesn't see the new tag.)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:26:10)</span> <b>***tlmiller:</b></span> will bbl.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:27:15)</span> <b>johnkn:</b></span> Moving the tag is going to re-run the whole build/test cycle.   it would be a lot faster submit a workspace test run against the runid of the build anway.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:31:52)</span> <b>johnkn:</b></span> Also, We should fix it so that you can have an arbitrary suffix on the build tag, and that suffix gets included in the batlab build comment.  i.e. you should be able to <tt>build-HTCONDOR-546-take2</tt> and have that build and test.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:41:41)</span> <b>tlmiller:</b></span> That's not a bad idea.  Go poke Carl with it.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:53:24)</span> <b>coatsworth:</b></span> @tlmiller Yup that's the correct hash, and github can see the tag.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:55:02)</span> <b>coatsworth:</b></span> I think TJ's idea about <tt>build-HTCONDOR-546-take2</tt> is a good one, but we should think about a way to clean up these tags as time goes on. If we have a new tag per workspace build, that is going to add up very quickly.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:56:46)</span> <b>johnkn:</b></span> good point.  better to just submit workspace builds directly if you have login access to batlab.submit.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:57:01)</span> <b>johnkn:</b></span> save the tags for when that's not an option.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(12:57:26)</span> <b>jfrey:</b></span> We still have daily build tags from 13 years ago.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(12:57:55)</span> <b>jfrey:</b></span> I see about 9200 tags in the repo at the moment<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:58:02)</span> <b>johnkn:</b></span> oof.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(12:59:45)</span> <b>tim:</b></span> I can delete those. I'll put that on my list. I found a way to get it done very quickly.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:03:57)</span> <b>tlmiller:</b></span> We can probably just leave a cron job somewhere to delete all <tt>build-HTCONDOR-*</tt> tags &gt; 30 days old once a month.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(13:05:03)</span> <b>tim:</b></span> Yes, more automation.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:07:04)</span> <b>johnkn:</b></span> Do tags have a date on them?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:08:16)</span> <b>tlmiller:</b></span> I was just assuming they did, I guess.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:08:31)</span> <b>johnkn:</b></span> I don't see it in <tt>git tag --list</tt><br/>
+<span style="color: #bb86b7"><span style="font-size: small">(13:09:45)</span> <b>tim:</b></span> The tag itself does not have a date. However, the commit that it points to does and perhaps that is good enough.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:10:07)</span> <b>johnkn:</b></span> Looks like 2 types of tags.  heavy and light.<br/><pre>Tag objects (created with -a, -s, or -u) are called "annotated" tags; they contain a creation date, the tagger name and e-mail, a tagging message, and an optional GnuPG signature. Whereas a "lightweight" tag is simply a name for an object (usually a commit object).<br/><br/>Annotated tags are meant for release while lightweight tags are meant for private or temporary object labels. For this reason, some git commands for naming objects (like git describe) will ignore lightweight tags by default.</pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:10:32)</span> <b>tlmiller:</b></span> Ah, I think Carl was mumbling about this at some point.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:11:26)</span> <b>tlmiller:</b></span> (Really, we can probably just run the script twice an hour apart and remove any tags of the right form that appear in the list twice.)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:13:12)</span> <b>johnkn:</b></span> Given the distributed nature of git. I forsee problems with old tags reappearing and kicking off unwanted builds<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:14:10)</span> <b>tlmiller:</b></span> I think the tag-builder is cued by github saying that a new tag has appeared.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:15:34)</span> <b>johnkn:</b></span> and you think if we delete a tag, and a repo clone pushes it again that will not show up as a "new" tag?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:15:58)</span> <b>tlmiller:</b></span> Only if we're being really stupid about which machine we delete the tag on.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:16:30)</span> <b>tlmiller:</b></span> Even then, it should still work, as long as we're deleting the tags out of the AFS repository and not the GitHub one.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:18:02)</span> <b>johnkn:</b></span> I suggest we have the autobuilder ignore tags that point to commits that are old.  (1 month? 12 months?).  and also keep track of tags that it has seen for the same amount of time.<br/>
+</body>
+</html>

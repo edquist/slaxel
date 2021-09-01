@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Oct 18, 2018 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Thu Oct 18, 2018 : #xcache (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(12:13:32)</span> <b>matyas:</b></span> what's the appropriate service in topology for a stashcache cache?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:13:49)</span> <b>matyas:</b></span> "XRootD component"?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:15:03)</span> <b>dweitzel:</b></span> Is that what it is currently?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:17:00)</span> <b>matyas:</b></span> I dunno. The only resource registered in topology that has "stashcache" anywhere in its data is LIGO's origin server<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:19:16)</span> <b>dweitzel:</b></span> I think currently it is XRootD component.  Probably not the most appropriate though.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:19:29)</span> <b>dweitzel:</b></span> "XRootD Cache" (giving the role of the node)<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:22:24)</span> <b>matyas:</b></span> we could add that<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:22:41)</span> <b>matyas:</b></span> as a side note, none of the hosts in caches.json are registered in topology. naughty, naughty :slightly_smiling_face:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:24:54)</span> <b>dweitzel:</b></span> :slightly_smiling_face:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:25:10)</span> <b>dweitzel:</b></span> They used to be.<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:33:06)</span> <b>matyas:</b></span> looking through the old OIM, they used to use XRootD component<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:33:23)</span> <b>matyas:</b></span> but I'm fine with adding a new service type<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:38:09)</span> <b>matyas:</b></span> ah I see why they were removed: all of them were under "Indiana University/OSG GOC/Monitored Caches.yml"<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:43:37)</span> <b>matyas:</b></span> hm. once we can properly re-register all the cache servers, we could build <tt>caches.json</tt> from that instead of manually<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:54:53)</span> <b>matyas:</b></span> created <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-3444">https://opensciencegrid.atlassian.net/browse/SOFTWARE-3444</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(12:55:15)</span> <b>matyas:</b></span> "Re-register known StashCache servers in topology"<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:08:00)</span> <b>matyas:</b></span> is there a doc for what the output from <tt>xrdmapc</tt> means? there's no manpage<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:12:41)</span> <b>matyas:</b></span> I want to add a few lines to the origin server install doc to let the admin verify that the data they're trying to export is visible. I think the command is like <tt>xrdmapc <a href="http://redirector.opensciencegrid.org:1094">redirector.opensciencegrid.org:1094</a> /matyas</tt> but I don't know what the output means<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:25:11)</span> <b>dweitzel:</b></span> Did you google it?  Maybe there’s something on the Xrootd pages. <br/>
+<span style="color: #c386df"><span style="font-size: small">(16:35:39)</span> <b>matyas:</b></span> didn't find anything; I guess I can source-dive<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:05:14)</span> <b>bbockelm:</b></span> Marian probably knows that, but he’s on vacation this week<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:09:46)</span> <b>matyas:</b></span> I think I figured it out<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:10:36)</span> <b>matyas:</b></span> here's what I put in my notes:<br/><pre><br/>before the redirector, the output just lists what you're doing:<br/>- "0****" if you didn't specify a path<br/>- "0*r**" if you specified a path but not <tt>--verify'<br/>- "0*rv*" if you specified both a path and </tt>--verify'<br/>(BTW <tt>--verify' is ignored if you don't specify a path).<br/><br/>Funky characters before servers ("Srv"):<br/>- "&gt;" your path was there last time we could contact your server<br/>- "?" (</tt>--verify' only) - couldn't contact the server ("&gt;" might still<br/>  be there); lists the reason too<br/>- "+" (<tt>--verify' only) - your path is definitely there; stat<br/>  succeeded<br/>- "-" (</tt>--verify' only) - your path is definitely not there<br/><br/>The number before "Man" (manager) is the level of the manager (depth<br/>in the tree)<br/></pre><br/>
+</body>
+</html>

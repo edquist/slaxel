@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Aug 17, 2018 : #operations (osg)</title>
+</head>
+<body>
+<h3>Fri Aug 17, 2018 : #operations (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(14:32:32)</span> <b>blin:</b></span> @dweitzel what are the central collector hosts and do i have access?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:32:55)</span> <b>blin:</b></span> evgeniy is seeing his advertisement requests rejected <a href="https://support.opensciencegrid.org/helpdesk/tickets/7462">https://support.opensciencegrid.org/helpdesk/tickets/7462</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:33:27)</span> <b>blin:</b></span> i think there may be an issue with the RDIG line in the mapfile, it currently reads: <tt>GSI "^\/C\=RU\/O\=RDIG\/OU\=hosts\/OU=*\/CN\=(host\/)?([A-Za-z0-9.\-]*)$" \2@daemon.opensciencegrid.org</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:33:35)</span> <b>blin:</b></span> and i think it should be <tt>GSI "^\/C\=RU\/O\=RDIG\/OU\=hosts\/OU=.*\/CN\=(host\/)?([A-Za-z0-9.\-]*)$" \2@daemon.opensciencegrid.org</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:33:49)</span> <b>blin:</b></span> <tt>.*</tt> after the second <tt>OU=</tt> instead of <tt>*</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:40:45)</span> <b>dweitzel:</b></span> indeed.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:40:55)</span> <b>dweitzel:</b></span> from the collector:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:40:59)</span> <b>dweitzel:</b></span> <pre><br/>GSI "^\/C\=RU\/O\=RDIG\/OU\=hosts\/OU=*\/CN\=(host\/)?([A-Za-z0-9.\-]*)$" \2@daemon.opensciencegrid.org<br/></pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:41:12)</span> <b>dweitzel:</b></span> (collector hosts are <a href="http://collector1.opensciencegrid.org">collector1.opensciencegrid.org</a> and <a href="http://collector2.opensciencegrid.org">collector2.opensciencegrid.org</a>)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:41:58)</span> <b>dweitzel:</b></span> would you like me to change it, and see if it fixes it?  Then the htcondor-ce package will need to be udpated?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:42:12)</span> <b>blin:</b></span> should i be trying to log in as <tt>osgcollab</tt>?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:42:20)</span> <b>blin:</b></span> yes, please<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:42:59)</span> <b>dweitzel:</b></span> I don't think we ever added osgcollab to the collectors.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:43:04)</span> <b>dweitzel:</b></span> just the software/repo hosts.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:43:21)</span> <b>blin:</b></span> i guess i don't really need login access<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:43:43)</span> <b>dweitzel:</b></span> so the only change is that period after <tt>OU=</tt>?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:45:10)</span> <b>blin:</b></span> yea and if we want to verify that it works for evgeniy immediately, a restart of the ce service<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:45:18)</span> <b>blin:</b></span> or we can wait 30 min or so for the auth cache to clear<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:45:32)</span> <b>dweitzel:</b></span> oh, didn't know about the auth cache.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:45:35)</span> <b>dweitzel:</b></span> Just restarted.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:46:44)</span> <b>dweitzel:</b></span> btw, I do see a bunch of:<br/><pre><br/>08/17/18 19:41:42 DC_AUTHENTICATE: received DC_AUTHENTICATE from &lt;159.93.221.21:1332&gt;<br/>08/17/18 19:41:43 DC_AUTHENTICATE: authentication of 159.93.221.21 complete.<br/>08/17/18 19:41:43 PERMISSION DENIED to gsi@unmapped from host 159.93.221.21 for command 60010 (UPDATE_SCHEDD_AD), access level ADVERTISE_SCHEDD: reason: cached result for ADVERTISE_SCHEDD; see first case for the full reason<br/></pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:47:00)</span> <b>dweitzel:</b></span> that IP address is the *.ru address of the CE in question<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:50:54)</span> <b>blin:</b></span> figures<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:51:22)</span> <b>dweitzel:</b></span> @blin Ok, I see the CE in question, and another, from *.ru:<br/><pre>Scheduler          None               <a href="http://cloud-osg-ce.jinr.ru">cloud-osg-ce.jinr.ru</a><br/>Scheduler          None               <a href="http://osgce.jinr.ru">osgce.jinr.ru</a></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:52:01)</span> <b>blin:</b></span> great!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:55:52)</span> <b>dweitzel:</b></span> There's a bunch of other CE's being denied.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:56:42)</span> <b>dweitzel:</b></span> A LOT from cern.  1 from pakistan.<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:47:59)</span> <b>blin:</b></span> mmmm<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:48:07)</span> <b>blin:</b></span> i think we need to completely revisit the auth config<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:48:18)</span> <b>blin:</b></span> did you make the change to collector2?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:48:25)</span> <b>blin:</b></span> (the rdig condor_mapfile change)<br/>
+</body>
+</html>

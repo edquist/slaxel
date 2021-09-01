@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jan 23, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Mon Jan 23, 2017 : #gracc (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(11:29:15)</span> <b>dweitzel:</b></span> @kretzke Anything up with GRACC?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:29:24)</span> <b>dweitzel:</b></span> NVM<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:31:25)</span> <b>kretzke:</b></span> the cluster had severe indigestion this morning<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:31:43)</span> <b>dweitzel:</b></span> Yeah, there was some CEPH stuff this morning.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:33:37)</span> <b>kretzke:</b></span> looks like rabbitmq is down. Marina said she would be working on setting it up to use TLS (yay!)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:28:51)</span> <b>rynge:</b></span> I need some help with querying gracc with the python api (dsl one)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:29:19)</span> <b>rynge:</b></span> I try to group on "Processors"<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:29:21)</span> <b>rynge:</b></span> # Bucket aggs<br/>        # we need to group on project, user and size of job<br/>        bucket = s.aggs.bucket('group_ProjectName', 'terms', field='ProjectName') \<br/>            .bucket('group_LocalUserId', 'terms', field='LocalUserId') \<br/>            .bucket('group_Processors', 'terms', field='Processors') \<br/>            .bucket('group_NodeCount', 'terms', field='NodeCount')<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:29:32)</span> <b>rynge:</b></span> But seems like I always get 0 documents then<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:29:39)</span> <b>rynge:</b></span> Like:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:29:47)</span> <b>rynge:</b></span> {u'buckets': [{u'doc_count': 6747,<br/>               u'group_LocalUserId': {u'buckets': [{u'doc_count': 6747,<br/>                                                    u'group_Processors': {u'buckets': [],<br/>                                                                          u'doc_count_error_upper_bound': 0,<br/>                                                                          u'sum_other_doc_count': 0},<br/>                                                    u'key': u'donkri'}],<br/>                                      u'doc_count_error_upper_bound': 0,<br/>                                      u'sum_other_doc_count': 0},<br/>               u'key': u'TG-IBN130001'},<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:29:57)</span> <b>rynge:</b></span> Any pointers on what I'm doing wrong?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:13:11)</span> <b>dweitzel:</b></span> Hum... @rynge good question.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:13:21)</span> <b>dweitzel:</b></span> it looks mostly ok.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:13:36)</span> <b>rynge:</b></span> Yeah, when I remove "Processors" it seems to work fine<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:13:53)</span> <b>rynge:</b></span> I wonder if maybe "Processors" is not getting set correctly?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:14:46)</span> <b>rynge:</b></span> Also, first time I'm using the module, so I might be misunderstanding the api<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:18:21)</span> <b>dweitzel:</b></span> What "index" are you querying?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:20:28)</span> <b>rynge:</b></span> gracc.osg.raw-2017.01<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:20:55)</span> <b>dweitzel:</b></span> Ok, couple things.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:21:05)</span> <b>dweitzel:</b></span> 1, not great to use the raw indexes... can slow things down.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:21:31)</span> <b>dweitzel:</b></span> 2. You should use the gracc.osg.raw* index.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:21:56)</span> <b>dweitzel:</b></span> @kretzke can correct me on the perfect index to use, but I usually the wildcard index.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:22:33)</span> <b>dweitzel:</b></span> ideally, you should use gracc.osg.summary<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:23:09)</span> <b>rynge:</b></span> I talked to Tanya and Shreyas before Christmas, and I think we decided that the monthly index would be good for this (GRACC-&gt;Gold)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:24:05)</span> <b>rynge:</b></span> How is the summary one different?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:24:19)</span> <b>dweitzel:</b></span> Summary has summarized data, rather than raw records.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:24:31)</span> <b>dweitzel:</b></span> For the same reason we don't query the JobUsageRecord table in Gratia.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:25:08)</span> <b>rynge:</b></span> Well, I think for the same reason, we did query JobUsageRecord in the current version of this<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:25:31)</span> <b>dweitzel:</b></span> oh, ok.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:26:46)</span> <b>dweitzel:</b></span> well, I still would not use the raw monthly index.  Instead, I would use the gracc.osg.raw-* and the appropriate filters.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:27:07)</span> <b>rynge:</b></span> I also think the index is less important, as we are just "tailing" the data, picking up changes from the last hour or so<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:27:48)</span> <b>dweitzel:</b></span> yeah, but you probably don't want to have logic in there to use the current monthly index, when you don't have to.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:28:14)</span> <b>rynge:</b></span> index = 'gracc.osg.raw-' + now.strftime("%Y.%m")<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:28:16)</span> <b>rynge:</b></span> :slightly_smiling_face:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:28:48)</span> <b>dweitzel:</b></span> what about when the month rolls over?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:29:17)</span> <b>rynge:</b></span> Not a huge problem - we don't need perfect data for this<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:29:23)</span> <b>rynge:</b></span> But yeah, that could be improbed<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:30:11)</span> <b>rynge:</b></span> Another question about the API. Once I have the result set, I have to loop through the buckets to "flatten" the information to a single level dict<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:30:18)</span> <b>rynge:</b></span> Any nicer way doing this?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:30:24)</span> <b>rynge:</b></span> for project in (results.group_ProjectName.buckets):<br/>            print "\n"<br/>            for user in (project.group_LocalUserId.buckets):<br/>                for nodes in (user.group_NodeCount.buckets):<br/>                        print "{0}\t{1}\t{2}\t{3}".format(project.key, user.key, nodes.CreateTimeLast.value_as_string, nodes.WallDurationTotal.value)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:30:36)</span> <b>rynge:</b></span> (obviously no dict yet)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:31:37)</span> <b>dweitzel:</b></span> not really.  I used a recursive function to do it in the summarizer.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:32:40)</span> <b>rynge:</b></span> Do you have something online I can look at?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:33:19)</span> <b>rynge:</b></span> I'm looking at Shreyas examples, but it would be nice to get a second set of examples<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:33:29)</span> <b>dweitzel:</b></span> <a href="https://github.com/opensciencegrid/gracc-request/blob/master/src/graccreq/summary_replayer.py#L110">https://github.com/opensciencegrid/gracc-request/blob/master/src/graccreq/summary_replayer.py#L110</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:33:43)</span> <b>rynge:</b></span> Thanks!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:34:22)</span> <b>dweitzel:</b></span> I'm able to visualize the data pretty easily.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:34:45)</span> <b>dweitzel:</b></span> with the terms you used before.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:37:36)</span> <b>rynge:</b></span> Nice! I will steal some code!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:37:50)</span> <b>dweitzel:</b></span> steal all the code!<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(18:48:33)</span> <b>kretzke:</b></span> It's probably not a bad idea to limit the query to specific indices when querying the raw records, although elasticsearch tracks the limits on fields so it might be able to short-circuit queries that hit indices outside the query range.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(19:14:13)</span> <b>rynge:</b></span> Thanks for you help! Stolen code works great<br/>
+<span style="color: #235e5b"><span style="font-size: small">(19:35:10)</span> <b>dweitzel:</b></span> great!<br/>
+</body>
+</html>

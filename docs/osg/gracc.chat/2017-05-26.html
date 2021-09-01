@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri May 26, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Fri May 26, 2017 : #gracc (osg)</h3>
+<span style="color: #53b759"><span style="font-size: small">(10:47:48)</span> <b>marian:</b></span> I've noticed on hcc-grace-itb lot of containers present after exit, reason is we run them from timer so when it launch and exits it's still there inactive so we don't need it ... @kevin: any recommendation do from to time clean up? Or just regularly run "$ docker rm <tt>docker ps --no-trunc -aq</tt>"?<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:48:14)</span> <b>marian:</b></span> @kretzke ^<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:51:14)</span> <b>kretzke:</b></span> So every time it triggers it does <tt>docker run</tt>; why not run the same container each time with <tt>docker start</tt>?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:52:14)</span> <b>kretzke:</b></span> Or if you want to keep making a new container each time, run it with <tt>--rm</tt> so it gets deleted upon exiting.<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:56:28)</span> <b>marian:</b></span> does it happen running container (or reusing) may fail?<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:56:44)</span> <b>marian:</b></span> if so, I'd prefer option with <tt>--rm</tt><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:57:03)</span> <b>kretzke:</b></span> probably the simplest option, yeah<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:58:27)</span> <b>marian:</b></span> yeah just run whole thing from beginning to end and clean<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:58:45)</span> <b>marian:</b></span> its one-time thing every hour, gracc-apel report<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:58:59)</span> <b>marian:</b></span> so create and destory<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:01:32)</span> <b>kretzke:</b></span> yeah, sounds good.  In any case, an automatic cleanup process is not a bad idea, but I’d suggest it only delete containers that have been stopped for &gt; n days, so someone has a chance to do a post-mortem on a crashed process.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:02:50)</span> <b>kretzke:</b></span> although I suppose that same reasoning could be applied to *not* using <tt>--rm</tt>… hm<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:03:18)</span> <b>marian:</b></span> I might thing of yet another timer for clean up then<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:03:20)</span> <b>marian:</b></span> think<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:03:37)</span> <b>marian:</b></span> every other day or so<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:03:57)</span> <b>marian:</b></span> rather than <tt>--rm</tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(11:04:11)</span> <b>marian:</b></span> from ExecStart<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:05:34)</span> <b>kretzke:</b></span> actually, if the logs are going to stdout/stderr or are bind-mounted outside the container, then deleting the container shouldn’t be a problem.<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:06:05)</span> <b>marian:</b></span> I don't think it's the case now<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:06:56)</span> <b>marian:</b></span> ok, so we have few options to think ... will put in JIRA and get to it eventually, low prio now just saw many containers and images in place so I thought of clean up...<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:08:22)</span> <b>kretzke:</b></span> speaking of container logs… don’t think I documented this anywhere, on the gracc host docker is configured to send all logs to the systemd journal, via <tt>ExecStart=/usr/bin/dockerd --log-driver=journald</tt> in <tt>/etc/systemd/system/docker.service.d/custom.conf</tt><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:09:12)</span> <b>kretzke:</b></span> otherwise they go to a docker-controlled json file and *will* be deleted with the container<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:09:50)</span> <b>marian:</b></span> ah, nice!<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:09:57)</span> <b>marian:</b></span> good to know, thanks!<br/>
+</body>
+</html>

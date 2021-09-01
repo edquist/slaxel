@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Feb 27, 2020 : #uscms (osg)</title>
+</head>
+<body>
+<h3>Thu Feb 27, 2020 : #uscms (osg)</h3>
+<span style="color: #de5f24"><span style="font-size: small">(13:16:32)</span> <b>justas.balcas:</b></span> @gattebury is something wrong with <a href="http://xrootd.unl.edu">xrootd.unl.edu</a> ?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(13:17:02)</span> <b>justas.balcas:</b></span> all file opens via DNS Aliased <a href="http://cmsxrootd.fnal.gov">cmsxrootd.fnal.gov</a> always fail if it goes to UNL Redirector<br/>
+<span style="color: #619a4f"><span style="font-size: small">(13:17:38)</span> <b>clundstedt:</b></span> I'll have a look<br/>
+<span style="color: #de5f24"><span style="font-size: small">(13:23:38)</span> <b>justas.balcas:</b></span> e.g.:<br/><pre>xrdcp --debug 3 -f <a href="root://129.93.239.131//store/relval/CMSSW_11_0_0_pre12/RelValMinBias_14TeV/GEN-SIM/110X_mcRun3_2021_realistic_v5-v1/20000/0334A557-4FEF-B940-9A73-B78C4421D53B.root">root://129.93.239.131//store/relval/CMSSW_11_0_0_pre12/RelValMinBias_14TeV/GEN-SIM/110X_mcRun3_2021_realistic_v5-v1/20000/0334A557-4FEF-B940-9A73-B78C4421D53B.root</a> /dev/null</pre><br/>
+<span style="color: #619a4f"><span style="font-size: small">(13:23:50)</span> <b>clundstedt:</b></span> looks like cmsd was busted on our local redirector.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(13:23:52)</span> <b>justas.balcas:</b></span> get’s redirected to cms-xrd-global, later transit<br/>
+<span style="color: #de5f24"><span style="font-size: small">(13:23:54)</span> <b>justas.balcas:</b></span> ok<br/>
+<span style="color: #619a4f"><span style="font-size: small">(13:24:00)</span> <b>clundstedt:</b></span> still busted?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(13:24:18)</span> <b>justas.balcas:</b></span> still failing<br/>
+<span style="color: #619a4f"><span style="font-size: small">(13:24:20)</span> <b>clundstedt:</b></span> yep<br/>
+<span style="color: #bc3663"><span style="font-size: small">(13:25:19)</span> <b>dmason:</b></span> Aha — yet another thread :wink:   @justas.balcas did this break for you about an hour ago?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(13:25:30)</span> <b>justas.balcas:</b></span> more or less<br/>
+<span style="color: #de5f24"><span style="font-size: small">(13:25:41)</span> <b>justas.balcas:</b></span> users started to complain on our slack<br/>
+<span style="color: #619a4f"><span style="font-size: small">(13:25:57)</span> <b>clundstedt:</b></span> Is better now?  I'm getting the above to transfer.<br/>
+<span style="color: #bc3663"><span style="font-size: small">(13:25:57)</span> <b>dmason:</b></span> aha — I’m thinking there is an underlying network problem happening and @gattebury restarting caused it to lose IPv4<br/>
+<span style="color: #bc3663"><span style="font-size: small">(13:26:40)</span> <b>dmason:</b></span> changed something?  I’ll go back and run my rounds again<br/>
+<span style="color: #de5f24"><span style="font-size: small">(13:26:49)</span> <b>justas.balcas:</b></span> I am still getting redirected to cms-xrd-global<br/>
+<span style="color: #619a4f"><span style="font-size: small">(13:27:03)</span> <b>clundstedt:</b></span> Ok, I think you're on the right track with losing ipV4.<br/>
+<span style="color: #619a4f"><span style="font-size: small">(13:27:19)</span> <b>clundstedt:</b></span> I'll poke the  Garhan<br/>
+<span style="color: #bc3663"><span style="font-size: small">(13:27:44)</span> <b>dmason:</b></span> [2020-02-27 20:27:02.895104 +0100][Debug  ][ExDbgMsg          ] [<a href="http://cms-xrd-global.cern.ch:1094">cms-xrd-global.cern.ch:1094</a>] Destroying MsgHandler: 0x1ca29f0.<br/>[0B/0B][100%][==================================================][0B/s]<br/>Run: [ERROR] Server responded with an error: [3011] No servers are reachable via public IPv4 network to read the file.<br/>
+<span style="color: #bc3663"><span style="font-size: small">(13:28:05)</span> <b>dmason:</b></span> so far I see the failure from SL6 hosts preferentially through the UNL redirector<br/>
+<span style="color: #bc3663"><span style="font-size: small">(13:28:25)</span> <b>dmason:</b></span> seems OK with SL7 — thats primarily from lxplus<br/>
+<span style="color: #bc3663"><span style="font-size: small">(13:28:52)</span> <b>dmason:</b></span> Though we’ve been seeing fail in our SAM xrootd-access tests from this since yesterday<br/>
+<span style="color: #bc3663"><span style="font-size: small">(13:31:35)</span> <b>dmason:</b></span> our workers are not dual stack — IPv4 only, so there’s that correlation, but huh — so much for that theory.  Looks the tests are running in a SL7 singularity container…  So IPv4 is looking like the thing<br/>
+<span style="color: #619a4f"><span style="font-size: small">(13:31:45)</span> <b>clundstedt:</b></span> and our internal SL6 box seemed to grab a file happily.<br/>
+<span style="color: #bc3663"><span style="font-size: small">(13:32:10)</span> <b>dmason:</b></span> I think the SL6 hosts I’ve been on were also IPv4 only<br/>
+<span style="color: #619a4f"><span style="font-size: small">(13:38:35)</span> <b>clundstedt:</b></span> that file, /store/relval/CMSSW_11_0_0_pre12/RelValMinBias_14TeV/GEN-SIM/110X_mcRun3_2021_realistic_v5-v1/20000/0334A557-4FEF-B940-9A73-B78C4421D53B.root, isn't here.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(13:39:15)</span> <b>justas.balcas:</b></span> m? it is at fnal :wink:<br/>
+<span style="color: #d1707d"><span style="font-size: small">(13:41:13)</span> <b>gattebury:</b></span> I still don’t see anything out of the ordinary with respect to networking @ Nebraska and <a href="http://xrootd.unl.edu">xrootd.unl.edu</a> — both v4 and v6 connectivity is fine internal and external, and the daemons are listening and responding on both v4 and v6. Unless I’m missing something entirely, this is something wonky within xrootd (which isn’t ever surprising).<br/>
+<span style="color: #bc3663"><span style="font-size: small">(13:42:10)</span> <b>dmason:</b></span> any changes — yum updates yesterday?  Lemme see when we started seeing this<br/>
+<span style="color: #d1707d"><span style="font-size: small">(13:43:07)</span> <b>gattebury:</b></span> <tt>Feb 20 13:52:41 <a href="http://xrootd.unl.edu">xrootd.unl.edu</a> yum[23206]: Updated: vo-client-99-1.osg34.el7.noarch</tt> — that was the last yum change<br/>
+<span style="color: #d1707d"><span style="font-size: small">(13:43:31)</span> <b>***gattebury:</b></span> eyes that suspiciously being about a week ago<br/>
+<span style="color: #bc3663"><span style="font-size: small">(13:44:26)</span> <b>dmason:</b></span> <pre>26-Feb-2020 13:36:20 UTC</pre><br/>when first fails hit<br/>
+<span style="color: #d1707d"><span style="font-size: small">(13:44:27)</span> <b>gattebury:</b></span> There was a campus DNS fiasco last Friday but that’s all “corrected” now — still, I know xrootd does some horrible DNS caching which has bit us before. Perhaps it’s just now coming around?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:44:42)</span> <b>blin:</b></span> the only update in the <tt>vo-client</tt> was the new HCC VOMS DN<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:44:46)</span> <b>blin:</b></span> i can't imagine that being related<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:58:13)</span> <b>jthiltges:</b></span> Something seems off with the redirector's list of registered clients. Doing an IPv4 request gives IPv6-ish replies from the UNL redirector, but not FNAL.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:01:48)</span> <b>justas.balcas:</b></span> p.s. I can access Caltech/UCSd data via FNAL and UNL Redirector, but not data which resides at FNAL via UNL. Maybe FNAL xrootd servers lost subscription to UNL ?<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:01:56)</span> <b>marian:</b></span> note, depends from which client you're doing requests ... if dual-stack and not forcing XRD_NETWORKSTACK it defaults to IPv6 path ways...<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:02:31)</span> <b>jthiltges:</b></span> If I had to guess... I'd say that UNL sees the FNAL redirectors (cmsxrootd-site[1-3].<a href="http://fnal.gov">fnal.gov</a>.) as IPv6 only.<br/>
+<span style="color: #bc3663"><span style="font-size: small">(14:06:40)</span> <b>dmason:</b></span> I can make it fail by setting XRD_NETWORKSTACK to IPv4 and talking to the UNL host — it does work with it set to IPv6.  I can do IPv4 or IPv6 to the FNAL host.  cmsxrootd-site* from CERN directly IPv4 or 6<br/>
+<span style="color: #bc3663"><span style="font-size: small">(14:07:03)</span> <b>dmason:</b></span> this was all from lxplus (SL7)<br/>
+<span style="color: #619a4f"><span style="font-size: small">(14:09:08)</span> <b>clundstedt:</b></span> I am no longer seeing it fail as it was before.  From (<a href="http://cmssrv248.fnal.gov">cmssrv248.fnal.gov</a>)<br/>
+<span style="color: #bc3663"><span style="font-size: small">(14:09:10)</span> <b>dmason:</b></span> Still confused by all the IPv6 addresses I see flying around in the debug output when I tell it IPv4, but at least I get it to fail with the same error as I’m seeing on SL6 (presumably only IPv4) lxplus host.<br/>
+<span style="color: #bc3663"><span style="font-size: small">(14:09:13)</span> <b>dmason:</b></span> or did<br/>
+<span style="color: #bc3663"><span style="font-size: small">(14:09:18)</span> <b>dmason:</b></span> somebody just fixed something<br/>
+<span style="color: #619a4f"><span style="font-size: small">(14:09:25)</span> <b>clundstedt:</b></span> -.-<br/>
+<span style="color: #d1707d"><span style="font-size: small">(14:09:25)</span> <b>gattebury:</b></span> we were thinking you just fixed something lol<br/>
+<span style="color: #bc3663"><span style="font-size: small">(14:10:57)</span> <b>dmason:</b></span> <a href="https://youtu.be/UmzsWxPLIOo">https://youtu.be/UmzsWxPLIOo</a><br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:10:58)</span> <b>jthiltges:</b></span> I'm now seeing FNAL local redirectors subscribed to <a href="http://xrootd.unl.edu">xrootd.unl.edu</a> with IPv4 addresses.<br/>
+<span style="color: #619a4f"><span style="font-size: small">(14:14:33)</span> <b>clundstedt:</b></span> So...um...we good?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:14:37)</span> <b>jthiltges:</b></span> This seem accurate? For _reasons_, the FNAL local redirectors only had a IPv6 subscription to the UNL regional redirector. This caused IPv4 transfers for FNAL data to fail when using the UNL regional redirector.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:15:52)</span> <b>justas.balcas:</b></span> Thanks! Seems to work via both :slightly_smiling_face:<br/>
+<span style="color: #bc3663"><span style="font-size: small">(14:16:30)</span> <b>dmason:</b></span> have no idea who you should be thanking though :wink:<br/>
+<span style="color: #bc3663"><span style="font-size: small">(14:18:56)</span> <b>dmason:</b></span> And now my access SAM tests are green again.<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:24:32)</span> <b>marian:</b></span> hmm, @dmason, Yujun just replied he runs xrootd redirectors at FNAL in IPv4 mode only ... Justas says it works via both stacks, though ...<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:24:33)</span> <b>marian:</b></span> weird, no?<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:25:13)</span> <b>marian:</b></span> (ah, going back to video :))<br/>
+<span style="color: #bc3663"><span style="font-size: small">(14:25:43)</span> <b>dmason:</b></span> uh OK I’ll have to talk with him why he’s doing that.<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:25:56)</span> <b>marian:</b></span> good, thanks<br/>
+<span style="color: #bc3663"><span style="font-size: small">(14:26:18)</span> <b>dmason:</b></span> or wait — sounds like he did that to fix this<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:26:30)</span> <b>marian:</b></span> try to restart for both, v4 and v6 ... maybe check if v6 interface didn't get into sort of limbo state on the machine<br/>
+<span style="color: #bc3663"><span style="font-size: small">(14:27:52)</span> <b>dmason:</b></span> the mystery deepens then — why that would happen simultaneously on 3 different hosts.<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:28:12)</span> <b>marian:</b></span> and, we should probably talk on the upgrading xrootd regional redirestors asap ... we try to keep them in sync in terms of versioning, but it's quite old<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:28:35)</span> <b>marian:</b></span> maybe some IPv6 gremlin in the game at FNAL?<br/>
+<span style="color: #bc3663"><span style="font-size: small">(14:29:57)</span> <b>dmason:</b></span> don’t know — there was a host with a busted network card spamming with all sorts of ethernet addresses here today.  Think we’re not sure until Yujun tries to turn IPv6 back on then I guess<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:31:04)</span> <b>marian:</b></span> fair enough<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:31:39)</span> <b>marian:</b></span> go for it, it's Thursday :)<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:31:56)</span> <b>marian:</b></span> ehm, I meant, it's not Friday :slightly_smiling_face:<br/>
+<span style="color: #bc3663"><span style="font-size: small">(14:45:45)</span> <b>dmason:</b></span> We may be leaving it like this for a little while — there may have been more than one problem — one of which is still there — reverse DNS for IPv6 on our xrootd hosts looks broken, so when @gattebury restarted the UNL host it lost knowledge of the mapping.   Not sure if thats related to the problems we were having that prompted the restarts.  But currently we’re leaving IPv4 only until we get reverse DNS fixed — seems to be for outside the lab.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(18:43:38)</span> <b>bockjoo:</b></span> gfal-copy with the davs fails with this error:<br/>
+<span style="color: #7d414c"><span style="font-size: small">(18:43:39)</span> <b>bockjoo:</b></span> gfal-copy test.txt <a href="davs://cmsio5.rc.ufl.edu:1094/store/unmerged/SAM/test.2.txt">davs://cmsio5.rc.ufl.edu:1094/store/unmerged/SAM/test.2.txt</a><br/>Copying file:///data/coldhead/test.txt   [FAILED]  after 0s<br/>gfal-copy error: 1 (Operation not permitted) - DESTINATION OVERWRITE   HTTP 403 : Permission refused<br/>
+<span style="color: #7d414c"><span style="font-size: small">(18:43:54)</span> <b>bockjoo:</b></span> Does anyone know what's the issue?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(18:44:17)</span> <b>bockjoo:</b></span> I have no problem with the gridftp protocol though<br/>
+<span style="color: #a72f79"><span style="font-size: small">(18:44:49)</span> <b>andrew.melo:</b></span> crank the lcmaps and xrootd debugging and check from the server<br/>
+</body>
+</html>

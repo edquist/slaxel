@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Dec 4, 2018 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue Dec 4, 2018 : #software (osg)</h3>
+<span style="color: #e96699"><span style="font-size: small">(12:11:46)</span> <b>lincoln:</b></span> FYI- the UChicago repo mirror will be down Monday morning, hopefully for less than 30min<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:47:56)</span> <b>matyas:</b></span> ok, thanks<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:09:34)</span> <b>blin:</b></span> anyone ever see this error? @dweitzel<br/><pre><br/>Traceback (most recent call last):<br/>  File "/usr/share/condor-ce/condor_ce_jobmetrics", line 12, in &lt;module&gt;<br/>    <br/>import rrdtool<br/>ImportError:  /lib64/libpango-1.0.so.0: undefined symbol: g_log_structured_standard<br/></pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:13:20)</span> <b>dweitzel:</b></span> No I haven’t. That’s weird. <br/>
+<span style="color: #43761b"><span style="font-size: small">(15:14:07)</span> <b>blin:</b></span> it's something i'm seeing in the travis CI tests on EL7 but nowhere else<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:14:45)</span> <b>bbockelm:</b></span> looks like rrdtool was built against a different version of libpango than is available at runtime?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:15:56)</span> <b>dweitzel:</b></span> Did the errors just start?  I saw cents just released a new version. <br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:16:06)</span> <b>dweitzel:</b></span> Maybe the docker container was updated?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:16:19)</span> <b>dweitzel:</b></span> Centos <br/>
+<span style="color: #43761b"><span style="font-size: small">(15:18:13)</span> <b>blin:</b></span> library/centos hasn't been updated in 2 months<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:18:45)</span> <b>dweitzel:</b></span> Well shoot. There goes my theory. <br/>
+<span style="color: #43761b"><span style="font-size: small">(15:23:03)</span> <b>blin:</b></span> and brian's theory makes sense at first glance but we don't see the same problems in the nightlies with the same versions<br/><pre><br/># nightlies<br/>pango                          x86_64 1.42.4-1.el7               base    280 k<br/>rrdtool                        x86_64 1.4.8-9.el7                base    440 k<br/>rrdtool-python                 x86_64 1.4.8-9.el7                base     35 k<br/><br/># broken docker test<br/>pango                        x86_64 1.42.4-1.el7               base      280 k<br/>rrdtool                      x86_64 1.4.8-9.el7                base      440 k<br/>rrdtool-python               x86_64 1.4.8-9.el7                base       35 k<br/><br/># working docker tests (4 days ago)<br/>pango                       x86_64 1.40.4-1.el7          base            275 k<br/>rrdtool                     x86_64 1.4.8-9.el7           base            440 k<br/>rrdtool-python              x86_64 1.4.8-9.el7           base             35 k<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:24:59)</span> <b>blin:</b></span> seems relevant: <a href="https://bugs.centos.org/view.php?id=15495">https://bugs.centos.org/view.php?id=15495</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:25:45)</span> <b>bbockelm:</b></span> @blin - so the issue would be in the <tt>glib2</tt> package?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:27:08)</span> <b>blin:</b></span> possibly at build time -- we don't install glib2 anywhere<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:34:10)</span> <b>blin:</b></span> oh, that may be a lie, it looks like glib2 comes with the OS by default?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:34:20)</span> <b>bbockelm:</b></span> yeah, I think so.<br/>
+</body>
+</html>

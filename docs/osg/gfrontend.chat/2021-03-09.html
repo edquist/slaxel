@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Mar 9, 2021 : #gfrontend (osg)</title>
+</head>
+<body>
+<h3>Tue Mar 9, 2021 : #gfrontend (osg)</h3>
+<span style="color: #bd9336"><span style="font-size: small">(09:06:21)</span> <b>joshua.willis:</b></span> If anyone who needs to is *not* able to see that ticket, please let me know your github username and I will add you.<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:29:54)</span> <b>marian:</b></span> I just reported about it on OSG standup, and @bbockelm volunteered take a look at that github ticket :slightly_smiling_face: ... his username is same as I taggeg him here<br/>
+<span style="color: #bd9336"><span style="font-size: small">(09:35:45)</span> <b>joshua.willis:</b></span> He appears to already have access<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:00:50)</span> <b>bbockelm:</b></span> :slightly_smiling_face: Thanks for the write-up Josh!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:01:22)</span> <b>bbockelm:</b></span> That said, before we dig in there, where are we on fixing VIRGO VOMS access?<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:04:58)</span> <b>marian:</b></span> @james.clark, do you think you could drive this and sign up for VIRGO VOMS proxy? either yourself or talk to @peter.couvares about it who should that be? As I commented in the freshdesk ticket we're in the situation where VIRGO is completely disabled from the IGWN Frontend until this is fixed<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(11:08:42)</span> <b>james.clark:</b></span> Sure, that probably makes sense - i'm already signed up for another one.  I get a <tt>PR_END_OF_FILE_ERROR</tt> if i try to follow the voms link in the ticket but i'm guessing this is just a case of going to the voms signup page and registering the appropriate DN under my name?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:09:03)</span> <b>bbockelm:</b></span> yup.  Do you have a certificate loaded in your browser?<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(11:09:28)</span> <b>james.clark:</b></span> i do :slightly_smiling_face: i'm trying different browsers / private sessions rn...<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:09:53)</span> <b>bbockelm:</b></span> <a href="https://voms.cnaf.infn.it:8443/voms/virgo/register/start.action">https://voms.cnaf.infn.it:8443/voms/virgo/register/start.action</a> &lt;~ I think this is the start page<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(11:10:45)</span> <b>james.clark:</b></span> hm, and that works for you?  just double checking but this browser should be "clean"<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:11:04)</span> <b>bbockelm:</b></span> Yup<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:11:36)</span> <b>bbockelm:</b></span> (oh the fun of certificates in browsers...) What CA is your user certificate from?  That's the most likely problem.<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(11:12:05)</span> <b>james.clark:</b></span> that's odd, definitely no certs in this chrome.   i'll get there - in the meantime, what is / where can i find the DN?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:12:28)</span> <b>bbockelm:</b></span> Looking at Edgar's user, he utilized a CERN CA-issued user certificate.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:12:52)</span> <b>bbockelm:</b></span> Ah yes - the Italians are using software that'll probably bounce you if you don't have a client certificate loaded in your browser.<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(11:13:50)</span> <b>james.clark:</b></span> ah, wrong way round then :slightly_smiling_face:<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(11:15:13)</span> <b>james.clark:</b></span> right, just discovered i have a very out of date cert in here.  will update<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(11:23:06)</span> <b>james.clark:</b></span> Ok, i'm in and can actually see what's gong on.  I guess we need a whole new certificate,  register the DN in here and send that certificate and key to @marian ?   Any restrictions on the CA / suggestions where to obtain it?  I can request e.g. an InCommon from LIGO easily enough  (i don't think i can get anything from CERN, by the looks of it)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:39:09)</span> <b>bbockelm:</b></span> Hm.  How much time would it take you to get the InCommon one?  More or less than 30 minutes of your time?<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(11:41:52)</span> <b>james.clark:</b></span> about as long as it takes to send an email asking Juan to request one..<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(11:45:38)</span> <b>james.clark:</b></span> another potential option might be a LIGO robot cert but I don't know how well that will play with the virgo voms (or if that matters)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:58:54)</span> <b>bbockelm:</b></span> Yeah, I wouldn't take the risk... let's play it safe and go for a user cert.<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:05:40)</span> <b>marian:</b></span> @james.clark, if there are any issues with it, I can go with my CERN cert to request things and do it all similar way that was on Edgar, but it would be preferable you just give me .pem files and I have nothing about ownership around those certs nor proxy :)<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(12:13:34)</span> <b>james.clark:</b></span> sure, should be able to do that.<br/>
+</body>
+</html>

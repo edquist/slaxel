@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Sep 27, 2018 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Thu Sep 27, 2018 : #xcache (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(13:57:52)</span> <b>matyas:</b></span> possibly stupid question; what's the point of an xrootd Authfile on a cache server? shouldn't it just be <tt>a * / rl</tt>?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:00:08)</span> <b>dweitzel:</b></span> it's important for authenticated cache.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:00:18)</span> <b>dweitzel:</b></span> for un-authenticated... probably less important.<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:03:34)</span> <b>matyas:</b></span> you're not protecting any data though, right?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:03:55)</span> <b>matyas:</b></span> if someone wants to look at "sensitive" data they just set up their own cache server<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:37:23)</span> <b>bbockelm:</b></span> well, if you keep the authenticated and unauthenticated data in the same directory, you want the authenticated data to not be served by the unauthenticated one.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:38:09)</span> <b>bbockelm:</b></span> i.e., if both halves read out of <tt>/stash</tt>, you don't want <tt>/stash/user/ligo</tt> to go out the unauthenticated door.<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:39:51)</span> <b>matyas:</b></span> does that cause conflicts or something? i figured people would use the unauth door if they're ok with unencrypted http traffic, and the auth door if they want https<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:40:12)</span> <b>matyas:</b></span> but for the same data<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:50:49)</span> <b>bbockelm:</b></span> the problem is the unauth and auth door share the same cache.<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:54:22)</span> <b>matyas:</b></span> but they're separate instances of xrootd so they'd stomp over each other?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:57:38)</span> <b>matyas:</b></span> and there's no way to get one instance to run both an unauth and an auth door?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:26:32)</span> <b>dweitzel:</b></span> As far as I know, there is no good way to run a single instance that does both auth and unauth.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:26:52)</span> <b>dweitzel:</b></span> They could stomp over eachother, but most likely, the directories will be very different from auth / unauth.<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:28:43)</span> <b>matyas:</b></span> I'm wondering if it's worth putting into the cache install doc that the Authfiles for the two instances shouldn't overlap directories?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:03:27)</span> <b>bbockelm:</b></span> Right - the problem is on the Xrootd protocol side. There’s no concept there of a server that does both unauthenticated and authenticated clients.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:03:41)</span> <b>bbockelm:</b></span> Mat, your suggested note would be good!<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:14:07)</span> <b>marian:</b></span> ^ I'll do PR for it ...<br/>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jul 14, 2021 : #operations (osg)</title>
+</head>
+<body>
+<h3>Wed Jul 14, 2021 : #operations (osg)</h3>
+<span style="color: #53b759"><span style="font-size: small">(10:22:48)</span> <b>marian:</b></span> @blin, all, I asked JLAB to update to <tt>vo-client-114-1.osg35.el7.noarch</tt> from <tt>osg-testing</tt> and seems like it fixes things!<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:23:03)</span> <b>blin:</b></span> awesome, apologies for screwing this up<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:23:08)</span> <b>blin:</b></span> @tim.theisen FYI ^^<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:23:10)</span> <b>marian:</b></span> <pre>-- Schedd: <a href="http://osg-ce-1.jlab.org">osg-ce-1.jlab.org</a> : &lt;129.57.198.168:5275&gt; @ 07/14/21 11:19:49<br/>OWNER      BATCH_NAME    SUBMITTED   DONE   RUN    IDLE  TOTAL JOB_IDS<br/>wmoore     ID: 482     11/13 21:05      _      _      _      1 482.0<br/>osg-clas12 ID: 277407   7/14 11:17      _      1      _      1 277407.0<br/>osg-clas12 ID: 277408   7/14 11:17      _      1      _      1 277408.0<br/>osg-clas12 ID: 277409   7/14 11:17      _      1      _      1 277409.0<br/>osg-clas12 ID: 277410   7/14 11:17      _      1      _      1 277410.0</pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(10:23:36)</span> <b>marian:</b></span> aaaand, pilots are running on the CE! I don't errors in the pilot submission on the Factory side either!<br/>
+<span style="color: #73769d"><span style="font-size: small">(10:23:50)</span> <b>tim.theisen:</b></span> Cool, I'll mark it as ready for release.<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:23:55)</span> <b>marian:</b></span> when can this go to osg production releae?<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:23:58)</span> <b>marian:</b></span> cool!<br/>
+<span style="color: #73769d"><span style="font-size: small">(10:24:57)</span> <b>tim.theisen:</b></span> I have planned to release it tomorrow.<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:25:45)</span> <b>marian:</b></span> should sites wait or should I talk to other CLAS12 CE admins update from <tt>osg-testing</tt>?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:26:57)</span> <b>blin:</b></span> i'd suggest installing from <tt>osg-testing</tt> today but if they can't get to it, updating from the release repo<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:27:44)</span> <b>marian:</b></span> sounds good<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:47:19)</span> <b>marian:</b></span> thanks again, @blin, <b>@edquist</b> for the quick fix and for the release, @tim.theisen! this has been quite nasty thing to find out given so many changes involved from various people, not only on the Frontend side!<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:50:10)</span> <b>lincoln:</b></span> I'm getting reports that the CRLs we're getting from OASIS are out of date - can someone check the fetch-crl on the OASIS server before I dig deeply into this?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:00:17)</span> <b>blin:</b></span> oh it's about time for this problem again, eh? :slightly_smiling_face:<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:02:48)</span> <b>blin:</b></span> looks ok to me<br/><pre>[ouser.mis@hcc-oasis-login ~]$ ls -l /cvmfs/oasis.opensciencegrid.org/mis/certificates/ | awk '/\.r0$/ {print $6, $7, $8}' | sort | uniq -c<br/>    142 Jul 14 06:20<br/>     38 Jul 14 06:21<br/>      2 Jun 29 00:24</pre><br/>
+<span style="color: #385a86"><span style="font-size: small">(11:12:28)</span> <b>jdost321:</b></span> @blin is the fixed vo-client in the hosted ce images yet?<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(11:32:18)</span> <b>blin:</b></span> not yet. i think i want to wait on the release since we also have the new condor in the upcoming-testing repos<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:32:44)</span> <b>blin:</b></span> can you hold off on updates until tomorrow? if not, i can hack something in<br/>
+<span style="color: #385a86"><span style="font-size: small">(11:58:02)</span> <b>jdost321:</b></span> yes holding off for release is fine. brian b manually hacked lamar i'll see what he did and repeat, i want to try redeploying with a python3 bosco workaround at some point today<br/>
+<span style="color: #385a86"><span style="font-size: small">(11:58:10)</span> <b>jdost321:</b></span> but the others can wait<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:00:17)</span> <b>blin:</b></span> it's just fixing the issuer in the <tt>/etc/grid-security/vomsdir/**/**.lsc</tt> files<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:00:38)</span> <b>blin:</b></span> fix here <a href="https://github.com/opensciencegrid/osg-vo-config/commit/d1d3a63d09fa3af7ce4843e85e1c8348f3019c9f">https://github.com/opensciencegrid/osg-vo-config/commit/d1d3a63d09fa3af7ce4843e85e1c8348f3019c9f</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:01:03)</span> <b>blin:</b></span> i imagine he hacked it in by hand since i don't think we have a way to do it in the SLATE app<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:01:56)</span> <b>jdost321:</b></span> ok, right, i'm fine with putting this back in place after redeploying, just to get lamar going again<br/>
+<span style="color: #73769d"><span style="font-size: small">(13:41:37)</span> <b>tim.theisen:</b></span> @jdost321 I plan to push the release out early tomorrow morning.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:09:01)</span> <b>blin:</b></span> Though @jdost321 the new condor looks pretty good from my perspective so if you wanna try it today, we can make a container available<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:24:10)</span> <b>jdost321:</b></span> i'm juggling a lot of things no guarantee i can even get back to the lamar ce today<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:26:47)</span> <b>blin:</b></span> ok, tomorrow it is!<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:32:13)</span> <b>tim.theisen:</b></span> The vo-client is in osg-rolling and only the vo-client. That might be a fast way to get it.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:32:47)</span> <b>blin:</b></span> hrm, we don't have rolling-based containers atm<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:32:57)</span> <b>tim.theisen:</b></span> I see<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:58:13)</span> <b>marian:</b></span> quick check of Lamar still shows this error:<br/><pre>012 (5435316.001.000) 07/14 13:53:08 Job was held.<br/>        status command failed: /home/osg01/bosco_slate/glite/libexec/slurm_status.sh: /home/osg01/bosco_slate/glite/libexec/slurm_status.py: /usr/bin/python3: bad interpreter: No such file or directory-/home/osg01/bosco_slate/glite/libexec/slurm_status.sh: line 2</pre><br/>I guess there weren't any hacks applied yet, ignore my message if that's the case<br/>
+<span style="color: #73769d"><span style="font-size: small">(2021-07-15 08:14:44)</span> <b>tim.theisen:</b></span> vo-client 114 has been released<br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-07-15 08:30:32)</span> <b>blin:</b></span> :tada:<br/>
+<span style="color: #53b759"><span style="font-size: small">(2021-07-15 09:17:47)</span> <b>marian:</b></span> :fireworks:<br/>
+</blockquote>
+<span style="color: #e96699"><span style="font-size: small">(11:29:32)</span> <b>lincoln:</b></span> @blin thanks. I did a cvmfs wipecache and the proble mfixed itself :disappointed:<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(14:52:19)</span> <b>timm:</b></span> Fermilab is seeing more osg-factory-generated glideins with auth errors recently,<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(14:52:47)</span> <b>timm:</b></span> Could this be related to the mention above?<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(14:53:19)</span> <b>timm:</b></span> 07/14/21 14:53:10 DC_AUTHENTICATE: required authentication of 129.93.227.92 failed: AUTHENTICATE:1003:Failed to authenticate with any method|AUTHENTICATE:1004:Failed to authenticate using GSI|GSI:5002:Failed to authenticate because the remote (client) side was not able to acquire its credentials.<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(14:53:30)</span> <b>timm:</b></span> (that's <a href="http://unl.edu">unl.edu</a>)<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(14:53:39)</span> <b>timm:</b></span> but there are many other sites also complaining, and some not complaining<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:06:51)</span> <b>marian:</b></span> @timm, what VO or FE is involved in this?<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(20:33:13)</span> <b>timm:</b></span> <a href="http://Okd-gpfe01.fnal.gov">Okd-gpfe01.fnal.gov</a><br/>
+<span style="color: #50a0cf"><span style="font-size: small">(20:33:31)</span> <b>timm:</b></span> Fermilab and dune VO<br/>
+</body>
+</html>

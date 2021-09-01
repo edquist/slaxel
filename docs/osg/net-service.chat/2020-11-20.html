@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Nov 20, 2020 : #net-service (osg)</title>
+</head>
+<body>
+<h3>Fri Nov 20, 2020 : #net-service (osg)</h3>
+<span style="color: #4ec0d6"><span style="font-size: small">(10:44:37)</span> <b>smckee:</b></span> Should we plan to meet this afternoon to go over status?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:00:31)</span> <b>dweitzel:</b></span> Yes. Let’s meet this afternoon. <br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:00:41)</span> <b>dweitzel:</b></span> 1:30 my time?  2:30?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:11:04)</span> <b>smckee:</b></span> Sounds good.  1:30 Central, 2:30 Eastern<br/>
+<span style="color: #84b22f"><span style="font-size: small">(12:11:27)</span> <b>ivukotic:</b></span> OK.<br/>
+<span style="color: #84b22f"><span style="font-size: small">(12:11:50)</span> <b>ivukotic:</b></span> where do we meet?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:11:59)</span> <b>smckee:</b></span> Zoom?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:12:04)</span> <b>smckee:</b></span> Let me get a meeting setup<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:13:28)</span> <b>smckee:</b></span> Topic: Talk about OSG net pipeline / writing to RabbitMQ<br/>Time: Nov 20, 2020 02:30 PM Eastern Time (US and Canada)<br/><br/><a href="https://umich.zoom.us/j/94916333496">https://umich.zoom.us/j/94916333496</a><br/>Passcode: 178745<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:21:30)</span> <b>dweitzel:</b></span> As a summary: Writing to RabbitMQ seems to be working perfectly.  When I compare the packet loss tests, there are some tests that are either in the pull (production) or push (test) indexes, but not both.  Maybe 20% of tests are not in both.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:21:47)</span> <b>dweitzel:</b></span> Which makes it very difficult to figure out, because it's not 100% off.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:23:25)</span> <b>smckee:</b></span> Could there be an incorrect timestamp one vs the other?  (I believe the timestamp is supposed to be when the original measurement was made and should match exactly for both push and pull)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:24:37)</span> <b>dweitzel:</b></span> Right, but 80% of the timestamps match.  I've broken down to just looking at measurements between psmsu01 and <a href="http://ps1.ochep.ou.edu">ps1.ochep.ou.edu</a>.  I "key" on timestamp + src + dest.  80% are the same.  ~20% are different.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:24:47)</span> <b>smckee:</b></span> Are you able to find the exact same data (for some case) in push and pull results?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:25:16)</span> <b>dweitzel:</b></span> For those that match, they match exactly, as far as I can tell.  I've only just looked at packetloss so far.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:33:10)</span> <b>smckee:</b></span> Is this visible/accessible in ELK ?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:16:37)</span> <b>dweitzel:</b></span> Kibana has test index and the production indexes.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:16:47)</span> <b>dweitzel:</b></span> But to compare, I had to write a comparison script.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:20:16)</span> <b>dweitzel:</b></span> I can join meeting now.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:25:50)</span> <b>dweitzel:</b></span> Another thing I noticed.  The "In test, not in production" goes to 0 if I query back more than 3 hours.  Which makes some sense, if it takes a while for the "pull" method to grab the data.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:26:24)</span> <b>dweitzel:</b></span> At 3+ hours, there is 0 extra data in the test index.  But, there is still extra data in the Production index.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:43:14)</span> <b>dweitzel:</b></span> <pre>  Production Records    Test Records    In production, not test    In test not production<br/>--------------------  --------------  -------------------------  ------------------------<br/>                9875            6901                       2974                         0</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:45:27)</span> <b>dweitzel:</b></span> <pre>'192.111.108.112': 59, '192.41.236.31': 743, '2001:48a8:68f7:8001:192:41:236:31': 2113, '192.41.236.35': 59</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:50:17)</span> <b>dweitzel:</b></span> For all production:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:50:20)</span> <b>dweitzel:</b></span> <pre>'192.41.236.31': 7315, '2001:48a8:68f7:8001:192:41:236:31': 2726, '192.111.108.112': 59, '192.41.236.35': 60</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:53:38)</span> <b>dweitzel:</b></span> For Test:<br/><pre>'192.41.236.31': 6689, '2001:48a8:68f7:8001:192:41:236:31': 623</pre><br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:56:08)</span> <b>smckee:</b></span> 1 /us-atlas *USATLAS Mesh Config*<br/>2 /wlcg-atlas-latency *WLCG ATLAS Latency Mesh Config*<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:57:19)</span> <b>smckee:</b></span> ITB config1 /us-atlas *USATLAS Mesh Config*<br/>2/wlcg-atlas-latency *WLCG ATLAS Latency Mesh Config*<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:58:27)</span> <b>smckee:</b></span> USATLAS latency mesh group in ITB has 11 hosts<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:58:47)</span> <b>smckee:</b></span> WLCG ATLAS Latency Group has 67 hosts<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:59:31)</span> <b>smckee:</b></span> Production USATLAS Latency mesh group  has 11 hosts<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(14:00:04)</span> <b>smckee:</b></span> Production WLCG ATLAS Latency Group has 66 hosts<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:02:13)</span> <b>dweitzel:</b></span> Production Records  Test Records  In production, not test  In test not production<br/>-------------------- -------------- ------------------------- ------------------------<br/>         379       314             65             0<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:48:24)</span> <b>dweitzel:</b></span> @ivukotic I replayed ~100,000 records of perfsonar data from 11/19 (UTC)<br/>
+</body>
+</html>

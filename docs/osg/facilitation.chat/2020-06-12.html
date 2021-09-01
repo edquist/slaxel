@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jun 12, 2020 : #facilitation (osg)</title>
+</head>
+<body>
+<h3>Fri Jun 12, 2020 : #facilitation (osg)</h3>
+<span style="color: #4cc091"><span style="font-size: small">(08:39:24)</span> <b>cbrown58:</b></span> We have a quota increase request here: <a href="https://support.opensciencegrid.org/a/tickets/65141">https://support.opensciencegrid.org/a/tickets/65141</a><br/>
+<span style="color: #4cc091"><span style="font-size: small">(08:51:50)</span> <b>cbrown58:</b></span> How are accounts associated with XSEDE projects (ones starting with <tt>TG-</tt>) handled? Does @rynge handle these?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:43:48)</span> <b>rynge:</b></span> Yeah, send the TG ones to me<br/>
+<span style="color: #4cc091"><span style="font-size: small">(11:27:55)</span> <b>cbrown58:</b></span> Ok, I’ll assign it to you.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(11:28:53)</span> <b>cbrown58:</b></span> He’s stated he’s in a bit of a rush and wanted to do the onboarding meeting today. Let me know if you can’t get back to him today and I’ll send a brief message explaining the hand off :slightly_smiling_face:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:39:07)</span> <b>rynge:</b></span> Thanks<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:40:03)</span> <b>rynge:</b></span> I'll take care of it<br/>
+<span style="color: #db3150"><span style="font-size: small">(15:02:06)</span> <b>christinalk:</b></span> what’s the current recommendation for running GROMACS on OSG?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:20:02)</span> <b>rynge:</b></span> I had a user ask today as well<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:20:20)</span> <b>rynge:</b></span> It can be a difficult code to fit - long runtime and could be large outputs<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:21:04)</span> <b>rynge:</b></span> We need to look at the checkpointing<br/>
+<span style="color: #db3150"><span style="font-size: small">(15:23:00)</span> <b>christinalk:</b></span> yes, I met w/ a user today with the same questions.<br/>
+<span style="color: #db3150"><span style="font-size: small">(15:23:33)</span> <b>christinalk:</b></span> we talked about a couple of options<br/>
+<span style="color: #db3150"><span style="font-size: small">(15:23:55)</span> <b>christinalk:</b></span> my question was more about software: we don’t have a module (I think) - but I’m not sure I want to go the container route either.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:25:30)</span> <b>rynge:</b></span> We have a few containers<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:25:34)</span> <b>rynge:</b></span> <pre>$ ls /cvmfs/singularity.opensciencegrid.org/opensciencegrid/ | grep gromacs<br/>osgvo-gromacs-gpu:latest<br/>osgvo-gromacs:latest<br/>osgvo-gromacs-plumed:latest</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:25:48)</span> <b>rynge:</b></span> It seems different groups want different versions and build options<br/>
+<span style="color: #db3150"><span style="font-size: small">(15:26:26)</span> <b>christinalk:</b></span> ah, that’s good to know though<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:26:30)</span> <b>rynge:</b></span> <tt>osgvo-gromacs:latest</tt> is pretty much the upstream one<br/>
+<span style="color: #db3150"><span style="font-size: small">(15:26:32)</span> <b>christinalk:</b></span> so he could use that at least for testing, maybe.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(15:27:28)</span> <b>lmichael:</b></span> Big barrier for gromacs is that default builds do automatic hardware-specific optimization.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:27:42)</span> <b>rynge:</b></span> At build time?<br/>
+<span style="color: #5a4592"><span style="font-size: small">(15:27:51)</span> <b>lmichael:</b></span> And if the code lands on a machine with less-sophisticated CPUs than what it was compiled on, it can just give up/fail.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(15:28:04)</span> <b>lmichael:</b></span> (yes, at build time)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:28:47)</span> <b>rynge:</b></span> Ok, well the <tt>osgvo-*gromacs*:latest</tt> container inherits from <tt>gromacs/gromacs</tt> , so we did not build that binary<br/>
+<span style="color: #5a4592"><span style="font-size: small">(15:29:25)</span> <b>lmichael:</b></span> We have run into it at recent OSG schools. Only a few years ago, we actually used gromacs as an example software that the user could compile and run, and when a user tried to compile on our submit nodes in CHTC (newer CPUs than some of our pool at the time) instead of our designated ‘build’ machines (older CPUs) there were failures.<br/>
+<span style="color: #db3150"><span style="font-size: small">(15:29:34)</span> <b>christinalk:</b></span> does the osgvo gromacs container have stashcp, @rynge?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:29:36)</span> <b>rynge:</b></span> A good trick is using has_avx==True or has_avx2==True in your requirements - that usually gets you a "newer" cpu<br/>
+<span style="color: #5a4592"><span style="font-size: small">(15:29:41)</span> <b>lmichael:</b></span> @rynge ah, that’s good to know.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:29:43)</span> <b>rynge:</b></span> No, no stashcp<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:29:48)</span> <b>rynge:</b></span> But, can add it<br/>
+<span style="color: #db3150"><span style="font-size: small">(15:29:49)</span> <b>christinalk:</b></span> HMMMM<br/>
+<span style="color: #db3150"><span style="font-size: small">(15:29:56)</span> <b>christinalk:</b></span> that was my main reservation w/ using a container<br/>
+<span style="color: #db3150"><span style="font-size: small">(15:30:05)</span> <b>christinalk:</b></span> I almost want him to try building it himself then…<br/>
+<span style="color: #5a4592"><span style="font-size: small">(15:30:10)</span> <b>lmichael:</b></span> There are certainly use cases in MD (not just gromacs) that are more numerous, smaller/shorter runs. That’s what would make the OSG distinction, not necessarily the gromacs software.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(15:30:52)</span> <b>lmichael:</b></span> And it does have some checkpoint/restart/resume capabilities (more than one option), but it’s never been clear to me or some other users in CHTC (Spencer E, for @christinalk) how to integrate with HTCondor. I’m certain there’s a way, tho<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:31:24)</span> <b>rynge:</b></span> Stashcp is pretty easy to add if you don't need the xrootd crap (it falls back to curl)<br/>
+<span style="color: #db3150"><span style="font-size: small">(15:31:51)</span> <b>christinalk:</b></span> I’d like to have a less ad hoc solution for being able to use containers + stashcp, in the long run<br/>
+<span style="color: #5a4592"><span style="font-size: small">(15:32:09)</span> <b>lmichael:</b></span> Is the gromacs container a good guinea pig for automated stashcp integration to OSG containers? Who else should we run this by (@bbockelm?) in case there’s a better way.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(15:32:57)</span> <b>lmichael:</b></span> However, there are probably stashcp use cases where http is definitely NOT the way to go (and we’d be supporting that with no policiing). @dweitzel may have thoughts<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:38:00)</span> <b>dweitzel:</b></span> HTTP is actually pretty good way to use stashcache, with stashcp. I wrote a whole paper on it. HTTP is roughly the same performance as using xrootd protocol in stashcache. <br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:40:12)</span> <b>rynge:</b></span> @christinalk Hah! We are talking about the same user! Tanya contacted me about him<br/>
+<span style="color: #db3150"><span style="font-size: small">(15:40:28)</span> <b>christinalk:</b></span> how did they get in touch w/ you?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:40:49)</span> <b>rynge:</b></span> Tanya just introduced us. I had asked for a meeting sometime next week<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:40:57)</span> <b>rynge:</b></span> Wires must have crossed<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:41:14)</span> <b>rynge:</b></span> All good - please run with it and will back you up<br/>
+<span style="color: #db3150"><span style="font-size: small">(15:41:35)</span> <b>christinalk:</b></span> :+1:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:46:31)</span> <b>rynge:</b></span> I added stashcp - it will be available soon<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:47:50)</span> <b>rynge:</b></span> @christinalk Did you talk about RAM?<br/>
+<span style="color: #db3150"><span style="font-size: small">(15:47:59)</span> <b>christinalk:</b></span> yes<br/>
+<span style="color: #db3150"><span style="font-size: small">(15:48:28)</span> <b>christinalk:</b></span> and CPUs.<br/>
+<span style="color: #db3150"><span style="font-size: small">(15:49:00)</span> <b>christinalk:</b></span> I think even his “small” simulations will get close to the boundaries of what we can provide<br/>
+<span style="color: #db3150"><span style="font-size: small">(15:49:10)</span> <b>christinalk:</b></span> But it seemed like it was worth trying.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:49:26)</span> <b>rynge:</b></span> Great<br/>
+<span style="color: #db3150"><span style="font-size: small">(16:43:29)</span> <b>christinalk:</b></span> oh, other question — is it technically possible to request multiple GPUs?<br/>
+<span style="color: #db3150"><span style="font-size: small">(16:43:40)</span> <b>christinalk:</b></span> like - it’s possible for slots like that to be created?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:45:33)</span> <b>dweitzel:</b></span> Mats will know best, but I don't think we have many (or any?) pilots that request multiple GPUs.  There are certainly multiple GPU nodes on the OSG, just the factory is not creating pilots requesting multiple gpus.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:45:42)</span> <b>dweitzel:</b></span> so it's something that can be changed.<br/>
+<span style="color: #db3150"><span style="font-size: small">(17:04:55)</span> <b>christinalk:</b></span> thanks @dweitzel that’s precisely what I needed to know. :slightly_smiling_face:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:27:38)</span> <b>rynge:</b></span> Yeah, I'm only aware of single-gpu factory entries<br/>
+</body>
+</html>

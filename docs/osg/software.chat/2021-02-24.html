@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Feb 24, 2021 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Feb 24, 2021 : #software (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(10:12:03)</span> <b>matyas:</b></span> @efajardo sorry to bother you -- for the LIGO RSV page <a href="http://cabinet-10-10-4.t2.ucsd.edu/rsv/">http://cabinet-10-10-4.t2.ucsd.edu/rsv/</a> do you use osg-configure-rsv or is it just set up by hand?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:17:42)</span> <b>blin:</b></span> also, who's going to be the new owner of this service?<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:59:01)</span> <b>efajardo:</b></span> I think @paschos will be but we moved the service to a rhel7 machine<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:59:08)</span> <b>efajardo:</b></span> <a href="http://test-002.t2.ucsd.edu/rsv/">http://test-002.t2.ucsd.edu/rsv/</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(11:59:15)</span> <b>efajardo:</b></span> I am impressed cabinet-10-10-4 is stil up<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:59:34)</span> <b>paschos:</b></span> yeah it’s still alive<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:59:53)</span> <b>paschos:</b></span> but we are not going ot use it anymore ---<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:17:03)</span> <b>andrew.melo:</b></span> Is it possible to revert the revision of a CVMFS mount on a single node? I see that I can get the revision from cvmfs_talk, but I don't see a way to set it<br/>
+<blockquote>
+<span style="color: #235e5b"><span style="font-size: small">(12:59:33)</span> <b>dweitzel:</b></span> I don't think so.  I know how to do it on the stratum 0, but I don't think it's possible on a single client node.  @dwd would know.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:02:04)</span> <b>andrew.melo:</b></span> Basically, we got a report that rev N has some software that's not working but the revision a few days ago allegedly did, so I want to tst out the reproducer<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:02:09)</span> <b>dwd:</b></span> Yes there is a config variable for that …<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:03:20)</span> <b>andrew.melo:</b></span> ah, I didn't think to look at those, I figured there was some sort of CLI or mount option or something<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:04:02)</span> <b>dwd:</b></span> I’m having trouble finding it though … it may be only for those repos that have snapshots, checking<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:06:00)</span> <b>dwd:</b></span> CVMFS_REPOSITORY_TAG<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:06:46)</span> <b>dwd:</b></span> It doesn’t go by revision number, but by publication name.  Most repos are set up to give a name based on datestamp for every publication, and delete ones older than a number of weeks (4, I think)<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:09:01)</span> <b>dwd:</b></span> The tag names can be found on the stratum 0, I’m not sure they can be figure out by a client<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:09:50)</span> <b>dwd:</b></span> What repository did you want to mount?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:11:09)</span> <b>andrew.melo:</b></span> A local one - <a href="http://priv.accre.vanderbilt.edu">priv.accre.vanderbilt.edu</a><br/>
+<span style="color: #99a949"><span style="font-size: small">(13:11:24)</span> <b>dwd:</b></span> And you have access to the publishing machine?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:11:51)</span> <b>andrew.melo:</b></span> yeah, I maintain it (we keep our licensed software in there)<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:12:17)</span> <b>dwd:</b></span> ok then on the that machine run cvmfs_server tag -lx <a href="http://priv.accre.vanderbilt.edu">priv.accre.vanderbilt.edu</a> to see the list of tags<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:12:32)</span> <b>andrew.melo:</b></span> nice<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:12:34)</span> <b>andrew.melo:</b></span> one sec<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:16:11)</span> <b>andrew.melo:</b></span> <pre>[root@vm-infr-cvmfs-s0 ~]# cvmfs_server tag -lx <a href="http://priv.accre.vanderbilt.edu">priv.accre.vanderbilt.edu</a><br/>generic-2021-02-24T03:42:42Z 65fe7ea81ea687d900546cbd4c713304ba49fee2 16384 1266 1614138199 trunk (default) <br/>trunk 65fe7ea81ea687d900546cbd4c713304ba49fee2 16384 1266 1614138199 trunk (default) current HEAD<br/>generic-2021-02-23T22:19:36Z b48dfe9ef5bf5c7738efc6d292312707b75b8803 16384 1265 1614129507 trunk (default) <br/>trunk-previous b48dfe9ef5bf5c7738efc6d292312707b75b8803 16384 1265 1614129507 trunk (default) default undo target<br/>generic-2021-02-10T19:04:32Z 0afcd6d4bb597254010d82d525d1edf924f25368 16384 1264 1612985218 trunk (default) </pre><br/>So, I presume I want to add <tt>CVMFS_REPOSITORY_TAG=generic-2021-02-10T19:04:32Z</tt> to /etc/cvmfs/domain.d/priv.accre.vanderbilt.edu.conf and reload the config?<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:18:11)</span> <b>dwd:</b></span> I’m not sure if reload is enough, you can try it.  Otherwise umount/mount<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:18:29)</span> <b>dwd:</b></span> That would be config.d, not domain.d<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:18:41)</span> <b>andrew.melo:</b></span> ah, gotcha<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:20:40)</span> <b>andrew.melo:</b></span> bingo, that did it. thanks a ton<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:21:56)</span> <b>dwd:</b></span> Looks like you also could have just used trunk-previous, same hash<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:22:38)</span> <b>dwd:</b></span> no sorry that’s a different one<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:24:22)</span> <b>andrew.melo:</b></span> Yeah, long story short, our syncing script didn't have <tt>set -o pipefail</tt>, and a network glitch caused GPFS to drop, so rsync made an incomplete copy which apparently/maybe stopped in the middle of the LMod cache files<br/>
+</blockquote>
+<span style="color: #c386df"><span style="font-size: small">(12:22:56)</span> <b>matyas:</b></span> @paschos there's a bunch of old code in osg-configure for configuring rsv; are you OK with me ripping it out?<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:55:17)</span> <b>paschos:</b></span> yes<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:55:23)</span> <b>paschos:</b></span> go ahead<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:46:04)</span> <b>efajardo:</b></span> @matyas could you remove my email from <tt><a href="mailto:osg-commits@cs.wisc.edu">osg-commits@cs.wisc.edu</a></tt>?<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:46:07)</span> <b>efajardo:</b></span> please?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:46:20)</span> <b>matyas:</b></span> yeah sure<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:48:08)</span> <b>efajardo:</b></span> thank you<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:48:23)</span> <b>matyas:</b></span> do you want to stop seeing vmu test results too?<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(13:51:05)</span> <b>blin:</b></span> i'm mucking around in this repo, i can remove him<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:52:51)</span> <b>efajardo:</b></span> thank you<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:53:35)</span> <b>blin:</b></span> yeah @efajardo, and noting what TimC mentioned below, I was planning on removing you from <a href="mailto:technology-team@opensciencegrid.org">technology-team@opensciencegrid.org</a> next week<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:53:41)</span> <b>blin:</b></span> but i can do it sooner if you want<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:54:17)</span> <b>efajardo:</b></span> Well I am not in a rush I was just worried this commit lists would fell through the cracks<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:54:28)</span> <b>blin:</b></span> nah dude, we have processes :slightly_smiling_face:<br/>
+</blockquote>
+<span style="color: #9d8eee"><span style="font-size: small">(13:52:56)</span> <b>cat:</b></span> I would note that every team has an offboarding process that includes removal from mailing lists, etc.<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(13:53:12)</span> <b>cat:</b></span> This will get kicked off next week, I hope.<br/>
+</body>
+</html>

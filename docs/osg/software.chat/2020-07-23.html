@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jul 23, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu Jul 23, 2020 : #software (osg)</h3>
+<span style="color: #a63024"><span style="font-size: small">(16:29:47)</span> <b>efajardo:</b></span> <b>@here</b> condor experts if I want an condor map file that maps<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:30:12)</span> <b>efajardo:</b></span> like<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:30:14)</span> <b>efajardo:</b></span> <pre>GSI "/DC=org/DC=cilogon/C=US/O=LIGO/CN=Edgar Hernandez <a href="mailto:edgar.hernandez@ligo.org">edgar.hernandez@ligo.org</a>" edgar.hernandez</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(16:30:25)</span> <b>efajardo:</b></span> But in a more genral way<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:30:27)</span> <b>efajardo:</b></span> would be like<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:30:37)</span> <b>efajardo:</b></span> <tt>GSI "/DC=org/DC=cilogon/C=US/O=LIGO/CN=*. (.*)&lt;mailto:/@ligo.org|/@ligo.org&gt;" /1</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(16:30:38)</span> <b>efajardo:</b></span> ?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:34:01)</span> <b>matyas:</b></span> That one's a tricky regex to write, since you basically want to capture everything after the _last_ space in the CN. Let me experiment a bit...<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:35:27)</span> <b>rynge:</b></span> Why does it have to map to a specific user? Can't you just do <tt>GSI "&lt;mailto:/DC=org/DC=cilogon/C=US/O=LIGO/CN=.*@ligo.org|/DC=org/DC=cilogon/C=US/O=LIGO/CN=.*@ligo.org&gt;" ligo</tt><br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:36:06)</span> <b>rynge:</b></span> Most of the time we just care that it is mapped, but not really what the mapping is<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:40:33)</span> <b>matyas:</b></span> Try<br/><pre>GSI "/DC=org/DC=cilogon/C=US/O=LIGO/CN=.* ([^@ ]+)@ligo.org/" \1</pre><br/>It works in Perl so it should work in Condor<br/>
+<span style="color: #e06b56"><span style="font-size: small">(16:42:34)</span> <b>jthiltges:</b></span> Drop the <tt>/</tt> after <tt><a href="http://ligo.org">ligo.org</a></tt>, I think<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:42:59)</span> <b>matyas:</b></span> ah you're right<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:43:19)</span> <b>matyas:</b></span> <pre>GSI "/DC=org/DC=cilogon/C=US/O=LIGO/CN=.* ([^@ ]+)@ligo.org" \1</pre><br/><br/>
+<span style="color: #e06b56"><span style="font-size: small">(16:44:36)</span> <b>jthiltges:</b></span> The condor-test package has a handy utility. Example:<br/><pre>[root@3bc66141dc59 ~]# cat maptest<br/>GSI "/DC=org/DC=cilogon/C=US/O=LIGO/CN=.* ([^@ ]+)@ligo.org" \1<br/><br/>[root@3bc66141dc59 ~]# /usr/libexec/condor/test_user_mapping -file maptest -method GSI -user '/DC=org/DC=cilogon/C=US/O=LIGO/CN=First Middle Last <a href="mailto:first.last@ligo.org">first.last@ligo.org</a>'<br/>first.last</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(16:44:54)</span> <b>matyas:</b></span> Nice!!<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:48:43)</span> <b>efajardo:</b></span> @rynge I am working on special mapping to allow for “personal submit hosts in a container”<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:49:03)</span> <b>efajardo:</b></span> thanks @jthiltges that is very handy<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:49:13)</span> <b>efajardo:</b></span> @matyas I will give you credit on the slides<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:54:30)</span> <b>matyas:</b></span> thanks!<br/>
+</body>
+</html>

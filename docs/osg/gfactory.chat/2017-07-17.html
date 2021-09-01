@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jul 17, 2017 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Mon Jul 17, 2017 : #gfactory (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(09:37:51)</span> <b>blin:</b></span> @marian @jdost321 @vaibhav2.g could we bump the pilot debug level to <tt>D_SECURITY</tt> for <a href="http://gluskap.phys.uconn.edu">gluskap.phys.uconn.edu</a>?<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:14:03)</span> <b>marian:</b></span> not sure who is on the shift today, but I'll file JIRA for ouselves<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:05:54)</span> <b>blin:</b></span> thanks!<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(15:40:13)</span> <b>sthapa:</b></span> Hi, can someone verify that the OSG_US_ASU_OCTILLO has a limit of 3 running glideins at a time?<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(15:40:43)</span> <b>sthapa:</b></span> I’m seeing 5 running jobs there<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:41:08)</span> <b>jdost321:</b></span> suchandra our limits weren't hard caps at 3.. that is too hard with multiple production factories<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:41:14)</span> <b>jdost321:</b></span> so you may see some overshooting, is that a problem?<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:41:25)</span> <b>jdost321:</b></span> like, we cna't say SDSC only have 1.5 pilots and GOC have 1.5<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(15:42:31)</span> <b>sthapa:</b></span> it’s a bit of a problem, is there a way to get an upper bound, e.g. if the number is at x, we’ll have at most 1.5x jobs running most of the time<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:43:58)</span> <b>jdost321:</b></span> i can say 1 each factory<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:44:05)</span> <b>jdost321:</b></span> that will give you a max of 2 glideins at the site<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:44:11)</span> <b>jdost321:</b></span> but, that could make debugging really hard<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:44:27)</span> <b>jdost321:</b></span> if i said 2 then we get 4 total<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(15:44:28)</span> <b>sthapa:</b></span> can you do that?<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:44:31)</span> <b>jdost321:</b></span> is that still too much?<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(15:44:37)</span> <b>sthapa:</b></span> that’ll be fine<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(15:45:08)</span> <b>sthapa:</b></span> the ASU admins want a limit of 3 jobs and I think the jobs are actually whole node jobs  (need to verify this)<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(15:45:26)</span> <b>sthapa:</b></span> so we may need to while the pilots to whole node pilots in a day or so<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:45:29)</span> <b>jdost321:</b></span> hmm.. we would need to properly configure the piots then right?<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:45:46)</span> <b>jdost321:</b></span> we need to flag them as whole node so they accept user jobs that can fill all the cores, rather than just 1<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(15:47:04)</span> <b>sthapa:</b></span> yeah, I’m waiting for the admins to get back to me on whether they claim a single job or a whole node<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:54:57)</span> <b>jdost321:</b></span> alright i capped it at 2 per factory<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:55:02)</span> <b>jdost321:</b></span> 4 total glideins at the CE<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:59:27)</span> <b>jdost321:</b></span> :disappointed: just discovered factory limits aren't doing their job<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:59:53)</span> <b>jdost321:</b></span> there's supposed to be total limits and per-frontend limits<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:00:09)</span> <b>jdost321:</b></span> i am seeing 2 glideins per frontend submitted even though i capped the totals<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:01:22)</span> <b>jdost321:</b></span> going to explicitly cap idle and held too<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:22:58)</span> <b>jdost321:</b></span> @sthapa sorry looks like goc factory is just not respecting the limits correctly, don't know why limits work at SDSC and not there.. they are running the same versions<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:23:24)</span> <b>jdost321:</b></span> only solution if this is a real issue is to put ASU entry in downtime at GOC<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:23:36)</span> <b>jdost321:</b></span> we don't usually have to set such low limits..<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(16:24:02)</span> <b>sthapa:</b></span> okay<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(16:24:05)</span> <b>sthapa:</b></span> that’s fine<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(16:24:13)</span> <b>sthapa:</b></span> thanks for looking into this<br/>
+<span style="color: #385a86"><span style="font-size: small">(18:51:22)</span> <b>jdost321:</b></span> @blin sorry for the delay I just added D_SECURITY for OSG_US_UConn_gluskap<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:52:46)</span> <b>blin:</b></span> no worries, i'm fairly busy with the school so i didn't even notice :slightly_smiling_face:<br/>
+</body>
+</html>

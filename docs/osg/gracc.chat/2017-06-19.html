@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jun 19, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Mon Jun 19, 2017 : #gracc (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(11:02:54)</span> <b>dweitzel:</b></span> what's the status of the reprocessing?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:35:14)</span> <b>kretzke:</b></span> ready to kick off I suppose<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:36:46)</span> <b>dweitzel:</b></span> Awesome, I can watch the usage.  Any idea on how fast it is?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:36:55)</span> <b>dweitzel:</b></span> How long will it take to do the month of May?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:59:42)</span> <b>kretzke:</b></span> no idea, I’m cleaning up a fife mess from the weekend. You want to run it? <a href="https://github.com/opensciencegrid/gracc-tools/tree/master/gracc-reprocess">https://github.com/opensciencegrid/gracc-tools/tree/master/gracc-reprocess</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:00:08)</span> <b>kretzke:</b></span> oh, well need to get the new stash agents in place first…<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:03:41)</span> <b>kretzke:</b></span> opensciencegrid/gracc-stash-raw:latest image was automatically built. didn’t have it set to automatically build tags though. started a build for 3.3<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:22:33)</span> <b>dweitzel:</b></span> Yup, I can do it.  Just so we are on the same page, the order of operations is:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:24:13)</span> <b>dweitzel:</b></span> 1. Edit the docker-compose.yml to use stash 3.3<br/>2. <tt>docker-compose up</tt> to upgrade the stash (logstash).<br/>3. Run the reprocessing tool for index <tt>gracc.osg.raw3-2016.05</tt> ?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:29:51)</span> <b>kretzke:</b></span> yep, that looks right. reprocess command will be something like <tt>./gracc-reprocess -pq --query 'NOT _exists_:EndTime' 'gracc.osg.raw3-2016.05' <a href="http://localhost:8180">http://localhost:8180</a></tt> (double-check the port, or use the external alias)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:32:17)</span> <b>dweitzel:</b></span> kk.  After May, I will check to make sure things look good, then I will redo june as well.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:32:47)</span> <b>kretzke:</b></span> could start with April, should only be a few there since cutover was the 25th<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:33:04)</span> <b>dweitzel:</b></span> ok.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:34:28)</span> <b>kretzke:</b></span> well, “a few” being a couple hundred thousand… I see 284221<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:35:04)</span> <b>dweitzel:</b></span> Also, changing <tt>docker-compose</tt> to pull from opensciencegrid org rather than your personal docker hub.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:35:19)</span> <b>kretzke:</b></span> 1680515 in may, 893711 in june<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:36:58)</span> <b>kretzke:</b></span> ah good. maybe check that it’s up to date with <a href="https://github.com/opensciencegrid/gracc-docker/blob/master/deploy/docker-compose.yml">https://github.com/opensciencegrid/gracc-docker/blob/master/deploy/docker-compose.yml</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:51:59)</span> <b>dweitzel:</b></span> ok, running for april.  Should take ~20 minutes according to progress bar.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:21:18)</span> <b>dweitzel:</b></span> Ok, April done.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:22:14)</span> <b>dweitzel:</b></span> If I run the command again, it says I can process the same number of records again.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:22:38)</span> <b>dweitzel:</b></span> shouldn't it say "no records found?"  Since all the records should have EndTimes now?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:23:17)</span> <b>kretzke:</b></span> no, you’ve just added new records with EndTime.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:24:00)</span> <b>dweitzel:</b></span> Ah, ok.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:24:10)</span> <b>dweitzel:</b></span> well, no change in a few of the resources that I was monitoring.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:24:18)</span> <b>dweitzel:</b></span> but, I guess for april, I wasn't expecting a big change.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:25:08)</span> <b>kretzke:</b></span> I posted a sample elasticsearch command to delete the bad records at <a href="https://github.com/opensciencegrid/gracc-tools/pull/1#issuecomment-309235021">https://github.com/opensciencegrid/gracc-tools/pull/1#issuecomment-309235021</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:26:40)</span> <b>dweitzel:</b></span> So, how do I know if it worked?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:27:58)</span> <b>kretzke:</b></span> EndTime:&gt;2017-04-25 and Status:3?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:30:40)</span> <b>kretzke:</b></span> not Status, whatever field the Condor job status goes into<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:30:53)</span> <b>dweitzel:</b></span> Kibana Query: <tt>ProbeName:"condor:<a href="http://red-gw1.unl.edu">red-gw1.unl.edu</a>" AND EndTime:&gt;2017-04-25 AND Resource_condor-JobStatus:3</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:32:13)</span> <b>dweitzel:</b></span> I'm a big confused:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:32:14)</span> <b>dweitzel:</b></span> <a href="https://gracc.opensciencegrid.org/kibana/app/kibana#/doc/gracc.osg.raw-*/gracc.osg.raw3-2017.06/JobUsageRecord?id=41fe958b331919f588f3bfad9761d06d&amp;_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-6M,mode:quick,to:now))">https://gracc.opensciencegrid.org/kibana/app/kibana#/doc/gracc.osg.raw-*/gracc.osg.raw3-2017.06/JobUsageRecord?id=41fe958b331919f588f3bfad9761d06d&amp;_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-6M,mode:quick,to:now))</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:32:20)</span> <b>dweitzel:</b></span> The @timestamp is set to today?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:32:38)</span> <b>dweitzel:</b></span> is that right?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:33:16)</span> <b>kretzke:</b></span> nope<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:34:51)</span> <b>kretzke:</b></span> forgot to set <tt>@timestamp</tt> here <a href="https://github.com/opensciencegrid/gracc-docker/blob/master/gracc-stash-raw/logstash.conf#L83">https://github.com/opensciencegrid/gracc-docker/blob/master/gracc-stash-raw/logstash.conf#L83</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:35:23)</span> <b>dweitzel:</b></span> Ok, I don't think that's a big deal.  Duplicate detection will update the record, right?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:35:39)</span> <b>kretzke:</b></span> yes<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:36:05)</span> <b>dweitzel:</b></span> Ok, go ahead and make the change, and I'll do the docker-compose up and reprocess again.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:37:47)</span> <b>kretzke:</b></span> actually I’m not 100% sure that I can just set <tt>@timestamp</tt> or if the <tt>date</tt> filter does something special. give me a few minutes<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:37:55)</span> <b>dweitzel:</b></span> kk<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:49:36)</span> <b>dweitzel:</b></span> @kretzke I see 3.3.1 is built in docker hub.  Good to deploy?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:53:27)</span> <b>kretzke:</b></span> :thumbsup:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:21:22)</span> <b>dweitzel:</b></span> Now it appears we have duplicates in April.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:21:42)</span> <b>dweitzel:</b></span> 1 with @timestamp accurate, and 1 with the old timestamp.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:22:38)</span> <b>dweitzel:</b></span> Well... the checksum and the _id are the same.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:22:45)</span> <b>dweitzel:</b></span> kibana is showing both though...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:25:36)</span> <b>dweitzel:</b></span> Ah, they are in different indexes.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:25:42)</span> <b>dweitzel:</b></span> based on the @timestamps<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:25:47)</span> <b>dweitzel:</b></span> well shoot.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:26:09)</span> <b>kretzke:</b></span> ah damn<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:27:01)</span> <b>dweitzel:</b></span> I guess it's easy to query for id's, then go to the other index and delete them?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:27:12)</span> <b>dweitzel:</b></span> Either way, should I move onto May?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:27:16)</span> <b>dweitzel:</b></span> I've only done April so far.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:28:26)</span> <b>kretzke:</b></span> can do <tt>/gracc.osg.raw3-2017.06/_delete_by_query</tt> with query <tt>EndTime:&lt;2017-06-01</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:28:47)</span> <b>dweitzel:</b></span> Yup, that would do it.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:29:41)</span> <b>kretzke:</b></span> yep, 284221, same as number reprocessed.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:29:46)</span> <b>dweitzel:</b></span> yup<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:31:37)</span> <b>dweitzel:</b></span> ok, starting may.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:32:27)</span> <b>dweitzel:</b></span> may is gonna take ~1.5 hours.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:33:54)</span> <b>kretzke:</b></span> did you want me to delete the bad records, or are you doing it?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:34:27)</span> <b>dweitzel:</b></span> Oh, you<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:34:48)</span> <b>dweitzel:</b></span> Thanks<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:39:19)</span> <b>kretzke:</b></span> done<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:42:50)</span> <b>dweitzel:</b></span> confirmed, looks good.<br/>
+</body>
+</html>

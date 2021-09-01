@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon May 17, 2021 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Mon May 17, 2021 : #gfactory (osg)</h3>
+<span style="color: #3c8c69"><span style="font-size: small">(10:07:55)</span> <b>jpeterson:</b></span> per @blin:<br/><pre>we need osg-ca-certs-1.96, which should have been released last week</pre><br/>current version on factory is <tt>osg-ca-certs-1.94-1.osg35.el7.noarch</tt><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:10:04)</span> <b>jpeterson:</b></span> <b>@here</b>  best/proper way to get this updated?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:48:17)</span> <b>blin:</b></span> context: we suspect pilot jobs against newly redeployed Hosted CEs are being held because of this<br/>
+<span style="color: #385a86"><span style="font-size: small">(10:54:46)</span> <b>jdost321:</b></span> @jpeterson @blin I just updated the certs on prod and itb factories<br/>
+<span style="color: #385a86"><span style="font-size: small">(10:55:27)</span> <b>jdost321:</b></span> @rynge we may be bitten in amnh debugging because of ^I'll clear out the HEL queues again to see if that helps<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:56:33)</span> <b>blin:</b></span> i think HEL failures are unrelated<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:56:46)</span> <b>blin:</b></span> i'm working with Jaime on troubleshooting that<br/>
+<span style="color: #385a86"><span style="font-size: small">(11:00:44)</span> <b>jdost321:</b></span> can confirm HEL is still broken, cert update did not change things<br/>
+<span style="color: #385a86"><span style="font-size: small">(11:01:31)</span> <b>jdost321:</b></span> ref latest hold messages in our private notes here <a href="https://opensciencegrid.freshdesk.com/a/tickets/67143">https://opensciencegrid.freshdesk.com/a/tickets/67143</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:02:59)</span> <b>jpeterson:</b></span> UTC has switched from the GSI error to “<tt>Unspecified gridmanager error</tt>”<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:03:20)</span> <b>blin:</b></span> oof<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:04:25)</span> <b>jpeterson:</b></span> same with PSU<br/>
+<span style="color: #385a86"><span style="font-size: small">(11:04:46)</span> <b>jdost321:</b></span> and that's what i see on HEL on production factory where tokens should be ignored<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:05:53)</span> <b>blin:</b></span> what are the image tags + tarballs that you're using for all 3?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:06:57)</span> <b>jpeterson:</b></span> UTC<br/><pre><a href="https://research.cs.wisc.edu/htcondor/bosco/1.3/bosco-1.3-x86_64_CentOS7.tar.gz">https://research.cs.wisc.edu/htcondor/bosco/1.3/bosco-1.3-x86_64_CentOS7.tar.gz</a><br/>release</pre><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:07:18)</span> <b>jpeterson:</b></span> same for PSU<br/>
+<span style="color: #385a86"><span style="font-size: small">(11:07:25)</span> <b>jdost321:</b></span> HEL:<br/><pre>        Image: opensciencegrid/hosted-ce:release<br/>        ImageID: 86e8862a193de540cb7044b55b41876923edc9366875ca94f9b691ef86eb1dd4</pre><br/>
+<span style="color: #385a86"><span style="font-size: small">(11:07:37)</span> <b>jdost321:</b></span> <pre>BoscoOverrides:<br/>  URL: <a href="https://research.cs.wisc.edu/htcondor/bosco/1.3/bosco-1.3-x86_64_CentOS7.tar.gz">https://research.cs.wisc.edu/htcondor/bosco/1.3/bosco-1.3-x86_64_CentOS7.tar.gz</a><br/>  TarballURL: <a href="https://research.cs.wisc.edu/htcondor/bosco/1.3/bosco-1.3-x86_64_CentOS7.tar.gz">https://research.cs.wisc.edu/htcondor/bosco/1.3/bosco-1.3-x86_64_CentOS7.tar.gz</a></pre><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:07:42)</span> <b>jpeterson:</b></span> and AMNH<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:07:43)</span> <b>blin:</b></span> ok, thanks<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:22:34)</span> <b>blin:</b></span> @jpeterson @jdost321 do you guys recall if you tried to deploy <tt>testing</tt> for any of these CEs?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:23:30)</span> <b>jpeterson:</b></span> nope, just the TCNJ one with the testing tag you gave me, otherwise I have only used release since we switched from stable/fresh<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:32:20)</span> <b>blin:</b></span> ok it's a shot in the dark but could we try moving the <tt>bosco_slate</tt> dir out of the way for AMNH-HEL and redeploying the CE?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:48:56)</span> <b>rynge:</b></span> @jdost321 Also, we have not gotten any Syracuse glideins since ~Friday<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:49:06)</span> <b>rynge:</b></span> That is pretty uncommon<br/>
+<span style="color: #385a86"><span style="font-size: small">(11:50:01)</span> <b>jdost321:</b></span> I'm just hearing from @bbockelm that syracuse has been offline since thurs, I don't know if anyone has followed up with them<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:50:24)</span> <b>rynge:</b></span> I haven't - I was out on vacation Friday<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:50:54)</span> <b>rynge:</b></span> Do you want to followup, or should I?<br/>
+<span style="color: #385a86"><span style="font-size: small">(11:59:30)</span> <b>jdost321:</b></span> @rynge I just double checked, no one has followed up. Can you start the conversation, then pull me in as needed if we need to look on the factory side?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:59:39)</span> <b>rynge:</b></span> Will do<br/>
+<span style="color: #385a86"><span style="font-size: small">(11:59:40)</span> <b>jdost321:</b></span> (FD ticket?)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:59:45)</span> <b>rynge:</b></span> Yes<br/>
+<span style="color: #385a86"><span style="font-size: small">(11:59:49)</span> <b>jdost321:</b></span> thanks!<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:02:15)</span> <b>jdost321:</b></span> @blin @jpeterson I'll give moving the bosco dir and redepolying for AMNH now<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:20:06)</span> <b>jdost321:</b></span> @blin no change on HEL redeploy<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:20:29)</span> <b>blin:</b></span> ugh, thanks. still deploying <tt>release</tt> + Bosco 1.3?<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:21:08)</span> <b>jdost321:</b></span> yes<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:34:42)</span> <b>blin:</b></span> we found the problem but it means we may need to rethink some solutions for 9.0.0<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:36:50)</span> <b>blin:</b></span> @jpeterson @jdost321 i must have messed up my condor 9.0.0 + bosco 1.3 testing. if you redeploy with the <tt>testing</tt> tag + the May 2 tarball, i believe that should get around this issue<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:39:06)</span> <b>blin:</b></span> any word from TCNJ on Python 3 support?<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:43:58)</span> <b>jdost321:</b></span> How do I get the "May 2 tarball" ?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:44:14)</span> <b>blin:</b></span> i sent that email to osg-ops a week or two ago<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:44:33)</span> <b>jdost321:</b></span> ah ok let me dig for i<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:44:42)</span> <b>blin:</b></span> same idea with the tarball URL override, just a different tarball<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:45:18)</span> <b>jdost321:</b></span> ok, sure was jsut looking here didn't see any w/ that date <a href="https://research.cs.wisc.edu/htcondor/bosco/1.3/">https://research.cs.wisc.edu/htcondor/bosco/1.3/</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:46:13)</span> <b>blin:</b></span> yeah, with 9.0.0 we're trying to move away from Bosco 1.x<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:46:19)</span> <b>blin:</b></span> did you find the email?<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:46:40)</span> <b>jdost321:</b></span> not finding it.. do you recall the subject?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:47:12)</span> <b>blin:</b></span> &gt;  Working Hosted CE and Bosco combinations<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:49:14)</span> <b>blin:</b></span> hrmm, i also don't see it in the operations list. maybe spam caught it or something<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:49:29)</span> <b>jdost321:</b></span> yeah i'm coming out empty searching, can you resend?<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:49:41)</span> <b>jdost321:</b></span> maybe just to me and jeff p for now<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:50:03)</span> <b>blin:</b></span> ah, i see the problem =/<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:51:04)</span> <b>blin:</b></span> actually, i think we have a container-only fix here<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:56:09)</span> <b>jdost321:</b></span> what does that mean? should I still try testing + may 2? or is testing only sufficient?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:57:34)</span> <b>blin:</b></span> try testing + may 2. i may have a fix for current release + bosco 1.3 but that may not be relevant in a few hours since we're going to be releasing 9.0.0 (that's what's in testing)<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:58:05)</span> <b>jdost321:</b></span> ok<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:58:18)</span> <b>blin:</b></span> you should also be able to use testing + Bosco 1.3 if you want to be more conservative about your redeploy<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:05:51)</span> <b>jdost321:</b></span> @blin quick , what is the diff in bosco overrides between TarballURL and URL? I feel like one was supposed to replace the other but we still set both out of paranoia?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:06:06)</span> <b>blin:</b></span> you can drop URL and just go with TarballURL<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:06:11)</span> <b>jdost321:</b></span> ok, thanks<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:30:35)</span> <b>jdost321:</b></span> @blin @rynge we have pilots starting at HEL ! <a href="http://gfactory-2.opensciencegrid.org/factory/monitor/factoryStatus.html?entry=COVID19_US_AMNH-HEL&amp;frontend=total&amp;infoGroup=running&amp;elements=StatusRunningCores,ClientCoresTotal,ClientCoresRunning,ClientCoresIdle,&amp;rra=0&amp;window_min=0&amp;window_max=0&amp;timezone=-7">http://gfactory-2.opensciencegrid.org/factory/monitor/factoryStatus.html?entry=COVID19_US_A[…]oresIdle,&amp;rra=0&amp;window_min=0&amp;window_max=0&amp;timezone=-7</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:30:51)</span> <b>jpeterson:</b></span> (catching up after lunch ,). so either <tt>testing</tt> with old 1.3, or with new may2 daily should be tried with PSU and UTC?<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:32:05)</span> <b>jdost321:</b></span> i have testing with May 2: <a href="https://research.cs.wisc.edu/htcondor/tarball/9.0/9.0.1/daily/condor-9.0.1-20210502-x86_64_CentOS7-stripped.tar.gz">https://research.cs.wisc.edu/htcondor/tarball/9.0/9.0.1/daily/condor-9.0.1-20210502-x86_64_CentOS7-stripped.tar.gz</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:32:47)</span> <b>jpeterson:</b></span> okay, I’ll apply that to the other 2<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:57:00)</span> <b>jpeterson:</b></span> hmm both PSU and UTC with testing and may2 the jobs are just sitting idle in entry_q<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:01:15)</span> <b>blin:</b></span> i see this on UTC<br/><pre>[osg01@epyc:~]$ squeue <br/>             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)<br/>              3962   general bl_Hleo8    osg01 PD       0:00      1 (PartitionTimeLimit)<br/>              3961   general bl_LCMdy    osg01 PD       0:00      1 (PartitionTimeLimit)<br/>              3960   general bl_LNa0e    osg01 PD       0:00      1 (PartitionTimeLimit)<br/>              3959   general bl_EeQnj    osg01 PD       0:00      1 (PartitionTimeLimit)<br/>              3958   general bl_xQ419    osg01 PD       0:00      1 (PartitionTimeLimit)<br/>              3957   general bl_G9mWU    osg01 PD       0:00      1 (PartitionTimeLimit)<br/>              3956   general bl_8KRzG    osg01 PD       0:00      1 (PartitionTimeLimit)<br/>              3955   general bl_3FKbB    osg01 PD       0:00      1 (PartitionTimeLimit)<br/>              3954   general bl_kpoYo    osg01 PD       0:00      1 (PartitionTimeLimit)<br/>              3953   general bl_b8TQ3    osg01 PD       0:00      1 (PartitionTimeLimit)</pre><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:01:59)</span> <b>jpeterson:</b></span> hmm, that was not the thing we were changing.    whelp.<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:03:41)</span> <b>blin:</b></span> i also only see 1/2 containers up for PSU. looks like it's in crashloopbackoff<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:04:44)</span> <b>blin:</b></span> <pre>+++ ssh-keyscan -p <a href="tel:22128.118.25.39">22 128.118.25.39</a><br/>++ REMOTE_HOST_KEY=<br/>++ [[ -n '' ]]<br/>++ errexit 'Failed to determine host key for 128.118.25.39:22'<br/>++ echo 'Failed to determine host key for 128.118.25.39:22'<br/>Failed to determine host key for 128.118.25.39:22<br/>++ exit 1</pre><br/>
+</body>
+</html>

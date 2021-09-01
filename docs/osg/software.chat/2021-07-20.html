@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jul 20, 2021 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue Jul 20, 2021 : #software (osg)</h3>
+<span style="color: #e96699"><span style="font-size: small">(08:37:44)</span> <b>lincoln:</b></span> we've been getting a bunch of crons emails of this flavor:<br/><pre>2021-07-20 08:33:53 CDT Gratia: ERROR: Unexpected error encountered: local variable 'e' referenced before assignment<br/>Traceback (most recent call last):<br/>  File "/usr/share/gratia/condor/condor_meter", line 953, in &lt;module&gt;<br/>    main()<br/>  File "/usr/share/gratia/condor/condor_meter", line 224, in main<br/>    process_history_dirs(dirs)<br/>  File "/usr/share/gratia/condor/condor_meter", line 322, in process_history_dirs<br/>    if not e and cnt_submit + cnt_alternate == cnt_found and (cnt_submit &gt; 0 or cnt_alternate &gt; 0):<br/>UnboundLocalError: local variable 'e' referenced before assignment</pre><br/>Any idea what that's about?<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:42:19)</span> <b>blin:</b></span> looks like a bug! what version of gratia-probe do you have installed?<br/>
+<span style="color: #e96699"><span style="font-size: small">(08:58:50)</span> <b>lincoln:</b></span> let me look<br/>
+<span style="color: #e96699"><span style="font-size: small">(08:59:10)</span> <b>lincoln:</b></span> <pre>[root@login05 ~]# rpm -qa | grep gratia<br/>gratia-probe-glideinwms-1.20.14-1.osg35.el7.x86_64<br/>gratia-probe-common-1.23.2-1.osg35.el7.x86_64<br/>gratia-probe-condor-1.23.2-1.osg35.el7.x86_64</pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(08:59:27)</span> <b>lincoln:</b></span> maybe a mismatch ?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:07:01)</span> <b>blin:</b></span> nah, that should be fine (though the next release should make sure versions match)<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:08:02)</span> <b>lincoln:</b></span> well, I'm about to update these nodes. Strangely only login05 is reporting an error<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:08:18)</span> <b>lincoln:</b></span> should we revisit after I slap a bunch of yum updates on them?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:08:43)</span> <b>blin:</b></span> yeah, that sounds good<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:09:08)</span> <b>blin:</b></span> though i don't imagine it'll go away, 1.23.3 looks like the latest in 3.5<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:09:12)</span> <b>lincoln:</b></span> alright<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:32:42)</span> <b>edquist:</b></span> Just seeing this now, thanks @lincoln for reporting<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:33:17)</span> <b>edquist:</b></span> in gratia, tracebacks are a feature not a bug<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:33:29)</span> <b>edquist:</b></span> but, we'll fix it nonetheless ;)<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:35:41)</span> <b>lincoln:</b></span> that's what those python people keep telling me<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:37:45)</span> <b>edquist:</b></span> i'm a little fuzzy on the history here, but it does look like it should work properly in the current master<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:38:05)</span> <b>edquist:</b></span> (<tt>e</tt> is set to <tt>None</tt> just above the try/except block)<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:38:43)</span> <b>edquist:</b></span> i would be curious to see lines ~ 290 - 325 in your /usr/share/gratia/condor/condor_meter<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:39:18)</span> <b>edquist:</b></span> <a href="https://github.com/opensciencegrid/gratia-probe/blob/master/condor/condor_meter#L315-L322">https://github.com/opensciencegrid/gratia-probe/blob/master/condor/condor_meter#L315-L322</a><br/>
+<span style="color: #16569E"><span style="font-size: small">(09:39:41)</span> <b>edquist:</b></span> or 310-325<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:05:12)</span> <b>edquist:</b></span> @lincoln that is real bizarre <br/>
+<span style="color: #e96699"><span style="font-size: small">(10:05:17)</span> <b>lincoln:</b></span> :slightly_smiling_face:<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:05:17)</span> <b>edquist:</b></span> i just busted open <a href="https://kojihub0000.chtc.wisc.edu/kojifiles/work/tasks/2620/332620/gratia-probe-condor-1.23.2-1.osg35.el7.x86_64.rpm">https://kojihub0000.chtc.wisc.edu/kojifiles/work/tasks/2620/332620/gratia-probe-condor-1.23.2-1.osg35.el7.x86_64.rpm</a><br/>
+<span style="color: #16569E"><span style="font-size: small">(10:05:33)</span> <b>edquist:</b></span> (i think that's the version you mentioned above)<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:05:52)</span> <b>edquist:</b></span> and for the lines in your traceback i see<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:05:55)</span> <b>edquist:</b></span> <pre><br/>        if m:<br/>            e = None<br/>            try:<br/>                cnt_submit, cnt_found, cnt_alternate = process_history_file(log)<br/>            except ValueError as e:<br/>                DebugPrint(1, "Failed to parse log file: %s\nError was: %s" % (log, e))<br/>                cnt_submit, cnt_found, cnt_alternate = 0, 0, 0<br/><br/>            if not e and cnt_submit + cnt_alternate == cnt_found and (cnt_submit &gt; 0 or cnt_alternate &gt; 0):<br/></pre><br/>
+<span style="color: #16569E"><span style="font-size: small">(10:06:08)</span> <b>edquist:</b></span> it looks like <tt>e</tt> gets set regardless<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:06:19)</span> <b>edquist:</b></span> curious isn't it?<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:28:50)</span> <b>lincoln:</b></span> oh i forgot to tell you, I'm LD_PRELOADing Python..<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:28:51)</span> <b>lincoln:</b></span> just kidding<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:34:25)</span> <b>matyas:</b></span> lol<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:06:59)</span> <b>lincoln:</b></span> OK, I'm updated to the latest &amp; greatest. I'm waiting to see if another one of those gratia mails graces my mailbox<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:38:02)</span> <b>lincoln:</b></span> ok, just to confirm I'm still getting this error<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:42:39)</span> <b>blin:</b></span> <b>@edquist</b> please make a ticket and track this down<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:42:54)</span> <b>edquist:</b></span> ok<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:43:01)</span> <b>blin:</b></span> @lincoln just for sanity's sake, what does <tt>rpm -q --verify gratia-probe-condor</tt> give you?<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:43:04)</span> <b>edquist:</b></span> thanks @lincoln for reporting this<br/>
+<span style="color: #16569E"><span style="font-size: small">(13:03:06)</span> <b>edquist:</b></span> &gt; (12:43:01) &lt;font size="3"&gt;blin: @lincoln just for sanity's sake, what does <tt>rpm -q --verify gratia-probe-condor</tt> give you?<br/><br/>^^^&lt;/font&gt;<br/>
+<span style="color: #16569E"><span style="font-size: small">(13:03:19)</span> <b>edquist:</b></span> blin: @lincoln just for sanity's sake, what does <tt>rpm -q --verify gratia-probe-condor</tt> give you?<br/><br/>^^^<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:04:52)</span> <b>lincoln:</b></span> checking<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:05:07)</span> <b>lincoln:</b></span> <pre>[root@login05 ~]# rpm -q --verify gratia-probe-condor<br/>missing   c /etc/condor/config.d/99_gratia.conf</pre><br/>
+<span style="color: #16569E"><span style="font-size: small">(13:08:01)</span> <b>edquist:</b></span> <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-4711">https://opensciencegrid.atlassian.net/browse/SOFTWARE-4711</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:04:55)</span> <b>blin:</b></span> @tim.theisen<br/><pre>[osgvopilot@hpclogin1 ~]$ grep blahp bosco_slate/glite/Manifest.txt <br/>external-packages/blahp-2.1.0-1.el7.x86_64.rpm</pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(15:16:58)</span> <b>lincoln:</b></span> can multiple condor roles be stacked? can i do something like<br/><pre>use role:CentralManager<br/>use role:Submit</pre><br/>on the same host ?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:17:53)</span> <b>matyas:</b></span> yep<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:19:07)</span> <b>lincoln:</b></span> thanks<br/>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jan 3, 2018 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Jan 3, 2018 : #software (osg)</h3>
+<span style="color: #674b1b"><span style="font-size: small">(11:06:31)</span> <b>rynge:</b></span> Are there any known CVMFS issues on EL7? We have /cvmfs/singularity.opensciencegrid.org missing at some sites<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:07:09)</span> <b>tiradani:</b></span> 7.4?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:07:21)</span> <b>rynge:</b></span> UCSDT2 is one (Terrance can give details) and SU is another one (<a href="https://ticket.opensciencegrid.org/35734">https://ticket.opensciencegrid.org/35734</a>)<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:07:56)</span> <b>tiradani:</b></span> there are a couple of bugs related to autofs/fuse that can cause problems<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:08:33)</span> <b>tiradani:</b></span> At FNAL, (at least for now) we have disabled unmounting due to timeout in autofs<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:08:38)</span> <b>rynge:</b></span> Yeah I think it might be 7.4<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:08:39)</span> <b>tiradani:</b></span> that seems to help<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:09:03)</span> <b>tiradani:</b></span> there was another bug that was related to the CVMFS client, but I think that has already been patched and released<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:09:31)</span> <b>rynge:</b></span> What was the timeout change?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:10:24)</span> <b>tiradani:</b></span> we set <pre>timeout = 0</pre> in /etc/autofs.conf<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:10:31)</span> <b>rynge:</b></span> Ah<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:11:05)</span> <b>tiradani:</b></span> this allows the mount to happen dynamically, but doesn’t unmount it<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:11:45)</span> <b>tiradani:</b></span> we are running grid jobs in docker containers on SLF7x hosts<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:11:58)</span> <b>tiradani:</b></span> we saw many of those issues with Docker<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:12:50)</span> <b>rynge:</b></span> So the issue was that it was unmounted due to the timeout, and then it could not be mounted again?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:13:18)</span> <b>rynge:</b></span> @tmartin Something to try?<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(11:13:48)</span> <b>tmartin:</b></span> yes 7.4<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(11:14:04)</span> <b>tmartin:</b></span> ahh<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(11:14:06)</span> <b>tmartin:</b></span> that makes sense<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:14:22)</span> <b>tiradani:</b></span> the issue in both cases (the kernel bugs and the CVMFS client bug) was that the usage of the mount was never updated correctly in FUSE so autofs believed the mount was dormant and unmounted it after the timeout<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:14:51)</span> <b>rynge:</b></span> Ok<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:17:41)</span> <b>rynge:</b></span> Thanks! I will suggest that to SU and see if it makes a difference<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(11:18:08)</span> <b>tmartin:</b></span> Your sure that is not autofs.conf?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:21:47)</span> <b>tiradani:</b></span> <pre># grep timeout /etc/autofs.conf<br/># timeout - set the default mount timeout in secons. The internal<br/>#	    configuration overrides this and sets the timeout to 5<br/>timeout = 0</pre><br/>
+<span style="color: #b14cbc"><span style="font-size: small">(11:30:48)</span> <b>tmartin:</b></span> Sorry I misread above, thanks!<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:32:45)</span> <b>tiradani:</b></span> no problem, hope it helps!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:09:34)</span> <b>bbockelm:</b></span> @tmartin - note that the timeout bug is acknowledged by upstream meant to be fixed in a future kernel release.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:09:58)</span> <b>bbockelm:</b></span> Sounds like everyone gets to update their kernels in the next week at least...<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(16:16:38)</span> <b>tmartin:</b></span> @bbockelm Oh ya, fun times....:)<br/>
+</body>
+</html>

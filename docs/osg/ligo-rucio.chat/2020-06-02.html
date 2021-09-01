@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jun 2, 2020 : #ligo-rucio (osg)</title>
+</head>
+<body>
+<h3>Tue Jun 2, 2020 : #ligo-rucio (osg)</h3>
+<span style="color: #a2a5dc"><span style="font-size: small">(10:47:30)</span> <b>james.clark:</b></span> <b>@channel</b> I have the following message from Tokyo but it's not clear what I'm supposed to do with the info:<br/><pre>I found that the certificate revocation list (CRL) for KEK GRID CA<br/>has been updated recently and GRID FTP connection is failed with the old<br/>CRL. Please check /etc/grid-security/certificates/2f2f573f.r0.<br/><br/>$ cd /etc/grid-security/certificates<br/>$ ls -l 2f2f573f.r0<br/>-rw-r--r-- 1 root root 4004 Jun  2 12:53 2f2f573f.r0</pre><br/>any thoughts?<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:19:07)</span> <b>paschos:</b></span> check what on that ?<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(11:26:25)</span> <b>james.clark:</b></span> yeah, that's what i don't understand - if it's not obvious to anyone else,  i'll ask them to clarify<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:35:38)</span> <b>paschos:</b></span> @jlstephen is there a need for an update for these CA packages? what's the process for this. I am not familiar with it.<br/>
+<span style="color: #ea2977"><span style="font-size: small">(11:37:52)</span> <b>jlstephen:</b></span> how are the ca certificates being managed on the machine?<br/>
+<span style="color: #ea2977"><span style="font-size: small">(11:38:43)</span> <b>jlstephen:</b></span> you might have to also restart the gridftp server to pick up the new certificates<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:39:08)</span> <b>paschos:</b></span> for fts -- aren't these included  in osg-ca-certs which are recently -- supposedly --- updated by OSG?<br/>
+<span style="color: #ea2977"><span style="font-size: small">(11:39:27)</span> <b>jlstephen:</b></span> on <a href="http://fts.mwt2.org">fts.mwt2.org</a>?<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:39:30)</span> <b>paschos:</b></span> yes<br/>
+<span style="color: #ea2977"><span style="font-size: small">(11:40:03)</span> <b>jlstephen:</b></span> <a href="http://fts.mwt2.org">fts.mwt2.org</a> does not use osg-ca-certs directly on the VM. it, like all of our other machines, use the CA certificates shipped out of OASIS<br/>
+<span style="color: #ea2977"><span style="font-size: small">(11:40:11)</span> <b>jlstephen:</b></span> so it's up to OSG to update their stuff<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:40:26)</span> <b>paschos:</b></span> oh i see<br/>
+<span style="color: #ea2977"><span style="font-size: small">(11:40:27)</span> <b>jlstephen:</b></span> i assume they have done this :slightly_smiling_face:<br/>
+<span style="color: #ea2977"><span style="font-size: small">(11:40:34)</span> <b>jlstephen:</b></span> at least by this point in the fire<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:41:15)</span> <b>paschos:</b></span> so if they push out anything in oasis our machines automatically pick those up and there is no need for any manual installation on your end<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:41:29)</span> <b>paschos:</b></span> that's neat actually<br/>
+<span style="color: #ea2977"><span style="font-size: small">(11:47:38)</span> <b>jlstephen:</b></span> until it breaks :slightly_smiling_face:<br/>
+<span style="color: #ea2977"><span style="font-size: small">(11:48:09)</span> <b>jlstephen:</b></span> but yeah, the idea is that you have to only rely on rpms updating and fetch_crl being run on one host<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(12:00:01)</span> <b>james.clark:</b></span> Ok, thanks, i'll suggest they restart the gridftp service if they haven't already<br/>
+</body>
+</html>

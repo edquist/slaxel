@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jul 11, 2019 : #operations (osg)</title>
+</head>
+<body>
+<h3>Thu Jul 11, 2019 : #operations (osg)</h3>
+<span style="color: #e23f99"><span style="font-size: small">(07:22:47)</span> <b>marco.mascheroni:</b></span> yes, there are a couple with multiple local user and same host: hosted-ce08 hosted-ce10<br/>
+<span style="color: #e23f99"><span style="font-size: small">(07:23:49)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(07:24:04)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(07:24:36)</span> <b>marco.mascheroni:</b></span> However, one is LIGO india, which has been broken since before I took over from Suchandra and the admin never fixed despite multiple pings<br/>
+<span style="color: #e23f99"><span style="font-size: small">(07:26:14)</span> <b>marco.mascheroni:</b></span> the other is Stampede2 at TACC, that is supposed to run also atlas jobs (besides CMS ones). Rob pinged me about it some time ago, the CE part should work, but there was no follow up on the ATLAS side to connect to it.<br/>
+<span style="color: #e23f99"><span style="font-size: small">(07:26:49)</span> <b>marco.mascheroni:</b></span> Long story short, 2 CEs in principle, but not used/broken CEs<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:48:17)</span> <b>bbockelm:</b></span> @marco.mascheroni - why is the Requirements for the ATLAS route set to <tt>Requirements = regexp("osg", TARGET.x509UserProxyVOName);</tt> ?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:50:16)</span> <b>rwg:</b></span> hello<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:52:15)</span> <b>blin:</b></span> :wave:<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:52:42)</span> <b>rwg:</b></span> do we have any config docs for hosted CE - Lincoln is revisiting containerizing<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:52:54)</span> <b>rwg:</b></span> we need one for TACC too for ATLAS<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:53:18)</span> <b>rwg:</b></span> and configured to route to the correct account/allocation on stampede2<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:54:32)</span> <b>marco.mascheroni:</b></span> @bbockelm that was a leftover from Suchandra, I can set it to whatever. I think this was discussed with Rob myself @jdost321 at some point<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:57:10)</span> <b>marco.mascheroni:</b></span> Anyway, point is that if we want to restrict 1 hostedCE &lt;-&gt; 1 user we can do that. It's not much work to set up a new ce for the atlas stampede case<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:58:58)</span> <b>rwg:</b></span> okay good.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:59:09)</span> <b>rwg:</b></span> Lincoln was finding some issues<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:59:12)</span> <b>marco.mascheroni:</b></span> @rwg @lincoln, the hosted CE isntallation document is <a href="https://docs.google.com/document/d/1NXb_jQXbbFfwYuaj5MZHB5QqhnWtg7GuZATd6pnShiY/edit#heading=h.llx3xjs8rmhn">https://docs.google.com/document/d/1NXb_jQXbbFfwYuaj5MZHB5QqhnWtg7GuZATd6pnShiY/edit#heading=h.llx3xjs8rmhn</a><br/>
+<span style="color: #e96699"><span style="font-size: small">(11:13:05)</span> <b>lincoln:</b></span> hi Marco, thanks I will take a look and try to run through these<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:14:43)</span> <b>lincoln:</b></span> I will try to read through them, try things out, and we can discuss on Tuesday?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:16:19)</span> <b>marco.mascheroni:</b></span> sounds good!<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:19:04)</span> <b>blin:</b></span> @marian i assume the announcement tim sent went out without any hitches -- he sends announcements using a host that's in our SPF record<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:19:23)</span> <b>marian:</b></span> thanks, sounds good<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:19:28)</span> <b>blin:</b></span> i was saying announcements sent from your VM may have issues since i don't believe it's in the SPF record<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:19:37)</span> <b>marian:</b></span> yeah, got it<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:20:05)</span> <b>marian:</b></span> that's why we need more formal way what to do next time ... I don't think OPS should rely on Tim doing that<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:20:44)</span> <b>blin:</b></span> :+1:<br/>
+<span style="color: #e06b56"><span style="font-size: small">(11:21:13)</span> <b>jthiltges:</b></span> SPF records for <a href="http://opensciencegrid.org">opensciencegrid.org</a>:<br/><pre>FNAL network:          ip4:131.225.0.0/16<br/>                       ip6:2620:6a::/48<br/>Indiana network:       ip4:129.79.0.0/16<br/>                       ip4:149.159.0.0/16<br/>                       ip4:156.56.0.0/16<br/>                       ip4:140.182.0.0/16<br/>                       ip6:2001:18e8:2::/48<br/><a href="http://osghost.chtc.wisc.edu">osghost.chtc.wisc.edu</a>  ip4:128.105.244.224/32<br/><a href="http://submit-1.chtc.wisc.edu">submit-1.chtc.wisc.edu</a> ip4:128.105.244.191/32<br/><br/>Also includes the following:<br/><a href="http://email.freshservice.com">email.freshservice.com</a><br/><a href="http://spf.protection.outlook.com">spf.protection.outlook.com</a></pre><br/>
+<span style="color: #e06b56"><span style="font-size: small">(11:21:51)</span> <b>jthiltges:</b></span> Seems like a reasonable time to get that updated, if needed. That's a cloudflare DNS thing?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:22:35)</span> <b>dweitzel:</b></span> indeed, cloudflare DNS thing.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:22:50)</span> <b>dweitzel:</b></span> lets make a freshdesk ticket for it, we can discuss what the SPF "should" be.<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:18:52)</span> <b>matyas:</b></span> just add UNL :nailedit:<br/>
+</body>
+</html>

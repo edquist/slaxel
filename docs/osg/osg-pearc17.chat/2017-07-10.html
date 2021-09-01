@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jul 10, 2017 : #osg-pearc17 (osg)</title>
+</head>
+<body>
+<h3>Mon Jul 10, 2017 : #osg-pearc17 (osg)</h3>
+<span style="color: #2b6836"><span style="font-size: small">(09:23:49)</span> <b>rwg:</b></span> hello! we are underway.. <a href="https://swc-osg-workshop.github.io/OSG-UserTraining-PEARC17/index.html">https://swc-osg-workshop.github.io/OSG-UserTraining-PEARC17/index.html</a><br/>
+<span style="color: #2b6836"><span style="font-size: small">(09:29:36)</span> <b>rwg:</b></span> anyone know what the job limit is on the training host?<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:29:58)</span> <b>lincoln:</b></span> i wouldn't submit a ton, it doesn't have a lot of memory<br/>
+<span style="color: #2b6836"><span style="font-size: small">(09:30:30)</span> <b>rwg:</b></span> just submitted 10<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:30:36)</span> <b>lincoln:</b></span> ok :slightly_smiling_face:<br/>
+<span style="color: #2b6836"><span style="font-size: small">(09:31:52)</span> <b>rwg:</b></span> q: how do we know if folks are keeping up?<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:32:58)</span> <b>lincoln:</b></span> well, there seems to be a variety of folks submitting<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:33:02)</span> <b>lincoln:</b></span> <pre><br/>osguser01<br/>osguser02<br/>osguser07<br/>osguser08<br/>osguser13<br/>osguser20<br/>osguser25<br/>osguser26<br/>osguser31<br/>osguser37<br/>osguser49<br/>osguser50<br/>osguser54<br/></pre><br/>
+<span style="color: #2b6836"><span style="font-size: small">(09:33:06)</span> <b>rwg:</b></span> true<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:33:18)</span> <b>lincoln:</b></span> from <tt>condor_history | grep '7/10' | awk '{print $2}'  | sort | uniq</tt><br/>
+<span style="color: #2b6836"><span style="font-size: small">(09:33:42)</span> <b>rwg:</b></span> connect histogram work?<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:33:56)</span> <b>lincoln:</b></span> hrm.. seems like.. sort of.. ?<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:34:07)</span> <b>lincoln:</b></span> the new condor_q format mightve broken it :confused:<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:34:12)</span> <b>lincoln:</b></span> <pre><br/>[osguser07@training tutorial-quickstart]$ connect histogram<br/>Val      |Ct (Pct)   Histogram<br/>suspended|2 (66.67%) ██████████████████████████████████████████████████████████▏<br/>09:33:48 |1 (33.33%) █████████████████████████████▏<br/></pre><br/>
+<span style="color: #2b6836"><span style="font-size: small">(09:34:14)</span> <b>rwg:</b></span> yeah<br/>
+<span style="color: #2b6836"><span style="font-size: small">(09:34:22)</span> <b>rwg:</b></span> [osguser01@training tutorial-quickstart]$ connect histogram<br/>Val      |Ct (Pct)   Histogram<br/>suspended|2 (66.67%) ██████████████████████████████████████████████████████████▏<br/>09:33:53 |1 (33.33%) █████████████████████████████▏<br/>[osguser01@training tutorial-quickstart]$<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:34:30)</span> <b>lincoln:</b></span> d'oh<br/>
+<span style="color: #965d1b"><span style="font-size: small">(09:44:11)</span> <b>briedel:</b></span> <pre><br/>condor_history -format '%s\n' LastRemoteHost &lt;job_number&gt; | cut -d@ -f2 | cut -d. -f2,3 | distribution --height=100<br/></pre><br/>
+<span style="color: #965d1b"><span style="font-size: small">(09:44:25)</span> <b>briedel:</b></span> bash replacement for connect histogram<br/>
+<span style="color: #965d1b"><span style="font-size: small">(09:44:30)</span> <b>briedel:</b></span> mats has it in the tutorial<br/>
+<span style="color: #2b6836"><span style="font-size: small">(09:44:50)</span> <b>rwg:</b></span> cool thanks<br/>
+<span style="color: #965d1b"><span style="font-size: small">(09:45:11)</span> <b>briedel:</b></span> you need to add the job # though<br/>
+<span style="color: #2b6836"><span style="font-size: small">(09:45:13)</span> <b>rwg:</b></span> are we rotating the history logs too quickly?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(09:46:01)</span> <b>rwg:</b></span> i’ve submitted 12 jobs, would like to know where they all ran --- whats the script?<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:49:38)</span> <b>lincoln:</b></span> no, the history isnt rotating too quickly<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:50:31)</span> <b>lincoln:</b></span> @rwg  try <tt>condor_history -format '%s\n' LastRemoteHost $USER | cut -d@ -f2 | cut -d. -f2,3 | distribution --height=100</tt><br/>
+<span style="color: #965d1b"><span style="font-size: small">(09:50:39)</span> <b>briedel:</b></span> you beat me too it :smile:<br/>
+<span style="color: #2b6836"><span style="font-size: small">(09:51:27)</span> <b>rwg:</b></span> interesting<br/>
+<span style="color: #965d1b"><span style="font-size: small">(09:52:45)</span> <b>briedel:</b></span> on the xenon host<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:52:56)</span> <b>lincoln:</b></span> a bit better version perhaps..<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:52:58)</span> <b>lincoln:</b></span> <pre><br/>condor_history -format '%s\n' MATCH_EXP_JOBGLIDEIN_ResourceName $USER | cut -d@ -f2 | cut -d. -f2,3 | distribution --height=100<br/></pre><br/>
+<span style="color: #965d1b"><span style="font-size: small">(09:53:29)</span> <b>briedel:</b></span> @briedel uploaded a file: <a href="https://opensciencegrid.slack.com/files/briedel/F65QPEUP3/-.sh">Untitled</a><br/>
+<span style="color: #e96699"><span style="font-size: small">(09:53:48)</span> <b>lincoln:</b></span> use MATCH_EXP_JOBGLIDEIN_ResourceName<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:54:02)</span> <b>lincoln:</b></span> instead of LastRemoteHost<br/>
+<span style="color: #965d1b"><span style="font-size: small">(09:54:19)</span> <b>briedel:</b></span> yeah i am trying it now<br/>
+<span style="color: #e7392d"><span style="font-size: small">(09:54:21)</span> <b>bala:</b></span> In fact, I think it contains very old history from ahm17, jlab etc.<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:54:35)</span> <b>lincoln:</b></span> yes it does @bala<br/>
+<span style="color: #965d1b"><span style="font-size: small">(09:56:15)</span> <b>briedel:</b></span> with @lincoln's version<br/>
+<span style="color: #965d1b"><span style="font-size: small">(09:56:25)</span> <b>briedel:</b></span> <pre><br/>[briedel@login ~]$ condor_history -format '%s\n' MATCH_EXP_JOBGLIDEIN_ResourceName ershockley | cut -d@ -f2 | cut -d. -f2,3 | distribution --height=100<br/>^[[OVal            |Ct (Pct)       Histogram<br/>MWT2-COREOS    |22846 (34.40%) +++++++++++++++++++++++++++++++++++++++++++++++++<br/>IN2P3-CC       |9383 (14.13%)  ++++++++++++++++++++<br/>IIT_CE1        |4341 (6.54%)   ++++++++++<br/>UCSDT2         |4336 (6.53%)   ++++++++++<br/>NIKHEF-ELPROD  |4122 (6.21%)   +++++++++<br/><a href="http://mwt2.org/condor%7C4000">mwt2.org/condor|4000</a> (6.02%)   +++++++++<br/>MWT2           |2749 (4.14%)   ++++++<br/>GLOW           |2713 (4.08%)   ++++++<br/>INFN-T1        |1906 (2.87%)   +++++<br/>AGLT2          |1890 (2.85%)   ++++<br/>UCR-HEP        |1521 (2.29%)   ++++<br/>SU-OG-CE1      |1423 (2.14%)   +++<br/>UColorado_HEP  |1316 (1.98%)   +++<br/>SU-OG-CE       |1315 (1.98%)   +++<br/>CIT_CMS_T2     |821 (1.24%)    ++<br/>uprm-cms       |504 (0.76%)    ++<br/>NUMEP_CE       |280 (0.42%)    +<br/>IIT_CE2        |240 (0.36%)    +<br/>OSG_US_PEARC_10|204 (0.31%)    +<br/>BNL-ATLAS      |150 (0.23%)    +<br/>cinvestav      |143 (0.22%)    +<br/>UCD            |100 (0.15%)    +<br/>Nebraska       |54 (0.08%)     +<br/>SWT2_CPB       |17 (0.03%)     +<br/>BU_ATLAS_Tier2 |15 (0.02%)     +<br/>Jetstream-CE-1 |11 (0.02%)     +<br/>Purdue-Hadoop  |8 (0.01%)      +<br/>Crane          |5 (0.01%)      +<br/>Hyak           |3 (0.00%)      +<br/></pre><br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:08:00)</span> <b>rwg:</b></span> very useful - any chance to filter on date (e.g. since today)<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:10:24)</span> <b>rwg:</b></span> funny that we’ve run almost 2000 training jobs on the Italian Tier1<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(10:11:23)</span> <b>rquick:</b></span> and 4k on the dutch tier1<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:11:39)</span> <b>rwg:</b></span> Rob can you remind us of your training dates<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(10:11:57)</span> <b>rquick:</b></span> July 20 and 21<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(10:12:25)</span> <b>rquick:</b></span> so next week Thursday and Friday... though it would be great if i could do testing earlier in the week<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:12:42)</span> <b>rwg:</b></span> ok<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:13:02)</span> <b>rwg:</b></span> @briedel I guess those were actually xenon jobs no?  (not training jobs)<br/>
+<span style="color: #965d1b"><span style="font-size: small">(10:13:12)</span> <b>briedel:</b></span> yeah those are xenon jobs<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(10:13:26)</span> <b>rquick:</b></span> ahhh... yeah<br/>
+<span style="color: #965d1b"><span style="font-size: small">(10:13:27)</span> <b>briedel:</b></span> just checking with a user i know hits a lot of places<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:17:32)</span> <b>rwg:</b></span> [osguser01@training ~]$ condor_history -format ‘%s\n’ MATCH_EXP_JOBGLIDEIN_ResourceName $USER | cut -d@ -f2 | cut -d. -f2,3 | distribution --height=100<br/>Val            |Ct (Pct)    Histogram<br/>MWT2-COREOS    |23 (58.97%) ++++++++++++++++++++++++++++++++++++++++++++++++++++<br/>MWT2           |7 (17.95%)  ++++++++++++++++<br/>UCSDT2         |5 (12.82%)  ++++++++++++<br/>USCMS-FNAL-WC1 |2 (5.13%)   +++++<br/>UColorado_HEP  |1 (2.56%)   +++<br/>HOSTED_STANFORD|1 (2.56%)   +++<br/>[osguser01@training ~]$<br/>
+<span style="color: #965d1b"><span style="font-size: small">(10:20:50)</span> <b>briedel:</b></span> should i change the instructions?<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:21:00)</span> <b>lincoln:</b></span> lets not<br/>
+<span style="color: #965d1b"><span style="font-size: small">(10:21:05)</span> <b>briedel:</b></span> okay<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:21:06)</span> <b>lincoln:</b></span> we'll have it ready for next time<br/>
+<span style="color: #965d1b"><span style="font-size: small">(10:21:20)</span> <b>briedel:</b></span> okay<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:23:14)</span> <b>bala:</b></span> we need to remove the old log for the next time. otherwise, old log files may cause confusion to the users.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:23:28)</span> <b>bala:</b></span> (if we chose to use $USER)<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:28:55)</span> <b>lincoln:</b></span> yeah<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:28:56)</span> <b>lincoln:</b></span> we can do that<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:36:57)</span> <b>lincoln:</b></span> @rwg <a href="https://docs.google.com/document/d/1woGA0dCg_2XgBM2CIdddqA9k6wA1pIi2m1Wpe1jpjXc/edit">https://docs.google.com/document/d/1woGA0dCg_2XgBM2CIdddqA9k6wA1pIi2m1Wpe1jpjXc/edit</a><br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:51:06)</span> <b>bala:</b></span> Is ” Benjamin Evans” from Yale, one of the participant?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:52:07)</span> <b>bala:</b></span> ok, not in this list: <a href="https://drive.google.com/file/d/0BzgiYUsbrz2TckhqSVQtUTdJUGM/view?usp=sharing">https://drive.google.com/file/d/0BzgiYUsbrz2TckhqSVQtUTdJUGM/view?usp=sharing</a><br/>
+<span style="color: #965d1b"><span style="font-size: small">(10:56:45)</span> <b>briedel:</b></span> maybe he is part of the HostedCE portion<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(10:57:35)</span> <b>sthapa:</b></span> could be someone that showed up for the workshop without pre-registering<br/>
+<span style="color: #2b6836"><span style="font-size: small">(11:09:32)</span> <b>rwg:</b></span> @bala yes, he is here<br/>
+<span style="color: #e7392d"><span style="font-size: small">(11:10:11)</span> <b>bala:</b></span> ok, i am approving and sending him the welcome email<br/>
+<span style="color: #2b6836"><span style="font-size: small">(11:10:17)</span> <b>rwg:</b></span> great<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:31:27)</span> <b>rynge:</b></span> @sthapa what are the resourcenames I shoudl submit against?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:46:21)</span> <b>rynge:</b></span> @jdost321 Do you have a list of the entires<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:47:22)</span> <b>jdost321:</b></span> I created entries OSG_US_PEARC_ce-1 OSG_US_PEARC_ce-2 ... to ce-10<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:47:29)</span> <b>jdost321:</b></span> resource names are OSG_US_PEARC_1, OSG_US_PEARC_2, etc<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:47:43)</span> <b>rynge:</b></span> Ok, cool!<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:47:46)</span> <b>jdost321:</b></span> only OSG_US_PEARC_10 is enabled currently<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:47:54)</span> <b>jdost321:</b></span> waiting for Suchandra to give me the go-ahead to enable the rest<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:47:58)</span> <b>rynge:</b></span> Ok<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:48:29)</span> <b>rynge:</b></span> And then later we will switch to real resource names if they become permanent resources?<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:48:51)</span> <b>jdost321:</b></span> we'll probably want to change the entry names to reflect the real sites<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:49:00)</span> <b>jdost321:</b></span> that means i'll have to create new entries for htem<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:40:52)</span> <b>rynge:</b></span> @jdost321 Do you do OS checks on those entries? Sounds like we will have 1 or 2 non-rhel sites<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:41:40)</span> <b>jdost321:</b></span> yeah all were assumed to be rhel6<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:42:54)</span> <b>jdost321:</b></span> non-rhel? i can try disabling the check.. but the condor tarballs are rhel, so i don't expect non-rhel to work<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:43:39)</span> <b>dweitzel:</b></span> &gt; have you no faith ?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:43:43)</span> <b>dweitzel:</b></span> :slightly_smiling_face:<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:43:51)</span> <b>jdost321:</b></span> heh, just speaking out of experience<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(14:51:32)</span> <b>sthapa:</b></span> Okay, it sounds like we’ll have 4-5 clusters setup, give me a bit to configure things and I’ll give you details on the first one  (PEARC_1)<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:53:19)</span> <b>jdost321:</b></span> sounds good<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:59:45)</span> <b>jdost321:</b></span> @sthapa just checking in, how's it going?<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(16:00:20)</span> <b>sthapa:</b></span> We’re troubleshooting some of the CEs, condor_ce_trace is going held so we’re working on fixing that<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:08:03)</span> <b>dweitzel:</b></span> jobs are running fine on ce2<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:08:07)</span> <b>dweitzel:</b></span> I would start sending pilots.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:08:28)</span> <b>dweitzel:</b></span> ok, start sending pilots to ce-2<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:08:48)</span> <b>jdost321:</b></span> any entry tweaks or can i just bring it out of downtime?<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(16:08:55)</span> <b>sthapa:</b></span> just bring it out of downtime<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:09:55)</span> <b>jdost321:</b></span> done<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:11:23)</span> <b>dweitzel:</b></span> send glideins faster!!!!<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:11:31)</span> <b>lincoln:</b></span> :slightly_smiling_face:<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:11:44)</span> <b>jdost321:</b></span> heh, now we're at the mercy of asynchronous communication<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(16:12:54)</span> <b>sthapa:</b></span> @jdost For site name, OSG_US_WSU_GRID_ce2 work as a permanent name?<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:14:02)</span> <b>jdost321:</b></span> sure, later if we want to rename any PEARC entries though i have to duplicate them and remove the current entries (gwms doesn't allow simple entry renaming)<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:15:10)</span> <b>jdost321:</b></span> <pre>3997434.4   fefermifife     7/10 21:13 Error connecting to schedd <a href="http://pearc-ce-2.grid.uchicago.edu">pearc-ce-2.grid.uchicago.edu</a>: SECMAN:2007:Failed to received post-auth ClassAd|AUTHENTICATE:1004:Failed to authenticate using FS</pre><br/>
+<span style="color: #385a86"><span style="font-size: small">(16:16:04)</span> <b>jdost321:</b></span> the above may not be important for the PEARC demo.. let's wait and see how osgflock pilots do<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(16:16:14)</span> <b>sthapa:</b></span> do they need to update the vo rpms?<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:16:24)</span> <b>jdost321:</b></span> thats what i had to do with my test frontend..<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(16:17:21)</span> <b>sthapa:</b></span> @sthapa uploaded a file: <a href="https://opensciencegrid.slack.com/files/sthapa/F66H86RK5/-.txt">Untitled</a><br/>
+<span style="color: #5b89d5"><span style="font-size: small">(16:17:30)</span> <b>sthapa:</b></span> looks like there are pilots running there<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(16:18:24)</span> <b>sthapa:</b></span> @jdost can you confirm?<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(16:18:41)</span> <b>sthapa:</b></span> @rynge do you see your jobs running?<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:18:50)</span> <b>jdost321:</b></span> i may have lag on my end i only just see flock getting queued on the factories<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:19:31)</span> <b>jdost321:</b></span> yep i see them now on the factory queues switch from I-&gt;R<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:20:15)</span> <b>jdost321:</b></span> fermi and glow pilots going held, but flock are all authenticating normally<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:22:09)</span> <b>dweitzel:</b></span> <tt>condor_status -pool <a href="http://osg-flock.grid.iu.edu">osg-flock.grid.iu.edu</a> -const 'GLIDEIN_ResourceName == "OSG_US_PEARC_2"' -format '%s\n' 'RemoteOwner' | sort | uniq -c</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:22:25)</span> <b>dweitzel:</b></span> Running xenon jobs.<br/>
+<span style="color: #965d1b"><span style="font-size: small">(16:22:34)</span> <b>briedel:</b></span> yeap that is me<br/>
+<span style="color: #965d1b"><span style="font-size: small">(16:23:00)</span> <b>briedel:</b></span> <pre><br/>[briedel@login check_sites]$ condor_q briedel -r<br/><br/><br/>-- Schedd: <a href="http://login.xenon.ci-connect.net">login.xenon.ci-connect.net</a> : &lt;192.170.227.97:38815?...<br/> ID         OWNER            SUBMITTED     RUN_TIME HOST(S)<br/>4373239.26  briedel         7/10 13:48   0+00:01:04 <a href="mailto:glidein_15144_329845392@wsu142.grid.wayne.edu">glidein_15144_329845392@wsu142.grid.wayne.edu</a><br/>4373239.27  briedel         7/10 13:48   0+00:01:04 <br/></pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:24:06)</span> <b>dweitzel:</b></span> stop submitting sleep jobs<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:24:09)</span> <b>dweitzel:</b></span> we want real jobs!<br/>
+<span style="color: #965d1b"><span style="font-size: small">(16:24:31)</span> <b>briedel:</b></span> jobs removed<br/>
+<span style="color: #965d1b"><span style="font-size: small">(16:31:48)</span> <b>briedel:</b></span> does this site have cvmfs?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:35:37)</span> <b>dweitzel:</b></span> ha, no<br/>
+<span style="color: #965d1b"><span style="font-size: small">(16:36:00)</span> <b>briedel:</b></span> one can dream :smile:<br/>
+</body>
+</html>

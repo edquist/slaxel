@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Apr 7, 2021 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Wed Apr 7, 2021 : #xcache (osg)</h3>
+<span style="color: #bb86b7"><span style="font-size: small">(12:52:08)</span> <b>dart:</b></span> @justas.balcas do we know how the files get corrupted? Are they corrupted in transit, or are they corrupt at their source, were they corrupted by the filesystem on the cache, or something else?  Or, do you need the checksumming capabilities in XRootD to learn that?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(12:59:14)</span> <b>justas.balcas:</b></span> The case I know was mainly this: Data at T2_IN_TIFR, and getting data from it to Caltech is slow (rtt is 270ms). Cache was still precaching file and failed at some point with<br/><pre>finished with error 11 resource temporarily unavailable</pre><br/>Maybe client failed and closed connection? timeout? After this, and any next open of same file - failed. Whenever I check checksum of file - it was wrong. I tried to get source file from TIFR, and checksum was correct.<br/>It might be that the source was bad<br/>
+<span style="color: #de5f24"><span style="font-size: small">(12:59:23)</span> <b>justas.balcas:</b></span> @didavila might know more cases for corruption<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(13:00:57)</span> <b>didavila:</b></span> I know of a case where a network switch was restarted and it came back in a weird state which made transferred files corrupted<br/>
+<span style="color: #de5f24"><span style="font-size: small">(13:03:26)</span> <b>justas.balcas:</b></span> and identification is hard of corrupted files (afaik). I think Diego does this at ucsd scanning all files, open them and check with root, etc. Having checksum correction on the fly - that would not require this anymore<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:25:28)</span> <b>bbockelm:</b></span> @dart All of the above.  We've observed network-layer corruption (bad switch at Oklahoma), we suspect-but-never-confirmed a few disk corruptions, and I have my suspicions about the occasional software bug.  By adding (hardware) checksums to various layers, we hopefully start to get insight into where these come from.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(15:34:42)</span> <b>dart:</b></span> Excellent. Thanks. This is something that I’m very interested in (and I know this community has done a bunch of good work in this space in the past).<br/>
+</body>
+</html>

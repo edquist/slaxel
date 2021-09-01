@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jan 13, 2017 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Fri Jan 13, 2017 : #gfactory (osg)</h3>
+<span style="color: #53b759"><span style="font-size: small">(11:06:36)</span> <b>marian:</b></span> question @all: should I put entry CMSHTPC_T2_CH_CSCS_arcbrisi in downtime? they have site downtime till January 30th...<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:07:15)</span> <b>marian:</b></span> or we let glideins get held there and ignore for the time being?<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:09:40)</span> <b>marian:</b></span> nevermind, I just put it in downtime and made comment in JIRA<br/>
+<span style="color: #bd9336"><span style="font-size: small">(11:09:46)</span> <b>mkandes:</b></span> Marian, if that is the case, I would just put the site in the .downtimes file on the factories. You can set it to expire at the end of the month.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(11:09:55)</span> <b>mkandes:</b></span> Okay, cool./<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:10:17)</span> <b>marian:</b></span> ah, I just did it like "sudo service gwms-factory down -entry CMSHTPC_T2_CH_CSCS_arcbrisi"<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:10:26)</span> <b>marian:</b></span> should I specify date?<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:11:16)</span> <b>marian:</b></span> or just leave it and we eventually get to it since we'd have it in JIRA open<br/>
+<span style="color: #bd9336"><span style="font-size: small">(11:12:41)</span> <b>mkandes:</b></span> If we know the approximate date of the downtime, I would just manually put it in the file with explicit start date and end date.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(11:13:23)</span> <b>mkandes:</b></span> I assume the command you did above will leave it open-ended and we may forget to come back to it.<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:13:27)</span> <b>marian:</b></span> yeah, we know dates ... it's in goc.egi.eu...<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:13:50)</span> <b>marian:</b></span> make sense, I'll edit glideinWMS.downtime file<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:14:17)</span> <b>marian:</b></span> or re-run command with -end option to see if it does effect<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:35:22)</span> <b>marian:</b></span> well that command is pretty much screwed ... I just edited downtime file in the end ... should we restart factory after that or how it's picked up?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(11:38:40)</span> <b>mkandes:</b></span> If I remember correctly, you don't need to reconfig factory. It'll pick up the changes itself. And yeah, I've never used that command myself. I always just manually edit when needed.<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:02:57)</span> <b>marian:</b></span> ok, so this is right location to edit I assume "/etc/gwms-factory/glideinWMS.xml" or this one "/var/lib/gwms-factory/work-dir/glideinWMS.downtimes"? I did former... and just in case service restart<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:03:34)</span> <b>marian:</b></span> sorry meant "/etc/gwms-factory/glideinWMS.downtimes"<br/>
+<span style="color: #bd9336"><span style="font-size: small">(12:12:14)</span> <b>mkandes:</b></span> Yes, that's fine. One is the symlink of the other I believe.<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:13:24)</span> <b>marian:</b></span> well something is not right on CERN factory ... that file doesn't exist ... I didn't want to mess up so I tried generic command "service gwms-factory down -entry CMSHTPC_T2_CH_CSCS_arcbrisi" to see if /etc/gwms-gfactory/glideinWMS.downtimes get's created but it doesn't ...<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:13:49)</span> <b>marian:</b></span> when I ran that command on SDSC it adds line just fine ...<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:14:16)</span> <b>marian:</b></span> [_gfactory@vocms0805 zvada]$ service gwms-factory down -entry CMSHTPC_T2_CH_CSCS_arcbrisi<br/>Setting downtime...                                        [OK]<br/>[_gfactory@vocms0805 zvada]$ vim /etc/gwms-factory/glideinWMS.downtimes<br/>[_gfactory@vocms0805 zvada]$ cat /etc/gwms-factory/glideinWMS.downtimes<br/>cat: /etc/gwms-factory/glideinWMS.downtimes: No such file or directory<br/>[_gfactory@vocms0805 zvada]$ whoami <br/>_gfactory<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:14:44)</span> <b>marian:</b></span> (ignore my vim there, I realized it opened empty file)<br/>
+<span style="color: #bd9336"><span style="font-size: small">(12:14:58)</span> <b>mkandes:</b></span> On CERN factory, just do a .... locate glideinWMS.downtimes<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:14:58)</span> <b>marian:</b></span> I try touch the file<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:15:06)</span> <b>marian:</b></span> I did<br/>
+<span style="color: #bd9336"><span style="font-size: small">(12:15:09)</span> <b>mkandes:</b></span> It's somewhere else on the CERN factory.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(12:15:35)</span> <b>mkandes:</b></span> Okay, let me check. I thought I just edited it yesterday.<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:15:46)</span> <b>marian:</b></span> [_gfactory@vocms0805 zvada]$ locate glideinWMS.downtimes<br/>/data/lib/gwms-factory/work-dir/glideinWMS.downtimes<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:16:02)</span> <b>marian:</b></span> that's what I was asking ... about work-dir location vs in /etc/...<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:16:23)</span> <b>marian:</b></span> I'll put it there on CERN factory<br/>
+<span style="color: #bd9336"><span style="font-size: small">(12:16:40)</span> <b>mkandes:</b></span> Yes, that's the directory. CERN factory does not have the symlink in /etc/gwms-factory<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:16:49)</span> <b>marian:</b></span> and I see it did add my line in there<br/>
+<span style="color: #bd9336"><span style="font-size: small">(12:17:03)</span> <b>mkandes:</b></span> Cool.<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:18:09)</span> <b>marian:</b></span> yeah, just noticed it's symlink indeed<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:18:29)</span> <b>marian:</b></span> not on CERN factory, correct<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:18:51)</span> <b>marian:</b></span> thanks<br/>
+<span style="color: #bd9336"><span style="font-size: small">(12:20:01)</span> <b>mkandes:</b></span> No problem. Thanks for following up on that site.<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:45:54)</span> <b>marian:</b></span> @kherner: I think hearing nothing from you or Nikita there is no objection push this entry to production factories? <a href="https://ticket.opensciencegrid.org/32162">https://ticket.opensciencegrid.org/32162</a><br/>
+<span style="color: #8d4b84"><span style="font-size: small">(13:50:23)</span> <b>kherner:</b></span> Let's wait until Monday if that's all right<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(13:50:58)</span> <b>kherner:</b></span> I understood that Nikita wanted to run a couple of extra tests to check that cases that should fail actually do fail<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:04:09)</span> <b>marian:</b></span> sounds good!<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:06:51)</span> <b>marian:</b></span> how about this one Ken? @kherner:  <a href="https://ticket.opensciencegrid.org/32030">https://ticket.opensciencegrid.org/32030</a><br/>
+<span style="color: #8d4b84"><span style="font-size: small">(14:07:40)</span> <b>kherner:</b></span> We're still seeing problems when copying output back. That may be on the SE side of things though. We can open a separate ticket for that if you prefer.<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:08:54)</span> <b>marian:</b></span> not really, just wanted to know where we're with that ... we can wait until you say all is good ... thanks<br/>
+</body>
+</html>

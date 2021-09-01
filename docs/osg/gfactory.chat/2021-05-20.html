@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu May 20, 2021 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Thu May 20, 2021 : #gfactory (osg)</h3>
+<span style="color: #385a86"><span style="font-size: small">(10:00:55)</span> <b>jdost321:</b></span> @bbockelm sorry I'm just seeing your request. It may have been seen sooner if a FD ticket was made or we were emailed at <a href="mailto:osg-gfactory-support@physics.ucsd.edu">osg-gfactory-support@physics.ucsd.edu</a> . I've made 8.9.13 available on both ITB and production, and 9.0.0 on production. I'm not sure why 9.0.0 tarballs were there but it wasn't enabled. In general we only update tarballs on frontend admin request, they might have asked for it on ITB only at the time.<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:45:26)</span> <b>moate:</b></span> @matyas I'm going to call myself done making changes to the ITB frontend for now<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:45:41)</span> <b>moate:</b></span> I'll coordinate with you if I want to try again later<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:47:38)</span> <b>matyas:</b></span> OK, thanks. I won't have time to do anything with it until Monday anyway.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:17:47)</span> <b>rynge:</b></span> @jdost321 and team - we are seeing glideins die with:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:17:51)</span> <b>rynge:</b></span> <pre>/var/lib/condor/execute/dir_127157/glide_v9YwLH/main/condor/sbin/condor_master: error while loading shared libraries: libcondor_utils_8_9_13.so: cannot open shared object file: No such file or directory</pre><br/><br/>
+<span style="color: #385a86"><span style="font-size: small">(13:18:17)</span> <b>jdost321:</b></span> @rynge what condor are you asking for?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:18:53)</span> <b>rynge:</b></span> 8.9.x<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:19:02)</span> <b>rynge:</b></span> Worked with 8.9.11<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:19:07)</span> <b>rynge:</b></span> So I could go back to that<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:19:09)</span> <b>jdost321:</b></span> I just updated 8.9.x to 8.9.13 on @bbockelm request<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:19:36)</span> <b>rynge:</b></span> Did you add 9.0.x?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:19:43)</span> <b>rynge:</b></span> That is the version we really want<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:19:44)</span> <b>jdost321:</b></span> @moate @bbockelm any issues if I just revert 8.9.x to 8.9.11 then you guys explicitly ask for 8.9.13?<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:19:53)</span> <b>jdost321:</b></span> yes thats in prod now too, not sure why it wasn't<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:20:01)</span> <b>rynge:</b></span> Ok, I'll go there then<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:20:34)</span> <b>jdost321:</b></span> ok, hopefully my change didn't break other FEs..<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:21:03)</span> <b>jdost321:</b></span> i may revert 8.9.x to 8.9.11 anyway but keep 8.9.13 available<br/>
+<span style="color: #aba727"><span style="font-size: small">(13:22:15)</span> <b>moate:</b></span> @jdost321 I think it's fine<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:24:29)</span> <b>rynge:</b></span> We might want to check if 9.0.x has the same issue. It will take me a long time to get logs for that<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:24:58)</span> <b>jdost321:</b></span> 9.0.x has beein in ITB for a while, were you asking for it there?<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:25:10)</span> <b>jdost321:</b></span> the 8.9.13 might have brokken at least ligo as well<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:25:16)</span> <b>jdost321:</b></span> reverting..<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:27:11)</span> <b>rynge:</b></span> I did request 9.0.x in itb, and are currently not getting any glideins<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:29:45)</span> <b>rynge:</b></span> <pre>entry_CMSHTPC_T1_US_FNAL_condce_opp1_whole/job.824453.0.err:/storage/local/data1/condor/execute/dir_6631/glide_YJlVL3/main/condor/sbin/condor_master: error while loading shared libraries: libcondor_utils_9_0_0.so: cannot open shared object file: No such file or directory</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:29:48)</span> <b>rynge:</b></span> That is ITB<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:30:00)</span> <b>jdost321:</b></span> so that's a 9.0.0 glidein or did it get 8.9.13?<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:30:08)</span> <b>jdost321:</b></span> i just reverted 8.9.x<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:30:18)</span> <b>rynge:</b></span> No, I requested 9.0.x for on ITB since a couple of days<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:30:34)</span> <b>rynge:</b></span> My point is that both 8.9.13 and 9.0.0 tarballs have the same problem<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:30:39)</span> <b>jdost321:</b></span> weird, the 9.0.0 tarballs aren't new they have been in there for a wile<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:31:04)</span> <b>jdost321:</b></span> maybe something else is causing the error<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:31:44)</span> <b>rynge:</b></span> Can you get me a URL for those tarballs? I want to take a look<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:35:41)</span> <b>jdost321:</b></span> we have the gwms script that strips them.. let me put those on the server<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:35:55)</span> <b>jdost321:</b></span> but they were taken from <a href="https://research.cs.wisc.edu/htcondor/tarball/9.0/9.0.0/release/">https://research.cs.wisc.edu/htcondor/tarball/9.0/9.0.0/release/</a><br/>
+<span style="color: #385a86"><span style="font-size: small">(13:35:56)</span> <b>jdost321:</b></span> and <a href="https://research.cs.wisc.edu/htcondor/tarball/8.9/8.9.13/release/">https://research.cs.wisc.edu/htcondor/tarball/8.9/8.9.13/release/</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:37:27)</span> <b>rynge:</b></span> That lib is missing<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:37:32)</span> <b>rynge:</b></span> <pre># ldd condor_master <br/>        linux-vdso.so.1 =&gt;  (0x00007ffcd6155000)<br/>        libcondor_utils_9_0_0.so =&gt; not found<br/>        librt.so.1 =&gt; /lib64/librt.so.1 (0x00007ffb61f44000)<br/>        libclassad.so.15 =&gt; /lib64/libclassad.so.15 (0x00007ffb61c9e000)<br/>        libpcre.so.1 =&gt; /lib64/libpcre.so.1 (0x00007ffb61a3c000)<br/>        libdl.so.2 =&gt; /lib64/libdl.so.2 (0x00007ffb61838000)<br/>        libcrypto.so.10 =&gt; /lib64/libcrypto.so.10 (0x00007ffb613d5000)<br/>        libuuid.so.1 =&gt; /lib64/libuuid.so.1 (0x00007ffb611d0000)<br/>        libstdc++.so.6 =&gt; /lib64/libstdc++.so.6 (0x00007ffb60ec8000)<br/>        libm.so.6 =&gt; /lib64/libm.so.6 (0x00007ffb60bc6000)<br/>        libgomp.so.1 =&gt; /lib64/libgomp.so.1 (0x00007ffb609a0000)<br/>        libgcc_s.so.1 =&gt; /lib64/libgcc_s.so.1 (0x00007ffb6078a000)<br/>        libpthread.so.0 =&gt; /lib64/libpthread.so.0 (0x00007ffb6056e000)<br/>        libc.so.6 =&gt; /lib64/libc.so.6 (0x00007ffb601a0000)<br/>        /lib64/ld-linux-x86-64.so.2 (0x00007ffb6236e000)<br/>        libz.so.1 =&gt; /lib64/libz.so.1 (0x00007ffb5ff8a000)</pre><br/><br/>
+<span style="color: #385a86"><span style="font-size: small">(13:37:52)</span> <b>jdost321:</b></span> right its not included in the gwms stripping command..<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:40:13)</span> <b>jdost321:</b></span> the whole thing looks corrupt.. i don't think create_condor_tarball even works properly for more recent condor tarballs<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:43:43)</span> <b>rynge:</b></span> Maybe now is the time to just use the upstream one - we talked about this a while ago, and I think we decided it was not a terrible idea<br/>
+<span style="color: #73769d"><span style="font-size: small">(13:44:02)</span> <b>tim.theisen:</b></span> There is a difference to accounted for.<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:44:37)</span> <b>jdost321:</b></span> i still have to manually juggle crap, the create_condor_tarball at minimum removes the base condor-9.0.0-1-x86_64_CentOS7-stripped dir<br/>
+<span style="color: #73769d"><span style="font-size: small">(13:44:41)</span> <b>tim.theisen:</b></span> In the stripped tarball, the bin, lib, etc, are in the root directory of the tarball.<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:44:42)</span> <b>jdost321:</b></span> inside the tarball<br/>
+<span style="color: #73769d"><span style="font-size: small">(13:45:32)</span> <b>tim.theisen:</b></span> The HTCondor tarballs have a condor-9.0.0-x86_64_CentOS7-stripped directory at the root and it contains bin, lib, etc.<br/>
+<span style="color: #73769d"><span style="font-size: small">(13:46:12)</span> <b>tim.theisen:</b></span> Yes, I think if you just remove that top level directory, everything will work fine.<br/>
+<span style="color: #73769d"><span style="font-size: small">(13:46:29)</span> <b>tim.theisen:</b></span> The should be nothing else to do.<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:48:01)</span> <b>jdost321:</b></span> no gwms is making my life miserable there's more<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:48:19)</span> <b>jdost321:</b></span> well.. maybe not i'm still comparing the last working one<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:49:29)</span> <b>jdost321:</b></span> a base dir changed from lib to lib64<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:50:00)</span> <b>jdost321:</b></span> last working one downloaded vs gwms processed<br/><pre>[1147] root@gfactory-2 ~# tar -tf ~/Downloads/tarballs/condor-8.9.11-x86_64_CentOS7-stripped.tar.gz | grep libcondor_utils<br/>condor-8.9.11-x86_64_CentOS7-stripped/lib/libcondor_utils_8_9_11.so<br/><br/>[1147] root@gfactory-2 ~# tar -tf /var/lib/gwms-factory/condor/gfactory-3.7.2-condor-8.9.11-x86_64_CentOS8-stripped.tar.gz | grep libcondor_utils<br/>lib/libcondor_utils_8_9_11.so</pre><br/>
+<span style="color: #385a86"><span style="font-size: small">(13:50:15)</span> <b>jdost321:</b></span> current 9.0.0 downloaded<br/><pre>[1149] root@gfactory-2 ~# tar -tf ~/Downloads/tarballs/condor-9.0.0-x86_64_CentOS7-stripped.tar.gz | grep libcondor_utils<br/>condor-9.0.0-1-x86_64_CentOS7-stripped/usr/lib64/libcondor_utils_9_0_0.so</pre><br/>
+<span style="color: #73769d"><span style="font-size: small">(13:52:46)</span> <b>tim.theisen:</b></span> The rpath set in the executables is $ORIGIN/../lib64. So, nothing outside of the tarball should care about lib vs lib64.<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:53:24)</span> <b>jdost321:</b></span> i'm thinking though the gwms stripping script is ignoring lib64 and expecting lib<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:53:27)</span> <b>jdost321:</b></span> still digging<br/>
+<span style="color: #73769d"><span style="font-size: small">(13:56:35)</span> <b>tim.theisen:</b></span> I ran the script several weeks ago and things seemed mostly intact. However, there were broken links for CondorJavaInfo.class,  CondorJavaWrapper.class, and condor_ssh_to_job_sshd_config_template.<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:01:31)</span> <b>jdost321:</b></span> i think this is where its throwing out lib64 <a href="https://github.com/glideinWMS/glideinwms/blob/f42d7fd0bc7089763702e4f92df26e1ac53739d1/creation/lib/cgWCreate.py#L536">https://github.com/glideinWMS/glideinwms/blob/f42d7fd0bc7089763702e4f92df26e1ac53739d1/creation/lib/cgWCreate.py#L536</a><br/>
+<span style="color: #385a86"><span style="font-size: small">(14:02:11)</span> <b>jdost321:</b></span> @rynge you vote for just keeping the whole thing? I can just try untarring to remove the basedir<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:02:55)</span> <b>rynge:</b></span> I think keeping the whole thing would be fine<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:03:06)</span> <b>rynge:</b></span> It is not large, and heavily cached at the sites<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:16:08)</span> <b>jdost321:</b></span> Mats I just tried this for 9.0.x on ITB only. let's confirm you get a working 9.0.0 glidein and I'll fix it in prod as well as 8.9.13<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:17:00)</span> <b>jdost321:</b></span> in the end its 5mb vs 25mb i think we should just deprecate the gwms stripping<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:20:15)</span> <b>rynge:</b></span> :thumbsup:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:20:16)</span> <b>bbockelm:</b></span> :point_up: Yes!<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:20:45)</span> <b>tim.theisen:</b></span> I think that the compressed tarballs are all 14Mb.<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:22:28)</span> <b>jdost321:</b></span> I see 8.9.11 was 25mb, Tim you are correct for the 8.9.13 and 9.0.0<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:23:12)</span> <b>tim.theisen:</b></span> I was able to trim a bunch for 8.9.13 and later.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:25:52)</span> <b>rynge:</b></span> <pre>$ condor_status -const 'GLIDEIN_Factory == "OSG-ITB"' -af CondorVersion | uniq -c<br/>     14 $CondorVersion: 9.0.0 Apr 14 2021 BuildID: 536780 PackageID: 9.0.0-1 RC $</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:25:55)</span> <b>rynge:</b></span> Seems to work on ITB<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:26:20)</span> <b>rynge:</b></span> How about a 9.0.1?  ;)<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:26:27)</span> <b>jdost321:</b></span> great! death to create_condor_tarball<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:26:41)</span> <b>bbockelm:</b></span> Yeah - what kind of old crap is this, 9.0.0?  9.0.1 came out three days ago!!<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:26:43)</span> <b>jdost321:</b></span> let me fix 8.9.13 first<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:26:48)</span> <b>bbockelm:</b></span> :wink:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:27:54)</span> <b>rynge:</b></span> My short term goal for the open pool is 9.0.1. Probably less important on the glidein side, but the FE and submit nodes are going there<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:28:33)</span> <b>tim.theisen:</b></span> HTCondor 9.0.1 is already in 3.5-upcoming-testing.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:29:02)</span> <b>rynge:</b></span> Right - this more of a maintenance window problem than availability<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:47:18)</span> <b>jdost321:</b></span> @rynge do you want 9.0.1 on itb only for now or both?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:58:51)</span> <b>rynge:</b></span> Sure<br/>
+<span style="color: #aba727"><span style="font-size: small">(16:38:45)</span> <b>moate:</b></span> @bbockelm I've spotted <tt>9.0.0</tt> in the wild (or in captivity?) -&gt;<br/><pre>[moate@glidein-cm3000 ~]$ condor_status -af GLIDECLIENT_Name GLIDEIN_Factory name condorversion<br/>...<br/>chtc2.glow-into-glow OSG <a href="mailto:glidein_5123_331763555@e269.chtc.wisc.edu">glidein_5123_331763555@e269.chtc.wisc.edu</a> $CondorVersion: 9.0.0 Apr 14 2021 BuildID: 536780 PackageID: 9.0.0-1 RC $<br/>...</pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:00:09)</span> <b>bbockelm:</b></span> Wonderful!  Next time we fight against the Singularity dragon, we can at least see the logs of why we failed!<br/>
+</body>
+</html>

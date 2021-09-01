@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Aug 1, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Thu Aug 1, 2019 : #xcache (osg)</h3>
+<span style="color: #a63024"><span style="font-size: small">(10:07:00)</span> <b>efajardo:</b></span> <b>@here</b> about the CNAF cache<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:07:04)</span> <b>efajardo:</b></span> indeed we have a problem<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:07:11)</span> <b>efajardo:</b></span> <pre># /usr/libexec/xcache/authfile-update --cache<br/>Error fetching <a href="https://topology.opensciencegrid.org/stashcache/authfile?cache_fqdn=ds-914.cr.cnaf.infn.it">https://topology.opensciencegrid.org/stashcache/authfile?cache_fqdn=ds-914.cr.cnaf.infn.it</a><br/>File contents:<br/># Error generating authfile for this FQDN: <a href="http://ds-914.cr.cnaf.infn.it">ds-914.cr.cnaf.infn.it</a> is not a registered resource.<br/># Please check configuration in OSG topology or contact <a href="mailto:help@opensciencegrid.org">help@opensciencegrid.org</a><br/>Error fetching <a href="https://topology.opensciencegrid.org/stashcache/authfile-public?cache_fqdn=ds-914.cr.cnaf.infn.it">https://topology.opensciencegrid.org/stashcache/authfile-public?cache_fqdn=ds-914.cr.cnaf.infn.it</a><br/>File contents:<br/># Error generating authfile for this FQDN: <a href="http://ds-914.cr.cnaf.infn.it">ds-914.cr.cnaf.infn.it</a> is not a registered resource.<br/># Please check configuration in OSG topology or contact <a href="mailto:help@opensciencegrid.org">help@opensciencegrid.org</a><br/></pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(10:07:16)</span> <b>efajardo:</b></span> can we have alias in topology?<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:08:00)</span> <b>marian:</b></span> I believe so!<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:08:42)</span> <b>matyas:</b></span> the stashcache code doesn't check FQDNAliases so I don't think so<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:10:44)</span> <b>marian:</b></span> moment, I think you suffer from improper reverse lookup I mentioned yesterday:<br/><pre><br/>$ host <a href="http://xcache.cr.cnaf.infn.it">xcache.cr.cnaf.infn.it</a><br/><a href="http://xcache.cr.cnaf.infn.it">xcache.cr.cnaf.infn.it</a> has address 131.154.130.130<br/>$ host 131.154.130.130<br/>130.130.154.131.in-addr.arpa domain name pointer <a href="http://ds-102-11-18.cr.cnaf.infn.it">ds-102-11-18.cr.cnaf.infn.it</a>.<br/></pre><br/>if they add AAA record for <a href="http://ds-102-11-18.cr.cnaf.infn.it">ds-102-11-18.cr.cnaf.infn.it</a> pointing <a href="http://xcache.cr.cnaf.infn.it">xcache.cr.cnaf.infn.it</a> shouldn't that resolve the issue?<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:10:59)</span> <b>marian:</b></span> and register just alias<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:11:37)</span> <b>matyas:</b></span> no it doesn't use DNS<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:11:53)</span> <b>matyas:</b></span> I have a suggestion, one sec<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:13:18)</span> <b>matyas:</b></span> create <tt>/etc/systemd/system/stash-cache-authfile.service</tt> with the following contents:<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:13:35)</span> <b>matyas:</b></span> <pre><br/>[Service]<br/>Environment=CACHE_FQDN=<a href="http://ds-914.cr.cnaf.infn.it">ds-914.cr.cnaf.infn.it</a><br/></pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:13:56)</span> <b>matyas:</b></span> er<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:14:01)</span> <b>efajardo:</b></span> hmmm<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:14:06)</span> <b>efajardo:</b></span> maybe the other way aroudn no?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:14:07)</span> <b>matyas:</b></span> not that FQDN<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:14:10)</span> <b>matyas:</b></span> yeah<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:14:12)</span> <b>blin:</b></span> don't we want that set to -- yeah<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:14:35)</span> <b>matyas:</b></span> <pre><br/>[Service]<br/>Environment=CACHE_FQDN=<a href="http://xcache.cr.cnaf.infn.it">xcache.cr.cnaf.infn.it</a><br/></pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(10:14:47)</span> <b>marian:</b></span> shouldn't it be rather override.conf?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:15:42)</span> <b>matyas:</b></span> if I read the systemd manpage correctly, a conffile in /etc/systemd/system will be parsed after the corresponding conffile in /usr/lib/systemd/system, and settings will be added or modified<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:15:51)</span> <b>blin:</b></span> that's correct<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:16:36)</span> <b>blin:</b></span> but modified*, if you're overwriting some (?) values like <tt>ExecStart</tt>, you need to do something like<br/><pre><br/>ExecStart=<br/>ExecStart=/path/to/new/exec<br/></pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(10:17:03)</span> <b>efajardo:</b></span> Well I an always ask them<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:17:18)</span> <b>efajardo:</b></span> to fix the reverse lookup like @marian suggested<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:17:34)</span> <b>efajardo:</b></span> I was just wondering if this case was ever considerede<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:17:36)</span> <b>matyas:</b></span> no, reverse lookup doesn't help<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:18:03)</span> <b>matyas:</b></span> the script uses <tt>hostname -f</tt> as the hostname to look up unless CACHE_FQDN is in the environment, or <tt>--cache-fqdn</tt> is in the command line<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:19:52)</span> <b>matyas:</b></span> hold on, I'm wrong about /etc/systemd/system<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:20:00)</span> <b>marian:</b></span> if not correct in DNS that could do some other issues from within xrootd ...<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:20:13)</span> <b>matyas:</b></span> a config _file_ in that directory will _replace_ the config file in /usr/lib/systemd/system<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:20:18)</span> <b>matyas:</b></span> instead what you want to do is<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:21:22)</span> <b>matyas:</b></span> 1. create the directory <tt>/etc/systemd/system/stash-cache-authfile.d/</tt><br/>2. create the file <tt>/etc/systemd/system/stash-cache-authfile.d/hostname.conf</tt> with the contents I wrote above<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:23:39)</span> <b>efajardo:</b></span> But if I understand the problem is it is trying yo fin this <tt><a href="http://ds-914.cr.cnaf.infn.it">ds-914.cr.cnaf.infn.it</a></tt> in topology and does not find it<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:23:44)</span> <b>efajardo:</b></span> so should not the contents of<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:24:02)</span> <b>efajardo:</b></span> of the conf<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:24:03)</span> <b>efajardo:</b></span> be<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:24:04)</span> <b>efajardo:</b></span> <pre>[Service]<br/>Environment=CACHE_FQDN=<a href="http://xcache.cr.cnaf.infn.it">xcache.cr.cnaf.infn.it</a></pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(10:24:06)</span> <b>efajardo:</b></span> ahh I seee<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:24:10)</span> <b>blin:</b></span> yes<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:24:15)</span> <b>efajardo:</b></span> ok thank you<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:24:17)</span> <b>efajardo:</b></span> I see the lines<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:24:36)</span> <b>matyas:</b></span> yeah sorry, the _second_ thing I wrote<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:27:04)</span> <b>marian:</b></span> there is yet another option to set before <tt>ExecStart=</tt> do line:<br/><pre><br/>ExecStartPre=/bin/bash -c "systemctl set-environment CACHE_FQDN=<a href="http://xcache.cr.cnaf.infn.it">xcache.cr.cnaf.infn.it</a>"<br/></pre><br/>that'll make this variable set for the entire process in the environment prior to service start<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:28:36)</span> <b>matyas:</b></span> i think that'll have the same effect<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:28:39)</span> <b>marian:</b></span> that saves you step creating <tt>hostname.conf</tt> I believe<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:28:48)</span> <b>matyas:</b></span> why?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:29:14)</span> <b>matyas:</b></span> you don't want to edit /usr/lib/systemd/system/... because a yum update will overwrite it<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:29:32)</span> <b>marian:</b></span> ok, fair enough ... that's why I said override :slightly_smiling_face:<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:30:23)</span> <b>matyas:</b></span> I mean you can call it <tt>/etc/systemd/system/stash-cache-authfile.d/override.conf</tt> if you want<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:30:44)</span> <b>matyas:</b></span> the actual name doesn't matter as long as it's in the right directory and has the extension <tt>.conf</tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(10:30:47)</span> <b>marian:</b></span> yeah, that makes me happy :slightly_smiling_face: ... anyway, I think we shouldn't try to make on top addons and try to figure how to avoid it within packaging already if possible<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:31:20)</span> <b>marian:</b></span> for the sake of convention I'd vote for override, because essentially you do that<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:32:27)</span> <b>blin:</b></span> i think we just need to add support for <tt>FQDNAliases</tt> in the lookup<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:32:51)</span> <b>matyas:</b></span> well you're adding, not overriding but whatever<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:33:03)</span> <b>blin:</b></span> and have people register their <tt>hostname -f</tt> output there if it doesn't match DNS<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:33:11)</span> <b>matyas:</b></span> @blin is right, FQDNAliases is probably the best from a UX standpoint<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:33:47)</span> <b>blin:</b></span> that's us, UX experts :smile:<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:35:54)</span> <b>matyas:</b></span> makes the code way more complicated, and we'd have to make sure FQDNAliases are also unique<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:37:18)</span> <b>blin:</b></span> if we only do it for caches/origins does that make it any simpler?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:41:48)</span> <b>matyas:</b></span> not really<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:42:09)</span> <b>matyas:</b></span> probably not _way_ more complicated, just more complicated<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:43:16)</span> <b>matyas:</b></span> should make a JIRA ticket; if I ever have time for it or we get another Zhenzhou, it might get completed too :stuck_out_tongue:<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:43:38)</span> <b>matyas:</b></span> in the meantime, if my suggestion works, we should document it<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:52:21)</span> <b>marian:</b></span> agreed! @efajardo tries workaround that we can document and let's have ticket for <tt>FQDNAliases</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(10:52:29)</span> <b>efajardo:</b></span> ok<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:52:35)</span> <b>efajardo:</b></span> I sent them to tes the ticket<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:52:43)</span> <b>efajardo:</b></span> unforutnatly this is not a kubernitized host<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:53:00)</span> <b>efajardo:</b></span> so it is a high latency talk between SoCal and Italu<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:53:06)</span> <b>marian:</b></span> ah, so this is normal installation<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:53:19)</span> <b>efajardo:</b></span> yea otherwise this would be running like two weeks ago<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:53:28)</span> <b>blin:</b></span> well we'd have to give them a different solution for a kubernetes host<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:53:30)</span> <b>marian:</b></span> fair enough<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:53:47)</span> <b>efajardo:</b></span> kuberntes would not be a problem cause we control the whole enviroment<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:54:10)</span> <b>blin:</b></span> sure but i'm curious what the workaround would be in that case<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:54:40)</span> <b>blin:</b></span> is it enough to just dump the proper CACHE_FQDN in the env? or would you just change the hostname so that it matches topology?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:55:36)</span> <b>matyas:</b></span> i mean from my pov it would be best if we could just change the hostname<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:04:56)</span> <b>marian:</b></span> actually, what if add alias in the /etc/hosts or they do <tt>hostnamectl set-hostname <a href="http://xcache.cr.cnaf.infn.it">xcache.cr.cnaf.infn.it</a></tt> and test, that'll work without adding anything on top of the config since we do only <tt>hostname -f</tt>, no?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:12:03)</span> <b>matyas:</b></span> hostnamectl would probably work, but how would an /etc/hosts alias work?<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:40:14)</span> <b>efajardo:</b></span> one morequestion<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:40:19)</span> <b>efajardo:</b></span> are we only building xcache for el7<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:40:34)</span> <b>efajardo:</b></span> Cause I see this<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:40:35)</span> <b>efajardo:</b></span> <pre>BuildRequires: systemd<br/>%{?systemd_requires}</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(11:40:42)</span> <b>efajardo:</b></span> Systemd is only on el7 right?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:40:46)</span> <b>matyas:</b></span> yeah<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:41:04)</span> <b>efajardo:</b></span> ok<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:41:05)</span> <b>matyas:</b></span> xcache needs systemd because we use systemd times for reporting and the authfile<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:41:09)</span> <b>efajardo:</b></span> that is fine<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:41:14)</span> <b>efajardo:</b></span> I just wanted to make sure<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:41:39)</span> <b>blin:</b></span> ah crap, we should've tagged xcache as a pre-release<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:42:01)</span> <b>blin:</b></span> like <tt>v1.1.0-0.1</tt> instead of <tt>v1.1.0</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(11:42:23)</span> <b>efajardo:</b></span> ahh well we can always do  a prerelease 1.1.1-0.1<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:42:34)</span> <b>matyas:</b></span> did you make a github release? you can still change that into a prerelease<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:42:52)</span> <b>matyas:</b></span> or just delete the tag and i'll look the other way :stuck_out_tongue:<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:50:13)</span> <b>efajardo:</b></span> do I have to change the spec file too?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:52:16)</span> <b>matyas:</b></span> yeah<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:59:41)</span> <b>efajardo:</b></span> I changed it to a prerelease on<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:59:44)</span> <b>efajardo:</b></span> github<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:00:08)</span> <b>efajardo:</b></span> that should be good enough for now<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:00:09)</span> <b>efajardo:</b></span> then<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:00:19)</span> <b>efajardo:</b></span> I can make a preprelease in osg-development<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:00:21)</span> <b>efajardo:</b></span> and work from there<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:12:21)</span> <b>marian:</b></span> to the previous, @matyas, yeah, scratch my idea of <tt>/etc/hosts</tt>, <tt>hostnamectl</tt> should do it, though... but that probably doesn't preserve hostname after reboot, depends... anyway, for quick test it's good enough<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:44:11)</span> <b>blin:</b></span> hey @efajardo, can you delete the <tt>v1.1.0</tt> tag that's still around? <a href="https://github.com/opensciencegrid/xcache/releases">https://github.com/opensciencegrid/xcache/releases</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:44:21)</span> <b>blin:</b></span> <a href="https://www.abeautifulsite.net/how-to-delete-a-tag-on-github">https://www.abeautifulsite.net/how-to-delete-a-tag-on-github</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:44:40)</span> <b>efajardo:</b></span> I thought I could turn into a pre release tag<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:44:46)</span> <b>blin:</b></span> you did that part<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:44:52)</span> <b>blin:</b></span> but the v1.1.0 tag still exists<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:44:57)</span> <b>blin:</b></span> and we'll want to use that one for the actual release<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:47:25)</span> <b>efajardo:</b></span> ok done<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:38:41)</span> <b>matyas:</b></span> dammit it's not <tt>/etc/systemd/system/stash-cache-authfile.d</tt>, it's <tt>/etc/systemd/system/stash-cache-authfile.service.d</tt>. I am a moron<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:40:06)</span> <b>matyas:</b></span> @efajardo ^^<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:40:17)</span> <b>efajardo:</b></span> ok<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:40:19)</span> <b>efajardo:</b></span> no worries<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:40:33)</span> <b>efajardo:</b></span> should we put into the doc first<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:40:48)</span> <b>matyas:</b></span> <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-3779">https://opensciencegrid.atlassian.net/browse/SOFTWARE-3779</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:12:10)</span> <b>blin:</b></span> one thought about the proxy issue: @efajardo is the ucsd cms xcache using <tt>xrootd-lcmaps</tt> with <tt>no-authz</tt>?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:13:02)</span> <b>blin:</b></span> because @ivukotic's caches aren't using using authN, not via <tt>xrootd-lcmaps</tt> at least<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:05:15)</span> <b>efajardo:</b></span> no cms xcache do not use any authentication till now<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:09:15)</span> <b>efajardo:</b></span> so I doubt that is the case<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:09:28)</span> <b>efajardo:</b></span> Andy said on the call he has a way to repdocue this<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:09:34)</span> <b>efajardo:</b></span> but did not share much more details<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:14:28)</span> <b>blin:</b></span> @efajardo i built the new xcache pre-release. you should be good to go<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:19:44)</span> <b>blin:</b></span> oops that was the scratch build...the new RC build should be done shortly<br/>
+</body>
+</html>

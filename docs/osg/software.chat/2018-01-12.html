@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jan 12, 2018 : #software (osg)</title>
+</head>
+<body>
+<h3>Fri Jan 12, 2018 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(11:11:11)</span> <b>blin:</b></span> @gattebury @jthiltges: <b>@edquist</b> is working on gridftp-hdfs with hdfs 2.6, would one of you be able to assist him tracking down the source of the issue? something appears to be misconfigured<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:26:34)</span> <b>bbockelm:</b></span> @jthiltges @gattebury @tmartin ^^^ poke poke<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:27:28)</span> <b>jthiltges:</b></span> @bbockelm <b>@edquist</b> Any details available on the issue?<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:38:37)</span> <b>edquist:</b></span> Hi @jthiltges, we're using osg-test to do the setup on a Fermicloud SL7 VM, installing <tt>osg-gridftp-hdfs</tt> out of osg-upcoming-development.<br/>The command that fails is:<br/><pre><br/>globus-url-copy <a href="gsiftp://fermicloud370.fnal.gov/usr/share/osg-test/test_gridftp_data.txt">gsiftp://fermicloud370.fnal.gov/usr/share/osg-test/test_gridftp_data.txt</a> file:///tmp/tmpZDeNMV/copied_file.txt<br/><br/>error: an end-of-file was reached<br/>globus_xio: An end of file occurred<br/></pre><br/>And in <tt>/var/log/gridftp-auth.log</tt> I see:<br/><pre><br/>[17489] Fri Jan 12 14:22:35 2018 :: Server configuration error. Couldn't load 'osg'. DSI 'osg' is not available in the module.<br/></pre><br/><br/>This is a bit confusing because the <tt>globus-gridftp-osg-extensions</tt> package is installed and <tt>/etc/gridftp.d/gridftp-hdfs.osg-extensions.conf</tt> (which loads the osg dsi) is present, as laid down by the <tt>gridftp-hdfs</tt> rpm<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:41:52)</span> <b>edquist:</b></span> The same tests in osg 3.3 (which has the older version of hadoop) succeed<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:39:08)</span> <b>jthiltges:</b></span> <b>@edquist</b> Hmm. I'd be tempted to watch the globus-gridftp-server with strace and see if there are any interesting failures. I'd guess it's just dlopen()ing the library. No dependencies showing up as missing in an ldd of libglobus_gridftp_server_osg.so?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:42:08)</span> <b>bbockelm:</b></span> so, that indicates the OSG DSI is trying to load the OSG DSI.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:42:24)</span> <b>bbockelm:</b></span> You want to set the right environment variable so it tries to load the HDFS DSI.<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:12:05)</span> <b>edquist:</b></span> doing an <tt>ldd /usr/lib64/libglobus_gridftp_server_osg.so</tt> shows all the deps are there.<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:14:21)</span> <b>edquist:</b></span> @bbockelm, which env var do you have in mind?  I see the following in <tt>/etc/gridftp.d/gridftp-hdfs.osg-extensions.conf</tt>:<br/><pre><br/>$OSG_EXTENSIONS_OVERRIDE_DSI hdfs<br/><br/>load_dsi_module osg<br/></pre><br/>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Feb 9, 2021 : #uscms (osg)</title>
+</head>
+<body>
+<h3>Tue Feb 9, 2021 : #uscms (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(06:00:42)</span> <b>spiperov:</b></span> @gattebury @ajit Thanks for sharing these details!<br/>We are also running our NN and SNN on real hardware so far, but because they are going out-of-warranty this year we are considering the options, given the critical role they play - at least the NN. So we are inclined to replace the NN with a new dedicated stand-alone server, and possibly moving the SNN to a VM (it's function is not critical, so temporary hiccups can be tolerated).<br/><br/>We have not considered the HA scenario yet, and I have a question about its usefulness: Doesn't the shared file-system become the new single-point-of-failure?<br/>In our everyday experience we see our shared file-systems go down several times per year, while our (single) NN has never stopped except for planned maintenance.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:47:31)</span> <b>andrew.melo:</b></span> You can do 3 journal nodes and skip the shared FS too<br/>
+<span style="color: #de5f24"><span style="font-size: small">(09:47:31)</span> <b>justas.balcas:</b></span> What if you use Journal nodes?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(09:47:44)</span> <b>justas.balcas:</b></span> fun, same time ;))<br/>
+<span style="color: #de5f24"><span style="font-size: small">(09:55:56)</span> <b>justas.balcas:</b></span> you can have even more than 3 and it cat tolerate at most (N - 1) / 2 failures. It is not the same as in Ceph, but with 5 nodes (each with 2x1tb nvme with RAID1) - 1k$ for nvmes - and you can distribute the NN/SNN on any other nodes<br/>
+<span style="color: #e475df"><span style="font-size: small">(10:16:44)</span> <b>ajit:</b></span> Yes, at least 3 journal nodes are needed : <a href="https://www.edureka.co/community/2011/why-minimum-journal-nodes-are-required-hadoop-architecture">https://www.edureka.co/community/2011/why-minimum-journal-nodes-are-required-hadoop-architecture</a><br/>
+<span style="color: #e475df"><span style="font-size: small">(10:16:52)</span> <b>ajit:</b></span> and no shared FS is required.<br/>
+<span style="color: #e475df"><span style="font-size: small">(10:18:30)</span> <b>ajit:</b></span> The 3 JNs can be : 1 JN daemon/service each on the active/standby NN, and the 3rd one on a VM<br/>
+<span style="color: #e475df"><span style="font-size: small">(10:21:46)</span> <b>ajit:</b></span> As long as your 2 NNs are solid hardware, it will be fine.<br/>
+</body>
+</html>

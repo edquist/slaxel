@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Dec 21, 2020 : #general (osg)</title>
+</head>
+<body>
+<h3>Mon Dec 21, 2020 : #general (osg)</h3>
+<span style="color: #d58247"><span style="font-size: small">(12:49:48)</span> <b>essedore:</b></span> At the risk of asking the wrong question, in the wrong place, and to the wrong set of people - is there a place to see the GPU factory queue?  All of our OSG allocated GPU's are idle and I am trying to make sure there is work before I tear things apart.  I see pilots regularly, but without any "real" jobs to follow.  Scolding, redirection, and just ignoring me is fine. Thanks.<br/>
+<span style="color: #db3150"><span style="font-size: small">(12:50:54)</span> <b>christinalk:</b></span> I would like to know this as well!<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:56:57)</span> <b>jdost321:</b></span> Hi, here's the factory monitoring page for one, it seems OSG gpu utilization has gone way down since Dec 14 <a href="http://gfactory-2.opensciencegrid.org/factory/monitor/factoryStatus.html?entry=Glow_US_Syracuse2_condor_gpu&amp;frontend=total&amp;infoGroup=running&amp;elements=StatusRunningCores,ClientCoresTotal,ClientCoresRunning,ClientCoresIdle,&amp;rra=2&amp;window_min=0&amp;window_max=0&amp;timezone=-8">http://gfactory-2.opensciencegrid.org/factory/monitor/factoryStatus.html?entry=Glow_US_Syra[…]oresIdle,&amp;rra=2&amp;window_min=0&amp;window_max=0&amp;timezone=-8</a><br/>
+<span style="color: #385a86"><span style="font-size: small">(12:57:08)</span> <b>jdost321:</b></span> @rynge any ideas?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:57:38)</span> <b>blin:</b></span> Mats is out of office until next year<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:57:43)</span> <b>jdost321:</b></span> we have a lot of idle pilots on the queues, I guess waiting for the gpu nodes, but oddly the few pilots that get them aren't really using them much<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:58:09)</span> <b>jdost321:</b></span> maybe @dweitzel can comment on his folding at home workflows?<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(12:58:27)</span> <b>cat:</b></span> @essedore, are you asking about the queue of pilots waiting to run on GPU resources, or the queue of actual end-user “payload” jobs waiting for GPU resources? I think the latter… but just checking.<br/>
+<span style="color: #d58247"><span style="font-size: small">(12:59:16)</span> <b>essedore:</b></span> Correct, the latter, "payload" jobs.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:59:37)</span> <b>dweitzel:</b></span> Let me check why F@H isn't landing there, give me a few minutes.<br/>
+<span style="color: #d58247"><span style="font-size: small">(12:59:41)</span> <b>essedore:</b></span> I see the drop off on the 14th as well<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(13:00:02)</span> <b>cat:</b></span> @christinalk, as a first order of approximation, would it make sense to look on the OSG Connect submit nodes for GPU jobs? Even a snapshot in time might be telling, right?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:00:34)</span> <b>dweitzel:</b></span> This page is usually updated pretty often: <a href="http://flock.opensciencegrid.org/overview/gpus.php">http://flock.opensciencegrid.org/overview/gpus.php</a><br/>
+<span style="color: #9d8eee"><span style="font-size: small">(13:01:15)</span> <b>cat:</b></span> @dweitzel, would you like to explain what that page is showing? It could use a description or something…<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:02:09)</span> <b>dweitzel:</b></span> I believe it is showing all gpus in the OSG global pool, by site, GPU model, and CUDA capability.<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(13:02:23)</span> <b>cat:</b></span> Ah, ok<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(13:02:29)</span> <b>cat:</b></span> So nothing about payload job pressure.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:02:39)</span> <b>dweitzel:</b></span> So, I think something is up with the pilots.  They are not advertising GPUs from syracuse.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:02:58)</span> <b>dweitzel:</b></span> right, nothing about job pressure<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:04:02)</span> <b>dweitzel:</b></span> I that case, factory ops needs to look at pilot logs to debug.<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(13:05:43)</span> <b>blin:</b></span> @jdost321 sounds like we need factory ops on this one<br/>
+</blockquote>
+<span style="color: #9d8eee"><span style="font-size: small">(13:04:05)</span> <b>cat:</b></span> Or there are no GPU pilots running there right now due to lack of pressure…<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:04:34)</span> <b>dweitzel:</b></span> On login04 alone:<br/><pre>$ condor_q -const 'RequestGpus&gt;=1' -all<br/>...<br/>Total for query: 3539 jobs; 0 completed, 0 removed, 1186 idle, 38 running, 2315 held, 0 suspended </pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:04:51)</span> <b>dweitzel:</b></span> 1186 GPU jobs idle just on login04, so 1/2 submit hosts.<br/>
+<span style="color: #d58247"><span style="font-size: small">(13:05:08)</span> <b>essedore:</b></span> I noticed GPU's from SU appear (and mostly don't appear) on this list periodically - not sure why that is (perhaps what VO they are allocated to?). <a href="http://flock.opensciencegrid.org/overview/gpus.php">http://flock.opensciencegrid.org/overview/gpus.php</a><br/>
+<span style="color: #9d8eee"><span style="font-size: small">(13:06:23)</span> <b>cat:</b></span> @dweitzel, good! So at least we think there should be some payload pressure. That is good to establish.<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(13:07:11)</span> <b>cat:</b></span> Is it easy to get a summary of the idle (and held) jobs by user to see if there are significant clumps?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:07:38)</span> <b>dweitzel:</b></span> define "clumps" :slightly_smiling_face:<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:07:59)</span> <b>blin:</b></span> there are 1179 pilots requesting GPUs on <a href="http://its-condor-ce3.syr.edu">its-condor-ce3.syr.edu</a> so it looks like the factory is sending GPU pilots<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(13:08:32)</span> <b>blin:</b></span> and 1124 on <a href="http://its-condor-ce-2.syr.edu">its-condor-ce-2.syr.edu</a><br/>
+</blockquote>
+<span style="color: #9d8eee"><span style="font-size: small">(13:08:02)</span> <b>cat:</b></span> Ok, at its simplest: Do all 1,186 idle jobs belong to one user?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:08:22)</span> <b>dweitzel:</b></span> yes, belong to me, F@H jobs.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:08:51)</span> <b>blin:</b></span> it doesn't strike me as a job pressure issue<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:09:20)</span> <b>dweitzel:</b></span> On login05, there's a bunch of GPU jobs that are not mine, along with ~1800 that are mine.<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(13:09:30)</span> <b>cat:</b></span> @blin, so there are lots of pilot jobs from the factory that are idle and trying to run at Syracuse?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:09:49)</span> <b>blin:</b></span> i didn't check their state, just that the factory is sending the pilots<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:10:52)</span> <b>dweitzel:</b></span> From what I can see at the factory monitoring, it doesn't think any of the syracuse GPU pilots are running.  Well, maybe 1.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:11:05)</span> <b>blin:</b></span> states of GPU jobs on its-condor-ce3:<br/><pre>Total for query: 1179 jobs; 15 completed, 46 removed, 1063 idle, 32 running, 23 held, 0 suspended</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:11:56)</span> <b>blin:</b></span> yeah there are no running OSG GPU pilots on CE3<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:12:15)</span> <b>blin:</b></span> <pre>blin@blin-latitude:~$ condor_q -all -name $ce -pool $ce:9619 -const '!isUndefined(requestgpus)' -af owner jobstatus | sort | uniq -c<br/>   1007 cmspilot 1<br/>     33 cmspilot 2<br/>      7 cmspilot 3<br/>     15 cmspilot 4<br/>      1 fermigli 3<br/>     27 glow 1<br/>      1 glow 2<br/>     15 glow 3<br/>      8 glow 5<br/>     30 osg 1<br/>     23 osg 3<br/>     14 osg 5</pre><br/>
+<span style="color: #9d8eee"><span style="font-size: small">(13:12:27)</span> <b>cat:</b></span> Huh, none of that seems to line up with the factory info.<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(13:12:59)</span> <b>cat:</b></span> Well, I think I see the 27 glow 1 and the 30 osg 1.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:13:23)</span> <b>blin:</b></span> yeah, across the 3 syracuse CEs, there are no running OSG GPU pilots<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(13:13:24)</span> <b>cat:</b></span> But none of the rest. Maybe the cmspilot ones are coming from the CERN factory?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:30:53)</span> <b>blin:</b></span> @cat nope, CMS pilots are coming from the OSG factory, at least on ce3<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:32:12)</span> <b>jdost321:</b></span> for the gpu entries on the factory there's about 60 pending on each ce (pending means made it to the site batch but are idle)<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:32:18)</span> <b>blin:</b></span> yup, same for all the other CEs<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:32:26)</span> <b>jdost321:</b></span> that means for whatever reason they aren't starting up in the site batch<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:34:37)</span> <b>blin:</b></span> ok, we should turn this into a freshdesk ticket<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:39:34)</span> <b>jdost321:</b></span> hmm some osg flock have been idle for over a week.. i'm going to clear the idle pilots form the factory queues first to see if that changes things<br/>
+<span style="color: #d58247"><span style="font-size: small">(13:40:13)</span> <b>essedore:</b></span> Hmm, I guess I should have asked sooner. :slightly_smiling_face:<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:48:10)</span> <b>jdost321:</b></span> ok, oddly the CMS global pool seems to be running on most of the gpu slots at syracuse but they aren't visible in our monitoring<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:48:33)</span> <b>jdost321:</b></span> @essedore can you confirm that from your side?<br/>
+<span style="color: #d58247"><span style="font-size: small">(13:54:11)</span> <b>essedore:</b></span> Here is what I see on CE3 when I ask about jobs requesting GPUs.  Helpful?<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:10:44)</span> <b>jdost321:</b></span> @dweitzel i see some GPU pilots for OSG flock starting from CE4, are your jobs matching those?<br/><pre>condor_status -pool <a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a> -const 'GLIDEIN_Entry_Name=?="Glow_US_Syracuse4_condor_gpu"' <br/>Name                                                        OpSys      Arch   State     Activity LoadAv Mem   ActvtyTime<br/><br/>slot1@glidein_24815_301405528@SURGE-OSG-C7-GPU-10-5-18-10   LINUX      X86_64 Unclaimed Idle      0.000    0  0+00:23:37<br/>slot1_1@glidein_24815_301405528@SURGE-OSG-C7-GPU-10-5-18-10 LINUX      X86_64 Claimed   Busy      2.000 2048  0+00:21:23<br/>slot1_2@glidein_24815_301405528@SURGE-OSG-C7-GPU-10-5-18-10 LINUX      X86_64 Claimed   Busy      1.000 2048  0+00:21:22<br/>slot1@glidein_365_387822398@SURGE-OSG-C7-GPU-10-5-58-3      LINUX      X86_64 Unclaimed Idle      0.000    0  0+00:23:29<br/>slot1_1@glidein_365_387822398@SURGE-OSG-C7-GPU-10-5-58-3    LINUX      X86_64 Claimed   Busy      2.000 2048  0+00:21:21<br/>slot1_2@glidein_365_387822398@SURGE-OSG-C7-GPU-10-5-58-3    LINUX      X86_64 Claimed   Busy      1.000 2048  0+00:21:21</pre><br/>
+<span style="color: #385a86"><span style="font-size: small">(14:11:04)</span> <b>jdost321:</b></span> when i add -l i see the proper CUDA vars, etc so i don't think its a pilot misconfiguration<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:29:40)</span> <b>jdost321:</b></span> @essedore as an update I was able to have someone track down "rogue" cms jobs. they were probe jobs and way too many of them were submitted due to an unfortunate infinite bash while loop. the reason they didn't show in my factory monitoring is they were launched as manual glideins, bypassing the normal routes. Indeed these jobs were doing nothing but I'm suspecting the churn was preventing real gpu jobs from getting in. I just cleaned them all op. Please let us know if you don't see any improvements after a few hours<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:30:12)</span> <b>essedore:</b></span> Thanks @jdost321, will do!<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:08:34)</span> <b>essedore:</b></span> Good news, already seeing a significant uptick in payload jobs running happily - off to keep track of our 20% to NSF/OSG commitment for the new GPUs. :-)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:54:55)</span> <b>dweitzel:</b></span> Indeed, I see some of my jobs are running at Syracuse.<br/>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Oct 2, 2017 : #software (osg)</title>
+</head>
+<body>
+<h3>Mon Oct 2, 2017 : #software (osg)</h3>
+<span style="color: #674b1b"><span style="font-size: small">(09:52:57)</span> <b>rynge:</b></span> Software team, we got this question:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:53:00)</span> <b>rynge:</b></span> Ian Stakenvicius<br/>Hi, i was just looking at docker-osg-wn, and I noticed that although it's using OSG-3.4 it's installing osg-wn-glexec .. except that I was fairly sure glexec is removed in OSG-3.4 according to release notes? anyhow, was wondering if a bug should be filed and where?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:53:14)</span> <b>rynge:</b></span> Can you follow up with Ian? He is here on Slack.<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:49:10)</span> <b>matyas:</b></span> @ian_cancercomputer that should not be possible ... osg-wn-client-glexec is not contained in the 3.4 repos at all. which specific docker container are you using?<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:01:22)</span> <b>ian_cancercomputer:</b></span> Hey; i'm not actually using docker yet but was looking into it, came across the repo <a href="https://github.com/opensciencegrid/docker-osg-wn">https://github.com/opensciencegrid/docker-osg-wn</a> .. if you take a look at the <a href="http://Dockerfile.in">Dockerfile.in</a> any of the osg-3.4 images it's explicitly listing osg-wn-client-glexec as an argument to yum -y install<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:02:00)</span> <b>ian_cancercomputer:</b></span> sorry, s/images/appropriate word/<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:07:39)</span> <b>matyas:</b></span> @bbockelm, did you see @gattebury and @jthiltges's comments about the ipv6 load leveling patch?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:17:18)</span> <b>matyas:</b></span> @ian_cancercomputer yeah, that's just a copy and paste error. it doesn't have any effect since osg-wn-client-glexec is not in the 3.4 repositories, so the yum install command will issue a warning and skip that package<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:17:55)</span> <b>ian_cancercomputer:</b></span> Ahh, ok thx!<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:22:21)</span> <b>matyas:</b></span> <a href="https://jira.opensciencegrid.org/browse/SOFTWARE-2919">https://jira.opensciencegrid.org/browse/SOFTWARE-2919</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:22:29)</span> <b>bbockelm:</b></span> @matyas - yeah, I saw some emails about the same thing from John and Garhan also.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:22:48)</span> <b>bbockelm:</b></span> It sounds like we just need to enable IPv6 by default in order to match the prior behavior?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:23:30)</span> <b>bbockelm:</b></span> Do we have any patches on that package otherwise<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:23:42)</span> <b>bbockelm:</b></span> We could maybe just do the change at the configuration level?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:25:22)</span> <b>matyas:</b></span> yeah, we have tcp-rst-stuck.patch, contributed by @jthiltges, though i don't have a jira link<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:35:06)</span> <b>bbockelm:</b></span> Gotcha.  Yeah, that's the DoS caused by opening a TCP connection and immediately closing it without sending any data on it.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:35:49)</span> <b>bbockelm:</b></span> I suppose changing the default in the OSG-provided configuration is less likely to surprise users, as the behavior should match the upstream documentation...<br/>
+<span style="color: #e06b56"><span style="font-size: small">(11:56:45)</span> <b>jthiltges:</b></span> @matyas Here's the JIRA link for the TCP RST issue. <a href="https://jira.opensciencegrid.org/browse/SOFTWARE-2486">https://jira.opensciencegrid.org/browse/SOFTWARE-2486</a>  I think it was intentionally vague to avoid the flaw being used as a DoS. I could copy some of the email thread details into the ticket if you like (now that it's been almost a year).<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:30:52)</span> <b>bbockelm:</b></span> @jthiltges - for the Xrootd 4.7.0 issue with crashing plugins -- can we file a ticket with upstream?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:31:33)</span> <b>jthiltges:</b></span> @bbockelm Sure. Github?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:31:44)</span> <b>bbockelm:</b></span> yup, I think so.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:31:56)</span> <b>bbockelm:</b></span> Should probably do the same for the HTTP resource leak.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:33:14)</span> <b>jthiltges:</b></span> Looking at Bockjoo's reply, I'm feeling more confident that the GUMS failures are what's doing it. grid-mapfile all the things. :slightly_smiling_face:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:33:48)</span> <b>bbockelm:</b></span> Probably a threading / caching issue or failed lookups when an external plugin is used?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:34:08)</span> <b>bbockelm:</b></span> or maybe an interface change that now expects something slightly different on failure?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:56:53)</span> <b>jthiltges:</b></span> It looks like the GSI auth code frees two buffers before doing the GUMS check. If there's a GUMS failure, it short-circuits out of the section and never reallocates them. Next time the same entry comes up for authentication, it tries to access the buffers and segfaults on a NULL pointer.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:46:57)</span> <b>matyas:</b></span> @bbockelm, so should I add <tt>epsv_ip 1</tt> to gridftp.conf in globus-gridftp-server, make the option default to TRUE in globus-gridftp-server-control, or both? if we only change gridftp.conf, some people might not get the change...<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:47:40)</span> <b>bbockelm:</b></span> What about the <tt>osg-extensions</tt> RPM?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:48:22)</span> <b>matyas:</b></span> what about it?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:48:48)</span> <b>bbockelm:</b></span> I mean, could we put <tt>epsv_ip 1</tt> in an <tt>/etc/gridftp.d</tt> config file there?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:49:08)</span> <b>bbockelm:</b></span> although I guess we'll always have to ship our own <tt>globus-gridftp-server</tt>, eh?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:50:37)</span> <b>matyas:</b></span> we could do that too<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:51:23)</span> <b>matyas:</b></span> once we take over maintenance of globus-gridftp-server, we'll push our patches upstream, right?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:51:26)</span> <b>bbockelm:</b></span> yeah, as long as we always ship our own <tt>globus-gridftp-server</tt>, I guess the config file can go there.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:51:37)</span> <b>bbockelm:</b></span> and/or we are upstream :wink:<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:53:03)</span> <b>matyas:</b></span> i vaguely heard that globus wasn't dropping support till the end of the year? new versions of some of the packages showed up in epel a few weeks ago...<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:54:16)</span> <b>matyas:</b></span> also, how will we take over maintenance? will we fork globus/globus-toolkit, or will we ask for commit access to their repo?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:55:18)</span> <b>bbockelm:</b></span> I'm thinking either a separate GitHub organization (or just fork it into <tt>opensciencegrid</tt>).<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:55:23)</span> <b>bbockelm:</b></span> I don't think we'll do commit access to their repo.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:56:21)</span> <b>matyas:</b></span> ok. i updated the globus dependencies ticket (<a href="https://jira.opensciencegrid.org/browse/SOFTWARE-2887">https://jira.opensciencegrid.org/browse/SOFTWARE-2887</a>) with... globus dependencies<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:58:04)</span> <b>bbockelm:</b></span> <tt>globus-authz-callout-error</tt> ... not used?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:59:00)</span> <b>bbockelm:</b></span> Rats.  meeting time.  be back in an hour or so.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:59:58)</span> <b>matyas:</b></span> hmm... that's not correct<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:01:07)</span> <b>matyas:</b></span> never mind. i'll have to look at the script and see where it's going wrong<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:27:33)</span> <b>matyas:</b></span> is there anything preventing us from forking the globus-toolkit repo now?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:00:15)</span> <b>jthiltges:</b></span> @matyas For SOFTWARE-2920: s/espv_ip/epsv_ip/<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:00:55)</span> <b>matyas:</b></span> ugh. thanks<br/>
+<span style="color: #9e3997"><span style="font-size: small">(21:34:56)</span> <b>bbockelm:</b></span> @matyas - I think we can fork now.  No reason why not.  We will need to start talking about surrounding infrastructure (think stuff like build system and tests)<br/>
+</body>
+</html>

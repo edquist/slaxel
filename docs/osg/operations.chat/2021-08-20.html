@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Aug 20, 2021 : #operations (osg)</title>
+</head>
+<body>
+<h3>Fri Aug 20, 2021 : #operations (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(09:39:57)</span> <b>blin:</b></span> @matyas how'd the topology deploy go?<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:40:41)</span> <b>matyas:</b></span> seemed to work fine last I looked<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:42:52)</span> <b>matyas:</b></span> are you seeing the expected LIGO data?<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:45:47)</span> <b>matyas:</b></span> I'm getting this traceback:<br/><pre>[wsgi:error] [pid 13] [remote 192.168.122.142:53054] [2021-08-20 14:41:21,818] ERROR in stashcache: Failed to connect to the LIGO LDAP<br/>[wsgi:error] [pid 13] [remote 192.168.122.142:53054] Traceback (most recent call last):<br/>[wsgi:error] [pid 13] [remote 192.168.122.142:53054]   File "/app/stashcache.py", line 54, in _generate_ligo_dns<br/>[wsgi:error] [pid 13] [remote 192.168.122.142:53054]     conn.bind()<br/>[wsgi:error] [pid 13] [remote 192.168.122.142:53054]   File "/usr/local/lib/python3.6/site-packages/ldap3/core/connection.py", line 604, in bind<br/>[wsgi:error] [pid 13] [remote 192.168.122.142:53054]     request = bind_operation(self.version, self.authentication, self.user, self.password, auto_encode=self.auto_encode)<br/>[wsgi:error] [pid 13] [remote 192.168.122.142:53054]   File "/usr/local/lib/python3.6/site-packages/ldap3/operation/bind.py", line 59, in bind_operation<br/>[wsgi:error] [pid 13] [remote 192.168.122.142:53054]     raise LDAPPasswordIsMandatoryError('password is mandatory in simple bind')<br/>[wsgi:error] [pid 13] [remote 192.168.122.142:53054] ldap3.core.exceptions.LDAPPasswordIsMandatoryError: password is mandatory in simple bind</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(09:49:13)</span> <b>matyas:</b></span> ah there's no LIGO_LDAP_PASSFILE configured<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:49:16)</span> <b>blin:</b></span> oh, we need to add the passfile<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:49:28)</span> <b>blin:</b></span> yeah. you have it, right? otherwise i can make the change<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:51:56)</span> <b>matyas:</b></span> not on my hard drive but I can download it again<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:52:07)</span> <b>matyas:</b></span> you'll need to make a SealedSecret right?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:52:43)</span> <b>blin:</b></span> don't worry about it, i got it<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:55:02)</span> <b>matyas:</b></span> thanks<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:27:39)</span> <b>blin:</b></span> alright, we're in business<br/><pre>$ curl -s <a href="https://topology.opensciencegrid.org/stashcache/authfile">https://topology.opensciencegrid.org/stashcache/authfile</a> | head<br/>g /GLOW /chtc/PROTECTED rl<br/>u 5922b3b6.0 /chtc/PROTECTED rl<br/>g /cms /store rl<br/>g /hcc /hcc/focusday rl<br/>u 6fb7593d.0 /hcc/focusday rl /user/ligo rl<br/>u 47146b14.0 /user/ligo rl<br/>u b4ba4c21.0 /user/ligo rl<br/>u 0f4276ff.0 /user/ligo rl<br/>u 1edc005a.0 /user/ligo rl<br/>u 69ccef3f.0 /user/ligo rl</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:28:01)</span> <b>matyas:</b></span> :tada:<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:28:42)</span> <b>blin:</b></span> not having the passfile in there was actually a nice test to make sure we were using the creds for our queries :slightly_smiling_face:<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:29:20)</span> <b>matyas:</b></span> there ya go, it's not a screwup, it's an integration test<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:31:11)</span> <b>blin:</b></span> @marian @jdost321 do we have any internal documentation on maintaining the OASIS shared login host? specifically how to handle tickets with folks asking for OASIS access<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:31:58)</span> <b>marian:</b></span> you mean access to the oasis-login I guess?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:32:53)</span> <b>blin:</b></span> yeah<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:53:05)</span> <b>marian:</b></span> specifically, what are you looking for to maintain? directly on the oasis-login node? there is just limited root access for UNL folks, but maybe I misunderstand ... is this for existing users or for new oasis users? also, if there is anything obvious that needs to be maintained, like a user that is doing something crazy, I usually get ticket opened by @dwd and I move on from there ...<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:53:39)</span> <b>blin:</b></span> my question is where is the documentation for managing this host?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:54:21)</span> <b>blin:</b></span> if a ticket comes in from an OASIS manager (or someone that wants to be one), how do you know what steps need to be taken?<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:55:30)</span> <b>dwd:</b></span> It was kind of encoded in the user documentation until you removed it just now.  We should probably instead add a page along side <a href="https://opensciencegrid.org/operations/external-oasis-repos/">https://opensciencegrid.org/operations/external-oasis-repos/</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:56:01)</span> <b>blin:</b></span> yeah, that's why i was asking :slightly_smiling_face:<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:56:10)</span> <b>dwd:</b></span> All that really needs to be done is to add somebody to topology<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:56:12)</span> <b>blin:</b></span> the user-facing documentation seemed like the wrong place to keep it<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:58:47)</span> <b>dwd:</b></span> For reference it was line 28 at <a href="https://github.com/opensciencegrid/docs/pull/865/files">https://github.com/opensciencegrid/docs/pull/865/files</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(17:01:08)</span> <b>blin:</b></span> @marian <a href="https://opensciencegrid.atlassian.net/browse/OPS-208">https://opensciencegrid.atlassian.net/browse/OPS-208</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(17:01:32)</span> <b>marian:</b></span> ugh, that's on me :slightly_smiling_face:<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:02:31)</span> <b>marian:</b></span> will do<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:12:05)</span> <b>marian:</b></span> I updated ticket what was proposed to be done ... if you have any comments, please, post it there ... thanks!<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(17:15:24)</span> <b>didavila:</b></span> seems that @colby still doesn’t have a site in FD, is that correct?<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(17:15:43)</span> <b>didavila:</b></span> whom should I assign his tickets to in the interim?<br/>
+<span style="color: #73769d"><span style="font-size: small">(17:22:18)</span> <b>colby:</b></span> You can assign it to @jdost321<br/>
+<span style="color: #73769d"><span style="font-size: small">(17:22:28)</span> <b>colby:</b></span> until I get an account<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(17:29:45)</span> <b>didavila:</b></span> ok, thaks!<br/>
+</body>
+</html>

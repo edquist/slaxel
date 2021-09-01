@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Oct 22, 2018 : #software (osg)</title>
+</head>
+<body>
+<h3>Mon Oct 22, 2018 : #software (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(15:34:16)</span> <b>dweitzel:</b></span> @matyas I need some help.  <a href="http://koji.chtc.wisc.edu/koji/taskinfo?taskID=280897">http://koji.chtc.wisc.edu/koji/taskinfo?taskID=280897</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:34:38)</span> <b>dweitzel:</b></span> The "expected" hash looks correct.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:34:51)</span> <b>dweitzel:</b></span> I'm not sure how it is getting the incorrect hash on checkout.<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:35:12)</span> <b>blin:</b></span> i wonder if it has to do with the github issues<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:37:47)</span> <b>dweitzel:</b></span> I suppose it's possible...  But the web interface has the release / commit / correct hash: <a href="https://github.com/scitokens/scitokens/releases/tag/v1.2.1">https://github.com/scitokens/scitokens/releases/tag/v1.2.1</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(15:40:14)</span> <b>matyas:</b></span> that's weird<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:50:16)</span> <b>blin:</b></span> yeah<br/><pre><br/>$ git co d6cfc27ae40ba1d272dfc69ee67f18480630b292<br/>warning: refname 'd6cfc27ae40ba1d272dfc69ee67f18480630b292' is ambiguous.<br/>...<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:52:51)</span> <b>blin:</b></span> well maybe that's nothing, but if i <tt>git checkout d6cfc27</tt> then i get this:<br/><pre><br/>$ git show<br/>commit 025cda070a922fad40f0b2384fd72a8498805407 (HEAD, tag: v1.2.1)<br/>...<br/></pre><br/>
+<span style="color: #16569E"><span style="font-size: small">(15:55:23)</span> <b>edquist:</b></span> <tt>git rev-parse HEAD</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:56:37)</span> <b>blin:</b></span> <pre><br/>$ git rev-parse HEAD<br/>025cda070a922fad40f0b2384fd72a8498805407<br/></pre><br/>
+<span style="color: #16569E"><span style="font-size: small">(15:58:23)</span> <b>edquist:</b></span> do you see anything that looks like your <tt>d6cfc27</tt> if you do <tt>git for-each-ref</tt> ?<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:59:13)</span> <b>edquist:</b></span> ah -<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:59:56)</span> <b>blin:</b></span> yup<br/><pre><br/>$ git for-each-ref | grep d6cfc27<br/>c67b03259998b7e4f32283f195572f05d85eda58 commit	refs/heads/d6cfc27ae40ba1d272dfc69ee67f18480630b292<br/>d6cfc27ae40ba1d272dfc69ee67f18480630b292 tag	refs/tags/v1.2.1<br/></pre><br/>
+<span style="color: #16569E"><span style="font-size: small">(16:00:06)</span> <b>edquist:</b></span> yeah<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:00:07)</span> <b>edquist:</b></span> so<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:00:21)</span> <b>edquist:</b></span> that is a bit messed up that you have a branch named <tt>d6cfc27ae40ba1d272dfc69ee67f18480630b292</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:00:34)</span> <b>blin:</b></span> oh lol<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:00:40)</span> <b>edquist:</b></span> that's why git warned you<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:01:33)</span> <b>edquist:</b></span> the other thing -<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:02:19)</span> <b>edquist:</b></span> <tt>025cda070a922fad40f0b2384fd72a8498805407</tt> is a <tt>tag</tt> object<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:02:34)</span> <b>edquist:</b></span> ```<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:02:38)</span> <b>edquist:</b></span> <pre><br/>d6cfc27ae40ba1d272dfc69ee67f18480630b292 tag	refs/tags/v1.2.1<br/></pre><br/>
+<span style="color: #16569E"><span style="font-size: small">(16:03:21)</span> <b>edquist:</b></span> <pre><br/>[... ~/gits/git/scitokens]$ git rev-parse d6cfc27ae40ba1d272dfc69ee67f18480630b292^{commit}<br/>025cda070a922fad40f0b2384fd72a8498805407<br/></pre><br/>
+<span style="color: #16569E"><span style="font-size: small">(16:03:28)</span> <b>edquist:</b></span> so<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:03:37)</span> <b>edquist:</b></span> the koji fetch sources thing is broken<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:03:39)</span> <b>edquist:</b></span> :smile:<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:04:17)</span> <b>edquist:</b></span> aaaanyway<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:04:39)</span> <b>edquist:</b></span> i don't know how you made your branch<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:05:27)</span> <b>blin:</b></span> oh, i was futzing around, i blew that up<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:06:08)</span> <b>blin:</b></span> i'm not sure i understand the fetch-sources being broken explanation but uhh @matyas ^^<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:06:23)</span> <b>matyas:</b></span> i dunno <b>@edquist</b>?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:06:52)</span> <b>edquist:</b></span> <pre><br/>[edquist@monza ~/scratch/git/redhat/redhat.all/scitokens]$ cat upstream/github.source <br/>type=git url=<a href="https://github.com/scitokens/scitokens.git">https://github.com/scitokens/scitokens.git</a> tag=v1.2.1 hash=025cda070a922fad40f0b2384fd72a8498805407<br/></pre><br/>
+<span style="color: #16569E"><span style="font-size: small">(16:07:05)</span> <b>edquist:</b></span> <tt>hash=025cda070a922fad40f0b2384fd72a8498805407</tt><br/>
+<span style="color: #16569E"><span style="font-size: small">(16:07:24)</span> <b>edquist:</b></span> anyway<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:07:28)</span> <b>edquist:</b></span> the easy fix?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:07:47)</span> <b>edquist:</b></span> we just fix the <tt>hash</tt> in the upstream.source<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:07:55)</span> <b>matyas:</b></span> "fix" to what?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:08:00)</span> <b>matyas:</b></span> d6... ?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:08:00)</span> <b>edquist:</b></span> to be the thing that the tag points to<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:08:08)</span> <b>matyas:</b></span> but that's not what github says the tag points to<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:08:13)</span> <b>edquist:</b></span> <tt>d6cfc27ae40ba1d272dfc69ee67f18480630b292 tag    refs/tags/v1.2.1</tt><br/>
+<span style="color: #16569E"><span style="font-size: small">(16:08:30)</span> <b>edquist:</b></span> well<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:08:38)</span> <b>matyas:</b></span> github is wrong? :stuck_out_tongue:<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:08:58)</span> <b>edquist:</b></span> the <tt>refs/tags/v1.2.1</tt> _ref_ points to the <tt>d6cfc27ae40ba1d272dfc69ee67f18480630b292</tt> <tt>tag</tt> object<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:09:13)</span> <b>edquist:</b></span> and the <tt>tag</tt> object points to <tt>025cda070a922fad40f0b2384fd72a8498805407</tt><br/>
+<span style="color: #16569E"><span style="font-size: small">(16:09:37)</span> <b>edquist:</b></span> anyway<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:11:20)</span> <b>edquist:</b></span> normally we make "lightweight" tags<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:11:34)</span> <b>edquist:</b></span> where the tag ref points directly to the <tt>commit</tt> object<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:12:09)</span> <b>edquist:</b></span> somehow in this case the <tt>v1.2.1</tt> tag ref points to a <tt>tag</tt> object<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:12:42)</span> <b>edquist:</b></span> the easy (non-software) fix is just to fix the hash match the tag object that the tag ref points to<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:12:45)</span> <b>edquist:</b></span> instead of the commit<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:14:17)</span> <b>matyas:</b></span> @dweitzel how did you make the tag in the first place?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:20:36)</span> <b>edquist:</b></span> the two options are:<br/>1. put whatever the tag ref points to in the upstream.source <tt>hash</tt> argument; in particular, the <tt>tag</tt> object if that's what it points to<br/>2. have our fetch sources check dereference down to a <tt>commit</tt> (or even <tt>tree</tt>), with <tt>hash^{commit}</tt><br/>
+<span style="color: #16569E"><span style="font-size: small">(16:21:36)</span> <b>edquist:</b></span> (1) is easy to do now and doesn't require any software fixes<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:22:10)</span> <b>edquist:</b></span> (2) requires an <tt>osg-build</tt> update, but avoids having to worry about this distinction in the future<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:22:31)</span> <b>blin:</b></span> if we do (1), followed by (2), would that break the bandaid of (1)?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:22:36)</span> <b>edquist:</b></span> no<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:22:43)</span> <b>edquist:</b></span> it's fine to do both<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:22:50)</span> <b>matyas:</b></span> (3) delete the tag, make a new one<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:22:50)</span> <b>edquist:</b></span> might as well<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:22:56)</span> <b>edquist:</b></span> N.O.<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:23:06)</span> <b>edquist:</b></span> DO NOT DELETE THE TAG<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:23:16)</span> <b>matyas:</b></span> bah screw you and your history :slightly_smiling_face:<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:23:36)</span> <b>matyas:</b></span> I will totally accept PRs for (2)<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:23:50)</span> <b>edquist:</b></span> please read the<br/><pre><br/>DISCUSSION<br/>   On Re-tagging<br/></pre><br/>section in <tt>git help tag</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(16:24:07)</span> <b>matyas:</b></span> yeah yeah whatever that's for pedants and nice people<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:24:25)</span> <b>matyas:</b></span> or call it 1.2.1.1 :slightly_smiling_face:<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:24:55)</span> <b>edquist:</b></span> there's no need to remove the ref to the <tt>tag</tt> object<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:24:56)</span> <b>blin:</b></span> if you do it fast enough, the github backup script won't complain!<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:25:04)</span> <b>matyas:</b></span> do we back up scitokens?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:25:23)</span> <b>blin:</b></span> nah, we don't. i meant in general<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:25:32)</span> <b>edquist:</b></span> regardless it's the principle that you've broken<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:25:42)</span> <b>edquist:</b></span> anyway<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:28:07)</span> <b>blin:</b></span> ok @dweitzel you'll want to set <tt>hash=d6cfc27ae40ba1d272dfc69ee67f18480630b292</tt> and rebuild. that should work<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:28:21)</span> <b>edquist:</b></span> mmm<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:28:22)</span> <b>edquist:</b></span> nope<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:28:27)</span> <b>blin:</b></span> the other commit?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:28:43)</span> <b>blin:</b></span> errr hash*<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:29:00)</span> <b>blin:</b></span> how's that?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:29:15)</span> <b>blin:</b></span> ah yes, i misread your above comment<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:29:23)</span> <b>blin:</b></span> anywho<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:29:39)</span> <b>blin:</b></span> <b>@edquist</b> if you haven't already started work on a fix, please create a jira ticket to track this bug<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:30:10)</span> <b>matyas:</b></span> lol<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:30:19)</span> <b>edquist:</b></span> for osg-build, you mean?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:30:34)</span> <b>edquist:</b></span> i just updated the hash in the scitokens packaging<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:30:45)</span> <b>edquist:</b></span> to point to the tag object<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:31:11)</span> <b>edquist:</b></span> <pre><br/>--- a/scitokens/upstream/github.source<br/>+++ b/scitokens/upstream/github.source<br/>@@ -1 +1 @@<br/>-type=git url=<a href="https://github.com/scitokens/scitokens.git">https://github.com/scitokens/scitokens.git</a> tag=v1.2.1 hash=025cda070a922fad40f0b2384fd72a8498805407<br/>+type=git url=<a href="https://github.com/scitokens/scitokens.git">https://github.com/scitokens/scitokens.git</a> tag=v1.2.1 hash=d6cfc27ae40ba1d272dfc69ee67f18480630b292<br/></pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:31:15)</span> <b>dweitzel:</b></span> Ah, I added a “message” to the tag I believe. Which probably caused git to make a non lightweight tag?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:31:24)</span> <b>edquist:</b></span> mmm<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:31:31)</span> <b>edquist:</b></span> that'd explain it<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:32:18)</span> <b>matyas:</b></span> <b>@edquist</b> if you're going to update osg-build, make it accept *both* the undereferenced and the dereferenced tag<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:32:59)</span> <b>dweitzel:</b></span> But I also screwed up the tag on Saturday and had to delete it and re tag, but that was like 10 minute window. <br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:33:51)</span> <b>dweitzel:</b></span> So you know. Lots of odd things. <br/>
+<span style="color: #16569E"><span style="font-size: small">(16:35:10)</span> <b>edquist:</b></span> the thing with re-tagging again now is it won't update for anybody that's already go the tag<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:35:26)</span> <b>edquist:</b></span> not that i care that much :wink:<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:35:38)</span> <b>blin:</b></span> separately...why is boost in osg-3.4-contrib?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:36:20)</span> <b>edquist:</b></span> did i do that<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:36:22)</span> <b>edquist:</b></span> ?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:36:29)</span> <b>edquist:</b></span> oh sheesh<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:36:35)</span> <b>edquist:</b></span> NICE CATCH<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:37:01)</span> <b>edquist:</b></span> that was not intentional<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:37:20)</span> <b>edquist:</b></span> i'm sure there was some reason<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:37:35)</span> <b>edquist:</b></span> at the time<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:37:44)</span> <b>edquist:</b></span> but i did not mean to commit it to svn<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:41:48)</span> <b>edquist:</b></span> reverted<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:45:55)</span> <b>blin:</b></span> thanks bruh<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:46:25)</span> <b>matyas:</b></span> lol<br/>
+</body>
+</html>

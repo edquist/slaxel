@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Mar 15, 2019 : #scitokens (osg)</title>
+</head>
+<body>
+<h3>Fri Mar 15, 2019 : #scitokens (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(08:21:07)</span> <b>jpatton:</b></span> @bbockelm I'm going to merge this PR (I'm fairly certain it works/fixes the problems with sessions) but I'm always happy to take reviews on improving my code <a href="https://github.com/htcondor/scitokens-credmon/pull/21">https://github.com/htcondor/scitokens-credmon/pull/21</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(09:16:18)</span> <b>jpatton:</b></span> thanks!<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:29:08)</span> <b>rynge:</b></span> @dweitzel @zmiller Still dies with the same error:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:29:11)</span> <b>rynge:</b></span> <pre><br/>03/14/19 18:26:45 (pid:26341) Initialized IO Proxy.<br/>03/14/19 18:26:46 (pid:26341) SECMAN: required authentication with &lt;192.170.227.22:9618&gt; failed, so aborting command CREDD_GET_PASSWD.<br/>03/14/19 18:26:46 (pid:26341) ERROR: AUTHENTICATE:1003:Failed to authenticate with any method|AUTHENTICATE:1004:Failed to authenticate using GSI|GSI:5006:Failed to authenticate because the subject '/DC=org/DC=opensciencegrid/O=Open Science Grid/OU=Services/CN=<a href="http://login03.osgconnect.net">login03.osgconnect.net</a>' is not currently trusted by you.  If it should be, add it to GSI_DAEMON_NAME or undefine GSI_DAEMON_NAME.<br/>03/14/19 18:26:46 (pid:26341) CREDMON: failed to decode credential into file (/local_scratch/osg/glide_Jd91jb/creds/.cred)!<br/>03/14/19 18:26:46 (pid:26341) Failed to initialize JobInfoCommunicator, aborting<br/></pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:29:43)</span> <b>dweitzel:</b></span> Is the current configuration in github somewhere?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:33:40)</span> <b>rynge:</b></span> <a href="https://github.com/opensciencegrid/osg-flock/blob/master/node-check/scitokens">https://github.com/opensciencegrid/osg-flock/blob/master/node-check/scitokens</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:41:53)</span> <b>dweitzel:</b></span> @zmiller @jpatton <br/>
+<span style="color: #902d59"><span style="font-size: small">(11:26:15)</span> <b>zmiller:</b></span> Can I get a link to the full logs (newest ones)?  And although it generates a lot, you may as well run again with this in the config:STARTER_DEBUG=D_ALL:2<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:27:23)</span> <b>zmiller:</b></span> It's not clear to me why it is asking for the .cred (which I call "CERN mode") instead of using the syscall socket to get tokens.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:36:27)</span> <b>tannenba:</b></span> The error message with the clause _so aborting command CREDD_GET_PASSWD_ should never appear in HTCondor v8.8.1 if the condor_starter's condor config file has CREDD_OAUTH_MODE=True<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:38:53)</span> <b>tannenba:</b></span> @rynge @dweitzel So looking at this line in the glidein startup script:<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:39:06)</span> <b>tannenba:</b></span> <br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:39:51)</span> <b>tannenba:</b></span> Will that result in a condor config file line of CREDD_OAUTH_MODE=True or CREDD_OAUTH_MODE="True"  (note the quotations!)<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:40:05)</span> <b>tannenba:</b></span> ?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:40:44)</span> <b>rynge:</b></span> <tt>True</tt> - it is really controlled by the next line<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:41:20)</span> <b>tannenba:</b></span> I have no idea what that next line even means. Looks like garble to me :slightly_smiling_face:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:41:35)</span> <b>rynge:</b></span> Welcome to the world of gwms<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:41:43)</span> <b>tannenba:</b></span> Are you able to post the actual condor_config file(s) produced by gwms  ?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:41:44)</span> <b>rynge:</b></span> <tt>C</tt> means constant<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:42:10)</span> <b>rynge:</b></span> Well probably not<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:42:30)</span> <b>rynge:</b></span> I only have access to the frontend, and if I can't run jobs, I can't get to the glideins at all<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:42:43)</span> <b>rynge:</b></span> I think we should just try one by hand at this point<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:42:54)</span> <b>rynge:</b></span> See if we can reproduce it that way<br/>
+<span style="color: #902d59"><span style="font-size: small">(13:05:36)</span> <b>zmiller:</b></span> Right... well as I was saying, and Todd said (differently) as well, it can't be asking for the .cred file if CREDD_OAUTH_MODE is set to True.  So it seems the config is still an issue.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(13:36:22)</span> <b>tannenba:</b></span> @rynge So when you say "we should just try one by hand", does that mean _you_ will try it by hand to see if you can reproduce the issue?  Just want to be sure we aren't waiting on each other. Thanks<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:37:02)</span> <b>rynge:</b></span> I can, but it will not be until next week sometime<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:41:56)</span> <b>rynge:</b></span> I will look at the config issue first<br/>
+<span style="color: #de5f24"><span style="font-size: small">(13:42:20)</span> <b>tannenba:</b></span> Sounds good, thanks<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:24:48)</span> <b>rynge:</b></span> @zmiller @tannenba @dweitzel Zach was right - the config was messed up and CREDD_OAUTH_MODE was not set correctly. 8.8.1 glideins are now working on ITB. Derek - let me know if you need anything for testing your stuff.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:25:30)</span> <b>dweitzel:</b></span> Ok. I’ll begin running tests. <br/>
+</body>
+</html>

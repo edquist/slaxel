@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Aug 19, 2021 : #operations (osg)</title>
+</head>
+<body>
+<h3>Thu Aug 19, 2021 : #operations (osg)</h3>
+<span style="color: #53b759"><span style="font-size: small">(15:50:56)</span> <b>marian:</b></span> do OSG provide certificates that would match in DN of host on domain <tt>.<a href="http://osg.chtc.io">osg.chtc.io</a></tt>? and IGTF compliant? @blin?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:53:07)</span> <b>bbockelm:</b></span> IGTF, no.  Let's Encrypt, yes.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:53:43)</span> <b>bbockelm:</b></span> For visible external services, I'd strongly recommend getting a *.<a href="http://opensciencegrid.org">opensciencegrid.org</a> DNS entry; <a href="http://chtc.io">chtc.io</a> is really meant for internal-facing stuff.<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:22:33)</span> <b>marian:</b></span> would it then makes sense start introducing DNS alias for service like <a href="http://htcondor-cm-igwn.osg.chtc.io">htcondor-cm-igwn.osg.chtc.io</a> to public? E.g. use instead <a href="http://collector-igwn.opensciencegrid.org">collector-igwn.opensciencegrid.org</a> and also matching IGTF certificate for it?<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:26:06)</span> <b>marian:</b></span> don't want to create complexity, but thing is that not matching certificates for service like this we're forcing schedd admins add <tt>GSI_SKIP_HOST_CHECK_CERT_REGEX = true</tt> in their configuration? otherwise we're introducing the errors like this:<br/><pre>08/19/21 11:28:13 SECMAN: required authentication with collector<br/><a href="http://htcondor-cm-igwn.osg.chtc.io">htcondor-cm-igwn.osg.chtc.io</a> failed, so aborting command UPDATE_SCHEDD_AD.<br/>08/19/21 11:28:13 ERROR: AUTHENTICATE:1003:Failed to authenticate with any<br/>method|AUTHENTICATE:1004:Failed to authenticate using GSI|GSI:5008:We are<br/>trying to connect to a daemon with certificate DN<br/>(/DC=org/DC=incommon/C=US/ST=California/L=La Jolla/O=University of<br/>California, San Diego/OU=UCSD/CN=<a href="http://osg-ligo-1.t2.ucsd.edu">osg-ligo-1.t2.ucsd.edu</a>), but the host name<br/>in the certificate does not match any DNS name associated with the host to<br/>which we are connecting (host name is '<a href="http://tigerreserve0010.chtc.wisc.edu">tigerreserve0010.chtc.wisc.edu</a>', IP<br/>is '128.104.103.125', Condor connection address is '&lt;128.104.103.125:9618&gt;').</pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:26:38)</span> <b>bbockelm:</b></span> Yes - I'd suggest adding a CNAME.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:26:50)</span> <b>bbockelm:</b></span> (and then getting an IGTF certificate)<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:27:46)</span> <b>marian:</b></span> and, I had already NIKHEF asking as 'security concern' why hostname publicly visible should be different than in the DN involved in the certificate for authentication ... another words, they are hesitant put workaround like <tt>GSI_SKIP_HOST_CHECK_CERT_REGEX = true</tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(16:28:07)</span> <b>marian:</b></span> ok, sounds good, thanks @bbockelm<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:29:33)</span> <b>marian:</b></span> while they will add it, there is certainly good point about it, hence suggestion for alias, or CNAME as you said<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:31:30)</span> <b>bbockelm:</b></span> I don't think <tt>GSI_SKIP_HOST_CHECK_CERT_REGEX = true</tt> should ever be recommended... if there's not a good DN available (which you can make available easily), you can always switch to IDTOKENS.<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:32:31)</span> <b>marian:</b></span> well, avoid the error we did recommend it already ... then in retrospective I was thinking of it whether it's good or not ...<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:34:02)</span> <b>marian:</b></span> ok, we'll discuss also on tomorrow OSG Ops and message is we move on with getting CNAME and replacing with cert with <a href="http://opensciencegrid.org">opensciencegrid.org</a> domain<br/>
+</body>
+</html>

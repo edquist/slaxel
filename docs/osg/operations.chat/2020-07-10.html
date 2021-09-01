@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jul 10, 2020 : #operations (osg)</title>
+</head>
+<body>
+<h3>Fri Jul 10, 2020 : #operations (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(13:14:22)</span> <b>blin:</b></span> @efajardo do you have unclaimed running pilots anywhere in your factory monitoring dashboard?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:20:48)</span> <b>dweitzel:</b></span> Be careful about multi-core pilots as well.  Unclaimed running pilots may be 1 core, may be 8, may be 32 (in the case of Nebraska)<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:22:27)</span> <b>blin:</b></span> hrm, true<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:22:54)</span> <b>blin:</b></span> so where can i find total cores of unclaimed running pilots?<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:23:52)</span> <b>efajardo:</b></span> I think each VO knows that<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:24:47)</span> <b>blin:</b></span> so @rynge would know that for the OSG VO?<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:25:44)</span> <b>efajardo:</b></span> <a href="http://flock.opensciencegrid.org/vofrontend/monitor/frontendRRDGroupMatrix.html">http://flock.opensciencegrid.org/vofrontend/monitor/frontendRRDGroupMatrix.html</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(13:26:17)</span> <b>efajardo:</b></span> <a href="http://flock.opensciencegrid.org/vofrontend/monitor/frontendStatus.html?group=total&amp;factory=total&amp;infoGroup=Running&amp;elements=MatchCoreIdle,&amp;rra=0&amp;window_min=0&amp;window_max=0&amp;timezone=-7">http://flock.opensciencegrid.org/vofrontend/monitor/frontendStatus.html?group=total&amp;factory=total&amp;infoGroup=Running&amp;elements=MatchCoreIdle,&amp;rra=0&amp;window_min=0&amp;window_max=0&amp;timezone=-7</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(13:26:22)</span> <b>efajardo:</b></span> so right now around 4k<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:26:31)</span> <b>efajardo:</b></span> of unmatched cores<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:28:04)</span> <b>blin:</b></span> which groups would regular OSG users have access to?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:28:11)</span> <b>blin:</b></span> <tt>main</tt>?<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:29:41)</span> <b>efajardo:</b></span> yes<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:30:17)</span> <b>rynge:</b></span> Could be more than one, but yes<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:30:21)</span> <b>rynge:</b></span> main is the main group<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:31:55)</span> <b>rynge:</b></span> It should be noted that gwms monitoring is a little bit off - for example, most of those unmatched are really retiring<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:32:28)</span> <b>blin:</b></span> ok, i think this gets me close enough<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:32:31)</span> <b>blin:</b></span> thanks!<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:32:46)</span> <b>rynge:</b></span> What are you trying to find?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:33:39)</span> <b>blin:</b></span> just a rough estimate of #s of total and idle cores available to your average OSG user<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:34:08)</span> <b>rynge:</b></span> The idle there is not available to the user<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:35:01)</span> <b>blin:</b></span> what would be a good estimate for number of idle cores, then?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:35:25)</span> <b>rynge:</b></span> It is basically 0. We have enough idle jobs that we never have idle cores<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:35:48)</span> <b>rynge:</b></span> Unless 1) the core is marked for retirement, or 2) we have run out of other consumables like memory<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:35:59)</span> <b>blin:</b></span> ah i see<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:36:35)</span> <b>blin:</b></span> so how long are these jobs waiting in queue? do pilots free up frequently enough for it to not matter or does the factory just submit more pilots?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:37:28)</span> <b>rynge:</b></span> I don't have averages, but with as many slots as we have, most users have O(500) jobs running<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:38:00)</span> <b>blin:</b></span> i'm trying to convey in a user school talk that "osg has a lot of cores and if you don't have enough local capacity, you can get up and running quickly!"<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:38:10)</span> <b>rynge:</b></span> Pilots are coming in at a good rate, and for the main group we always have pressure on the sites<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:38:29)</span> <b>rynge:</b></span> Right! Well, fair-share is important to mention in that context<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:38:43)</span> <b>rynge:</b></span> If you haven't run for a while and come, and start a new run<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:38:52)</span> <b>rynge:</b></span> It will give you resources fast due to fair-share<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:39:36)</span> <b>rynge:</b></span> Once you have run for a little bit, it will settle down and you will get the current O(500)-O(1000) cores<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:39:52)</span> <b>rynge:</b></span> That number changes all the time<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:40:10)</span> <b>rynge:</b></span> But I like to give the 500 just to set expectations<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:40:18)</span> <b>blin:</b></span> rough ballparks are fine for my purposes<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:40:27)</span> <b>blin:</b></span> thanks!<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:22:26)</span> <b>paschos:</b></span> jobs from SPT that land on CRUSH-OSG-C7-10-5-186-21 report issues with gfal-copy as follows:<br/><tt>gfal-copy error: 70 (Communication error on send) - globus_ftp_client: GLOBUS_FTP_CLIENT_IDLE not allowed here</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(15:22:39)</span> <b>paschos:</b></span> not sure which site (geographically) CRUSH-OSG-C7 corresponds to<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(15:40:08)</span> <b>cat:</b></span> Could that be Orange Crush at Syracuse?<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(15:40:34)</span> <b>cat:</b></span> Oh, that’s OrangeGrid.<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(15:40:55)</span> <b>cat:</b></span> Getting confused with their lacrosse team… :grin:<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:41:15)</span> <b>blin:</b></span> i think technicaly we're not running on OrangeGrid anymore but yeah that's syracuse<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:42:34)</span> <b>blin:</b></span> @paschos are jobs running ok on other CRUSH hosts?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:51:08)</span> <b>rynge:</b></span> We run a lot of jobs at Syracuse, but their networking has always been a less than perfect<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:11:45)</span> <b>paschos:</b></span> @blin yes if they exclude that site, they run fine<br/>
+</body>
+</html>

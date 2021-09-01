@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Apr 3, 2019 : #syr-prp (osg)</title>
+</head>
+<body>
+<h3>Wed Apr 3, 2019 : #syr-prp (osg)</h3>
+<span style="color: #8f4a2b"><span style="font-size: small">(13:51:04)</span> <b>dabrown:</b></span> set the channel description: Discussion of Syracuse testing PRP<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(13:51:29)</span> <b>dabrown:</b></span> @dfinstad I think we need to create slimmer docker image to use PyCBC Inference on the PRP.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(13:52:06)</span> <b>dabrown:</b></span> Our current image is based on the PyCBC interactive Docker image, which contains a bunch of stuff that we don't need.<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:52:22)</span> <b>isfiligoi:</b></span> FYI: This is what I was using so far in PRP for “generic users”:<br/><a href="https://github.com/sfiligoi/prp-osg-pool/blob/master/wn/Dockerfile.wn-cpu">https://github.com/sfiligoi/prp-osg-pool/blob/master/wn/Dockerfile.wn-cpu</a><br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(13:53:29)</span> <b>dabrown:</b></span> Great. I'll set up an so you can <tt>FROM</tt> our image rather than <tt>centos:centos7</tt><br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(14:49:52)</span> <b>dabrown:</b></span> @dfinstad I'm starting to put together a minimal image here <a href="https://github.com/sugwg/prp">https://github.com/sugwg/prp</a><br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(14:50:04)</span> <b>dabrown:</b></span> I'll let you know when it's tested and you can layer your stuff on top.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:51:01)</span> <b>dfinstad:</b></span> great, thanks!<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:28:46)</span> <b>isfiligoi:</b></span> @dabrown I see you are manually installing  stashcp.<br/>Any reason not to get it from the OSG repo?<br/>[root@osg-wn-cpu-prio-55c444dddd-xljkj /]# rpm -qf /bin/stashcp<br/>stashcache-client-5.2.0-1.osg34.el7.noarch<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:38:22)</span> <b>isfiligoi:</b></span> BTW: Unless there is a good reason to have  it in your image, t is part of the “grid stack” and it will be pulled in as part of my additions<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(19:05:21)</span> <b>dabrown:</b></span> @isfiligoi for some experiments with Brian and Derek I'd been patching the source, but for this image the OSG install is fine so I'll just assume that your layers pull it in.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(21:05:42)</span> <b>dabrown:</b></span> @dfinstad OK, the Dockerfile at <a href="https://github.com/sugwg/prp/blob/master/Dockerfile">https://github.com/sugwg/prp/blob/master/Dockerfile</a> should be ready for you to modify.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(21:06:39)</span> <b>dabrown:</b></span> This installs a the minimal software needed to get PyCBC working and the installs the latest tag of PyCBC.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(21:07:13)</span> <b>dabrown:</b></span> You can set up your own Docker image that inherits from this and customizes it however you want.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(21:08:46)</span> <b>dabrown:</b></span> This image is pushed to the sugwg repo so you'll want something like<br/><pre><br/>FROM sugwg/prp:latest<br/><br/># Uninstall the release version from the image<br/>RUN pip uninstall pycbc<br/><br/>RUN command to install your pycbc<br/>RUN commands that make any <br/></pre><br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(21:09:05)</span> <b>dabrown:</b></span> You can create a <tt>Dockerfile.dfinstad</tt> file in the prp repo and build that.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(21:09:18)</span> <b>dabrown:</b></span> There are a couple of difference between the PyCBC docker image and this one:<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(21:14:15)</span> <b>dabrown:</b></span> This image installs the software as root, so the code is in <tt>/usr</tt>, e.g.<br/><pre><br/>[root@fb22941c9a78 /]# which pycbc_inference<br/>/usr/bin/pycbc_inference<br/></pre><br/>and there is no virtualenv <tt>bin/activate</tt><br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(21:15:09)</span> <b>dabrown:</b></span> Igor will make sure CVMFS is installed, so you can assume that jobs will have access to <tt><a href="http://gwosc.osgstorage.org">gwosc.osgstorage.org</a></tt>, <tt>stash.osgstorage,org</tt>, and <tt><a href="http://oasis.opensciencegrid.org">oasis.opensciencegrid.org</a></tt> under <tt>/cvmfs</tt><br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(21:15:59)</span> <b>dabrown:</b></span> Once you have customized your image, you can push to <tt>sugwg/dfinstad:prp</tt> on dockerhub and Igor can pull from that.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(21:28:12)</span> <b>dabrown:</b></span> I added the necessary environment to make sure MKL and the ROM data is set up.<br/>
+</body>
+</html>

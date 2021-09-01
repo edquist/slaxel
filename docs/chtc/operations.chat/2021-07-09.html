@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jul 9, 2021 : #operations (chtc)</title>
+</head>
+<body>
+<h3>Fri Jul 9, 2021 : #operations (chtc)</h3>
+<span style="color: #9f69e7"><span style="font-size: small">(09:15:00)</span> <b>lmichael:</b></span> @tjslauson @eturatsinze @kcramer any word on power-related issues from yesterday?<br/>
+<blockquote>
+<span style="color: #4bbe2e"><span style="font-size: small">(09:16:05)</span> <b>tjslauson:</b></span> no news is good news :slightly_smiling_face:<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(09:16:55)</span> <b>tjslauson:</b></span> from CHTC's perspective, we had a few nonessential servers in CS go down and that was about it<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(09:18:00)</span> <b>tjslauson:</b></span> if there were more significant issues, you would have seen an update from us yesterday<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(16:34:19)</span> <b>lmichael:</b></span> yay!<br/>
+</blockquote>
+<span style="color: #684b6c"><span style="font-size: small">(09:30:43)</span> <b>bbockelman:</b></span> Does anyone know if there's a way to do pubkey auth to <a href="http://moria.cs.wisc.edu">moria.cs.wisc.edu</a> ?<br/>
+<span style="color: #684b6c"><span style="font-size: small">(15:44:09)</span> <b>bbockelman:</b></span> So, during meetings today, I've been tinkering with supercharging my SSH setup.  A few notes:<br/>1. Setup a ProxyJump in your SSH config so you can easily bounce between hosts without having to do double-nested logins (you don't create a shell session on Moria, just does enough to forward TCP).<br/>2. Setup ControlMaster and set it to cache for an hour.  That way you can launch fresh SSH sessions to the remote host without having to log in.<br/>3. Move your GPG and SSH private key onto your Yubikey -- or better, generate them on Yubikey.  You only have to type in your PIN to unlock the key once.  I still have my Yubikey set to require a physical touch for every signing operation (otherwise an attacker on the remote host can use your SSH key to burrow in the network for as long as you're connected to that remote host).<br/>4. You can forward the GPG and SSH Unix sockets over SSH to the remote host (this is what makes the jump host nice).  This allows you to do code signing and SSH connections on remote hosts without your private key ever traveling abroad.  @tim - I'd highly recommend this for code signing.  Very easy.<br/>In the end, because I'm a paranoid, I still have a single touch per login -- but no passwords to copy and no waiting for Duo.<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:46:28)</span> <b>gthain:</b></span> Last time I looked at this, ssh public key access to csl machines would not grant you a krb ticket, so you couldn't get to AFS, which was a headache<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:46:51)</span> <b>edquist:</b></span> so,<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:46:57)</span> <b>edquist:</b></span> regarding these two comments<br/>
+<span style="color: #684b6c"><span style="font-size: small">(15:47:25)</span> <b>bbockelman:</b></span> &gt;  ssh public key access to csl machines would not grant you a krb ticket<br/>Even worse than that, CSL needs a krb ticket to read your authorized_keys... can't jump through moria without a password :disappointed: .<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:47:25)</span> <b>edquist:</b></span> right, ProxyJump through moria won't get you a kerberos token<br/>
+<span style="color: #684b6c"><span style="font-size: small">(15:48:12)</span> <b>bbockelman:</b></span> (I have little need for a krb5 token... can't recall last time I used AFS)<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:48:13)</span> <b>edquist:</b></span> but if you do a proper shell login to, say, moria, then you can ssh from there to other csl hosts using that token, including afs<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:50:01)</span> <b>edquist:</b></span> &gt;can't recall last time I used AFS<br/><br/>to read your .ssh/authorized_keys file maybe?<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:51:46)</span> <b>edquist:</b></span> &gt;Setup ControlMaster and set it to cache for an hour<br/><br/>my fave is actually to explicitly connect a control master in the background with <tt>ssh -MNf</tt><br/>
+<span style="color: #16569E"><span style="font-size: small">(15:52:07)</span> <b>edquist:</b></span> and then take it down explicitly with <tt>ssh -O exit</tt><br/>
+<span style="color: #16569E"><span style="font-size: small">(15:52:23)</span> <b>edquist:</b></span> leave it in the background for the day (or until my ip resets)<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:53:55)</span> <b>edquist:</b></span> but the biggest secret of all is you can run kinit on your home computer<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:54:09)</span> <b>edquist:</b></span> and then.......<br/><br/><pre><br/>Host kmoria<br/>  GSSAPIAuthentication yes<br/>  GSSAPIDelegateCredentials yes<br/></pre><br/>
+<span style="color: #16569E"><span style="font-size: small">(15:56:10)</span> <b>edquist:</b></span> (speaking of which, i don't know what's better, a supercharger or a twin turbo...)<br/>
+<span style="color: #684b6c"><span style="font-size: small">(16:02:33)</span> <b>bbockelman:</b></span> for the <tt>kinit</tt> - what's the actual controller?  <tt><a href="mailto:username@CS.WISC.EDU">username@CS.WISC.EDU</a></tt>?<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:02:51)</span> <b>gthain:</b></span> Why not both -- twin charging<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:02:57)</span> <b>edquist:</b></span> oh dear<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:03:14)</span> <b>edquist:</b></span> &gt;for the <tt>kinit</tt> ...<br/><br/>yes but don't tell mom please<br/>
+<span style="color: #684b6c"><span style="font-size: small">(16:04:04)</span> <b>bbockelman:</b></span> Ok, so now I'm truly down to "one Yubikey press to rule them all!"<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:08:04)</span> <b>edquist:</b></span> anyway yes kinit will get you csl access including afs<br/>
+<span style="color: #684b6c"><span style="font-size: small">(16:20:16)</span> <b>bbockelman:</b></span> That said, I've hit a record high of "accidentally pressing Yubikey and sending someone a text consisting of ccccccnkkilkgunjiiurijhcrdffrinfchruvfjuhidd<br/>
+<span style="color: #684b6c"><span style="font-size: small">(16:23:36)</span> <b>bbockelman:</b></span> (oh - another advantage of <tt>ProxyJump</tt> is <tt>moria</tt> has no ability to MITM your connection to CHTC)<br/>
+</body>
+</html>

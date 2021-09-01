@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Aug 12, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Aug 12, 2020 : #software (osg)</h3>
+<span style="color: #7d414c"><span style="font-size: small">(12:52:12)</span> <b>bockjoo:</b></span> @blin I set the spooldir :<br/>
+<span style="color: #7d414c"><span style="font-size: small">(12:52:15)</span> <b>bockjoo:</b></span> [root@cms ~]# condor_ce_config_val -dump | grep ^SPOOL | cut -d= -f2-<br/> /var/lib/condor-ce/cms/spool<br/>
+<span style="color: #7d414c"><span style="font-size: small">(12:52:36)</span> <b>bockjoo:</b></span> But systemctl status condor-ce.service -l shows different spool:<br/>
+<span style="color: #7d414c"><span style="font-size: small">(12:52:50)</span> <b>bockjoo:</b></span> Aug 12 13:51:39 cms.ufhpc condor_ce_startup[22381]: ERROR: The following directories are not owned by the condor user/group:<br/>Aug 12 13:51:39 cms.ufhpc condor_ce_startup[22381]: /var/lib/condor-ce/spool (UNKNOWN:UNKNOWN)<br/>Aug 12 13:51:39 cms.ufhpc condor_ce_startup[22381]: /var/lib/condor-ce/execute (UNKNOWN:UNKNOWN)<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:54:04)</span> <b>blin:</b></span> ah, those are hardcoded in the CE startup script<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:54:09)</span> <b>blin:</b></span> <pre>required_dirs="/var/run/condor-ce /var/log/condor-ce /var/log/condor-ce/user /var/lib/condor-ce /var/lib/condor-ce/spool</pre><br/>
+<span style="color: #7d414c"><span style="font-size: small">(12:55:11)</span> <b>bockjoo:</b></span> 3 CEs share the spool, I need to use the SPOOL that I specify. How can I fix that?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(12:55:59)</span> <b>bockjoo:</b></span> Is there any other way to fix this without touching the condor_ce_startup script?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:56:06)</span> <b>blin:</b></span> for now, i would modify <tt>/usr/share/condor-ce/condor_ce_startup</tt><br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:56:11)</span> <b>andrew.melo:</b></span> Don't you want a different spool per-CE?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:56:46)</span> <b>blin:</b></span> i think that's what bockjoo's trying to do<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:57:15)</span> <b>andrew.melo:</b></span> I set SPOOL to <tt>/mnt/ce-spool/$(hostname -s)</tt><br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:57:28)</span> <b>andrew.melo:</b></span> OH wait<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:57:29)</span> <b>andrew.melo:</b></span> sorry<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:57:34)</span> <b>andrew.melo:</b></span> I cant read apparently<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:58:09)</span> <b>blin:</b></span> @bockjoo could you open a github issue here? <a href="https://github.com/htcondor/htcondor-ce">https://github.com/htcondor/htcondor-ce</a><br/>
+<span style="color: #7d414c"><span style="font-size: small">(12:59:02)</span> <b>bockjoo:</b></span> Will do that.<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:59:12)</span> <b>blin:</b></span> thanks<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:00:26)</span> <b>andrew.melo:</b></span> Brian -- any other news on the issue @ vanderbilt?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:00:52)</span> <b>blin:</b></span> did the factory respond? i thought i added myself to the notify list but i may have messed that up<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:01:59)</span> <b>andrew.melo:</b></span> not yet<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:02:52)</span> <b>blin:</b></span> i think it's in their court atm, the factory's killing the pilots for whatever reason<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:03:49)</span> <b>bockjoo:</b></span> Do you know what causes this?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:03:52)</span> <b>bockjoo:</b></span> Aug 12 14:02:04 cms.ufhpc htcondor-ce[24973]: lcmaps: verify_log: Warning: No proxy certificate in certificate stack to check.<br/>Aug 12 14:02:04 cms.ufhpc htcondor-ce[24973]: Warning: failed mapping. LCMAPS returned: 1<br/>Aug 12 14:02:04 cms.ufhpc htcondor-ce[24973]: Execution of LCMAPS failed.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:04:42)</span> <b>blin:</b></span> maybe a submitted job without a proxy?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:05:04)</span> <b>blin:</b></span> increasing the debug level may tell you more <a href="https://opensciencegrid.org/docs/security/lcmaps-voms-authentication/#htcondor-ce-hosts">https://opensciencegrid.org/docs/security/lcmaps-voms-authentication/#htcondor-ce-hosts</a><br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:32:07)</span> <b>bockjoo:</b></span> I submitted a job to a newly installed CE but the job does not appear. CollectorLog shows this:<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:32:09)</span> <b>bockjoo:</b></span> 08/12/20 14:30:36 ERROR: SECMAN:2007:Failed to end classad message.<br/>08/12/20 14:30:36 Failed to send update to collector cms.ufhpc:9619.<br/>08/12/20 14:30:36 Unable to send UPDATE_COLLECTOR_AD to all configured collectors<br/>08/12/20 14:30:36 condor_write(): Socket closed when trying to write 283 bytes to &lt;172.16.200.183:28340&gt;, fd is 22<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:41:07)</span> <b>blin:</b></span> take a look at this section: <a href="https://opensciencegrid.org/docs/compute-element/troubleshoot-htcondor-ce/#htcondor-ce-troubleshooting-items">https://opensciencegrid.org/docs/compute-element/troubleshoot-htcondor-ce/#htcondor-ce-troubleshooting-items</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:41:32)</span> <b>blin:</b></span> the collector log could indicate issues with daemons failing to start properly<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:45:46)</span> <b>bockjoo:</b></span> condor_ce_reconfig<br/>ERROR<br/>SECMAN:2010:Received "DENIED" from server for user <a href="mailto:condor@daemon.htcondor.org">condor@daemon.htcondor.org</a> using method FS.<br/>Can't send Reconfig command to local master<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:46:01)</span> <b>bockjoo:</b></span> The master address is in /var/log/condor-ce/.master_address<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:46:31)</span> <b>bockjoo:</b></span> But it should be in /var/log/condor-ce/cms/.master_address or /var/log/condor-ce/cms/spool/.master_address<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:47:50)</span> <b>bockjoo:</b></span> Wrong ownership. My bad.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:48:03)</span> <b>blin:</b></span> wrong ownership on the dirs?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(15:19:59)</span> <b>bockjoo:</b></span> Is gratia user used by anything?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:21:15)</span> <b>blin:</b></span> yeah, the gratia probe<br/>
+<span style="color: #7d414c"><span style="font-size: small">(15:23:34)</span> <b>bockjoo:</b></span> But I don't see any file in gratia packages (so far) owned by gratia user<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:24:41)</span> <b>blin:</b></span> i could've sworn it created history files or something as the gratia user<br/>
+<span style="color: #7d414c"><span style="font-size: small">(15:41:24)</span> <b>bockjoo:</b></span> I see only /var/log/gratia is owned by gratia. The files in the directory are owned by root. Is this because of a different scheduler ( I have slurm ).<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:42:55)</span> <b>blin:</b></span> <b>@edquist</b> do you know off-hand where else the gratia user is actually used?<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:43:13)</span> <b>edquist:</b></span> ooh<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:44:07)</span> <b>edquist:</b></span> right so again i think by default gratia is run as root<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:44:31)</span> <b>edquist:</b></span> i think we have that user as a non-root option ?<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:44:51)</span> <b>edquist:</b></span> i'll take a quick peek here...<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:48:10)</span> <b>edquist:</b></span> yeah<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:48:18)</span> <b>edquist:</b></span> it's documented as the "gratia runtime user"<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:48:32)</span> <b>edquist:</b></span> though again it's normally run as root<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:50:56)</span> <b>edquist:</b></span> the gratia user and the permissions on the log dir were actually introduced by DrBrian<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:50:58)</span> <b>edquist:</b></span> <a href="https://github.com/opensciencegrid/gratia-probe/commit/208c4cc149bc39c05dc708aa047bbd1d7c19c05d#diff-0aa340f0f726de78d45b4d05127b28cfR334-R345">https://github.com/opensciencegrid/gratia-probe/commit/208c4cc149bc39c05dc708aa047bbd1d7c19c05d#diff-0aa340f0f726de78d45b4d05127b28cfR334-R345</a><br/>
+<span style="color: #16569E"><span style="font-size: small">(15:51:13)</span> <b>edquist:</b></span> anyway<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:51:23)</span> <b>edquist:</b></span> i think it's just there as a non-root user option<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:51:30)</span> <b>edquist:</b></span> as far as i'm aware<br/>
+<span style="color: #7d414c"><span style="font-size: small">(15:52:10)</span> <b>bockjoo:</b></span> Thanks! I guess I can get rid of gratia user, one less user.<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:54:39)</span> <b>edquist:</b></span> sure<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:55:07)</span> <b>edquist:</b></span> you might wanna consider chowning the dir root:root<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:55:27)</span> <b>edquist:</b></span> since if you drop the gratia user, the old gratia uid will still own that dir<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:55:57)</span> <b>edquist:</b></span> and if that uid gets reclaimed by a new user, technically the new user will own the directory<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:59:43)</span> <b>blin:</b></span> won't package updates revert the dir ownership, though?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:03:46)</span> <b>bbockelm:</b></span> The commit message refers to GRATIA-33, which sadly no longer exists.<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:04:56)</span> <b>edquist:</b></span> ... our old jira used to redirect old tickets to their new ticket names when they were moved between projects<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:05:02)</span> <b>edquist:</b></span> (eg GRATIA -&gt; SOFTWARE)<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:05:06)</span> <b>edquist:</b></span> maybe not anymore<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:07:31)</span> <b>edquist:</b></span> it must be old though since the commit is from 2012<br/>
+<span style="color: #7d414c"><span style="font-size: small">(17:18:47)</span> <b>bockjoo:</b></span> service osg-ca-certs-updater-cron start<br/>
+<span style="color: #7d414c"><span style="font-size: small">(17:19:12)</span> <b>bockjoo:</b></span> Can this be added to the systemctl next time?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:22:27)</span> <b>blin:</b></span> what OS are you running on? i thought <tt>systemctl</tt> automatically attempted <tt>service</tt> commands if there wasn't a corresponding systemd unit<br/>
+<span style="color: #7d414c"><span style="font-size: small">(17:37:28)</span> <b>bockjoo:</b></span> Yes, it does. It was not listed in the systemctl list-units. Now it shows.<br/>
+</body>
+</html>

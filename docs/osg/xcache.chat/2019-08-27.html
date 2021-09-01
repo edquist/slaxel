@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Aug 27, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Tue Aug 27, 2019 : #xcache (osg)</h3>
+<span style="color: #53b759"><span style="font-size: small">(18:17:02)</span> <b>isfiligoi:</b></span> @bbockelm How do I pull a file from a specific stashcache?<br/>I should be able to just use curl, right?<br/>e.g. /cvmfs/gwosc.osgstorage.org/gwdata/O2/strain.16k/hdf.v1/H1/1186988032/H-H1_GWOSC_O2_16KHZ_R1-1187700736-4096.hdf5 from the Kansas location<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:18:10)</span> <b>matyas:</b></span> yeah or xrdcp<br/>
+<span style="color: #53b759"><span style="font-size: small">(18:18:25)</span> <b>isfiligoi:</b></span> what is the URL?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:18:34)</span> <b>bbockelm:</b></span> Yes - for those files you can take the CVMFS server URL and concatenation the name in the repo<br/>
+<span style="color: #53b759"><span style="font-size: small">(18:18:37)</span> <b>isfiligoi:</b></span> assuming I do not have cvmfs installed on my node<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:19:42)</span> <b>bbockelm:</b></span> The prefixes are also in GitHub<br/>
+<span style="color: #53b759"><span style="font-size: small">(18:19:50)</span> <b>isfiligoi:</b></span> where? :slightly_smiling_face:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:19:55)</span> <b>bbockelm:</b></span> (On my phone, can look in a bit)<br/>
+<span style="color: #53b759"><span style="font-size: small">(18:20:08)</span> <b>isfiligoi:</b></span> np, not urgent… but need some guidance<br/>
+<span style="color: #53b759"><span style="font-size: small">(18:20:42)</span> <b>isfiligoi:</b></span> if someone could provide me with a concrete URL to use for the above example, I would be grateful<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:23:00)</span> <b>bbockelm:</b></span> <a href="https://github.com/opensciencegrid/oasis-server/blob/master/goc/config-osg/etc/cvmfs/domain.d/osgstorage.org.conf">https://github.com/opensciencegrid/oasis-server/blob/master/goc/config-osg/etc/cvmfs/domain.d/osgstorage.org.conf</a> here's the config<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:23:01)</span> <b>matyas:</b></span> I don't know where to find out what stash directory is mounted at <a href="http://gwosc.osgstorage.org">gwosc.osgstorage.org</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:23:22)</span> <b>dweitzel:</b></span> It should be something like: <tt><a href="http://osg-kansas-city-stashcache.nrp.internet2.edu/gwdata/O2/strain.16k/hdf.v1/H1/1186988032/H-H1_GWOSC_O2_16KHZ_R1-1187700736-4096.hdf5">http://osg-kansas-city-stashcache.nrp.internet2.edu/gwdata/O2/strain.16k/hdf.v1/H1/1186988032/H-H1_GWOSC_O2_16KHZ_R1-1187700736-4096.hdf5</a></tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:23:30)</span> <b>dweitzel:</b></span> oh, forgot the port.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:23:32)</span> <b>dweitzel:</b></span> port 8000<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:23:33)</span> <b>bbockelm:</b></span> probably this line?  <a href="https://github.com/opensciencegrid/oasis-server/blob/master/goc/config-osg/etc/cvmfs/domain.d/osgstorage.org.conf#L7">https://github.com/opensciencegrid/oasis-server/blob/master/goc/config-osg/etc/cvmfs/domain.d/osgstorage.org.conf#L7</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:23:45)</span> <b>dweitzel:</b></span> <tt><a href="http://osg-kansas-city-stashcache.nrp.internet2.edu:8000/gwdata/O2/strain.16k/hdf.v1/H1/1186988032/H-H1_GWOSC_O2_16KHZ_R1-1187700736-4096.hdf5">http://osg-kansas-city-stashcache.nrp.internet2.edu:8000/gwdata/O2/strain.16k/hdf.v1/H1/1186988032/H-H1_GWOSC_O2_16KHZ_R1-1187700736-4096.hdf5</a></tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:24:23)</span> <b>dweitzel:</b></span> (works from my browser)<br/>
+<span style="color: #53b759"><span style="font-size: small">(18:24:43)</span> <b>isfiligoi:</b></span> yep, that worked, thanks!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:24:59)</span> <b>bbockelm:</b></span> <pre><br/>curl -L -v '<a href="http://osg-kansas-city-stashcache.nrp.internet2.edu:8000/gwdata/O2/strain.16k/hdf.v1/H1/1186988032/H-H1_GWOSC_O2_16KHZ_R1-1187700736-4096.hdf5">http://osg-kansas-city-stashcache.nrp.internet2.edu:8000/gwdata/O2/strain.16k/hdf.v1/H1/1186988032/H-H1_GWOSC_O2_16KHZ_R1-1187700736-4096.hdf5</a>' &gt; /dev/null<br/></pre><br/>Looks like it redirects to a separate instance on port 9001.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:25:45)</span> <b>bbockelm:</b></span> for 492MB of that file:<br/><pre><br/>real    0m1.041s<br/>user    0m0.077s<br/>sys     0m0.407s<br/></pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:26:17)</span> <b>bbockelm:</b></span> :wink: you're going to need a bigger test file<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:28:07)</span> <b>dweitzel:</b></span> Yup, those are the cmsd's.  Redirects between the KC one, and nebraska<br/>
+<span style="color: #53b759"><span style="font-size: small">(18:37:51)</span> <b>isfiligoi:</b></span> Found a perfect one :slightly_smiling_face:<br/>/cvmfs/stash.osgstorage.org/user/dweitzel/public/bigfile.txt<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:38:17)</span> <b>matyas:</b></span> nice<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:53:36)</span> <b>dweitzel:</b></span> That works.  I wonder how big that file is.<br/>
+<span style="color: #53b759"><span style="font-size: small">(19:02:28)</span> <b>isfiligoi:</b></span> 10G<br/>
+<span style="color: #53b759"><span style="font-size: small">(19:02:41)</span> <b>isfiligoi:</b></span> exactly what I needed<br/>
+<span style="color: #53b759"><span style="font-size: small">(19:03:48)</span> <b>isfiligoi:</b></span> BTW: aria2 fails to download the file<br/>are partial downloads not supported?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(19:34:32)</span> <b>dweitzel:</b></span> should be able to do partial downloads.  Like byte ranges<br/>
+</body>
+</html>

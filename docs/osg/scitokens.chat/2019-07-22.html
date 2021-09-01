@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jul 22, 2019 : #scitokens (osg)</title>
+</head>
+<body>
+<h3>Mon Jul 22, 2019 : #scitokens (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(09:55:11)</span> <b>dweitzel:</b></span> @jpatton we're seeing instability in the credmon on osgconnect, and I would like to debug it.  Though, it's difficult to reproduce.  Seems to happen when there is filesystem instability.  For example, the last case, the credmon was "stuck" somewhere.  It's not clear to me where.  "kill" signal did nothing.  I have the output of <tt>lsof</tt>, and strace says it was waiting on a <tt>futex</tt> (never very useful)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:59:26)</span> <b>dweitzel:</b></span> one thing that might help is if the condor_master can detect a "stuck" credmon, and restart it.  Isn't there a protocol that can be implemented for the master / credmon to communicate?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:31:53)</span> <b>rynge:</b></span> @dweitzel The problem is that the daemon doesn't really die - I don't know how the master would know that something is wrong<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:04:28)</span> <b>dweitzel:</b></span> Other condor daemons have communication between the master and the daemon. If the master doesn’t get a message in X minutes, it assumes the process is stuck and restarts it. <br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:50:22)</span> <b>rynge:</b></span> Well, if credmon can tell by itself it is a bad state, we should be able to do better logging on why that is<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:21:32)</span> <b>dweitzel:</b></span> right, the point is if the credmon is stuck and can't send a "alive" message to the master, then the master can restart it.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:34:30)</span> <b>rynge:</b></span> My point is that when we looked at CredMon logs, it was not stuck<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:34:57)</span> <b>rynge:</b></span> It was still processing things, albeit in a broken way<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:35:29)</span> <b>rynge:</b></span> So, lets say you stick the "alive" message in the main loop, I think that would still be sent<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:58:38)</span> <b>dweitzel:</b></span> possibly in some cases.  But not in the issue today.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:58:43)</span> <b>dweitzel:</b></span> the log wasn't touched in a few days.<br/>
+</body>
+</html>

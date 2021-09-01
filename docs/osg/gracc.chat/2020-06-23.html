@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jun 23, 2020 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Tue Jun 23, 2020 : #gracc (osg)</h3>
+<span style="color: #16569E"><span style="font-size: small">(15:28:49)</span> <b>edquist:</b></span> Hello gracc folks, anybody here know much about the 2020-06-15 change?<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:29:07)</span> <b>edquist:</b></span> in particular,<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:29:40)</span> <b>edquist:</b></span> if we were doing ES queries against <a href="https://gracc.opensciencegrid.org/q">https://gracc.opensciencegrid.org/q</a><br/>
+<span style="color: #16569E"><span style="font-size: small">(15:29:49)</span> <b>edquist:</b></span> do we need to update the query url or something?<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:30:30)</span> <b>edquist:</b></span> it appears something stopped working for me after the 15th<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:51:34)</span> <b>edquist:</b></span> (slightly more loudly) <b>@here</b>, anyone know if i need to use a new ES query URL for the June 15 change, where i was previously querying <a href="https://gracc.opensciencegrid.org/q">https://gracc.opensciencegrid.org/q</a> ?<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:51:47)</span> <b>edquist:</b></span> i am getting errors now<br/>
+<blockquote>
+<span style="color: #3c8c69"><span style="font-size: small">(15:54:09)</span> <b>kretzke:</b></span> what error are you getting? The endpoint looks ok to me<br/>
+</blockquote>
+<span style="color: #16569E"><span style="font-size: small">(15:56:16)</span> <b>edquist:</b></span> one sec lemme check<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:00:11)</span> <b>edquist:</b></span> i guess i need to run a query more manually to see, as the python traceback is maybe not so helpful<br/><br/><pre><br/>...<br/>    resp = s.execute()<br/>  File "/usr/lib/python2.7/site-packages/elasticsearch_dsl/search.py", line 579, in execute<br/>    **self._params<br/>  File "/usr/lib/python2.7/site-packages/elasticsearch/client/utils.py", line 69, in _wrapped<br/>    return func(*args, params=params, **kwargs)<br/>  File "/usr/lib/python2.7/site-packages/elasticsearch/client/__init__.py", line 548, in search<br/>    doc_type, '_search'), params=params, body=body)<br/>  File "/usr/lib/python2.7/site-packages/elasticsearch/transport.py", line 329, in perform_request<br/>    status, headers, data = connection.perform_request(method, url, params, body, ignore=ignore, timeout=timeout)<br/>  File "/usr/lib/python2.7/site-packages/elasticsearch/connection/http_urllib3.py", line 109, in perform_request<br/>    self._raise_error(response.status, raw_data)<br/>  File "/usr/lib/python2.7/site-packages/elasticsearch/connection/base.py", line 108, in _raise_error<br/>    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)<br/>elasticsearch.exceptions.TransportError<br/></pre><br/>
+<span style="color: #16569E"><span style="font-size: small">(16:09:38)</span> <b>edquist:</b></span> anyway apparently this started sometime on the 15th, so presumably it's related to the change<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:13:21)</span> <b>edquist:</b></span> ooh<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:13:28)</span> <b>edquist:</b></span> <pre><br/>TransportError(406, u'Content-Type header [] is not supported', {u'status': 406, u'error': u'Content-Type header [] is not supported'})<br/></pre><br/>
+<span style="color: #16569E"><span style="font-size: small">(16:13:31)</span> <b>edquist:</b></span> so<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:13:35)</span> <b>edquist:</b></span> maybe new ES<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:13:42)</span> <b>edquist:</b></span> that requires content type header<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:14:04)</span> <b>edquist:</b></span> which apparently old (?) elasticsearch-dsl library does not send?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:25:59)</span> <b>kretzke:</b></span> yeah try upgrading the library to 7.x<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:07:03)</span> <b>dweitzel:</b></span> Yes. The new Elasticsearch doesn’t work well with old libraries. The good and bad of a fast moving project. <br/>
+<span style="color: #16569E"><span style="font-size: small">(17:57:00)</span> <b>edquist:</b></span> thanks @kretzke and @dweitzel!  Would have been cool if the elasticsearch library took an optional headers argument or something, but i guess upgrading is probably the best route.  I'll make myself a ticket upgrade the version we carry in osg<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:03:08)</span> <b>dweitzel:</b></span> We carry a version of elastic search in OSG repos?<br/>
+<span style="color: #16569E"><span style="font-size: small">(19:06:34)</span> <b>edquist:</b></span> in the devops repo, yes (formerly goc-itb/-production).  for internal osg server use only<br/>
+</body>
+</html>

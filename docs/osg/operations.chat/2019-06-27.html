@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jun 27, 2019 : #operations (osg)</title>
+</head>
+<body>
+<h3>Thu Jun 27, 2019 : #operations (osg)</h3>
+<span style="color: #e23f99"><span style="font-size: small">(10:38:00)</span> <b>marco.mascheroni:</b></span> @blin any idea what this is and how to debug what is going on?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:38:14)</span> <b>marco.mascheroni:</b></span> <pre><br/>[root@hosted-ce29 ~]# condor_ce_q -held<br/><br/><br/>-- Schedd: <a href="http://hosted-ce29.grid.uchicago.edu">hosted-ce29.grid.uchicago.edu</a> : &lt;128.135.158.211:27684&gt; @ 06/27/19 10:37:36<br/> ID      OWNER          HELD_SINCE  HOLD_REASON<br/> 803.0   ligo            6/27 10:16 FT_GAHP at 127.0.0.1 failed to send file(s) to &lt;127.0.0.1:44112&gt;: error reading from /home/ligouser/bosco/sandbox/5689/56895a91/hosted-ce29.grid.uchicago.edu_9619_hosted-ce29.grid.uchicago.edu#805.0#1561646281/_condor_stdout: (errno 2) No such file or directory; GRIDMANAGER failed to receive file(s) from &lt;128.135.158.211:64486&gt;<br/> 804.0   ligo            6/27 10:16 FT_GAHP at 127.0.0.1 failed to send file(s) to &lt;127.0.0.1:44112&gt;: error reading from /home/ligouser/bosco/sandbox/d071/d071ed9b/hosted-ce29.grid.uchicago.edu_9619_hosted-ce29.grid.uchicago.edu#806.0#1561646281/_condor_stdout: (errno 2) No such file or directory; GRIDMANAGER failed to receive file(s) from &lt;128.135.158.211:64488&gt;<br/></pre><br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:38:31)</span> <b>marco.mascheroni:</b></span> @efajardo this is the QB2 CE<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:39:08)</span> <b>marco.mascheroni:</b></span> the error I psoted is form the hosted CE<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:39:39)</span> <b>marco.mascheroni:</b></span> If I log in on the submit node the file is there<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:39:41)</span> <b>blin:</b></span> can you manually write to the sandbox on the host?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:39:46)</span> <b>marco.mascheroni:</b></span> <pre><br/>[ligouser@qb8 ~]$ ls -altr /home/ligouser/bosco/sandbox/5689/56895a91/hosted-ce29.grid.uchicago.edu_9619_hosted-ce29.grid.uchicago.edu#805.0#1561646281/_condor_stdout<br/>-rw-r--r-- 1 ligouser lsuusers 22425 Jun 27 10:23 /home/ligouser/bosco/sandbox/5689/56895a91/hosted-ce29.grid.uchicago.edu_9619_hosted-ce29.grid.uchicago.edu#805.0#1561646281/_condor_stdout<br/></pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(10:41:04)</span> <b>efajardo:</b></span> hmm<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:41:11)</span> <b>efajardo:</b></span> I will take a look later today<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:42:21)</span> <b>marco.mascheroni:</b></span> you mean writing a file like here:<br/>/home/ligouser/bosco/sandbox/5689/56895a91/hosted-ce29.grid.uchicago.edu_9619_hosted-ce29.grid.uchicago.edu#805.0#1561646281/abc<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:42:24)</span> <b>marco.mascheroni:</b></span> I can<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:48:18)</span> <b>blin:</b></span> @dweitzel you may know the details regarding the ftgahp<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:48:56)</span> <b>blin:</b></span> does this error look like something occurring transferring files to the remote SSH host?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:49:12)</span> <b>blin:</b></span> @marco.mascheroni how many jobs are we running through this CE? are all jobs being held like this?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:50:50)</span> <b>marco.mascheroni:</b></span> yes seems all jobs went held<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:50:54)</span> <b>marco.mascheroni:</b></span> I can try to launch more<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:51:22)</span> <b>blin:</b></span> if that's the case, it strikes me as a remote FS issue or something<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:52:52)</span> <b>dweitzel:</b></span> Is it possible bosco is detecting the jobs as finished before they have started. And therefore the stdout file hasn’t been created yet?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:54:28)</span> <b>blin:</b></span> perhaps -- @marco.mascheroni what kind of batch system is this? if it's pbs/slurm are there issues with the qstat/sbatch cache?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:00:37)</span> <b>marco.mascheroni:</b></span> I'll check that Derek (will do it later, in a meeting now). Thanks for the suggestion.<br/>
+</body>
+</html>

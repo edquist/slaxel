@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Aug 1, 2019 : #rift-osg (osg)</title>
+</head>
+<body>
+<h3>Thu Aug 1, 2019 : #rift-osg (osg)</h3>
+<span style="color: #53b759"><span style="font-size: small">(16:48:06)</span> <b>isfiligoi:</b></span> @james.clark We seem to have solved the IceCube container problems…<br/>So we can switch to all singularity nodes in PRP<br/>What would be a good time for you?<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(16:56:55)</span> <b>james.clark:</b></span> Great news!  Jake is in the middle of a fairly large run right now (and i'm trying to fix the container to run successfully elsewhere).   I'll check but I think that run will be complete by tomorrow, if not later tonight.  So tomorrow afternoon should probably be ok<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:57:22)</span> <b>isfiligoi:</b></span> Fri afternoon? You are brave :stuck_out_tongue:<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:57:35)</span> <b>isfiligoi:</b></span> Can I add that I am leaving for vacation the day after :smile:<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(16:58:18)</span> <b>james.clark:</b></span> haha good point.  At your convenience, then :slightly_smiling_face: , once this current run has finished<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:58:44)</span> <b>isfiligoi:</b></span> I guess we are better off to just keep the current setup until I get back…<br/>would want at least 24h to monitor the status<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:00:16)</span> <b>isfiligoi:</b></span> no hurry to move to containers… apart from marking it as done<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(17:01:34)</span> <b>james.clark:</b></span> Sure.  I can suggest they hold off from submitting new jobs if it'd help?<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:02:03)</span> <b>isfiligoi:</b></span> no… if you have important work to do, I don’t want to stand in your way<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:02:17)</span> <b>isfiligoi:</b></span> and it is likley better to postpone anyway… 24h is not much :stuck_out_tongue:<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(17:04:00)</span> <b>james.clark:</b></span> actually, is it possible to provision a single singularity slot for my testing?  I guess we can stop the current non-singularity jobs landing there by adding <tt>HAS_SINGULARITY == FALSE</tt>, right?<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:16:47)</span> <b>isfiligoi:</b></span> I guess… @efajardo?<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:17:17)</span> <b>efajardo:</b></span> I am not sure<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:17:19)</span> <b>efajardo:</b></span> what do you mean<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:17:59)</span> <b>isfiligoi:</b></span> I would add a PRP node that has singularity (and only ligo glideins would run there)…<br/>how can user jobs prevent to start there?<br/>(all other nodes would be without singularity)<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:19:46)</span> <b>efajardo:</b></span> so basically you want a node where James jobs land but no one else<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:21:03)</span> <b>isfiligoi:</b></span> how can James steer jobs one way or the other<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:21:13)</span> <b>efajardo:</b></span> well that<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:21:15)</span> <b>efajardo:</b></span> is easy<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:21:33)</span> <b>efajardo:</b></span> he has to have <tt>+DESIRED_SITES="SDSC-PRP"</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(17:21:38)</span> <b>efajardo:</b></span> and have in Requirements<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(17:21:38)</span> <b>james.clark:</b></span> right - i'd like to test singularity jobs there but direct Jake's jobs to the old/current configuration<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:21:46)</span> <b>efajardo:</b></span> <tt>HAS_SINGULARITY=?=True</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(17:22:03)</span> <b>efajardo:</b></span> ahh<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:22:17)</span> <b>efajardo:</b></span> so we want to steer James and Jabo’s jobs<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:22:20)</span> <b>efajardo:</b></span> that is trickier<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:22:32)</span> <b>efajardo:</b></span> cause I cannot <tt>condor_qedit</tt> those jobs<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(17:22:49)</span> <b>james.clark:</b></span> yeah, so that's why i wondered if Jake could just tell his jobs to *not* want singularity<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:23:36)</span> <b>efajardo:</b></span> yes<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:23:41)</span> <b>efajardo:</b></span> that would be the easiest<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:24:12)</span> <b>efajardo:</b></span> I could create a dedicated FE group for James<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:24:30)</span> <b>isfiligoi:</b></span> too complicated.. it is a short term thing<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:25:53)</span> <b>isfiligoi:</b></span> I don’t mind (too much) if we waste one GPU for testing<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:26:31)</span> <b>isfiligoi:</b></span> the important thing is that Jake’s job don’t end there and fail<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(17:27:01)</span> <b>james.clark:</b></span> it's not so urgent that i can't wait - it was mostly just so i have a reference for a site where i know the container is ok.  but if jake can just do <tt>HAS_SINGULARITY==False</tt> then that's easy<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:27:54)</span> <b>efajardo:</b></span> no<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:28:03)</span> <b>efajardo:</b></span> just add to your jobs<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:28:40)</span> <b>isfiligoi:</b></span> we know ligo jobs as-is fail on the singularity-enabled nodes<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:29:00)</span> <b>isfiligoi:</b></span> so, we need to do something, if we were to add a test node<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:29:34)</span> <b>efajardo:</b></span> <tt>+is_itb=True</tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(17:29:46)</span> <b>isfiligoi:</b></span> I am not adding a new CE<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:29:56)</span> <b>efajardo:</b></span> no that is for Jame’s jobs<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:29:58)</span> <b>efajardo:</b></span> to add<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:30:34)</span> <b>isfiligoi:</b></span> how would that help to distinguish nodes with and without singularity on PRP???<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:31:05)</span> <b>isfiligoi:</b></span> That’s the problem; a mix of nodes on PRP, some with and some without singualrity<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:31:35)</span> <b>isfiligoi:</b></span> And a subset of jobs that fail if they match to jobs with singularity<br/>(probably because the default container is not good for ligo)<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:33:31)</span> <b>isfiligoi:</b></span> Basically, what James wants is to tag those jobs as “do not match to glideins that would use singularity)” …<br/>We are OK with keeping those Unclaimed<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:36:52)</span> <b>efajardo:</b></span> Let me think this more slowly<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:37:01)</span> <b>efajardo:</b></span> cause I cannot come from the top of my head how to do this<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:37:07)</span> <b>efajardo:</b></span> so I will list the constratins<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:37:51)</span> <b>efajardo:</b></span> well those jobs from James<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:38:00)</span> <b>efajardo:</b></span> will ask for some itb gpu pilots<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:38:16)</span> <b>efajardo:</b></span> Jacob’s jobs will never match those<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:38:22)</span> <b>efajardo:</b></span> so we are good<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:38:32)</span> <b>efajardo:</b></span> the problem is how are you going to distinguish<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:38:46)</span> <b>efajardo:</b></span> between itb and non itb gpu pilots<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:39:37)</span> <b>isfiligoi:</b></span> All I know is the username… and I have a single ligo user<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:40:59)</span> <b>efajardo:</b></span> I can put something special in the proxy if you want to go that route<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:41:01)</span> <b>isfiligoi:</b></span> @james.clark Do you have access to any other GPU site that has singularity?<br/>May be easier for you to just test there<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:41:36)</span> <b>isfiligoi:</b></span> In principle, there is nothing special about PRP’s singularity<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:42:22)</span> <b>efajardo:</b></span> @james.clark what about CIT<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:42:24)</span> <b>efajardo:</b></span> we can try<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:42:25)</span> <b>efajardo:</b></span> there<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:42:26)</span> <b>isfiligoi:</b></span> And we keep all nodes without singularity until I come back<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:42:34)</span> <b>efajardo:</b></span> it has singularity<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:42:35)</span> <b>efajardo:</b></span> and pilots<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:48:18)</span> <b>efajardo:</b></span> I have to go will be back in an hour<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:54:23)</span> <b>isfiligoi:</b></span> @james.clark Just checked in the IceCube pool using PRP resources:<br/>If you add ” (HAS_SINGULARITY=!=True)” to the job requirements, they will not match to glideins using singularity<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:54:53)</span> <b>isfiligoi:</b></span> If Jake can add that to his jobs, he will be safe<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(19:19:25)</span> <b>james.clark:</b></span> Hi <b>@channel</b>, sorry, i was traveling home.   Thank you both, we'll give things a try<br/>
+<span style="color: #53b759"><span style="font-size: small">(19:36:38)</span> <b>isfiligoi:</b></span> let me know if/when you want me to add the test node<br/>
+</body>
+</html>

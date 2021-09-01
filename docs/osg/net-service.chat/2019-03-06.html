@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Mar 6, 2019 : #net-service (osg)</title>
+</head>
+<body>
+<h3>Wed Mar 6, 2019 : #net-service (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(09:57:36)</span> <b>dweitzel:</b></span> The new rsv-perfsonar (now without RSV) seems to work.  The rates look good.  Specific hosts look great.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:57:54)</span> <b>dweitzel:</b></span> But, and I'm not sure why, it seems to run "slower".  As in, it's always behind an hour or so.<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:05:08)</span> <b>efajardo:</b></span> I was working on some IN2p3 LIGO inefficiencies<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:05:23)</span> <b>efajardo:</b></span> and I found that from IN2p3 to the “nearest” cache<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:05:31)</span> <b>efajardo:</b></span> in Amsterdam<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:05:37)</span> <b>efajardo:</b></span> the route is through New York<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:05:48)</span> <b>efajardo:</b></span> <pre>MSG: tracepath :  <a href="http://fiona.uvalight.net">fiona.uvalight.net</a><br/>MSG:  1?: [LOCALHOST]                                         pmtu 1500<br/>MSG:  1:  <a href="http://lyon-corea.in2p3.fr">lyon-corea.in2p3.fr</a>                                   4.569ms <br/>MSG:  1:  <a href="http://lyon-corea.in2p3.fr">lyon-corea.in2p3.fr</a>                                   0.455ms <br/>MSG:  2:  <a href="http://lyon-ext-inter.in2p3.fr">lyon-ext-inter.in2p3.fr</a>                               1.032ms <br/>MSG:  3:  no reply<br/>MSG:  4:  193.51.180.20                                         0.441ms <br/>MSG:  5:  <a href="http://renater.mx1.gen.ch.geant.net">renater.mx1.gen.ch.geant.net</a>                          2.645ms <br/>MSG:  6:  <a href="http://ae4.mx1.par.fr.geant.net">ae4.mx1.par.fr.geant.net</a>                             16.726ms asymm  5 <br/>MSG:  7:  <a href="http://et-3-1-0.102.rtsw.newy32aoa.net.internet2.edu">et-3-1-0.102.rtsw.newy32aoa.net.internet2.edu</a>        88.085ms asymm  6 <br/>MSG:  8:  <a href="http://v3-6-8.120.xsr03.amsterdam1a.surf.net">v3-6-8.120.xsr03.amsterdam1a.surf.net</a>                94.506ms</pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:34:42)</span> <b>bbockelm:</b></span> Hop 6 &amp; 7 is really bizarre!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:34:50)</span> <b>bbockelm:</b></span> @dweitzel - potential timezone issue?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:36:23)</span> <b>dweitzel:</b></span> Eh, the timestamps are in UTC, and it catches up periodically.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:36:53)</span> <b>dweitzel:</b></span> Looking through the logs, it takes almost an hour to query 1 node in netherlands *.nl<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:56:56)</span> <b>bbockelm:</b></span> ah - so it's really a blocking issue, not a catch up issue.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:59:30)</span> <b>dweitzel:</b></span> sure sounds like it.  I'm not sure why though.  I'll stare at it more.  It's not like it "sleeps" anywhere in the code.  Sure feels like it though<br/>
+</body>
+</html>

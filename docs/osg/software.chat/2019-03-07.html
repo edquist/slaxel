@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Mar 7, 2019 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu Mar 7, 2019 : #software (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(10:15:40)</span> <b>dweitzel:</b></span> Did anyone change the OSG dockerhub configuration lately?  Maybe to a bot user?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:17:02)</span> <b>blin:</b></span> yeah<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:17:23)</span> <b>blin:</b></span> i added a bot user for pushing xcache/frontier squid images<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:17:37)</span> <b>blin:</b></span> it's got its own bot team and currently has write permissions for the squid and xcache-related images<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:18:29)</span> <b>dweitzel:</b></span> The automated builds in docker hub are broke.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:18:47)</span> <b>blin:</b></span> which ones?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:18:49)</span> <b>dweitzel:</b></span> the osg-bot user can't see the opensciencegrid github org.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:19:04)</span> <b>dweitzel:</b></span> well, probably most if not all of them.  But specifically <a href="https://cloud.docker.com/u/opensciencegrid/repository/docker/opensciencegrid/gracc-request">https://cloud.docker.com/u/opensciencegrid/repository/docker/opensciencegrid/gracc-request</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:19:19)</span> <b>blin:</b></span> hrm, the osg-bot github user?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:19:35)</span> <b>blin:</b></span> because the bot user i'm using for dockerhub is osgsoftware<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:19:59)</span> <b>dweitzel:</b></span> <br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:20:08)</span> <b>dweitzel:</b></span> it's linked to the Github user "osg-bot"<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:20:40)</span> <b>dweitzel:</b></span> I don't think the github osg-bot user has the correct permissions in the organization.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:21:23)</span> <b>blin:</b></span> @matyas did you make any changes here?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:22:22)</span> <b>matyas:</b></span> i think it needs "admin" privs not just "write"<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:22:44)</span> <b>matyas:</b></span> i was adding them per-repo since i don't want it to have admin privs over the whole org<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:23:57)</span> <b>dweitzel:</b></span> I know most of the gracc stuff is auto-build.  And a bunch of @rynge's osg-vo docker images.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:24:52)</span> <b>blin:</b></span> what exactly did we change so that the repo was associated with osg-bot?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:25:28)</span> <b>dweitzel:</b></span> well, it's the Dockerhub osg organization is linked to the osg-bot Github user.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:28:07)</span> <b>blin:</b></span> oh, i see, so we changed a setting in docker hub<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:28:13)</span> <b>blin:</b></span> that's gross that it needs admin privs<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:28:20)</span> <b>blin:</b></span> (what account was used before?)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:28:30)</span> <b>dweitzel:</b></span> I think mine.<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:30:03)</span> <b>matyas:</b></span> yeah it used to be derek's<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:36:44)</span> <b>dweitzel:</b></span> ok, I had to make the osg-bot an "admin" collaborator on the repo.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:47:27)</span> <b>blin:</b></span> @matyas can you go through the autobuilt packages in dockerhub and make sure that osg-bot is added as an owner of their respective github repos?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:47:53)</span> <b>blin:</b></span> the ones i'm concerned about are osg-vo docker images, specifically<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:49:11)</span> <b>matyas:</b></span> sure<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:50:55)</span> <b>matyas:</b></span> ugh i can't get a list of autobuilds<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:51:08)</span> <b>matyas:</b></span> i have to click on each one<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:53:42)</span> <b>matyas:</b></span> @rynge, just to let you know, we changed the github user the docker autobuilds are associated with from derek to "osg-bot"<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:53:52)</span> <b>blin:</b></span> alright, just make a ticket to follow up on it and let's pay attention specifically to the osg-vo ones<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:54:07)</span> <b>matyas:</b></span> i'll do the osg-vo ones now<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:54:34)</span> <b>matyas:</b></span> so you'll have to manually add "osg-bot" as a collaborator, with "Admin" privs<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:06:29)</span> <b>matyas:</b></span> ...although I think it only needs admin to add a deploy key, so you might be able to give it admin, run one build, then drop its privs down to "Read"<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:06:49)</span> <b>dweitzel:</b></span> yeah, sounds right.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:08:38)</span> <b>matyas:</b></span> i'm not gonna click through two dozen repos (again) to do that right now<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:09:42)</span> <b>blin:</b></span> that's gross<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:12:17)</span> <b>dweitzel:</b></span> :slightly_smiling_face:<br/>
+</body>
+</html>

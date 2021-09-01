@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Feb 14, 2018 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Feb 14, 2018 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(15:54:27)</span> <b>blin:</b></span> @tmartin i saw your comment on the triage ticket (cc <b>@edquist</b>)<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(15:55:34)</span> <b>tmartin:</b></span> Was this the one regarding the voms file?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:55:35)</span> <b>blin:</b></span> i just want to check to make sure i understand what it is you need<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:55:36)</span> <b>blin:</b></span> yup<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(15:55:39)</span> <b>tmartin:</b></span> Ok<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(15:56:09)</span> <b>tmartin:</b></span> I have this situation, I want to map DN, and Extended Attribute to a username, not just DN or Attribute<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:56:19)</span> <b>blin:</b></span> so DN + role -&gt; cmswriter<br/>just the DN -&gt; some other user<br/>just the role -&gt; another user<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(15:56:28)</span> <b>tmartin:</b></span> yes<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(15:57:27)</span> <b>tmartin:</b></span> It does not come up much, but in this case I want to be able to pick that one user out of a list of users for that role<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:59:55)</span> <b>blin:</b></span> so i don't know much about phedex, what's the underlying technology?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:00:53)</span> <b>blin:</b></span> but from what i gathered from your comment, the people in question will interact with it in two different ways: 1) as the privileged cmswriter and 2) as a regular user to put their own data in their?<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(16:01:15)</span> <b>tmartin:</b></span> Yes<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(16:01:34)</span> <b>tmartin:</b></span> the thing about phedex is that there are say 20 users in that role, but only one can write at a site<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:01:38)</span> <b>blin:</b></span> and by it in my previous statement, i meant the same endpoint<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:02:19)</span> <b>blin:</b></span> i see, and at each site the person with write-access is different?<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(16:02:29)</span> <b>tmartin:</b></span> Yes as far as I know<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:03:10)</span> <b>blin:</b></span> ok because i was tempted to suggest a specific <tt>/cms/Role=phedexwriter</tt> attribute or something<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(16:03:30)</span> <b>tmartin:</b></span> No it is a top level thing<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:03:40)</span> <b>blin:</b></span> what do you mean by that?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:03:58)</span> <b>blin:</b></span> also we should probably include @bbockelm in this question as CMS tech guru<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:04:14)</span> <b>blin:</b></span> and how many phedex sites are there? i'm surprised that this hasn't come up earlier<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(16:04:44)</span> <b>tmartin:</b></span> It may be how we are setup. Each T2 and T1 are<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(16:05:36)</span> <b>tmartin:</b></span> You know, it might not matter<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:06:28)</span> <b>blin:</b></span> yea, i wonder how nebraska is doing phedex mapping in that case because they've been using lcmaps voms for ages now<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(16:07:38)</span> <b>tmartin:</b></span> They do have a fair amount of exceptions. We do too, but mostly because of how I control write access to storage. In 99% of the cases the move to lcmaps voms is actually very natural. All I am doing is treating each DN as a specific username that I manually change in the gums mapping database. This just takes Mysql out of the loop<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(16:08:58)</span> <b>tmartin:</b></span> More general question then, voms-mapfile is evaluated first right? So I will need to make sure that any group mappings I want to take priority (ie if they have different roles) go in there first, then all my custom stuff<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(16:10:24)</span> <b>tmartin:</b></span> However now that I think about it for the Condor side it would still be nice to be able to combine a DN + Role to a specific user :slightly_smiling_face:<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:11:33)</span> <b>blin:</b></span> actually looking at the default <tt>/etc/lcmaps.db</tt>, the grid-mapfile is evaluated first:<br/><pre><br/>authorize_only:<br/><br/>verifyproxynokey -&gt; banfile<br/>banfile -&gt; banvomsfile | bad<br/>banvomsfile -&gt; gridmapfile | bad<br/>gridmapfile -&gt; good | vomsmapfile<br/>vomsmapfile -&gt; good | defaultmapfile<br/>defaultmapfile -&gt; good | bad<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:11:42)</span> <b>blin:</b></span> @matyas in case i'm reading this wrong<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:12:15)</span> <b>matyas:</b></span> well, the ban files are evaluated first but yeah, after that the grid mapfile takes precedence<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(16:12:57)</span> <b>tmartin:</b></span> Well that is a bit backwards to my thinking, the gridmapfile is the most specific mapping. Should it not be general to specific?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:13:29)</span> <b>matyas:</b></span> that's how it is<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:13:36)</span> <b>matyas:</b></span> in this case, first one wins<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:13:54)</span> <b>matyas:</b></span> that's why I said "takes precedence" instead of "evaluated first"<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(16:15:00)</span> <b>tmartin:</b></span> Well that is going to be a problem, how do you map a specific user to a username, and allow them to also use the FQDN to be in a larger group?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:16:14)</span> <b>matyas:</b></span> can you give an example?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:16:17)</span> <b>blin:</b></span> what does "allowing them to be in a larger group" entail?<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(16:17:00)</span> <b>tmartin:</b></span> James letts goes to write in our hadoop with DN /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=jletts/CN=409293/CN=James Letts<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(16:17:13)</span> <b>tmartin:</b></span> I map him to user jletts<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(16:17:20)</span> <b>tmartin:</b></span> so I put that in the grid map file right?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:17:27)</span> <b>matyas:</b></span> sure<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(16:18:10)</span> <b>tmartin:</b></span> Ok but James also is a the cmswriter who uses the same DN, so when he comes in as <br/>/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=jletts/CN=409293/CN=James Letts  /cms/Role=cmsphedex <br/>What happens?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:18:54)</span> <b>matyas:</b></span> ah<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(16:18:56)</span> <b>tmartin:</b></span> Ya<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:20:20)</span> <b>matyas:</b></span> well, our thinking behind picking that ordering was that users _were_ the most specific<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:21:05)</span> <b>matyas:</b></span> so there's two ways I can think of to hack around that<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:21:13)</span> <b>blin:</b></span> so other users with <tt>/cms/Role=cmsphedex</tt> are allowed to just read phedex?<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(16:21:48)</span> <b>tmartin:</b></span> Actually they might be able to write. That does not change that when James is phedex I need him phedex, when he is james I need him james. :slightly_smiling_face:<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:21:49)</span> <b>matyas:</b></span> one is to reorder your lcmaps.db to evaluate voms-mapfile first and grid-mapfile second -- in which case if he has the fqan /cms/Role=cmsphedex he gets mapped to cmsphedex, and if he doesn't, he gets mapped to jletts<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(16:21:57)</span> <b>tmartin:</b></span> Yes<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:22:14)</span> <b>matyas:</b></span> two is to give him an fqan like "/cms/Role=jletts" when you want him to be jletts<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(16:22:46)</span> <b>tmartin:</b></span> You want the experiment to create a role for each user that is a replication of their username?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:23:03)</span> <b>matyas:</b></span> just throwing out ideas. the first one is probably more sustainable for an experiment of your size<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:23:47)</span> <b>blin:</b></span> personally, i think the right thing to do is have a specific role for whatever james' capabilities should be <tt>/cms/Role=cmsphedexwriter</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:24:28)</span> <b>blin:</b></span> because maybe it's not james that has these specific privs tomorrow, maybe it's someone else<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(16:24:29)</span> <b>tmartin:</b></span> That is if I need to restrict to just James, lets assume that I can allow all cmswriters to write here. At least I can let that happen if I reverse the two files<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(16:26:49)</span> <b>tmartin:</b></span> @blin The experiment does that, everyone with role of cmsphedex can write. I just mapped it to the username cmswriter<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:28:42)</span> <b>matyas:</b></span> can you use unix groups instead?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:28:57)</span> <b>blin:</b></span> ok i'm a little confused, i thought the requirements were something like this:<br/>james' DN + <tt>/cms/Role=cmsphedex</tt> -&gt; <tt>cmswriter</tt><br/>james' DN -&gt; <tt>jletts</tt><br/><tt>/cms/Role=cmsphedex</tt> -&gt; <tt>cmsphedex</tt><br/>
+<span style="color: #b14cbc"><span style="font-size: small">(16:30:08)</span> <b>tmartin:</b></span> james' DN + <tt>/cms/Role=cmsphedex</tt> -&gt; <tt>cmswriter</tt><br/>james' DN -&gt; <tt>jletts</tt><br/><tt>/cms/Role=cmsphedex</tt> -&gt; <tt>cmswriter</tt><br/>
+<span style="color: #b14cbc"><span style="font-size: small">(16:30:58)</span> <b>tmartin:</b></span> If I swap around the precedence of the map file and the voms file that should allow that if I understand correctly<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:31:10)</span> <b>matyas:</b></span> yeah<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:32:31)</span> <b>matyas:</b></span> so the code for that would be something like<br/>[...]<br/><pre><br/>banvomsfile -&gt; vomsmapfile | bad<br/>vomsmapfile -&gt; good | gridmapfile<br/>gridmapfile -&gt; good | defaultmapfile<br/>defaultmapfile -&gt; good | bad<br/></pre><br/>[...]<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:33:07)</span> <b>matyas:</b></span> and turn <tt>edit_lcmaps_db</tt> off in <tt>10-misc.ini</tt> so osg-configure doesn't overwrite your changes<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:36:29)</span> <b>matyas:</b></span> tbh to me it seems like this is what unix groups are useful for though<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(16:36:48)</span> <b>tmartin:</b></span> Hehe I would have a duel between puppet and osg-configure. :slightly_smiling_face: That is a good feature. :slightly_smiling_face:<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(16:37:19)</span> <b>tmartin:</b></span> Unix groups are terrible for storage. ACLs sure, but hadoop does not do that well<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(16:37:43)</span> <b>tmartin:</b></span> Group sticky bits are not to be trusted<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:38:10)</span> <b>matyas:</b></span> really? I'm curious, what happens?<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(16:45:41)</span> <b>tmartin:</b></span> I have found that group stick bits getting lost  every time I have let users loose with it, and hadoop has not had good support so we could not use it in the past<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(16:48:12)</span> <b>tmartin:</b></span> umask<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(16:48:23)</span> <b>tmartin:</b></span> that is what can mess up sticky bit tricks<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:50:06)</span> <b>matyas:</b></span> ah<br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:38:52)</span> <b>bbockelm:</b></span> @tmartin - where are we in the end?<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(20:39:35)</span> <b>tmartin:</b></span> We are setup for xrootd auth with lcmaps, and the xrootd system allows for https across all of the data transfer nodes<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(20:40:22)</span> <b>tmartin:</b></span> The other features need a patch so I am waiting on that. I was just moving forward with voms lcmap migration for gridftp and CE<br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:40:39)</span> <b>bbockelm:</b></span> code patch?  Or config files?<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(20:40:58)</span> <b>tmartin:</b></span> I thought there was a code patch for the third party transfer part<br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:41:19)</span> <b>bbockelm:</b></span> ah, ok.  I'll give you a heads-up once the third-party-transfer stuff is ready.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:41:24)</span> <b>bbockelm:</b></span> Maybe ... Friday?  Monday?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:41:40)</span> <b>bbockelm:</b></span> It'll be xrootd-hdfs-2.0.0-ish.<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(20:42:18)</span> <b>tmartin:</b></span> That sounds fine, I will keep working on the CE and Gridftp and getting rid of GUMS.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:42:59)</span> <b>bbockelm:</b></span> (on the upside, I successfully made a roast chicken, roasted vegetables, duck fat potatoes, suprême sauce, and apple strudel this afternoon...)<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(20:43:40)</span> <b>tmartin:</b></span> Yum, that sounds tasty!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:45:31)</span> <b>bbockelm:</b></span> (things I do with a day off...)<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(20:45:49)</span> <b>tmartin:</b></span> Well that is a good way to spend it for sure. :slightly_smiling_face:<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(20:46:10)</span> <b>tmartin:</b></span> Presumably that is not just all for you. :slightly_smiling_face:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:47:28)</span> <b>bbockelm:</b></span> well, the two year old ate it after appropriate bribery<br/>
+</body>
+</html>

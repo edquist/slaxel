@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jan 25, 2018 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu Jan 25, 2018 : #software (osg)</h3>
+<span style="color: #e06b56"><span style="font-size: small">(11:50:26)</span> <b>jthiltges:</b></span> <b>@edquist</b> Working on testing HDFS 2.6 from osg-upcoming-testing, ran into a dependency issue with avro-libs. It would be handy if avro-libs could be tagged into osg-upcoming-testing to match hadoop. Is there an existing ticket I should comment on?<br/><pre>Error: Package: hadoop-2.6.0+cdh5.12.1+2540-1.cdh5.12.1.p0.3.6.osgup.el7.x86_64 (osg-upcoming-testing)<br/>           Requires: avro-libs</pre><br/>
+<span style="color: #16569E"><span style="font-size: small">(12:04:14)</span> <b>edquist:</b></span> Ah, right! Good catch @jthiltges -- I forgot to request promoting that one to upcoming-testing, which we will do here very shortly.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:04:41)</span> <b>jthiltges:</b></span> Thank you!<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:06:39)</span> <b>edquist:</b></span> It's promoted now, so I suspect within an hour or so it should hit the rpm repo mirrors.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:07:45)</span> <b>jthiltges:</b></span> <b>@edquist</b> Any thoughts on having the hadoop.spec require java (and java-devel) 1.7 or later, rather than 1.7 only?<br/>We're thinking of a move to JDK 1.8 along with the upgrade, and noticed the dependency.<br/>(Neither the Cloudera nor Hortonworks RPMs seem to have a java requirement at all, for whatever that's worth.)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:52:30)</span> <b>bbockelm:</b></span> @jthiltges - I think we should be a bit further along than "thinking".  It needs to be done.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:52:52)</span> <b>bbockelm:</b></span> I think that particular version of HDFS might require 1.7 at _build_ time but most everyone uses 1.8 at runtime.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:55:11)</span> <b>jthiltges:</b></span> The JDK 1.8 move needs to be done?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:04:04)</span> <b>jthiltges:</b></span> CDH5 lists both 1.7 and 1.8 JDKs as supported, and it seemed pretty easy to swap. (install new one, restart services)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:04:23)</span> <b>bbockelm:</b></span> yeah, 1.7 is sinfully old.<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:53:56)</span> <b>edquist:</b></span> Arright, looks like the only packages with runtime deps locked at 1.7 are hadoop and zookeeper -- we can make them both <tt>&gt;= 1:1.7.0</tt><br/>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Aug 31, 2020 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Mon Aug 31, 2020 : #xcache (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(11:17:26)</span> <b>matyas:</b></span> xrootd got OOM-killed over the weekend on sc-cache. Is adding some swap a good idea or a bad idea?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(11:33:18)</span> <b>jthiltges:</b></span> My uneducated guess is that adding swap is a bad idea. It'll just make the failure more painful.<br/>Do you have memory usage history handy? A graph might show if it looks "leaky".<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:55:51)</span> <b>matyas:</b></span> Nah it's not leaky. This just happens when the cache gets hit really hard.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:59:01)</span> <b>matyas:</b></span> I think.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:59:32)</span> <b>matyas:</b></span> Note that this machine has only 8G. Our docs say that it's the minimum for a cache...<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:12:14)</span> <b>jthiltges:</b></span> Been a while since I'd looked at this, but I think each HTTP request in flight gets a 1MB buffer. And buffers should get reused by later requests. That's the only connection-related scaling thing that comes to mind.<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:17:10)</span> <b>matyas:</b></span> Does seem to be collaborated with load... both core files are from August 29.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:33:28)</span> <b>bbockelm:</b></span> Can you correlate it with # of threads?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:38:01)</span> <b>matyas:</b></span> I can correlate it with threads/procs created per second:<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:27:10)</span> <b>matyas:</b></span> woo, the journal says xrootd got oom-killed a _lot_ more often than I have core files for<br/>
+<blockquote>
+<span style="color: #a72f79"><span style="font-size: small">(13:29:23)</span> <b>andrew.melo:</b></span> (/me quietly grumbles about when a juicy crash happens, the journald log has always rotated and systemctl status shows nothing useful)<br/>
+</blockquote>
+<span style="color: #c386df"><span style="font-size: small">(13:29:16)</span> <b>matyas:</b></span> we're talking dozens between 8/26 and today<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:29:26)</span> <b>matyas:</b></span> Are we ready to say that 8 GB is not enough for the cache?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:33:35)</span> <b>matyas:</b></span> If you don't have 12, don't bother?<br/>
+</body>
+</html>

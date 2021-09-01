@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jun 29, 2021 : #batlab (chtc)</title>
+</head>
+<body>
+<h3>Tue Jun 29, 2021 : #batlab (chtc)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(10:15:01)</span> <b>johnkn:</b></span> the batlab docker build jobs are tagged IOHEAVY,  this seems wrong to me.  are we sure that's needed?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:15:17)</span> <b>johnkn:</b></span> was this an attempt to prevent them from causing test failures?<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(10:31:21)</span> <b>tim:</b></span> I think that it must have been an attempt to prevent test failures. I don't think that they should be marked IOHEAVY.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:35:10)</span> <b>johnkn:</b></span> We gotta turn that off if we want to send build jobs to e2460<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:35:22)</span> <b>gthain:</b></span> At one point there was a suggestion to mark both build &amp; tests as IOHEAVY so there would only be one of those on any one machine at any one time<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:36:34)</span> <b>johnkn:</b></span> looks like that's happening.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:37:00)</span> <b>johnkn:</b></span> build and test docker jobs are ioheavy.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:37:56)</span> <b>johnkn:</b></span> is that getting ignored for test docker jobs on e2460?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:38:33)</span> <b>johnkn:</b></span> no, that's not right,  the request is undefined<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:39:06)</span> <b>johnkn:</b></span> but ioheavy is listed in provisionedresources<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:40:47)</span> <b>johnkn:</b></span> Ok.  I was confused.  the jobs are not requesting ioheavy.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:42:16)</span> <b>johnkn:</b></span> just one of them is<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:43:33)</span> <b>johnkn:</b></span> the bare metal Centos7 build is<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:53:40)</span> <b>johnkn:</b></span> I would like to get rid of <tt>NUM_CPUS = 16</tt> on <a href="http://e2460.chtc.wisc.edu">e2460.chtc.wisc.edu</a> so we can send builds there and have them know how many cores they can use.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:53:51)</span> <b>johnkn:</b></span> I want to have it quantize slots to 8 core instead.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:54:21)</span> <b>tlmiller:</b></span> (Is that different, on a technical level, than setting SLOT1_TYPE=cpus=8, or whatever?)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:54:40)</span> <b>johnkn:</b></span> yes, they would still be d-slots<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:54:52)</span> <b>tlmiller:</b></span> Ahh, gotcha.  Forgot about that.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:54:54)</span> <b>johnkn:</b></span> and the quantize could pay attention to job request<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:54:58)</span> <b>johnkn:</b></span> if we want<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:55:47)</span> <b>johnkn:</b></span> also changing the quantize would be a reconfig operation, not a restart<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:55:55)</span> <b>johnkn:</b></span> changing num_cpus is a restart<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:56:40)</span> <b>tlmiller:</b></span> OK, thanks.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:56:54)</span> <b>johnkn:</b></span> So I will have to take the startd down to change this.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:58:06)</span> <b>tlmiller:</b></span> Taking the startd down is fine by me.  I guess you could call letting builds run a stability test.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:58:36)</span> <b>johnkn:</b></span> that's the thought.  I'd like to stress the machine a bit more while running tests<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:59:10)</span> <b>johnkn:</b></span> looks like 8 test runs going now.  the would be aborted.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:59:55)</span> <b>johnkn:</b></span> looks like a doc comment,  I think we can live with those tests not running.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:02:15)</span> <b>tlmiller:</b></span> All 8 of them?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:02:26)</span> <b>tlmiller:</b></span> Oh, right, lots of platforms.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:02:32)</span> <b>tlmiller:</b></span> Sounds good to me.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:02:49)</span> <b>johnkn:</b></span> I'm looking at the dashboard, and I only see that sha running tests right now.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:03:14)</span> <b>tlmiller:</b></span> We'll need to make changes to direct the builds there... and other changes to make the builds use more cores, I'm sure.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:03:48)</span> <b>johnkn:</b></span> I would think so.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:04:00)</span> <b>johnkn:</b></span> does that live in metronome? or in condor_nmi_submit?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:04:05)</span> <b>tlmiller:</b></span> I'm still at the car repair place, so I'd like to hold off (personally) on doing anything exciting until my lag goes down.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:04:16)</span> <b>johnkn:</b></span> sure.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(11:04:43)</span> <b>tim:</b></span> The RPM builds may automagically use more core. I don't think that the deb builds will.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(11:05:19)</span> <b>tim:</b></span> In any case, I would have to look at the build scripts in the htcondor repository.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:05:27)</span> <b>johnkn:</b></span> the builds won't land there until we make more changes<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:06:15)</span> <b>johnkn:</b></span> Ideally the build scripts would pay attention to the environment to get the number of cores to use<br/>
+<span style="color: #d58247"><span style="font-size: small">(11:06:36)</span> <b>gthain:</b></span> I thought we were going to leave the test machine alone for a week<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:10:00)</span> <b>tlmiller:</b></span> We agreed not to do anything for speed/latency reasons this week,<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:10:39)</span> <b>tlmiller:</b></span> which is why I hypothesized that TJ wanted to check on stability by running a few builds through.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:11:01)</span> <b>johnkn:</b></span> yes, no trying to make the test go faster before we know they are stable<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:11:26)</span> <b>johnkn:</b></span> What I'm doing right now is just fixing the config so that we *can* do other things<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:12:19)</span> <b>johnkn:</b></span> there will still be a max of 16 slots, just without lying about how many cores the slots have<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:29:39)</span> <b>johnkn:</b></span> It's done.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:30:00)</span> <b>johnkn:</b></span> 7 test runs started right away<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:30:16)</span> <b>johnkn:</b></span> <pre>[johnkn@submit3 .ssh]$ condor_status <a href="http://e2460.chtc.wisc.edu">e2460.chtc.wisc.edu</a> -af name cpus totalcpus totalslotcpus jobid<br/><a href="mailto:slot1@e2460.chtc.wisc.edu">slot1@e2460.chtc.wisc.edu</a> 72 128.0 128 undefined<br/><a href="mailto:slot1_1@e2460.chtc.wisc.edu">slot1_1@e2460.chtc.wisc.edu</a> 8 128.0 8 692693.0<br/><a href="mailto:slot1_2@e2460.chtc.wisc.edu">slot1_2@e2460.chtc.wisc.edu</a> 8 128.0 8 692679.0<br/><a href="mailto:slot1_3@e2460.chtc.wisc.edu">slot1_3@e2460.chtc.wisc.edu</a> 8 128.0 8 692651.0<br/><a href="mailto:slot1_4@e2460.chtc.wisc.edu">slot1_4@e2460.chtc.wisc.edu</a> 8 128.0 8 692640.0<br/><a href="mailto:slot1_5@e2460.chtc.wisc.edu">slot1_5@e2460.chtc.wisc.edu</a> 8 128.0 8 692633.0<br/><a href="mailto:slot1_6@e2460.chtc.wisc.edu">slot1_6@e2460.chtc.wisc.edu</a> 8 128.0 8 692617.0<br/><a href="mailto:slot1_7@e2460.chtc.wisc.edu">slot1_7@e2460.chtc.wisc.edu</a> 8 128.0 8 692589.0</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:30:58)</span> <b>johnkn:</b></span> still configured to match only nmi test runs<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:31:49)</span> <b>johnkn:</b></span> but we can change the start expression now with just a reconfig<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:34:21)</span> <b>johnkn:</b></span> (or a drain command :wink:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:07:45)</span> <b>tlmiller:</b></span> Oh, hey, look at run ID 548080.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:07:53)</span> <b>tlmiller:</b></span> We should get ice cream or something.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:33:32)</span> <b>johnkn:</b></span> So this is interesting.  build 548091 was green except for 2 test failures, both on Windows.<br/>one was <tt>cmd_drain_scavenging_vacation</tt> which failed because the evicted job re-ran just as we were trying to remove it.  I think that's just a race in the test.  The other failure was <tt>max_jobs_per_owner_test_group</tt> . The test actually succeeded, but the rest reported failure because it could not shut condor down.<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:34:01)</span> <b>gthain:</b></span> There's a bunch of Windows failures where we can't run a tool<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:34:42)</span> <b>gthain:</b></span> Looking at the condor logs for the <tt>max_jobs_per_owner_group</tt> it looks like the master never got the shutdown request<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:35:07)</span> <b>gthain:</b></span> other test show that condor_submit just fails<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:35:18)</span> <b>johnkn:</b></span> But here's the interesting part.  The test has this, note the timestamp.<br/><pre>12:22:50 CondorPersonal Waiting 120 sec for &lt;condor&gt; to be down. MasterTime:160<br/>	DAEMON_LIST = MASTER SCHEDD COLLECTOR NEGOTIATOR STARTD<br/>StateChange: &lt;condor&gt; Master did not exit in 160 seconds. giving up.</pre><br/>The MasterLog has this<br/><pre>06/29/21 12:22:38.541 (D_ALWAYS) Sent signal 1 to SCHEDD (pid 21292)<br/>06/29/21 12:22:38.542 (D_ALWAYS) Sent signal 1 to SHARED_PORT (pid 12380)<br/>06/29/21 12:22:38.543 (D_ALWAYS) Sent signal 1 to STARTD (pid 17532)<br/>06/29/21 12:22:51.871 (D_ALWAYS) Adding SHARED_PORT to DAEMON_LIST, because USE_SHARED_PORT=true (to disable this, set AUTO_INCLUDE_SHARED_PORT_IN_DAEMON_LIST=False)<br/>06/29/21 12:22:51.871 (D_ALWAYS) SHARED_PORT is in front of a COLLECTOR, so it will use the configured collector port<br/>06/29/21 12:22:51.872 (D_ALWAYS) Reconfiguring all managed daemons.<br/>06/29/21 12:22:51.873 (D_ALWAYS) Sent signal 1 to COLLECTOR (pid 19472)<br/>06/29/21 12:22:51.875 (D_ALWAYS) Sent signal 1 to NEGOTIATOR (pid 14744)<br/>06/29/21 12:22:51.876 (D_ALWAYS) Sent signal 1 to SCHEDD (pid 21292)<br/>06/29/21 12:22:51.877 (D_ALWAYS) Sent signal 1 to SHARED_PORT (pid 12380)<br/>06/29/21 12:22:51.878 (D_ALWAYS) Sent signal 1 to STARTD (pid 17532)</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:35:35)</span> <b>johnkn:</b></span> the master is behaving as if it got a restart command instead of a shutdown command<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:36:07)</span> <b>johnkn:</b></span> I really wish we were logging D_COMMAND here<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:37:17)</span> <b>johnkn:</b></span> Condor submit is *supposed* to fail in the max_jobs_per_owner test<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:37:31)</span> <b>tlmiller:</b></span> TJ, if you could look at HTCONDOR-555 and see if you agree that what you saw for build 548091 is as described there, I'd appreciate it.<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:37:37)</span> <b>gthain:</b></span> condor_submit fails in all kinds of other tests<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:39:20)</span> <b>gthain:</b></span> e.g. in <tt>cmd_status_slot_variants</tt>:<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:39:33)</span> <b>gthain:</b></span> <pre>21:17:01   RunCheck: calling RunTest(cmd_status_slot_variants, cmd_status_slot_variants.submit.11708.2)<br/>non-zero return from condor_submit</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:42:07)</span> <b>johnkn:</b></span> @tlmiller there may be other races, but that one I see in this test run would be fixed by simply adding a Requirements to the job that prevents it from matching again after it is evicted the first time.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:42:40)</span> <b>johnkn:</b></span> HTCONDOR-555 seems basically correct to me, but posits other race conditions that I did not see here.<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:42:41)</span> <b>gthain:</b></span> or here in dagman:<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:42:51)</span> <b>gthain:</b></span> <pre>ERROR: condor_submit_dag -verbose -f -notification never job_dagman_splice_connect-A.dag &gt; job_dagman_splice_connect-A.dag.out 2&gt;&amp;1 failed.<br/>ERROR: Output follows:<br/>ERROR: Renaming rescue DAGs newer than number 0<br/>ERROR: Submitting job(s).<br/>ERROR: 1 job(s) submitted to cluster 1.<br/>ERROR: ERROR: condor_submit failed; aborting.<br/>ERROR: </pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:44:22)</span> <b>johnkn:</b></span> Back in the long ago days, condor_submit or condor_q failing was common enough in our test suite that run-too-n-times was added as a primative.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:44:51)</span> <b>johnkn:</b></span> it would not be surprising if this still happened, but if it does, we should treat that as a condor bug to be fixed.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:45:44)</span> <b>johnkn:</b></span> (or a bug in the test if the test is multi-threaded)<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:45:52)</span> <b>gthain:</b></span> Also, I thought dagman itself retried failed condor_submits<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:46:17)</span> <b>gthain:</b></span> oh, this is the submit_dag<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:46:21)</span> <b>johnkn:</b></span> I thought so also, unless it was configured not to<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:47:08)</span> <b>johnkn:</b></span> we need to have D_COMMAND:1 logged in all of the tests for master and schedd at the very least.<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:47:47)</span> <b>gthain:</b></span> would also like to see debug log for these failing tools<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:48:44)</span> <b>johnkn:</b></span> yes.<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:50:04)</span> <b>gthain:</b></span> In this dag case, the submit failed pretty quickly:<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:50:06)</span> <b>gthain:</b></span> <pre>Job exit code: 2, Elapsed time: 2.828 sec</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:51:02)</span> <b>johnkn:</b></span> some of the tools actually have a mechanism for this.  <tt>dprintf_config_tool_on_error()</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:51:33)</span> <b>johnkn:</b></span> but by default it only logs D_ALWAYS, which may not be enough.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:52:06)</span> <b>johnkn:</b></span> you can config <tt>TOOL_DEBUG_ON_ERROR</tt> to enable this special logging<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:57:19)</span> <b>johnkn:</b></span> BTW: I think this will fix the race in the cmd_drain_scavenging_vacation test.<br/><pre>diff --git a/src/condor_tests/cmd_drain_scavenging_vacation.run b/src/condor_tests/cmd_drain_scavenging_vacation.run<br/>index 934c177..8962dbf 100755<br/>--- a/src/condor_tests/cmd_drain_scavenging_vacation.run<br/>+++ b/src/condor_tests/cmd_drain_scavenging_vacation.run<br/>@@ -142,6 +142,8 @@ queue 3<br/> arguments                              = ${killFile}.\$(CLUSTER).\$(PROCESS) 60<br/> +IsInterruptible               = true<br/> MaxJobRetirementTime   = 3600<br/>+# prevent job from restarting after eviction before we can kill it<br/>+Requirements                   = (NumJobStarts?:0) &lt; 1</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:57:41)</span> <b>johnkn:</b></span> there are lots of things we could use as a requirements trigger here.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:12:52)</span> <b>tlmiller:</b></span> TJ, I think the fix I proposed in that ticket is the same as what you just said?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:14:45)</span> <b>johnkn:</b></span> I think so<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:15:28)</span> <b>tlmiller:</b></span> OK, then I won't worry about what other race condition you think I posited. :)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:16:47)</span> <b>johnkn:</b></span> 555 mentions something about duplicate eviction events, but I did not see that.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:17:19)</span> <b>tlmiller:</b></span> Ah, OK.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:17:34)</span> <b>tlmiller:</b></span> Thanks for the clarification.<br/>
+</body>
+</html>

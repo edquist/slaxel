@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jul 19, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Fri Jul 19, 2019 : #xcache (osg)</h3>
+<span style="color: #a72f79"><span style="font-size: small">(15:30:05)</span> <b>andrew.melo:</b></span> OK, planning on moving Vandy's hosts back to <a href="http://Vanderbilt.edu">Vanderbilt.edu</a> -- is there any reason to have unique hostnames for all the xrootd hosts? (Thinking of saving $ on the certs) or, can I just have N hosts map forwards and backwards to the same host name and CMSSW won't complain<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:31:39)</span> <b>blin:</b></span> @marian @efajardo @dweitzel ^^<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:33:04)</span> <b>jthiltges:</b></span> Worth doing a quick test with the existing certs? Hopefully just takes a DNS change.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:37:08)</span> <b>andrew.melo:</b></span> smart thinking. IIUC, xrootd passes around IPs internally and not hostnames?<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:39:23)</span> <b>efajardo:</b></span> ues<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:39:34)</span> <b>efajardo:</b></span> we use same certs<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:39:35)</span> <b>efajardo:</b></span> for all<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:40:04)</span> <b>efajardo:</b></span> however xrdcp complains<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:40:09)</span> <b>efajardo:</b></span> but CMSSW does not<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:40:19)</span> <b>efajardo:</b></span> when the hostcert does not match the hostname<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:40:33)</span> <b>jthiltges:</b></span> Your single cert has alt names for each host?<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:41:04)</span> <b>efajardo:</b></span> what @jthiltges mentioens we use for stashcaches with DNS alias and also for gftp/xrootd host meaning<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:41:13)</span> <b>efajardo:</b></span> one cert with 6 SAN<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:41:18)</span> <b>efajardo:</b></span> and we placed them in all the hosts the same<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:41:21)</span> <b>efajardo:</b></span> one probably the est<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:41:24)</span> <b>efajardo:</b></span> solution all around<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:43:32)</span> <b>jthiltges:</b></span> Looks like xrootd v4.9 added SAN support. Lots of clients will be using older versions though?<br/><a href="https://github.com/xrootd/xrootd/commit/8f7d3aee05">https://github.com/xrootd/xrootd/commit/8f7d3aee05</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(15:43:51)</span> <b>efajardo:</b></span> yes<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:43:51)</span> <b>isfiligoi:</b></span> Looks like CMSSW has a huge security hole in it (unless there is FQAN whitelisting, somewhere)… basically, anyone could impersonate any xcache, redirect the traffic to itself, and CMSSW would never notice it…<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:44:31)</span> <b>efajardo:</b></span> The worst they can do is make some jobs fail feeding irrelevant data to CMSSW<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:45:06)</span> <b>isfiligoi:</b></span> Well… why do we even bother using any kind of “security”, if we do not care about it<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:45:36)</span> <b>efajardo:</b></span> I would agree withyou the only reason this security exists is to make CMS data not public<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:46:36)</span> <b>efajardo:</b></span> Yes @jthiltges see<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:46:38)</span> <b>efajardo:</b></span> <pre>X509v3 Subject Alternative Name: <br/>                DNS:<a href="http://gftp.t2.ucsd.edu">gftp.t2.ucsd.edu</a>, DNS:<a href="http://gftp-1.t2.ucsd.edu">gftp-1.t2.ucsd.edu</a>, DNS:<a href="http://gftp-2.t2.ucsd.edu">gftp-2.t2.ucsd.edu</a>, DNS:<a href="http://gftp-3.t2.ucsd.edu">gftp-3.t2.ucsd.edu</a>, DNS:<a href="http://gftp-4.t2.ucsd.edu">gftp-4.t2.ucsd.edu</a>, DNS:<a href="http://gftp-5.t2.ucsd.edu">gftp-5.t2.ucsd.edu</a>, DNS:<a href="http://gftp-6.t2.ucsd.edu">gftp-6.t2.ucsd.edu</a></pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(15:48:14)</span> <b>efajardo:</b></span> I use this too in some stashcaches<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:48:34)</span> <b>efajardo:</b></span> but at least at UCSD is a little bit of extra pain to get SAN from incommon<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:48:40)</span> <b>efajardo:</b></span> I which they made that easier<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:57:55)</span> <b>andrew.melo:</b></span> could be worse -- we're having to pay per-certificate<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:58:05)</span> <b>andrew.melo:</b></span> (which is why I'm wanting to get as few as possible)<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:11:45)</span> <b>efajardo:</b></span> @andrew.melo can you get as many SAN in one cert?<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:11:51)</span> <b>efajardo:</b></span> or you have o pay per SAN?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:12:00)</span> <b>andrew.melo:</b></span> as many SAN as I want in a cert<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:12:05)</span> <b>efajardo:</b></span> ok<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:12:05)</span> <b>andrew.melo:</b></span> just pay for the certs<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:12:07)</span> <b>efajardo:</b></span> well there you go<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:12:11)</span> <b>efajardo:</b></span> you can get one cert<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:12:14)</span> <b>efajardo:</b></span> and with all SAN<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:12:19)</span> <b>andrew.melo:</b></span> I don't think the CE works w/SANs<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:12:32)</span> <b>andrew.melo:</b></span> so I'll have 2 for the CEs, one for gridftp<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:12:36)</span> <b>efajardo:</b></span> well<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:12:42)</span> <b>andrew.melo:</b></span> and looks like I can share SAN for xrootd<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:12:53)</span> <b>efajardo:</b></span> yes we ashare one between gftp and xroot<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:12:53)</span> <b>andrew.melo:</b></span> (I need to twiddle DNS to test it first)<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:12:58)</span> <b>efajardo:</b></span> CE ’s I do not know<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:13:04)</span> <b>efajardo:</b></span> I did not know condor-g checks<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:13:13)</span> <b>efajardo:</b></span> that hostname and host<br/>
+<span style="color: #e06b56"><span style="font-size: small">(16:13:16)</span> <b>jthiltges:</b></span> I'd tried to use a single certificate for multiple CEs, but ran into troubles and went back to a cert per CE.<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:13:27)</span> <b>efajardo:</b></span> but if they do we can turn it off at te factory<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:13:42)</span> <b>efajardo:</b></span> probably the factory does not like it<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:13:45)</span> <b>andrew.melo:</b></span> that's not terrible, we only have 2 CEs, so 2x$175 isn't gonna break the bank<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:13:49)</span> <b>efajardo:</b></span> but I have seen the know in HTCondor<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:13:51)</span> <b>efajardo:</b></span> for it<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:14:05)</span> <b>isfiligoi:</b></span> You should never turn off DNS checks, unless you do FQAN whitelisting!<br/>That’s the only thing that keeps the system secure<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:14:08)</span> <b>andrew.melo:</b></span> but doing 20 xrootd hosts wouldn't be the best<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:14:35)</span> <b>andrew.melo:</b></span> ideally condor would understand SANs in a sensible way<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:14:50)</span> <b>isfiligoi:</b></span> SANs are OK, of course<br/>
+<span style="color: #e06b56"><span style="font-size: small">(16:14:51)</span> <b>jthiltges:</b></span> I'm still curious how the "single hostname, single cert, multiple IPs" scenario would play out. (For xrootd)<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:15:30)</span> <b>andrew.melo:</b></span> @ john -- I'll give it a shot. problem is that CMS bundles the xrootd client with each CMSSW release, so there's potentially very old clients out there<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:16:08)</span> <b>efajardo:</b></span> I do knot know if HTCondor understand s SAN<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:17:46)</span> <b>blin:</b></span> it does understands SANs but iirc will only use the subject to map a cert to a condor principle<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:18:25)</span> <b>andrew.melo:</b></span> but I guess if the FQDN doesn't map to the subject, it'll barf?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:18:51)</span> <b>blin:</b></span> yeah<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:19:14)</span> <b>andrew.melo:</b></span> Well, it kinda sucks, but it's not the worst thing<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:19:28)</span> <b>efajardo:</b></span> But the gfactory does not have a mapfile with all the CE’s in the world<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:19:44)</span> <b>andrew.melo:</b></span> Peak Cert (tm) would be to have all our software accept wildcard certs, so I could just get one issued to *.<a href="http://accre.vanderbilt.edu">accre.vanderbilt.edu</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(16:19:58)</span> <b>efajardo:</b></span> so the CE authenticathes the factory but the other side the THCodnorG side?<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:20:40)</span> <b>isfiligoi:</b></span> For low-security situations, a wildcard cert would indeed be the best<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:21:16)</span> <b>isfiligoi:</b></span> (assuming you can assure you will never host anything high-security in the same domain)<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:22:52)</span> <b>andrew.melo:</b></span> we don't, but worst-case, I could just drill down a level deeper and do a *.<a href="http://t2.accre.vanderbilt.edu">t2.accre.vanderbilt.edu</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(16:23:00)</span> <b>isfiligoi:</b></span> right<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:23:35)</span> <b>andrew.melo:</b></span> as a rule, we don't expose anything over HTTPS, we have too much ITAR and HIPAA stuff on our cluster to risk it<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:24:03)</span> <b>andrew.melo:</b></span> some assholes are trying to cure cancer or something<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:25:29)</span> <b>andrew.melo:</b></span> It'd be much easier to run a cluster if we didn't have all these users<br/>
+</body>
+</html>

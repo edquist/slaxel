@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Aug 18, 2021 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Aug 18, 2021 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(10:47:27)</span> <b>blin:</b></span> @dbox i'm seeing the same thing where the other schedd dirs are owned <tt>root:root</tt><br/><pre>[root@9876321b2866 /]# ls -l /var/lib/condor/<br/>total 64<br/>drwxrwxrwt. 2 condor condor 4096 Aug 16 19:45 execute<br/>drwxr-xr-x. 2 root   root   4096 Aug 16 19:45 krb_credentials<br/>drwxrws---. 2 root   condor 4096 Aug 16 19:45 oauth_credentials<br/>drwxr-xr-x. 6 root   root   4096 Aug 18 15:24 schedd_glideins2<br/>drwxr-xr-x. 6 root   root   4096 Aug 18 15:24 schedd_glideins3<br/>drwxr-xr-x. 6 root   root   4096 Aug 18 15:24 schedd_glideins4<br/>drwxr-xr-x. 6 root   root   4096 Aug 18 15:24 schedd_glideins5<br/>drwxr-xr-x. 2 condor condor 4096 Aug 16 19:45 spool</pre><br/>this appears to be from the packaging:<br/><pre>[root@9876321b2866 /]# rpm -qf /var/lib/condor/schedd_glideins2<br/>glideinwms-factory-condor-3.7.5-03.rc3.osg35up.el7.noarch</pre><br/>and so i think you just need to fixup the install lines here <a href="https://github.com/glideinWMS/glideinwms/blob/master/build/packaging/rpm/glideinwms.spec#L443-L451">https://github.com/glideinWMS/glideinwms/blob/master/build/packaging/rpm/glideinwms.spec#L443-L451</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:48:59)</span> <b>dbox:</b></span> thanks I will give that a try<br/>
+</body>
+</html>

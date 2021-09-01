@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon May 2, 2016 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Mon May 2, 2016 : #xcache (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(09:15:27)</span> <b>bbockelm:</b></span> Alright - @lincoln - lots of refactoring of the stash sync service over the weekend.  It’s now a systemd service.  Incidentally, I hate logging in RHEL7.<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:32:59)</span> <b>lincoln:</b></span> sorry, wasnt watching slack over the weekend. so what's the current state? still slow?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:04:21)</span> <b>bbockelm:</b></span> really bizarre.  Depending on the directory, the rates would go between 30MB/s and 300MB/s.<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:08:37)</span> <b>lincoln:</b></span> interesting<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:14:40)</span> <b>bbockelm:</b></span> seemed to at least partially be a function of the directory processed.<br/>
+<span style="color: #84b22f"><span style="font-size: small">(11:39:52)</span> <b>ivukotic:</b></span> Hi<br/>
+<span style="color: #84b22f"><span style="font-size: small">(11:40:19)</span> <b>ivukotic:</b></span> Brian, I have noticed you stressed StashCache a bit over the weekend.<br/>
+<span style="color: #84b22f"><span style="font-size: small">(11:40:30)</span> <b>ivukotic:</b></span> I did a few tests myself.<br/>
+<span style="color: #84b22f"><span style="font-size: small">(11:41:40)</span> <b>ivukotic:</b></span> What I noticed is that xrdcp transfers would start nicely the first few blocks and than wait for a long time. Repeating it multiple times did nothing to improve performance<br/>
+<span style="color: #84b22f"><span style="font-size: small">(11:42:46)</span> <b>ivukotic:</b></span> We know that the current implementation of the xrootd disk cache proxy is suboptimal, but Andy, Matevz and Alja worked hard last two months to make it better.<br/>
+<span style="color: #84b22f"><span style="font-size: small">(11:43:08)</span> <b>ivukotic:</b></span> So there is a brand new version which is still being tested at MWT2 and SLAC.<br/>
+<span style="color: #84b22f"><span style="font-size: small">(11:43:27)</span> <b>ivukotic:</b></span> For now it runs OK.<br/>
+<span style="color: #84b22f"><span style="font-size: small">(11:45:04)</span> <b>ivukotic:</b></span> I would like to propose the following: I’ll talk to A,M &amp; A and see if we could deploy the new version everywhere on StashCache. If they OK it, I’ll ask everyone to update.<br/>
+<span style="color: #84b22f"><span style="font-size: small">(11:45:10)</span> <b>ivukotic:</b></span> What do you think?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:05:38)</span> <b>bbockelm:</b></span> @ivukotic: I would have to ask Matevz, but I was under the impression that the improvements were only for when cache copy was being created?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:05:52)</span> <b>bbockelm:</b></span> If it would benefit repeated reads, that would be great.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:06:18)</span> <b>bbockelm:</b></span> But yes, let’s indeed upgrade as soon as possible.<br/>
+<span style="color: #84b22f"><span style="font-size: small">(16:06:28)</span> <b>ivukotic:</b></span> not only that… it for example does not try to find the original file before looking up if it has it locally.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:06:41)</span> <b>bbockelm:</b></span> if nothing else, we could upgrade one or two sites to confirm the improvement.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:06:47)</span> <b>bbockelm:</b></span> ah, great!  That one really drove me nuts...<br/>
+<span style="color: #84b22f"><span style="font-size: small">(16:06:52)</span> <b>ivukotic:</b></span> I’m just writing a mail proposing next steps.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:07:45)</span> <b>bbockelm:</b></span> Thanks!  I spent a lot of time this weekend trying to make the <tt>/cvmfs/stash.osgstorage.org</tt> update process more reliable… things look relatively good today.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:09:40)</span> <b>bbockelm:</b></span> ok, gotta run.  Good luck!<br/>
+</body>
+</html>

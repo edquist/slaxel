@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue May 7, 2019 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Tue May 7, 2019 : #gfactory (osg)</h3>
+<span style="color: #674b1b"><span style="font-size: small">(09:34:56)</span> <b>rynge:</b></span> @jdost321 @marco.mascheroni @marian I need help with <a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a> - we are not getting very many glideins. I see a bunch of held ones in the factory monitoring. Can you let me know why they are going into held?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(09:56:22)</span> <b>marco.mascheroni:</b></span> Hi Mats, the reason is:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(09:57:26)</span> <b>marco.mascheroni:</b></span> <pre>Error connecting to schedd <a href="http://pearc-ce-2.grid.uchicago.edu">pearc-ce-2.grid.uchicago.edu</a>: SECMAN:2010:Received "DENIED" from server for user <a href="mailto:flock.opensciencegrid.org@daemon.opensciencegrid.org">flock.opensciencegrid.org@daemon.opensciencegrid.org</a> using method GSI.|AUTHENTICATE:1004:Failed to authenticate using FS</pre><br/>
+<span style="color: #e23f99"><span style="font-size: small">(09:58:20)</span> <b>marco.mascheroni:</b></span> @rynge have you changed anything on the frontend? Certificates for example? I think everythin stopped running on May the 2nd<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:59:15)</span> <b>rynge:</b></span> Hmm, ok, I think that could be due to a new voms server DN and the vomses file being out of date on the sites<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:00:00)</span> <b>marco.mascheroni:</b></span> do you knwo what has to be updated on the site (for the hsoted CEs)<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:00:48)</span> <b>blin:</b></span> <tt>vo-client</tt> should be on 88+<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:00:57)</span> <b>marco.mascheroni:</b></span> ok<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:02:37)</span> <b>rynge:</b></span> I upgraded from 87 to 88 on my test site and that solved it<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:03:13)</span> <b>rynge:</b></span> Any chance you get me a list of sites that error is happening at?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:05:47)</span> <b>marco.mascheroni:</b></span> I can try, give me one sec<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:06:13)</span> <b>marco.mascheroni:</b></span> I am looking at why pilots are idle at fnal<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(10:14:11)</span> <b>blin:</b></span> idle pilots on the CE should be fine, if they've gotten that far, authN/authZ is working fine<br/>
+</blockquote>
+<span style="color: #e23f99"><span style="font-size: small">(10:07:33)</span> <b>marco.mascheroni:</b></span> they seems just queued at the site<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:09:11)</span> <b>rynge:</b></span> I think that is pretty normal at FNAL - we only get jobs there if they have a big hole in their processing<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:09:22)</span> <b>marco.mascheroni:</b></span> k<br/>
+<span style="color: #de5f24"><span style="font-size: small">(10:10:41)</span> <b>tiradani:</b></span> quick spot check, Mats is correct, no errors on the CEs at FNAL<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:11:01)</span> <b>rynge:</b></span> @tiradani What vo-client version do you have?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(10:11:30)</span> <b>tiradani:</b></span> 88-1<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:11:42)</span> <b>rynge:</b></span> Great! Thanks!<br/>
+<span style="color: #de5f24"><span style="font-size: small">(10:11:59)</span> <b>tiradani:</b></span> we had to upgrade to get the VOMS cert DN changed for our VOMS servers when we went to InCommon<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:21:57)</span> <b>marco.mascheroni:</b></span> @rynge let's see if this makes sense for you:<br/><tt> sudo condor_q feosgflock -all -g -af GlideinEntryName JobStatus HoldReason -const 'jobstatus=!=3' | sort | uniq -c | less | sort -n</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:21:57)</span> <b>blin:</b></span> hey @rynge we have a list of CEs from our old VO cert vs new VO cert experiment in the ops meeting notes<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:22:08)</span> <b>blin:</b></span> so that may also be a good starting point<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:22:31)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:22:43)</span> <b>marco.mascheroni:</b></span> there are more with less than 30 pilots<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:31:59)</span> <b>blin:</b></span> yeah, those "DENIED" messages are the interesting ones<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:35:07)</span> <b>marco.mascheroni:</b></span> <tt>sudo yum upgrade vo-client -y</tt> will do the trick (tested with hosted ces)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:41:36)</span> <b>rynge:</b></span> Thanks!<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:41:41)</span> <b>rynge:</b></span> I will contact the larger ones<br/>
+</body>
+</html>

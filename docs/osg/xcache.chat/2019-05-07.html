@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue May 7, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Tue May 7, 2019 : #xcache (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(07:46:29)</span> <b>blin:</b></span> @efajardo it should be, there's a proxy renewal cron job<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:08:00)</span> <b>blin:</b></span> could you check your cron logs?<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:47:18)</span> <b>efajardo:</b></span> @blin I see no <tt>/var/log/cron</tt> and <tt>/var/spool/cron</tt> is emtpy<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:47:41)</span> <b>efajardo:</b></span> But I see this running<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:47:44)</span> <b>efajardo:</b></span> <tt>root        17  0.0  0.0  22696  1548 ?        S    May06   0:00 /usr/sbin/crond -n</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(11:52:13)</span> <b>blin:</b></span> hrm, that's curious. is there anything in <tt>/etc/cron.d/</tt>?<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:54:35)</span> <b>efajardo:</b></span> <pre>[root@fiona-r-uva cron.d]# ls -lh<br/>total 54K<br/>-rw-r--r-- 1 root root 128 Nov 20 14:22 0hourly<br/>-rw-r--r-- 1 root root 326 Mar 22  2017 fetch-crl<br/>-rw-rw-r-- 1 root root 191 Apr 23 23:22 fetch-crl.cron<br/>-rw-rw-r-- 1 root root  57 Apr 23 23:22 stash-cache-auth.cron<br/>-rw-rw-r-- 1 root root  41 Apr 23 23:22 stash-cache-renew-proxy.cron<br/>-rw-rw-r-- 1 root root 166 Apr 23 23:22 xcache-reporter.cron</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(11:56:19)</span> <b>blin:</b></span> oh i see the problem, i'm awful at crontab formatting<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:56:26)</span> <b>blin:</b></span> i'll have a fix in a sec<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:57:20)</span> <b>blin:</b></span> though maybe not...you should at the very least see cron logs from fetch-crl<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:04:04)</span> <b>blin:</b></span> maybe there's something in <tt>journalctl</tt> instead of cron?<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:00:18)</span> <b>efajardo:</b></span> <pre>[root@fiona-r-uva cron.d]# journalctl <br/>No journal files were found.<br/>-- No entries --</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(13:01:38)</span> <b>efajardo:</b></span> I htink this is wrong<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:01:39)</span> <b>efajardo:</b></span> <pre>cat stash-cache-renew-proxy.cron<br/>0 0 * * * /usr/libexec/xcache/renew-proxy</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(13:02:15)</span> <b>efajardo:</b></span> It should be,<br/><tt>0 0 * * * root /usr/libexec/xcache/renew-proxy</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(13:07:09)</span> <b>efajardo:</b></span> @blin<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:01:51)</span> <b>blin:</b></span> good, you found the PR<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:01:58)</span> <b>blin:</b></span> what's strange to me though is that fetch-crl hadn't run<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:02:38)</span> <b>efajardo:</b></span> Is the docker image set up for auto build?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:02:51)</span> <b>blin:</b></span> sorta, it does it via travis-ci<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:03:18)</span> <b>blin:</b></span> the build worked though so it should be available on docker hub<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:04:04)</span> <b>blin:</b></span> yup, check out the latest <tt>fresh</tt> tag<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:09:17)</span> <b>efajardo:</b></span> <tt>opensciencegrid/stash-cache:latest</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(14:09:23)</span> <b>efajardo:</b></span> ahh fresh<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:09:23)</span> <b>efajardo:</b></span> ok<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:10:51)</span> <b>efajardo:</b></span> that looks better<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:10:55)</span> <b>efajardo:</b></span> thanks @blin<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:11:53)</span> <b>blin:</b></span> np, lmk if the cron jobs still aren't working<br/>
+</body>
+</html>

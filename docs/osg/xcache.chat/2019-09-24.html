@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Sep 24, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Tue Sep 24, 2019 : #xcache (osg)</h3>
+<span style="color: #a63024"><span style="font-size: small">(10:06:30)</span> <b>efajardo:</b></span> Btw this works fine with the <tt>stable</tt> image not with <tt>fresh</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:12:19)</span> <b>blin:</b></span> so this is stash-cache?<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:18:04)</span> <b>efajardo:</b></span> yes<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:18:17)</span> <b>efajardo:</b></span> I believe the problem is <tt>4.11.0-0.rc1</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(10:21:43)</span> <b>efajardo:</b></span> I have never noticed this<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:22:20)</span> <b>efajardo:</b></span> cause I was testing agaisnt files which were already cached :man-facepalming::skin-tone-4:<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:24:21)</span> <b>blin:</b></span> :anguished:<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:24:49)</span> <b>blin:</b></span> can you try a specific date stamped tag before 4.11.0-0.rc1 to verify?<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:27:45)</span> <b>efajardo:</b></span> I am not sure what you mean<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:30:19)</span> <b>blin:</b></span> <a href="https://hub.docker.com/layers/opensciencegrid/stash-cache/20190910-2332/images/sha256-54e46f7844de095dba4a94ebb478fd4c6e55b99813b87781be13d4efae9b5b4f">https://hub.docker.com/layers/opensciencegrid/stash-cache/20190910-2332/images/sha256-54e46f7844de095dba4a94ebb478fd4c6e55b99813b87781be13d4efae9b5b4f</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:30:41)</span> <b>blin:</b></span> this one shouldn't have xrootd-4.11.0-0.rc1<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:33:03)</span> <b>efajardo:</b></span> hmm interesitng<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:35:08)</span> <b>efajardo:</b></span> same problem<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:35:27)</span> <b>efajardo:</b></span> <pre>190923 23:21:21 1173 ba2ba880.2:161@osg-ligo-1.t2.ucsd.edu XrootdResponse: sending err 3005: Unable to locate /user/ligo/frames/O3/hoft/H1/H-H1_HOFT_C00-12477/H-H1_HOFT_C00-1247739904-4096.gwf; too many levels of symbolic links<br/>[2019-09-23 23:21:21.935682 +0000][Warning][XRootD            ] Redirect trace-back:<br/>[2019-09-23 23:21:21.935682 +0000][Warning][XRootD            ] 	0. Redirected from: <a href="root://redirector.osgstorage.org:1094/">root://redirector.osgstorage.org:1094/</a> to: <a href="root://xrootd-local.unl.edu:1094/">root://xrootd-local.unl.edu:1094/</a><br/>[2019-09-23 23:21:21.935682 +0000][Warning][XRootD            ] 	1. Retrying: <a href="root://redirector.osgstorage.org:1094/">root://redirector.osgstorage.org:1094/</a><br/>[2019-09-23 23:21:21.935682 +0000][Warning][XRootD            ] 	2. Redirected from: <a href="root://redirector.osgstorage.org:1094/">root://redirector.osgstorage.org:1094/</a> to: <a href="root://xrootd-local.unl.edu:1094/">root://xrootd-local.unl.edu:1094/</a><br/>[2019-09-23 23:21:21.935682 +0000][Warning][XRootD            ] 	3. Retrying: <a href="root://redirector.osgstorage.org:1094/">root://redirector.osgstorage.org:1094/</a><br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:38:27)</span> <b>blin:</b></span> hrm, interesting...i'd be interested in testing xrootd 4.10 + stash-cache 1.0 to see if it's a problem with stash cache vs xrootd<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:38:53)</span> <b>efajardo:</b></span> stashcache 1.0 you mean the rpm?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:40:23)</span> <b>blin:</b></span> yeah<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:40:34)</span> <b>blin:</b></span> ah, that's what stable is<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:40:52)</span> <b>blin:</b></span> so it looks like an issue in stash-cache 1.1<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:48:11)</span> <b>efajardo:</b></span> indeed<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:49:18)</span> <b>efajardo:</b></span> What PR am I looking for here?<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:49:59)</span> <b>efajardo:</b></span> cause stashcache versions are 5.x<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:50:05)</span> <b>efajardo:</b></span> so you mean xcache1.0<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:50:08)</span> <b>efajardo:</b></span> vs xcache1.1<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:50:29)</span> <b>blin:</b></span> we never released any stash-cache 5.x stuff, iirc<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:50:34)</span> <b>blin:</b></span> do you mean 0.5.x?<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:54:14)</span> <b>efajardo:</b></span> Well I was checking here<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:54:14)</span> <b>efajardo:</b></span> <a href="https://github.com/opensciencegrid/StashCache/releases">https://github.com/opensciencegrid/StashCache/releases</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(10:54:22)</span> <b>efajardo:</b></span> and the latest is v5.4.1<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:55:30)</span> <b>matyas:</b></span> @blin that's the client<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:55:55)</span> <b>matyas:</b></span> i.e. stashcp<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:55:59)</span> <b>efajardo:</b></span> I am trying to understand the differnece in configuration that broke things up<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:56:17)</span> <b>blin:</b></span> you should look here <a href="https://github.com/opensciencegrid/xcache">https://github.com/opensciencegrid/xcache</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:56:54)</span> <b>blin:</b></span> and diff the 1.0.5 and 1.1.1 tags<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:56:58)</span> <b>blin:</b></span> but also note that some config moved to osg-xrootd<br/>
+</body>
+</html>

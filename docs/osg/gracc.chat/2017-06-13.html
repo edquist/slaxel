@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jun 13, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Tue Jun 13, 2017 : #gracc (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(15:25:42)</span> <b>dweitzel:</b></span> FYI, This is coming down the line: <a href="https://jira.opensciencegrid.org/browse/SOFTWARE-2714">https://jira.opensciencegrid.org/browse/SOFTWARE-2714</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:25:53)</span> <b>dweitzel:</b></span> Arbitrary attributes added to the Raw records.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:26:12)</span> <b>dweitzel:</b></span> Elasticsearch should be able to handle them, hopefully.  No schema is what ES is designed for.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:26:26)</span> <b>dweitzel:</b></span> But... we have a whitelist for summarization... so they won't be summarized.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:26:40)</span> <b>kretzke:</b></span> limit of 10k fields I think.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:27:00)</span> <b>dweitzel:</b></span> 10k unique fields total in the index?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:27:08)</span> <b>kretzke:</b></span> yep<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:27:30)</span> <b>dweitzel:</b></span> Any idea what we are at for, say, May?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:27:37)</span> <b>dweitzel:</b></span> I don't think that should be an issue.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:28:24)</span> <b>kretzke:</b></span> kibana says 100 fields total in gracc.osg.raw-*<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:29:09)</span> <b>kretzke:</b></span> if it becomes an issue, someone’s probably doing something they shouldn’t<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:34:03)</span> <b>dweitzel:</b></span> If this happens, where will we see errors?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:34:49)</span> <b>dweitzel:</b></span> But yeah, we are at 100, and we have a 10k field limit per index (per month), not bad.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:36:43)</span> <b>kretzke:</b></span> elasticsearch and logstash logs probably. it may just refuse to index documents that try to create new fields, not sure<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:38:54)</span> <b>kretzke:</b></span> correction: limit is 1000, configurable per index. <pre>index.mapping.total_fields.limit<br/>The maximum number of fields in an index. The default value is 1000.</pre><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:40:43)</span> <b>kretzke:</b></span> so it can be changed for existing indices, or set in the mapping template. probably don’t want to increase it unless you need to, and after careful consideration<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:43:06)</span> <b>dweitzel:</b></span> What's the downside of increasing it?  Does the # of fields increase the memory usage or something?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:48:00)</span> <b>kretzke:</b></span> undoubtably<br/>
+</body>
+</html>

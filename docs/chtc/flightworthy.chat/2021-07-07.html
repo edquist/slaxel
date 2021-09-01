@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jul 7, 2021 : #flightworthy (chtc)</title>
+</head>
+<body>
+<h3>Wed Jul 7, 2021 : #flightworthy (chtc)</h3>
+<span style="color: #9b3b45"><span style="font-size: small">(08:00:16)</span> <b>jfrey:</b></span> Still no love with htcondor/nmi-zdev:x86_64_CentOS8-09010002:<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(08:00:32)</span> <b>jfrey:</b></span> <pre>$ make html<br/>sphinx-build -b html -d _build/doctrees   . _build/html<br/>Running Sphinx v1.7.6<br/><br/>Extension error:<br/>Could not import extension sphinx_autodoc_typehints (exception: No module named 'sphinx_autodoc_typehints')<br/>make: *** [Makefile:53: html] Error 2</pre><br/><br/>
+<span style="color: #bb86b7"><span style="font-size: small">(08:31:35)</span> <b>tim:</b></span> @jfrey I have a solution for you. Use a recent Ubuntu20 container and install a couple of packages:<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(08:33:46)</span> <b>tim:</b></span> <pre>apt update<br/>apt install python3-sphinx-autodoc-typehints python3-nbsphinx</pre><br/>
+<span style="color: #bb86b7"><span style="font-size: small">(08:34:35)</span> <b>tim:</b></span> I'll add those to a the Ubuntu20 Docker image for future staff use.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(09:22:22)</span> <b>jfrey:</b></span> That worked. Thanks.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(09:54:56)</span> <b>blin:</b></span> @tim is Bosco kosher in 9.0.2 from your guys' perspective?<br/>
+<blockquote>
+<span style="color: #bb86b7"><span style="font-size: small">(10:48:22)</span> <b>tim:</b></span> @blin: I want to get the smoke tests done on the 9.0.2 RC. But, we don't expect any problems. We should be sure about it today.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(10:54:17)</span> <b>blin:</b></span> cool. if that all looks good we can give it a go if you give us a URL<br/>
+<span style="color: #4cc091"><span style="font-size: small">(10:54:47)</span> <b>blin:</b></span> @jpeterson also has a CE that he needs the latest tarball for (SUT) so I imagine he'd be able to give it a whirl in the next couple of days<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:55:16)</span> <b>jpeterson:</b></span> well, today.  then I’m out until next Wednesday<br/>
+<span style="color: #4cc091"><span style="font-size: small">(10:56:06)</span> <b>blin:</b></span> oh that's right<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(16:24:59)</span> <b>tim:</b></span> Smoke tests came out clean. The regular release happens tomorrow at this point.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(2021-07-08 10:24:46)</span> <b>blin:</b></span> don't we need to verify it on the OSG side before release?<br/>
+<span style="color: #4cc091"><span style="font-size: small">(2021-07-08 10:24:53)</span> <b>blin:</b></span> what URL can we use?<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(2021-07-08 11:11:13)</span> <b>tim:</b></span> Please use the latest rc release.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(2021-07-08 11:12:51)</span> <b>tim:</b></span> <a href="https://research.cs.wisc.edu/htcondor/tarball/9.0/9.0.2/rc/">https://research.cs.wisc.edu/htcondor/tarball/9.0/9.0.2/rc/</a><br/>
+<span style="color: #bb86b7"><span style="font-size: small">(2021-07-08 11:13:38)</span> <b>tim:</b></span> I can't cut and paste the link on my phone. @blin<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(2021-07-08 11:16:08)</span> <b>tim:</b></span> Let me know how the test goes.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(2021-07-08 13:21:15)</span> <b>tim:</b></span> @blin I ran OSG VMU tests on HTCondor 9.0.2 and blahp 2.1.0 and it is no worse than before.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(2021-07-08 13:22:53)</span> <b>blin:</b></span> great!<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(2021-07-08 16:08:31)</span> <b>tim:</b></span> @blin Have you tried out the new tarball?<br/>
+<span style="color: #4cc091"><span style="font-size: small">(2021-07-08 16:23:24)</span> <b>blin:</b></span> nope, i've been having some issues with container builds<br/>
+<span style="color: #4cc091"><span style="font-size: small">(2021-07-08 16:23:34)</span> <b>blin:</b></span> i can revisit it tomorrow<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(2021-07-15 13:08:45)</span> <b>jpeterson:</b></span> catching back up with things, was this tested?  should I test this with the OzStar CE that was having the package problem?<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(2021-07-15 13:25:56)</span> <b>tim:</b></span> @jpeterson  As far as I know, it did not get tested.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(2021-07-15 14:58:39)</span> <b>blin:</b></span> i did deploy it on the tiger osgdev slurm CE and it seemed to work<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(2021-07-15 15:04:41)</span> <b>jpeterson:</b></span> and I have it deployed to the OzStar CE right now, and pilots are at least running now.  hasn’t matched jobs yet though<br/>
+</blockquote>
+<span style="color: #d58247"><span style="font-size: small">(10:04:27)</span> <b>gthain:</b></span> I've got a rust that I think is from a Windows user.<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:04:56)</span> <b>gthain:</b></span> Does anyone know off the top of their head how to properly quote a requirements expression in condor_qedit in the windows shell?<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:05:12)</span> <b>gthain:</b></span> e.g. the equivalent of<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:05:36)</span> <b>gthain:</b></span> <pre>condor_qedit 1.0 Requirements 'foo == "bar"'</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:26:16)</span> <b>johnkn:</b></span> use <tt>condor_qedit -edits</tt> and you don't have to worry about that.  But the way to do it is<br/><pre>condor_qedit 1.0 Requirements "foo==\"bar\""</pre><br/>
+<span style="color: #9b3b45"><span style="font-size: small">(10:29:30)</span> <b>jfrey:</b></span> Huh, I didn’t know about that option. Nice.<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(11:07:57)</span> <b>lmichael:</b></span> What does ‘this’ refer to in the following warning? (vague as written)<br/><pre>[lmichael@cm3000 ~]$ condor_status -constraint 'TotalMemory &gt;= 500000' -compact<br/>WARNING: GSI authentication is enabled by your security configuration! This will not work in future releases.</pre><br/>
+<span style="color: #9f69e7"><span style="font-size: small">(11:08:18)</span> <b>lmichael:</b></span> GSI won’t work? or my command (as written) won’t work? What will I have to change?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(11:10:32)</span> <b>jfrey:</b></span> GSI won’t work. The admin needs to remove GSI from the HTCondor configuration files.<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(11:14:00)</span> <b>lmichael:</b></span> Thanks! Can I make a polite, general suggestion to avoid the word ‘this’, as it nearly always adds ambiguity? (Exceptions are when it’s followed by a specific noun, but even then … “this feature” is not exactly better in the above example.) Generally, it’s better to just use specific nouns, e.g. “GSI will not work in future releases of HTCondor.”<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(11:17:31)</span> <b>jfrey:</b></span> I like that change.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(11:17:39)</span> <b>blin:</b></span> also, I think a link to the GSI timeline doc would be appropriate<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(11:42:12)</span> <b>lmichael:</b></span> So who can/should make sure the changes are made?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(12:11:58)</span> <b>jfrey:</b></span> I will do that.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(12:16:44)</span> <b>jfrey:</b></span> Can anyone help me with how to submit a private workspace build in the batlab?<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(12:36:41)</span> <b>tim:</b></span> I'll help.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(12:36:45)</span> <b>tim:</b></span> @jfrey<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(12:37:21)</span> <b>tim:</b></span> It'll take a short time to locate our security release doc.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:10:51)</span> <b>tlmiller:</b></span> Does anyone here aside from Zach feel confident enough in their knowledge of the file transfer object to review a change to code in it written by Dan Bradley?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:11:22)</span> <b>tlmiller:</b></span> (HTCONDOR-583)<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:14:00)</span> <b>jfrey:</b></span> I could do that.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:14:38)</span> <b>tlmiller:</b></span> I will assign it to you shortly; I think I just noticed a logic error. :(<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:20:53)</span> <b>tlmiller:</b></span> OK, repatched and retested, and pushed.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:23:57)</span> <b>tlmiller:</b></span> Thanks.<br/>
+</body>
+</html>

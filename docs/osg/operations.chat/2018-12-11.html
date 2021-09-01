@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Dec 11, 2018 : #operations (osg)</title>
+</head>
+<body>
+<h3>Tue Dec 11, 2018 : #operations (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(04:04:41)</span> <b>blin:</b></span> good work guys :thumbsup:<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:05:38)</span> <b>jdost321:</b></span> @dweitzel @marian @jthiltges have you noticed any weirdness with GRACC? Dave Mason reported for the past 3 days for CMS he was only able to see stats from FNAL <a href="https://docs.google.com/document/d/1Zx3BceVWCM4QWyzj6auQ5_DritLnt7Etwx66h8zqtrQ/edit">https://docs.google.com/document/d/1Zx3BceVWCM4QWyzj6auQ5_DritLnt7Etwx66h8zqtrQ/edit</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:11:10)</span> <b>dweitzel:</b></span> nope, no weirdness<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:11:54)</span> <b>dweitzel:</b></span> though I do see the same thing<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:11:58)</span> <b>dweitzel:</b></span> <a href="https://gracc.opensciencegrid.org/dashboard/db/vo-summary?orgId=1&amp;var-interval=$__auto_interval&amp;var-vo=cms&amp;var-type=Batch">https://gracc.opensciencegrid.org/dashboard/db/vo-summary?orgId=1&amp;var-interval=$__auto_interval&amp;var-vo=cms&amp;var-type=Batch</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:12:56)</span> <b>dweitzel:</b></span> indeed, the last 3 days, we have only gotten records from fnal.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:13:16)</span> <b>dweitzel:</b></span> @marian any changes since... friday?<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:14:01)</span> <b>jdost321:</b></span> as a cross ref there's definitely CMS pilots at all sites beyond fnal according to the factory <a href="http://gfactory-1.t2.ucsd.edu/factory/monitor/factoryStatusNow.html">http://gfactory-1.t2.ucsd.edu/factory/monitor/factoryStatusNow.html</a><br/>
+<span style="color: #385a86"><span style="font-size: small">(15:14:28)</span> <b>jdost321:</b></span> (select CMSG-v1_0)<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:16:03)</span> <b>jthiltges:</b></span> These timestamps line up?<br/><pre>Dec  7 23:53:44 <a href="http://hcc-gracc-fe1.unl.edu">hcc-gracc-fe1.unl.edu</a> kernel: gracc-collector invoked oom-killer: gfp_mask=0x50, order=0, oom_score_adj=0<br/>Dec  8 03:46:54 <a href="http://hcc-gracc-fe1.unl.edu">hcc-gracc-fe1.unl.edu</a> kernel: gracc-collector invoked oom-killer: gfp_mask=0xd0, order=0, oom_score_adj=0<br/>Dec  8 09:06:37 <a href="http://hcc-gracc-fe1.unl.edu">hcc-gracc-fe1.unl.edu</a> kernel: gracc-collector invoked oom-killer: gfp_mask=0xd0, order=0, oom_score_adj=0</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:16:36)</span> <b>dweitzel:</b></span> sorta.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:16:48)</span> <b>dweitzel:</b></span> anything in the logs from that docker image?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:17:13)</span> <b>jthiltges:</b></span> <tt>docker ps</tt> is hanging so far. =[<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:17:38)</span> <b>dweitzel:</b></span> indeed, gatkeeper I have access to is storing the records.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:19:25)</span> <b>dweitzel:</b></span> the process <tt>docker-current</tt> was last started on the 9th.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:28:39)</span> <b>dweitzel:</b></span> restarted docker.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:28:46)</span> <b>dweitzel:</b></span> seems to be getting records again.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:30:33)</span> <b>jthiltges:</b></span> Something is causing docker to dump a silly number of messages to syslog:<br/><pre>Dec 11 15:03:43 <a href="http://hcc-gracc-fe1.unl.edu">hcc-gracc-fe1.unl.edu</a> journal: Suppressed 647380 messages from /system.slice/docker.service<br/>Dec 11 15:04:13 <a href="http://hcc-gracc-fe1.unl.edu">hcc-gracc-fe1.unl.edu</a> journal: Suppressed 638132 messages from /system.slice/docker.service</pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:32:19)</span> <b>bbockelm:</b></span> I had noticed that <a href="http://display.opensciencegrid.org">display.opensciencegrid.org</a> was starting to get pretty far behind.<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:42:38)</span> <b>marian:</b></span> nope, I don't know about changes on my side since Friday<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:43:27)</span> <b>marian:</b></span> and I got some grafana messages just now ...<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:43:57)</span> <b>marian:</b></span> hanging <tt>docker ps</tt> I think we had already on gracc ... couple months ago, though<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:48:56)</span> <b>marian:</b></span> all look ok now it seems?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:02:31)</span> <b>bbockelm:</b></span> <a href="https://display.opensciencegrid.org/osg_display/jobs_daily.png">https://display.opensciencegrid.org/osg_display/jobs_daily.png</a> doesn't really look like it from the display side.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:05:24)</span> <b>bbockelm:</b></span> The raw record counts also look fairly low.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:05:36)</span> <b>bbockelm:</b></span> Raw record counts from Kibana<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:20:36)</span> <b>dweitzel:</b></span> one of the logstash's configs (the one that parses htcondor TCP records) was set to debug.  Turned off debug so that journalctl doesn't take 100% cpu time.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:20:49)</span> <b>dweitzel:</b></span> The collector now seems to be processing records much faster.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:21:16)</span> <b>dweitzel:</b></span> @marian could you go through /etc/gracc/docker/gracc.osg, make sure the docker-compose file is the same as in puppet.<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:27:46)</span> <b>marian:</b></span> this is the only difference:<br/><pre><br/>]$ diff docker-compose.yml ~/docker-compose.yml <br/>57c57<br/>&lt;         - ./glidein-logs-logstash.conf:/usr/share/logstash/pipeline/glidein-logs-logstash.conf<br/>---<br/>&gt;         - ./glidein-logs-logstash.conf:/usr/share/logstash/pipeline/logstash.conf<br/>60c60<br/>&lt;         - ./cilogon-osg.crt:/etc/cilogon-osg.crt <br/>---<br/>&gt;         - ./cilogon-osg.crt:/etc/cilogon-osg.crt<br/>66c66<br/>&lt;             - 6938<br/>---<br/>&gt;         - 6938<br/></pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(16:28:15)</span> <b>marian:</b></span> ~/docker-compose.yml is one on gracc-fe1 host<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:31:12)</span> <b>dweitzel:</b></span> yup, update in puppet.<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:33:20)</span> <b>jdost321:</b></span> looks like the stats are catching up <a href="https://gracc.opensciencegrid.org/dashboard/db/vo-summary?orgId=1&amp;var-interval=$__auto_interval&amp;var-vo=cms&amp;var-type=Batch">https://gracc.opensciencegrid.org/dashboard/db/vo-summary?orgId=1&amp;var-interval=$__auto_interval&amp;var-vo=cms&amp;var-type=Batch</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:36:53)</span> <b>dweitzel:</b></span> yup, now the records are coming in faster than ES can ingest them.  A queue is building up on the message bus.<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:49:34)</span> <b>marian:</b></span> puppet updated, Derek<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:57:55)</span> <b>dweitzel:</b></span> Thanks<br/>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jul 15, 2021 : #batlab (chtc)</title>
+</head>
+<body>
+<h3>Thu Jul 15, 2021 : #batlab (chtc)</h3>
+<span style="color: #bb86b7"><span style="font-size: small">(13:32:20)</span> <b>tim:</b></span> @tlmiller So, I copied the two lines from the e2460 config and set the number of slots to 3 and restarted condor and it had no effect on the CentOS7 build machine.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:32:54)</span> <b>tlmiller:</b></span> That's... interesting.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:34:50)</span> <b>tlmiller:</b></span> ... where did you set the number of slots to 3?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:35:17)</span> <b>tlmiller:</b></span> .. derp, sorry, looking at the wrong machine.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(13:35:41)</span> <b>tim:</b></span> I added:<br/><pre>DSLOT_COUNT=3<br/>MODIFY_REQUEST_EXPR_REQUESTCPUS = quantize(RequestCpus,{$(DETECTED_CORES)/$(DSLOT_COUNT)})</pre><br/>
+<span style="color: #bb86b7"><span style="font-size: small">(13:36:14)</span> <b>tim:</b></span> I was expecting to see <tt>make -j4</tt> However, it's just <tt>make</tt><br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:36:45)</span> <b>tlmiller:</b></span> Turning on dynamic slots might help.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(13:37:51)</span> <b>tim:</b></span> It supposed to key off of OMP_NUM_THREADS. Oh OK, that must be somewhere else in the config. I assumed that e2460 was configured in a similar way. My bad.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(13:38:26)</span> <b>tim:</b></span> So, are we supposed to use gitolite or just adjust the flightworthy config.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:38:28)</span> <b>tlmiller:</b></span> Sorry, I misremembered which way was which this morning.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:38:56)</span> <b>tlmiller:</b></span> -- if you look at the lines right under the comment you quoted earlier, it's all adding static slot users.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:41:23)</span> <b>tlmiller:</b></span> Well, at some point the machine will expire and we'll lose everything in the flightworthy config.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:41:46)</span> <b>tlmiller:</b></span> But it makes a lot of sense to tweak things in the flightworthy config file until we'll sure we like them.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:43:31)</span> <b>tlmiller:</b></span> (It looks like include/batlab_startd.conf is making the slots static, but adding<br/><pre>NUM_SLOTS_TYPE_1 = 1<br/>SLOT_TYPE_1_PARTITIONABLE = true<br/>SLOT_TYPE_1 = 100%</pre><br/>should make the quantize config work)<br/>
+<blockquote>
+<span style="color: #bb86b7"><span style="font-size: small">(15:05:26)</span> <b>tim:</b></span> I applied this change<br/>
+</blockquote>
+<span style="color: #bb86b7"><span style="font-size: small">(13:44:19)</span> <b>tim:</b></span> I'll give that a whirl when the machine goes idle again.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:44:30)</span> <b>tlmiller:</b></span> right-o.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:14:05)</span> <b>jcpatton:</b></span> no Debian build failures since Greg’s fix for the bindings’ cmake :eyes: :tada:<br/>
+<span style="color: #d58247"><span style="font-size: small">(14:26:56)</span> <b>gthain:</b></span> Probably because of the code review it got<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(17:13:11)</span> <b>tim:</b></span> Now the CentOS7 machine has 3 4-core slots.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(17:18:01)</span> <b>tim:</b></span> What's amazing to me is that the Amazon Linux 2 build in Docker finishes first/fastest.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(17:44:42)</span> <b>tim:</b></span> Now the CentOS7 machine finishes (build+tests) before Windows and MacOS!<br/>
+</body>
+</html>

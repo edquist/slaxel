@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Sep 13, 2019 : #uscms (osg)</title>
+</head>
+<body>
+<h3>Fri Sep 13, 2019 : #uscms (osg)</h3>
+<span style="color: #de5f24"><span style="font-size: small">(11:23:05)</span> <b>justas.balcas:</b></span> anyone from MIT in this channel ?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:29:12)</span> <b>justas.balcas:</b></span> does anyone can point me how to enforce xrootd server to use only ipv4 (even disabled ipv6 still add’s ipv6 route)<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:48:14)</span> <b>blin:</b></span> @maxi ^^<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:41:50)</span> <b>marian:</b></span> @justas.balcas, is this on SL7 or SL6 system?<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:42:31)</span> <b>marian:</b></span> you'd need to hack-in <tt>-I v4</tt> inside startup options for xrootd and cmsd process accordingly<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:44:28)</span> <b>marian:</b></span> from my SL6 notes this used to work to force xrootd use only IPV4:<br/><pre><br/>CMSD_DEFAULT_OPTIONS="-I v4 -l /var/log/xrootd/cmsd.log -c /etc/xrootd/xrootd-clustered.cfg -k fifo"<br/>XROOTD_DEFAULT_OPTIONS="-I v4 -l /var/log/xrootd/xrootd.log -c /etc/xrootd/xrootd-clustered.cfg -k fifo" <br/>...<br/>XROOTD_INSTANCES="default"<br/>CMSD_INSTANCES="default"<br/></pre><br/>that had to be in <tt>/etc/sysconfig/xrootd</tt> file on SL6 system<br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:47:11)</span> <b>andrew.melo:</b></span> Can someone help me find the docs describing the format for Xrootd's authfile? I'm failing at google<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:48:45)</span> <b>jthiltges:</b></span> @andrew.melo I think this is what you're after? <a href="https://xrootd.slac.stanford.edu/doc/dev49/sec_config.htm#_Toc517294132">https://xrootd.slac.stanford.edu/doc/dev49/sec_config.htm#_Toc517294132</a><br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:49:09)</span> <b>andrew.melo:</b></span> Thanks!<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:49:39)</span> <b>jthiltges:</b></span> Sure! (And yeah... I've struggled to find that same info, so it's kinda fresh in mind.)<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:15:44)</span> <b>blin:</b></span> we also try to document it for common cases in the OSG: <a href="https://opensciencegrid.org/docs/data/xrootd/xrootd-authorization/#authorization-file">https://opensciencegrid.org/docs/data/xrootd/xrootd-authorization/#authorization-file</a><br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:16:42)</span> <b>justas.balcas:</b></span> @marian did not worked, it still add’s route for IPv6 (even ps auxf shows it with v4)<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:17:30)</span> <b>justas.balcas:</b></span> But seems I am just trying to rule out all possible issues while TIer2 does out ~50Gbps-60Gbps from HDFS<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:18:11)</span> <b>justas.balcas:</b></span> these SAM XrootD failures annoy me and no solution.<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:32:24)</span> <b>marian:</b></span> Have you tried XRD_NETWORKSTACK=IPv6 xrdcp -d2 -f ... from dual-stack client against your server what it says?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:32:44)</span> <b>andrew.melo:</b></span> @blin @jthiltges we have some users obliterating our xrootd hosts and killing the sam tests. I'm trying to set it up so those paths they're using are served by a subset of our xrootd hosts and the Sam tests with a different subset.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:33:55)</span> <b>andrew.melo:</b></span> @justas.balcas I'm glad that frank chimed in recently about SAM. Hopefully we can move to a testing scheme that actually uses the production infrastructure<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:34:21)</span> <b>marian:</b></span> SAM tests I’ll follow up in the GGUS ticket we have, @justas.balcas, but not getting to it before Monday I’m afraid <br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:36:11)</span> <b>justas.balcas:</b></span> yea, gonna be in WR soon :smile: I will try these tests later (~1h)<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:37:05)</span> <b>jthiltges:</b></span> @andrew.melo Hmm. Not sure how I'd solve that puzzle. Any chance something like <tt>xrootd.redirect</tt> would be helpful?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:37:39)</span> <b>andrew.melo:</b></span> @justas.balcas waiting room party!<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:38:10)</span> <b>andrew.melo:</b></span> @jthiltges could you enlighten me?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:38:21)</span> <b>andrew.melo:</b></span> @eric.appelt ^^<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:38:49)</span> <b>jthiltges:</b></span> &gt; Specifies that when a file open request occurs on the specified path prefix, the client should be redirected to the specified host and port.<br/><a href="https://xrootd.slac.stanford.edu/doc/dev50/xrd_config.htm#_Toc10218131">https://xrootd.slac.stanford.edu/doc/dev50/xrd_config.htm#_Toc10218131</a><br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:38:58)</span> <b>andrew.melo:</b></span> Oopoooooohhhhhhhhh<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:39:15)</span> <b>andrew.melo:</b></span> That's a much better solution<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:39:51)</span> <b>andrew.melo:</b></span> That's twice you've saved my bacon. I owe you a coffee<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:53:19)</span> <b>marian:</b></span> be careful with xrootd.redirect, can be very dangerous and request end up in circles ... depends on what context you’re setting it up<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:53:57)</span> <b>marian:</b></span> Also consider it a Friday to deploy, hooray! :)<br/>
+</body>
+</html>

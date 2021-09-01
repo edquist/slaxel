@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Aug 21, 2018 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue Aug 21, 2018 : #software (osg)</h3>
+<span style="color: #a72f79"><span style="font-size: small">(09:46:30)</span> <b>andrew.melo:</b></span> Hiya - I started an oasis publication last night, and I'm not sure if it completed right.. I see the following (which is confusing)<br/><pre><br/> cat /cvmfs/oasis.opensciencegrid.org/accre/update.details <br/>Update initiated: Tue Aug 21 01:42:25 CDT 2018<br/>Update unix time: 1534833745<br/>No proxy found for user ouser.accre<br/></pre><br/>
+<blockquote>
+<span style="color: #99a949"><span style="font-size: small">(16:37:44)</span> <b>dwd:</b></span> Andrew I just noticed your message from this morning.  That requires the gsissh config option GSSAPIDelegateCredentials yes<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:38:10)</span> <b>dwd:</b></span> @andrew.melo<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:40:48)</span> <b>andrew.melo:</b></span> That's how I connect to the gateway server<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:42:09)</span> <b>dwd:</b></span> It forwards your credentials so osg-oasis-update can see it.  Not required, but nice to have.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:42:59)</span> <b>andrew.melo:</b></span> Ahhhh, ok. I'll add that to my ssh_config too<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:43:00)</span> <b>andrew.melo:</b></span> thanks!<br/>
+</blockquote>
+<span style="color: #a72f79"><span style="font-size: small">(09:46:41)</span> <b>andrew.melo:</b></span> I presume if I didn't have a proxy, I wouldn'tve been able to SSH in at all, right?<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:48:22)</span> <b>efajardo:</b></span> @dwd and @matyas I got a question about lcmaps<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:48:38)</span> <b>efajardo:</b></span> I am playing with stashcache on kubernetes<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:48:50)</span> <b>efajardo:</b></span> and for the secure staschache when I test it I get<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:49:01)</span> <b>efajardo:</b></span> <pre>------ xrootd <a href="mailto:stashcache-cache-server-auth@xcache-11.t2.ucsd.edu">stashcache-cache-server-auth@xcache-11.t2.ucsd.edu</a>:8444 initialization failed.<br/>INFO in AuthzFun: Lookup with key /DC=org/DC=opensciencegrid/O=Open Science Grid/OU=Services/CN=pilot/osg-ligo-1.t2.ucsd.edu::osg:/osg/ligo,::<br/>ERROR in AuthzFun: LCMAPS failed or denied mapping<br/>INFO in AuthzFun: Lookup with key /DC=org/DC=opensciencegrid/O=Open Science Grid/OU=Services/CN=pilot/osg-ligo-1.t2.ucsd.edu::osg:/osg/ligo,::<br/>ERROR in AuthzFun: LCMAPS failed or denied mapping</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(14:49:10)</span> <b>efajardo:</b></span> but that DN is in the gridmap-file<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:52:19)</span> <b>efajardo:</b></span> Any ideas on what is going on?<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:52:20)</span> <b>dwd:</b></span> I suggest enabling lcmaps debugging<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:55:25)</span> <b>blin:</b></span> what dave said and i'd be interested in seeing your xrootd authz config<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:08:58)</span> <b>efajardo:</b></span> Well I got this<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:09:13)</span> <b>efajardo:</b></span> <br/>
+<span style="color: #a63024"><span style="font-size: small">(15:14:33)</span> <b>efajardo:</b></span> I feel this is the main error<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:14:36)</span> <b>efajardo:</b></span> <pre>lcmaps[17]   LOG_DEBUG: 2018-08-21.20:07:45Z: lcmaps_credential_store_x509_and_sub_elements: Found LCMAPS vomsdata structure, adding it to the lcmaps_credentials.<br/>lcmaps[17]   LOG_DEBUG: 2018-08-21.20:07:45Z: lcmaps.mod-lcmaps_runPluginManager(): Running in normal mode<br/>lcmaps[17]   LOG_DEBUG: 2018-08-21.20:07:45Z: lcmaps.mod-lcmaps_runPluginManager(): extract RunVars<br/>lcmaps[17]   LOG_DEBUG: 2018-08-21.20:07:45Z: lcmaps.mod-lcmaps_runPluginManager(): Do lcmaps_runEvaluationManager with the following policies:<br/>lcmaps[17]   LOG_DEBUG: 2018-08-21.20:07:45Z: lcmaps.mod-lcmaps_runPluginManager():     xrootd_policy<br/>lcmaps[17]   LOG_DEBUG: 2018-08-21.20:07:45Z: evaluationmanager: found plugin: lcmaps_localaccount.mod<br/>lcmaps[17]   LOG_DEBUG: 2018-08-21.20:07:45Z: evaluationmanager: found plugin: lcmaps_dummy_bad.mod<br/>lcmaps[17]   LOG_DEBUG: 2018-08-21.20:07:45Z: evaluationmanager: No more policies to run</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:21:10)</span> <b>blin:</b></span> @efajardo how about lcmaps.db?<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:21:27)</span> <b>efajardo:</b></span> I am using this one here<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:21:28)</span> <b>efajardo:</b></span> <a href="https://paste.fedoraproject.org/paste/dUn~qlOsHMUCbhCScYtfsQ">https://paste.fedoraproject.org/paste/dUn~qlOsHMUCbhCScYtfsQ</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(15:46:59)</span> <b>efajardo:</b></span> @blin<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:07:38)</span> <b>blin:</b></span> hey sorry, had to run the production call<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:09:22)</span> <b>blin:</b></span> that lcmaps.db doesn't look quite right. Is xrootd set to use a different one?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:09:37)</span> <b>blin:</b></span> also, i need your xrootd authz config<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:11:28)</span> <b>blin:</b></span> do you want to do any VOMS mapping or do purely manual gridmapfile mappings?<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:33:06)</span> <b>efajardo:</b></span> well<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:33:12)</span> <b>efajardo:</b></span> I would like to do both<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:33:23)</span> <b>efajardo:</b></span> but I got it from @dweitzel and it it works<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:33:28)</span> <b>efajardo:</b></span> in the Syracuse stashcache<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:33:42)</span> <b>efajardo:</b></span> And my xrootd config is here<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:33:42)</span> <b>efajardo:</b></span> <a href="https://github.com/efajardo/prp-stashcache/blob/master/stashcache-server.cfg">https://github.com/efajardo/prp-stashcache/blob/master/stashcache-server.cfg</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:36:27)</span> <b>blin:</b></span> ah ok, so you want to give me <tt>/etc/xrootd/lcmaps.cfg</tt> <a href="https://github.com/efajardo/prp-stashcache/blob/master/stashcache-server.cfg#L74">https://github.com/efajardo/prp-stashcache/blob/master/stashcache-server.cfg#L74</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:36:42)</span> <b>blin:</b></span> what version of xrootd-lcmaps are you running vs what is @dweitzel running at syracuse?<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:37:19)</span> <b>efajardo:</b></span> <a href="https://github.com/efajardo/prp-stashcache/blob/master/lcmaps.cfg">https://github.com/efajardo/prp-stashcache/blob/master/lcmaps.cfg</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(16:37:23)</span> <b>efajardo:</b></span> this one is the one I am using<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:37:34)</span> <b>efajardo:</b></span> xrootd-lcmaps.x86_64                                                                  1.4.0-1.osg34.el7                                                                  @vince_osg<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:38:08)</span> <b>efajardo:</b></span> 1.6.6-1.8.osg34.el7<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:38:11)</span> <b>efajardo:</b></span> of lcmaps<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:39:03)</span> <b>dweitzel:</b></span> At syr: <tt>/etc/xrootd/lcmaps.cfg</tt><br/><pre><br/>good = "lcmaps_dummy_good.mod"<br/><br/>gridmapfile = "lcmaps_localaccount.mod"<br/>              "-gridmap /etc/xrootd/ligo-mapfile"<br/><br/>vomsmapfile = "lcmaps_voms_localaccount.mod"<br/>              "-gridmap /etc/xrootd/ligo-voms-mapfile"<br/><br/>xrootd_policy:<br/><br/>gridmapfile -&gt; good | vomsmapfile<br/></pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:39:28)</span> <b>dweitzel:</b></span> and <tt>/etc/xrootd/ligo-voms-mapfile</tt>:<br/><pre><br/>"/osg/ligo/*" ligo<br/></pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(16:39:39)</span> <b>efajardo:</b></span> ahh<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:39:41)</span> <b>efajardo:</b></span> I see<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:56:27)</span> <b>blin:</b></span> did you figure it out?<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:09:10)</span> <b>efajardo:</b></span> kinda<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:11:13)</span> <b>efajardo:</b></span> It looks like the lcmaps part is fixed<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:11:16)</span> <b>efajardo:</b></span> <pre>------ xrootd <a href="mailto:stashcache-cache-server-auth@xcache-11.t2.ucsd.edu">stashcache-cache-server-auth@xcache-11.t2.ucsd.edu</a>:8444 initialization failed.<br/>INFO in AuthzFun: Lookup with key /DC=org/DC=opensciencegrid/O=Open Science Grid/OU=Services/CN=pilot/osg-ligo-1.t2.ucsd.edu::osg:/osg/ligo,::<br/>lcmaps[17]    LOG_INFO: 2018-08-21.22:10:17Z: Starting policy: xrootd_policy<br/>lcmaps[17]    LOG_INFO: 2018-08-21.22:10:17Z: lcmaps_gridmapfile: Found mapping ligo for "/DC=org/DC=opensciencegrid/O=Open Science Grid/OU=Services/CN=pilot/osg-ligo-1.t2.ucsd.edu" (line 706)<br/>lcmaps[17]    LOG_INFO: 2018-08-21.22:10:17Z: lcmaps_localaccount-plugin_run(): localaccount plugin succeeded<br/>lcmaps[17]    LOG_INFO: 2018-08-21.22:10:17Z: lcmaps_dummy_good-plugin_run(): good plugin succeeded<br/>lcmaps[17]  LOG_NOTICE: 2018-08-21.22:10:17Z: LCMAPS CRED FINAL: DN:"/DC=org/DC=opensciencegrid/O=Open Science Grid/OU=Services/CN=pilot/osg-ligo-1.t2.ucsd.edu"-&gt;mapped uid:'1000',pgid:'1000',sgid:'1000'<br/>INFO in AuthzFun: Got uid 1000<br/>INFO in AuthzFun: Lookup with key /DC=org/DC=opensciencegrid/O=Open Science Grid/OU=Services/CN=pilot/osg-ligo-1.t2.ucsd.edu::osg:/osg/ligo,::<br/>INFO in AuthzFun: Using cached entity with username ligo</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(17:11:46)</span> <b>efajardo:</b></span> But still get error inthe client<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:11:59)</span> <b>efajardo:</b></span> <pre><br/>head: error reading `/cvmfs/oasis.opensciencegrid.org/ligo/frames/O2/hoft_C02_clean/L1/L-L1_CLEANED_HOFT_C02-11877/L-L1_CLEANED_HOFT_C02-1187716053-4096.gwf': Input/output error</pre><br/>
+</body>
+</html>

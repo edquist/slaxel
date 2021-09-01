@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jul 1, 2021 : #gfrontend (osg)</title>
+</head>
+<body>
+<h3>Thu Jul 1, 2021 : #gfrontend (osg)</h3>
+<span style="color: #385a86"><span style="font-size: small">(12:01:26)</span> <b>jdost321:</b></span> @didavila since we asked you to check, let me know the current DNs for jlab and gluex FEs, the ones they use to talk to the factory. I wonder if we have to update the ones in our factory config<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(12:03:08)</span> <b>didavila:</b></span> this is JLAB’s:<br/><pre>/DC=org/DC=incommon/C=US/ST=Wisconsin/L=Madison/O=University of Wisconsin-Madison/OU=OCIS/CN=<a href="http://fejlab.svc.opensciencegrid.org">fejlab.svc.opensciencegrid.org</a></pre><br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(12:04:05)</span> <b>didavila:</b></span> and GLUEX’s:<br/><pre>/DC=org/DC=incommon/C=US/ST=California/L=La Jolla/O=University of California, San Diego/OU=UCSD/CN=<a href="http://osg-gluex-1.t2.ucsd.edu">osg-gluex-1.t2.ucsd.edu</a></pre><br/>
+<span style="color: #385a86"><span style="font-size: small">(12:04:44)</span> <b>jdost321:</b></span> yes i think we updated our DNs but not the condor map file on our side.. I'll try adding those and reconfig<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:05:04)</span> <b>jdost321:</b></span> (only updated GSI_DAEMON_NAME)<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:05:59)</span> <b>jdost321:</b></span> oops well the gluex one still is a UCSD cert<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:14:16)</span> <b>jdost321:</b></span> ok, I've just updated JLAB, let's see if that one recovers<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:14:53)</span> <b>jdost321:</b></span> GLUEX config matched the DN you gave me, although I'm not sure where Marian left off also moving that one to the OSG incommon<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:17:55)</span> <b>jdost321:</b></span> JLAB is talking to the factory again. Not sure what went wrong with GLUEX<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:21:35)</span> <b>jdost321:</b></span> <a href="http://osg-gluex-1.t2.ucsd.edu">osg-gluex-1.t2.ucsd.edu</a> 169.228.130.64 is a ucsd host i thought it was migrated to tiger?<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(12:25:58)</span> <b>didavila:</b></span> yeah gluex was migrated to tiger a long time ago<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(12:27:45)</span> <b>didavila:</b></span> the proxy there is expired and cannot renew it<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(12:37:40)</span> <b>didavila:</b></span> the cert is expired:<br/><pre>[root@vo-frontend-gluex-bbbdf9878-hm5h8 /]# openssl x509 -in  /etc/grid-security/gwms-frontend/hostcert.pem  -noout -dates <br/>notBefore=May 28 00:00:00 2020 GMT<br/>notAfter=Jun 27 23:59:59 2021 GMT</pre><br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(12:38:48)</span> <b>didavila:</b></span> will try to get the new cert from Terrence<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(12:42:43)</span> <b>didavila:</b></span> @jdost321 do we want to continue to use UCSD certs for that FE?<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(12:43:05)</span> <b>didavila:</b></span> Terrence said he doesn’t have the new cert, he’d have to request it<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(12:43:32)</span> <b>didavila:</b></span> so maybe this is a chance to move to use Madison’s cert instead?<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:44:38)</span> <b>jdost321:</b></span> I think that is what we agreed on standup, to get all the ones but UCSD CMS into the Madison incommon<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(12:45:45)</span> <b>didavila:</b></span> ok, then I’ll tell Terrence no t to reuqest the new cert. to whom should I request the madison cert then?<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:46:13)</span> <b>jdost321:</b></span> I think @blin and / or @matyas can help you with that<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:47:27)</span> <b>jdost321:</b></span> guys can you help Diego get a new gluex hostcert for the frontend? I'm guessing we want to use <a href="http://osg-gluex-1.svc.opensciencegrid.org">osg-gluex-1.svc.opensciencegrid.org</a> as the domain?<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:47:37)</span> <b>jdost321:</b></span> oops!<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:48:33)</span> <b>jdost321:</b></span> just edited<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:48:47)</span> <b>blin:</b></span> @didavila generate a CSR/private key from the docs here <a href="https://opensciencegrid.org/docs/security/host-certs/incommon/#requesting-certificates-from-a-registration-authority">https://opensciencegrid.org/docs/security/host-certs/incommon/#requesting-certificates-from-a-registration-authority</a> and send the CSR to <a href="mailto:osg-bot@cs.wisc.edu">osg-bot@cs.wisc.edu</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(12:50:49)</span> <b>marian:</b></span> OK, I'm back in bussines, thanks for leading effort on fixing JLab ... where the DN of JLab was still missing, @jdost321?<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:51:33)</span> <b>jdost321:</b></span> <tt>/etc/condor/certs/condor_mapfile</tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(12:51:34)</span> <b>marian:</b></span> I can go ahead and request new one for GLUEX<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:51:35)</span> <b>jdost321:</b></span> in the factory<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(12:51:48)</span> <b>didavila:</b></span> great @marian<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(12:52:09)</span> <b>didavila:</b></span> you’re familiar with all the sealing of secrets and all that in tiger, right?<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(12:52:14)</span> <b>didavila:</b></span> let me knwo if you need any help<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:52:19)</span> <b>marian:</b></span> ugh ... so the only single and last palce missing ... thought it reads it from gWMS DNs file, but that's different format<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:52:40)</span> <b>marian:</b></span> yeah, I was doing seal for JLab last week so I should know<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:53:00)</span> <b>marian:</b></span> also requesting certs for JLab so can do for GLUEX same<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:53:20)</span> <b>marian:</b></span> just need to run XCache meetign shortly and then will take care of it<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:57:49)</span> <b>marian:</b></span> for the GLUEX cert I'd lean toward CN like: <a href="http://fegluex.svc.opensciencegrid.org">fegluex.svc.opensciencegrid.org</a> ... just to keep consistent with naming convention picked for JLab for instance: <a href="http://fejlab.svc.opensciencegrid.org">fejlab.svc.opensciencegrid.org</a> ... any objection to <a href="http://fegluex.svc.opensciencegrid.org">fegluex.svc.opensciencegrid.org</a>?<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:00:15)</span> <b>jdost321:</b></span> fine with me, as long as you never forsee them to need a second host<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:07:28)</span> <b>marian:</b></span> I guess this is for the FE node, so it should be an OK ...<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:54:59)</span> <b>marian:</b></span> ok, working on this ... realized one more piece to clarify ... GLUEX uses voms server for getting VOMS extension to the proxy:<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:55:02)</span> <b>marian:</b></span> <a href="https://github.com/opensciencegrid/tiger-osg-config/blob/master/manifests/production/vo-frontend-gluex/proxies.ini#L16">https://github.com/opensciencegrid/tiger-osg-config/blob/master/manifests/production/vo-frontend-gluex/proxies.ini#L16</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(13:55:19)</span> <b>marian:</b></span> <pre>subject   : /DC=org/DC=incommon/C=US/ST=California/L=La Jolla/O=University of California, San Diego/OU=UCSD/CN=<a href="http://osg-gluex-1.t2.ucsd.edu/CN=3204620824">osg-gluex-1.t2.ucsd.edu/CN=3204620824</a><br/>issuer    : /DC=org/DC=incommon/C=US/ST=California/L=La Jolla/O=University of California, San Diego/OU=UCSD/CN=<a href="http://osg-gluex-1.t2.ucsd.edu">osg-gluex-1.t2.ucsd.edu</a><br/>identity  : /DC=org/DC=incommon/C=US/ST=California/L=La Jolla/O=University of California, San Diego/OU=UCSD/CN=<a href="http://osg-gluex-1.t2.ucsd.edu">osg-gluex-1.t2.ucsd.edu</a><br/>type      : RFC compliant proxy<br/>strength  : 1024 bits<br/>path      : pilot_gluex_proxy.proxy<br/>timeleft  : 0:00:00<br/>key usage : Digital Signature, Key Encipherment, Data Encipherment<br/>=== VO Gluex extension information ===<br/>VO        : Gluex<br/>subject   : /DC=org/DC=incommon/C=US/ST=California/L=La Jolla/O=University of California, San Diego/OU=UCSD/CN=<a href="http://osg-gluex-1.t2.ucsd.edu">osg-gluex-1.t2.ucsd.edu</a><br/>issuer    : /DC=org/DC=incommon/C=US/ST=Connecticut/L=Storrs/O=University of Connecticut/OU=Academic IT/CN=<a href="http://gryphn.phys.uconn.edu">gryphn.phys.uconn.edu</a><br/>attribute : /Gluex/Role=NULL/Capability=NULL<br/>timeleft  : 0:00:00<br/>uri       : <a href="http://gryphn.phys.uconn.edu:15014">gryphn.phys.uconn.edu:15014</a></pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(13:55:55)</span> <b>marian:</b></span> so we'd need somebody to register it in their VOMRS?<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:56:13)</span> <b>marian:</b></span> see issuer<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:59:49)</span> <b>marian:</b></span> that's for the pilot proxy ... as we're at it I'd consider rather redesign as we did for VIRGO ... use separate certs that are requested by them and use it for the pilot proxy ... certificate for the FE we keep separate and not tight to the OSG one<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:02:01)</span> <b>marian:</b></span> @bbockelm what do you think? I think it'll be more consistent solution and separate also ownership what OSG owns in the Frontend and who owns pilot as it requires authorization by GLUEX voms service<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:02:30)</span> <b>marian:</b></span> I'll go ahead and request OSG one in the meantime<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:43:36)</span> <b>paschos:</b></span> i think edgar was a member of the gluex voms so he was able request those --- but i’d agree witht marian t to have the pilot’s cert owned by gluex --- i can reach out to richard on this<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:50:58)</span> <b>marian:</b></span> Poked Richard in separate ticket: <a href="https://support.opensciencegrid.org/a/tickets/67540">https://support.opensciencegrid.org/a/tickets/67540</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(16:51:32)</span> <b>marian:</b></span> certificate from OSG I'm waiting for approval and issuance<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(17:32:46)</span> <b>blin:</b></span> Carl sent the request so hopefully we should have the cert for you tomorrow morning<br/>
+<span style="color: #53b759"><span style="font-size: small">(2021-07-02 10:31:51)</span> <b>marian:</b></span> got an email from you, thanks! can you send that cert directly to my email instead of whatever shared folder somewhere where I don't know if I have access? or, guide me where to download, <b>@edquist</b><br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-07-02 10:47:40)</span> <b>blin:</b></span> you should just be able to click the link from the forwarded email<br/>
+<span style="color: #53b759"><span style="font-size: small">(2021-07-02 10:49:55)</span> <b>marian:</b></span> ah, right ... got it now!<br/>
+</blockquote>
+<span style="color: #a63024"><span style="font-size: small">(17:00:14)</span> <b>paschos:</b></span> better than a direct email. thanks… added thomas as well<br/>
+</body>
+</html>

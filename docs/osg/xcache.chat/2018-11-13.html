@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Nov 13, 2018 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Tue Nov 13, 2018 : #xcache (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(09:36:37)</span> <b>bbockelm:</b></span> @matyas - there was a private discussion about fixing the auth setup for the hcc-stash server; it turned into a generic discussion about auth setup.  The  outcomes are:<br/><br/>1.  You can't have <tt>u * /user/ligo -rl / rl</tt> rule in <tt>Authfile-auth</tt>.  Xrootd applies _all_ matching rules and the first deny wins.<br/>2. You need to tell Xrootd specifically about the proxy file you setup as in <a href="https://github.com/opensciencegrid/prp-stashcache/blob/master/stashcache-server.cfg#L117">https://github.com/opensciencegrid/prp-stashcache/blob/master/stashcache-server.cfg#L117</a><br/>3. We still aren't quite to the point where you can follow the web directions and end up with a working authenticated setup.  Getting closer...<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:37:15)</span> <b>bbockelm:</b></span> @jthiltges is going to do PRs for items (1) and (2).  Might have to lean on you for (3).<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:49:23)</span> <b>matyas:</b></span> sure<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:50:28)</span> <b>bbockelm:</b></span> With those two changes, hcc-stash appears to function.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:54:39)</span> <b>jthiltges:</b></span> PR opened for the two config changes above: <a href="https://github.com/opensciencegrid/StashCache-Daemon/pull/16">https://github.com/opensciencegrid/StashCache-Daemon/pull/16</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:54:30)</span> <b>bbockelm:</b></span> Hm.  <tt>/user/ligo</tt> is becoming more problematic by the day, isn't it?  Having a non-public namespace inside a public namespace is quite miserable.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:29:32)</span> <b>bbockelm:</b></span> <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-3468">https://opensciencegrid.atlassian.net/browse/SOFTWARE-3468</a> &lt;~ @matyas @blin<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:30:30)</span> <b>bbockelm:</b></span> that ticket covers the automatic creation of <tt>Authfile</tt> from topology.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:42:00)</span> <b>bbockelm:</b></span> <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-3469">https://opensciencegrid.atlassian.net/browse/SOFTWARE-3469</a> &lt;~ this ticket covers the generation of the grid-mapfile the origin needs in place.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:56:02)</span> <b>bbockelm:</b></span> <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-3470">https://opensciencegrid.atlassian.net/browse/SOFTWARE-3470</a> &lt;~ and finally, the integration with CVMFS and stashcp.<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:57:55)</span> <b>blin:</b></span> is there a deadline for these?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:23:40)</span> <b>bbockelm:</b></span> I think we need SOFTWARE-3468 and SOFTWARE-3469 before we can realistically do an authorized CHTC-based origin.<br/>
+</body>
+</html>

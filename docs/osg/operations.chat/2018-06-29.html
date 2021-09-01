@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jun 29, 2018 : #operations (osg)</title>
+</head>
+<body>
+<h3>Fri Jun 29, 2018 : #operations (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(11:03:21)</span> <b>matyas:</b></span> @dweitzel, i'd like to make some config changes to topology-itb for testing<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:03:35)</span> <b>matyas:</b></span> specifically, <tt>/etc/opt/topology/config-itb.py</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:04:19)</span> <b>dweitzel:</b></span> Sure<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:05:57)</span> <b>matyas:</b></span> ok, I want to set <pre><br/>TOPOLOGY_DATA_DIR = "/var/cache/topology-itb/topology-matyas"<br/>TOPOLOGY_DATA_REPO = "<a href="https://github.com/matyasselmeci/topology">https://github.com/matyasselmeci/topology</a>"<br/>TOPOLOGY_DATA_BRANCH = "parsetime2"</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(11:14:07)</span> <b>matyas:</b></span> can you set that in puppet? or should I just turn off puppet while I'm testing?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:24:43)</span> <b>dweitzel:</b></span> I'm not sure the best plan.  I hate to say turn off puppet, but that may be the best course of action right now.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:26:17)</span> <b>matyas:</b></span> ok. I'll turn it back on when I'm done testing<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:40:20)</span> <b>matyas:</b></span> I'm done<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:14:10)</span> <b>matyas:</b></span> proposal: add a way to specify permanent downtime. specify:<br/>Permanent: True<br/>no Class, no Severity, no EndTime.<br/><br/>Output will have Class: SCHEDULED, Severity: Outage, EndTime: Jan 19, 2038 03:14 AM UTC<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:15:02)</span> <b>matyas:</b></span> (that date is the time_tpocalypse)<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:18:40)</span> <b>blin:</b></span> why do that instead of disabling the resource?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:19:37)</span> <b>matyas:</b></span> I dunno; we've seen people do it in their downtime files<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:20:22)</span> <b>matyas:</b></span> e.g. for <tt>Duke_University/DukeTier3/DukeT3_downtime.yaml</tt>:<br/><pre>- Class: SCHEDULED<br/>  Description: permanent outage<br/>  EndTime: Oct 1, 2019 00:00 +0000<br/>  ID: 1005312<br/>  ResourceName: Duke_ATLAS_gridftp<br/>  Services:<br/>  - GridFtp<br/>  Severity: Outage<br/>  StartTime: May 14, 2017 00:00 +0000</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:20:45)</span> <b>blin:</b></span> we should just find those and disable the resources<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:20:48)</span> <b>matyas:</b></span> except the Duke admin apparently thought 2019 is close enough to forever?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:21:08)</span> <b>matyas:</b></span> do our consumers care about downtime info for permanent outages?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:21:40)</span> <b>blin:</b></span> i'll ask in the thread i started<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:21:49)</span> <b>blin:</b></span> but i would think they are not<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:22:07)</span> <b>***matyas:</b></span> &lt;- has no idea<br/>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jul 31, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Mon Jul 31, 2017 : #gracc (osg)</h3>
+<span style="color: #3c8c69"><span style="font-size: small">(10:59:07)</span> <b>kretzke:</b></span> Grafana 4.4 was released earlier this month. dashboard version control! <a href="https://grafana.com/blog/2017/07/04/grafana-4.4-release/">https://grafana.com/blog/2017/07/04/grafana-4.4-release/</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:00:06)</span> <b>dweitzel:</b></span> Cool!  How is grafana installed on gracc, is it installed on the machine or in docker?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:01:42)</span> <b>kretzke:</b></span> on the machine with yum<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:03:35)</span> <b>kretzke:</b></span> I’d suggest backing up the database (/var/lib/grafana/grafana.db) before doing an update. Although I haven’t had a problem with a migration yet!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:07:28)</span> <b>bbockelm:</b></span> Yay!  Just as Derek was starting to tackle backups...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:08:00)</span> <b>dweitzel:</b></span> Yup, Hopefully I can have backups working this week, then we should feel a little safer.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:08:32)</span> <b>bbockelm:</b></span> Trying to recall - what version of ElasticSearch are we on?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:08:41)</span> <b>bbockelm:</b></span> I seem to remember we are running 5.4; I noticed the latest is 5.5<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:12:54)</span> <b>kretzke:</b></span> 5.1.1. They’ve been burning through releases this year…<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:13:14)</span> <b>bbockelm:</b></span> @marian ^^^ something to schedule...<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:13:50)</span> <b>marian:</b></span> thanks, will do<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:16:38)</span> <b>kretzke:</b></span> they’ve also deprecated mapping types, with the plan to remove them entirely in 6.0. I haven’t fully digested the ramifications of that. Elastic loves their breaking changes…<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:01:32)</span> <b>marian:</b></span> @kretzke how you were testing that things are consistent when we update to new ES? dev instance or just update and downgrade if pretty bit screw up?<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:01:48)</span> <b>marian:</b></span> bit=big<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:07:17)</span> <b>kretzke:</b></span> well, since it *was* development we just did the latter.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:09:11)</span> <b>kretzke:</b></span> also, with rolling upgrades (upgrade one node, wait for cluster to turn green)<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:09:58)</span> <b>kretzke:</b></span> in theory that ensures a smooth transition…<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:27:51)</span> <b>bbockelm:</b></span> @kretzke - as you drain your email swamp -- have you ever looked at putting the factory logs in ElasticSearch?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:28:19)</span> <b>bbockelm:</b></span> I am setting @efajardo down that road and would like to make sure no one else is doing it already<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:29:27)</span> <b>bbockelm:</b></span> The pilot logs are extra pleasant because the HTCondor logs are compressed/base64-encoded inside the pilot log.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:29:39)</span> <b>kretzke:</b></span> think that’s on my list of “put all the things into Elasticsearch,” haven’t done anything<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:29:55)</span> <b>bbockelm:</b></span> Great!  Well, I guess Edgar has the mutex then :slightly_smiling_face:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:30:05)</span> <b>bbockelm:</b></span> Any advice to give?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:30:32)</span> <b>kretzke:</b></span> well, that’s not totally true… I played around with sending a Beats along with our glideins, that tailed the pilot logs and streamed them back to us<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:31:43)</span> <b>kretzke:</b></span> talk to Marco Mambelli, I seem to recall he was working on something like that<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:33:32)</span> <b>bbockelm:</b></span> sure.  Is there any better way to "feed" FileBeats than drop a file in a directory?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:35:45)</span> <b>kretzke:</b></span> I want to say it can read a pipe from stdin<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:42:32)</span> <b>kretzke:</b></span> beats are pretty easy to write though, so I’d say write a custom one<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:43:57)</span> <b>bbockelm:</b></span> oh?  Any handy documentation for that?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:44:15)</span> <b>bbockelm:</b></span> (there's a lot of fiddly details, I suspect, doing it with FileBeats alone)<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:44:29)</span> <b>kretzke:</b></span> <a href="https://www.elastic.co/guide/en/beats/libbeat/current/new-beat.html">https://www.elastic.co/guide/en/beats/libbeat/current/new-beat.html</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:47:08)</span> <b>kretzke:</b></span> I ~wrote~ started one that collects condor status, queue, and history: <a href="https://github.com/retzkek/condorbeat">https://github.com/retzkek/condorbeat</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:48:43)</span> <b>kretzke:</b></span> most of it’s boilerplate, mainly just need to write the “beater”<br/>
+</body>
+</html>

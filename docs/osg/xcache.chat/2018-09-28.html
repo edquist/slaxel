@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Sep 28, 2018 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Fri Sep 28, 2018 : #xcache (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(10:00:07)</span> <b>matyas:</b></span> @marian <a href="https://github.com/opensciencegrid/StashCache-Daemon/pull/8">https://github.com/opensciencegrid/StashCache-Daemon/pull/8</a> &lt;- can I merge?<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:01:42)</span> <b>marian:</b></span> yep, sorry for not commenting on earlier<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:01:59)</span> <b>marian:</b></span> give it a go and let's cut a release<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:24:29)</span> <b>matyas:</b></span> any objection to <a href="https://github.com/opensciencegrid/StashCache-Daemon/pull/9">https://github.com/opensciencegrid/StashCache-Daemon/pull/9</a> ?<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:31:45)</span> <b>marian:</b></span> sounds good!<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:13:20)</span> <b>matyas:</b></span> authfiles: is there a point to giving someone _just_ <tt>r</tt> (not <tt>rl</tt>) privilege on a directory?<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:41:54)</span> <b>marian:</b></span> I'm not sure, but I think <tt>rl</tt> is local read for <tt>u</tt> when you map for user and <tt>r</tt> for <tt>g</tt> which refer to voms group ... i.e. not sure if it allows something like <tt>g /osg/ligo /user/ligo rl</tt> if that's the question?<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:42:10)</span> <b>marian:</b></span> while it works with <tt>g /osg/ligo /user/ligo r</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:44:42)</span> <b>dweitzel:</b></span> I thought <tt>l</tt> stands for "list"<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:46:41)</span> <b>marian:</b></span> ¯\_(ツ)_/¯<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:47:04)</span> <b>marian:</b></span> could be, I always remembered it something along "local read", the <tt>rl</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(13:47:12)</span> <b>matyas:</b></span> is it kinda like having x but not r on a directory in unix?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:47:31)</span> <b>matyas:</b></span> you can <tt>cd</tt> through it but can't <tt>ls</tt> inside it?<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:49:04)</span> <b>marian:</b></span> trying to find out better documentation for it, but can't...<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:53:57)</span> <b>matyas:</b></span> here are the default Authfiles we ship with stashcache-cache:<br/>Authfile-noauth: <pre><br/>u * /user/ligo -rl / rl<br/></pre> -&gt; anybody can read and traverse <tt>/</tt>, and nobody can read or traverse <tt>/user/ligo</tt><br/>Authfile-auth: <pre><br/>g /osg/ligo /user/ligo r<br/>u ligo /user/ligo lr / rl<br/></pre> -&gt; group <tt>/osg/ligo</tt> can <tt>r</tt> (whatever that means) <tt>/user/ligo</tt>, and user <tt>ligo</tt> can read and traverse <tt>/user/ligo</tt> and <tt>/</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(13:54:14)</span> <b>matyas:</b></span> which seems bad because there is overlap between Authfile-noauth and Authfile-auth<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:05:37)</span> <b>marian:</b></span> yep, that's what we have also on <a href="http://hcc-stash.unl.edu">hcc-stash.unl.edu</a> ... @dweitzel or @jthiltges, do you know more how to decipher this and why we have it so? I believe I just previously took this as an example to ship with stashcache (year ago?)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:00:16)</span> <b>bbockelm:</b></span> yeah - I think @matyas got it right - I corrected his branch.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:00:31)</span> <b>bbockelm:</b></span> but fundamentally, you don't want overlaps between the two.<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:41:42)</span> <b>matyas:</b></span> I feel like there's certain checks you can add for these files:<br/>1. permissions other than <tt>rl</tt> don't make sense (it's a cache so you can't write)<br/>2. if it's permitted to anybody in Authfile-auth, it should be denied to everybody in Authfile-noauth<br/>
+<span style="color: #c386df"><span style="font-size: small">(19:04:02)</span> <b>matyas:</b></span> @bbockelm the examples in the docs come straight from the Authfiles in the stashcache package<br/>
+<span style="color: #c386df"><span style="font-size: small">(19:05:10)</span> <b>matyas:</b></span> so we should update the stashcache package (again, sorry) to make the changes we made in the docs<br/>
+<span style="color: #c386df"><span style="font-size: small">(19:07:28)</span> <b>matyas:</b></span> (I'm out all next week so somebody else will have to do it)<br/>
+</body>
+</html>

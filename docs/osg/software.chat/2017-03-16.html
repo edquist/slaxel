@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Mar 16, 2017 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu Mar 16, 2017 : #software (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(12:24:08)</span> <b>bbockelm:</b></span> Well, it is good to see it hands back both V4 and V6 address.<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:54:38)</span> <b>lincoln:</b></span> does anyone roughly know how a glidein adds new classads to the running startd?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:14:00)</span> <b>mkandes:</b></span> @lincoln: We can publish an startd attribute for glideins at the factory ... maybe @rynge knows how to from the frontend-side. What are you trying to do?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:14:35)</span> <b>rynge:</b></span> We call the node advertise script periodically<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:14:36)</span> <b>lincoln:</b></span> just poking around with glideins at the moment. i want to know how the “add_config_line” bit gets turned into an actual classad in the running startd<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:14:50)</span> <b>rynge:</b></span> Worst interface ever<br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:15:00)</span> <b>mkandes:</b></span> Yeah, I don't think I've ever used that tool.<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:15:11)</span> <b>lincoln:</b></span> :slightly_smiling_face:<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:15:32)</span> <b>lincoln:</b></span> I can’t find the magic trick that actually gets the startd to see those classads though<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:15:38)</span> <b>rynge:</b></span> <a href="https://github.com/opensciencegrid/osg-flock/blob/master/node-check/osgvo-node-advertise#L43">https://github.com/opensciencegrid/osg-flock/blob/master/node-check/osgvo-node-advertise#L43</a><br/>
+<span style="color: #e96699"><span style="font-size: small">(17:15:50)</span> <b>lincoln:</b></span> is it just putting classads into the <tt>glidein_config</tt> file and the startd cron is reading that?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:15:58)</span> <b>rynge:</b></span> So, if the script is called before the glidein starts, we use add_config_line<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:16:07)</span> <b>lincoln:</b></span> yeah, what does add_config_line do?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:16:15)</span> <b>rynge:</b></span> Then when the same script runs periodically, we put the attributes on stdout<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:17:11)</span> <b>lincoln:</b></span> and does HTcondor know what to do with them if it sees key=value on stdout?<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:17:36)</span> <b>lincoln:</b></span> i guess im just wondering how you do this without a “condor_reconfig” somewhere<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:17:55)</span> <b>rynge:</b></span> <a href="https://github.com/opensciencegrid/osg-flock/blob/master/node-check/osgvo-node-advertise#L43">https://github.com/opensciencegrid/osg-flock/blob/master/node-check/osgvo-node-advertise#L43</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:18:30)</span> <b>rynge:</b></span> <a href="http://www.uscms.org/SoftwareComputing/Grid/WMS/glideinWMS/doc.prd/factory/custom_scripts.html">http://www.uscms.org/SoftwareComputing/Grid/WMS/glideinWMS/doc.prd/factory/custom_scripts.html</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:19:25)</span> <b>rynge:</b></span> More specifically:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:19:27)</span> <b>rynge:</b></span> <a href="http://www.uscms.org/SoftwareComputing/Grid/WMS/glideinWMS/doc.prd/factory/custom_scripts.html#glidein_config">http://www.uscms.org/SoftwareComputing/Grid/WMS/glideinWMS/doc.prd/factory/custom_scripts.html#glidein_config</a><br/>
+<span style="color: #e96699"><span style="font-size: small">(17:20:30)</span> <b>lincoln:</b></span> yeah, i still dont understand how a running startd picks up any attributes coming out of there<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:20:36)</span> <b>lincoln:</b></span> help me out, i’m slow here :slightly_smiling_face:<br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:24:22)</span> <b>mkandes:</b></span> Lincoln, only new glidein startds will pick up the attribute ... I don't think you can edit them while running.<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:25:30)</span> <b>lincoln:</b></span> what does the startd cron do then?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:33:04)</span> <b>mkandes:</b></span> Sounds like Mats may be using it only to update attributes in stdout ... not necessarily dynamically updating the glidein classads if I understand what he said above.<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:39:39)</span> <b>lincoln:</b></span> <a href="https://research.cs.wisc.edu/htcondor/manual/latest/4_4Hooks.html#sec:daemon-classad-hooks">https://research.cs.wisc.edu/htcondor/manual/latest/4_4Hooks.html#sec:daemon-classad-hooks</a> if im reading this right ,the startd cron’s stdout will update the running startd’s classads<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:40:08)</span> <b>lincoln:</b></span> assuming that’s the case i get the trick now :slightly_smiling_face:<br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:45:46)</span> <b>mkandes:</b></span> Ah. I see. Yeah, so maybe the glideins classads can be updated dynamically. I don't see what happens at the front-end though myself. Mats can confirm Im sure.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:58:19)</span> <b>rynge:</b></span> So we are doing both. At glidein setup time, the osgvo-node-advertise script is run in the add_config_line mode<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:58:33)</span> <b>rynge:</b></span> Then it is configured to run periodically from the startd every 5 minutes<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:58:41)</span> <b>rynge:</b></span> Which is when we use the stdout<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:59:17)</span> <b>rynge:</b></span> <a href="https://github.com/opensciencegrid/osg-flock/blob/master/gwms-frontend/frontend.xml#L518">https://github.com/opensciencegrid/osg-flock/blob/master/gwms-frontend/frontend.xml#L518</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:59:20)</span> <b>rynge:</b></span> period=300<br/>
+</body>
+</html>

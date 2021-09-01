@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Nov 12, 2020 : #ligo-condor (osg)</title>
+</head>
+<body>
+<h3>Thu Nov 12, 2020 : #ligo-condor (osg)</h3>
+<span style="color: #5870dd"><span style="font-size: small">(10:11:30)</span> <b>duncan.macleod:</b></span> howdy. I don't suppose anyone knows why my condor configuration does this:<br/><pre>$ condor_run "sleep 1"<br/>Submitting job(s)ERROR: Can't determine proxy filename<br/>X509 user proxy is required for this job.<br/>Failed to submit Condor job.</pre><br/>I haven't told condor I want to use x509, and definitely don't need it for this command, so I presume its a configuration setting somewhere?<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(10:27:22)</span> <b>james.clark:</b></span> Not sure how closely this channel is watched.  just curious: does <tt>condor_submit</tt> do the same thing and does it work *with* a proxy?<br/>
+<span style="color: #5870dd"><span style="font-size: small">(10:28:04)</span> <b>duncan.macleod:</b></span> yes, and yes, and it also works if I manually add <tt>use_x509userproxy = false</tt><br/>
+<span style="color: #5870dd"><span style="font-size: small">(10:28:18)</span> <b>duncan.macleod:</b></span> I have emailed the condorligo list as well, which should hopefully hit a wider audience<br/>
+<span style="color: #5870dd"><span style="font-size: small">(10:29:57)</span> <b>duncan.macleod:</b></span> something somewhere is setting <tt>use_x509userproxy = true</tt>  by default<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(10:31:56)</span> <b>james.clark:</b></span> don't have anything terribly informative, just interested in picking things up after setting up a modified RIFT/minicondor container.   anything in <tt>$ condor_config_val -dump | grep -i x509</tt> ?<br/>
+<span style="color: #5870dd"><span style="font-size: small">(10:32:34)</span> <b>duncan.macleod:</b></span> <pre>$ condor_config_val -dump | grep -i x509<br/>SYSTEM_SECURE_JOB_ATTRS = x509userProxySubject x509UserProxyEmail x509UserProxyVOName x509UserProxyFirstFQAN x509UserProxyFQAN</pre><br/>so... no?<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(10:34:24)</span> <b>james.clark:</b></span> huh<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:47:25)</span> <b>bbockelm:</b></span> it's theoretically possible that <tt>SUBMIT_ATTRS</tt> is set but only for the <tt>SUBMIT</tt> subsystem -- can you just grep for <tt>x509</tt> in <tt>/etc/condor/config.d</tt> (or wherever you have your config saved?).<br/>
+<span style="color: #5870dd"><span style="font-size: small">(10:48:34)</span> <b>duncan.macleod:</b></span> thanks @bbockelm, but <tt>grep -ir x509 /etc/condor/config.d/</tt> returns empty<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:48:56)</span> <b>bbockelm:</b></span> anything in <tt>~/.condor/</tt> perhaps?<br/>
+<span style="color: #5870dd"><span style="font-size: small">(10:49:07)</span> <b>duncan.macleod:</b></span> nope<br/>
+<span style="color: #5870dd"><span style="font-size: small">(10:49:35)</span> <b>duncan.macleod:</b></span> just in case it's relevant:<br/><pre>$ condor_version<br/>$CondorVersion: 8.8.9 May 06 2020 BuildID: 503068 PackageID: 8.8.9-1 $<br/>$CondorPlatform: x86_64_CentOS7 $</pre><br/><br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:49:56)</span> <b>bbockelm:</b></span> Dang.  Indeed, I just checked the code and the only way I see this occurring is if something is setting <tt>use_x509userproxy = true</tt><br/>
+<span style="color: #5870dd"><span style="font-size: small">(10:50:31)</span> <b>duncan.macleod:</b></span> yup, I have the code open in front of me just to configm that the default for that is indeed false, which checks out (for 8.8.9 and beyond, at least)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:56:28)</span> <b>bbockelm:</b></span> What about:<br/><pre>condor_config_val SUBMIT_ATTRS<br/>condor_config_val SUBMIT_ATTRS -subsys SUBMIT</pre><br/>?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:57:01)</span> <b>bbockelm:</b></span> Another trick would be to look at the output of <tt>condor_config_val -dump</tt>, which should have a list of files like:<br/><pre># Contributing configuration file(s):<br/>#       /etc/condor/condor_config<br/>#       /etc/condor/config.d/00-restart_peaceful.config<br/>#       /etc/condor/config.d/10-batch_gahp_blahp.config<br/>#       /etc/condor/config.d/50-condor-ce-defaults.conf<br/>#       /etc/condor/config.d/50-scitokens-credmon.conf<br/>#       /etc/condor/config.d/90-daemons.config<br/>#       /etc/condor/config.d/99-local.config<br/>#       /etc/condor/config.d/99-scitokens-issuer.config<br/>#       /etc/condor/condor_config.local<br/>#       /home/cse496/bbockelm/.condor/user_config</pre><br/>
+<span style="color: #5870dd"><span style="font-size: small">(10:57:11)</span> <b>duncan.macleod:</b></span> <pre>$ condor_config_val SUBMIT_ATTRS<br/>Not defined: SUBMIT_ATTRS<br/>$ condor_config_val SUBMIT_ATTRS -subsys SUBMIT<br/>Not defined: SUBMIT_ATTRS</pre><br/><br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:58:52)</span> <b>bbockelm:</b></span> oh - in addition to looking at the input config files, maybe look and see if the <tt>condor_submit</tt> or <tt>condor_run</tt> are actually shell script wrappers?<br/>
+<span style="color: #5870dd"><span style="font-size: small">(10:59:45)</span> <b>duncan.macleod:</b></span> AAAAAAAAAAAAAAAAAH, @bbockelm wins!<br/><pre>$ cat $(which condor_submit)<br/>#!/bin/sh<br/>exec /usr/bin/condor_submit use_x509userproxy=True "$@"</pre><br/>now to work out why Paul did that...<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:00:14)</span> <b>bbockelm:</b></span> probably because non-local-universe jobs require it for data access through CVMFS?<br/>
+<span style="color: #5870dd"><span style="font-size: small">(11:00:47)</span> <b>duncan.macleod:</b></span> most likely, but now that we don't connect to the submit host via gsissh most of the time we don't actually start with a proxy, so this should be undone<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:03:21)</span> <b>bbockelm:</b></span> FWIW, for things that are actually a hard requirement, it's much better to use the newer knobs for job transforms and/or job requirements -- this is enforced by the schedd instead of the submit tool.<br/>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jul 29, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Mon Jul 29, 2019 : #xcache (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(08:39:05)</span> <b>bbockelm:</b></span> &gt; lcmaps[20170]     LOG_ERR: 2019-07-26.20:05:32Z: /etc/lcmaps.db:165: [warning] no rules specified for policy: 'glexec' at line 153.<br/>Looks like it's trying to load the glexec-enabled lcmaps.db that we ship by default?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:31:55)</span> <b>blin:</b></span> @bbockelm yeah but i'm not sure where we can override it (i didn't have any luck finding the xrootd http docs)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:32:48)</span> <b>bbockelm:</b></span> What's the <tt>sec.protocol</tt> line you have right now?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:36:16)</span> <b>blin:</b></span> ah, i'm using <tt>sec.protocol host</tt> from here: <a href="https://github.com/opensciencegrid/xcache/blob/master/configs/stash-origin/config.d/50-stash-origin-authz.cfg">https://github.com/opensciencegrid/xcache/blob/master/configs/stash-origin/config.d/50-stash-origin-authz.cfg</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(09:46:07)</span> <b>matyas:</b></span> we're not shipping a glexec-enabled lcmaps.db anymore, are we???<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:46:29)</span> <b>matyas:</b></span> not in 3.4 anyway<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:47:32)</span> <b>bbockelm:</b></span> No.  We also default to enabling GUMS :wink:<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:54:37)</span> <b>matyas:</b></span> ok we gotta fix that for 3.5<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:54:38)</span> <b>matyas:</b></span> you get your choice of gridmap or vomsmap<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:54:55)</span> <b>matyas:</b></span> flip a coin as to which one's the default<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:41:51)</span> <b>blin:</b></span> <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-3776">https://opensciencegrid.atlassian.net/browse/SOFTWARE-3776</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:42:01)</span> <b>blin:</b></span> you can flip that coin<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:00:04)</span> <b>blin:</b></span> so who knows where i can found documentation on xrootd http config?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(11:02:38)</span> <b>jthiltges:</b></span> Offhand, I don't know of anything better than this section: <a href="http://xrootd.org/doc/dev50/xrd_config.htm#_Toc10218134">http://xrootd.org/doc/dev50/xrd_config.htm#_Toc10218134</a><br/>(Hopefully this bad answer will prompt someone to give a good one. :slightly_smiling_face: )<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:14:30)</span> <b>bbockelm:</b></span> @efajardo worked on this a bit: <a href="https://opensciencegrid.org/docs/data/xrootd/install-storage-element/#optional-enabling-xrootd-over-http">https://opensciencegrid.org/docs/data/xrootd/install-storage-element/#optional-enabling-xrootd-over-http</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(11:18:59)</span> <b>efajardo:</b></span> The xrootd manual has very good documentation<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:19:07)</span> <b>efajardo:</b></span> if you can read between the lines<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:19:10)</span> <b>efajardo:</b></span> @blin<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:15:56)</span> <b>blin:</b></span> thanks, that's helpful @jthiltges!<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:16:18)</span> <b>blin:</b></span> i was just checking out our current <tt>osg-xrootd</tt> config and don't think it makes sense in some places<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:16:40)</span> <b>blin:</b></span> namely setting <tt>http.secxtractor</tt> for HTTP without HTTPS<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:47:23)</span> <b>matyas:</b></span> hi folks<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:47:57)</span> <b>matyas:</b></span> what's a good way of demonstrating the 'success' of stashcache<br/>e.g. that stashcache is improving someone's throughput<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:54:34)</span> <b>matyas:</b></span> or at least transfer time<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:56:00)</span> <b>blin:</b></span> well since users are generally using <tt>stashcp</tt> they could just use <tt>time</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(15:56:34)</span> <b>matyas:</b></span> what do they compare it to?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:56:36)</span> <b>blin:</b></span> i think we could actually plot it via kibana<br/>
+</body>
+</html>

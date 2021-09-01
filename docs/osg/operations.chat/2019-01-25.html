@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jan 25, 2019 : #operations (osg)</title>
+</head>
+<body>
+<h3>Fri Jan 25, 2019 : #operations (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(09:35:20)</span> <b>dweitzel:</b></span> @matyas Is topology-itb being used for anything?  I would like to update it to master.<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:43:22)</span> <b>matyas:</b></span> Carl has been using it for webhook testing so talk to him first<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:43:41)</span> <b>matyas:</b></span> in general, what I do is merge master into itb then update topology-itb to itb<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:44:06)</span> <b>matyas:</b></span> let me know if you need push access so you can do that<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:44:55)</span> <b>blin:</b></span> <b>@edquist</b> ^^<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:45:29)</span> <b>dweitzel:</b></span> oh, there's an ITB branch?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:45:57)</span> <b>dweitzel:</b></span> I could just merge master into whatever is running on topology-itb now, (which is some detached HEAD)<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:47:04)</span> <b>matyas:</b></span> the detached HEAD was for testing one of my PRs; it's merged now and I forgot to switch it back to itb<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:47:27)</span> <b>dweitzel:</b></span> oh, well if Carl isn't using it, and you're the last to use it, then sounds like I can use it.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(09:48:19)</span> <b>jthiltges:</b></span> Nebraska switch swapping for VM environment continues. (Delayed by an exciting detour where a switch with an old OS version can't bring up a 40Gb link to one with a new version.)<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:49:40)</span> <b>matyas:</b></span> OK. His webhook stuff is running from a separate directory anyway<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:16:43)</span> <b>marco.mascheroni:</b></span> Hi @lincoln few hosted CEs have a messed up hostname, this is the result of hostname -r:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:16:49)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e96699"><span style="font-size: small">(11:17:08)</span> <b>lincoln:</b></span> hi. i'm out today but feel free to change them. <tt>hostnamectl set-hostname &lt;whatever&gt;</tt><br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:17:27)</span> <b>marco.mascheroni:</b></span> I fixed one of them by hand using hostname<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:17:41)</span> <b>marco.mascheroni:</b></span> I'll use your command, thx<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:19:06)</span> <b>edquist:</b></span> hi @dweitzel - i think you can go ahead and update whatever you like on topology-itb<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:19:17)</span> <b>dweitzel:</b></span> already done :slightly_smiling_face:<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:19:18)</span> <b>edquist:</b></span> the webhook stuff runs from a separate checkout<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:20:15)</span> <b>marco.mascheroni:</b></span> Anyway, hostname fixed one problem (schedd not able to auth itself with the collector), but the factory is still not able to contact the CE:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:20:25)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:20:46)</span> <b>marco.mascheroni:</b></span> Does anybody know what this could be, the mapfile is not any different from a working CE..<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:21:28)</span> <b>dweitzel:</b></span> That log is from the factory?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:21:38)</span> <b>marco.mascheroni:</b></span> yes<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:21:46)</span> <b>marco.mascheroni:</b></span> 169.228.38.36 is the factory<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:22:27)</span> <b>dweitzel:</b></span> Wait, so the log you posted above, is that from the factory or CE?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:22:39)</span> <b>dweitzel:</b></span> looks like from the CE<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:22:40)</span> <b>marco.mascheroni:</b></span> The log is from the CE, the ip is from the factory<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:22:55)</span> <b>marco.mascheroni:</b></span> My guess is that the CE is not able to find the hostname of the factory<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:23:06)</span> <b>dweitzel:</b></span> k<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:23:25)</span> <b>marco.mascheroni:</b></span> (given the messed up hostname Brian suggested there could be DNS issues)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:24:00)</span> <b>dweitzel:</b></span> anything interesting on the factory end?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:24:17)</span> <b>dweitzel:</b></span> The log line leads me to believe that "Client does not trust our certificate", where client here is the factory.<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:24:52)</span> <b>marco.mascheroni:</b></span> oh, ok<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:28:29)</span> <b>marco.mascheroni:</b></span> Any idea what I should check?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:30:57)</span> <b>dweitzel:</b></span> This would be in the SchedLog.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:31:23)</span> <b>dweitzel:</b></span> Though, I'm not a glideinwms expert.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:32:31)</span> <b>blin:</b></span> wait...i thought that log snippet was from the CE<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:32:44)</span> <b>marco.mascheroni:</b></span> yes it is from the CE<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:33:44)</span> <b>blin:</b></span> ah yes, i missed a bunch of the conversation<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:36:12)</span> <b>blin:</b></span> did you check if the hostcert is still valid?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:37:08)</span> <b>marco.mascheroni:</b></span> yes it is<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:40:51)</span> <b>blin:</b></span> <pre><br/>$ ce=<a href="http://hosted-ce19.grid.uchicago.edu">hosted-ce19.grid.uchicago.edu</a><br/>$ condor_ping -name $ce -pool $ce:9619 -verbose -debug WRITE<br/>&lt;snip&gt;<br/>01/25/19 11:39:34 (D_ALWAYS) Condor GSI authentication failure<br/>GSS Major Status: Authentication Failed<br/>GSS Minor Status Error Chain:<br/>globus_gss_assist: Error during context initialization<br/>globus_gsi_callback_module: Could not verify credential<br/>globus_gsi_callback_module: Could not verify credential<br/>globus_gsi_callback_module: Invalid CRL: The available CRL has expired<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(11:41:12)</span> <b>blin:</b></span> is <tt>fetch-crl-cron</tt> enabled?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:47:33)</span> <b>blin:</b></span> oops nvm, those were CRL issues on my end :stuck_out_tongue:<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:48:03)</span> <b>blin:</b></span> this is what i'm seeing after updating my CRLs:<br/><pre><br/>01/25/19 11:47:02 (D_ALWAYS) SECMAN: required authentication with schedd <a href="http://hosted-ce19.grid.uchicago.edu">hosted-ce19.grid.uchicago.edu</a> failed, so aborting command DC_SEC_QUERY.<br/>WRITE failed!<br/>AUTHENTICATE:1003:Failed to authenticate with any method<br/>AUTHENTICATE:1004:Failed to authenticate using GSI<br/>GSI:5008:Failed to look up server host address for GSI connection to server with IP 128.135.158.230 and DN /DC=org/DC=opensciencegrid/O=Open Science Grid/OU=Services/CN=<a href="http://hosted-ce19.grid.uchicago.edu">hosted-ce19.grid.uchicago.edu</a>.  Is DNS correctly configured?  This server name check can be bypassed by making GSI_SKIP_HOST_CHECK_CERT_REGEX match the DN, or by disabling all hostname checks by setting GSI_SKIP_HOST_CHECK=true or defining GSI_DAEMON_NAME.<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(11:49:03)</span> <b>blin:</b></span> andddd it is DNS<br/><pre><br/>$ host 128.135.158.230<br/>Host 230.158.135.128.in-addr.arpa. not found: 3(NXDOMAIN)<br/></pre><br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:53:08)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:54:38)</span> <b>marco.mascheroni:</b></span> maybe running {hostnamectl set-hostname <a href="http://hosted-ce19.grid.uchicago.edu">hosted-ce19.grid.uchicago.edu</a>} was not enoug @lincoln?<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:55:23)</span> <b>lincoln:</b></span> ah i can set the reverse DNS<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:55:52)</span> <b>marco.mascheroni:</b></span> can you check all the CE? Especially the 4 that had a different hostname<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:56:02)</span> <b>marco.mascheroni:</b></span> 11 12 18 19<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:56:20)</span> <b>marco.mascheroni:</b></span> I need to go now, let me know<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:56:50)</span> <b>lincoln:</b></span> i will work on it<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:59:14)</span> <b>marco.mascheroni:</b></span> 18 and 19 are also the ones that had a broken ssh: <a href="https://support.opensciencegrid.org/helpdesk/tickets/8202">https://support.opensciencegrid.org/helpdesk/tickets/8202</a> and<a href="https://support.opensciencegrid.org/helpdesk/tickets/8204">https://support.opensciencegrid.org/helpdesk/tickets/8204</a><br/>Site admins had to change their ssh config (the whitelisted ip)<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:59:56)</span> <b>blin:</b></span> we should note somewhere that if possible they should whitelist a range (<tt>128.135.158.128/25</tt>)<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:53:48)</span> <b>lincoln:</b></span> range whitelist is definitely preferable<br/>
+</body>
+</html>

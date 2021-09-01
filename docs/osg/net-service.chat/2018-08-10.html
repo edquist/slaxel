@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Aug 10, 2018 : #net-service (osg)</title>
+</head>
+<body>
+<h3>Fri Aug 10, 2018 : #net-service (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(12:10:03)</span> <b>blin:</b></span> hey @smckee we have quite a few registered perfsonar resources that seem to share fqdns<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:10:20)</span> <b>blin:</b></span> i.e. it seems like the various perfsonar services on the same machine are being separated out into different registered resources<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:10:31)</span> <b>smckee:</b></span> That can happen<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:10:43)</span> <b>blin:</b></span> is there a specific reason for this or do we direct people to do this in the documentation?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:11:03)</span> <b>smckee:</b></span> The traceroute service runs on the same node as the bandwiddth<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:12:07)</span> <b>blin:</b></span> well in the topology, you can have multiple services on one resource<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:13:21)</span> <b>blin:</b></span> we're trying to make fqdn's unique across resources and would like to merge them. is there any reason that they _have_ to be separate resources?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:19:29)</span> <b>smckee:</b></span> Sorry on a phone call....can you show me an example in the current setup?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:30:01)</span> <b>blin:</b></span> UNL has their bandwidth and latency nodes as separate resources <a href="https://github.com/opensciencegrid/topology/blob/master/topology/University%20of%20Nebraska/Nebraska-CMS/Nebraska.yaml#L215-L261">https://github.com/opensciencegrid/topology/blob/master/topology/University%20of%20Nebraska/Nebraska-CMS/Nebraska.yaml#L215-L261</a> and <a href="https://github.com/opensciencegrid/topology/blob/master/topology/University%20of%20Nebraska/Nebraska-CMS/Nebraska.yaml#L296-L341">https://github.com/opensciencegrid/topology/blob/master/topology/University%20of%20Nebraska/Nebraska-CMS/Nebraska.yaml#L296-L341</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:30:42)</span> <b>blin:</b></span> there are a number of perfsonar hosts like that: <a href="https://github.com/opensciencegrid/topology/pull/154#issuecomment-410093252">https://github.com/opensciencegrid/topology/pull/154#issuecomment-410093252</a><br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:45:57)</span> <b>smckee:</b></span> So I am not sure I understand?  For the UNL case the bandwidth node is <a href="http://hcc-ps02.unl.edu">hcc-ps02.unl.edu</a><br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:46:22)</span> <b>smckee:</b></span> There is another one:  <a href="http://perfsonar.unl.edu">perfsonar.unl.edu</a><br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:46:42)</span> <b>smckee:</b></span> The latency node is <a href="http://hcc-ps01.unl.edu">hcc-ps01.unl.edu</a><br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:47:27)</span> <b>smckee:</b></span> The node <a href="http://perfsonar.unl.edu">perfsonar.unl.edu</a> is part of the perfSONAR testbed and it runs both latency and bandwidth tests (not a production recommendation BTW)<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:47:43)</span> <b>blin:</b></span> oops, wrong resources!<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:48:30)</span> <b>blin:</b></span> <tt>US-Nebraska LT (Test)</tt> and <tt>US-Nebraska BW (Test)</tt> both refer to <a href="http://perfsonar.unl.edu">perfsonar.unl.edu</a><br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:49:15)</span> <b>smckee:</b></span> Sure, as I noted above this is because they only had one system to donate to the testbed.  It runs both latency and bandwidth (which is a no-no for production systems)<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:49:45)</span> <b>smckee:</b></span> The problem is that the bandwidth tests can introduce problems in the latency tests<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:50:12)</span> <b>smckee:</b></span> You need to have different NICs (and hostnames) to run both services on a single server in production<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:51:16)</span> <b>blin:</b></span> hrm, good to know<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:51:34)</span> <b>blin:</b></span> but is there a reason why they can't be listed as the same resource in the topology data?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:51:56)</span> <b>smckee:</b></span> One of our challenges is  to track site topology and naming vs perfSONAR toolkit info<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:52:53)</span> <b>smckee:</b></span> If we have traceroutes running on bandwidth nodes and we want to check which path a latency test ran on, we need to identify the correct bandwidth node that corresponds to that latency node and then lookup the traceroute info<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:53:13)</span> <b>blin:</b></span> like:<br/><pre><br/>US-Nebraska PerfSonar (Test):<br/>...<br/>    Services:<br/>          net.perfSONAR.Bandwidth:<br/>            Description: PerfSonar Bandwidth monitoring node<br/>            Details:<br/>               endpoint: <a href="http://perfsonar.unl.edu">perfsonar.unl.edu</a><br/>          net.perfSONAR.Latency:<br/>            Description: PerfSonar Latency monitoring node<br/>            Details:<br/>                endpoint: <a href="http://perfsonar.unl.edu">perfsonar.unl.edu</a><br/>...<br/></pre><br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:54:25)</span> <b>smckee:</b></span> For the testbed, Garhan is running both services on the same server (and NIC).    But this is not a supported production configuration.  If a site had only one box, we would likely tell them to run only latency and traceroute and not run bandwidth<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:55:07)</span> <b>smckee:</b></span> Many of the LHC systems have "site names" and we often want to find the corresponding perfSONARs for a give site.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:55:12)</span> <b>smckee:</b></span> (Or vice-versa)<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:56:40)</span> <b>smckee:</b></span> (FYI the traceroute service could actually be run on a latency or bandwidth "server")<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:57:01)</span> <b>blin:</b></span> ok so you guys have some sort of monitoring that depends on separating out services to different resources even if the services run on the same host<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:57:50)</span> <b>blin:</b></span> i know it's not a supported prod config but it sounds like it's fine as a testbed<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:57:55)</span> <b>smckee:</b></span> Sort of...traceroute can share the same "host" (actually NIC) as bandwidth or latency BUT we don't mix latency and bandwidth services on the same "host" (NIC).<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:58:32)</span> <b>smckee:</b></span> So a server with two network interface cards can run both bandwidth and latency (they will have to have different IP addresses and DNS names on each NIC)<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:58:51)</span> <b>smckee:</b></span> So it will look like two different servers in practice.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:00:37)</span> <b>blin:</b></span> sorry i must be missing something<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:01:22)</span> <b>blin:</b></span> the UNL test bed has latency/bandwidth on the same DNS name<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:05:18)</span> <b>smckee:</b></span> "For the testbed, Garhan is running both services on the same server (and NIC).    But this is not a supported *production* configuration."<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:05:38)</span> <b>smckee:</b></span> So for the testbed we allow it<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(13:05:54)</span> <b>smckee:</b></span> The testbed is to test the software, not measure the network<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:10:57)</span> <b>blin:</b></span> ok, so there's no issue if we merge it in the topology<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:11:09)</span> <b>blin:</b></span> you may want to look at the comment i linked from the PR<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:15:08)</span> <b>blin:</b></span> there are a few perfsonar resources that appear to be on the same host, though they just may be duplicated services?<br/>
+</body>
+</html>

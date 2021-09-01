@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jul 20, 2021 : #general (chtc)</title>
+</head>
+<body>
+<h3>Tue Jul 20, 2021 : #general (chtc)</h3>
+<span style="color: #684b6c"><span style="font-size: small">(10:12:06)</span> <b>bbockelman:</b></span> &gt; We discovered a size_t-to-int conversion vulnerability in the Linux kernel's filesystem layer: by creating, mounting, and deleting a deep directory structure whose total path length exceeds 1GB, an unprivileged local attacker can write the 10-byte string "//deleted" to an offset of exactly -2GB-10B below the beginning of a vmalloc()ated kernel buffer.<br/><a href="https://lwn.net/Articles/863586/">https://lwn.net/Articles/863586/</a><br/><br/>Total path length greater than 1GB....<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:13:20)</span> <b>edquist:</b></span> and here i thought PATH_MAX was 4k<br/>
+<blockquote>
+<span style="color: #d58247"><span style="font-size: small">(10:22:37)</span> <b>gthain:</b></span> I thought PATH_MAX was a min...<br/>
+<span style="color: #684b6c"><span style="font-size: small">(10:36:20)</span> <b>bbockelman:</b></span> The <tt>PATH_MAX</tt> is a lie!<br/>
+</blockquote>
+<span style="color: #16569E"><span style="font-size: small">(10:13:44)</span> <b>edquist:</b></span> that is cute though!<br/>
+<span style="color: #99a949"><span style="font-size: small">(10:21:26)</span> <b>matyas:</b></span> an unprivileged local attacker can mildly annoy you<br/>
+<span style="color: #684b6c"><span style="font-size: small">(10:37:29)</span> <b>bbockelman:</b></span> I dunno, mild out-of-bounds-writes can be deceptively dangerous: <a href="https://google.github.io/security-research/pocs/linux/cve-2021-22555/writeup.html">https://google.github.io/security-research/pocs/linux/cve-2021-22555/writeup.html</a><br/>
+<blockquote>
+<span style="color: #99a949"><span style="font-size: small">(10:45:51)</span> <b>matyas:</b></span> looks like they get to choose their location though<br/>
+<span style="color: #684b6c"><span style="font-size: small">(17:09:19)</span> <b>bbockelman:</b></span> ... only through heap spraying to force the allocator to move some data structures together.<br/>
+</blockquote>
+<span style="color: #3c989f"><span style="font-size: small">(10:41:20)</span> <b>wiscmoate:</b></span> @bbockelman we probably should have a conversation about kernel versions;  We run mostly an old 5-series kernel (5.0.8-1) on execute nodes in CHTC, mostly because FW expressed a desire for a modern kernel a few years back.  The reason we're not running newer than 5.0.8-1 is that every time I've tried to upgrade we've had various hardware platforms fail to come up after reboot.  For example, after a particular upgrade PowerEdge R410s might fail to boot, or KVM guests, or some other hardware platform, etc.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(10:41:44)</span> <b>wiscmoate:</b></span> On non-execute nodes (and a minority of execute nodes) we run the stock CentOS kernel<br/>
+<span style="color: #3c989f"><span style="font-size: small">(10:42:00)</span> <b>wiscmoate:</b></span> Which generally doesn't cause problems when upgraded<br/>
+<span style="color: #3c989f"><span style="font-size: small">(10:43:07)</span> <b>wiscmoate:</b></span> If we want to keep running 5-series, we're going to have to go through a somewhat time-intensive testing process<br/>
+<span style="color: #3c989f"><span style="font-size: small">(10:43:34)</span> <b>wiscmoate:</b></span> 4-series has caused the same sorts of issues as 5-series, FYI<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:18:28)</span> <b>coatsworth:</b></span> Has the CS fire alarm stopped yet?<br/>
+<blockquote>
+<span style="color: #99a949"><span style="font-size: small">(14:21:16)</span> <b>matyas:</b></span> has the union run out of beer yet?<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(14:57:40)</span> <b>cat:</b></span> No random fire alarm at my house today…<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(15:20:17)</span> <b>tjslauson:</b></span> @matyas Moate tried, but no dice :disappointed:<br/>
+</blockquote>
+<span style="color: #9e3997"><span style="font-size: small">(14:19:09)</span> <b>tlmiller:</b></span> Don't know, but the power-washing guy here is still going, so I'm getting the very-loud-noises treat as well.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(14:20:59)</span> <b>blin:</b></span> @coatsworth yup it's over<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:21:36)</span> <b>coatsworth:</b></span> @blin Great thanks!<br/>
+</body>
+</html>

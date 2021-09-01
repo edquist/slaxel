@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Aug 26, 2021 : #operations (osg)</title>
+</head>
+<body>
+<h3>Thu Aug 26, 2021 : #operations (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(09:44:55)</span> <b>blin:</b></span> @matyas any reason we shouldn't build new topology containers on push to the <tt>src/</tt>  dir? I'm thinking separate tags (<tt>release*</tt>?) from the versioned ones<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:45:27)</span> <b>matyas:</b></span> other than making a bazillion tags most of which we don't care about, no<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:45:40)</span> <b>blin:</b></span> we don't change the <tt>src/</tt> dir all that much<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:46:22)</span> <b>blin:</b></span> you can restrict GHA to only run on certain paths for push/pr <a href="https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#onpushpull_requestpaths">https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#onpushpull_requestpaths</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(09:46:39)</span> <b>blin:</b></span> (or alternatively, only run when certain dirs/files aren't touched)<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:50:04)</span> <b>matyas:</b></span> I don't see the benefit.<br/>If you want to test a change, you should test it _before_ you merge the PR.<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:50:38)</span> <b>matyas:</b></span> If you want to deploy a merged change, tag it with a version so we can see later (by looking at git history) what changes were in what version.<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:59:57)</span> <b>blin:</b></span> i'm proposing the following process:<br/>1. make PR, get it reviewed, have some basic CI tests<br/>2. merge PR, GHA kicks off new container<br/>3. test new container on ITB<br/>4. repeat 1-3 as necessary<br/>5. tag version, deploy to prod<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:00:56)</span> <b>blin:</b></span> i'd like to get rid of the container building hurdles that it takes to test the changes<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:02:27)</span> <b>matyas:</b></span> except swap 2 and 3. I want the container tested _before_ we merge the change<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:03:39)</span> <b>matyas:</b></span> if you want to skip testing on ITB before merging, then "basic" CI isn't going to cut it<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:20:54)</span> <b>matyas:</b></span> I'd be OK with following your workflow if the merge went into a separate _devel_ branch, but I want _master_ to be clean so if I have to quickly make and deploy a security fix, I can do that without including someone's not-fully-tested feature addition<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(10:45:08)</span> <b>blin:</b></span> good point<br/>
+</blockquote>
+<span style="color: #c386df"><span style="font-size: small">(10:24:31)</span> <b>matyas:</b></span> although we'd have to set up a cleanup policy for harbor<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:37:56)</span> <b>marian:</b></span> <a href="https://support.opensciencegrid.org/a/tickets/67888">https://support.opensciencegrid.org/a/tickets/67888</a><br/>^ @dweitzel and/or @blin... can some of you tackle this one with higher prio, please? (among tons of other high prio stuff you may have!)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:38:12)</span> <b>dweitzel:</b></span> Yup, let me do it now.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:39:22)</span> <b>dweitzel:</b></span> done<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:53:18)</span> <b>blin:</b></span> do we have stratum-1s for OASIS?<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:18:31)</span> <b>marian:</b></span> by we you mean? There is at FNAL, BNL, UNL...<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:28:39)</span> <b>blin:</b></span> i mean an institution with OSG staff so UNL counts!<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:28:39)</span> <b>blin:</b></span> thanks<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(18:22:54)</span> <b>didavila:</b></span> does anyone know if this is the right URL to harbor? <a href="https://hub.opensciencegrid.org/harbor/">https://hub.opensciencegrid.org/harbor/</a> and if so, why I can’t see the option to sign in with CILogon?<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:35:49)</span> <b>matyas:</b></span> it's the right URL although you can drop the <tt>/harbor/</tt> if you want<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:36:26)</span> <b>matyas:</b></span> ... and the option to sign in with CILogon disappears when something's broken<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:38:49)</span> <b>matyas:</b></span> @bbockelm this keeps showing up in the logs for the core pod:<br/><pre>2021-08-26T23:37:54Z [ERROR] [/lib/orm/orm.go:72]: begin transaction failed: pq: cannot set transaction read-write mode during recovery<br/>2021-08-26T23:37:54Z [ERROR] [/lib/http/error.go:54]: {"errors":[{"code":"UNKNOWN","message":"unknown: deal with /v2/ request in transaction failed: pq: cannot set transaction read-write mode during recovery"}]} <br/>2021-08-26T23:37:54Z [ERROR] [/lib/orm/orm.go:72]: begin transaction failed: pq: cannot set transaction read-write mode during recovery<br/>2021-08-26T23:37:54Z [ERROR] [/lib/http/error.go:54]: {"errors":[{"code":"UNKNOWN","message":"unknown: deal with /v2/opensciencegrid/hosted-ce/manifests/release request in transaction failed: pq: cannot set transaction read-write mode during recovery"}]} <br/>2021/08/26 23:37:56.058 [server.go:3093]  [HTTP] http: TLS handshake error from 192.168.160.237:45710: remote error: tls: bad certificate<br/>2021/08/26 23:37:56.066 [server.go:3093]  [HTTP] http: TLS handshake error from 192.168.160.237:45712: remote error: tls: bad certificate<br/>2021/08/26 23:37:57.524 [server.go:3093]  [HTTP] http: TLS handshake error from 192.168.160.237:45722: remote error: tls: bad certificate<br/>2021/08/26 23:37:57.534 [server.go:3093]  [HTTP] http: TLS handshake error from 192.168.160.237:45724: remote error: tls: bad certificate</pre><br/><br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:59:03)</span> <b>bbockelm:</b></span> Interesting. Not sure why the connection pooler isn’t taking care of that.  Need to run the kids around, will look this evening<br/>
+<span style="color: #c386df"><span style="font-size: small">(19:04:40)</span> <b>matyas:</b></span> mind if I bounce the pod?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:17:14)</span> <b>bbockelm:</b></span> Go for it. I probably mostly need to look at the Postgres pods<br/>
+</body>
+</html>

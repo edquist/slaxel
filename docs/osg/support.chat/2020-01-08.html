@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jan 8, 2020 : #support (osg)</title>
+</head>
+<body>
+<h3>Wed Jan 8, 2020 : #support (osg)</h3>
+<span style="color: #5870dd"><span style="font-size: small">(06:09:46)</span> <b>duncan.macleod:</b></span> hi @dwd, @jdost321, @blin, I have successfully published new content to <a href="http://oasis.opensciencegrid.org">oasis.opensciencegrid.org</a> for the LIGO VO. However, I see there are symlinks in place for a few things, e.g:<br/><pre>$ ls -lrt /cvmfs/oasis.opensciencegrid.org/ligo/sw/<br/>total 0<br/>lrwxrwxrwx 1 ouser.ligo ouser.ligo 77 Oct 19  2016 pycbc -&gt; $(LIGO_PYCBC_LOCATION:-/cvmfs/oasis.opensciencegrid.org/ligo/deploy/sw/pycbc)<br/>lrwxrwxrwx 1 ouser.ligo ouser.ligo 83 Feb 15  2017 lalsuite -&gt; $(LIGO_LALSUITE_LOCATION:-/cvmfs/oasis.opensciencegrid.org/ligo/deploy/sw/lalsuite)<br/>lrwxrwxrwx 1 ouser.ligo ouser.ligo 81 Mar 17  2017 lscsoft -&gt; $(LIGO_LSCSOFT_LOCATION:-/cvmfs/oasis.opensciencegrid.org/ligo/deploy/sw/lscsoft)</pre><br/>Should I just add a new symlink for the new <tt>conda</tt> directory in that location, or is this something legacy that shouldn’t be used any more?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:33:11)</span> <b>blin:</b></span> hey @duncan.macleod that strikes me as something LIGO software specific<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:33:27)</span> <b>blin:</b></span> maybe @efajardo knows about the paths<br/>
+<span style="color: #5870dd"><span style="font-size: small">(09:35:11)</span> <b>duncan.macleod:</b></span> or @dabrown might know<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:36:19)</span> <b>efajardo:</b></span> Actually I do not know how the sotware part is setup<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(09:39:02)</span> <b>dabrown:</b></span> @duncan.macleod check with @peter.couvares on that. I think it was set up because there was some old legacy (burst?) code that expected lalsuite somewhere specific in the tree.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(09:39:25)</span> <b>dabrown:</b></span> But in any case, you still might want to set up the env variable for conda as it allows the sysadmin to override the symlink.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(09:40:47)</span> <b>dabrown:</b></span> The syntax <tt>ln -s $(LIGO_LSCSOFT_LOCATION:-/cvmfs/oasis.opensciencegrid.org/ligo/deploy/sw/lscsoft) lscsoft</tt> tells CVMFS "point this symlink at `<tt>/cvmfs/oasis.opensciencegrid.org/ligo/deploy/sw/lscsoft</tt><tt>  unless the environment variable </tt>LIGO_LSCSOFT_LOCATION` is set *in the CVMFS configuration* in which case override to that location.<br/>
+<span style="color: #5870dd"><span style="font-size: small">(09:40:50)</span> <b>duncan.macleod:</b></span> I don’t think I want to support that, but adding the symlink is the easiest thing to do _right now_<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(09:40:59)</span> <b>dabrown:</b></span> Sounds good.<br/>
+<span style="color: #5870dd"><span style="font-size: small">(09:43:43)</span> <b>duncan.macleod:</b></span> how do you create that?<br/><pre>$ ln -s $(LIGO_CONDA_LOCATION:-/cvmfs/oasis.opensciencegrid.org/ligo/deploy/sw/conda) conda<br/>-bash: LIGO_CONDA_LOCATION:-/cvmfs/oasis.opensciencegrid.org/ligo/deploy/sw/conda: No such file or directory</pre><br/>
+<span style="color: #5870dd"><span style="font-size: small">(09:44:53)</span> <b>duncan.macleod:</b></span> ok, got it, just had to escape the <tt>$</tt><br/>
+<span style="color: #5870dd"><span style="font-size: small">(09:58:34)</span> <b>duncan.macleod:</b></span> @blin, thanks, for your response as well, is there any way to see the progress of <tt>oasis-batch-worker</tt> as submitted by <tt>osg-oasis-update</tt>?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:59:13)</span> <b>blin:</b></span> i thought it was just a condor job so maybe <tt>condor_q</tt>?<br/>
+<span style="color: #5870dd"><span style="font-size: small">(10:01:01)</span> <b>duncan.macleod:</b></span> yes, that just shows me that it is running, is there any way to see how long it might take?<br/><pre>$ condor_q 4026.0 -af Out Err<br/>/dev/null /dev/null</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:02:33)</span> <b>blin:</b></span> ah, i don't believe there is, no<br/>
+<span style="color: #5870dd"><span style="font-size: small">(10:03:47)</span> <b>duncan.macleod:</b></span> ok, do you happen to know whether the runtime is in any way linked to the extent of the changes to a particular VO area?<br/>
+<span style="color: #5870dd"><span style="font-size: small">(10:04:08)</span> <b>duncan.macleod:</b></span> I added a single symlink this time, so am curious to see if it takes as long as the publish I did earlier that added several GB of new content<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:13:07)</span> <b>blin:</b></span> i don't know off-hand but @dwd should know the answer<br/>
+<span style="color: #99a949"><span style="font-size: small">(10:16:20)</span> <b>dwd:</b></span> Yes the publish definitely takes longer for a lot of files, and the stratum 1 updates also generally take longer.<br/>
+<span style="color: #5870dd"><span style="font-size: small">(10:16:49)</span> <b>duncan.macleod:</b></span> some minor patience yielded data. this job completed in 23:41 while the previous job took 1:04:42, thanks both<br/>
+<span style="color: #99a949"><span style="font-size: small">(10:17:15)</span> <b>dwd:</b></span> oasis repo publishes also have to wait for anything happening by other VOs sharing the same repo<br/>
+<span style="color: #99a949"><span style="font-size: small">(10:17:33)</span> <b>dwd:</b></span> If you hosted your own repo, publishes can be considerably faster.<br/>
+<span style="color: #5870dd"><span style="font-size: small">(10:18:30)</span> <b>duncan.macleod:</b></span> I am not concerned by the publish speed, just a curious n00b, anything you give me is better than something I would host myself<br/>
+</body>
+</html>

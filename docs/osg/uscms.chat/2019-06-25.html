@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jun 25, 2019 : #uscms (osg)</title>
+</head>
+<body>
+<h3>Tue Jun 25, 2019 : #uscms (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(08:16:53)</span> <b>blin:</b></span> hi all, we're trying to help out Brown set up a new XRootD door to integrate their HDFS cluster with AAA: <a href="https://support.opensciencegrid.org/public/tickets/f426e050715054b2cfe1ab1b9a0284931c6c9c270ef536be61c4dba2defc2630">https://support.opensciencegrid.org/public/tickets/f426e050715054b2cfe1ab1b9a0284931c6c9c270ef536be61c4dba2defc2630</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(08:17:53)</span> <b>blin:</b></span> i'm trying to understand if a standalone XRootD installation is sufficient or if they need an SE<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:18:27)</span> <b>blin:</b></span> is there some sort of CMS global redirector that would mean they'd need to run a <tt>cmsd</tt>?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(09:13:51)</span> <b>bockjoo:</b></span> Yeah, they will need cmsd if they want to report to the CMS global redirector. We usually report to the one at FNAL <a href="http://cmsxrootd.fnal.gov:1213">cmsxrootd.fnal.gov:1213</a> But even without that, users can directly access their xrootd by pointing to their xrootd server instead of the global redirector.<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:51:48)</span> <b>blin:</b></span> why would a site want to report to the CMS global redirector? is that required to work with AAA?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:00:21)</span> <b>bockjoo:</b></span> If a file exists at several sites, the global redirector will need to pick a site. So sites will need to report to the global redirector. For example, if  sites want to participate in the Monte Carlo event production, the sites need to join and provide the file service.<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(16:40:02)</span> <b>blin:</b></span> so if the user is doing something like this:<br/><pre><br/>[eusai@lxplus024 src]$ xrdcp <a href="root://cms-xrd-global.cern.ch//store/user/eusai/step3_dipigun01/step3_100.root">root://cms-xrd-global.cern.ch//store/user/eusai/step3_dipigun01/step3_100.root</a> .<br/>Last server error 3011 ('No servers are available to read the file.')<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:40:51)</span> <b>blin:</b></span> i assume they're expecting their local storage endpoint to report to the global redirector?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(23:22:06)</span> <b>bockjoo:</b></span> correct!<br/>
+</blockquote>
+<span style="color: #7d414c"><span style="font-size: small">(10:11:39)</span> <b>bockjoo:</b></span> If it's unclear, let me know.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:13:09)</span> <b>blin:</b></span> nah that helps, thanks<br/>
+<span style="color: #7d414c"><span style="font-size: small">(11:51:41)</span> <b>bockjoo:</b></span> @bbockelm x509-scitoken-init <a href="https://scitokens.org/cms">https://scitokens.org/cms</a> fails with<br/>
+<span style="color: #7d414c"><span style="font-size: small">(11:51:56)</span> <b>bockjoo:</b></span> requests.exceptions.SSLError: [Errno 1] _ssl.c:492: error:14077410:SSL routines:SSL23_GET_SERVER_HELLO:sslv3 alert handshake failure<br/>
+<span style="color: #7d414c"><span style="font-size: small">(11:52:12)</span> <b>bockjoo:</b></span> Who can fix <a href="https://scitokens.org/cms">https://scitokens.org/cms</a>?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(12:39:03)</span> <b>bockjoo:</b></span> It looks like it does not accept my certificate anymore.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(12:39:32)</span> <b>bockjoo:</b></span> Can "@sombody" test  x509-scitoken-init <a href="https://scitokens.org/cms">https://scitokens.org/cms</a> ?<br/>
+</body>
+</html>

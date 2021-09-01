@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Aug 3, 2021 : #operations (chtc)</title>
+</head>
+<body>
+<h3>Tue Aug 3, 2021 : #operations (chtc)</h3>
+<span style="color: #3c989f"><span style="font-size: small">(11:21:40)</span> <b>wiscmoate:</b></span> @lmichael @ckoch5 @jcpatton :<br/><pre>   Beginning August 23, multi-factor authentication (MFA) with Duo will be<br/>   added to UW-Madison's Virtual Private Network (WiscVPN). This change will<br/>   only impact individuals who access WiscVPN, no other virtual private<br/>   networks (VPNs) on campus will be affected.</pre><br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:22:01)</span> <b>wiscmoate:</b></span> FYI for our non-UW-Madison VPN users<br/>
+<blockquote>
+<span style="color: #99a949"><span style="font-size: small">(11:28:03)</span> <b>matyas:</b></span> hope it will work better than the CS VPN<br/>
+</blockquote>
+<span style="color: #e7392d"><span style="font-size: small">(11:22:05)</span> <b>ckoch5:</b></span> @bbockelman maybe had a plan for this?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(11:22:23)</span> <b>ckoch5:</b></span> @tjslauson @wiscmoate what config variable controls the size of the history file?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:22:44)</span> <b>wiscmoate:</b></span> @ckoch5 might be an ignorant question, but which one?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:23:00)</span> <b>wiscmoate:</b></span> I think multiple HTCondor roles might have history files<br/>
+<span style="color: #e7392d"><span style="font-size: small">(11:23:04)</span> <b>ckoch5:</b></span> good question! job history.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:24:27)</span> <b>wiscmoate:</b></span> This looks promising:<br/><pre># TJ requested for MAX_HISTORY_LOG to be increased<br/># so that the HISTORY_LOG wouldn't rotate so often.<br/># Unfortunately, this was out of bounds:<br/># ERROR "MAX_HISTORY_LOG in the condor configuration is out of<br/># bounds for an integer (5000000000).  Please set it to an<br/># integer in the range -2147483648 to 2147483647 (default<br/># 20971520)." at line 2209 in file<br/># /slots/01/dir_2118510/userdir/.tmpym9A9q/BUILD/condor-8.7.2/src/condor_utils/condor_config.cpp<br/># So, used 2147483647 instead.<br/># See Ticket #82201: more logging needed for late<br/># materialization on CHTC schedds<br/># <a href="https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=82201">https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=82201</a><br/>MAX_HISTORY_LOG = 2147483647</pre><br/>
+<span style="color: #d58247"><span style="font-size: small">(11:24:46)</span> <b>gthain:</b></span> MAX_HISTORY_LOG is what you want for the submit-side job history<br/>
+<span style="color: #e7392d"><span style="font-size: small">(11:25:42)</span> <b>ckoch5:</b></span> Is that entries?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:25:51)</span> <b>wiscmoate:</b></span> I think it's bytes<br/>
+<span style="color: #e7392d"><span style="font-size: small">(11:26:08)</span> <b>ckoch5:</b></span> AHA<br/>
+<span style="color: #d58247"><span style="font-size: small">(11:28:16)</span> <b>gthain:</b></span> bytes it is<br/>
+<span style="color: #d58247"><span style="font-size: small">(11:28:51)</span> <b>gthain:</b></span> The idea is that we want to enforce an upper bound on how much disk space the daemons will use<br/>
+<span style="color: #e7392d"><span style="font-size: small">(11:31:15)</span> <b>ckoch5:</b></span> makes sense<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:20:54)</span> <b>ckoch5:</b></span> someone is trying to user our smbclient / research drive instructions and getting an error: <a href="https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=103799">https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=103799</a><br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:21:08)</span> <b>ckoch5:</b></span> ^^ who knows about smbclient? @wiscmoate? @jcpatton?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:22:15)</span> <b>jcpatton:</b></span> I’m not sure, <tt>-k</tt> is definitely required, but it seems like there’s a problem with their kerberos ticket<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:28:20)</span> <b>wiscmoate:</b></span> Weird that they were getting the error about <tt>/home/lnell/.cache/samba</tt>, it seems to exist and to be accessible to <tt>lnell</tt>:<br/><pre>[moate@transfer2000 ~]$ sudo find /home/lnell/.cache -exec ls -ald {} +<br/>drwxrwxr-x 3 lnell lnell   4096 Jul 31 12:36 /home/lnell/.cache<br/>drwx------ 2 lnell lnell   4096 Jul 31 12:36 /home/lnell/.cache/samba<br/>-rw-r--r-- 1 lnell lnell 454656 Aug  1 11:30 /home/lnell/.cache/samba/gencache.tdb</pre><br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:29:19)</span> <b>wiscmoate:</b></span> I can't test unfortunately, as I have no access to research drive<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:30:29)</span> <b>wiscmoate:</b></span> But my biggest question is why this is happening -&gt; <tt>gencache_init: Failed to create directory: /home/lnell/.cache/samba - No such file or directory</tt><br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:32:33)</span> <b>ckoch5:</b></span> I get the same error but can log in successfully<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:32:40)</span> <b>ckoch5:</b></span> both with <tt>-k</tt> and without<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:33:13)</span> <b>wiscmoate:</b></span> Weird<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:33:27)</span> <b>wiscmoate:</b></span> What does <tt>klist -a</tt> show you?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:33:45)</span> <b>jcpatton:</b></span> not super helpful bug report: <a href="https://bugzilla.redhat.com/show_bug.cgi?id=1908506">https://bugzilla.redhat.com/show_bug.cgi?id=1908506</a><br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:33:49)</span> <b>ckoch5:</b></span> <pre>Ticket cache: FILE:/tmp/krb5cc_20849_y4NO46<br/>Default principal: ckoch5@AD.WISC.EDU<br/><br/>Valid starting       Expires              Service principal<br/>08/03/2021 14:18:01  08/04/2021 00:18:01  krbtgt/AD.WISC.EDU@AD.WISC.EDU<br/>	renew until 08/10/2021 14:18:01<br/>	Addresses: (none)<br/>08/03/2021 14:18:27  08/04/2021 00:18:01  cifs/research.drive.wisc.edu@AD.WISC.EDU<br/>	renew until 08/10/2021 14:18:01<br/>	Addresses: (none)</pre><br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:34:12)</span> <b>wiscmoate:</b></span> Ask <tt>lnell</tt> to do a <tt>klist -a</tt><br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:34:18)</span> <b>ckoch5:</b></span> kk<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:34:25)</span> <b>wiscmoate:</b></span> I suspect they're failing to get a kerberos ticket<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:34:50)</span> <b>wiscmoate:</b></span> (as Jason pointed out)<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:35:44)</span> <b>wiscmoate:</b></span> Or maybe they'd been SSHed in for so long that their kerberos ticket expired?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:36:19)</span> <b>ckoch5:</b></span> yes, but then shouldn’t the password based login work?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:36:34)</span> <b>ckoch5:</b></span> (what you’re prompted with if you don’t use -k)<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:36:52)</span> <b>wiscmoate:</b></span> Hold on with that <tt>klist -a</tt> request Christina, I can use rootly powers to do it<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:37:15)</span> <b>wiscmoate:</b></span> I'm somewhat surprised you can do it without -k<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:38:27)</span> <b>wiscmoate:</b></span> I don't see a kerberos ticket cache for <tt>lnell</tt> in /tmp<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:38:35)</span> <b>wiscmoate:</b></span> Maybe the system pruned it?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:39:59)</span> <b>wiscmoate:</b></span> @ckoch5 yeah, I'd advise having them log back into <a href="http://transfer.chtc.wisc.edu">transfer.chtc.wisc.edu</a>, do a <tt>klist -a</tt> and put the output in the email, then try the smbclient again<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:43:20)</span> <b>wiscmoate:</b></span> and maybe if it fails do <tt>klist -a</tt> a second time and post the output<br/>
+</body>
+</html>

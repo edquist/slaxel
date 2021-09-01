@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jul 30, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu Jul 30, 2020 : #software (osg)</h3>
+<span style="color: #a63024"><span style="font-size: small">(09:53:21)</span> <b>efajardo:</b></span> @tim.theisen and @matyas I see that for EL8<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:53:26)</span> <b>efajardo:</b></span> condor is avaialble<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:53:33)</span> <b>efajardo:</b></span> but not condor-python<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:53:43)</span> <b>efajardo:</b></span> <pre>yum list condor-python --enablerepo=osg-development<br/>Failed to set locale, defaulting to C.UTF-8<br/>Last metadata expiration check: 0:00:51 ago on Thu Jul 30 14:52:47 2020.<br/>Error: No matching Packages to list</pre><br/>
+<span style="color: #73769d"><span style="font-size: small">(09:54:53)</span> <b>tim.theisen:</b></span> That's because we only support Python3 bindings in HTCondor on EL8. Look for python3-condor.<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:56:45)</span> <b>efajardo:</b></span> ohh boy<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:56:57)</span> <b>efajardo:</b></span> I actually<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:57:05)</span> <b>efajardo:</b></span> @matyas can you comment<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:57:22)</span> <b>efajardo:</b></span> should I change xcache to use python3?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:03:25)</span> <b>matyas:</b></span> yeah that would be a good idea<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:04:27)</span> <b>matyas:</b></span> the part of xcache that uses condor is the reporting script at <a href="https://github.com/opensciencegrid/xcache/blob/master/src/xcache-reporter">https://github.com/opensciencegrid/xcache/blob/master/src/xcache-reporter</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:05:54)</span> <b>matyas:</b></span> it looks fairly good; I don't think you'll need to make any code changes,<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:06:09)</span> <b>matyas:</b></span> oh there's also this: <a href="https://github.com/opensciencegrid/xcache/blob/master/src/xrootd_cache_stats.py">https://github.com/opensciencegrid/xcache/blob/master/src/xrootd_cache_stats.py</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(10:06:40)</span> <b>efajardo:</b></span> ANd also change it to require <tt>python3-xrootd</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(10:06:40)</span> <b>efajardo:</b></span> ?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:07:26)</span> <b>matyas:</b></span> yep<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:09:04)</span> <b>efajardo:</b></span> ok<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:09:07)</span> <b>matyas:</b></span> for xrootd_cache_stats.py, you'll need to change the exception syntax (<tt>except Foo, e</tt> -&gt; <tt>except Foo as e</tt>) and urlparse<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:09:09)</span> <b>efajardo:</b></span> so yea some code<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:09:25)</span> <b>matyas:</b></span> yeah<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:09:57)</span> <b>efajardo:</b></span> ok<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:10:00)</span> <b>efajardo:</b></span> I will get to it<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:16:27)</span> <b>efajardo:</b></span> @tim.theisen do you know<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:16:28)</span> <b>efajardo:</b></span> where<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:16:30)</span> <b>efajardo:</b></span> <pre>  - nothing provides boost-python3 needed by python3-condor-8.8.9-1.2.osg35.el8.x86_64<br/>  - nothing provides libboost_python3.so.1.66.0()(64bit) needed by python3-condor-8.8.9-1.2.osg35.el8.x86_64</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(10:16:38)</span> <b>efajardo:</b></span> boostpython is supposed to come from?<br/>
+<span style="color: #73769d"><span style="font-size: small">(10:18:34)</span> <b>tim.theisen:</b></span> You have to enable power tools on EL8<br/><pre>dnf install 'dnf-command(config-manager)'<br/>dnf config-manager --set-enabled PowerTools</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:19:16)</span> <b>blin:</b></span> (<a href="https://opensciencegrid.org/docs/common/yum/#centos-8">https://opensciencegrid.org/docs/common/yum/#centos-8</a>)<br/>
+<span style="color: #73769d"><span style="font-size: small">(10:20:12)</span> <b>tim.theisen:</b></span> That document should be using dnf instead of yum for EL8.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:20:56)</span> <b>blin:</b></span> i'm pretty sure yum is an alias to dnf for centos 8<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:21:00)</span> <b>blin:</b></span> @matyas^^<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:21:39)</span> <b>efajardo:</b></span> ok<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:21:53)</span> <b>efajardo:</b></span> I am re writting my own <tt>docker-software-base</tt> for el8<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:22:01)</span> <b>efajardo:</b></span> thanks @tim.theisen I will put it there<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:23:51)</span> <b>efajardo:</b></span> Still no dice<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:23:54)</span> <b>efajardo:</b></span> <pre> Problem: package python3-condor-8.8.9-1.2.osg35.el8.x86_64 requires libcondor_utils_8_8_9.so()(64bit), but none of the providers can be installed<br/>  - package python3-condor-8.8.9-1.2.osg35.el8.x86_64 requires condor = 8.8.9-1.2.osg35.el8, but none of the providers can be installed<br/>  - conflicting requests<br/>  - nothing provides blahp &gt;= 1.16.1 needed by condor-8.8.9-1.2.osg35.el8.x86_64</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:24:11)</span> <b>blin:</b></span> we have one already at <tt>opensciencegrid/software-base:el8</tt>. have you tried that?<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:24:17)</span> <b>efajardo:</b></span> I did not know that<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:24:21)</span> <b>efajardo:</b></span> ok I will try that<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:24:47)</span> <b>blin:</b></span> our bad, we should've mentioned it at the team meeting<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:25:03)</span> <b>efajardo:</b></span> so where is <tt>blahp</tt> supposed to come from?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:25:20)</span> <b>blin:</b></span> i don't think it's built yet<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:25:39)</span> <b>efajardo:</b></span> ok I can try to build it<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:25:45)</span> <b>efajardo:</b></span> what a can of worms<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:25:48)</span> <b>blin:</b></span> i think it's going to be a huge mess but i'll make a ticket<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:29:26)</span> <b>matyas:</b></span> yum is an alias to dnf in EL8. Red Hat's not telling anybody to start typing dnf, so we shouldn't either<br/>
+<span style="color: #73769d"><span style="font-size: small">(10:46:46)</span> <b>tim.theisen:</b></span> OK<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:20:52)</span> <b>efajardo:</b></span> @blin why is this not open<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:20:53)</span> <b>efajardo:</b></span> <pre>docker pull opensciencegrid/docker-software-base:el8<br/>Error response from daemon: pull access denied for opensciencegrid/docker-software-base, repository does not exist or may require 'docker login': denied: requested access to the resource is denied</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(11:21:28)</span> <b>matyas:</b></span> el8-fresh<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:21:32)</span> <b>blin:</b></span> <tt>software-base</tt> not <tt>docker-software-base</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(11:21:36)</span> <b>matyas:</b></span> that too<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:21:52)</span> <b>matyas:</b></span> let me double-check about el8-fresh actually<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:22:14)</span> <b>blin:</b></span> i'm pretty sure it's just el8<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:22:57)</span> <b>blin:</b></span> nvm you're right, <tt>el8-fresh</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(11:24:41)</span> <b>efajardo:</b></span> Same problem<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:24:45)</span> <b>efajardo:</b></span> <pre> docker pull opensciencegrid/docker-software-base:el8-fresh<br/>Error response from daemon: pull access denied for opensciencegrid/docker-software-base, repository does not exist or may require 'docker login': denied: requested access to the resource is denied</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(11:24:53)</span> <b>efajardo:</b></span> software-base does not exist<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:25:01)</span> <b>efajardo:</b></span> <pre>docker pull opensciencegrid/software-base:el8<br/>Error response from daemon: manifest for opensciencegrid/software-base:el8 not found: manifest unknown: manifest unknown</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(11:25:17)</span> <b>matyas:</b></span> docker pull opensciencegrid/software-base:el8-fresh<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:25:31)</span> <b>efajardo:</b></span> wow ok that one works<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:35:45)</span> <b>efajardo:</b></span> So building the blahp for el8 fails<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:35:47)</span> <b>efajardo:</b></span> <pre>*** ERROR: ambiguous python shebang in /usr/libexec/blahp/slurm_status.py: #!/usr/bin/python. Change it to python3 (or python2) explicitly.<br/>*** ERROR: ambiguous python shebang in /usr/libexec/blahp/pbs_status.py: #!/usr/bin/python. Change it to python3 (or python2) explicitly.<br/>*** WARNING: ./usr/libexec/blahp/blah.py is executable but has empty or no shebang, removing executable bit<br/>*** WARNING: ./etc/blahp/lsf_local_submit_attributes.sh is executable but has empty or no shebang, removing executable bit<br/>*** WARNING: ./etc/blahp/slurm_local_submit_attributes.sh is executable but has empty or no shebang, removing executable bit<br/>*** WARNING: ./etc/blahp/condor_local_submit_attributes.sh is executable but has empty or no shebang, removing executable bit<br/>*** WARNING: ./etc/blahp/pbs_local_submit_attributes.sh is executable but has empty or no shebang, removing executable bit</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(11:36:02)</span> <b>efajardo:</b></span> should I through this over the fence to codnor folks @tim.theisen or try to fix it<br/>
+<span style="color: #73769d"><span style="font-size: small">(11:37:21)</span> <b>tim.theisen:</b></span> I guess it's the HTCondor team's job to fix it.<br/>
+<span style="color: #73769d"><span style="font-size: small">(11:37:58)</span> <b>tim.theisen:</b></span> It's on the plate to do next week. I can make the pull request for the fix today.<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:38:12)</span> <b>efajardo:</b></span> ok<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:38:26)</span> <b>efajardo:</b></span> thanks<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:38:49)</span> <b>blin:</b></span> @efajardo make sure to dump that in the jira ticket ^^<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:47:32)</span> <b>matyas:</b></span> I have an oidc-agent question. How do I save a refresh token to a file so I can load it back later (e.g. in a fresh container)<br/>
+</body>
+</html>

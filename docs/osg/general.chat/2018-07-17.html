@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jul 17, 2018 : #general (osg)</title>
+</head>
+<body>
+<h3>Tue Jul 17, 2018 : #general (osg)</h3>
+<span style="color: #dc7dbb"><span style="font-size: small">(02:02:52)</span> <b>carsten.aulbert:</b></span> I've got a question about setting up a cluster-local squid farm for cvmfs (if there is another channel here better suited, please let me know/invite me) - at the moment we have only a single proxy which to no-one's surprise can quickly become overloaded. Now I could add a number of well networked machines (u pto 37 at the moment) where the proxy-local storage could be on NVMe Flash. As I would hope all servers would be used "equally", I would only define a single group in CVMFS_HTTP_PROXY to have automatic load-balancing. Thus my questions:<br/>(1) Should that be enough or is there any advantage of having a backup group if all servers ought to be equal?<br/>(2) To prevent multiple proxies hitting upstream servers to hard, I'm currently considering pre-loading an alien cache or our own (non-public?) stratum 1 replica in-house. Any suggestions what to prefer?<br/>(at the moment I'm only interested in the contents of /cvmfs/oasis.opensciencegrid.org/ligo/)<br/>Thanks a lot in advance<br/>
+<span style="color: #9e3997"><span style="font-size: small">(07:59:32)</span> <b>bbockelm:</b></span> @dwd ^^^<br/>
+<span style="color: #99a949"><span style="font-size: small">(08:01:29)</span> <b>dwd:</b></span> For number 1, round-robin DNS load balancing is sufficient; you can set them all in one name in CVMFS_HTTP_PROXY.<br/>
+<span style="color: #99a949"><span style="font-size: small">(08:01:58)</span> <b>dwd:</b></span> For number 2, there should be no need to have a stratum 1 replica or alien cache.  Are you talking about an HPC system?<br/>
+<span style="color: #99a949"><span style="font-size: small">(08:07:33)</span> <b>dwd:</b></span> If you need a large number of squids, my recommendation would be to have one pair that feeds all the others.  That can be set up with the “cache_peer parent” squid configuration on all the others.  Squid itself doesn’t do as well with round-robin DNS as the cvmfs client does, but it can be worked around with listing each of the two parent squids separately and using the “round-robin” keyword at the end of the cache_peer parent lines so squid does the round-robin itself.<br/>
+<span style="color: #99a949"><span style="font-size: small">(08:07:50)</span> <b>dwd:</b></span> I am in an airport in Munich right now, need to board soon, will be back in the office tomorrow<br/>
+<span style="color: #dc7dbb"><span style="font-size: small">(08:09:15)</span> <b>carsten.aulbert:</b></span> Thanks Dave - good flight btw. Yes, this is for a LIGO HTC system and using two proxies to feed the others sounds like a good way to go.<br/>
+</body>
+</html>

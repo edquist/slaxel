@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Nov 15, 2019 : #operations (osg)</title>
+</head>
+<body>
+<h3>Fri Nov 15, 2019 : #operations (osg)</h3>
+<span style="color: #e96699"><span style="font-size: small">(16:00:38)</span> <b>ian_cancercomputer:</b></span> hey all .. hoping someone could shed some light on this.  I've got worker_node_tmp set to /var/tmp/osg in 10-storage.ini as one would expect, but on my workers the /var/lib/condor/dir_####/_condor_stderr file reports "Startup dir /var/tmp/osg does not exist" (even though it does and is writeable)..  This is OSG3.4 still; has something changed?  I notice there is a 'var/tmp' subdirectory within that dir_#### directory as well, is it possible for some reason it expects the path to resolve to that?<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:01:07)</span> <b>ian_cancercomputer:</b></span> (at this stage I think its the glidein script thats doing this correct?)<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:20:19)</span> <b>blin:</b></span> what version of htcondor are you running?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:21:10)</span> <b>blin:</b></span> 8.8 sets <tt>MOUNT_UNDER_SCRATCH</tt> to /tmp and /var/tmp by default<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:21:29)</span> <b>blin:</b></span> so i think all you have to do is set <tt>MOUNT_UNDER_SCRATCH = $(MOUNT_UNDER_SCRATCH, /var/tmp/osg</tt><br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:44:40)</span> <b>rynge:</b></span> @ian_cancercomputer Could also be systemd giving htcondor its own /var/tmp<br/>
+</body>
+</html>

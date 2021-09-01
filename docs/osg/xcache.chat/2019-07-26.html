@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jul 26, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Fri Jul 26, 2019 : #xcache (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(09:38:46)</span> <b>blin:</b></span> @ivukotic how do you control client access to atlas xcache?<br/>
+<span style="color: #84b22f"><span style="font-size: small">(09:40:30)</span> <b>ivukotic:</b></span> you need x509 proxy to access the data<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:52:31)</span> <b>blin:</b></span> so are you using this xrootd config?<br/><pre><br/># Uncomment the following and bind mount to /etc/xrootd/xcache.cfg to request GSI security from client<br/>#xrootd.seclib /usr/lib64/libXrdSec.so<br/>#sec.protparm gsi -vomsfun:/usr/lib64/libXrdSecgsiVOMS.so -vomsfunparms:certfmt=raw|vos=atlas|grps=/atlas<br/>#sec.protocol /usr/lib64 gsi -ca:1 -crl:3<br/>#acc.authdb /etc/xrootd/auth_db<br/>#acc.authrefresh 60<br/>#ofs.authorize<br/></pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:12:37)</span> <b>matyas:</b></span> how far away are we from having a condor file transfer plugin for stashcache/xcache?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:37:27)</span> <b>blin:</b></span> so when you're running xrootd in clustered mode, each host needs to run xrootd + cmsd with at least one cmsd manager and the rest servers?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:26:02)</span> <b>blin:</b></span> so i'm getting this error when specifying <tt>http.secxtractor /usr/lib64/libXrdLcmaps.so</tt>:<br/><pre><br/>Plugin No such file or directory loading secxtractorlib /usr/lib64/libXrdLcmaps-4.so<br/>Config Falling back to using /usr/lib64/libXrdLcmaps.so<br/>Plugin loaded <br/>lcmaps[20170]     LOG_ERR: 2019-07-26.20:05:32Z: /etc/lcmaps.db:165: [warning] expecting rule definitions.<br/>lcmaps[20170]     LOG_ERR: 2019-07-26.20:05:32Z: /etc/lcmaps.db:165: [warning] no rules specified for policy: 'glexec' at line 153.<br/>lcmaps[20170]     LOG_ERR: 2019-07-26.20:05:32Z: lcmaps.mod-PluginInit(): plugin lcmaps_gums_client.mod not found (arguments: -resourcetype ce -actiontype execute-now -capath /etc/grid-security/certificates -cert   /etc/grid-security/hostcert.pem -key    /etc/grid-security/hostkey.pem --cert-owner root --endpoint <a href="https://yourgums.yourdomain:8443/gums/services/GUMSXACMLAuthorizationServicePort)">https://yourgums.yourdomain:8443/gums/services/GUMSXACMLAuthorizationServicePort)</a><br/>lcmaps[20170]     LOG_ERR: 2019-07-26.20:05:32Z: lcmaps.mod-lcmaps_startPluginManager(): error initializing plugin: lcmaps_gums_client.mod<br/>lcmaps[20170]     LOG_ERR: 2019-07-26.20:05:32Z: lcmaps_init() error: could not start plugin manager<br/>ERROR in xrootd-lcmaps config: Failed to initialize LCMAPS<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:26:32)</span> <b>blin:</b></span> i'm not really sure why it's trying to use <tt>libXrdLcmaps-4.so</tt>:<br/><pre><br/># ls -l /usr/lib64/libXrdLcmaps.*<br/>lrwxrwxrwx. 1 root root    17 Jul 22 14:02 /usr/lib64/libXrdLcmaps.so -&gt; libXrdLcmaps.so.0<br/>lrwxrwxrwx. 1 root root    21 Jul 22 14:02 /usr/lib64/libXrdLcmaps.so.0 -&gt; libXrdLcmaps.so.0.0.2<br/>-rwxr-xr-x. 1 root root 59248 Apr 10 16:13 /usr/lib64/libXrdLcmaps.so.0.0.2<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:26:46)</span> <b>blin:</b></span> anyone have any ideas?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:27:10)</span> <b>blin:</b></span> also, where does the xrootd http documentation live?<br/>
+</body>
+</html>

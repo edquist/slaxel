@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jun 23, 2021 : #operations (chtc)</title>
+</head>
+<body>
+<h3>Wed Jun 23, 2021 : #operations (chtc)</h3>
+<span style="color: #2b6836"><span style="font-size: small">(09:53:15)</span> <b>jcpatton:</b></span> random finding while picking through our startd policy, I don’t think this comment section is quite right anymore<br/>
+<span style="color: #2b6836"><span style="font-size: small">(09:54:20)</span> <b>jcpatton:</b></span> the <tt>WANT_HOLD</tt> expression has only to do with going over the time limit<br/>
+<span style="color: #d58247"><span style="font-size: small">(09:57:27)</span> <b>gthain:</b></span> I suspect that when we dropped support for standard universe there was another clause after that comment that got deleted, but the comment wasn't<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:01:59)</span> <b>tlmiller:</b></span> ... I should make a clever remark about the typo, instead, but I've got nothing.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:17:08)</span> <b>jcpatton:</b></span> It looks like COBA-server folks need to have some extra Docker automounts in the startd config: <a href="https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=103495">https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=103495</a> (parsing through the thread, at least <tt>/dp</tt> needs to be mounted somewhere)… unless you know some way to allow users to choose how to mount custom paths in a Docker universe job @gthain<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:17:57)</span> <b>gthain:</b></span> What's COBA-server ?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:18:15)</span> <b>jcpatton:</b></span> a researcher-owned startd<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:18:44)</span> <b>gthain:</b></span> There's support to add additional volume mounts to docker universe via DOCKER_VOLUME_MOUNTS<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:19:03)</span> <b>jcpatton:</b></span> in the submit file?<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:19:40)</span> <b>gthain:</b></span> on the startd side<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:19:58)</span> <b>jcpatton:</b></span> that’s what we already do with staging?<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:20:27)</span> <b>gthain:</b></span> Yeah<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:37:43)</span> <b>jcpatton:</b></span> I’ll get an htcondor-inf thread going for this<br/>
+<span style="color: #d58247"><span style="font-size: small">(20:33:16)</span> <b>gthain:</b></span> What's up with 420?<br/>
+<span style="color: #d58247"><span style="font-size: small">(20:33:32)</span> <b>gthain:</b></span> <pre>$ ssh <a href="http://e420.chtc.wisc.edu">e420.chtc.wisc.edu</a><br/>Connection closed by 128.105.245.220 port 22<br/>[gthain@batlabsubmit0001 ~]$ </pre><br/>
+<blockquote>
+<span style="color: #4bbe2e"><span style="font-size: small">(2021-06-24 09:03:25)</span> <b>tjslauson:</b></span> you and I talked about this, but for others interested: <a href="https://ganglia.chtc.wisc.edu/graph_all_periods.php?c=CHTC&amp;h=e420.chtc.wisc.edu&amp;r=hour&amp;z=default&amp;jr=&amp;js=&amp;st=1624542226&amp;v=19846.09&amp;m=load_one&amp;vl=%20&amp;ti=One%20Minute%20Load%20Average&amp;z=large">https://ganglia.chtc.wisc.edu/graph_all_periods.php?c=CHTC&amp;h=e420.chtc.wisc.edu&amp;r=hour&amp;[…]m=load_one&amp;vl=%20&amp;ti=One%20Minute%20Load%20Average&amp;z=large</a><br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(2021-06-24 09:08:12)</span> <b>tjslauson:</b></span> tl;dr: there's a recurring slow climb in process count, which I think is causing e420's <tt>pid_max</tt> to be hit.  The processes accumulate regularly and surprisingly infrequently - it takes a month to top out, so we have time to inspect it.<br/>
+</blockquote>
+</body>
+</html>

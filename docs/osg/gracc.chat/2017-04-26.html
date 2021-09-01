@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Apr 26, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Wed Apr 26, 2017 : #gracc (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(10:22:50)</span> <b>dweitzel:</b></span> @dweitzel uploaded a file: <a href="https://opensciencegrid.slack.com/files/dweitzel/F549M8GBB/pasted_image_at_2017_04_26_10_22_am.png">Google Analytics GRACC OS Breakdown</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:35:27)</span> <b>kretzke:</b></span> having some issues with records from UW <tt>level=error msg="error unmarshalling xml" error="XML syntax error on line 14: element &lt;jobname&gt; closed by &lt;/JobName&gt;" from="pbs:<a href="http://globus1.hyak.washington.edu">globus1.hyak.washington.edu</a>" </tt><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:47:55)</span> <b>kretzke:</b></span> we’ve successfully processed records from them as recently as 15:00 this morning… odd<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:02:19)</span> <b>dweitzel:</b></span> is it happening every time?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:02:33)</span> <b>dweitzel:</b></span> or is it resubmitting the same record over and over?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:02:35)</span> <b>dweitzel:</b></span> any ideas?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:04:34)</span> <b>kretzke:</b></span> it’s probably the same one. I’ll flip on debug (SIGUSR2)<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:10:35)</span> <b>kretzke:</b></span> and rutgers is sending records with non-rfc3339-compliant times. ugh.  <tt> error="parsing time \"2017-04-25T20:06:30\" as \"2006-01-02T15:04:05Z07:00\": cannot parse \"\" as \"Z07:00\"" from="gridftp-transfer:<a href="http://ruhex-osgce.physics.rutgers.edu">ruhex-osgce.physics.rutgers.edu</a>"</tt><br/>
+<blockquote>
+<span style="color: #235e5b"><span style="font-size: small">(11:54:18)</span> <b>dweitzel:</b></span> kretzke: I just want to talk about this problem first.  I'm not sure I understand it fully.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:54:35)</span> <b>dweitzel:</b></span> ok, so it's not the right format, ok.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:54:47)</span> <b>dweitzel:</b></span> why does it have 2 dates?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:55:39)</span> <b>kretzke:</b></span> the second date <tt>2006-01-02T15:04:05Z07:00</tt> is the format string<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:56:26)</span> <b>dweitzel:</b></span> define "format string"<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:56:36)</span> <b>kretzke:</b></span> so the issue is that RFC3339 requires a timezone offset or Z, and this has neither<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:57:08)</span> <b>dweitzel:</b></span> ok<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:57:15)</span> <b>kretzke:</b></span> it’s how the Go time package parses times <a href="https://golang.org/pkg/time/#pkg-constants">https://golang.org/pkg/time/#pkg-constants</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:58:19)</span> <b>dweitzel:</b></span> I am also wondering, I see these errors in my local gratia collector like this:<br/><pre><br/>DateElement: caught problem with date element, "2017-04-26 16:51:03.775863Z", fixed to "2017-04-26T16:51:03.775863Z"<br/></pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:58:29)</span> <b>dweitzel:</b></span> Though, that isn't the same problem.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:58:35)</span> <b>dweitzel:</b></span> (though, it could be in the future)<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:00:18)</span> <b>kretzke:</b></span> yeah, probably. legacy code, sigh<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:01:56)</span> <b>dweitzel:</b></span> I don't see anything like the problem you saw though.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:02:22)</span> <b>dweitzel:</b></span> Though, I'm not sure about the gridftp-transfer probes.   I don't think we run them.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:04:19)</span> <b>dweitzel:</b></span> I wonder, could you just add a "Z" afterwards?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:04:20)</span> <b>dweitzel:</b></span> ugh<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:04:59)</span> <b>kretzke:</b></span> the Gratia time parser must support more of iso8601 than rfc3339. sadly it’s such a broad standard that it’s very hard to implement<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:06:35)</span> <b>kretzke:</b></span> I’ll probably just have it try several variants (i.e. strict, no offset, no T, etc)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:07:01)</span> <b>dweitzel:</b></span> ugh<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:10:09)</span> <b>kretzke:</b></span> ok, so Gratia just tries to parse it, then if it fails it uses a regex to grab the date and time parts then puts “T” between and “Z” after<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:10:48)</span> <b>dweitzel:</b></span> wonderful<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:11:09)</span> <b>dweitzel:</b></span> went code diving through gratia collector?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:11:14)</span> <b>kretzke:</b></span> yeah<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:12:07)</span> <b>kretzke:</b></span> <tt>/collector/gratia-services/net/sf/gratia/storage/DateElement.java</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:14:30)</span> <b>dweitzel:</b></span> good find.<br/>
+</blockquote>
+<span style="color: #235e5b"><span style="font-size: small">(11:13:27)</span> <b>dweitzel:</b></span> of course, we implement a better collector, and see all the problems in the probes.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:13:41)</span> <b>kretzke:</b></span> so hyak has both condor and pbs probes named <tt><a href="http://globus1.hyak.washington.edu">globus1.hyak.washington.edu</a></tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:14:03)</span> <b>dweitzel:</b></span> do they have the condor: and pbs: prefixes?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:14:07)</span> <b>kretzke:</b></span> yeah<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:14:16)</span> <b>dweitzel:</b></span> that's probably ok.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:14:58)</span> <b>kretzke:</b></span> htcondor-ce and pbs local?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:26:13)</span> <b>dweitzel:</b></span> usually you don't run both probes.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:36:55)</span> <b>kretzke:</b></span> yeah, it appears to be re-sending the same records. some bundles are getting through<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:40:45)</span> <b>kretzke:</b></span> at least the number of bad bundles has pretty much flatlined… <a href="https://gracc.opensciencegrid.org/dashboard/db/gracc-collector-stats?refresh=1m&amp;panelId=7&amp;fullscreen&amp;orgId=1&amp;from=now-24h&amp;to=now">https://gracc.opensciencegrid.org/dashboard/db/gracc-collector-stats?refresh=1m&amp;panelId=7&amp;fullscreen&amp;orgId=1&amp;from=now-24h&amp;to=now</a><br/>
+<span style="color: #902d59"><span style="font-size: small">(15:12:15)</span> <b>tanya:</b></span> so, gratia was smart and rejected all these records and nobody looked at it<br/>
+<span style="color: #902d59"><span style="font-size: small">(15:12:37)</span> <b>tanya:</b></span> now we have to open tickets for every site that is doing something stupid<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:12:43)</span> <b>dweitzel:</b></span> Actually gratia accepted and modified the date.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:13:16)</span> <b>dweitzel:</b></span> @kretzke and I talked, and it looks like gratia accepted the malformed date records, and used a custom regex to modify it into something reasonable.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:13:30)</span> <b>dweitzel:</b></span> The bad XML record, I'm not sure about.<br/>
+<span style="color: #902d59"><span style="font-size: small">(15:13:50)</span> <b>tanya:</b></span> malformed xml records were rejected for sure<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:26:20)</span> <b>kretzke:</b></span> I prefer throwing the record back at the source rather than silently discarding it…<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(17:28:39)</span> <b>kherner:</b></span> FWIW @kretzke I agree that's better<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:30:10)</span> <b>kretzke:</b></span> of course if nobody does anything then it’ll bounce back and forth forever. todo: create FUSE mount that stores data in bouncing accounting records.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:30:54)</span> <b>kretzke:</b></span> (someone did that with ICMP packets or something)<br/>
+</body>
+</html>

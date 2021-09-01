@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Aug 27, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu Aug 27, 2020 : #software (osg)</h3>
+<span style="color: #e23f99"><span style="font-size: small">(04:07:52)</span> <b>marco.mascheroni:</b></span> I am testing 3.6.3 in the CMS ITBs factory and frontend. Found an issue with the new python version of condor_chirp that is shipped with gwms (the one that uses pychirp). But I think it is something we can fix ourselves once Bruno gives me the patch<br/>
+<span style="color: #73769d"><span style="font-size: small">(08:35:29)</span> <b>tim.theisen:</b></span> @blin @marcom @marco.mascheroni Should this issue hold up the release?<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:36:09)</span> <b>blin:</b></span> i think Marco Mambelli's out on vacation<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:36:25)</span> <b>blin:</b></span> i'm inclined to hold it back unless @jdost321 says that it's ok<br/>
+<span style="color: #73769d"><span style="font-size: small">(08:39:00)</span> <b>tim.theisen:</b></span> Yes, it seems like a regression. I will wait to hear from Jeff.<br/>
+<span style="color: #e23f99"><span style="font-size: small">(09:02:39)</span> <b>marco.mascheroni:</b></span> The scripts are shipped with the factory. But I believe "holding the release back" is more a VO decision. Condor_chirp is mostly used to set classads in the schedds by the various job wrappers (The WMAgent and the CRAB ones for example). For CMS some monitoring pages won't work properly.<br/>
+<span style="color: #385a86"><span style="font-size: small">(09:05:01)</span> <b>jdost321:</b></span> Well, it could affect many VOs. I don't know who else depends on it besides CMS on the frontends, @efajardo do any of your FEs use condor_chirp?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:08:13)</span> <b>blin:</b></span> hrm, i think we should hold this back then and wait for a patch from bruno<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:08:55)</span> <b>blin:</b></span> we could apply it and release a patched build next week instead. if anyone's hurting for 3.6.3, they can grab it from <tt>osg-testing</tt><br/>
+<span style="color: #73769d"><span style="font-size: small">(09:12:42)</span> <b>tim.theisen:</b></span> Yes, we are holding back glideinWMS.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:29:14)</span> <b>rynge:</b></span> HTCondor experts, I see all glideins on a particular site behave oddly. Jobs are always preempted during the stage out. For example, a 10 minute sleep job:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:29:48)</span> <b>rynge:</b></span> It sat there fine for 10 minutes, and then as soon as stageout started, it gets disconnected<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:30:42)</span> <b>rynge:</b></span> <pre>001 (4300714.000.000) 2020-08-27 15:06:32 Job executing on host: &lt;172.20.1.82:39390?CCBID=192.170.227.251:9735%3faddrs%3d192.170.227.251-9735%26alias%3dflock.opensciencegrid.org#864511&amp;addrs=172.20.1.82-39390&amp;alias=execute3038.nemo.uwm.edu&amp;noUDP&gt;<br/>...<br/>040 (4300714.000.000) 2020-08-27 15:16:35 Started transferring output files<br/>...<br/>022 (4300714.000.000) 2020-08-27 15:21:35 Job disconnected, attempting to reconnect<br/>    Socket between submit and execute hosts closed unexpectedly<br/>    Trying to reconnect to slot1_16@glidein_2833140_938629072@execute3038.nemo.uwm.edu &lt;172.20.1.82:39390?CCBID=192.170.227.251:9735%3faddrs%3d192.170.227.251-9735%26alias%3dflock.opensciencegrid.org#864511&amp;addrs=172.20.1.82-39390&amp;alias=execute3038.nemo.uwm.edu&amp;noUDP&gt;<br/>...<br/>023 (4300714.000.000) 2020-08-27 15:21:35 Job reconnected to slot1_16@glidein_2833140_938629072@execute3038.nemo.uwm.edu<br/>    startd address: &lt;172.20.1.82:39390?CCBID=192.170.227.251:9735%3faddrs%3d192.170.227.251-9735%26alias%3dflock.opensciencegrid.org#864511&amp;addrs=172.20.1.82-39390&amp;alias=execute3038.nemo.uwm.edu&amp;noUDP&gt;<br/>    starter address: &lt;172.20.1.82:41919?CCBID=192.170.227.251:9830%3faddrs%3d192.170.227.251-9830%26alias%3dflock.opensciencegrid.org#829401&amp;PrivNet=execute3038.nemo.uwm.edu&amp;addrs=172.20.1.82-41919&amp;alias=execute3038.nemo.uwm.edu&amp;noUDP&gt;<br/>...<br/>007 (4300714.000.000) 2020-08-27 15:21:36 Shadow exception!<br/>        FileTransfer::Download called during active transfer!<br/>        0  -  Run Bytes Sent By Job<br/>        163  -  Run Bytes Received By Job</pre><br/><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:39:52)</span> <b>blin:</b></span> what version of condor is running  in the pilot?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:44:05)</span> <b>rynge:</b></span> 8.9.6<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:44:21)</span> <b>rynge:</b></span> That  is the same one as all the sites though<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:44:38)</span> <b>rynge:</b></span> I suspect a network issue or something else that is specific to that site<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:44:47)</span> <b>blin:</b></span> oh this is UWM<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:45:05)</span> <b>rynge:</b></span> But it is odd that it is so reproducible - every job has this issue<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:45:24)</span> <b>blin:</b></span> i remember @marco.mascheroni and @jdost321 had to do some funny things for them when setting up their hosted CEs because of an interesting network setup<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:11:06)</span> <b>bbockelm:</b></span> They had a network setup that would kill the TCP connection after N KB.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:11:45)</span> <b>bbockelm:</b></span> At the time, the problem was jumbo packets - as soon as the TCP window was large enough to hit a jumbo packet, boom!<br/>
+<span style="color: #a72f79"><span style="font-size: small">(19:13:33)</span> <b>andrew.melo:</b></span> fun times with NAT<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:18:24)</span> <b>bbockelm:</b></span> Worse, this was an Enterprise Firewall<br/>
+<span style="color: #a72f79"><span style="font-size: small">(19:20:35)</span> <b>andrew.melo:</b></span> heh, VU and the VU medical center split recently, and a faulty route put the CMS nodes inside the medical center firewall. they were Not Ready for cms' traffic<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:21:38)</span> <b>bbockelm:</b></span> The best was when a popular IDS put in a rule for gnutls, which had a vulnerability in parsing an X509 extension<br/>
+<span style="color: #674b1b"><span style="font-size: small">(19:21:42)</span> <b>rynge:</b></span> Well that sounds about right<br/>
+<span style="color: #674b1b"><span style="font-size: small">(19:21:48)</span> <b>rynge:</b></span> I can get something back if it is tiny<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:22:01)</span> <b>bbockelm:</b></span> ... aka RFC 3280 aka grid proxies.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(19:22:16)</span> <b>rynge:</b></span> But as soon as it is a little bit larger, even output from <tt>env</tt> it drops<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:22:51)</span> <b>bbockelm:</b></span> It would kill any TCP connection with a packet where the extension was enabled, which happened about 10KB into the HTCondor auth<br/>
+<span style="color: #674b1b"><span style="font-size: small">(19:23:19)</span> <b>rynge:</b></span> Ok, do you remember who at UWM worked on this?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:23:35)</span> <b>bbockelm:</b></span> @rynge - the way we debugged it before was to do a curl and measure the download size where it would fail.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:23:57)</span> <b>bbockelm:</b></span> Shawn, unfortunately- who now is doing some great work at NERSC<br/>
+<span style="color: #674b1b"><span style="font-size: small">(19:24:14)</span> <b>rynge:</b></span> Was that curl in or out of the site?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:25:23)</span> <b>bbockelm:</b></span> In - in that case, we could trigger the issue by downloading from the VO-Frontend HTTP server <br/>
+<span style="color: #674b1b"><span style="font-size: small">(19:25:38)</span> <b>rynge:</b></span> Ok, I'll try this<br/>
+</body>
+</html>

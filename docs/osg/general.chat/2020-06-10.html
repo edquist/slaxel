@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jun 10, 2020 : #general (osg)</title>
+</head>
+<body>
+<h3>Wed Jun 10, 2020 : #general (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(09:39:05)</span> <b>blin:</b></span> If it's a systemic config issue where no one on that host can submit, software and @efajardo can likely help. If it's specific to that user, it strikes me as an RF issue<br/>
+<span style="color: #db3150"><span style="font-size: small">(10:48:39)</span> <b>christinalk:</b></span> I doubt this is user-specific. I’ve asked some more follow-ups but I do think it’s something to do w/ being (not) able to flock. *I don’t know what information to ask for to find out what’s wrong* so I would appreciate someone else chiming in on the ticket.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(10:57:41)</span> <b>lmichael:</b></span> @efajardo?<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:57:53)</span> <b>efajardo:</b></span> I am answering it right now is not even 9 am in california<br/>
+<span style="color: #5a4592"><span style="font-size: small">(11:00:28)</span> <b>lmichael:</b></span> Thanks! Wasn’t suggesting that level of urgency, but wanted to make sure you would see. :raised_hands:<br/>
+<span style="color: #5a4592"><span style="font-size: small">(11:04:05)</span> <b>lmichael:</b></span> @rynge is there anything weird about the following requirements expression that would keep jobs from matching?<br/>(HAS_SINGULARITY == true &amp;&amp; OSGVO_OS_STRING == “RHEL 7” &amp;&amp; Arch == “X86_64" &amp;&amp; HAS_MODULES == true) &amp;&amp; (TARGET.OpSys == “LINUX”) &amp;&amp;<br/>  (TARGET.Disk &gt;= RequestDisk) &amp;&amp; (TARGET.Memory &gt;= RequestMemory) &amp;&amp; (TARGET.HasFileTransfer)<br/>
+<span style="color: #5a4592"><span style="font-size: small">(11:04:40)</span> <b>lmichael:</b></span> AMNH is not getting many jobs started (for a batch that requests only 1GB disk and 100 MB memory)<br/>
+<span style="color: #5a4592"><span style="font-size: small">(11:05:45)</span> <b>lmichael:</b></span> This particular user (kprovost) has previously gotten up to thousands of jobs running, even during COVID19 prioritization, so it’s hard to believe this is a job/user issue (as @efajardo has indicated).<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:06:16)</span> <b>efajardo:</b></span> Well the job has Matched 15 times<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:06:21)</span> <b>efajardo:</b></span> as I mentioned in the ticket<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:06:25)</span> <b>efajardo:</b></span> so it is not a matching problem<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:08:06)</span> <b>efajardo:</b></span> My guess which I didn’t write in the ticket since I do not have the information. Is that he is not requestind Disk so Condor basically adjust the RequestDisk  to whatever the job is using last and keeps getting kicked for using too much, but this is just a guess. Withouth the user log I cannot know why it is getting kicked again and again<br/>
+<span style="color: #5a4592"><span style="font-size: small">(11:09:19)</span> <b>lmichael:</b></span> Matching 15 times still seems odd, so maybe something else is going on that allows matching, but doesn’t allow the job to run properly. This user has typically had short/sweet jobs without many evictions.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(11:10:01)</span> <b>lmichael:</b></span> Can you see how many jobs from this cluster have completed, run, matched (or whatever at your fingertips may provide additional insight). I’ve asked some follow-ups of Sajesh on how the batch is doing, and if there are problems beyond this job.<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:11:37)</span> <b>efajardo:</b></span> from that batch it llooks like that is the only remaining job to run<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:11:39)</span> <b>efajardo:</b></span> <pre>kprovost ID: 163      4/6  16:41   4977      _      1      _   4978 163.1706</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(11:11:50)</span> <b>efajardo:</b></span> but I see lots of idle jobs from this user<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:12:10)</span> <b>efajardo:</b></span> It could also be a problem transfering the input/output<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:12:17)</span> <b>efajardo:</b></span> that is why I need to see the ShadowLog<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:12:36)</span> <b>efajardo:</b></span> so the job tries to start but the Shadow gives up cause it cannot move some of the files<br/>
+<span style="color: #5a4592"><span style="font-size: small">(11:12:59)</span> <b>lmichael:</b></span> that’s good to know, and even more weird since all the other jobs in that batch did fine (presumably).<br/>
+<span style="color: #5a4592"><span style="font-size: small">(11:14:23)</span> <b>lmichael:</b></span> any idea if other kprovost jobs (in other job clusters) are experiencing the same issue, perhaps indicating a change that occurred relevant to this submit host?<br/>
+<span style="color: #5a4592"><span style="font-size: small">(11:16:38)</span> <b>lmichael:</b></span> (also, since we’re waiting on a next reply from Sajesh, and if you have other urgent matters to tend to, you don’t have to keep answering my questions - I’m just trying to satisfy my curiosity/learn more, at this point, which is not urgent relative to Sajesh’s next reply)<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:17:15)</span> <b>efajardo:</b></span> Well<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:17:34)</span> <b>efajardo:</b></span> for the jobs that actually had more than one restart<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:17:41)</span> <b>efajardo:</b></span> they restarted quite a few times<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:17:43)</span> <b>efajardo:</b></span> <pre>condor_q -name <a href="http://huxley-osgsub-001.sdmz.amnh.org">huxley-osgsub-001.sdmz.amnh.org</a>  -const 'Owner=?="kprovost" &amp;&amp; JobStatus=?=1 &amp;&amp; NumJobStarts&gt;1' -all -af NumJobStarts  | awk '{ sum += $1; n++ } END { if (n &gt; 0) print sum / n; }'<br/>11.2747</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(11:17:54)</span> <b>efajardo:</b></span> 11 Restarts in average for jbos that are currently idle<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:18:06)</span> <b>efajardo:</b></span> which makes me thing there is something broken with the batch<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:02:53)</span> <b>efajardo:</b></span> Well I am actually lost<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:03:03)</span> <b>efajardo:</b></span> I would imagine<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:03:23)</span> <b>efajardo:</b></span> the job runs and fails but it is not leaving any trace of it<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:03:26)</span> <b>efajardo:</b></span> <pre>Err = "163.1706.err"<br/>ExecutableSize = 1<br/>ExecutableSize_RAW = 1<br/>ExitBySignal = false<br/>ExitCode = 1<br/>ExitReason = "Exited normally"</pre><br/>
+<span style="color: #5a4592"><span style="font-size: small">(13:17:02)</span> <b>lmichael:</b></span> note leaving any trace of what?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:08:36)</span> <b>blin:</b></span> @lmichael: i think @efajardo’s saying that the job actually ran at least once and failed but there's no <tt>.err</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:10:18)</span> <b>blin:</b></span> perhaps there's a <tt>.out</tt>?<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:16:29)</span> <b>efajardo:</b></span> exactly<br/>
+</body>
+</html>

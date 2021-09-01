@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Mar 29, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Wed Mar 29, 2017 : #gracc (osg)</h3>
+<span style="color: #3c8c69"><span style="font-size: small">(09:58:52)</span> <b>kretzke:</b></span> @dweitzel @jthiltges we’re still being plagued by ceph issues, this morning (~12:00 UTC) it caused an elasticsearch node to drop out of the cluster. Any progress there?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:03:02)</span> <b>dweitzel:</b></span> We tried changing the IO scheduler, no luck.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:03:22)</span> <b>dweitzel:</b></span> may have to reconfigure the Ceph cluster.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:04:36)</span> <b>kretzke:</b></span> ugh, that sounds like fun :disappointed:<br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:06:06)</span> <b>jthiltges:</b></span> From a quick chat with Eric (the admin primarily taking care of Ceph)... the issue appears to be associated with deep scrubbing of PGs. He's going to disable deep scrubbing for now so we can see if the issue goes away.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:07:32)</span> <b>jthiltges:</b></span> We previously tried lowering the I/O priority of the scrubbing tasks to 'idle' (along with switching I/O scheduler from deadline to cfq so the priority change has an effect).<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:10:03)</span> <b>kretzke:</b></span> ok, thanks<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(10:59:34)</span> <b>sthapa:</b></span> @jthiltges @dweitzel have you talked with Lincoln ?  He has a lot of experience using and maintaining ceph here at UC.<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:00:19)</span> <b>lincoln:</b></span> dont use ES ontop of Ceph. nailed it :wink:<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:00:59)</span> <b>lincoln:</b></span> but seriously, having a distributed data store ontop of a distributed data store is probably not gonna be a good time.<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:02:27)</span> <b>lincoln:</b></span> i'd suggest watching out for blocked ops<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:03:05)</span> <b>lincoln:</b></span> we recently started graphing OSD latencies, might be helpful-- if you see one OSD consistently taking a long time to complete requests it may be dying<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:04:39)</span> <b>lincoln:</b></span> also dumping ops_in_flight:<br/><br/><pre>ceph --admin-daemon /var/run/ceph/ceph-mds.c.asok dump_ops_in_flight | awk -v date=$(date +%s) '{ print "stats.ceph.mds.num_ops",$2,date}' </pre><br/><br/>for latencies:<br/><pre>ceph osd perf | grep ^[0-9] | awk -v date=$(date +%s) '{print "stats.ceph.osd.fs_apply_latency.osd_"$1,$3,date}' </pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(11:05:06)</span> <b>lincoln:</b></span> the awk expression is just formatting for graphite<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:07:18)</span> <b>kretzke:</b></span> yeah, I’ve been saying that for a while, but when all you have is a hammer (or something like that)<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(11:10:28)</span> <b>sthapa:</b></span> If you are using ceph, using an rbd might be a little bit better.  I remember our ES cluster doing better when we went from cephfs to mounting a rbd on the data nodes and letting ES use that<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(11:10:49)</span> <b>sthapa:</b></span> The latencies on writes and reads would still cause nodes to go into weird states at times<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:13:37)</span> <b>kretzke:</b></span> honestly overall it’s been working well, except when io slows to a crawl for 20-30 minutes due to scrubbing or something. That causes problems all over the place with the machines though, not just Elasticsearch<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:30:32)</span> <b>dweitzel:</b></span> Yeah, it's the PG scrubbing that is causing the IO problems.<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:33:23)</span> <b>lincoln:</b></span> Are you on jewel+?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:35:23)</span> <b>dweitzel:</b></span> We are on hammer<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:55:04)</span> <b>lincoln:</b></span> some scrubbing priotiy options appear to have changed in jewel+ but im not sure if it'll help your use case<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:55:13)</span> <b>lincoln:</b></span> but i'm guessing you're stuck on Hammer for a reason like... EL6 clients.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:46:19)</span> <b>bbockelm:</b></span> @kretzke - how much benefit did we see going from daily indices to weekly indices on GRACC?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:46:28)</span> <b>bbockelm:</b></span> Trying to decide if I should do the same thing for CMS.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:49:50)</span> <b>kretzke:</b></span> substantial. all those shards make a lot of overhead, most notably in the heap. we actually went to monthly indices, and reduced the shard count to 3 from 5.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:56:36)</span> <b>bbockelm:</b></span> did you reindex or just updated the new ones?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:59:39)</span> <b>kretzke:</b></span> reindexed. you could certainly just update the template for new ones though<br/>
+</body>
+</html>

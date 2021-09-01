@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Apr 10, 2019 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Apr 10, 2019 : #software (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(10:59:31)</span> <b>matyas:</b></span> Just FYI everybody, most VMU test submissions broke between roughly 18 hours ago and were fixed roughly 19 minutes ago.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:00:01)</span> <b>matyas:</b></span> If you haven't gotten your test results yet, go to osghost and run condor_q -dag to make sure they're running<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:02:19)</span> <b>matyas:</b></span> If they failed early (check for a failed master-run.dag) then make sure parameters.d/osg34-stashcache-disabled.yaml doesn't exist before resubmitting<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:10:05)</span> <b>blin:</b></span> @matyas any idea why the xrootd 4.9.1 tests passed even though we forgot to rebuild xrootd-scitokens for it?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:23:34)</span> <b>matyas:</b></span> do we *have* xrootd-scitokens tests?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:24:58)</span> <b>matyas:</b></span> the xrootd-tpc tests use macaroons, not scitokens, which looks like it's a different .so file?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:25:41)</span> <b>matyas:</b></span> although shouldn't that one have failed too...?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:27:01)</span> <b>bbockelm:</b></span> Xrootd plug-ins don’t necessarily need to be rebuilt - It’s Complicated <br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:27:11)</span> <b>bbockelm:</b></span> Best practice is to rebuild, however<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:30:43)</span> <b>blin:</b></span> so we've got the following in the release:<br/><pre><br/>xrootd-dsi-3.0.4-22.osg34.el7             osg-3.4-el7-release   Brian Lin A106521<br/>xrootd-hdfs-2.0.2-1.1.osg34.el7           osg-3.4-el7-release   CARL EDQUIST A21486<br/>xrootd-hdfs-2.1.3-1.osg34.el7             osg-3.4-el7-release   zvada<br/>xrootd-lcmaps-1.3.3-3.osg34.el7           osg-3.4-el7-release   CARL EDQUIST A21486<br/>xrootd-lcmaps-1.3.4-1.osg34.el7           osg-3.4-el7-release   zvada<br/>xrootd-lcmaps-1.4.0-1.osg34.el7           osg-3.4-el7-release   CARL EDQUIST A21486<br/>xrootd-lcmaps-1.4.1-1.osg34.el7           osg-3.4-el7-release   CARL EDQUIST A21486<br/>xrootd-lcmaps-1.7.0-1.osg34.el7           osg-3.4-el7-release   Matyas Selmeci A148276<br/>xrootd-multiuser-0.4.2-1.osg34.el7        osg-3.4-el7-release   Derek Weitzel<br/>xrootd-scitokens-0.6.0-1.osg34.el7        osg-3.4-el7-release   Derek Weitzel<br/>xrootd-voms-plugin-0.4.0-1.osg34.el7      osg-3.4-el7-release   Brian Lin A106521<br/></pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(15:33:09)</span> <b>matyas:</b></span> rebuild 'em all?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:35:06)</span> <b>blin:</b></span> my god the xrootd ticket is long<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:35:16)</span> <b>blin:</b></span> there's a comment in there somewhere with all the packages we rebuilt for 4.9.0<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:36:26)</span> <b>matyas:</b></span> oh nuts. i forgot the epoch when adding the version dependency<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:36:47)</span> <b>matyas:</b></span> hang on, let me rebuild again<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:36:51)</span> <b>blin:</b></span> <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-3485?focusedCommentId=353485&amp;page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-353485">https://opensciencegrid.atlassian.net/browse/SOFTWARE-3485?focusedCommentId=353485&amp;page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-353485</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:37:36)</span> <b>blin:</b></span> that comment plus some of the ones following it<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:37:51)</span> <b>blin:</b></span> let's enlist <b>@edquist</b> to help since he did all of the 4.9.0 rebuilds as well<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:38:30)</span> <b>edquist:</b></span> hath my name been invoked?<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:39:02)</span> <b>edquist:</b></span> what's the question?<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:39:25)</span> <b>edquist:</b></span> oh, yes you need the 1: epoch<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:39:32)</span> <b>blin:</b></span> not just that, though<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:39:40)</span> <b>blin:</b></span> remember the big xrootd plugin rebuild we did for 4.9.0?<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:39:45)</span> <b>edquist:</b></span> yes?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:39:49)</span> <b>blin:</b></span> we need to do it again for 4.9.1<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:40:08)</span> <b>blin:</b></span> please split the rebuild load between you and mat, he's already working on xrootd-scitokens<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:41:00)</span> <b>matyas:</b></span> actually, do we, or were carl's rebuilds against 4.9.0 sufficient?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:41:13)</span> <b>matyas:</b></span> xrootd-scitokens was not rebuilt<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:42:22)</span> <b>edquist:</b></span> but you rebuilt that today, right?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:42:35)</span> <b>matyas:</b></span> just now, after John asked me to<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:42:58)</span> <b>matyas:</b></span> but that had never been rebuilt against 4.9, whereas the other plugins had<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:43:08)</span> <b>edquist:</b></span> but yeah otherwise i don't know if we need anything else<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:43:24)</span> <b>edquist:</b></span> unless the interface has changed since 4.9.0<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:43:28)</span> <b>blin:</b></span> hrmmmm<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:55:33)</span> <b>blin:</b></span> i vote that we rebuild them just to be safe<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:55:42)</span> <b>matyas:</b></span> 'k<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:55:42)</span> <b>blin:</b></span> i'm not 100% confident in our xrootd plugin tests atm<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:55:44)</span> <b>blin:</b></span> and builds are cheap<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:56:39)</span> <b>matyas:</b></span> <b>@edquist</b>, you do -dsi, -hdfs, -lcmaps, and i do -multiuser, -scitokens, -voms-plugin?<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:57:40)</span> <b>edquist:</b></span> sure, though are we voting?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:57:49)</span> <b>matyas:</b></span> on what?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:57:55)</span> <b>blin:</b></span> it's an authoritarian vote<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:58:00)</span> <b>edquist:</b></span> &gt;(15:55:33) &lt;font size="3"&gt;blin (osg): i vote that we rebuild them just to be safe&lt;/font&gt;<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:58:19)</span> <b>blin:</b></span> you guys get votes, they just matter less :stuck_out_tongue:<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:58:19)</span> <b>edquist:</b></span> just say decree then<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:58:30)</span> <b>matyas:</b></span> oh hush<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:01:07)</span> <b>edquist:</b></span> i suspect the rebuild to be a waste of effort is all<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:01:41)</span> <b>blin:</b></span> i hear you're a pro at it, though, and that you've got it down to a science<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:02:02)</span> <b>edquist:</b></span> lies<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:05:11)</span> <b>edquist:</b></span> i'm going to skip xrootd-dsi<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:05:19)</span> <b>matyas:</b></span> y?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:05:28)</span> <b>edquist:</b></span> does not build against xrootd<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:05:43)</span> <b>matyas:</b></span> fair enough<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:28:26)</span> <b>matyas:</b></span> Carl, could you kick off VMU tests once your builds are done, too?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:29:05)</span> <b>edquist:</b></span> sure<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:35:32)</span> <b>matyas:</b></span> thanks<br/>
+<span style="color: #c386df"><span style="font-size: small">(19:52:54)</span> <b>matyas:</b></span> @blin we can't actually tell from vmu tests if the hdfs plugins are good...<br/>
+<span style="color: #a63024"><span style="font-size: small">(20:28:33)</span> <b>efajardo:</b></span> @matyas Yes you can<br/>
+<span style="color: #a63024"><span style="font-size: small">(20:28:46)</span> <b>efajardo:</b></span> I wrote the hdfs tests and the multiuserplugin<br/>
+</body>
+</html>

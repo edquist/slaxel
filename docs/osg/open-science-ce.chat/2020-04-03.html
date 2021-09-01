@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Apr 3, 2020 : #open-science-ce (osg)</title>
+</head>
+<body>
+<h3>Fri Apr 3, 2020 : #open-science-ce (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(07:52:53)</span> <b>bbockelm:</b></span> Correct!  But that requires a recent version of 8.9.6 on both the collector and the negotiator.<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:41:21)</span> <b>blin:</b></span> @matyas i switched DNS from <a href="http://ce1.opensciencegrid.org">ce1.opensciencegrid.org</a> to the uchicago IP you're using yesterday<br/>
+<span style="color: #de5f24"><span style="font-size: small">(09:03:21)</span> <b>tiradani:</b></span> @blin did you resolve the CE networking issues?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:03:52)</span> <b>blin:</b></span> i /think/ so<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:04:48)</span> <b>blin:</b></span> at this point i'm stuck on jobs not being routed to the local submit<br/>
+<span style="color: #de5f24"><span style="font-size: small">(09:04:52)</span> <b>tiradani:</b></span> ok, we went through those gyrations with OKD.  as a data point, <tt>9618</tt> can be kept internal<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:05:24)</span> <b>blin:</b></span> yeah, that's what i figured we could on the submit side<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:05:42)</span> <b>matyas:</b></span> the osg-flock negotiator still needs to contact the submit side though<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:07:04)</span> <b>blin:</b></span> i'm currently stuck on <tt>04/03/20 13:51:16 (D_ALWAYS) ERROR (pool open-science-ce-blin-7f69b669c-lzfll:9618) Can't find address of schedd</tt> without any seemingly relevant info in the Collector/Schedd logs on the submit side<br/>
+<span style="color: #de5f24"><span style="font-size: small">(09:15:40)</span> <b>tiradani:</b></span> where is the “local” schedd (not the condor-c schedd)?  in the same pod?  if so, I was wrong, <tt>9618</tt> does have to be exposed.<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:16:55)</span> <b>blin:</b></span> yup, it is in the same pod<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:47:01)</span> <b>rynge:</b></span> @blin Looks like it is named <tt>open-science-ce-ce1-5bd796976b-drplh</tt> now<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:47:26)</span> <b>rynge:</b></span> It registers fine, but we are having issues getting the negotiator talk to it<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:47:49)</span> <b>blin:</b></span> you doing a reverse lookup?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:48:00)</span> <b>rynge:</b></span> No I see it in the collector<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:49:14)</span> <b>rynge:</b></span> <pre> condor_status -pool <a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a> -schedd -constraint 'Machine == "open-science-ce-ce1-5bd796976b-drplh"'</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:49:35)</span> <b>rynge:</b></span> <pre>AddressV1 = "{[ p=\"primary\"; a=\"192.170.236.216\"; port=9618; n=\"Internet\"; alias=\"open-science-ce-ce1-5bd796976b-drplh\"; spid=\"schedd_568_2de2_3\"; noUDP=true; ], [ p=\"IPv4\"; a=\"192.168.35.156\"; port=9618; n=\"open-science-ce-ce1-5bd796976b-drplh\"; alias=\"open-science-ce-ce1-5bd796976b-drplh\"; spid=\"schedd_568_2de2_3\"; noUDP=true; ], [ p=\"IPv4\"; a=\"192.170.236.216\"; port=9618; n=\"Internet\"; alias=\"open-science-ce-ce1-5bd796976b-drplh\"; spid=\"schedd_568_2de2_3\"; noUDP=true; ]}"</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:49:40)</span> <b>rynge:</b></span> All that looks good<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:49:46)</span> <b>rynge:</b></span> At least I think so<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:50:46)</span> <b>rynge:</b></span> But we have auth issues when negotiator is trying to connect back<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:51:07)</span> <b>rynge:</b></span> Matyas has asked about it in the flightworthy channel<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:58:05)</span> <b>matyas:</b></span> yeah and this is what I got from @bbockelm :<br/>&gt; @Mat - no method should succeed. Condor should be using a pre-negotiated session. If you see negotiation, you already lost.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:03:13)</span> <b>rynge:</b></span> That's it?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:05:07)</span> <b>rynge:</b></span> <pre>04/03/20 10:04:02 Socket to submituser@open-science-ce-ce1-5bd796976b-drplh (&lt;192.170.236.216:9618?PrivAddr=%3c192.168.35.156:9618%3fsock%3dschedd_568_2de2_3%3e&amp;PrivNet=open-science-ce-ce1-5bd796976b-drplh&amp;addrs=192.170.236.216-9618&amp;alias=open-science-ce-ce1-5bd796976b-drplh&amp;noUDP&amp;sock=schedd_568_2de2_3&gt;) not in cache, creating one<br/>04/03/20 10:04:02 SECMAN: no cached key for {&lt;192.170.236.216:9618?addrs=192.170.236.216-9618&amp;alias=open-science-ce-ce1-5bd796976b-drplh&amp;noUDP&amp;sock=schedd_568_2de2_3&gt;,&lt;416&gt;}.</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:05:26)</span> <b>rynge:</b></span> Is that the session, or the key here is something else?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:18:13)</span> <b>bbockelm:</b></span> @rynge - with <tt>D_SECURITY</tt> on, the negotiator should log when it is creating the security session.  You'll see it early on in the negotiation cycle, after the schedd ads are fetched.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:18:19)</span> <b>bbockelm:</b></span> (sorry, submitter ads)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:20:09)</span> <b>bbockelm:</b></span> Debug lines look like:<br/><pre>04/03/20 10:19:08.071 Will look for match security sessions.<br/>04/03/20 10:19:08.072 Creating a new session for capability &lt;129.93.244.211:9618?addrs=129.93.244.211-9618+[2600-900-6-1301-5054-ff-fe0b-9cba]-9618&amp;alias=<a href="http://hcc-briantest7.unl.edu">hcc-briantest7.unl.edu</a>&amp;noUDP&amp;sock=schedd_235437_c715&gt;#1584934012#9920#...</pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:21:14)</span> <b>bbockelm:</b></span> You want to ensure the address here:<br/><pre>&lt;129.93.244.211:9618?addrs=129.93.244.211-9618+[2600-900-6-1301-5054-ff-fe0b-9cba]-9618&amp;alias=<a href="http://hcc-briantest7.unl.edu">hcc-briantest7.unl.edu</a>&amp;noUDP&amp;sock=schedd_235437_c715&gt;</pre><br/>matches the address later on when it tries to talk to the submitter as in here:<br/><pre>04/03/20 10:04:02 SECMAN: no cached key for {&lt;192.170.236.216:9618?addrs=192.170.236.216-9618&amp;alias=open-science-ce-ce1-5bd796976b-drplh&amp;noUDP&amp;sock=schedd_568_2de2_3&gt;,&lt;416&gt;}.</pre><br/><br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:21:59)</span> <b>bbockelm:</b></span> So, the options are either:<br/>1.  You're not running a new enough negotiator / collector to get these match security sessions, OR<br/>2. There's some networking confusion to get the expected session name to not line up with the socket name later on.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:22:28)</span> <b>rynge:</b></span> Hang on. I'm running 8.9.5 on the collector side<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:22:37)</span> <b>rynge:</b></span> <pre>04/03/20 10:19:33 Creating a new session for capability &lt;192.170.236.216:9618?PrivAddr=%3c192.168.35.156:9618%3fsock%3dschedd_568_2de2_3%3e&amp;PrivNet=open-science-ce-ce1-5bd796976b-drplh&amp;addrs=192.170.236.216-9618&amp;alias=open-science-ce-ce1-5bd796976b-drplh&amp;noUDP&amp;sock=schedd_568_2de2_3&gt;#1585870369#567#[Encryption="YES";Integrity="YES";ValidCommands="416"]7c3a2b7d988ec0e80722ce04d0e5024301f788e39f411ef604d263c5dfbd8942</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:23:32)</span> <b>rynge:</b></span> <pre>04/03/20 10:19:33 Inserting pre-auth metadata for TOKEN.<br/>04/03/20 10:19:33 SECMAN: failed to create session &lt;192.170.236.216:9618?PrivAddr=%3c192.168.35.156:9618%3fsock%3dschedd_568_2de2_3%3e&amp;PrivNet=open-science-ce-ce1-5bd796976b-drplh&amp;addrs=192.170.236.216-9618&amp;alias=open-science-ce-ce1-5bd796976b-drplh&amp;noUDP&amp;sock=schedd_568_2de2_3&gt;#1585870369#567 (key already exists).</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:26:43)</span> <b>rynge:</b></span> <pre>04/03/20 10:19:33 SECMAN: no cached key for {&lt;192.170.236.216:9618?addrs=192.170.236.216-9618&amp;alias=open-science-ce-ce1-5bd796976b-drplh&amp;noUDP&amp;sock=schedd_568_2de2_3&gt;,&lt;416&gt;}.<br/>04/03/20 10:19:33 SECMAN: Security Policy:<br/>AuthMethods = "GSI,TOKEN,PASSWORD,FS"<br/>Authentication = "OPTIONAL"<br/>CryptoMethods = "BLOWFISH,3DES"<br/>Enact = "NO"<br/>Encryption = "OPTIONAL"<br/>Integrity = "OPTIONAL"<br/>IssuerKeys = "POOL,<a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a>,flocking"<br/>NewSession = "YES"<br/>OutgoingNegotiation = "PREFERRED"<br/>ParentUniqueID = "flock:20332:1585914058"<br/>ServerPid = 21298<br/>SessionDuration = "86400"<br/>SessionLease = 3600<br/>Subsystem = "NEGOTIATOR"<br/>TrustDomain = "<a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a>"</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:26:58)</span> <b>rynge:</b></span> <pre>04/03/20 10:19:33 SECMAN: negotiating security for command 416.<br/>04/03/20 10:19:33 SECMAN: sending DC_AUTHENTICATE command<br/>04/03/20 10:19:33 SECMAN: sending following classad:<br/>AuthMethods = "GSI,TOKEN,PASSWORD,FS"<br/>Authentication = "OPTIONAL"<br/>Command = 416<br/>ConnectSinful = "&lt;192.170.236.216:9618?addrs=192.170.236.216-9618&amp;alias=open-science-ce-ce1-5bd796976b-drplh&amp;noUDP&amp;sock=schedd_568_2de2_3&gt;"<br/>CryptoMethods = "BLOWFISH,3DES"<br/>Enact = "NO"<br/>Encryption = "OPTIONAL"<br/>Integrity = "OPTIONAL"<br/>IssuerKeys = "POOL,<a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a>,flocking"<br/>NewSession = "YES"<br/>OutgoingNegotiation = "PREFERRED"<br/>ParentUniqueID = "flock:20332:1585914058"<br/>RemoteVersion = "$CondorVersion: 8.9.5 Dec 30 2019 BuildID: 493601 PackageID: 8.9.5-1 $"<br/>ServerCommandSock = "&lt;192.170.227.251:9617?addrs=192.170.227.251-9617&amp;alias=<a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a>&gt;"<br/>ServerPid = 21298<br/>SessionDuration = "86400"<br/>SessionLease = 3600<br/>Subsystem = "NEGOTIATOR"<br/>TrustDomain = "<a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a>"<br/>04/03/20 10:19:33 SECMAN: server responded with:<br/>AuthMethods = "FS"<br/>AuthMethodsList = "FS,TOKEN"<br/>Authentication = "YES"<br/>CryptoMethods = "BLOWFISH,3DES"<br/>Enact = "YES"<br/>Encryption = "YES"<br/>Integrity = "YES"<br/>IssuerKeys = "POOL,<a href="http://osgconnect.net">osgconnect.net</a>"<br/>RemoteVersion = "$CondorVersion: 8.9.5 Jan 06 2020 PackageID: 8.9.5-1 $"<br/>ServerTime = 1585927173<br/>SessionDuration = "86400"<br/>SessionLease = 3600<br/>TrustDomain = "open-science-ce-ce1-5bd796976b-drplh"</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:29:03)</span> <b>rynge:</b></span> Full log: <a href="http://flock.opensciencegrid.org/debugging/NegotiatorLog">http://flock.opensciencegrid.org/debugging/NegotiatorLog</a><br/>
+<span style="color: #e85d72"><span style="font-size: small">(12:52:32)</span> <b>cnweaver:</b></span> (Quoth Jenkins: Hash of open-science-ce-0.1.6 has changed but chart version has not)<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:54:45)</span> <b>blin:</b></span> er, interesting<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:56:47)</span> <b>matyas:</b></span> oops I forgot to bump the version in my latest PR<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:56:54)</span> <b>blin:</b></span> ohh<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:57:31)</span> <b>matyas:</b></span> thanks<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:57:51)</span> <b>blin:</b></span> that PR isn't necessary btw<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:57:57)</span> <b>matyas:</b></span> why not?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:58:04)</span> <b>blin:</b></span> it's already there<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:59:46)</span> <b>matyas:</b></span> but git merged it just fine :pouting_cat:<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:00:20)</span> <b>matyas:</b></span> thanks for noticing<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:13:33)</span> <b>jdost321:</b></span> I'm seeing some pilots start on the COVID entries <a href="http://gfactory-2.opensciencegrid.org/factory/monitor/factoryStatusNow.html">http://gfactory-2.opensciencegrid.org/factory/monitor/factoryStatusNow.html</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:13:58)</span> <b>rynge:</b></span> @dweitzel is doing some testing<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:00:11)</span> <b>blin:</b></span> @rynge what accounting group do you want?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:01:02)</span> <b>rynge:</b></span> <tt>opportunistic.[project].[username]</tt><br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:01:06)</span> <b>rynge:</b></span> Or something like that<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:01:16)</span> <b>rynge:</b></span> @matyas might already be working on it<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:01:28)</span> <b>blin:</b></span> username is just <tt>submituser</tt>. should we have something more specific?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:01:57)</span> <b>rynge:</b></span> I don't really care what it is, as long as it has "COVID19" for the jobs you want to give high priority<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:02:30)</span> <b>matyas:</b></span> I put <tt>opportunistic.COVID19_<a href="http://WeNMR.ce1.opensciencegrid.org">WeNMR.ce1.opensciencegrid.org</a></tt><br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:02:43)</span> <b>rynge:</b></span> These are pilots right, so we probably have nothing more specific<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:02:51)</span> <b>blin:</b></span> yeah these are pilots<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:04:03)</span> <b>rynge:</b></span> We are currently giving any accounting group containing "COVID19" a 10x boost, but this might change as we go<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:04:53)</span> <b>rynge:</b></span> <a href="http://flock.opensciencegrid.org/overview/priorities.php">http://flock.opensciencegrid.org/overview/priorities.php</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:13:25)</span> <b>rynge:</b></span> Please also verify that you are sending Gratia records from the schedd<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:13:32)</span> <b>rynge:</b></span> <a href="https://gracc.opensciencegrid.org/dashboard/db/covid-19-research?orgId=1">https://gracc.opensciencegrid.org/dashboard/db/covid-19-research?orgId=1</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:14:47)</span> <b>blin:</b></span> how often is the cron running @matyas?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:15:33)</span> <b>matyas:</b></span> every 15 mintues in theory<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:16:05)</span> <b>blin:</b></span> ok cool<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:16:39)</span> <b>blin:</b></span> @dweitzel the dashboard looks great!<br/>
+<span style="color: #bc3663"><span style="font-size: small">(15:38:07)</span> <b>dmason:</b></span> Agree the dashboard looks great, but waiting to see FNAL show up in it --watched a pilot wander through a little while ago I think<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:41:18)</span> <b>dweitzel:</b></span> I am starting some testing jobs sent through the COVID routes, make sure everything is configured correctly.  Hopefully you will see some jobs show up soon.<br/>
+<span style="color: #bc3663"><span style="font-size: small">(15:42:37)</span> <b>dmason:</b></span> Saw one running here, was now waiting for it to show up in the GRACC stuff<br/>
+<span style="color: #bc3663"><span style="font-size: small">(15:43:14)</span> <b>dmason:</b></span> in fact looks like 3 jobs in the last few hours<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:43:25)</span> <b>blin:</b></span> how often does the dashboard update?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:43:55)</span> <b>dweitzel:</b></span> as often as gracc does.  So summarized every 15 minutes.  But usage only shows up after a job completes.<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:58:45)</span> <b>blin:</b></span> hrm ok<br/>
+<span style="color: #bc3663"><span style="font-size: small">(15:59:01)</span> <b>dmason:</b></span> I guess I would have expected to see this guy:<br/>
+<span style="color: #bc3663"><span style="font-size: small">(15:59:05)</span> <b>dmason:</b></span> condor_history --constraint “IsCOVID19 == true”<br/> ID     OWNER          SUBMITTED   RUN_TIME     ST COMPLETED   CMD<br/>114875.0   osg             4/3  13:59   0+00:46:14 C   4/3  14:47 ./glidein_sta<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:42:09)</span> <b>blin:</b></span> hey @lincoln you still around?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:44:15)</span> <b>blin:</b></span> 1. GSI auth doesn't seem to be working on our new CE. We may need a PTR<br/>2. we can't access the logger, is it firewalled off?<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:48:54)</span> <b>lincoln:</b></span> I am<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:48:59)</span> <b>lincoln:</b></span> it should not be<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:49:07)</span> <b>lincoln:</b></span> We can work on a PTR<br/>
+<span style="color: #e85d72"><span style="font-size: small">(16:49:25)</span> <b>cnweaver:</b></span> On which port is the logger supposed to be listening?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:49:34)</span> <b>blin:</b></span> 80<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:49:39)</span> <b>lincoln:</b></span> 80?<br/>
+<span style="color: #e85d72"><span style="font-size: small">(16:49:40)</span> <b>cnweaver:</b></span> Not 8080?<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:49:41)</span> <b>lincoln:</b></span> i thought it was 8080<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:49:45)</span> <b>lincoln:</b></span> and we needed a service object for it<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:49:52)</span> <b>blin:</b></span> <pre>open-science-ce-ce1 10.101.7.79 192.170.236.216 80:30821/TCP   192.170.236.216:80</pre><br/><br/>
+<span style="color: #e96699"><span style="font-size: small">(16:50:11)</span> <b>lincoln:</b></span> i thought 80 was for LE<br/>
+<span style="color: #e85d72"><span style="font-size: small">(16:50:17)</span> <b>cnweaver:</b></span> The service exposes 80, which is why I ask.<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:50:17)</span> <b>blin:</b></span> oh that's right<br/>
+<span style="color: #e85d72"><span style="font-size: small">(16:50:29)</span> <b>cnweaver:</b></span> * and not 8080<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:50:30)</span> <b>blin:</b></span> i did try 8080, too, though with no luck<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:50:34)</span> <b>blin:</b></span> ahhh<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:50:39)</span> <b>blin:</b></span> i wonder how that got mucked up<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:51:18)</span> <b>matyas:</b></span> do we just put another entry for that in the service.yaml<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:51:21)</span> <b>blin:</b></span> yup<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:51:33)</span> <b>matyas:</b></span> ok, got it<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:51:50)</span> <b>blin:</b></span> PR incoming<br/>
+<span style="color: #e85d72"><span style="font-size: small">(16:53:48)</span> <b>cnweaver:</b></span> Approved<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:53:59)</span> <b>blin:</b></span> much appreciated<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:54:48)</span> <b>blin:</b></span> i can't merge, though :anguished:<br/>
+<span style="color: #e85d72"><span style="font-size: small">(16:58:11)</span> <b>cnweaver:</b></span> Sorry about that!<br/>
+<span style="color: #e85d72"><span style="font-size: small">(16:58:28)</span> <b>cnweaver:</b></span> I guess only members of the org can merge, even after an approval?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:58:57)</span> <b>matyas:</b></span> yeah I think you still need write access<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:59:11)</span> <b>blin:</b></span> yeah, write is the minimum access<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:59:30)</span> <b>blin:</b></span> though you can give specific non-members varying access levels<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:11:05)</span> <b>blin:</b></span> @matyas i'm going to take down the instance and spin it back up<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:11:13)</span> <b>matyas:</b></span> sure<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:16:41)</span> <b>blin:</b></span> man i can't wait to get rid of GSI<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:16:48)</span> <b>blin:</b></span> it's definitely a PTR issue<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:16:50)</span> <b>matyas:</b></span> +100<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:17:29)</span> <b>blin:</b></span> @lincoln how long will it take to propagate the PTR?<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:19:42)</span> <b>lincoln:</b></span> it might take a while .. we might have to do these through a ticket to IT Services<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:19:47)</span> <b>lincoln:</b></span> i am checking<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:19:52)</span> <b>lincoln:</b></span> i may or may not have access to infoblox for this<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:20:11)</span> <b>matyas:</b></span> can we use token auth instead of GSI?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:21:31)</span> <b>blin:</b></span> yeah, i could throw something into the container<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:21:37)</span> <b>lincoln:</b></span> okay, i don't seem to have access<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:21:46)</span> <b>lincoln:</b></span> im making a ticket with ITS and will ask them to set this one<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:21:52)</span> <b>lincoln:</b></span> 192.170.236.216 ?<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:21:58)</span> <b>lincoln:</b></span> pointing to what forward name?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:21:59)</span> <b>blin:</b></span> ya<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:22:08)</span> <b>blin:</b></span> <a href="http://ce1.opensciencegrid.org">ce1.opensciencegrid.org</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(17:23:04)</span> <b>blin:</b></span> if the UChicago vs <a href="http://opensciencegrid.org">opensciencegrid.org</a> DNS is an issue again, we can move this to Wisconsin<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:23:33)</span> <b>lincoln:</b></span> i will hit them over the head with the covid19 hammer again hopefully :slightly_smiling_face:<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:23:59)</span> <b>blin:</b></span> rofl sounds good<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:24:11)</span> <b>blin:</b></span> thanks<br/>
+<span style="color: #385a86"><span style="font-size: small">(17:24:33)</span> <b>jdost321:</b></span> @lincoln sounds opposite to social distancing<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:24:45)</span> <b>lincoln:</b></span> It's a very large hammer.<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:24:57)</span> <b>matyas:</b></span> mounted on the end of a hockey stick<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:26:44)</span> <b>rynge:</b></span> :slightly_smiling_face:<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:26:52)</span> <b>lincoln:</b></span> ok request submitted- sorry I should've probably submitted one earlier.<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:27:11)</span> <b>blin:</b></span> eh i was hoping we wouldn't need it<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:27:22)</span> <b>blin:</b></span> i think this happens every time "hey maybe we don't need a PTR!"<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:27:25)</span> <b>blin:</b></span> followed by sadness<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:27:59)</span> <b>lincoln:</b></span> i'm glad the need for PTRs is slowly dying.<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:54:52)</span> <b>blin:</b></span> man it's been a struggle but i got a job submitted and it looks like it got routed<br/>
+<span style="color: #e85d72"><span style="font-size: small">(17:55:51)</span> <b>cnweaver:</b></span> Nice!<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:56:57)</span> <b>blin:</b></span> and the OSG VO pool is at least acknowledging that there's a job there!<br/><pre># condor_status -submitter -pool <a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a> | grep ce1<br/>opportunustic.COVID19_WeNMR.ce1-opensciencegrid-org@open-science-ce-ce1-6576999bff-2flwt open-science-ce-ce1-6576999bff-2flwt           0          1          0<br/>opportunustic.COVID19_WeNMR.ce1-opensciencegrid-org@open-science-ce-ce1-6576999bff-2flwt          0          1          0</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(17:58:21)</span> <b>matyas:</b></span> :clap::skin-tone-2:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:11:57)</span> <b>rynge:</b></span> @matyas Seems like the auth problem is back<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:12:27)</span> <b>rynge:</b></span> But I can query it, so the token you gave me is probably good<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:12:53)</span> <b>blin:</b></span> hrm ok<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:12:57)</span> <b>blin:</b></span> that's disappointing<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:13:33)</span> <b>blin:</b></span> what do the errors look like?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:14:46)</span> <b>rynge:</b></span> <a href="http://flock.opensciencegrid.org/debugging/NegotiatorLog">http://flock.opensciencegrid.org/debugging/NegotiatorLog</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:14:54)</span> <b>rynge:</b></span> Still looking<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:15:28)</span> <b>rynge:</b></span> Looks the same I think<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:19:38)</span> <b>blin:</b></span> <pre>04/03/20 18:17:18 Will use issuer open-science-ce-ce1-6576999bff-2flwt for remote server.<br/>04/03/20 18:17:18 AUTHENTICATE: will try to use 2048 (TOKEN)<br/>04/03/20 18:17:18 AUTHENTICATE: do_authenticate is 1.<br/>04/03/20 18:17:18 PW.<br/>04/03/20 18:17:18 PW: getting name.<br/>04/03/20 18:17:18 Looking for tokens in directory /etc/condor/tokens.d for issuer open-science-ce-ce1-6576999bff-2flwt<br/>04/03/20 18:17:18 TOKEN: Will use tokens found in /etc/condor/tokens.d/open-science-ce-3.<br/>04/03/20 18:17:18 JWT object was signed with server key POOL (out of 1 possible keys)<br/>04/03/20 18:17:18 TOKEN: Will use tokens found in /etc/condor/tokens.d/osgconnect.net.<br/>04/03/20 18:17:18 TOKEN: No token found.<br/>04/03/20 18:17:18 PW: Failed to fetch a login name<br/>04/03/20 18:17:18 PW: Generating ra.<br/>04/03/20 18:17:18 PW: Client sending.<br/>04/03/20 18:17:18 Client error: NULL in send?<br/>04/03/20 18:17:18 Client sending: -1, 0(), 0<br/>04/03/20 18:17:18 PW: Client receiving.<br/>04/03/20 18:17:18 Server sent status indicating not OK.<br/>04/03/20 18:17:18 PW: Client received ERROR from server, propagating<br/>04/03/20 18:17:18 PW: CLient sending two.<br/>04/03/20 18:17:18 In client_send_two.<br/>04/03/20 18:17:18 Client error: don't know my own name?<br/>04/03/20 18:17:18 Can't send null for random string.<br/>04/03/20 18:17:18 Client error: I have no name?<br/>04/03/20 18:17:18 Client sending: 0() 0 0<br/>04/03/20 18:17:18 Sent ok.<br/>04/03/20 18:17:18 AUTHENTICATE: method 2048 (TOKEN) failed.</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:19:39)</span> <b>rynge:</b></span> I don't understand why it is getting so confused about the sessions<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:20:16)</span> <b>blin:</b></span> we think there's a condor bug wrt the session that you were creating for us<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:20:21)</span> <b>blin:</b></span> or whatever<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:21:07)</span> <b>blin:</b></span> @matyas any ideas why the token would fail?<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:21:36)</span> <b>matyas:</b></span> where's the pod? I can't find it<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:21:48)</span> <b>matyas:</b></span> % kubectl get pod --namespace slate-app-osg-covid19<br/>No resources found.<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:21:55)</span> <b>blin:</b></span> it's on river<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:22:17)</span> <b>blin:</b></span> <pre>~/slate $ ./slate instance list --group osg-covid19<br/>Name                Cluster           ID<br/>open-science-ce-ce1 uchicago-river-v2 instance_1rj138uHytY</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(18:22:18)</span> <b>matyas:</b></span> % kubectl get pods --namespace osg-covid19<br/>No resources found.<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:22:56)</span> <b>blin:</b></span> <pre>~/slate $ kubectl get pods --namespace slate-group-osg-covid19<br/>NAME                                   READY   STATUS    RESTARTS   AGE<br/>open-science-ce-ce1-6576999bff-2flwt   3/3     Running   0          41m</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(18:23:03)</span> <b>matyas:</b></span> ah it's slate-group-, not slate-app<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:25:09)</span> <b>matyas:</b></span> I can't shell into it...<br/><pre>% kubectl exec -it --container osg-submit open-science-ce-ce1-6576999bff-2flwt bash<br/>Error from server (Forbidden): pods "open-science-ce-ce1-6576999bff-2flwt" is forbidden: User "osg-covid19" cannot create resource "pods/exec" in API group "" in the namespace "slate-group-osg-covid19"</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(18:25:29)</span> <b>blin:</b></span> yeah, i don't think we have permissions in the SLATE group<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:27:14)</span> <b>blin:</b></span> i think we're going to need to @bbockelm’s help on this one. i don't quite understand the token generation that we're doing and if we need to keep any state for it between instances<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:28:02)</span> <b>matyas:</b></span> and either get exec permissions or update the logs sidecar to export the condor logs as well, or both<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:29:34)</span> <b>rynge:</b></span> Also, we need to have it present a consistent name to the pool. The gwms frontend runs condor_q commands to determine the demand, and it needs to know the name of the schedd<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:29:53)</span> <b>rynge:</b></span> So we should try to have more persistent one<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:30:56)</span> <b>blin:</b></span> we shouldn't have to touch the logs sidecar, we just need to update the location of the condor/condor-ce log dirs and adjust the log volume mount accordingly<br/>
+<span style="color: #e85d72"><span style="font-size: small">(18:31:01)</span> <b>cnweaver:</b></span> If there's something specific you're looking for execing into the pod, I should be able to fetch it for you<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:31:02)</span> <b>blin:</b></span> hrm ok, i think that can be done<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:31:55)</span> <b>blin:</b></span> eh, i think i'm just gonna call it for the day<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:32:04)</span> <b>blin:</b></span> it's been a long week<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:32:20)</span> <b>matyas:</b></span> is it still running stuff?<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:32:34)</span> <b>blin:</b></span> the instance is still running<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:32:49)</span> <b>blin:</b></span> and there are jobs sitting idle<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:32:55)</span> <b>matyas:</b></span> @cnweaver /var/log/condor/SchedLog<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:33:21)</span> <b>blin:</b></span> in the <tt>osg-submit</tt> container of <tt>open-science-ce-ce1-6576999bff-2flwt</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(18:34:17)</span> <b>blin:</b></span> feel free to take it down if need be<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:34:54)</span> <b>blin:</b></span> and i think we'll be able to get a constant name in the pool. it's just a matter of tweaking a few of the networking knobs<br/>
+<span style="color: #e85d72"><span style="font-size: small">(18:35:39)</span> <b>cnweaver:</b></span> <br/>
+<span style="color: #43761b"><span style="font-size: small">(18:36:32)</span> <b>blin:</b></span> anywho, i'm headed out<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:36:57)</span> <b>blin:</b></span> we've gotten really far this week, good work everyone!<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:38:24)</span> <b>matyas:</b></span> ummmm<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:38:29)</span> <b>matyas:</b></span> I think I'm a moron<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:38:43)</span> <b>matyas:</b></span> it's a new instance of the container, right? So the pool password changed.<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:39:05)</span> <b>matyas:</b></span> So the password that created the token that I gave Mats is no longer the right one.<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:39:14)</span> <b>matyas:</b></span> So his token doesn't work.<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:40:22)</span> <b>matyas:</b></span> I'll need to put the password in as a Secret<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:45:00)</span> <b>matyas:</b></span> ...monday.<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:45:09)</span> <b>matyas:</b></span> Have a good weekend everyone!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(21:46:06)</span> <b>bbockelm:</b></span> (FWIW - I still don't believe we need a PTR!)<br/>
+</body>
+</html>

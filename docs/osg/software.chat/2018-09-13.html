@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Sep 13, 2018 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu Sep 13, 2018 : #software (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(13:50:30)</span> <b>matyas:</b></span> <pre><br/>$ condor_ce_ping -pool <a href="http://google.com">google.com</a> -table READ WRITE DAEMON<br/>         Instruction Authentication Encryption Integrity Decision Identity<br/>                READ           none       none      none    ALLOW unauthenticated@unmapped<br/>               WRITE             FS       none       MD5    ALLOW <a href="mailto:matyas@users.opensciencegrid.org">matyas@users.opensciencegrid.org</a><br/>              DAEMON           FAIL       FAIL      FAIL     FAIL FAIL  (use -verbose for more info)<br/></pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(13:50:43)</span> <b>matyas:</b></span> uh is that normal?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:50:50)</span> <b>matyas:</b></span> note the <tt>-pool</tt> hostname...<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:51:53)</span> <b>blin:</b></span> what does <tt>-verbose</tt> show you?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:53:00)</span> <b>matyas:</b></span> <pre><br/>$ condor_ce_ping -verbose -pool <a href="http://google.com">google.com</a> READ WRITE DAEMON<br/>Remote Version:              $CondorVersion: 8.6.12 Aug 06 2018 $<br/>Local  Version:              $CondorVersion: 8.6.12 Aug 06 2018 $<br/>Session ID:                  fermicloud155:8452:1536864751:23<br/>Instruction:                 READ<br/>Command:                     60020<br/>Encryption:                  none<br/>Integrity:                   none<br/>Authentication:              none<br/>Remote Mapping:              unauthenticated@unmapped<br/>Authorized:                  TRUE<br/><br/>Remote Version:              $CondorVersion: 8.6.12 Aug 06 2018 $<br/>Local  Version:              $CondorVersion: 8.6.12 Aug 06 2018 $<br/>Session ID:                  fermicloud155:8452:1536864751:24<br/>Instruction:                 WRITE<br/>Command:                     60021<br/>Encryption:                  none<br/>Integrity:                   MD5<br/>Authenticated using:         FS<br/>All authentication methods:  FS,GSI<br/>Remote Mapping:              <a href="mailto:matyas@users.opensciencegrid.org">matyas@users.opensciencegrid.org</a><br/>Authorized:                  TRUE<br/><br/>DAEMON failed!<br/>SECMAN:2010:Received "DENIED" from server for user <a href="mailto:matyas@users.opensciencegrid.org">matyas@users.opensciencegrid.org</a> using method FS.<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:56:35)</span> <b>blin:</b></span> not sure what <tt>condor_ping</tt> is doing with <tt>-pool</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:57:08)</span> <b>blin:</b></span> try bumping the tool debug and running with <tt>-debug</tt>, maybe?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:00:10)</span> <b>matyas:</b></span> <pre>$ _CONDOR_TOOL_DEBUG=1 condor_ce_ping -pool <a href="http://google.com">google.com</a> -verbose -debug READ WRITE <br/>09/13/18 13:59:33 recognized READ as authorization level, using command 60020.<br/>09/13/18 13:59:33 recognized WRITE as authorization level, using command 60021.<br/></pre><br/>and the rest is just the same<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:03:20)</span> <b>blin:</b></span> and you set <tt>TOOL_DEBUG = D_ALL</tt>?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:07:53)</span> <b>matyas:</b></span> just did. no difference<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:09:09)</span> <b>blin:</b></span> ask TJ ¯\_(ツ)_/¯<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:09:50)</span> <b>blin:</b></span> because you get the same thing with <tt>condor_ping</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(14:23:56)</span> <b>matyas:</b></span> well <tt>condor_ce_trace</tt> seems to be doing the right thing and that's what I'm trying to test anyway so ¯\_(ツ)_/¯<br/>
+</body>
+</html>

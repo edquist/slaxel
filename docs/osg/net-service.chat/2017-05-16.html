@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue May 16, 2017 : #net-service (osg)</title>
+</head>
+<body>
+<h3>Tue May 16, 2017 : #net-service (osg)</h3>
+<span style="color: #4bbe2e"><span style="font-size: small">(09:45:01)</span> <b>rquick:</b></span> we should probably start a RCA to deliver this to the OSG-ET<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(09:45:25)</span> <b>rquick:</b></span> looks like you've documented it pretty thoroughly in these two documents<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(09:45:57)</span> <b>rquick:</b></span> we just need to put it in a consumable format<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:46:21)</span> <b>smckee:</b></span> OK.  I hope we can find someone able to extract the missing data from the 9.4 instance<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(09:49:41)</span> <b>rquick:</b></span> i'll put together a outline based on our previous RCAs<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(10:37:36)</span> <b>rquick:</b></span> here the standard outline in a new doc...<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(10:37:37)</span> <b>rquick:</b></span> <a href="https://twiki.grid.iu.edu/bin/view/Operations/PerfSONARData">https://twiki.grid.iu.edu/bin/view/Operations/PerfSONARData</a><br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(15:10:58)</span> <b>smckee:</b></span> Found some more corruption on the cassandra1 system.  Fixed it by removing two indexes.   Rebuilding from the replicas on cassandra2 and cassandra3.  Should be OK now and I assume we have no data loss there.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(15:11:49)</span> <b>smckee:</b></span> ERROR [SSTableBatchOpen:1] 2017-05-16 19:51:46,781 FileUtils.java:447 - Exiting forcefully due to file system exception on startup, disk failure policy "stop"<br/>org.apache.cassandra.io.sstable.CorruptSSTableException: java.io.IOException: Corrupted Index File /usr/local/cassandra/data/esmond/raw_data-bcdcb550323311e597bdbb7b6ea8dddc/esmond-raw_data-ka-731455-CompressionInfo.db: read 6465 but expected 6634 chunks.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(15:12:12)</span> <b>smckee:</b></span> On cassandra1, su - cassandra and move the "bad" indexes to ~/corrupt_sstables:<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(15:12:30)</span> <b>smckee:</b></span> cd /usr/local/cassandra/data/esmond/<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(15:12:44)</span> <b>smckee:</b></span> cd raw_data-bcdcb550323311e597bdbb7b6ea8dddc<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(15:12:54)</span> <b>smckee:</b></span> mv *731455* ~/corrupt_sstables/<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(15:13:13)</span> <b>smckee:</b></span> Also moved '*7309218'<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(15:13:20)</span> <b>smckee:</b></span> restart then worked.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(15:25:20)</span> <b>smckee:</b></span> Updates are in place on cassandra1|2|3 and psds0|1|2<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(15:25:38)</span> <b>smckee:</b></span> still need to do perfsonar1|2<br/>
+<span style="color: #a63024"><span style="font-size: small">(18:13:19)</span> <b>efajardo:</b></span> @smckee I tagged rsv-perfsonar 1.3.1 separating posting to esmond and CERN MQ into two probes. Would it be ok for me to install it tomorrow on ITB? I have had it running on my development host for two days, working nicely. But this update needs a ocuple of manual steps apart from doing a yum install<br/>
+</body>
+</html>

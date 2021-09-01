@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jun 29, 2021 : #flightworthy (chtc)</title>
+</head>
+<body>
+<h3>Tue Jun 29, 2021 : #flightworthy (chtc)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(09:24:05)</span> <b>johnkn:</b></span> <tt>condor_fsync = false</tt> appears to have resulted in near total failure of tests on the MAC.  I'm retrying now just to make sure that it's that knob  and not something else.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:26:09)</span> <b>johnkn:</b></span> <a href="https://batlab.chtc.wisc.edu/results/run-details.php?runid=547838">https://batlab.chtc.wisc.edu/results/run-details.php?runid=547838</a><br/>
+<span style="color: #d58247"><span style="font-size: small">(09:31:42)</span> <b>gthain:</b></span> This seems suspicious:<br/>
+<span style="color: #d58247"><span style="font-size: small">(09:31:45)</span> <b>gthain:</b></span> <pre>07:16 Creating a HTCondor node  CONDOR_CONFIG=/usr/local/condor/local/execute/dir_83457/userdir/test-runs/job_core_basic_par.saveme/pdir88884basicpar/condor_config<br/>runcmd: condor_config_val -config Non-zero return: 1<br/>19:07:16 TestGlue: runCondorTool: iteration: 1 cmd condor_config_val -config failed sleep 10 * 1 <br/>runcmd: condor_config_val -config Non-zero return: 1<br/>19:07:26 TestGlue: runCondorTool: iteration: 2 cmd condor_config_val -config failed sleep 10 * 2 <br/>runcmd: condor_config_val -config Non-zero return: 1</pre><br/>
+<span style="color: #d58247"><span style="font-size: small">(09:31:55)</span> <b>gthain:</b></span> (only see that error on mac)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:32:46)</span> <b>johnkn:</b></span> yeah,  spot checking, looks like they are all like that.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:33:19)</span> <b>johnkn:</b></span> the tests that "failed" rather than setup error are just those that start personal condor inside the test rather than using #testreq<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:54:39)</span> <b>johnkn:</b></span> Now that's disturbing --  I did a retry, and now the MAC is succeeding.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(10:00:06)</span> <b>tim:</b></span> Yesterday when you did your test the Mac was fairly busy (running multiple test runs).<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:00:42)</span> <b>johnkn:</b></span> Ok.  so maybe we would get a repro if I do a load test.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:01:30)</span> <b>johnkn:</b></span> We should also maybe allow the docker test machine to run more than 16 tests at a time if I do a load test - see if it will repro there also.<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:02:10)</span> <b>gthain:</b></span> would love to see the stderr for the condor_config_val<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:10:19)</span> <b>zmiller:</b></span> I'm fairly certain everyone knows this, but condor_config_val does accept the <tt>-debug</tt> flag, and combined with <tt>TOOL_DEBUG=D_ALL:2</tt> it will tell you more than you want to know.<br/>
+<blockquote>
+<span style="color: #ea2977"><span style="font-size: small">(10:13:27)</span> <b>zmiller:</b></span> Should we put <tt>TOOL_DEBUG=D_ALL</tt> (not :2) in the param table?<br/>
+<span style="color: #99a949"><span style="font-size: small">(10:15:10)</span> <b>matyas:</b></span> it is kinda nonintuitive that <tt>-debug</tt> doesn't do anything unless you set an environment variable<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:17:53)</span> <b>johnkn:</b></span> yeah.  I'd love to fix this in all the tools<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:18:43)</span> <b>johnkn:</b></span> although it's not that it does nothing, it's just that D_ALWAYS logging is to terse to be useful in most tools<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:20:12)</span> <b>zmiller:</b></span> Yeah, that's why I was thinking D_ALL would be a good default.  People can crank it to D_ALL:2 if needed.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(10:26:54)</span> <b>blin:</b></span> does <tt>D_ALL:2</tt> give you /everything/?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:27:02)</span> <b>johnkn:</b></span> yes, never do that.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(10:27:58)</span> <b>blin:</b></span> it would be nice if we could use <tt>-debug N</tt> to set different debug "levels"<br/>
+<span style="color: #4cc091"><span style="font-size: small">(10:28:09)</span> <b>blin:</b></span> what levels those correspond to, though? idk<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:28:53)</span> <b>johnkn:</b></span> yeah. that's not really a thing.   you still need to indicate what category of messages are of interest or you get flooded with extraneous information and can't see what you need to see.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(10:30:03)</span> <b>blin:</b></span> yeah, i'm saying that we could give pre-set debug levels in addition to the current mechanism<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:30:22)</span> <b>johnkn:</b></span> I think you mean category, not level.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(10:30:29)</span> <b>blin:</b></span> eh<br/>
+<span style="color: #4cc091"><span style="font-size: small">(10:30:51)</span> <b>blin:</b></span> for someone that isn't too familiar with condor, i think levels make sense<br/>
+<span style="color: #4cc091"><span style="font-size: small">(10:31:30)</span> <b>blin:</b></span> but categories could work, too<br/>
+<span style="color: #99a949"><span style="font-size: small">(10:31:31)</span> <b>matyas:</b></span> or just make it be an easier way to specify the debug params<br/><pre>condor_status -debug network:2,security:2</pre><br/><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:33:27)</span> <b>johnkn:</b></span> yeah, that's doable.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:33:56)</span> <b>johnkn:</b></span> except you pretty much never want level 2 of either of those :wink:<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:34:52)</span> <b>zmiller:</b></span> *you* never want to do that.  I do often. : )<br/>
+<span style="color: #99a949"><span style="font-size: small">(10:35:34)</span> <b>matyas:</b></span> yeah I usually start with :1 (well, missing actually) and add 2 if I still don't get it<br/>
+<span style="color: #4cc091"><span style="font-size: small">(10:41:27)</span> <b>blin:</b></span> yeah, i almost always want <tt>D_SECURITY:2</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:45:05)</span> <b>johnkn:</b></span> doubtful, have you tried D_SECURITY:1  ?  it's the logging level for !Zach<br/>
+<span style="color: #99a949"><span style="font-size: small">(10:46:20)</span> <b>matyas:</b></span> well D_SECURITY:2 usually doesn't help _me_ figure it out, but it's more useful for sending to other people<br/>
+<span style="color: #4cc091"><span style="font-size: small">(10:49:27)</span> <b>blin:</b></span> 100% need it. <tt>D_SECURITY:1</tt> doesn't actually contain the underlying error messages for GSI/SciTokens/SSL failures most of the time<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:49:41)</span> <b>johnkn:</b></span> you should bug that.<br/>
+<span style="color: #99a949"><span style="font-size: small">(10:50:01)</span> <b>matyas:</b></span> yeah it would be nice to get those messages without getting the full classad<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:50:24)</span> <b>zmiller:</b></span> :100:<br/>
+<span style="color: #4cc091"><span style="font-size: small">(10:50:50)</span> <b>blin:</b></span> full classads are nice, though, honestly. it helps with sorting out security negotiation<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:50:53)</span> <b>johnkn:</b></span> Zach was just asking me if he could move the classads to D_SECURITY:3.   the answer is yes, but that won't do what you want right now.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:51:27)</span> <b>johnkn:</b></span> :3 currently behaves like logging at :1 AND at :2, which is.... not helpful.<br/>
+<span style="color: #99a949"><span style="font-size: small">(10:59:19)</span> <b>matyas:</b></span> :3 is a cute emote for a seal though<br/>
+<span style="color: #99a949"><span style="font-size: small">(10:59:40)</span> <b>matyas:</b></span> so is :5 equivalent to :1 ?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:13:30)</span> <b>johnkn:</b></span> I would expect so<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:14:05)</span> <b>johnkn:</b></span> have not looked that the code in at least 5 years<br/>
+</blockquote>
+<span style="color: #99a949"><span style="font-size: small">(10:13:04)</span> <b>matyas:</b></span> I did not know that worked for condor_config_val, thanks!<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:48:42)</span> <b>jfrey:</b></span> @johnkn I’d like to push an update for HTCONDOR-517 to the V9_1_1-branch.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:50:24)</span> <b>johnkn:</b></span> Is the commit on that ticket?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:51:34)</span> <b>jfrey:</b></span> I haven’t pushed the new commit yet.<br/>
+<blockquote>
+<span style="color: #235e5b"><span style="font-size: small">(16:53:53)</span> <b>johnkn:</b></span> what impact on CHTC?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:54:32)</span> <b>jfrey:</b></span> It prints a warning when GSI appears in the auth methods lists (stderr for tools, log for daemons).<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:54:49)</span> <b>jfrey:</b></span> Looking at submit1's configuration, it should not print for the tools in CHTC.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:56:31)</span> <b>johnkn:</b></span> sounds ok.  maybe a little risky, but better to do it now<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(17:00:30)</span> <b>tim:</b></span> Yes. push to the V9_1_1-branch<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:01:16)</span> <b>johnkn:</b></span> good with me.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(17:01:37)</span> <b>jfrey:</b></span> There are config knobs to disable the warnings, if needed.<br/>
+</blockquote>
+<span style="color: #99a949"><span style="font-size: small">(20:09:14)</span> <b>matyas:</b></span> why doesn't this work?<br/><pre>% condor_q -af Requirements 768.0<br/>% condor_q -af:r Requirements 768.0</pre><br/>but this does<br/><pre>% condor_q -format %s Requirements 768.0<br/>(TARGET.Arch == "X86_64") &amp;&amp; (TARGET.OpSys == "LINUX") &amp;&amp; (TARGET.Disk &gt;= RequestDisk) &amp;&amp; (TARGET.Memory &gt;= RequestMemory) &amp;&amp; ((TARGET.FileSystemDomain == MY.FileSystemDomain) || (TARGET.HasFileTransfer))</pre><br/>
+<span style="color: #99a949"><span style="font-size: small">(20:11:47)</span> <b>matyas:</b></span> <pre>% condor_version<br/>$CondorVersion: 9.1.0 May 13 2021 BuildID: 541048 PackageID: 9.1.0-0.541048 RC $<br/>$CondorPlatform: x86_64_CentOS7 $</pre><br/><br/>
+</body>
+</html>

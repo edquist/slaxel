@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Aug 5, 2016 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Fri Aug 5, 2016 : #gracc (osg)</h3>
+<span style="color: #902d59"><span style="font-size: small">(02:29:38)</span> <b>tanya:</b></span> also, keep in mind that CERN uses HDFS as a backup for ES<br/>
+<span style="color: #9e3997"><span style="font-size: small">(08:31:18)</span> <b>bbockelm:</b></span> Can't Spark also read directly from ES?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:24:11)</span> <b>kretzke:</b></span> elastic has a plugin. <a href="https://www.elastic.co/guide/en/elasticsearch/hadoop/current/spark.html">https://www.elastic.co/guide/en/elasticsearch/hadoop/current/spark.html</a> it crashed when I tried it<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:24:25)</span> <b>bbockelm:</b></span> :confused:<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:25:15)</span> <b>kretzke:</b></span> but I’m also testing 5.0alpha4, so maybe it’s related to that<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:26:12)</span> <b>bbockelm:</b></span> ah - how is the 5.0 release process coming along?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:29:22)</span> <b>kretzke:</b></span> it’s been on alpha4 for a while now. I haven’t done a whole lot with it, but it seems pretty stable. some good changes, like the <tt>keyword</tt> type replacing not_analyzed strings. kibana looks very different<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:46:52)</span> <b>kretzke:</b></span> I’m thinking CERN has the right idea though… keep recent data and summaries in elasticsearch for reporting, and have the raw detailed data in HDFS for in-depth analytics.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:49:36)</span> <b>bbockelm:</b></span> meh.  What’s the downside of keeping the data online forever?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:50:14)</span> <b>bbockelm:</b></span> provided we actually start closing indices (note - we need to start closing indices), seems there’s little penalty for keeping long-term data.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:54:17)</span> <b>kretzke:</b></span> well, sure, in closed indices. we can’t really close the raw indices though, since we can get historical records. maybe we want to set a hard limit on those?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:55:26)</span> <b>kretzke:</b></span> there’s actually a lot of closed indices… the old daily gracc dailies, FIFE indices are closed daily<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:08:16)</span> <b>bbockelm:</b></span> Yeah - I was thinking we should close anything over 90 days.  We can always re-open for very old data as necessary.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:08:28)</span> <b>bbockelm:</b></span> Gratia had a similar cutoff<br/>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jul 26, 2019 : #operations (osg)</title>
+</head>
+<body>
+<h3>Fri Jul 26, 2019 : #operations (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(08:15:20)</span> <b>bbockelm:</b></span> @lincoln - what was the final resolution of above?<br/>
+<span style="color: #e96699"><span style="font-size: small">(08:33:45)</span> <b>lincoln:</b></span> ATLAS started sending jobs again. osg never really ramped up<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:06:06)</span> <b>lincoln:</b></span> We had what looked like ~2780 glideins started in 1hr from OSG across 3 GKs ( we have 4, but the 4th wasn't getting OSG jobs when I checked), then it topped off around ~6600 glideins<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:06:17)</span> <b>lincoln:</b></span> <br/>
+<span style="color: #e96699"><span style="font-size: small">(09:06:57)</span> <b>lincoln:</b></span> ~09:45 is when we made a change to allow more OSG backfill<br/>~15:30 is when ATLAS started ramping back up<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:06:02)</span> <b>rynge:</b></span> Hmm, I think OSG VO had pressure the whole time<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:06:16)</span> <b>rynge:</b></span> Sounds a little like what Syracuse is complaining about<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:09:33)</span> <b>lincoln:</b></span> I can tell you from the Connect side that we had a ton of things queued<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:10:03)</span> <b>lincoln:</b></span> at least when I checked in the morning<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:10:54)</span> <b>rynge:</b></span> We pretty much always request glideins<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:10:55)</span> <b>isfiligoi:</b></span> From the graph is would almost seem there is a quota in place for OSG<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:10:56)</span> <b>rynge:</b></span> <a href="http://flock.opensciencegrid.org/vofrontend/monitor/frontendStatus.html?group=total&amp;factory=total&amp;infoGroup=Running&amp;elements=ReqIdle,&amp;rra=1&amp;window_min=0&amp;window_max=0&amp;timezone=-7">http://flock.opensciencegrid.org/vofrontend/monitor/frontendStatus.html?group=total&amp;factory=total&amp;infoGroup=Running&amp;elements=ReqIdle,&amp;rra=1&amp;window_min=0&amp;window_max=0&amp;timezone=-7</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(11:12:10)</span> <b>blin:</b></span> syracuse's issue was that because of their desktop scavenging lots of jobs would get evicted at once then the factory would throttle pilot submission<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:12:15)</span> <b>rynge:</b></span> Could be held job or something like that - I wish a saw this when it happened<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:12:24)</span> <b>blin:</b></span> iirc we lifted the held job threshold and we're doing better now?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:12:39)</span> <b>blin:</b></span> i didn't think uchicago had any major eviction events<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:13:13)</span> <b>rynge:</b></span> Re Syracuse, I think Eric would have to answer that question. We get a lot of hours from them (#1), but I can't answer if we are scaling up quickly enough for his liking<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:13:58)</span> <b>lincoln:</b></span> we have scaled up beyond 6600 glideins in recent memory<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:14:02)</span> <b>isfiligoi:</b></span> maybe unrelated, but I had to add to the CE schedd<br/><pre><br/>NEGOTIATE_ALL_JOBS_IN_CLUSTER = true<br/></pre><br/>in order to fill my site<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:14:32)</span> <b>isfiligoi:</b></span> due to startd start expression not being uniform<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:15:18)</span> <b>rynge:</b></span> The startd expresssions on the glideins, right?<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:15:37)</span> <b>isfiligoi:</b></span> no, the site-native condor<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:15:49)</span> <b>rynge:</b></span> Right, that's what I meant<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:16:02)</span> <b>lincoln:</b></span> recent glidein backfill<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:16:25)</span> <b>rynge:</b></span> @lincoln do you know the entry name? <tt>Engage_US_MWT2_osg_condce</tt>?<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:16:32)</span> <b>lincoln:</b></span> not offhand<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:16:38)</span> <b>lincoln:</b></span> can try to find it<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:16:41)</span> <b>isfiligoi:</b></span> seems a site issue from the last graph<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:16:53)</span> <b>isfiligoi:</b></span> plenty of osg glideins in the queue at all times<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:17:25)</span> <b>isfiligoi:</b></span> if they are a Condor site, try the above config setting<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:17:55)</span> <b>lincoln:</b></span> I'll try it<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:18:10)</span> <b>rynge:</b></span> <tt>	<a href="http://osg-gk.mwt2.org">osg-gk.mwt2.org</a> </tt>?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:20:13)</span> <b>rynge:</b></span> Do you happen to graph idle jobs as well?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:20:27)</span> <b>rynge:</b></span> Looking at this one: <a href="http://gfactory-2.opensciencegrid.org/factory/monitor/factoryEntryStatusNow.html?entry=Engage_US_MWT2_osg_condce">http://gfactory-2.opensciencegrid.org/factory/monitor/factoryEntryStatusNow.html?entry=Engage_US_MWT2_osg_condce</a><br/>
+<span style="color: #e96699"><span style="font-size: small">(11:20:57)</span> <b>lincoln:</b></span> hm, I don't think I have idle jobs but I can dig around and look<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:21:00)</span> <b>lincoln:</b></span> there are 4 GKs<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:21:00)</span> <b>rynge:</b></span> Comparing the idle glideins (31) with the pressure we are requesting (100)<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:21:09)</span> <b>lincoln:</b></span> uct2-gk, mwt2-gk, iut2-gk, and osg-gk<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:21:23)</span> <b>rynge:</b></span> And we have multicore entries as well<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:22:28)</span> <b>rynge:</b></span> uct2 looks better: <a href="http://gfactory-2.opensciencegrid.org/factory/monitor/factoryEntryStatusNow.html?entry=Engage_US_MWT2_uct2_condce">http://gfactory-2.opensciencegrid.org/factory/monitor/factoryEntryStatusNow.html?entry=Engage_US_MWT2_uct2_condce</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:23:11)</span> <b>rynge:</b></span> There is also a max per frontend limit at 5k<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:23:14)</span> <b>rynge:</b></span> Which seems odd<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:30:49)</span> <b>rynge:</b></span> According to this graph, submission rates were too low (note how the brown line, idle jobs went to ~0)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:31:37)</span> <b>rynge:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:38:39)</span> <b>marco.mascheroni:</b></span> @lincoln are the rsynchs and the cron working at <a href="http://uct2-stratum-r.mwt2.org">uct2-stratum-r.mwt2.org</a> ? I get a fresh copy at TACC with my stratum-r rsynchs but files are not up to date<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:38:50)</span> <b>lincoln:</b></span> hm, should be<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:38:51)</span> <b>lincoln:</b></span> let me look<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:38:57)</span> <b>marco.mascheroni:</b></span> thx<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:40:41)</span> <b>marco.mascheroni:</b></span> e.g.:<br/><pre><br/>login4(1048)$ ls -altr /cvmfs/cms.cern.ch/ | tail -n 20<br/>drwxrwxr-x   8 usatlas G-815132   4096  4 lug 16.47 slc7_aarch64_gcc700<br/>drwxrwxr-x   2 usatlas G-815132   4096  5 lug 17.05 bootstraptmp<br/>drwxrwxr-x   2 usatlas G-815132   4096  5 lug 17.17 common<br/>drwxrwxr-x   9 usatlas G-815132   4096 11 lug 03.22 slc6_amd64_gcc481<br/>drwxrwxr-x   8 usatlas G-815132   4096 11 lug 03.31 slc7_amd64_gcc820<br/>drwxrwxr-x   8 usatlas G-815132   4096 11 lug 04.00 slc7_amd64_gcc700<br/>drwxrwxr-x   8 usatlas G-815132   4096 11 lug 06.43 slc6_amd64_gcc630<br/>drwxrwxr-x   8 usatlas G-815132   4096 11 lug 06.47 slc7_amd64_gcc630<br/>-rwxrwxr-x   1 usatlas G-815132 236016 11 lug 13.43 releases.map<br/>drwxrwxr-x 137 usatlas G-815132  12288 11 lug 13.49 SITECONF<br/>-rwxrwxr-x   1 usatlas G-815132 550054 11 lug 13.49 cvmfs-cms.cern.ch-updates<br/>drwxrwxr-x   7 usatlas G-815132   4096 11 lug 19.21 cmssw.git<br/>drwxrwxr-x   7 usatlas G-815132   4096 12 lug 19.16 cmssw.git.daily<br/>-rwxrwxr-x   1 usatlas G-815132    132 12 lug 22.15 oo77<br/>drwxrwxr-x   2 usatlas G-815132   4096 12 lug 22.47 .xattr<br/>lrwxrwxrwx   1 usatlas G-815132      6 12 lug 22.48 cvmfs -&gt; /cvmfs<br/>drwxrwxr-x  11 usatlas G-815132   4096 24 lug 12.37 crab3<br/>drwxrwxr-x  70 usatlas G-815132   4096 24 lug 12.45 crab<br/>drwxrwxr-x  63 usatlas G-815132   4096 24 lug 12.45 .<br/>drwxrwxr-x   2 usatlas G-815132   4096 26 lug 13.27 .symlink<br/></pre><br/>while at cern I have more recent stuff<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:54:06)</span> <b>lincoln:</b></span> looks like the last CVMFS update i have on the stratum 1 portion is jul 12<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:55:31)</span> <b>lincoln:</b></span> looks like there's an rsync stuck<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:55:35)</span> <b>lincoln:</b></span> im going to reboot the machine<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:57:30)</span> <b>marco.mascheroni:</b></span> ok<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:25:01)</span> <b>lincoln:</b></span> syncs are running again @marco.mascheroni<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:25:08)</span> <b>lincoln:</b></span> will keep an eye on it to see if CMS runs<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(15:34:46)</span> <b>zalak:</b></span> <b>@here</b> how to check if a person is an active OSG staff member or not?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:36:00)</span> <b>blin:</b></span> we have flags in the contact db that we try to keep up to date<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:36:13)</span> <b>blin:</b></span> but we don't display it here <a href="https://topology.opensciencegrid.org/contacts">https://topology.opensciencegrid.org/contacts</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:39:00)</span> <b>blin:</b></span> honestly the best way would be to ask around<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:39:10)</span> <b>blin:</b></span> idk if @cat keeps a canonical list or what<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(15:39:59)</span> <b>zalak:</b></span> So, let's say someone just made a request to access the OSG DocDB, how would Tim C know that the requester is an actually a OSG Staff member?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:41:15)</span> <b>matyas:</b></span> call someone who knows them?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:41:20)</span> <b>blin:</b></span> that's a question that Tim would have to answer<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:41:32)</span> <b>blin:</b></span> and he's OOO today<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(15:46:54)</span> <b>zalak:</b></span> Ok, will ask Tim.<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(15:46:56)</span> <b>zalak:</b></span> Thanks.<br/>
+<span style="color: #385a86"><span style="font-size: small">(17:58:47)</span> <b>jdost321:</b></span> @blin @lincoln @rynge I sent an email reply about what I found regarding not being able to fill MWT2 with opportunistic pilots<br/>
+</body>
+</html>

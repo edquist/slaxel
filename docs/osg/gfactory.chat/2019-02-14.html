@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Feb 14, 2019 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Thu Feb 14, 2019 : #gfactory (osg)</h3>
+<span style="color: #8d4b84"><span style="font-size: small">(08:37:37)</span> <b>kherner:</b></span> Raja told me they're disabling offsite pings now, so if that's the only issue, you don't have to worry about it. Are pilots not starting at all?<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:08:28)</span> <b>efajardo:</b></span> @marco.mascheroni can I get your ssh key?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:18:03)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:19:46)</span> <b>marco.mascheroni:</b></span> How do we coordinate, I think I will have a look at this in 2 hours from now. Do you mind to upgrade the frontend right before I start having a look? We can coordinate in priavete I guess, no need to spam here<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:41:20)</span> <b>efajardo:</b></span> sure<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:41:23)</span> <b>efajardo:</b></span> ping me on slack<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:42:13)</span> <b>efajardo:</b></span> Try <tt>ssh <a href="mailto:root@osg-ligo-1.t2.ucsd.edu">root@osg-ligo-1.t2.ucsd.edu</a></tt><br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:42:49)</span> <b>marco.mascheroni:</b></span> it works<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:48:06)</span> <b>efajardo:</b></span> I will be on the stashcache meeting but I will leave it upgraded for now for oyu<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:48:18)</span> <b>marco.mascheroni:</b></span> ok<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:49:03)</span> <b>efajardo:</b></span> Thanks for taking a look at that<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:49:11)</span> <b>efajardo:</b></span> and remind me to remove you access<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:49:33)</span> <b>marco.mascheroni:</b></span> sounds good<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:53:10)</span> <b>efajardo:</b></span> @marco.mascheroni are you poking around?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:26:47)</span> <b>marco.mascheroni:</b></span> starting now, I had a call with Jeff<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:40:11)</span> <b>marco.mascheroni:</b></span> @efajardo do you have any tweak that is making the glideinFrontendElement.py running multiple threads?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:41:43)</span> <b>marco.mascheroni:</b></span> I guess             &lt;processing_workers matchmakers="3"/&gt;<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:41:56)</span> <b>marco.mascheroni:</b></span> do you mind if I change it to 1 and reconfigure the fronend?<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:50:37)</span> <b>efajardo:</b></span> sure<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:50:40)</span> <b>efajardo:</b></span> please go ahead<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:54:05)</span> <b>marco.mascheroni:</b></span> I actually patched the code :slightly_smiling_face:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:59:48)</span> <b>marco.mascheroni:</b></span> Has this always been like this:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:59:55)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:00:02)</span> <b>marco.mascheroni:</b></span> this is the match_expr<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:00:09)</span> <b>marco.mascheroni:</b></span> it is supposed to be python<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:03:22)</span> <b>marco.mascheroni:</b></span> (although it would not work with 342 as well, but I find it weird)<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:07:39)</span> <b>efajardo:</b></span> yea<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:07:43)</span> <b>efajardo:</b></span> it has always been<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:08:03)</span> <b>efajardo:</b></span> It is in python<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:08:09)</span> <b>efajardo:</b></span> but you cannot have <tt>&lt;</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(15:08:11)</span> <b>efajardo:</b></span> in xml<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:08:14)</span> <b>efajardo:</b></span> so you escape them<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:26:52)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:26:56)</span> <b>marco.mascheroni:</b></span> that's weir<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:27:07)</span> <b>marco.mascheroni:</b></span> I am running the main group by hand and debugging it<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:27:29)</span> <b>marco.mascheroni:</b></span> this is the expression that is supposed to be evaluated AFAICT<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:27:44)</span> <b>marco.mascheroni:</b></span> I'll dig more<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:31:12)</span> <b>marco.mascheroni:</b></span> There is also this that I missed that is not in the frontend.xml but it is in group_main/group.descript<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:31:26)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:31:34)</span> <b>marco.mascheroni:</b></span> And this is actually what Lorena changed<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:32:00)</span> <b>marco.mascheroni:</b></span> And it is evaluating to false:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:32:05)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:32:45)</span> <b>marco.mascheroni:</b></span> Of course....<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:32:52)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:33:21)</span> <b>marco.mascheroni:</b></span> So my intuition was actually right yesterday @tiradani<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:33:40)</span> <b>tiradani:</b></span> ah.  there is a missing “cast”<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:34:49)</span> <b>tiradani:</b></span> you were right<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:36:23)</span> <b>marco.mascheroni:</b></span> This is the incriminated change:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:36:45)</span> <b>marco.mascheroni:</b></span> I'll report this to redmine and we will get it fixed<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:37:47)</span> <b>marco.mascheroni:</b></span> @efajardo, I'll clean up my mess (pdb traces directly in the code and other changes) and I'll let you rollback. Although the rollback should overwrite it anyway..<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:37:52)</span> <b>tiradani:</b></span> that is reading from the config, right?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:38:01)</span> <b>tiradani:</b></span> do you specify the type in the xml?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:38:21)</span> <b>marco.mascheroni:</b></span> oh wait, the incriminated change is not that one sorry, wrong copy and paste<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:38:22)</span> <b>tiradani:</b></span> (I am having trouble remembering the syntax of the attr declaration)<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:39:28)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:39:39)</span> <b>marco.mascheroni:</b></span> this is the whole thing<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:41:07)</span> <b>marco.mascheroni:</b></span> I am just diffing 343 nd 342<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:45:01)</span> <b>efajardo:</b></span> @marco.mascheroni cool<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:45:16)</span> <b>efajardo:</b></span> let me know if I can restart<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:45:29)</span> <b>efajardo:</b></span> I should have noticed that was the error but I didnt look too deeply<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:45:32)</span> <b>marco.mascheroni:</b></span> actually Edgar, give 10 more mins so I can write all the info in redmine<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:45:33)</span> <b>efajardo:</b></span> I should have :disappointed:<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:45:44)</span> <b>efajardo:</b></span> And I can downgrade too<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:47:05)</span> <b>efajardo:</b></span> I am not a fan of the double negatives<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:47:08)</span> <b>efajardo:</b></span> <tt>elif (glidein_el['attrs'].get('GLIDEIN_REQUIRE_GLEXEC_USE', False) is True):</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(15:47:31)</span> <b>efajardo:</b></span> what was the intended case for this?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:48:38)</span> <b>marco.mascheroni:</b></span> what do you mean by double negative? .get(.., False) is for the default value to false if .. is not defined<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:48:58)</span> <b>efajardo:</b></span> I get that Marco I also undersand Python<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:49:12)</span> <b>marco.mascheroni:</b></span> ok sorry eheh<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:49:57)</span> <b>efajardo:</b></span> I think it is getting a little bit late in your side of the world<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:50:10)</span> <b>marco.mascheroni:</b></span> It's late Edgar, pls excuse me if I ma rude, do not report me at the UCSD HR departmant for harassment :stuck_out_tongue:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:50:23)</span> <b>marco.mascheroni:</b></span> ahah exaclty<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:51:13)</span> <b>efajardo:</b></span> I am glad you find this. But why did the unit test didnt catch this?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:52:15)</span> <b>marco.mascheroni:</b></span> good question<br/>
+<span style="color: #e23f99"><span style="font-size: small">(16:21:32)</span> <b>marco.mascheroni:</b></span> I summarizez everything here <a href="https://cdcvs.fnal.gov/redmine/issues/21898#note-3">https://cdcvs.fnal.gov/redmine/issues/21898#note-3</a><br/>Long story short to fix the downtime issue Lorena changed GLIDEIN_In_Downtime form str to bool. Then I assume she saw few lines below GLIDEIN_REQUIRE_VOMS and GLIDEIN_REQUIRE_GLEXEC_USE were also compared to string ('True') and changed them as well. Unfortunately I don't thing our unit tests go so much in the details of things anc could catch that.<br/>
+<span style="color: #e23f99"><span style="font-size: small">(16:22:17)</span> <b>marco.mascheroni:</b></span> good night guys<br/>
+<span style="color: #e23f99"><span style="font-size: small">(16:59:07)</span> <b>marco.mascheroni:</b></span> @efajardo did you roll back the frontend already? I can't find my changes (I opened my mailbox before reverting them and give you the ok...). Not that I needed them, it was just to clean up my mess, but the rollback already cleaned everything up. Anyeay, you can remove my key from your machine (till the next time...)<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:00:24)</span> <b>efajardo:</b></span> yEs I rolleeback<br/>
+</body>
+</html>

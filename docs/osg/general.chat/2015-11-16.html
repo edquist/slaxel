@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Nov 16, 2015 : #general (osg)</title>
+</head>
+<body>
+<h3>Mon Nov 16, 2015 : #general (osg)</h3>
+<span style="color: #df3dc0"><span style="font-size: small">(11:01:25)</span> <b>boj:</b></span> @bbockelm, I checked with Dave Lesny a few days back on this for Fermilab. the 1920 seems to be a consequence of how partioning is done there<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(11:03:07)</span> <b>boj:</b></span> from email:<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(11:03:08)</span> <b>boj:</b></span> As you discovered, we can handle multicore jobs of almost any size, though we are <br/>really best setup right now for a max of 8 cores and 1600MB. A request for more than<br/>8 cores will most likely never get a match since our defrag daemon stops once 8 cores <br/>are free on a node (thus 9 or more free cores might never happen on a busy site). <br/><br/>Memory is a similar issue. You can request almost any size, but the higher the request<br/>the less likely a node will ever have that number free. In general we have 1920GB per core<br/>but some nodes have 3GB or more. And another batch I am getting soon will have 5GB per core.<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(11:03:27)</span> <b>boj:</b></span> By default, we allocate 1 core and 1920GB to the job, unless you request otherwise.<br/>This is the "best" setting for a job to run on most of our nodes. Many of the NAT pool nodes<br/>are 4 core and 1920GB per core. The Ceph pool nodes are newer and have<br/>more memory per core. We just brought these online in the last few days.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:47:40)</span> <b>bbockelm:</b></span> Ok.  I’ll poke the LIGO folks about tightening up memory requirements.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:09:33)</span> <b>bbockelm:</b></span> @boj: turns out that the memory expression is buried in the code and not the config file right now.  MWT2 will have to sit out the current run.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:10:01)</span> <b>bbockelm:</b></span> but, in general, there’s not a problem with bumping down to 1920.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:10:14)</span> <b>bbockelm:</b></span> I saw the same "issue" is at UChicago.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:20:07)</span> <b>rynge:</b></span> OSG VO usually tell users to use 1.8 GBs requirements to not have to worry about these issues<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:20:49)</span> <b>bbockelm:</b></span> Yeah - I think this is just another small tweak moving from a dedicated cluster to OSG.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:21:14)</span> <b>bbockelm:</b></span> things are going fairly well overall though - just broke through 4k cores.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:42:37)</span> <b>rynge:</b></span> Nice! Karan is back today and he will check with Duncan to fix the sed hack<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:45:02)</span> <b>bbockelm:</b></span> another thing that’s going to come up (but is less simple) is how we’re distributing data — all sites are pulling from Nebraska, even sites that already have the data present locally.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:45:29)</span> <b>bbockelm:</b></span> It would be nice if the data could be preferentially read from /cvmfs/oasis.opensciencegrid.org/ligo/frames (which is a symlink configured by the site); if not, read it from GridFTP.<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:53:37)</span> <b>efajardo:</b></span> Or if the data is at a site pull it from the gridftp at a given site, no?<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:55:37)</span> <b>efajardo:</b></span> The way this is moving it seems to me that for Ligo it is being increasingly clear the benefit of creating their own  xrootd federation, no?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:55:46)</span> <b>rynge:</b></span> How do the sites maintain that symlink under oasis?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:03:48)</span> <b>bbockelm:</b></span> about three.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:04:54)</span> <b>bbockelm:</b></span> but, in general, I’d be interested in having for a single site in the pegasus catalog to be able to provide an ordered list of potential input methods.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:06:14)</span> <b>bbockelm:</b></span> @efajardo: Yes, this is moving slowly toward an Xrootd federation, but not quite there yet.  One thing I’d like you to do is port the stashcache support to the ligo frontend.<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:07:13)</span> <b>efajardo:</b></span> port it from where?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:07:19)</span> <b>bbockelm:</b></span> OSG VO frontend<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:07:55)</span> <b>bbockelm:</b></span> the OSG VO wrapper script is setup (I think) such that you can provide a custom attribute and have an Xrootd library in the LD_PRELOAD.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:08:20)</span> <b>rynge:</b></span> There is partial support for the multi source idea, but it needs to be cleaned up a little bit. I will put that on my todo list<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:08:46)</span> <b>bbockelm:</b></span> then we could default the CVMFS symlink to point at the “location” of the xrootd federation when the LD_PRELOAD is active.<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:12:47)</span> <b>efajardo:</b></span> Sure @bbockelm OSG VO frontend is using WantsStashCache and WantsPosixStashCache Ads you want to use same attrubytes?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:29:42)</span> <b>bbockelm:</b></span> yup<br/>
+<span style="color: #a63024"><span style="font-size: small">(18:59:03)</span> <b>efajardo:</b></span> Ok done<br/>
+</body>
+</html>

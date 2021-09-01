@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Sep 3, 2019 : #operations (osg)</title>
+</head>
+<body>
+<h3>Tue Sep 3, 2019 : #operations (osg)</h3>
+<span style="color: #e06b56"><span style="font-size: small">(10:32:12)</span> <b>jthiltges:</b></span> @matyas I found a promising VM (osg-bot), but not sure if it's the right one. It's running the osg-wn-nightly-build scripts, but not able to push updates.<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:47:03)</span> <b>***matyas:</b></span> looks at repo commit history<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:47:50)</span> <b>matyas:</b></span> apparently the last time it worked was April 11, 2017<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:47:59)</span> <b>matyas:</b></span> using @bbockelm’s credentials<br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:48:44)</span> <b>jthiltges:</b></span> If it turns out to be the right VM, I'm planning on getting some monitoring set up. :slightly_smiling_face:<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:50:12)</span> <b>matyas:</b></span> looks like the <tt>devel</tt> branches only got updated when we made a release<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:50:32)</span> <b>matyas:</b></span> since nobody's complained, I'm thinking retiring it would be a better idea<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:54:01)</span> <b>matyas:</b></span> @blin we should make our wn-client builds fit our new Docker image fresh/stable policy instead of automatically building the {3.3,3.4,3.5}-{devel,testing}-{el6,el7} matrix _every night_<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:54:11)</span> <b>matyas:</b></span> with aliases<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:55:24)</span> <b>blin:</b></span> i've thought about it but the WN client doesn't really fit into the fresh-stable paradigm since it supports multiple release series<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:56:56)</span> <b>matyas:</b></span> fine. here's my thought: get rid of <tt>*devel*</tt> and <tt>*testing*</tt>, and get rid of the aliases<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:57:17)</span> <b>matyas:</b></span> we'll ship <tt>3.4-release</tt> and <tt>3.5-release</tt>, updated whenever there is a release<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:57:43)</span> <b>matyas:</b></span> and if we need a hotfix for something then we'll have a procedure to do a one-off<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:59:00)</span> <b>matyas:</b></span> nobody has noticed that devel and testing only get updated on release day<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:00:21)</span> <b>blin:</b></span> fine by me<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:02:03)</span> <b>matyas:</b></span> mind if I add a "container" component to JIRA?<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(11:05:01)</span> <b>blin:</b></span> sure<br/>
+</blockquote>
+<span style="color: #c386df"><span style="font-size: small">(11:04:00)</span> <b>matyas:</b></span> @jthiltges, is there anything else running on that VM?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(11:04:28)</span> <b>jthiltges:</b></span> I'm trying to sort through. There's different stuff, but it all looks broken. :stuck_out_tongue_closed_eyes:<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:05:04)</span> <b>matyas:</b></span> ok, I think we can shut it down. @blin?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:05:25)</span> <b>blin:</b></span> yeah let's just shut it down and see if it breaks anything<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:05:35)</span> <b>blin:</b></span> then we can get rid of it a month from now?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(11:08:41)</span> <b>jthiltges:</b></span> broken services on the osg-bot VM:<br/>- github-ca-certs-update  (vdt svn mirror thing?)<br/>- github-update (more vdt svn mirror thing?)<br/>- osg-wn-nightly-build<br/>- update-gh-pages (seems the output goes to Brian's personal GH account)<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:12:43)</span> <b>matyas:</b></span> the VDT SVN mirror does seem to work so it might be running from somewhere else<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:27:22)</span> <b>matyas:</b></span> <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-3806">https://opensciencegrid.atlassian.net/browse/SOFTWARE-3806</a><br/>
+<span style="color: #e06b56"><span style="font-size: small">(11:31:20)</span> <b>jthiltges:</b></span> VM powered off. Thanks for the help sorting through things.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:35:46)</span> <b>matyas:</b></span> no prob. thanks for finding it<br/>
+</body>
+</html>

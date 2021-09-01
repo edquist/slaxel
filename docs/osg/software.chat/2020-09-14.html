@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Sep 14, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Mon Sep 14, 2020 : #software (osg)</h3>
+<span style="color: #a2a5dc"><span style="font-size: small">(12:30:55)</span> <b>didavila:</b></span> @matyas for python-scitokens el7, both py2 and py3 need to have Provides/Obsoletes python-scitokens or just py2?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:08:35)</span> <b>matyas:</b></span> Well you can't put Obsoletes on both otherwise yum will get confused and won't know which one to replace python-scitokens with<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:10:18)</span> <b>matyas:</b></span> You should put the Provides in both and the Obsoletes in py3<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(13:10:30)</span> <b>didavila:</b></span> go it, thanks!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:45:55)</span> <b>dweitzel:</b></span> I'm a little confused.  I don't see that we have ever had a python-scitokens package.  The python-scitokens package creates a python2-scitokens RPM.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:46:03)</span> <b>dweitzel:</b></span> Maybe I'm missing it in koji?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:46:19)</span> <b>matyas:</b></span> oh, if we've never had a python-scitokens, then you can skip the provides/obsoletes altogether<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:47:52)</span> <b>matyas:</b></span> my bad, I should have checked first<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:49:04)</span> <b>dweitzel:</b></span> @didavila ^<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(13:50:08)</span> <b>didavila:</b></span> got it<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(13:52:10)</span> <b>didavila:</b></span> the package originally had “Provides: python-scitokens” then I guess that should be removed ?<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(13:52:57)</span> <b>didavila:</b></span> what if there is a package out there that depends on python-scitokens ?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:53:42)</span> <b>matyas:</b></span> Let's check...<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:57:23)</span> <b>matyas:</b></span> I made an EL7 VM with the OSG repos, then yum installed yum-utils, then ran<br/><pre>repoquery --plugins --whatrequires python-scitokens</pre><br/>and that returned nothing. So I think we're in the clear.<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(13:57:42)</span> <b>didavila:</b></span> ok<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:00:09)</span> <b>matyas:</b></span> also I saw <a href="https://osg-sw-submit.chtc.wisc.edu/tests/20200914-1322/packages.html">https://osg-sw-submit.chtc.wisc.edu/tests/20200914-1322/packages.html</a>. xrootd-multiuser isn't in the release repos for EL8 yet so you'll have to adjust your parameters to only test the osg-development repos.<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(14:04:04)</span> <b>didavila:</b></span> yes, I saw it. Thanks<br/>
+</body>
+</html>

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jun 7, 2021 : #collaboration-support (osg)</title>
+</head>
+<body>
+<h3>Mon Jun 7, 2021 : #collaboration-support (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(07:40:17)</span> <b>ruben.lara:</b></span> This is confusing. According to last week conversations, we didn’t have to renew certificates for the HTCondor-CE we are using (<tt><a href="http://osg-sched2.pace.gatech.edu">osg-sched2.pace.gatech.edu</a></tt> ), because it’s a container. However, this morning there are no jobs in the queue, and found this message in the <tt>/var/log/condor-ce/SchedLog</tt> file:<br/><pre>06/07/21 09:56:33 (D_ALWAYS) authenticate_self_gss: acquiring self credentials failed. Please check your Condor configuration file if this is a server process. Or the user environment variable if this is a user process.<br/><br/>GSS Major Status: General failure<br/>GSS Minor Status Error Chain:<br/>globus_gsi_gssapi: Error with GSI credential<br/>globus_gsi_gssapi: Error with gss credential handle<br/>globus_credential: Error with credential: The host credential: /etc/grid-security/hostcert.pem<br/>     with subject: /DC=org/DC=incommon/C=US/ST=Georgia/L=Atlanta/O=Georgia Institute of Technology/OU=Office of Information Technology/CN=<a href="http://osg-sched2.pace.gatech.edu">osg-sched2.pace.gatech.edu</a><br/>     has expired 4916 minutes ago.</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(07:41:53)</span> <b>ruben.lara:</b></span> So, back to the question: what is the proper procedure to update the container’s certificate? It’s pulling it when it’s installed and started; please let us know where we should put the new certificate for it to work correctly when the condor-ce starts.<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:22:16)</span> <b>paschos:</b></span> Gatech is using IGTF certs. You need to request those from OIT. The process for updating the certs there:<br/>1. Create a private key and CSR with your institution and request an IGTF certificate for your host.<br/>2. Delete the old certificate/key from SLATE via <tt>slate secret delete</tt><br/>3. Upload the signed certificate you get back from your institution and the private key via the SLATE commands I pasted below, preferably with the same name as the old ones<br/>4. Change the values file if needed, and restart the instance.<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:22:51)</span> <b>paschos:</b></span> i think Treverr might have some notes on this since he worked with lincoln on it last time<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:22:58)</span> <b>paschos:</b></span> @ruben.lara<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:23:26)</span> <b>paschos:</b></span> <pre>slate secret create &lt;YOUR HOST CERT SECRET NAME&gt; --cluster &lt;YOUR CLUSTER&gt; --group &lt;YOUR GROUP&gt; --from-file host.cert=&lt;PATH TO CERT FILE&gt;<br/>slate secret create &lt;YOUR HOST KEY SECRET NAME&gt; --cluster &lt;YOUR CLUSTER&gt; --group &lt;YOUR GROUP&gt; --from-file host.key=&lt;PATH TO KEY FILE&gt;</pre><br/><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:58:23)</span> <b>ruben.lara:</b></span> Thank you.<br/>
+</body>
+</html>

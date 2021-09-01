@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Nov 7, 2018 : #operations (osg)</title>
+</head>
+<body>
+<h3>Wed Nov 7, 2018 : #operations (osg)</h3>
+<span style="color: #e06b56"><span style="font-size: small">(09:26:44)</span> <b>jthiltges:</b></span> Ah, <tt>osgcollab</tt> was in the sudoers list (via puppet), but didn't get <tt>NOPASSWD</tt>. Now sorted out.<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:52:56)</span> <b>matyas:</b></span> thanks!<br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:04:46)</span> <b>jthiltges:</b></span> Hi @tim.theisen. I noticed an empty directory path when migrating the tarball-install data over to the new server: <a href="http://repo-itb.opensciencegrid.org/tarball-install/3.4.17.3.4/3.4.17.3.4.18/">http://repo-itb.opensciencegrid.org/tarball-install/3.4.17.3.4/3.4.17.3.4.18/</a><br/>OK to remove?<br/>
+<span style="color: #73769d"><span style="font-size: small">(10:06:04)</span> <b>tim.theisen:</b></span> Yes, that happened that happened when the scripts were missing. I just removed them from <a href="http://repo.opensciencegrid.org">repo.opensciencegrid.org</a> a few minutes ago.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:08:14)</span> <b>dweitzel:</b></span> <a href="http://topology.opensciencegrid.org">topology.opensciencegrid.org</a> has been moved.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:08:53)</span> <b>jthiltges:</b></span> Err, topology-itb.<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:09:28)</span> <b>matyas:</b></span> new host key: <tt>SHA256:s6IeCkOCRSGYfNRmtqxL8TX9ciVvDqtrglX4KOxOGdY.</tt>?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:11:05)</span> <b>jthiltges:</b></span> Yes. New host key on topology-itb. The only server with the key preserved is <a href="http://repo.opensciencegrid.org">repo.opensciencegrid.org</a>. Is that OK?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:11:18)</span> <b>matyas:</b></span> that's fine, I just want to make sure that's what it is<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:11:48)</span> <b>matyas:</b></span> you can check with <tt>echo /etc/ssh/*.pub | xargs -n 1 ssh-keygen -l -f</tt><br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:12:27)</span> <b>jthiltges:</b></span> <tt>2048 SHA256:s6IeCkOCRSGYfNRmtqxL8TX9ciVvDqtrglX4KOxOGdY no comment (RSA)</tt> :+1:<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:16:07)</span> <b>matyas:</b></span> I'm getting a cert problem with firefox: the cert is only valid for <a href="http://my.opensciencegrid.org">my.opensciencegrid.org</a>, <a href="http://myosg.opensciencegrid.org">myosg.opensciencegrid.org</a>, <a href="http://topology.opensciencegrid.org">topology.opensciencegrid.org</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:16:36)</span> <b>dweitzel:</b></span> swapping DNS entries for topology-itb &lt;-&gt; topology now.  May take time with DNS caching to propagate, but it's usually pretty fast.<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:18:09)</span> <b>matyas:</b></span> what's the actual hostname, just so I can test? also, is it still 129.93.175.24?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:20:01)</span> <b>dweitzel:</b></span> <a href="http://hcc-osg-topology.unl.edu">hcc-osg-topology.unl.edu</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:21:26)</span> <b>matyas:</b></span> looks like /etc/httpd/conf.d/topology-itb.conf is looking at the wrong cert<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:21:45)</span> <b>matyas:</b></span> <pre>$ sudo openssl x509 -in /etc/letsencrypt/live/topology.opensciencegrid.org/cert.pem -noout -subject<br/>subject= /CN=<a href="http://topology.opensciencegrid.org">topology.opensciencegrid.org</a></pre><br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:31:13)</span> <b>jthiltges:</b></span> Hrm. LetsEncrypt makes this annoying. Can't use tls-sni-01 validation unless the host is reachable by the name. So can't easily have topology and topology-itb certs on the same box.<br/>Anyone used dns-01? (Haven't tried it myself.)<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:32:29)</span> <b>matyas:</b></span> can you cheat and make topology-itb an SAN for topology? or is that a bad idea?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:34:46)</span> <b>jthiltges:</b></span> I think that would be the best situation. But I'm not sure how to have LetsEncrypt validate the topology-itb name, with it living on a different server.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:35:13)</span> <b>jthiltges:</b></span> (Outside of maybe DNS validation. Or some sort of horrible shared filesystem.)<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:30:06)</span> <b>matyas:</b></span> can we either fix the cert on topology-itb or move it back to the old host please?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:31:15)</span> <b>matyas:</b></span> preferably the former, of course<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:43:38)</span> <b>jthiltges:</b></span> Swapped the cert over from the old itb box to the new one. Look OK @matyas?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:49:55)</span> <b>matyas:</b></span> cert looks ok though the webpage is old; I just need to update the checkout<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:51:47)</span> <b>matyas:</b></span> just got this when I tried to ssh: <pre><br/>@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@<br/>@       WARNING: POSSIBLE DNS SPOOFING DETECTED!          @<br/>@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@<br/>The RSA host key for <a href="http://topology-itb.opensciencegrid.org">topology-itb.opensciencegrid.org</a> has changed,<br/>and the key for the corresponding IP address 129.93.244.233<br/>is unchanged. This could either mean that<br/>DNS SPOOFING is happening or the IP address for the host<br/>and its host key have changed at the same time.<br/>Offending key for IP in /home/matyas/.ssh/known_hosts:4<br/>@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@<br/>@    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @<br/>@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@<br/>IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!<br/>Someone could be eavesdropping on you right now (man-in-the-middle attack)!<br/>It is also possible that a host key has just been changed.<br/>The fingerprint for the RSA key sent by the remote host is<br/>SHA256:y8/moSR05yFUVhmQ/hhIr0wqKpPlFSFZpYlUG5YKrEc.<br/>Please contact your system administrator.<br/>Add correct host key in /home/matyas/.ssh/known_hosts to get rid of this message.<br/>Offending RSA key in /home/matyas/.ssh/known_hosts:37<br/>RSA host key for <a href="http://topology-itb.opensciencegrid.org">topology-itb.opensciencegrid.org</a> has changed and you have requested strict checking.<br/>Host key verification failed.<br/></pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(13:52:58)</span> <b>matyas:</b></span> did the host key change again?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:06:02)</span> <b>jthiltges:</b></span> New VM became topology (with a new host key)<br/>Old topology became topology-itb (no change to key)  (<tt>SHA256:y8/moSR05yFUVhmQ/hhIr0wqKpPlFSFZpYlUG5YKrEc</tt>)<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:07:13)</span> <b>jthiltges:</b></span> Sorry about the confusion. Better to just put the topology host key in puppet too?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:09:22)</span> <b>matyas:</b></span> yeah please<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:20:48)</span> <b>matyas:</b></span> ok, both sites seem to work<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:26:03)</span> <b>matyas:</b></span> can you change the dns for <a href="http://my-itb.opensciencegrid.org">my-itb.opensciencegrid.org</a> too?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:29:25)</span> <b>dweitzel:</b></span> done<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:33:22)</span> <b>jthiltges:</b></span> One final SSH RSA host key change which makes topology-itb match topology: <tt>SHA256:s6IeCkOCRSGYfNRmtqxL8TX9ciVvDqtrglX4KOxOGdY</tt><br/>
+</body>
+</html>

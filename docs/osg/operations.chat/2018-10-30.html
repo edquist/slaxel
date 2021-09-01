@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Oct 30, 2018 : #operations (osg)</title>
+</head>
+<body>
+<h3>Tue Oct 30, 2018 : #operations (osg)</h3>
+<span style="color: #e06b56"><span style="font-size: small">(13:48:09)</span> <b>jthiltges:</b></span> @matyas Just to confirm, <a href="http://hcc-osg-software.unl.edu">hcc-osg-software.unl.edu</a> is not currently in production? And the SSH host key from hcc-osg-software2 should be applied to hcc-osg-software?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:50:00)</span> <b>matyas:</b></span> that one is currently in use as <tt>repo-itb</tt>; we don't have anything pushing to it so it's OK to change its key<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:05:11)</span> <b>jthiltges:</b></span> Thanks! I wanted to make sure things were copied the right direction.<br/><br/>SSH host key for hcc-osg-software2 is managed by puppet, and hcc-osg-software now matches.<br/>I also set <tt>PasswordAuthentication no</tt> to match the topology VMs.<br/><br/>There's some config issues on hcc-osg-software, with puppet expecting <tt>/usr/local/repo</tt> to exist, and nginx configured to use <tt>/etc/letsencrypt/live/hcc-osg-software.unl.edu/fullchain.pem</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(14:19:27)</span> <b>matyas:</b></span> @jthiltges as long as you're in there, could you add the line<br/><pre>LOGLEVEL=10  # logging.DEBUG</pre> to <tt>/etc/opt/topology/config-production.py</tt> on hcc-osg-topology2?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:21:59)</span> <b>jthiltges:</b></span> Done.<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:22:09)</span> <b>matyas:</b></span> thanks!<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:10:19)</span> <b>blin:</b></span> did we take down <a href="http://gracc.opensciencegrid.org">gracc.opensciencegrid.org</a> for maintenance at all?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:11:21)</span> <b>blin:</b></span> atlas/cms mentioned that they couldn't reach it for a little bit this afternoon<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:11:31)</span> <b>dweitzel:</b></span> I did see some messages about a small network outage at Nebraska earlier.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:12:42)</span> <b>dweitzel:</b></span> looks like it was down for 45 minutes, between 2:15 and 3 pm this afternoon.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:12:46)</span> <b>dweitzel:</b></span> @jthiltges?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:14:59)</span> <b>jthiltges:</b></span> Yes, there was a network outage between ~2:15pm and ~2:55pm today that affected the public IP network for anvil.<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:15:25)</span> <b>marian:</b></span> gracc page was inaccessible for that long? haven't got check_mk about it ... but if there was an outage also on check_mk host during that time? possible?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:16:24)</span> <b>jthiltges:</b></span> @gattebury was working with campus ITS to clean up some configuration, and it appeared to break the routing for incoming traffic.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:17:31)</span> <b>jthiltges:</b></span> The monitoring traffic went over our own internal link, so it stayed fine.<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:18:50)</span> <b>marian:</b></span> that's what I guessed, hmm<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:19:28)</span> <b>marian:</b></span> thanks @jthiltges for explanation<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:27:14)</span> <b>blin:</b></span> can we improve the monitoring to detect these sorts of issues that only affect those external to UNL?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:40:18)</span> <b>jthiltges:</b></span> Could run check_mk somewhere else, sure. Would hopefully not be too involved. Just the external-facing services, etc.<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:41:55)</span> <b>blin:</b></span> @jdost321 this may be worth adding to your planning retreat talk as a small project<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:42:07)</span> <b>blin:</b></span> or under a wider monitoring umbrella item<br/>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Aug 19, 2021 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Thu Aug 19, 2021 : #gfactory (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(08:45:28)</span> <b>blin:</b></span> i believe @marco.mascheroni said he was going to update it<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:28:28)</span> <b>rynge:</b></span> @marco.mascheroni I think I'm passed the scitoken issue, but I don't see any entries in the itb factory<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:28:34)</span> <b>rynge:</b></span> <pre># condor_status -pool <a href="http://gfactory-itb-1.opensciencegrid.org">gfactory-itb-1.opensciencegrid.org</a> -any -const 'GlideinMyType == "glidefactory"'</pre><br/><br/>
+<span style="color: #385a86"><span style="font-size: small">(12:05:19)</span> <b>jdost321:</b></span> @rynge we temporarily downgraded to 8.8.15 since that's what we're updating to in production. It won't work correctly until we get it back up to 9.0.4, which I hope to get to this afternoon, @blin i guess this double confirms token support doesn't work in the 8 series?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:06:19)</span> <b>rynge:</b></span> Ok, cool<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:06:26)</span> <b>jdost321:</b></span> but alos as an aside we removed SCITOKENS from the SEC_DEFAULT_AUTHENTICATION_METHODS as a workaround for the security issues 7-28<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:07:01)</span> <b>jdost321:</b></span> was token support actualy working more recently? I see pilots were still working ok<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:07:02)</span> <b>jdost321:</b></span> <a href="http://gfactory-itb-1.opensciencegrid.org/factory/monitor/factoryStatus.html?entry=OSG_US_ISI_osg&amp;frontend=total&amp;infoGroup=running&amp;elements=StatusRunningCores,ClientCoresTotal,ClientCoresRunning,ClientCoresIdle,&amp;rra=2&amp;window_min=0&amp;window_max=0&amp;timezone=-7">http://gfactory-itb-1.opensciencegrid.org/factory/monitor/factoryStatus.html?entry=OSG_US_ISI[…]esIdle,&amp;rra=2&amp;window_min=0&amp;window_max=0&amp;timezone=-7</a><br/>
+<span style="color: #385a86"><span style="font-size: small">(12:07:09)</span> <b>jdost321:</b></span> until our downgrade yesterday<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:11:26)</span> <b>bbockelm:</b></span> <tt>SEC_DEFAULT_AUTHENTICATION_METHODS</tt> controls authenticating _to_ the factory.  Submitting pilots the factory is a client (and the security issue didn't apply to clients).<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:11:47)</span> <b>bbockelm:</b></span> @jdost321 - I didn't realize the production factory is on 8.8.x... what's the schedule to get it to 9.0.x?<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:17:21)</span> <b>jdost321:</b></span> we need to converge on how to deal with the issue where CEs authorize but don't fall back to GSI if they aren't configured to authenticate w/ tokens<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:18:17)</span> <b>jdost321:</b></span> sorry maybe i said that backwards but the ordering issue we encountered<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:20:27)</span> <b>bbockelm:</b></span> &gt;  sorry maybe i said that backwards but the ordering issue we encountered<br/>Ah - that's not what I was asking though.  I was simply asking about upgrading to 9.0.x.<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:20:41)</span> <b>jdost321:</b></span> right, well going to 9.0.x induced hte problem<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:20:47)</span> <b>jdost321:</b></span> we don't see it on 8.0.x<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:20:52)</span> <b>jdost321:</b></span> sorry 8.8.x<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:21:14)</span> <b>bbockelm:</b></span> Ah, so we simply need to set <tt>SEC_DEFAULT_FOO</tt> to avoid SciTokens for now and then we can upgrade the prod factory?<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:22:13)</span> <b>jdost321:</b></span> i thoguht that's what i was doing above with <tt>SEC_DEFAULT_AUTHENTICATION_METHODS</tt> what is the client equiv?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:24:39)</span> <b>blin:</b></span> nope, the factory's the client to the CE so you need to set <tt>SEC_CLIENT_AUTHENTICATION_METHODS</tt><br/>
+<span style="color: #385a86"><span style="font-size: small">(12:25:52)</span> <b>jdost321:</b></span> i see in itb now, we were actually forcing it with<br/><pre>C_GAHP_WORKER_THREAD.SEC_CLIENT_AUTHENTICATION_METHODS = SCITOKENS, GSI, $(SEC_CLIENT_AUTHENTICATION_METHODS)</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:28:36)</span> <b>blin:</b></span> it's on my todo list to create a ticket for pushing on the CE upgrade transition<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:29:06)</span> <b>jdost321:</b></span> in 9.0.4 is that enabled by default? how would we turn it off? I am happy to move production to 9.0.4 if we can start with SCITOKENS disabled<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:29:10)</span> <b>blin:</b></span> and in parallel we can have @rynge specify a group to use proxies for<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(14:21:32)</span> <b>blin:</b></span> @rynge what info do you need to construct a special group for this? Would CE FQDNs or resource names work?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:24:23)</span> <b>rynge:</b></span> As I can't tell if a site should use proxy or scitoken, I would prefer the factory ops to make the classification. One approach would be splitting the <tt>"OSGVO"</tt> in <tt>GLIDEIN_Supported_VOs</tt>  into two: <tt>OSGVO_PROXIES</tt> and <tt>OSGVO_TOKENS</tt><br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:24:34)</span> <b>rynge:</b></span> I could also match on other attributes in the factory<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:25:38)</span> <b>rynge:</b></span> Maybe it should be <tt>OPENPOOL_GSI</tt> and <tt>OPENPOOL_SCITOKEN</tt><br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:26:22)</span> <b>rynge:</b></span> <pre>            &lt;factory query_expr='FactoryType == "production" &amp;&amp;<br/>                                 (stringListMember("OSGVO", GLIDEIN_Supported_VOs) || stringListMember("OSGVO_MULTICORE", GLIDEIN_Supported_VOs)) &amp;&amp; <br/>                                 (GLIDEIN_SupportedAuthenticationMethod == "grid_proxy") &amp;&amp;</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:26:36)</span> <b>rynge:</b></span> Looks like we already match on <tt>GLIDEIN_SupportedAuthenticationMethod</tt><br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:26:44)</span> <b>rynge:</b></span> But I don't know how that is defined<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:33:03)</span> <b>blin:</b></span> what if we gave you a list of CEs that don't support tokens?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:34:15)</span> <b>blin:</b></span> it's not so much the supported auth methods that a CE has: almost all of them support scitokens right now, we need a specific version of condor installed<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:35:34)</span> <b>blin:</b></span> i don't have strong feelings about whether it's you or @jdost321 that uses the list of CEs that don't have good token support<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:35:36)</span> <b>rynge:</b></span> Ok, well as long as something that I can match on<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:36:24)</span> <b>rynge:</b></span> Give me the list and I'll set it up<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:36:26)</span> <b>blin:</b></span> here's the list of CEs btw <a href="https://github.com/opensciencegrid/osg-flock/blob/master/flock.opensciencegrid.org/flocking-hosts.yml#L7-L17">https://github.com/opensciencegrid/osg-flock/blob/master/flock.opensciencegrid.org/flocking-hosts.yml#L7-L17</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:36:51)</span> <b>rynge:</b></span> No, that is the schedds<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:40:36)</span> <b>blin:</b></span> oops, copy paste fail<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:40:43)</span> <b>blin:</b></span> <a href="https://opensciencegrid.atlassian.net/browse/OPS-207">https://opensciencegrid.atlassian.net/browse/OPS-207</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:43:38)</span> <b>rynge:</b></span> Ok, will set this up later today. For this entry, you want scitoken credential?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:43:46)</span> <b>rynge:</b></span> That is the only difference?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:44:42)</span> <b>blin:</b></span> the opposite, we don't want to use scitokens with those CEs<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:45:43)</span> <b>rynge:</b></span> Got it<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:46:11)</span> <b>rynge:</b></span> I'll try today, but this might spill in to tomorrow<br/>
+<span style="color: #674b1b"><span style="font-size: small">(19:45:37)</span> <b>rynge:</b></span> I have a prototype running: <a href="https://github.com/opensciencegrid/osg-flock/blob/master/flock.opensciencegrid.org/gwms-patches/3.9.2.patch#L54-L191">https://github.com/opensciencegrid/osg-flock/blob/master/flock.opensciencegrid.org/gwms-patches/3.9.2.patch#L54-L191</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(19:46:04)</span> <b>rynge:</b></span> Not implemented via groups, but when we decide to generate/attach scitokens to a factory request<br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-08-20 09:39:06)</span> <b>blin:</b></span> awesome!<br/>
+</blockquote>
+<span style="color: #674b1b"><span style="font-size: small">(12:29:31)</span> <b>rynge:</b></span> :thumbsup:<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:29:42)</span> <b>blin:</b></span> it's not so much 9.0.4 as it's the combination of 9.0.4 + gwms 3.7.5<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:29:54)</span> <b>rynge:</b></span> My CE is so sad without any jobs... :disappointed:<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:30:20)</span> <b>blin:</b></span> you can set <tt>C_GAHP_WORKER_THREAD.SEC_CLIENT_AUTHENTICATION_METHODS = GSI, $(SEC_CLIENT_AUTHENTICATION_METHODS)</tt><br/>
+<span style="color: #385a86"><span style="font-size: small">(12:30:23)</span> <b>jdost321:</b></span> we're on gwms 3.7.4 on itb<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:30:26)</span> <b>jdost321:</b></span> 3.7.3 on prod<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:30:51)</span> <b>jdost321:</b></span> let me try on itb..<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:31:13)</span> <b>blin:</b></span> err sorry, i think i meant <tt>3.7.2</tt> . iirc, that's when the scitokens support was added<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:45:24)</span> <b>jdost321:</b></span> indeed it worked, still blocks SCI Tokens<br/><pre>condor_config_val C_GAHP_WORKER_THREAD.SEC_CLIENT_AUTHENTICATION_METHODS<br/>GSI,</pre><br/>
+<span style="color: #385a86"><span style="font-size: small">(12:46:05)</span> <b>jdost321:</b></span> interestlingly <tt>SEC_CLIENT_AUTHENTICATION_METHODS</tt> isn't defined right now, if i upgrade the prod factory with this in place can we be sure HTCondor won't sneak in SCITOKENS behind our back before we're ready?<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:46:17)</span> <b>jdost321:</b></span> suppose i just leave out the <tt>$(SEC_CLIENT_AUTHENTICATION_METHODS)</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:47:58)</span> <b>blin:</b></span> yeah, you could. i don't think htcondor will ever add scitokens to the default client list, though<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:09:23)</span> <b>jdost321:</b></span> @rynge i've upgraded itb to 9.0.4 and re-enabled scitokens so ISI should work again<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:15:43)</span> <b>jdost321:</b></span> and for the benefit of others who aren't on our announce list I've upgraded production to 9.0.4 as well, but kept sci tokens disabled<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:16:29)</span> <b>matyas:</b></span> where's the announce list? can I join?<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:17:14)</span> <b>jdost321:</b></span> I'm surprised you aren't already on it? <a href="mailto:osg-gfactory-announce@physics.ucsd.edu">osg-gfactory-announce@physics.ucsd.edu</a> I'll double check<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:17:47)</span> <b>matyas:</b></span> maybe I am<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:18:13)</span> <b>jdost321:</b></span> i see you listed <a href="mailto:matyas@cs.wisc.edu">matyas@cs.wisc.edu</a> ?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:18:20)</span> <b>matyas:</b></span> yep. ok, I am<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:19:16)</span> <b>matyas:</b></span> oh I just got the email. My bad, didn't check my email recently<br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:22:37)</span> <b>joshua.willis:</b></span> Not sure if this is the right place to ask this or not.  After a call with @gthain and @james.clark, we in IGWN (LIGO/Virgo/KAGRA) are trying to understand where some Glidein variables are set, and what their values are, for our jobs. In particular, the GlideinWMS docs [1] say that the default value of <tt>GLIDEIN_Expose_Grid_Env</tt> is <tt>False</tt>, but it looks to us like it in fact defaults to <tt>True</tt> [2].  If in fact it is <tt>True</tt>, we are wondering if it can be set to <tt>False</tt> for our VO’s jobs only, or if that is not configurable at that level of granularity? We wouldn’t want to do it yet (or only on some test setup) to see if this might be responsible for some unwanted propagation of environment variables inside of singularity containers for our jobs.<br/>[1] <a href="https://glideinwms.fnal.gov/doc.prd/factory/custom_vars.html#condor_vars">https://glideinwms.fnal.gov/doc.prd/factory/custom_vars.html#condor_vars</a><br/>[2] <a href="https://github.com/glideinWMS/glideinwms/blob/master/creation/web_base/condor_vars.lst#L118">https://github.com/glideinWMS/glideinwms/blob/master/creation/web_base/condor_vars.lst#L118</a><br/>
+<span style="color: #385a86"><span style="font-size: small">(19:10:13)</span> <b>jdost321:</b></span> Hi @joshua.willis That isn't something set in the factory. Maybe @marian can check if it's explicitly set in the IGWN frontend. This is actually the first I'm hearing of it. I would expect the default for GlideinWMS would be setting it to True however. A fundamental part of the validation scripts is to properly set environment variables for the end users<br/>
+<blockquote>
+<span style="color: #e0a729"><span style="font-size: small">(2021-08-20 11:19:33)</span> <b>gthain:</b></span> I think the question on the table, though is should the list of environment variables passed to the job be explicit, as we do with the STARTER_JOB_ENVIRONMENT knob, or should we implicitly pass every environment variables down to the job with JOB_INHERITS_STARTER_ENVIRONMENT<br/>
+</blockquote>
+</body>
+</html>

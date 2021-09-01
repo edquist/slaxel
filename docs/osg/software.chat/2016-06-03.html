@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jun 3, 2016 : #software (osg)</title>
+</head>
+<body>
+<h3>Fri Jun 3, 2016 : #software (osg)</h3>
+<span style="color: #e96699"><span style="font-size: small">(10:41:07)</span> <b>lincoln:</b></span> @bbockelm: with SRM going away, do you guys have any ideas for load balancing gridftp that isnt DNS roundrobin?<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:41:43)</span> <b>lincoln:</b></span> maybe just a generic LB of some sort? i’m mostly wondering about the case where 1 of my gridftp servers dies and now 1/N of my transfers are failign<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:42:14)</span> <b>lincoln:</b></span> where N is my gridftp servers in the RR<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:56:48)</span> <b>dweitzel:</b></span> Brian can answer, but basically we use LVS with heartbeats.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:56:58)</span> <b>dweitzel:</b></span> @gattebury: can also answer.<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:13:40)</span> <b>lincoln:</b></span> cool thanks<br/>
+<span style="color: #d1707d"><span style="font-size: small">(11:58:11)</span> <b>gattebury:</b></span> @lincoln: we still use LVS for our gridftp boxen - recently switched the directors to EL7 and are now using straight up keepalived (puppet module from <a href="https://github.com/arioch/puppet-keepalived">https://github.com/arioch/puppet-keepalived</a> for the most part)<br/>
+<span style="color: #d1707d"><span style="font-size: small">(11:59:28)</span> <b>gattebury:</b></span> all the config knobs are hiera and I don’t think we have any real weird gotchas with it — does both IPv4 and IPv6, and just does the basic TCP_CHECK magic to determine up/down status of a gridftp door. Pretty simple, nothing fancy.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:45:02)</span> <b>bbockelm:</b></span> Oh - magic sauce alert:<br/><pre><br/>--- globus_gridftp_server_control-2.10/globus_gridftp_server_control_commands.c.orig	2014-04-02 21:44:34.383271312 -0500<br/>+++ globus_gridftp_server_control-2.10/globus_gridftp_server_control_commands.c	2014-04-02 21:45:11.336295333 -0500<br/>@@ -2033,7 +2033,7 @@<br/>                 goto err;<br/>             }<br/>             <br/>-            if(0)<br/>+            if(1)<br/>             {<br/>                 msg = globus_common_create_string(<br/>                     "%d Entering Passive Mode (|%d|%s|%d|)\r\n",<br/></pre><br/>Load-balancing IPv6 addresses requires a slight break of the GridFTP spec.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:45:20)</span> <b>bbockelm:</b></span> but, once it works, it works beautifully.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:45:37)</span> <b>bbockelm:</b></span> it pops busted servers out of the rotation within a few seconds.<br/>
+</body>
+</html>

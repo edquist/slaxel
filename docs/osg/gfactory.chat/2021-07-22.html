@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jul 22, 2021 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Thu Jul 22, 2021 : #gfactory (osg)</h3>
+<span style="color: #674b1b"><span style="font-size: small">(10:28:36)</span> <b>rynge:</b></span> Can factory ops check an ITB entry for me?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:28:51)</span> <b>rynge:</b></span> <tt>OSG_CHTC-ITB-SLURM-CE</tt><br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:29:05)</span> <b>rynge:</b></span> We are requesting but are not getting any glideins<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:57:10)</span> <b>rynge:</b></span> @jdost321 ^^^^<br/>
+<span style="color: #385a86"><span style="font-size: small">(11:38:36)</span> <b>jdost321:</b></span> i'm not even seeing any requests for the entry from any FEs<br/><pre>condor_status -pool <a href="http://gfactory-itb-1.opensciencegrid.org">gfactory-itb-1.opensciencegrid.org</a> -any -const 'mytype=?="glideclient" &amp;&amp; ReqGlidein =?= "OSG_CHTC-ITB-SLURM-CE@gfactory_instance@OSG-ITB"'</pre><br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:49:32)</span> <b>rynge:</b></span> Hmm<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:49:35)</span> <b>rynge:</b></span> <pre>[2021-07-22 12:47:38,822] WARNING: No security credentials match for factory pool <a href="http://gfactory-itb-1.opensciencegrid.org">gfactory-itb-1.opensciencegrid.org</a>, not advertising request; if this is not intentional, check for typos frontend's credential trust_domain and type, vs factory's pool trust_domain and auth_method</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:50:11)</span> <b>rynge:</b></span> I also have a key error on GLIDEIN_Site<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:02:48)</span> <b>matyas:</b></span> any ideas?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:46:02)</span> <b>rynge:</b></span> Ah, it is the project_id which is messing us up<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:46:10)</span> <b>rynge:</b></span> What is a good value for that on your cluster<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:51:20)</span> <b>rynge:</b></span> @matyas ^^^^<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:51:30)</span> <b>rynge:</b></span> Also, can you add TG-PHY170051 to Expanse hosted ce?<br/>
+<blockquote>
+<span style="color: #c386df"><span style="font-size: small">(16:24:43)</span> <b>matyas:</b></span> I didn't see a topology entry for TG-PHY170051<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:26:03)</span> <b>matyas:</b></span> (or a topology entry containing a ResourceAllocation for TG-PHY170051)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:49:50)</span> <b>rynge:</b></span> Ah, forgot about that. I will fix<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:04:18)</span> <b>rynge:</b></span> <a href="https://github.com/opensciencegrid/topology/pull/1965">https://github.com/opensciencegrid/topology/pull/1965</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:26:35)</span> <b>rynge:</b></span> They have also added the <tt>osg</tt> user to the allocation<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:30:27)</span> <b>matyas:</b></span> looks like they're already on the hosted CE<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:31:38)</span> <b>matyas:</b></span> they'll run if <tt>(TARGET.Owner =?= "ux454281" &amp;&amp; TARGET.RequestGPUs=?=undefined);</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(17:39:17)</span> <b>matyas:</b></span> are we going to tell them to use DESIRED_Allocations or should WantsXSEDE keep working?<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:55:49)</span> <b>matyas:</b></span> are we renaming their existing frontend group or making a new one?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:02:25)</span> <b>rynge:</b></span> That is my user<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:02:44)</span> <b>rynge:</b></span> I think I want to line this up with all the other ones<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:02:50)</span> <b>rynge:</b></span> So new frontend group<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:02:58)</span> <b>rynge:</b></span> Using the <tt>osg</tt> user and so on<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:06:37)</span> <b>rynge:</b></span> I also have full control over their workflow, so we will user <tt>DESIRED_Allocations</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(18:07:43)</span> <b>matyas:</b></span> so <a href="https://github.com/opensciencegrid/osg-flock/pull/90">https://github.com/opensciencegrid/osg-flock/pull/90</a> would be how their frontend group looks like?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:08:59)</span> <b>rynge:</b></span> Wow you are fast<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:11:04)</span> <b>rynge:</b></span> I'll merge that once we have finished the slurm debugging<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:11:15)</span> <b>matyas:</b></span> OK<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:11:26)</span> <b>matyas:</b></span> I see the job route for xenon is disabled on expanse<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:15:08)</span> <b>matyas:</b></span> also, not sure how to deal with the factory entries: <a href="https://github.com/opensciencegrid/osg-gfactory/blob/master/OSG_autoconf/10-hosted-ces.auto.yml#L135-L182">https://github.com/opensciencegrid/osg-gfactory/blob/master/OSG_autoconf/10-hosted-ces.auto.yml#L135-L182</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:20:05)</span> <b>rynge:</b></span> Ok, let's worry about this tomorrow<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:20:22)</span> <b>rynge:</b></span> Did you get cvmfsexec working?<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:20:53)</span> <b>matyas:</b></span> I got the wrapper working<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:21:04)</span> <b>matyas:</b></span> it's mounting the directories and setting CVMFS_BASE in the environment<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:34:38)</span> <b>matyas:</b></span> ah right, we were going to do something like <a href="https://github.com/opensciencegrid/osg-flock/blob/master/node-check/osgvo-node-validation#L100-L114">https://github.com/opensciencegrid/osg-flock/blob/master/node-check/osgvo-node-validation#L100-L114</a> there to see if we could override HAS_SINGULARITY<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:39:50)</span> <b>matyas:</b></span> I didn't see anything like <tt>$TACC_SYSTEM</tt> in the environment but we could test for <tt>[[ $OSG_SITE_NAME == "CHTC-ITB-SLURM-CE" ]]</tt><br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:40:14)</span> <b>rynge:</b></span> Ok, so you want me to add that section?<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:42:21)</span> <b>matyas:</b></span> yep<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:42:32)</span> <b>rynge:</b></span> Hang on<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:43:06)</span> <b>matyas:</b></span> singularity is at /usr/bin/singularity and it's version 3.8.0<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:44:56)</span> <b>rynge:</b></span> Ok, try now<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:45:20)</span> <b>rynge:</b></span> If you get a glidein, try to capture the glidein_config file<br/>
+<span style="color: #c386df"><span style="font-size: small">(19:05:03)</span> <b>matyas:</b></span> <a href="http://pages.cs.wisc.edu/~matyas/glidein_config">http://pages.cs.wisc.edu/~matyas/glidein_config</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(19:06:07)</span> <b>matyas:</b></span> I see "HAS_SINGULARITY" in the twice - False the first time, True the second<br/>
+<span style="color: #c386df"><span style="font-size: small">(19:07:06)</span> <b>matyas:</b></span> the SINGULARITY_PATH is wrong though<br/>
+<span style="color: #c386df"><span style="font-size: small">(19:08:40)</span> <b>matyas:</b></span> ugh this is what's in condor_config:<br/><pre>HAS_SINGULARITY=False<br/>True</pre><br/><br/>
+<span style="color: #c386df"><span style="font-size: small">(19:16:17)</span> <b>matyas:</b></span> I need to eat dinner so let's call it a night. I'll ask Marco if he's got any ideas.<br/>
+</blockquote>
+<span style="color: #c386df"><span style="font-size: small">(15:51:35)</span> <b>matyas:</b></span> where would that be set? I don't see anything in the CE config restricting it<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:52:27)</span> <b>rynge:</b></span> The entry is configured with <tt>GLIDEIN_SupportedAuthenticationMethod = "grid_proxy+project_id"</tt><br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:52:34)</span> <b>rynge:</b></span> Just like the XSEDE ones<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:52:45)</span> <b>rynge:</b></span> If you don't want to use the projectid, that is fine<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:53:25)</span> <b>rynge:</b></span> Check the CE now if you see any OSG glideins coming in<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:53:49)</span> <b>matyas:</b></span> I was using it for GLOW jobs<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:54:40)</span> <b>matyas:</b></span> a pilot just came in but it's already completed<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:54:54)</span> <b>matyas:</b></span> probably something wrong with my wrapper<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:57:33)</span> <b>rynge:</b></span> @jdost321 Yeah, some entries do not have GLIDEIN_Site defined<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:57:37)</span> <b>rynge:</b></span> <pre># condor_status -pool <a href="http://gfactory-itb-1.opensciencegrid.org">gfactory-itb-1.opensciencegrid.org</a> -any -const 'GlideinMyType == "glidefactory" &amp;&amp; IsUndefined(GLIDEIN_Site)'<br/>MyType             TargetType         Name                                                            <br/><br/>glidefactory       None               CMSHTPC_T3_CH_CERN_DOMA@gfactory_instance                       <br/>glidefactory       None               CMSHTPC_T3_DE_Opportunistic_JURECAFake@gf                       <br/>glidefactory       None               CMSHTPC_T3_IT_Opportunistc_DodasFake@gfac                       <br/>glidefactory       None               CMS_T3_CH_CMSAtHome@gfactory_instance@OSG                       <br/>glidefactory       None               TEST_ENTRY@gfactory_instance@OSG-ITB       </pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:57:51)</span> <b>rynge:</b></span> I think it is the TEST_ENTRY which caused my advertise error<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:58:29)</span> <b>matyas:</b></span> ok fixed the wrapper. the next pilot should be OK<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:59:04)</span> <b>rynge:</b></span> Were you able to grab the stdout/stderr of that job? I don't need it, just want to know<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:00:30)</span> <b>matyas:</b></span> no, it didn't even get as far as creating a sandbox dir<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:01:41)</span> <b>matyas:</b></span> there's a new pilot starting up...<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:27:58)</span> <b>rynge:</b></span> I have an older log<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:28:02)</span> <b>rynge:</b></span> <pre>cvmfsexec tarball not found at /home/osgvopilot/cvmfsexec-osg.tar.gz</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:28:10)</span> <b>rynge:</b></span> Probably not the most current one though<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:28:35)</span> <b>matyas:</b></span> yeah I fixed that<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:28:55)</span> <b>rynge:</b></span> Ok, waiting for logs to sync<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:29:14)</span> <b>matyas:</b></span> it's still running<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:29:21)</span> <b>matyas:</b></span> I've got current logs at <a href="http://pages.cs.wisc.edu/~matyas/_condor_stdout">http://pages.cs.wisc.edu/~matyas/_condor_stdout</a> and <a href="http://pages.cs.wisc.edu/~matyas/_condor_stderr">http://pages.cs.wisc.edu/~matyas/_condor_stderr</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:30:22)</span> <b>rynge:</b></span> I don't see it registering with flock<br/>
+</body>
+</html>

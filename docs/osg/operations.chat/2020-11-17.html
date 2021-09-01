@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Nov 17, 2020 : #operations (osg)</title>
+</head>
+<body>
+<h3>Tue Nov 17, 2020 : #operations (osg)</h3>
+<span style="color: #385a86"><span style="font-size: small">(09:07:29)</span> <b>jdost321:</b></span> @jpeterson status update, I took a pass and kicked the following: amnh-ares, sdsc-triton, tcnj-elsa, uwm-nemo, wsu<br/>
+<span style="color: #385a86"><span style="font-size: small">(09:07:41)</span> <b>jdost321:</b></span> tcnj and uwm had expired certs so i set those to null<br/>
+<span style="color: #385a86"><span style="font-size: small">(09:07:47)</span> <b>jdost321:</b></span> to get new ones<br/>
+<span style="color: #385a86"><span style="font-size: small">(09:08:51)</span> <b>jdost321:</b></span> ones i didn't touch because I wasn't sure the state before the outage since they were work in progress: gsu, swinburne<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:09:07)</span> <b>jpeterson:</b></span> and swinburne is on tiger.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:09:32)</span> <b>jpeterson:</b></span> gsu is still waiting on them to let us know if we sould be running on more than one node<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:10:07)</span> <b>jpeterson:</b></span> and sounds like there is something up with the 8.9.9 negotiator so things aren’t matching to be sent out&gt;<br/>
+<span style="color: #385a86"><span style="font-size: small">(09:10:40)</span> <b>jdost321:</b></span> ones i didn't touch because @marco.mascheroni still works on them: psc, compute canada cedar, uconn xanadu, sdsc comet<br/>
+<span style="color: #385a86"><span style="font-size: small">(09:10:46)</span> <b>jdost321:</b></span> if he doesn't see this i'll ping him also out of band<br/>
+<span style="color: #e23f99"><span style="font-size: small">(09:17:14)</span> <b>marco.mascheroni:</b></span> Hi Jeff,<br/>
+<span style="color: #e23f99"><span style="font-size: small">(09:17:25)</span> <b>marco.mascheroni:</b></span> I'll take a pass on them and I'll check the certs<br/>
+<span style="color: #385a86"><span style="font-size: small">(09:18:07)</span> <b>jdost321:</b></span> Marco one thing to note, we've been setting the secrets to null to just let them pickup new certs if you find any expired ones<br/>
+<span style="color: #385a86"><span style="font-size: small">(09:18:46)</span> <b>jdost321:</b></span> the idea is if the ces are relatively stable we shouldn't get them kicked too often so we shouldn't get let's engrypt dos<br/>
+<span style="color: #385a86"><span style="font-size: small">(09:19:02)</span> <b>jdost321:</b></span> then we won't have to worry about regenerating and uploading new secrets manually every time<br/>
+<span style="color: #e23f99"><span style="font-size: small">(09:19:08)</span> <b>marco.mascheroni:</b></span> ok, that's the only thing we need to do?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(09:19:16)</span> <b>marco.mascheroni:</b></span> setting the cert to null?<br/>
+<span style="color: #385a86"><span style="font-size: small">(09:19:23)</span> <b>jdost321:</b></span> key and cert<br/>
+<span style="color: #385a86"><span style="font-size: small">(09:20:41)</span> <b>jdost321:</b></span> and.. i was bitten by my own advice, @blin @marco.mascheroni @jpeterson I got DOS'd for UWM<br/><pre>Establishing Let's Encrypt certificate..<br/>Saving debug log to /var/log/letsencrypt/letsencrypt.log<br/>Plugins selected: Authenticator standalone, Installer None<br/>Starting new HTTPS connection (1): <a href="http://acme-v02.api.letsencrypt.org">acme-v02.api.letsencrypt.org</a><br/>An unexpected error occurred:<br/>There were too many requests of a given type :: Error creating new account :: too many registrations for this IP: see <a href="https://letsencrypt.org/docs/rate-limits/">https://letsencrypt.org/docs/rate-limits/</a></pre><br/>
+<span style="color: #385a86"><span style="font-size: small">(09:21:11)</span> <b>jdost321:</b></span> @lincoln can you check if this one had an unusual number of restarts?<br/><pre>osg-hosted-ce-uwm-nemo            uchicago-river-v2 instance_qxE1VQ58UKI</pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(09:21:34)</span> <b>lincoln:</b></span> will check<br/>
+<span style="color: #385a86"><span style="font-size: small">(09:21:41)</span> <b>jdost321:</b></span> i only kicked it once since unsetting the let's encrypt section<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:22:09)</span> <b>blin:</b></span> did you first enable <tt>LetsEncryptStaging: true</tt> to see how the CE came up first?<br/>
+<span style="color: #385a86"><span style="font-size: small">(09:22:43)</span> <b>jdost321:</b></span> no but it didn't occur to me that it would request a new one more than once in such a short period of time (30 min or so, 1 manual kick)<br/>
+<span style="color: #385a86"><span style="font-size: small">(09:23:00)</span> <b>jdost321:</b></span> i would have done that if i saw it failed on the first try<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:25:01)</span> <b>blin:</b></span> if the container fails to start up, kubernetes will automatically retry starting it<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:25:13)</span> <b>blin:</b></span> you'll often see this as CrashLoopBackoff<br/>
+<span style="color: #385a86"><span style="font-size: small">(09:25:28)</span> <b>jdost321:</b></span> :disappointed:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(09:25:32)</span> <b>marco.mascheroni:</b></span> what's <tt>LetsEncryptStaging: true</tt> does?<br/>
+<span style="color: #385a86"><span style="font-size: small">(09:26:06)</span> <b>jdost321:</b></span> how long does let's encrypt lock us out? can i move it to <tt>LetsEncryptStaging: true</tt> for now until it lets us try again?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:26:20)</span> <b>blin:</b></span> it uses the LE staging CA, which doesn't have rate limiting<br/>
+<span style="color: #e23f99"><span style="font-size: small">(09:26:30)</span> <b>marco.mascheroni:</b></span> ok<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:26:56)</span> <b>blin:</b></span> you can set it to true but it's not an accepted CA<br/>
+<span style="color: #385a86"><span style="font-size: small">(09:27:31)</span> <b>jdost321:</b></span> i just want to set it to something other than null until lets encrypt lets us try again<br/>
+<span style="color: #e23f99"><span style="font-size: small">(09:28:45)</span> <b>marco.mascheroni:</b></span> I feel like it is safer to keep  handling the certs as before, and maybe write a script that automate cert renewal when we need new certs<br/>
+<span style="color: #e23f99"><span style="font-size: small">(09:29:13)</span> <b>marco.mascheroni:</b></span> I am sure I'll get locked out by let's encrypt in the future<br/>
+<span style="color: #e23f99"><span style="font-size: small">(09:29:50)</span> <b>marco.mascheroni:</b></span> (e.g.: I'll forget to set <tt>LetsEncryptStaging</tt> )<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:33:41)</span> <b>blin:</b></span> i strongly prefer using LE and redeploying more regularly than storing the cert/key<br/>
+<span style="color: #385a86"><span style="font-size: small">(09:33:57)</span> <b>jdost321:</b></span> but what about this case with river<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:34:01)</span> <b>blin:</b></span> esp since cert expirations aren't something that we're catching<br/>
+<span style="color: #385a86"><span style="font-size: small">(09:34:14)</span> <b>jdost321:</b></span> what if there's a k8s cluster meltdown, and we don't do anytihng but pods get stuck trying to redeploy on their own<br/>
+<span style="color: #385a86"><span style="font-size: small">(09:34:27)</span> <b>jdost321:</b></span> and we get LE dos everywhere without any human intervention<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:35:17)</span> <b>bbockelm:</b></span> fwiw - <tt>cert-manager</tt> solves all this, right?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:35:55)</span> <b>blin:</b></span> perhaps but we'd need it deployed so that it's available to the SLATE clusters we're deploying to, no?<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:37:18)</span> <b>lincoln:</b></span> ah the wonderful a la carte world of kubernetes..<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:38:07)</span> <b>blin:</b></span> pros: infinitely configurable! cons: infinitely configurable!<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:38:14)</span> <b>lincoln:</b></span> :man-facepalming:<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:38:23)</span> <b>lincoln:</b></span> for River in particular, we have certmanager I think. We can perhaps just use it?<br/>
+<span style="color: #385a86"><span style="font-size: small">(09:42:03)</span> <b>jdost321:</b></span> how do i handle UWM right now? pod seems stable now even though it is useless because of no cert. how long should I wait to try redeploying?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:47:41)</span> <b>blin:</b></span> i think we may want to reconfigure DNS for it<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:47:45)</span> <b>blin:</b></span> i think bans can last up to a week<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:48:36)</span> <b>blin:</b></span> <tt><a href="http://uwm-nemo.svc.opensciencegrid.org">uwm-nemo.svc.opensciencegrid.org</a></tt><br/>
+<span style="color: #9d8eee"><span style="font-size: small">(09:56:06)</span> <b>cat:</b></span> Could I get an email summary from one person (probably Jeff D.) of the state of our infrastructure this morning? I’m trying to process all the messages here but it’s not clear to me what all the consequences are. What isn’t working now and who does that affect?<br/>
+<span style="color: #385a86"><span style="font-size: small">(09:57:42)</span> <b>jdost321:</b></span> @cat will do<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(10:01:13)</span> <b>cat:</b></span> Thanks.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:35:38)</span> <b>blin:</b></span> anyways, @jdost321 for UWM Nemo, should we start working on setting up the new DNS records?<br/>
+<span style="color: #385a86"><span style="font-size: small">(10:47:23)</span> <b>jdost321:</b></span> @jpeterson can I hand off UWM ^to you? the idea is we'll make a descriptive hostname like Brian Lin suggested, like we did for Tufts. @lincoln will have to know what it is and its associated IP so he can update the PTR, and then request Derek to update the OSG DNS forward record<br/>
+<span style="color: #385a86"><span style="font-size: small">(10:48:24)</span> <b>jdost321:</b></span> or we can just create fresh in Tiger, whatever you prefer<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:48:37)</span> <b>jpeterson:</b></span> Given that it is an older one and probably doesn’t have the tiger incoming, @lincoln would also have to provide a new IP?<br/>
+<span style="color: #385a86"><span style="font-size: small">(10:49:10)</span> <b>jdost321:</b></span> ah right, site admin would have to update their firewall to accept tiger<br/>
+<span style="color: #385a86"><span style="font-size: small">(10:49:34)</span> <b>jdost321:</b></span> can we just reuse the same ip but associate it with the new hostname?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:50:09)</span> <b>jpeterson:</b></span> <pre>There were too many requests of a given type :: Error creating new account :: too many registrations for this IP:</pre><br/>guessing no?<br/>
+<span style="color: #385a86"><span style="font-size: small">(10:51:09)</span> <b>jdost321:</b></span> grr right. ok, yes i guess we'll need to request the new IP first for River form lincoln<br/>
+<span style="color: #385a86"><span style="font-size: small">(10:51:18)</span> <b>jdost321:</b></span> *From<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:01:13)</span> <b>blin:</b></span> i don't think the PTR technically needs to be changed<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:01:29)</span> <b>jpeterson:</b></span> and the request for @lincoln should be a Jira ticket?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:02:15)</span> <b>jpeterson:</b></span> @blin, doesn’t the PTR still have to match?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:03:33)</span> <b>jpeterson:</b></span> different IP, different hostname, different PTR?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:05:24)</span> <b>blin:</b></span> theoretically the PTR doesn't have to match the forward DNS<br/>
+<span style="color: #385a86"><span style="font-size: small">(11:05:36)</span> <b>jdost321:</b></span> @lincoln for river IP / PTR requests until now I've just sent email to you and @jlstephen directly. would you like us to formalize this process better and create OSG JIRA tickets for them?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:05:42)</span> <b>blin:</b></span> so i think we can try just the new IP + forward DNS<br/>
+<span style="color: #385a86"><span style="font-size: small">(11:06:15)</span> <b>jdost321:</b></span> @blin does @jlstephen have an OSG JIRA seat?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:06:21)</span> <b>blin:</b></span> do lincoln/judith have Jira accounts?<br/>
+<span style="color: #ea2977"><span style="font-size: small">(11:06:24)</span> <b>jlstephen:</b></span> no i don't have an account<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:08:13)</span> <b>blin:</b></span> seems like a FD type ticket to me, like how we handle tracking <a href="http://opensciencegrid.org">opensciencegrid.org</a> DNS changes<br/>
+<span style="color: #385a86"><span style="font-size: small">(11:09:21)</span> <b>jdost321:</b></span> DOn't we have even less FD seats available?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:09:36)</span> <b>jpeterson:</b></span> I didn’t see Lincoln in that list either which is why I guessed Jira above.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:10:21)</span> <b>blin:</b></span> judith/lincoln wouldn't need seats in this instance<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:10:30)</span> <b>blin:</b></span> open a ticket with them as the requester/cc<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:10:42)</span> <b>blin:</b></span> assign the ticket to whoever's working on the CE that you need the DNS/IP for<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:16:42)</span> <b>jpeterson:</b></span> but they would be the ones actually doing the work?  or is this mostly for tracking the outside request?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:17:24)</span> <b>blin:</b></span> the latter<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:00:31)</span> <b>bbockelm:</b></span> FWIW: with the appropriate safeguards and auditing in place (e.g., all is kept in a git repo so we can track changes), I'm OK with <tt>*.<a href="http://svc.opensciencegrid.org">svc.opensciencegrid.org</a></tt> getting automated updates with no FD tickets.<br/>
+</body>
+</html>

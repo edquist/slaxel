@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Oct 25, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Wed Oct 25, 2017 : #gracc (osg)</h3>
+<span style="color: #16569E"><span style="font-size: small">(15:30:22)</span> <b>edquist:</b></span> Hi GRACC fans, i have a depressingly old ticket regarding gridftp probe records from UConn being rejected by gratia<br/><a href="https://jira.opensciencegrid.org/browse/SOFTWARE-2560">https://jira.opensciencegrid.org/browse/SOFTWARE-2560</a><br/>(the theory at the time was it had something to do with rejecting records with WallDuration = 0)<br/>Is it possible for us to see if the GRACC backend is getting any records now from UConn that are still being rejected?<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:35:39)</span> <b>edquist:</b></span> (For the UConn-OSG site, OIM lists UConn-OSG_CE <a href="http://gluskap.phys.uconn.edu">gluskap.phys.uconn.edu</a> for GridFtp)<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:46:31)</span> <b>kretzke:</b></span> <b>@edquist</b> GRACC doesn’t check if WallDuration &gt; 0. That said I don’t see any records from them in the last six months.<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:48:25)</span> <b>edquist:</b></span> ah, you mean you don't see any records from UConn in the last 6 months?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:48:43)</span> <b>kretzke:</b></span> no transfer records<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:48:50)</span> <b>edquist:</b></span> ok<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:48:52)</span> <b>edquist:</b></span> thanks<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:49:41)</span> <b>kretzke:</b></span> no attempts to send records either<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:50:30)</span> <b>kretzke:</b></span> well wait… they’re sending transfer records to the main (job) collector<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:50:45)</span> <b>kretzke:</b></span> <pre>Oct 24 08:20:35 gratiav2-1.novalocal dockerd[6285]: time="2017-10-24T08:20:35Z" level=info msg="received multiupdate" bundlesize=100 from="gridftp-transfer:<a href="http://gluskap.phys.uconn.edu">gluskap.phys.uconn.edu</a>" <br/></pre><br/>
+<span style="color: #16569E"><span style="font-size: small">(15:51:04)</span> <b>edquist:</b></span> hmm<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:51:05)</span> <b>edquist:</b></span> ok<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:51:46)</span> <b>kretzke:</b></span> there they are <a href="https://gracc.opensciencegrid.org/kibana/app/kibana#/discover?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))&amp;_a=(columns:!(_source),index:'gracc.osg.raw-*',interval:auto,query:(query_string:(analyze_wildcard:!f,query:'ProbeName:%22gridftp-transfer:gluskap.phys.uconn.edu%22')),sort:!(StartTime,desc))">https://gracc.opensciencegrid.org/kibana/app/kibana#/discover?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))&amp;_a=(columns:!(_source),index:'gracc.osg.raw-*',interval:auto,query:(query_string:(analyze_wildcard:!f,query:'ProbeName:%22gridftp-transfer:gluskap.phys.uconn.edu%22')),sort:!(StartTime,desc))</a><br/>
+<span style="color: #16569E"><span style="font-size: small">(15:53:44)</span> <b>edquist:</b></span> ok thanks<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:54:00)</span> <b>edquist:</b></span> but as far as you can see gracc is not rejecting any records<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:55:04)</span> <b>kretzke:</b></span> no. but they won’t be accounted right until they send them to the transfer collector<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:21:44)</span> <b>edquist:</b></span> sorry i think it took me a bit to understand what you were saying ... so they are sending transfer records to the main collector, but these records should be sent to the transfer collector instead?  does that likely mean it's a configuration issue?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:27:54)</span> <b>kretzke:</b></span> yes<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:28:39)</span> <b>kretzke:</b></span> their probe should be configured to report to <a href="http://gratia-osg-transfer.opensciencegrid.org">gratia-osg-transfer.opensciencegrid.org</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:31:50)</span> <b>kretzke:</b></span> you should probably make sure that the gridftp-transfer probe RPM has the default right<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:33:22)</span> <b>edquist:</b></span> hmmmmmmmmmmmmm<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:33:23)</span> <b>edquist:</b></span> ok<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:33:25)</span> <b>edquist:</b></span> thanks!<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:37:20)</span> <b>edquist:</b></span> ugh<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:37:23)</span> <b>edquist:</b></span> oh dear<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:37:47)</span> <b>edquist:</b></span> well there is some logic in the packaging to set it to the transfer endpoint if the probe name ends in *-storage<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:37:55)</span> <b>edquist:</b></span> but nothing for *-transfer<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:39:00)</span> <b>edquist:</b></span> and actually cracking open the gratia-probe-gridftp-transfer rpm i see in the ProbeConfig<br/><br/><pre><br/>    CollectorHost="<a href="http://gratia-osg-prod.opensciencegrid.org:80">gratia-osg-prod.opensciencegrid.org:80</a>"<br/>    SSLHost="<a href="http://gratia-osg-prod.opensciencegrid.org:443">gratia-osg-prod.opensciencegrid.org:443</a>"<br/>    SSLRegistrationHost="<a href="http://gratia-osg-prod.opensciencegrid.org:80">gratia-osg-prod.opensciencegrid.org:80</a>"<br/></pre><br/>
+<span style="color: #16569E"><span style="font-size: small">(16:39:35)</span> <b>edquist:</b></span> (in <tt>/etc/gratia/gridftp-transfer/ProbeConfig</tt>)<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:40:02)</span> <b>kretzke:</b></span> yeah, I remember there was a lot of magic in that specfile<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:40:09)</span> <b>edquist:</b></span> but this should be <tt><a href="http://gratia-osg-transfer.opensciencegrid.org">gratia-osg-transfer.opensciencegrid.org</a></tt>, right?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:40:49)</span> <b>edquist:</b></span> oh<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:40:51)</span> <b>kretzke:</b></span> hm, it looks ok? <pre>    elif [ $probe == "*-transfer" -o $probe == "*-storage" ]; then<br/>      endpoint=%{osg_transfer_collector}:%{default_collector_port}<br/>      ssl_endpoint=%{osg_transfer_collector}:%{ssl_port}</pre> <a href="https://github.com/opensciencegrid/gratia-probe/blob/master/build/gratia-probe.spec#L181">https://github.com/opensciencegrid/gratia-probe/blob/master/build/gratia-probe.spec#L181</a><br/>
+<span style="color: #16569E"><span style="font-size: small">(16:40:51)</span> <b>edquist:</b></span> no<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:40:55)</span> <b>edquist:</b></span> now i see<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:40:59)</span> <b>edquist:</b></span> ahah<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:41:08)</span> <b>edquist:</b></span> that's the place<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:41:09)</span> <b>edquist:</b></span> but<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:42:54)</span> <b>edquist:</b></span> yeah i'm not exactly sure why the *-transfer bit is not catching<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:45:40)</span> <b>edquist:</b></span> the glob syntax might only work for double brackets <tt>[[</tt> <tt>]]</tt> in bash<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:47:28)</span> <b>edquist:</b></span> now i wonder why nobody ever noticed this before...<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:48:23)</span> <b>edquist:</b></span> for single-bracket <tt>[</tt> <tt>]</tt> it looks like it just treats it as a literal string<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:49:37)</span> <b>kretzke:</b></span> so that never worked eh? to git blame!<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:51:22)</span> <b>edquist:</b></span> heh, yeah looks like the change was made 2015-01-05<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:51:36)</span> <b>kretzke:</b></span> oh no, much before that <a href="https://github.com/opensciencegrid/gratia-probe/commit/7be298ba09e14005b3d145d1cdd381fb2dd863f8">https://github.com/opensciencegrid/gratia-probe/commit/7be298ba09e14005b3d145d1cdd381fb2dd863f8</a><br/>
+<span style="color: #16569E"><span style="font-size: small">(16:53:09)</span> <b>edquist:</b></span> yeah<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:54:59)</span> <b>kretzke:</b></span> are we sure it doesn’t work though?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:55:46)</span> <b>edquist:</b></span> all i can tell you is what's in the ProbeConfig laid down by the rpm<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:55:52)</span> <b>edquist:</b></span> i mean<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:56:04)</span> <b>edquist:</b></span> the test with the brackets is broken, yes<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:57:40)</span> <b>edquist:</b></span> <pre><br/>$ [ gridftp-transfer = "*-transfer" ]; echo $?<br/>1<br/>$ [ gridftp-transfer = *-transfer ]; echo $?<br/>1<br/>$ [[ gridftp-transfer = *-transfer ]]; echo $?<br/>0<br/></pre><br/>
+<span style="color: #16569E"><span style="font-size: small">(17:00:01)</span> <b>edquist:</b></span> for glob tests you either have to use double-brackets or else the <tt>case</tt> command<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:00:54)</span> <b>edquist:</b></span> what i don't know is whether osg-configure or something would have fixed the ProbeConfig<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:02:02)</span> <b>kretzke:</b></span> really reflects well on our testing… :cry:<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:02:35)</span> <b>edquist:</b></span> ah, well<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:02:58)</span> <b>edquist:</b></span> yeah but i suppose if these get tested they are configured to point to a test instance anyway<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:04:37)</span> <b>kretzke:</b></span> “I’m gonna write some complicated logic in a script but never check that it actually worked…”<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:06:51)</span> <b>kretzke:</b></span> not many people actually run those probes<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:10:45)</span> <b>edquist:</b></span> i see<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:12:29)</span> <b>edquist:</b></span> well<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:12:33)</span> <b>edquist:</b></span> the confusing thing is<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:12:49)</span> <b>edquist:</b></span> i just checked an old version of the probe<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:12:55)</span> <b>edquist:</b></span> 1.15.0-1<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:13:11)</span> <b>edquist:</b></span> which according to the ticket used to work<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:13:24)</span> <b>edquist:</b></span> but in the ProbeConfig i still see the (wrong?) setting<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:13:32)</span> <b>edquist:</b></span> <pre><br/>    CollectorHost="<a href="http://gratia-osg-prod.opensciencegrid.org:80">gratia-osg-prod.opensciencegrid.org:80</a>"<br/>    SSLHost="<a href="http://gratia-osg-prod.opensciencegrid.org:443">gratia-osg-prod.opensciencegrid.org:443</a>"<br/>    SSLRegistrationHost="<a href="http://gratia-osg-prod.opensciencegrid.org:80">gratia-osg-prod.opensciencegrid.org:80</a>"<br/></pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:36:36)</span> <b>bbockelm:</b></span> @kretzke - that's the simplified version, after I cut a few thousand lines from the script.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:37:16)</span> <b>bbockelm:</b></span> (FWIW - since Gratia configs work maximally poorly with RPMs, most people configure it once by hand and just copy/paste the ProbeConfig for a decade or two)<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(20:37:54)</span> <b>kretzke:</b></span> haha fair enough<br/>
+</body>
+</html>

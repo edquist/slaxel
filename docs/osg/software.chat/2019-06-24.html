@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jun 24, 2019 : #software (osg)</title>
+</head>
+<body>
+<h3>Mon Jun 24, 2019 : #software (osg)</h3>
+<span style="color: #53b759"><span style="font-size: small">(11:14:05)</span> <b>marian:</b></span> @matyas: this is internal Wisc ticket I mentioned on the software call: <a href="https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=97925">https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=97925</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(11:25:36)</span> <b>matyas:</b></span> thanks! it says you're on the Cc list so you should still get emails; Moate just sent one a few minutes ago<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:26:10)</span> <b>marian:</b></span> ah, right, didn't realize it keeps all the history in the thread... without needing to read it from the gui<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:56:41)</span> <b>blin:</b></span> @jthiltges UNL runs an XRootD door in front of your HDFS cluster, right?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:57:27)</span> <b>jthiltges:</b></span> @blin Yes indeed.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:58:22)</span> <b>blin:</b></span> so you don't run <tt>cmsd</tt> on any of your hosts, right? more or less "standalone xrootd" + xrootd-hdfs<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:58:59)</span> <b>jthiltges:</b></span> We run cmsd everywhere as well. On the local redirector as well as each SE.<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:00:13)</span> <b>blin:</b></span> oh, what's the reasoning? and why do you have multiple SEs?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:00:16)</span> <b>jthiltges:</b></span> My hazy understanding is that you need cmsd for the SE to register with the local redirector and receive requests. But other folks (@marian!) have a much better picture.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:01:48)</span> <b>jthiltges:</b></span> Both redundancy and capacity. We have 12 at the moment, with each running both gridftp and xrootd.<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:02:49)</span> <b>blin:</b></span> ok but you're not doing something like running xrootd on each hdfs data node, right?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:05:02)</span> <b>jthiltges:</b></span> That's correct. Some of our worker nodes also serve as HDFS data nodes. SEs are a separate set of machines.<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:07:53)</span> <b>matyas:</b></span> would running xrootd on a data node even work? can xrootd (or xrootd-hdfs i guess) see into what's on the datanode?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:08:55)</span> <b>jthiltges:</b></span> Should work fine, I'd expect. xrootd-hdfs is just another client.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:11:34)</span> <b>jthiltges:</b></span> Oh sorry, I'm misunderstanding your question, I think. There's no data locality magic.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:14:24)</span> <b>jthiltges:</b></span> To rephrase: I'd expect xrootd on data nodes world work the same as on SEs. They'd be downloading almost all their content from other data nodes though.<br/>And I don't know of any mechanism for xrootd to prefer data nodes which have the content stored locally.<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:17:34)</span> <b>blin:</b></span> sure, i'm just trying to figure out if <tt>xrootd-hdfs</tt> must be run on an "SE" (e.g. distributed nodes with cmsd + a redirector somewhere) or if it also would work with <tt>xrootd-standalone</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:17:35)</span> <b>blin:</b></span> i assume the latter applies<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:20:14)</span> <b>jthiltges:</b></span> I'd think xrootd-hdfs would work fine with the standalone config.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:25:34)</span> <b>andrew.melo:</b></span> I think you just need to remember to add the filesystem plugin to the standalone config<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:36:50)</span> <b>blin:</b></span> @andrew.melo this bit? <tt>xrootd.fslib /usr/lib64/libXrdOfs.so</tt><br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:38:12)</span> <b>andrew.melo:</b></span> I think you also need <tt>ofs.fslib /usr/lib64/libXrdOfs.so</tt>, but I'm no expert<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:39:00)</span> <b>bbockelm:</b></span> Erm - I think that’s the default<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:40:03)</span> <b>jthiltges:</b></span> We're running this:<br/><pre>#xrootd.fslib /usr/lib64/libXrdOfs.so<br/>ofs.osslib /usr/lib64/libXrdHdfs.so</pre><br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:47:17)</span> <b>andrew.melo:</b></span> wait, damn <tt>ofs.osslib /usr/lib64/libXrdHdfs.so</tt><br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:47:23)</span> <b>andrew.melo:</b></span> I'm a bad copy paster<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:13:13)</span> <b>blin:</b></span> anyways @efajardo the above is relevant to that Brown ticket<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:13:55)</span> <b>blin:</b></span> to me it doesn't sound like they need a full XRootD SE (e.g. clustered mode)<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:14:17)</span> <b>blin:</b></span> <a href="https://support.opensciencegrid.org/public/tickets/f426e050715054b2cfe1ab1b9a0284931c6c9c270ef536be61c4dba2defc2630">https://support.opensciencegrid.org/public/tickets/f426e050715054b2cfe1ab1b9a0284931c6c9c270ef536be61c4dba2defc2630</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:14:38)</span> <b>blin:</b></span> unless they need <tt>cmsd</tt> running on their xrootd host to talk with a CMS redirector or something?<br/>
+</body>
+</html>

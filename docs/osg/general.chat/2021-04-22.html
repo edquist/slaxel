@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Apr 22, 2021 : #general (osg)</title>
+</head>
+<body>
+<h3>Thu Apr 22, 2021 : #general (osg)</h3>
+<span style="color: #5a4592"><span style="font-size: small">(13:02:02)</span> <b>lmichael:</b></span> wondering if any OSG staff can help me diagnosing a user’s issue in #osg-connect-ops:<br/><br/>Their jobs use a python package or scp (if python package fails) to transfer output to their server in Hawaii, but ~half of their jobs fail to do so lately.<br/>At my urging, they’ve added an executable failure code to catch these jobs and leave them held in the queue. I could use help:<br/>(1) understanding why a site with RHEL7-based OS would not have ‘scp’ in path<br/>(2) looking at these jobs to understand if there are common features of the exec nodes that might be to blame (and how to fix)<br/><br/>looking at @dweitzel @rynge @bbockelm for ideas/help, but anyone else is welcome. come to #osg-connect-ops<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:07:11)</span> <b>blin:</b></span> the <tt>openssh-clients</tt> package provides <tt>scp</tt> on EL7 hosts. I'm not sure if it's installed by default<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:07:38)</span> <b>blin:</b></span> but for example, the CentOS 7 container image doesn't include it:<br/><pre>$ podman run --rm -it centos:centos7 rpm -q openssh-clients<br/>package openssh-clients is not installed</pre><br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:07:46)</span> <b>rynge:</b></span> I guess technically you could have a site without ssh installed, but it might be more likely that PATH is messed up<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:17:07)</span> <b>rynge:</b></span> @lmichael give me the ticket or username and I can take a look<br/>
+<span style="color: #684b6c"><span style="font-size: small">(13:35:36)</span> <b>cnatzke:</b></span> I have had a similar issue in the last 24 hours<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:47:22)</span> <b>rynge:</b></span> @cnatzke Do you still have the run dir or logs?<br/>
+<span style="color: #684b6c"><span style="font-size: small">(13:48:20)</span> <b>cnatzke:</b></span> Yep,<br/><tt>/home/cnatzke/workflows/runs/cnatzke/pegasus/ggac_surface-workflow/run0026</tt><br/>on <a href="http://login04.osgconnect.net">login04.osgconnect.net</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:48:31)</span> <b>rynge:</b></span> Thanks! let me look<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:55:48)</span> <b>lincoln:</b></span> My understanding is that openssh-clients is part of base, and a part of a normal install, but the CentOS 7 container image doesn't necessarily include all of base.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(14:05:07)</span> <b>lmichael:</b></span> continued in #osg-connect-ops!<br/>
+</body>
+</html>

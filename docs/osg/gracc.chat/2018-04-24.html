@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Apr 24, 2018 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Tue Apr 24, 2018 : #gracc (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(11:20:32)</span> <b>blin:</b></span> hey all, got a question about how the site is reported for pilot hours<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:20:54)</span> <b>blin:</b></span> what's the attribute where that data comes from? <tt>SiteName</tt>?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:27:06)</span> <b>dweitzel:</b></span> what page?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:28:21)</span> <b>blin:</b></span> erm, not sure entirely. @kherner how do you compile the monthly VOs vs Site matrix?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:28:46)</span> <b>blin:</b></span> this is related to suspecting that UNESP is showing up as "None"<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:30:15)</span> <b>sbhat:</b></span> @kherner is on vacation<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:30:25)</span> <b>sbhat:</b></span> but I'm assuming that's coming from one of the GRACC reports<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:30:49)</span> <b>sbhat:</b></span> let me check real quick<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:32:17)</span> <b>sbhat:</b></span> okay - so if it is from there, that "site" is OIM_Site (which depends on matching records to OIM), or if that's missing, it's SiteName from the raw records, which comes from the gratia probe<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:33:45)</span> <b>blin:</b></span> so in the former case, where it's keyed off of OIM, what does gracc use as the key from the record? resource name?<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:34:30)</span> <b>sbhat:</b></span> it tries to match the ProbeName first<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:34:47)</span> <b>sbhat:</b></span> (ProbeName from the raw record to the Probe FQDN in OIM)<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:35:27)</span> <b>sbhat:</b></span> and if that fails, it tries to match the raw record SiteName to the OIM ResourceName<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:36:01)</span> <b>sbhat:</b></span> (since for whatever reason, those seemed to match a lot)<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:36:40)</span> <b>blin:</b></span> oh yea, that reminds me how much i hate gratia probe<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:36:49)</span> <b>sbhat:</b></span> so if it matches on either, then it sets OIM_Site based on what's listed as the Site in OIM<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:37:07)</span> <b>sbhat:</b></span> haha<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:37:47)</span> <b>blin:</b></span> i'm a little confused about the <tt>ProbeName</tt> matching to <tt>Probe FQDN</tt><br/>
+<span style="color: #aba727"><span style="font-size: small">(11:37:49)</span> <b>sbhat:</b></span> I'm, let's say 90% sure that Ken gets the info from that report, since I wrote the report _for him_<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:38:00)</span> <b>blin:</b></span> we keep probe fqdn info in OIM?<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:38:25)</span> <b>sbhat:</b></span> yes?  Let me check real quick<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:38:36)</span> <b>sbhat:</b></span> it might not be called that though<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:39:08)</span> <b>blin:</b></span> i'm going to guess not because i haven't seen it<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:39:11)</span> <b>sbhat:</b></span> yeah<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:39:13)</span> <b>blin:</b></span> and because that would make too much sense<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:39:24)</span> <b>sbhat:</b></span> I'm pretty sure it's not the actual probe FQDN<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:39:30)</span> <b>sbhat:</b></span> but the FQDN of the actual resource that's registered there<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:39:42)</span> <b>blin:</b></span> it's just too much to ask for accounting attr names to be the same<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:39:45)</span> <b>blin:</b></span> lol of course<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:40:17)</span> <b>sbhat:</b></span> yes - so it's the FQDN of the registered resource<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:40:23)</span> <b>sbhat:</b></span> sorry for the misstatement above<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:40:59)</span> <b>sbhat:</b></span> so we first try to match the ProbeName from the raw record to a FQDN for a resource in OIM<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:41:34)</span> <b>blin:</b></span> then you try SiteName from the raw record to match the OIM ResourceName<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:41:38)</span> <b>sbhat:</b></span> yep<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:41:51)</span> <b>blin:</b></span> and set it to None if neither of those are set?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:42:10)</span> <b>blin:</b></span> <b>@edquist</b> ^^ this is relevant knowledge<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:42:13)</span> <b>sbhat:</b></span> and if that fails, we don't add any of the OIM_Site, OIM_ResourceName, etc.<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:42:44)</span> <b>sbhat:</b></span> there are other fields that could get added, like the OIM_ProjectName, OIM_PI, that are matched based on project info from the raw record<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:43:15)</span> <b>sbhat:</b></span> but for Batch/Pilot records, for the Topology information, the OIM fields only get added if one of those match<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:43:34)</span> <b>sbhat:</b></span> I don't believe it's None.  I'm pretty sure the fields just aren't added to the summary record<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:43:55)</span> <b>sbhat:</b></span> (from which that report, and a lot of GRACC dashboards read from)<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:44:03)</span> <b>sbhat:</b></span> so if that's the case, the report looks at SiteName<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:44:07)</span> <b>blin:</b></span> ah but the reporting displays it as None if SiteName isn't set?<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:44:19)</span> <b>sbhat:</b></span> checking, but I believe so<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:46:25)</span> <b>sbhat:</b></span> I think SiteName always (is supposed to always) exists: it's in the gratia probe XML, and I think that's a part of the mandatory gratia probe config<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:46:29)</span> <b>sbhat:</b></span> @dweitzel can correct me if I'm wrong on that<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:47:00)</span> <b>sbhat:</b></span> I just searched the last 90 days of all raw records, and they all have SiteName<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:47:01)</span> <b>dweitzel:</b></span> Yeah, SiteName will always be 'something'<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:47:12)</span> <b>sbhat:</b></span> so where do you see None, Brian?<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:47:24)</span> <b>sbhat:</b></span> As one of the sites?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:48:17)</span> <b>blin:</b></span> we're getting into hearsay territory, @cat and @kherner saw <tt>None</tt> a lot and I believe it's for the site<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:48:34)</span> <b>sbhat:</b></span> haha - no worries<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:48:43)</span> <b>blin:</b></span> if <tt>SiteName</tt> in the raw record is always something but it can't find a corresponding resource in OIM, what happens?<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:48:45)</span> <b>sbhat:</b></span> I just checked the last report, and I see "N/A".  So I'm goign to assume that's "None"<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:49:08)</span> <b>sbhat:</b></span> the summary record just doesn't get OIM_Site, OIM_Facility, OIM_ResourceGroup, or OIM_Resource fields added<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:49:12)</span> <b>sbhat:</b></span> the report should just use SiteName<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:49:24)</span> <b>sbhat:</b></span> I'm looking to see what causes "N/A"<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:56:12)</span> <b>sbhat:</b></span> ah<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:56:15)</span> <b>sbhat:</b></span> I didn't know about this part<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:56:31)</span> <b>sbhat:</b></span> so I was wrong about the case that both fail<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:57:11)</span> <b>sbhat:</b></span> if we don't pick up an OIM_Site through matching, we set it to the Host_description of the raw record<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:57:35)</span> <b>sbhat:</b></span> so for at least a few of these records, Host_description is N/A, so OIM_Site got set to that<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:58:18)</span> <b>blin:</b></span> ok, curious<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:58:46)</span> <b>blin:</b></span> so somehow, these sites are uploading records without basically any data<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:58:58)</span> <b>blin:</b></span> and the gratia probe is happily doing it<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:02:12)</span> <b>sbhat:</b></span> I don't think so<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:02:15)</span> <b>sbhat:</b></span> I'm looking at the code now<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:02:33)</span> <b>sbhat:</b></span> and the records.  There isn't a single raw record with N/A as the Host_description in the past couple of months<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:02:47)</span> <b>sbhat:</b></span> the summarizer has "N/A" as a default<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:03:10)</span> <b>sbhat:</b></span> but it should only fill that in if it can't see the Host_description in the raw records<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:03:16)</span> <b>sbhat:</b></span> @dweitzel - I'll pull you back in on this<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:04:02)</span> <b>sbhat:</b></span> So if we look at <a href="https://gracc.opensciencegrid.org/kibana/app/kibana#/doc/gracc.osg.summary/gracc.osg.summary3-2018/JobUsageRecordSummary?id=d367f44c349198265769f450d98a062d&amp;_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-30d,mode:quick,to:now))">https://gracc.opensciencegrid.org/kibana/app/kibana#/doc/gracc.osg.summary/gracc.osg.summary3-2018/JobUsageRecordSummary?id=d367f44c349198265769f450d98a062d&amp;_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-30d,mode:quick,to:now))</a><br/>
+<span style="color: #aba727"><span style="font-size: small">(12:04:19)</span> <b>sbhat:</b></span> well, let me find one that would have shown up on last month's report<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:05:15)</span> <b>sbhat:</b></span> This one: <a href="https://gracc.opensciencegrid.org/kibana/app/kibana#/doc/gracc.osg.summary/gracc.osg.summary3-2018/JobUsageRecordSummary?id=44d51bb426f036b25871208cc789831d&amp;_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:'2018-03-15T00:00:00.000Z',mode:absolute,to:'2018-03-15T12:00:00.000Z'))">https://gracc.opensciencegrid.org/kibana/app/kibana#/doc/gracc.osg.summary/gracc.osg.summary3-2018/JobUsageRecordSummary?id=44d51bb426f036b25871208cc789831d&amp;_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:'2018-03-15T00:00:00.000Z',mode:absolute,to:'2018-03-15T12:00:00.000Z'))</a><br/>
+<span style="color: #aba727"><span style="font-size: small">(12:05:31)</span> <b>sbhat:</b></span> is a summary record with N/A as <tt>OIM_Site</tt> and <tt>Host_description</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:32:26)</span> <b>dweitzel:</b></span> ResourceType: Batch<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:32:39)</span> <b>dweitzel:</b></span> so Host_description should be N/A, as it's a pilot job, not payload.<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:54:48)</span> <b>sbhat:</b></span> good point.  So basically, that extra bit about setting OIM_Site to Host_description is in case it's a Batch record or if OIM_Site doesn't get matched somehow?<br/>
+<span style="color: #aba727"><span style="font-size: small">(14:13:40)</span> <b>sbhat:</b></span> (retry - slack didn't let me edit: "good point.  So basically, that extra bit about setting OIM_Site to Host_description is in case it's a Batch record or if OIM_Site doesn't get matched somehow, and pretty much will always go to N/A if it's a batch record?")<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:14:39)</span> <b>blin:</b></span> i'm forgetting nomenclature here, does batch record = payload?<br/>
+<span style="color: #aba727"><span style="font-size: small">(14:21:01)</span> <b>sbhat:</b></span> I think payload=BatchPilot<br/>
+<span style="color: #aba727"><span style="font-size: small">(14:21:26)</span> <b>sbhat:</b></span> yeah, that's what I have written down<br/>
+<span style="color: #aba727"><span style="font-size: small">(14:21:36)</span> <b>sbhat:</b></span> because I always forgot too :slightly_smiling_face:<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:24:01)</span> <b>blin:</b></span> do you know when ken gets back from vacation?<br/>
+<span style="color: #aba727"><span style="font-size: small">(14:24:07)</span> <b>sbhat:</b></span> next week<br/>
+<span style="color: #aba727"><span style="font-size: small">(14:24:18)</span> <b>sbhat:</b></span> he should be back Monday<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:24:53)</span> <b>blin:</b></span> ok, then we can clarify what report he's getting this data from and if it's indeed OIM_Site that's set to <tt>None</tt> or <tt>N/A</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:25:43)</span> <b>blin:</b></span> and from what i'm understanding, <tt>OIM_Site</tt> should never be set to <tt>None</tt> or <tt>N/A</tt> for pilot records<br/>
+</body>
+</html>

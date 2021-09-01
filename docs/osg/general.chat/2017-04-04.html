@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Apr 4, 2017 : #general (osg)</title>
+</head>
+<body>
+<h3>Tue Apr 4, 2017 : #general (osg)</h3>
+<span style="color: #5870dd"><span style="font-size: small">(13:19:47)</span> <b>scotwk:</b></span> Is it a bad idea to crank up my Condor MAX_JOBS_RUNNING by a bit?  My machine has a beefy amount of memory.<br/><br/><pre><br/>$ condor_config_val -v MAX_JOBS_RUNNING<br/>MAX_JOBS_RUNNING = MIN({258222, 10000})<br/> # at: &lt;Default&gt;<br/> # raw: MAX_JOBS_RUNNING = MIN({$(DETECTED_MEMORY), 10000})<br/></pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:21:41)</span> <b>dweitzel:</b></span> Go big or go home!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:21:44)</span> <b>dweitzel:</b></span> :slightly_smiling_face:<br/>
+<span style="color: #e0a729"><span style="font-size: small">(13:21:50)</span> <b>kylegross:</b></span> just add a few zeroes!<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:22:09)</span> <b>blin:</b></span> yea, if you're not pegged on RAM, you should be fine<br/>
+<span style="color: #5870dd"><span style="font-size: small">(13:26:24)</span> <b>scotwk:</b></span> Be warned I might come back here asking questions about why my submit machine is so slow :stuck_out_tongue:<br/>
+<span style="color: #5870dd"><span style="font-size: small">(13:28:37)</span> <b>scotwk:</b></span> What is an upper limit on what people here are running with?  I was just planning to double it to about 20k (we don't hit our max often, so I figured I'd start there and evaluate).<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:30:15)</span> <b>blin:</b></span> i think the recommendation is that you should set aside 1/2MB of RAM per shadow<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:30:35)</span> <b>blin:</b></span> so that'd require 10GB RAM if you have 20k running at once if my math is correct<br/>
+<span style="color: #5870dd"><span style="font-size: small">(13:35:41)</span> <b>scotwk:</b></span> ok, so I might even go a bit higher then.  Thanks @blin !<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:54:13)</span> <b>bbockelm:</b></span> You really need to get into the 30k range before the schedd becomes a unique flower requiring deep expertise.<br/>
+<span style="color: #5870dd"><span style="font-size: small">(13:55:42)</span> <b>scotwk:</b></span> ok I won't set it to 258k then :slightly_smiling_face:  (I put it at 25k and I'll monitor from there)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:56:02)</span> <b>bbockelm:</b></span> What kind of IO do you have on the host?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(13:57:27)</span> <b>tiradani:</b></span> and do you have crazy users that submit 10 - 30k job clusters?<br/>
+<span style="color: #5870dd"><span style="font-size: small">(13:58:06)</span> <b>scotwk:</b></span> I'm not sure about the stats on the IO, but it is talking to two local machines only so it should have a solid connection to those<br/>
+<span style="color: #5870dd"><span style="font-size: small">(14:00:15)</span> <b>scotwk:</b></span> @tiradani - it's a huge dagman workflow.  I don't know the size off the top of my head, but there are always jobs queued.  I think I'm usually limited by what we can get from the OSG.  We probably are usually around 5k jobs running but there must have been some availability over the weekend because we noticed the plateau at 10k jobs<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:10:37)</span> <b>tiradani:</b></span> we have experienced with out job sub servers that sometimes users come in and submit a 10 - 30k job cluster.  This has the effect of bogging down the entire schedd.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:10:56)</span> <b>tiradani:</b></span> however, when that doesn’t occur we easily have 20k running jobs<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:11:11)</span> <b>tiradani:</b></span> and something like 50 - 60k queued<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:11:12)</span> <b>bbockelm:</b></span> 10-30k job cluster can be done well... should take, what, 20s?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:12:12)</span> <b>bbockelm:</b></span> The real question is whether you disable the file checks... the file checks take forever, not creating the jobs.<br/>
+</body>
+</html>

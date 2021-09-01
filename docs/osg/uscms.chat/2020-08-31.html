@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Aug 31, 2020 : #uscms (osg)</title>
+</head>
+<body>
+<h3>Mon Aug 31, 2020 : #uscms (osg)</h3>
+<span style="color: #de5f24"><span style="font-size: small">(14:09:28)</span> <b>justas.balcas:</b></span> Something wrong with xroot-4.12.3?<br/><pre>=====&gt; ofs.ckslib * /usr/lib64/libXrdHdfs.so<br/>=====&gt; ofs.authlib libXrdMacaroons.so libXrdAccSciTokens.so<br/>Plugin loaded<br/>Plugin No such file or directory loading (null) libXrdHdfsReal.so<br/>++++++ Configuring server role. . .<br/>=====&gt; all.adminpath /var/spool/xrootd<br/>=====&gt; all.manager <a href="http://xrootd.ultralight.org:1213">xrootd.ultralight.org:1213</a><br/>------ File system server initialization failed.<br/>200831 12:03:41 13923 XrootdConfig: Unable to load file system.<br/>------ xrootd protocol initialization failed.<br/>200831 12:03:41 13923 XrdProtocol: Protocol xrootd could not be loaded<br/>200831 12:03:41 13963 cms_Open: Unable to connect socket to /var/spool/xrootd/clustered/.olb/olbd.admin; connection refused<br/>------ xrootd <a href="mailto:clustered@transfer-6.ultralight.org">clustered@transfer-6.ultralight.org</a>:1094 initialization failed.</pre><br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:11:29)</span> <b>justas.balcas:</b></span> Also dont see anything to update in config in release notes: <a href="https://opensciencegrid.org/docs/release/3.5/release-3-5-19/">https://opensciencegrid.org/docs/release/3.5/release-3-5-19/</a><br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:11:38)</span> <b>justas.balcas:</b></span> @blin?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:12:32)</span> <b>blin:</b></span> shouldn't be anything config related<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:12:45)</span> <b>blin:</b></span> this looks troublesome:<br/><pre>=====&gt; ofs.ckslib * /usr/lib64/libXrdHdfs.so<br/>=====&gt; ofs.authlib libXrdMacaroons.so libXrdAccSciTokens.so<br/>Plugin loaded<br/>Plugin No such file or directory loading (null) libXrdHdfsReal.so</pre><br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:13:20)</span> <b>justas.balcas:</b></span> seeing this libXrdHdfsReal.so first time<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:13:49)</span> <b>blin:</b></span> what's <tt>rpm -q --verify xrootd-hdfs</tt> give you? and <tt>rpm -q xrootd-hdfs</tt><br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:14:20)</span> <b>justas.balcas:</b></span> <pre>[root@transfer-4 tmp]# rpm -q --verify xrootd-hdfs<br/>[root@transfer-4 tmp]# echo $?<br/>0<br/>[root@transfer-4 tmp]# rpm -q xrootd-hdfs<br/>xrootd-hdfs-2.1.7-8.osg35.el7.x86_64</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:19:08)</span> <b>blin:</b></span> how about <tt>rpm -ql xrootd-hdfs</tt>?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:19:27)</span> <b>justas.balcas:</b></span> <pre>[root@transfer-4 tmp]# rpm -ql xrootd-hdfs<br/>/etc/sysconfig/xrootd-hdfs<br/>/etc/xrootd/config.d/40-xrootd-hdfs.cfg<br/>/etc/xrootd/xrootd.sample.hdfs.cfg<br/>/usr/lib64/libXrdHdfs-4.so<br/>/usr/lib64/libXrdHdfs-4.so.0<br/>/usr/lib64/libXrdHdfs-4.so.0.0.1<br/>/usr/lib64/libXrdHdfsReal-4.so<br/>/usr/libexec/xrootd-hdfs/xrootd_hdfs_envcheck</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:22:32)</span> <b>blin:</b></span> hrm, i may see the problem<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:23:13)</span> <b>blin:</b></span> just curious, if you modify <tt>/etc/xrootd/config.d/40-xrootd-hdfs.cfg</tt> to contain<br/><pre>ofs.ckslib * /usr/lib64/libXrdHdfs-4.so<br/><br/>ofs.osslib /usr/lib64/libXrdHdfs-4.so</pre><br/>does that resolve the issue?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:48:18)</span> <b>blin:</b></span> @didavila i'm guessing that this is related to the lib versioning work?<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(14:50:39)</span> <b>didavila:</b></span> yes, it looks like that<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(14:51:07)</span> <b>didavila:</b></span> I would’ve expected for XRootD to find the right version<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:52:37)</span> <b>blin:</b></span> looks like maybe it's hardcoded in the plugin? <a href="https://github.com/opensciencegrid/xrootd-hdfs/blob/master/src/XrdHdfsBootstrap.cc#L85">https://github.com/opensciencegrid/xrootd-hdfs/blob/master/src/XrdHdfsBootstrap.cc#L85</a><br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:42:59)</span> <b>justas.balcas:</b></span> I am not using config.d dir (It is not the way I would like it to be) and our full config is in /etc/xrootd/xrootd-clustered.cfg<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:43:04)</span> <b>justas.balcas:</b></span> and both lines are there<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:44:57)</span> <b>blin:</b></span> ok, fwiw, we're moving to config.d in our packaging so you'll have to maintain your own config<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:45:23)</span> <b>blin:</b></span> for the time being, though, could you try replacing the lines with the versioned lines in your own config?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:52:30)</span> <b>justas.balcas:</b></span> for config.d then I would prefer that it follows htcondor (or whatever is first introduced this), that whatever is in 99-local.cfg overwrites anything defined before. Last time I tried, it did not worked<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:53:15)</span> <b>blin:</b></span> and by that i mean, if you install <tt>osg-xrootd</tt> metapackages, we're shipping config that makes use of config.d<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:54:38)</span> <b>blin:</b></span> yeah, xrootd configuration is special so we have common overrides in config files that we don't replace upon upgrade<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:54:54)</span> <b>blin:</b></span> and in theory, you should be able to override it in a 99-local.cfg<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:55:30)</span> <b>justas.balcas:</b></span> does not work, but this is diff issue :slightly_smiling_face: (or maybe it was only xcache?) topic for another time :wink:<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:57:04)</span> <b>justas.balcas:</b></span> <pre>[root@transfer-4 xrootd]# diff xrootd-clustered.cfg xrootd-clustered.cfg-new<br/>14c14<br/>&lt; ofs.osslib /usr/lib64/libXrdHdfs.so<br/>---<br/>&gt; ofs.osslib /usr/lib64/libXrdHdfs-4.so<br/>49c49<br/>&lt; ofs.ckslib * /usr/lib64/libXrdHdfs.so<br/>---<br/>&gt; ofs.ckslib * /usr/lib64/libXrdHdfs-4.so</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:58:01)</span> <b>blin:</b></span> yeah, this is for <tt>xcache</tt> but also for <tt>osg-xrootd</tt> , generally<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:58:07)</span> <b>blin:</b></span> ok, that's good to know, thanks<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:58:12)</span> <b>justas.balcas:</b></span> <pre>++++++ File system initialization started.<br/>=====&gt; ofs.osslib /usr/lib64/libXrdHdfs-4.so<br/>=====&gt; all.role server<br/>=====&gt; ofs.ckslib * /usr/lib64/libXrdHdfs-4.so<br/>=====&gt; ofs.authlib libXrdMacaroons.so libXrdAccSciTokens.so<br/>Plugin No such file or directory loading osslib /usr/lib64/libXrdHdfs-4-4.so<br/>Config Falling back to using /usr/lib64/libXrdHdfs-4.so<br/>Plugin loaded<br/>Plugin No such file or directory loading (null) libXrdHdfsReal.so</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:58:29)</span> <b>blin:</b></span> do you need <tt>xrootd-4.12.3</tt> or can you downgrade?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:59:06)</span> <b>justas.balcas:</b></span> puppet keeps latest, so yes<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:59:21)</span> <b>justas.balcas:</b></span> I disabled puppet for now<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:59:28)</span> <b>justas.balcas:</b></span> oon other nodes, not to get update<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:59:31)</span> <b>blin:</b></span> can't you force a specific version in puppet??<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:59:42)</span> <b>justas.balcas:</b></span> I can, but that is not what I want to do :smile:<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:59:47)</span> <b>blin:</b></span> haha, fair enough<br/>
+<span style="color: #de5f24"><span style="font-size: small">(16:00:35)</span> <b>justas.balcas:</b></span> was it not tested and released?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(16:00:41)</span> <b>justas.balcas:</b></span> sad :confused:<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:01:41)</span> <b>blin:</b></span> our <tt>xrootd-hdfs</tt> tests have been broken, unfortunately<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:01:42)</span> <b>blin:</b></span> <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-4245">https://opensciencegrid.atlassian.net/browse/SOFTWARE-4245</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:03:18)</span> <b>blin:</b></span> and because previous versions of the plugin were tied to specific versions of xrootd, you wouldn't have been able to upgrade to <tt>xrootd-4.12.3</tt> anyway =/<br/>
+<span style="color: #de5f24"><span style="font-size: small">(16:04:38)</span> <b>justas.balcas:</b></span> boh :wink: ok. Let me know once fixed<br/>
+</body>
+</html>

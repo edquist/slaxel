@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jun 14, 2016 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Tue Jun 14, 2016 : #gracc (osg)</h3>
+<span style="color: #3c8c69"><span style="font-size: small">(11:56:04)</span> <b>kretzke:</b></span> data nodes are hitting 75% capacity (4/6 TB combined). As I recall @bbockelm said at one point there was something like 20TB allotted for GRACC? what does it take to expand the volumes?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:00:02)</span> <b>kretzke:</b></span> quick back of the envelope: current OSG job records in Gratia will need 5 TB (including replicas; 3TB of that is already in GRACE). transfer records 8 TB (!!)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:20:06)</span> <b>dweitzel:</b></span> I don’t think we can expand existing volumes, but we can add more volumes to instances.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:26:15)</span> <b>kretzke:</b></span> oh, really? figured with ceph that would be pretty easy. ok, adding new mounts is easy and elasticsearch supports multiple data paths<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:26:44)</span> <b>dweitzel:</b></span> it’s more like with openstack, I don’t know of a way to resize a volume.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:26:56)</span> <b>kretzke:</b></span> ah, ok<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:29:09)</span> <b>dweitzel:</b></span> How much would you like?  And how big of volumes?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:29:30)</span> <b>dweitzel:</b></span> And I assume, equally distributed across the nodes?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:30:03)</span> <b>dweitzel:</b></span> also, it appears there is a volume attached to the gratiav2-1 node.  Are you actually using that?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:30:47)</span> <b>kretzke:</b></span> all good questions. We need to do some mid-to-long-term planning I think. Also want to allocate some space for snapshots.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:31:15)</span> <b>kretzke:</b></span> it has a bunch of historical XML records I think<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:37:00)</span> <b>dweitzel:</b></span> is the old gracc-osg-* index still used?  should it be purged?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:37:05)</span> <b>dweitzel:</b></span> would that save space?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:38:25)</span> <b>kretzke:</b></span> still reprocessing records. when an index is done it gets closed, then I’ve been manually deleting them.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:39:15)</span> <b>dweitzel:</b></span> @kretzke: have you played around with elasticsearch aggregations?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:44:35)</span> <b>kretzke:</b></span> some. @sbhat has been working with them lately<br/>
+<span style="color: #aba727"><span style="font-size: small">(13:45:56)</span> <b>sbhat:</b></span> yep - I've been doing a bit<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:46:51)</span> <b>dweitzel:</b></span> Do you have any experience with missing fields?  I’m working to summarize Gracc raw records, and different record types have different missing fields.<br/>
+<span style="color: #aba727"><span style="font-size: small">(13:47:51)</span> <b>sbhat:</b></span> unfortunately not<br/>
+<span style="color: #aba727"><span style="font-size: small">(13:48:37)</span> <b>sbhat:</b></span> I've only worked with the standard bucketing (group by) aggregations, and I'm starting to look into scripted ones now<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:56:23)</span> <b>bbockelm:</b></span> @dweitzel: you can chuck those records though via the filter.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:58:10)</span> <b>kretzke:</b></span> you can assign a default value with the <tt>missing</tt> parameter<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:58:41)</span> <b>bbockelm:</b></span> :confused: just confirmed on the OpenStack console: no options for increasing volume size.  We can attach larger volumes though - 2TB was somewhat arbitrary.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:58:48)</span> <b>dweitzel:</b></span> @bbockelm: define ‘chuck'<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:59:16)</span> <b>dweitzel:</b></span> they are legitimate records.  The Payload records have “HostDescription” field, the Batch records do not.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:59:28)</span> <b>dweitzel:</b></span> hence, the problem.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:02:14)</span> <b>bbockelm:</b></span> Ah - I would do that in two queries then.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:02:27)</span> <b>bbockelm:</b></span> actually, what’s wrong with missing then?  Does it not just cast it to null?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:02:52)</span> <b>kretzke:</b></span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-terms-aggregation.html#_missing_value_12">https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-terms-aggregation.html#_missing_value_12</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:02:54)</span> <b>dweitzel:</b></span> nope, for nesting aggregations, it stops transversing down the nesting chain.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:04:12)</span> <b>dweitzel:</b></span> @kretzke: I owe you a beer.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:04:15)</span> <b>kretzke:</b></span> or <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-missing-aggregation.html">https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-missing-aggregation.html</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:04:27)</span> <b>dweitzel:</b></span> the previous link worked great.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:04:58)</span> <b>kretzke:</b></span> sweet :metal:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:05:35)</span> <b>dweitzel:</b></span> I had found that second link, seemed like I had to have a tree of aggregations then.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:05:40)</span> <b>dweitzel:</b></span> if missing, if not missing...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:05:46)</span> <b>dweitzel:</b></span> but the first works great.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:05:52)</span> <b>kretzke:</b></span> ah, right.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:09:54)</span> <b>kretzke:</b></span> @bbockelm: attaching another volume to each node is no problem. maybe it even makes sense to use smaller volumes, and keep adding them on as we grow. then there’s also the option of growing horizontally and adding more nodes<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:10:42)</span> <b>bbockelm:</b></span> Would it make sense to launch a new node and actually practice draining an old one?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:12:14)</span> <b>kretzke:</b></span> we’ve effectively done that a couple times now, with rolling restarts<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:25:17)</span> <b>dweitzel:</b></span> @kretzke: Why is the processors field a <tt>string</tt> in elasticsearch ?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:30:57)</span> <b>kretzke:</b></span> because I don’t convert it to a number. probably should eh<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:33:54)</span> <b>kretzke:</b></span> as well as Memory and Swap.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:38:57)</span> <b>kretzke:</b></span> and Network. Also probably makes sense to just add fields with WallDuration and CpuDuration scaled by Processors.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:41:17)</span> <b>kretzke:</b></span> maybe just go with standard units too. “WallHours” and “CpuHours” maybe?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:45:13)</span> <b>dweitzel:</b></span> I’m not sure.  that certainly breaks convention in Gratia.  We always multiply by Processors in the visualization layer.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:47:33)</span> <b>bbockelm:</b></span> Actually, for Kibana, it’s much better to include that as a separate field.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:47:44)</span> <b>bbockelm:</b></span> For CMS, I use “core hours” to mean “processors * wall duration"<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:47:57)</span> <b>kretzke:</b></span> that’s why I’m suggesting adding new fields, not modifying. if it has to be done for every query certainly better to do it up front<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:55:11)</span> <b>bbockelm:</b></span> Yup!  That’s definitely the lesson we learned from CMS...<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:55:39)</span> <b>bbockelm:</b></span> it’s an el-giganto pain in the ass to reindex old data to add fields, but it’s still better than a field computed by script.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:04:21)</span> <b>kretzke:</b></span> CoreHours sounds good to me. I’m not going to reindex everything right now, but I’ll add the conversions and calc to the raw agent so new indices will get the correct mapping<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:26:11)</span> <b>bbockelm:</b></span> (my CMS instance has another 46.9M records to go on a particular re-index… need to actually do this right some day)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:27:21)</span> <b>dweitzel:</b></span> there has to be a better way!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:53:54)</span> <b>bbockelm:</b></span> well, doing the reindexing correctly would be a better way.  Just haven’t put in the time needed to, you know, learn it.<br/>
+</body>
+</html>

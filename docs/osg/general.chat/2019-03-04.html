@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Mar 4, 2019 : #general (osg)</title>
+</head>
+<body>
+<h3>Mon Mar 4, 2019 : #general (osg)</h3>
+<span style="color: #e96699"><span style="font-size: small">(09:59:26)</span> <b>lincoln:</b></span> hello OSG wizards. does anyone have a simple guide for setting up a GSISSH server?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:03:49)</span> <b>blin:</b></span> oof, not that i know of offhand<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:03:55)</span> <b>blin:</b></span> @matyas ^^ does ligo have one?<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:15:12)</span> <b>lincoln:</b></span> thatd be even better because I want to use it to test GATech's setup :slightly_smiling_face:<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:15:46)</span> <b>matyas:</b></span> uhh yum install gsi-openssh-server<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:15:52)</span> <b>lincoln:</b></span> yes, i got that far :slightly_smiling_face:<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:15:59)</span> <b>matyas:</b></span> systemctl start gsi-openssh<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:15:59)</span> <b>lincoln:</b></span> and somethingsomething fetch crl, and something hostcert<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:16:05)</span> <b>lincoln:</b></span> gettin closer!<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:16:18)</span> <b>lincoln:</b></span> i gues i probably need a gridmap file<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:16:25)</span> <b>lincoln:</b></span> ok ill go beat my head against the wall if there's nothing handy<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:16:50)</span> <b>lincoln:</b></span> thanks :slightly_smiling_face:<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:18:21)</span> <b>matyas:</b></span> i guess look at <a href="https://opensciencegrid.org/docs/security/lcmaps-voms-authentication/#configuring-the-lcmaps-voms-plugin">https://opensciencegrid.org/docs/security/lcmaps-voms-authentication/#configuring-the-lcmaps-voms-plugin</a> to get voms-based auth working and <a href="https://opensciencegrid.org/docs/common/ca/#startstop-fetch-crl-a-quick-guide">https://opensciencegrid.org/docs/common/ca/#startstop-fetch-crl-a-quick-guide</a> for cas and fetch-crl<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:18:59)</span> <b>lincoln:</b></span> thanks.<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:19:15)</span> <b>matyas:</b></span> if you don't want to use osg-configure, copy one of the templates in lcmaps-db-templates to /etc/lcmaps.db<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:20:25)</span> <b>matyas:</b></span> sorry, the only place i ever set it up was fermicloud (uhh where it was actually banned but i didn't know that) and they already had host certs and everything<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:22:42)</span> <b>lincoln:</b></span> hm, i wonder if i even need lcmaps/voms<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:23:16)</span> <b>lincoln:</b></span> i just want to test basic connectivity, regarding Andre's ticket about gsissh at GATech actually.<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:23:21)</span> <b>lincoln:</b></span> I assume that's not resolved yet<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:23:44)</span> <b>lincoln:</b></span> but I suspect its a funky network issue on their side, so I'm setting up a test server at UChicago to try to get debug info<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:23:59)</span> <b>matyas:</b></span> yeah then a grid-mapfile should be enough<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:24:03)</span> <b>lincoln:</b></span> :thumbsup:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:52:16)</span> <b>bbockelm:</b></span> <a href="https://opensciencegrid.org/docs/other/gsissh/">https://opensciencegrid.org/docs/other/gsissh/</a> @lincoln<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:52:31)</span> <b>bbockelm:</b></span> I mean, I have no clue if that actually works, but there are documents there...<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:52:46)</span> <b>lincoln:</b></span> thanks<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:03:05)</span> <b>lincoln:</b></span> i think i have things more or less working now, modulo understanding the mysteries of InCommon CA certs :slightly_smiling_face:<br/>
+<span style="color: #73769d"><span style="font-size: small">(11:39:06)</span> <b>tim.theisen:</b></span> @lincoln Could you install gsi-openssh out of osg-testing? Stuart Anderson from LIGO has been hit by a bug in our version. Details can be found in <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-3420">https://opensciencegrid.atlassian.net/browse/SOFTWARE-3420</a><br/>
+<span style="color: #e96699"><span style="font-size: small">(11:39:27)</span> <b>lincoln:</b></span> I can try, yeah. I apparently need to reissue myself an IGTF server cert to make it actually work.<br/>
+<span style="color: #73769d"><span style="font-size: small">(11:39:57)</span> <b>tim.theisen:</b></span> Thank you<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:42:59)</span> <b>rynge:</b></span> @lincoln If you want a system to look at, xd-login is running gsissh as the default sshd. The stardard sshd has been moved to port 222, and is firewalled off for most people.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:43:08)</span> <b>rynge:</b></span> That is on el6 with a gridmap file<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:44:03)</span> <b>lincoln:</b></span> ah cool<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:44:27)</span> <b>lincoln:</b></span> yeah, I think I got the configuration figured out. John Hover sent me a list of instructions he had for setting one up<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:44:29)</span> <b>lincoln:</b></span> now I wait for certs..<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:44:54)</span> <b>lincoln:</b></span> btw @rynge I created a ticket w/ UChicago ITS about the <a href="http://opensciencegrid.org">opensciencegrid.org</a> domain cert thing. waiting to hear back.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:45:03)</span> <b>rynge:</b></span> Great, thanks!<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:10:01)</span> <b>matyas:</b></span> @lincoln they gave me an strace. I don't _think_ it's a network issue -- it manages to start talking to the remote server but the remote server stops sending stuff at some point during auth<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:10:15)</span> <b>lincoln:</b></span> hm, ok<br/>
+</body>
+</html>

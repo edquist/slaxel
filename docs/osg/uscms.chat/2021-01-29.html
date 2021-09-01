@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jan 29, 2021 : #uscms (osg)</title>
+</head>
+<body>
+<h3>Fri Jan 29, 2021 : #uscms (osg)</h3>
+<span style="color: #73769d"><span style="font-size: small">(06:37:52)</span> <b>smithnp:</b></span> Not sure if I should ask here or in the more general #software channel, but I am having an issue with one of my CE's I can't seem to track down.  It appears to have been having issues before I started working on new routes for GPU work on the cluster.  The CE appears to consistently have all 12 cores maxed out (this is an older physical node) and a system load of &gt;30.  Most of the top processes are <tt>condor_schedd -f</tt> and a lot of <tt>slurm_status.py</tt> and <tt>slurm_status.sh</tt>.  Functionally, the system is working, just very slowly.  Incoming jobs get held in the condor queue pretty regularly for reason of "spooling input files" which to me sounds like the system is just being bogged down to a crawl.  It does submit to the Slurm scheduler, and the cluster appears to stay busy, but the CE acting so strangely is making doing any troubleshooting/debugging of new routes pretty difficult.  I've been told by previous admins who have worked with this system that we've seen this behavior before.  One time it appeared to be caused by a job or some other process that filled the condor spool up with millions of tiny files.  The other time they just reloaded the OS on the CE.  This CE is on fairly old hardware, so I haven't ruled out an imminent hardware failure that hasn't fully made itself known either.<br/><br/>BTW, I am able to submit GPU work locally to the CE, and as long as I use the entry name I have set the route up for and request a GPU in the condor submit file, the job does submit to a GPU node reliably.  So I've got that going for me at least:slightly_smiling_face:  Thanks to all that offered their assistance and experiences, makes the process go better when you don't have to re-invent the wheel.  Just seems my wheel has a flat tire on it right now :joy:<br/>
+<span style="color: #a72f79"><span style="font-size: small">(08:46:07)</span> <b>andrew.melo:</b></span> Are there plans to allow jobs to match on specific GPU models in the global pool?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(12:09:39)</span> <b>bockjoo:</b></span> @smithnp I see large number of slurm_status on my CE, too. They are between 'Z' and 'R', all the time. I would check condor_ce_q, free -g, and top commands to analyze the CE and SPOOL directory and <tt>_condor_stdout, _condor_stderr</tt><br/>
+<blockquote>
+<span style="color: #73769d"><span style="font-size: small">(16:33:11)</span> <b>smithnp:</b></span> I ended up building a new CE VM, it was something that had been on the back burner anyway to get off the old old physical hardware.  Hopefully the factory doesn't notice I replaced the idol with a bag of sand :joy:<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:34:31)</span> <b>smithnp:</b></span> <br/>
+</blockquote>
+<span style="color: #de5f24"><span style="font-size: small">(12:12:11)</span> <b>justas.balcas:</b></span> @andrew.melo should we have GPUs deployed in US-CMS CPU Deployment Spreadsheet (That becomes not CPU deployment, but Hardware deployment…)  Even so, we dont have any at Caltech from us-cms funds - but would be good to have all in one place so that can be easily be found what is deployed<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:12:53)</span> <b>andrew.melo:</b></span> Yes, I guess it would be useful to track CMS-owned and any non-CMS opportunistic GPUs as well<br/>
+<span style="color: #7d414c"><span style="font-size: small">(12:13:28)</span> <b>bockjoo:</b></span> I am planning to add 5 GPUs to the spreadsheet today.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(12:14:27)</span> <b>justas.balcas:</b></span> This one? <a href="https://docs.google.com/spreadsheets/d/1BuEW6xBUGeDhMyMYFgqq8EQzJgH_USPq8jNxvIcjT60/edit#gid=0">https://docs.google.com/spreadsheets/d/1BuEW6xBUGeDhMyMYFgqq8EQzJgH_USPq8jNxvIcjT60/edit#gid=0</a> ?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(12:14:35)</span> <b>bockjoo:</b></span> I forgot 'b it because only the local CMS users can use them for now.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:15:14)</span> <b>andrew.melo:</b></span> eh not that one, one sec<br/>
+<span style="color: #de5f24"><span style="font-size: small">(12:15:15)</span> <b>justas.balcas:</b></span> Maybe there is a need for new sheet (GPU) and rename Sheet 1 as CPU ;))<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:15:26)</span> <b>andrew.melo:</b></span> <a href="https://docs.google.com/spreadsheets/d/1wcBcHv1s9mYna2HCQ4CHZ9_mESmf4DozH7-Z3hh6V18/edit?usp=sharing">https://docs.google.com/spreadsheets/d/1wcBcHv1s9mYna2HCQ4CHZ9_mESmf4DozH7-Z3hh6V18/edit?usp=sharing</a><br/>
+<span style="color: #de5f24"><span style="font-size: small">(12:15:40)</span> <b>justas.balcas:</b></span> that one is just summary<br/>
+<span style="color: #de5f24"><span style="font-size: small">(12:16:58)</span> <b>justas.balcas:</b></span> there should be not only summary, but also detailed (what node, how much mem, cpu and how many GPUs in each node<br/>
+<span style="color: #de5f24"><span style="font-size: small">(12:17:04)</span> <b>justas.balcas:</b></span> just my 2 cents :wink:<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:17:12)</span> <b>andrew.melo:</b></span> Fair enough :slightly_smiling_face:<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:17:15)</span> <b>andrew.melo:</b></span> I'm updating it<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:41:34)</span> <b>andrew.melo:</b></span> done, some extra columns for you :slightly_smiling_face:<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:42:13)</span> <b>andrew.melo:</b></span> sheets too<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:18:34)</span> <b>bockjoo:</b></span> @andrew.melo I need a clarification about the storage target for this year's (2021-2022) facility plan. What are we supposed to have now. 3500TB usable? and we need to add 1500TB for this facility plan?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:19:17)</span> <b>andrew.melo:</b></span> Correct, WLCG pledge is 3.5PB usable, and we want an additional 1.5TB usable on top of that<br/>
+</body>
+</html>

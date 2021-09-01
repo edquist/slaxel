@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Mar 13, 2019 : #scitokens (osg)</title>
+</head>
+<body>
+<h3>Wed Mar 13, 2019 : #scitokens (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(12:59:13)</span> <b>dweitzel:</b></span> Hi @jpatton  Condor question.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:59:29)</span> <b>dweitzel:</b></span> We are running new 8.8.1 glideins (starters &amp; startd)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:59:35)</span> <b>dweitzel:</b></span> Getting this:<br/><pre>03/08/19 22:02:21 (pid:4276) Initialized IO Proxy.<br/>03/08/19 22:02:22 (pid:4276) SECMAN: required authentication with &lt;192.170.227.22:9618&gt; failed, so aborting command CREDD_GET_PASSWD.<br/>03/08/19 22:02:22 (pid:4276) ERROR: AUTHENTICATE:1003:Failed to authenticate with any method|AUTHENTICATE:1004:Failed to authenticate using GSI|GSI:5006:Failed to authenticate because the subject '/DC=org/DC=opensciencegrid/O=Open Science Grid/OU=Services/CN=<a href="http://login03.osgconnect.net">login03.osgconnect.net</a>' is not currently trusted by you.  If it should be, add it to GSI_DAEMON_NAME or undefine GSI_DAEMON_NAME.<br/>03/08/19 22:02:22 (pid:4276) CREDMON: failed to decode credential into file (/local_scratch/osg/glide_B9T0gT/creds/.cred)!<br/>03/08/19 22:02:22 (pid:4276) Failed to initialize JobInfoCommunicator, aborting<br/>03/08/19 22:02:22 (pid:4276) Unable to start job.<br/></pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:00:05)</span> <b>dweitzel:</b></span> makes me thing that the starter is trying to talk back to the schedd, but not using the NEGOTIATOR shared password?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:16:36)</span> <b>rynge:</b></span> Full logs if that helps: <a href="http://xd-login.opensciencegrid.org/scratch/gfaclogs/20190313/">http://xd-login.opensciencegrid.org/scratch/gfaclogs/20190313/</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:43:05)</span> <b>jpatton:</b></span> I don't know off the top of my head but pinging the other devs to see if they know<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:43:43)</span> <b>jpatton:</b></span> what does this list of auth methods look like?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:08:00)</span> <b>jpatton:</b></span> getting word that it might be related to the new OAuth code, standby<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:17:01)</span> <b>jpatton:</b></span> Zach will be joining soon<br/>
+<span style="color: #902d59"><span style="font-size: small">(14:22:38)</span> <b>zmiller:</b></span> Hello.... let me catch up on context for a minute here.<br/>
+<span style="color: #902d59"><span style="font-size: small">(14:24:35)</span> <b>zmiller:</b></span> This looks like the starter is not talking to the shadow using the already-establish syscall socket.  This implies that it's not in "OAuth mode".<br/>
+<span style="color: #902d59"><span style="font-size: small">(14:24:45)</span> <b>zmiller:</b></span> did this used to work with 8.8.0?<br/>
+<span style="color: #902d59"><span style="font-size: small">(14:25:00)</span> <b>zmiller:</b></span> can you double check the config and confirm that:<br/>
+<span style="color: #902d59"><span style="font-size: small">(14:25:03)</span> <b>zmiller:</b></span> CREDD_OAUTH_MODE = true<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:27:16)</span> <b>dweitzel:</b></span> never tried with 8.8.X series.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:27:31)</span> <b>dweitzel:</b></span> we were always on 8.7 series.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:28:01)</span> <b>dweitzel:</b></span> so we should add <tt>CREDD_OAUTH_MODE</tt> to the execute node config?<br/>
+<span style="color: #902d59"><span style="font-size: small">(14:28:22)</span> <b>zmiller:</b></span> Ah.  There was a knob called "TOKENS = True".  It was decided this wasn't a good name, so it got split and now you need these two:<br/>
+<span style="color: #902d59"><span style="font-size: small">(14:28:35)</span> <b>zmiller:</b></span> SEC_PROCESS_SUBMIT_TOKENS = true<br/>CREDD_OAUTH_MODE = true<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:28:59)</span> <b>dweitzel:</b></span> both of those need to be on execute nodes? (startd &amp; starter?)<br/>
+<span style="color: #902d59"><span style="font-size: small">(14:29:20)</span> <b>zmiller:</b></span> just the latter has any effect on the execute node<br/>
+<span style="color: #902d59"><span style="font-size: small">(14:29:44)</span> <b>zmiller:</b></span> that should be sufficient.  might as well set both on the submit node now as well, though, so that when you upgrade that you won't get bitten again.<br/>
+<span style="color: #902d59"><span style="font-size: small">(14:30:06)</span> <b>zmiller:</b></span> you can then delete "TOKENS = True" on both sides.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:30:11)</span> <b>dweitzel:</b></span> @rynge could you add that config knob, <tt>CREDD_OAUTH_MODE = TRUE</tt><br/>
+<span style="color: #902d59"><span style="font-size: small">(14:30:25)</span> <b>zmiller:</b></span> (after the upgrade, that is...)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:30:44)</span> <b>rynge:</b></span> So just to be clear here: the glidein is running 8.8.1, and the schedd 8.6<br/>
+<span style="color: #902d59"><span style="font-size: small">(14:31:05)</span> <b>zmiller:</b></span> 8.6 or 8.7?<br/>
+<span style="color: #902d59"><span style="font-size: small">(14:31:27)</span> <b>zmiller:</b></span> None of this will work with the submit side on 8.6... none of it was even implemented in that series.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:31:27)</span> <b>rynge:</b></span> 8.7.10<br/>
+<span style="color: #902d59"><span style="font-size: small">(14:31:30)</span> <b>zmiller:</b></span> okay.<br/>
+<span style="color: #902d59"><span style="font-size: small">(14:31:39)</span> <b>zmiller:</b></span> that is fine.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:32:06)</span> <b>rynge:</b></span> We will update both sides to 8.8, but wanted to test the glideins on ITB before going full speed ahead<br/>
+<span style="color: #902d59"><span style="font-size: small">(14:32:36)</span> <b>zmiller:</b></span> yep, makes sense.  for now set CREDD_OAUTH_MODE = TRUE on the execute side and I think you'll be good.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:32:41)</span> <b>rynge:</b></span> So leave the submit host alone, and add CREDD_OAUTH_MODE on the glidein?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:32:46)</span> <b>rynge:</b></span> Ok, will test<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:48:31)</span> <b>bbockelm:</b></span> :slightly_smiling_face: And we can write down all the knowledge ... somewhere?<br/>
+</body>
+</html>

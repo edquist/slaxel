@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri May 28, 2021 : #operations (chtc)</title>
+</head>
+<body>
+<h3>Fri May 28, 2021 : #operations (chtc)</h3>
+<span style="color: #e7392d"><span style="font-size: small">(10:26:32)</span> <b>ckoch5:</b></span> @wiscmoate I just drained mem2003 and a high memory job got kicked off. :sob:<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:26:49)</span> <b>ckoch5:</b></span> did you apply the changes you made yesterday to all three high mem nodes?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:27:43)</span> <b>ckoch5:</b></span> oop, never min<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:27:50)</span> <b>ckoch5:</b></span> Mickey’s job was over it’s memory request. :stuck_out_tongue:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:29:33)</span> <b>tlmiller:</b></span> (That sounds like you're still scheduling the high-mem nodes by hand... is there something we (flightworthy) need to fix, or is it just a really hard problem?)<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:51:01)</span> <b>ckoch5:</b></span> Improvements could be made, but I think the “real” solution has always been p-slot premption which is verboten.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:52:20)</span> <b>tlmiller:</b></span> OK.  Thanks.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(13:25:43)</span> <b>ckoch5:</b></span> we have a request for the latest version of the CUDA libraries on our GPU nodes<br/>
+<span style="color: #e7392d"><span style="font-size: small">(13:26:13)</span> <b>ckoch5:</b></span> is it preferred to create a new inf ticket and link the user ticket? or just move the user ticket to the inf queue and it can be moved back once the install is done?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:26:27)</span> <b>wiscmoate:</b></span> Either one is fine<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:26:41)</span> <b>wiscmoate:</b></span> That's going to take a reboot for each GPU node, so disruption<br/>
+<span style="color: #e7392d"><span style="font-size: small">(13:28:57)</span> <b>ckoch5:</b></span> could they use a container to access the newer libraries?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:29:44)</span> <b>wiscmoate:</b></span> I don't think so;  cuda runtime is usually "linked" to a specific nvidia driver which is specific to the host's kernel<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:30:41)</span> <b>tlmiller:</b></span> My impression was that newer drivers could usually host older runtimes, but the reverse was frequently not true.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(13:30:42)</span> <b>ckoch5:</b></span> so to use the newer library in a container, the underlying driver still needs to be sufficiently up to date?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:31:01)</span> <b>wiscmoate:</b></span> Maybe they have docker images that link newer cuda runtimes to older nvidia drivers?  I don't know, but then the user would have to be aware of the host's nvidia driver version?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:31:19)</span> <b>wiscmoate:</b></span> @ckoch5 generally yes<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:31:34)</span> <b>wiscmoate:</b></span> @tlmiller I think you're correct<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:31:51)</span> <b>wiscmoate:</b></span> But even so, we'd have to reboot to enable the newer CUDA runtimes<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:32:32)</span> <b>wiscmoate:</b></span> This is the reason that we've had issues in the past with uncontrolled CUDA runtime updates<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:32:41)</span> <b>wiscmoate:</b></span> And then the GPU becomes incommunicado<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:54:40)</span> <b>johnkn:</b></span> The driver advertises a 'maxiumum runtime' version that it supports, which GPU discovery reports as the "driver version"<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:55:11)</span> <b>johnkn:</b></span> So jobs can do matchmaking if the know the runtime version in their container<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:55:32)</span> <b>wiscmoate:</b></span> Ah, nice<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:03:57)</span> <b>johnkn:</b></span> unfortunately, the CUDADriverVersion is reported as a floating point number, which is... um... bad...<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:04:42)</span> <b>tlmiller:</b></span> Didn't we fix that?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:05:10)</span> <b>johnkn:</b></span> I'm seeing some floating point numbers in CHTC, so looks like not.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:06:01)</span> <b>tlmiller:</b></span> Yeah. I thought we had to change the attribute name for compat reasons..?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:06:14)</span> <b>johnkn:</b></span> right.  hang on....<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:07:14)</span> <b>johnkn:</b></span> you're rigtht.  <tt>CUDAMaxSupportedVersion = 11020</tt><br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:07:26)</span> <b>tlmiller:</b></span> Yup, just found it myself.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:47:47)</span> <b>ckoch5:</b></span> if someone’s name shows up w/o a suffix in the pool report (e.g. <tt>spalding</tt> vs <tt>spalding_chtc</tt>) do we know where they are submitting from?<br/>
+<blockquote>
+<span style="color: #3c989f"><span style="font-size: small">(14:52:35)</span> <b>wiscmoate:</b></span> Could probably figure this out by combing negotiator logs<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:53:07)</span> <b>johnkn:</b></span> or condor_status -submitter<br/>
+</blockquote>
+<span style="color: #e7392d"><span style="font-size: small">(14:50:10)</span> <b>ckoch5:</b></span> also, what is <tt>condorauto</tt> and where does it submit jobs from?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:50:37)</span> <b>johnkn:</b></span> condorauto is the batlab per-commit builds (also nightly?)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:50:48)</span> <b>johnkn:</b></span> <a href="http://batlab.chtc.wisc.edu">batlab.chtc.wisc.edu</a><br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:51:37)</span> <b>wiscmoate:</b></span> :arrow_up:<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:58:48)</span> <b>ckoch5:</b></span> okay, I’m trying to map its hours in the pool report to the CHTC project<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:00:56)</span> <b>johnkn:</b></span> hmm.  so these are all builds of Condor... project none-of-the-above? project *all-of-the-above* ?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:01:40)</span> <b>jcpatton:</b></span> Project Miron<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:02:29)</span> <b>ckoch5:</b></span> right now they are “other” b/c they’re unmapped in the script that maps submitters to projects<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:02:51)</span> <b>ckoch5:</b></span> but they’re going to get mapped to CHTC, like my account is<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:04:05)</span> <b>ckoch5:</b></span> (I mean, I hope they are. I don’t know if my changes are going to work)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:04:38)</span> <b>johnkn:</b></span> Charge it to *overhead*<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:05:23)</span> <b>jcpatton:</b></span> on a slightly related note, our old negotiator-based usage reports are only getting usage data from one of our three negotiators running on cm3000, that’s why we have user(s) missing from them, particularly if they only submit GPU Lab or “Fast Match” (interactive?) jobs<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:05:43)</span> <b>jcpatton:</b></span> mystery solved, but issue remains<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:06:49)</span> <b>jcpatton:</b></span> the c in cm3000 clearly stands for cerberus<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:09:20)</span> <b>ckoch5:</b></span> good lord.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:09:48)</span> <b>ckoch5:</b></span> there’s definitely “fastmatch” users showing up in the report sometimes though. was it random?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:10:13)</span> <b>jcpatton:</b></span> so… I don’t quite understand the fastmatch thing because we also have separate accounting for “fastmatch.$user”<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:10:41)</span> <b>johnkn:</b></span> condor_userprio will fetch from the first negotiator in hash order if you don't specify<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:11:05)</span> <b>johnkn:</b></span> I *think* that most of the time that is the fastmatch negotiator<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:11:10)</span> <b>jcpatton:</b></span> we do specify, but only specify <tt><a href="http://cm3000.chtc.wisc.edu">cm3000.chtc.wisc.edu</a></tt> which is the name of our primary negotiator<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:11:34)</span> <b>jcpatton:</b></span> there’s also <tt><a href="mailto:FASTMATCH_NEGOTIATOR@cm3000.chtc.wisc.edu">FASTMATCH_NEGOTIATOR@cm3000.chtc.wisc.edu</a></tt> and <tt><a href="mailto:GPULAB_NEGOTIATOR@cm3000.chtc.wisc.edu">GPULAB_NEGOTIATOR@cm3000.chtc.wisc.edu</a></tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:11:52)</span> <b>johnkn:</b></span> you specify how?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:12:26)</span> <b>jcpatton:</b></span> <tt>condor_userprio ... -pool <a href="http://cm.chtc.wisc.edu">cm.chtc.wisc.edu</a> -name "<a href="mailto:GPULAB_NEGOTIATOR@cm3000.chtc.wisc.edu">GPULAB_NEGOTIATOR@cm3000.chtc.wisc.edu</a>" ...</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:13:08)</span> <b>johnkn:</b></span> let me check something...<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:13:49)</span> <b>jcpatton:</b></span> but check this out… if you start grepping for usernames in the output when <tt>-name <a href="http://cm3000.chtc.wisc.edu">cm3000.chtc.wisc.edu</a></tt> is specified, you get two names per user<br/><pre>[jcpatton@submit3 ~]$ grep annamareddy cm.chtc.wisc.edu.1622230474.userprio <br/>Name1467 = "<a href="mailto:fastmatch.annamareddy@chtc.wisc.edu">fastmatch.annamareddy@chtc.wisc.edu</a>"<br/>Name4190 = "<a href="mailto:annamareddy@chtc.wisc.edu">annamareddy@chtc.wisc.edu</a>"</pre><br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:14:23)</span> <b>jcpatton:</b></span> Do we have some config that sticks fastmatch usage back into the primary negotiator?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:15:02)</span> <b>jcpatton:</b></span> (But then didn’t do the same for gpulab usage?)<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(15:18:26)</span> <b>jfrey:</b></span> As I recall, fastmatch is an accounting group users can opt into. The fastmatch negotiator only matches for fastmatch accounting groups and the small number of machines intended for them. The main negotiator doesn’t filter those accounting groups out, so it will try to match them as well.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(15:19:25)</span> <b>jfrey:</b></span> This was for a set of interactive jobs where the main negotiator’s cycle time was too long.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:20:11)</span> <b>jcpatton:</b></span> ah, so a user can be scheduled (and have usage) via either negotiator?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(15:20:37)</span> <b>jfrey:</b></span> Yes. We figured what’s the harm if the main negotiator got to a fastmatch user first and found a machine for them.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(15:20:52)</span> <b>jfrey:</b></span> So we didn’t have it filter those submitter ads out.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:22:00)</span> <b>jcpatton:</b></span> ok, so we should still scrape the fastmatch negotiator, it’s just that we’re sometimes “lucky” and get some fastmatch usage (from when a user opts into the fastmatch accounting group via submitting interactively[?]) via matches made via the primary negotiator<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(15:24:28)</span> <b>jfrey:</b></span> The fastmatch group is used (via submit transform) if <tt>IsBuildJob</tt> or <tt>InteractiveJob</tt> is true in the job ad.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(15:26:29)</span> <b>jfrey:</b></span> Also, there are only a couple of machines for fastmatch jobs, which are the only machines the fastmatch negotiator considers.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(15:26:57)</span> <b>jfrey:</b></span> If they’re busy, additional fastmatch jobs will need to wait for a regular slot delivered via the main negotiator.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:33:09)</span> <b>ckoch5:</b></span> so that means all of <tt>annamareddy</tt>’s jobs were matched via the GPULAB negotiator.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:45:23)</span> <b>wiscmoate:</b></span> Ah<br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:45:36)</span> <b>wiscmoate:</b></span> I feel like I should have thought of that<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:46:27)</span> <b>ckoch5:</b></span> It feels obvious now. :joy:<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:47:16)</span> <b>jcpatton:</b></span> Even so, I'm not sure yet that adding the other negotiators to the report is straightforward... I need to check the code a bit before doing it<br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:48:17)</span> <b>wiscmoate:</b></span> Agreed<br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:48:41)</span> <b>wiscmoate:</b></span> That sounds like headache<br/>
+<span style="color: #2b6836"><span style="font-size: small">(15:49:16)</span> <b>jcpatton:</b></span> I'll work on it since I've been going through it recently but it's not a Friday afternoon change :slightly_smiling_face:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:52:28)</span> <b>johnkn:</b></span> I wonder if it wouldn't be easier to just change the report to use <tt>condor_status -subsys accounting</tt>  and ignore which negotiator is making the ads?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:56:41)</span> <b>ckoch5:</b></span> @tjslauson can you double check on submit3 again and let me know if we’re still good?<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(16:01:15)</span> <b>tjslauson:</b></span> doesn't seem to be struggling yet, just high load avg<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(16:22:36)</span> <b>tjslauson:</b></span> I take that back, really high disk I/O was probably responsible for the log file locking email we got<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(16:22:48)</span> <b>tjslauson:</b></span> it's calmed down in the last 20 minutes<br/>
+</body>
+</html>

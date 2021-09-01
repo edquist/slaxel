@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Aug 23, 2021 : #icecube-condor (osg)</title>
+</head>
+<body>
+<h3>Mon Aug 23, 2021 : #icecube-condor (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(08:39:09)</span> <b>blin:</b></span> oh so you're submitting from outside of the container?<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(08:41:56)</span> <b>dschultz:</b></span> yes<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(08:43:00)</span> <b>dschultz:</b></span> I wanted to use condor as a service container in CI testing, which also means I can't use a shared fs<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:46:15)</span> <b>blin:</b></span> ah yeah, i'd keep going with CLAIMTOBE and i think maybe you can set <tt>Owner = submittest</tt> in your job ad?<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(08:50:17)</span> <b>dschultz:</b></span> that doesn't seem to do anything, still complains about my user not existing<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:51:50)</span> <b>blin:</b></span> hrmm<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:53:45)</span> <b>blin:</b></span> i've never actually tried to _use_ <tt>CLAIMTOBE</tt>. let me check in with the condor team<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:26:02)</span> <b>blin:</b></span> @dschultz try setting <tt>SEC_CLAIMTOBE_USER = submittest</tt> ...i'm not clear if that has to be on the client or server side<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:26:29)</span> <b>matyas:</b></span> probably the client<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:26:42)</span> <b>matyas:</b></span> i.e. on the thing that wants to claim to be someone else<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(10:06:56)</span> <b>dschultz:</b></span> not sure how to set that through the pybindings, but I can set the env variable <tt>_CONDOR_SEC_CLAIMTOBE_USER=condor</tt>.  note that <tt>submittest</tt> doesn't seem to be a valid user either<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(10:07:52)</span> <b>dschultz:</b></span> that allows me to submit a job, which is what I'm looking for<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:10:41)</span> <b>blin:</b></span> ah, it's supposed to be <tt>submituser</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:11:19)</span> <b>blin:</b></span> with the bindings, i think you want something like <tt>htcondor.param['SEC_CLAIMTOBE_USER'] = submituser</tt><br/>
+<span style="color: #50a0cf"><span style="font-size: small">(10:12:16)</span> <b>dschultz:</b></span> yes, that works.  thanks for the help<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:50:19)</span> <b>bbockelm:</b></span> @blin - I forget, is there some secret way to set per-thread config values via some context manager?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:51:00)</span> <b>blin:</b></span> hrmm, i don't recall one<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:01:05)</span> <b>matyas:</b></span> if there is one, it's secret for a reason :slightly_smiling_face:<br/>
+</body>
+</html>

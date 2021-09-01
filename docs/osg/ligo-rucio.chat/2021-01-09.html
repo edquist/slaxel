@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Sat Jan 9, 2021 : #ligo-rucio (osg)</title>
+</head>
+<body>
+<h3>Sat Jan 9, 2021 : #ligo-rucio (osg)</h3>
+<span style="color: #a2a5dc"><span style="font-size: small">(13:10:10)</span> <b>james.clark:</b></span> Hi <b>@channel</b> I'm seeing some surprising transfer failures -  these are probably transient network issues on my end but i wanted to check in just in case there was anything obvious with FTS itself, or if anyone else was having problems:<br/><br/>1. FTS is telling me i do not have permission for a path at ICRR, which is not true.  Further, FTSmon reports jobs as complete but the data is nowhere to be seen.   If i try to get to the individual monitor pages for those completed jobs, i see an <tt>Internal Server Error</tt> message on FTSMon.<br/>2. I'm seeing transient issues writing to LIGO-WA where jobs error-out with an "end of file reached" message.&gt;<br/>(Also, i rarely work at weekends myself - this can certainly wait until monday!)<br/>
+<span style="color: #ea2977"><span style="font-size: small">(13:13:22)</span> <b>jlstephen:</b></span> 1. indicates that the proxy being used for the fts transfer doesn't have access to the specified directory on the source<br/>
+<span style="color: #ea2977"><span style="font-size: small">(13:13:23)</span> <b>jlstephen:</b></span> <pre>INFO    Sat, 09 Jan 2021 13:11:30 -0600; Getting source file size<br/>ERR     Sat, 09 Jan 2021 13:11:31 -0600; Non recoverable error: [13] globus_ftp_client: the server responded with an error 550 550-GlobusError: v=1 c=PERMISSION_DENIED  550-GridFTP-Errno: 13  550-GridFTP-Reason: System error in stat  550-GridFTP-Error-String: Permission denied  550 End.  </pre><br/>
+<span style="color: #ea2977"><span style="font-size: small">(13:13:24)</span> <b>jlstephen:</b></span> e.g.<br/>
+<span style="color: #ea2977"><span style="font-size: small">(13:13:30)</span> <b>jlstephen:</b></span> that transfer is from gsi<a href="ftp://ldas-grid.ligo.caltech.edu:2811">ftp://ldas-grid.ligo.caltech.edu:2811</a><br/>
+<span style="color: #ea2977"><span style="font-size: small">(13:13:45)</span> <b>jlstephen:</b></span> <a href="https://fts.mwt2.org:8449/var/log/fts3/transfers/2021-01-09/ldas-grid.ligo.caltech.edu__kagra-ldr.icrr.u-tokyo.ac.jp/2021-01-09-1911__ldas-grid.ligo.caltech.edu__kagra-ldr.icrr.u-tokyo.ac.jp__35844369__f1383b11-dac8-597c-9f49-5470a8276503">https://fts.mwt2.org:8449/var/log/fts3/transfers/2021-01-09/ldas-grid.ligo.caltech.ed[…]-tokyo.ac.jp__35844369__f1383b11-dac8-597c-9f49-5470a8276503</a><br/>
+<span style="color: #ea2977"><span style="font-size: small">(13:14:44)</span> <b>jlstephen:</b></span> that appears to be the problematic endpoint in the transfer, not gsi<a href="ftp://kagra-ldr.icrr.u-tokyo.ac.jp:2811">ftp://kagra-ldr.icrr.u-tokyo.ac.jp:2811</a><br/>
+<span style="color: #ea2977"><span style="font-size: small">(13:15:14)</span> <b>jlstephen:</b></span> (just looking at the logs, not actually being able to look at the endpoints since i don't have access for that)<br/>
+<span style="color: #ea2977"><span style="font-size: small">(13:18:28)</span> <b>jlstephen:</b></span> i don't see error messages on the fts server that would indicate a problem with fts for 2., so that is probably some sort of network or issue on the storage side<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:22:19)</span> <b>paschos:</b></span> I cant check but Judith's assessment makes a lot of sense... when they place data at cit what ligo proxy do they use?<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(13:38:22)</span> <b>james.clark:</b></span> Ok, thanks.   These should all be using the same proxy, which i tested manually with no obvious problems.  I've suspended those rules for the time being, until i can dig into it properly.  thanks again<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(13:47:42)</span> <b>james.clark:</b></span> oh weird, turns out it's a permisions issue on the *directory* at CIT<br/>
+</body>
+</html>

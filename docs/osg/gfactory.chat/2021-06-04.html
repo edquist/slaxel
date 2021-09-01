@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jun 4, 2021 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Fri Jun 4, 2021 : #gfactory (osg)</h3>
+<span style="color: #3c8c69"><span style="font-size: small">(08:15:23)</span> <b>jpeterson:</b></span> working on the ODU Ubuntu based cluster CE and getting the following from the pilots:<br/><pre>=== Validation error in /scratch/osg01/glide_goTFCY/main/condor_platform_select.sh ===<br/>Fri Jun  4 08:26:20 EDT 2021 Error running '/scratch/osg01/glide_goTFCY/main/condor_platform_select.sh'<br/>    Cannot find a supported platform<br/>    CONDOR_VERSION '9.0.x'<br/>    CONDOR_OS      'linux-ubuntu18'<br/>    CONDOR_ARCH    'default'<br/>    Quitting<br/>Fri Jun  4 08:26:20 EDT 2021 Sleeping 256<br/>Fri Jun  4 08:30:36 EDT 2021 Sleeping 277<br/>Fri Jun  4 08:35:13 EDT 2021 Sleeping 308<br/>Fri Jun  4 08:40:21 EDT 2021 Sleeping 269<br/>Fri Jun  4 08:44:50 EDT 2021 Sleeping 89</pre><br/>what (and where) needs to be added to the factory for the Ubuntu18 condor 9.0.x support?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:20:09)</span> <b>blin:</b></span> hey all, do we have pilot logs for SIUE? we're suspecting IceCube pilots are starting there without Singularity even though SIUE has it available in <tt>/usr/local/bin</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:22:52)</span> <b>matyas:</b></span> do you have a login on <a href="http://xd-login.opensciencegrid.org">xd-login.opensciencegrid.org</a>?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:23:22)</span> <b>matyas:</b></span> logs are in <tt>/local-scratch/gfaclogs/sdsc/entry_OSG_US_SIUE_OS_*</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:24:03)</span> <b>blin:</b></span> ah right, thanks<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:27:00)</span> <b>matyas:</b></span> and Brian has a script for extracting the condor logs from the .err file: <a href="https://github.com/bbockelm/kestrel/blob/master/src/kestrel_unzip_log">https://github.com/bbockelm/kestrel/blob/master/src/kestrel_unzip_log</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(10:31:25)</span> <b>marian:</b></span> @jpeterson: I believe we need to add similar lines like existing ones to the <tt>/etc/gwms-factory/glideinWMS.xml</tt>:<br/><pre>$ grep ubuntu glideinWMS.xml<br/>      &lt;condor_tarball arch="default" os="ubuntu20,linux-ubuntu20" tar_file="/var/lib/gwms-factory/condor/condor-9.0.0-x86_64_Ubuntu20-stripped.tar.gz" version="9.0.0,9.0.x"/&gt;<br/>      &lt;condor_tarball arch="default" os="ubuntu20,linux-ubuntu20" tar_file="/var/lib/gwms-factory/condor/gfactory-3.7.2-condor-8.9.11-x86_64_Ubuntu20-stripped.tar.gz" version="8.9.11,8.9.x,default"/&gt;</pre><br/>Have you created tarball before? If not, let's file internal JIRA for GFACTOPS as a request and either me or @jdost321 can take care of it.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:33:07)</span> <b>jpeterson:</b></span> I haven’t, that was more Factory side than CE ops and where I fall, although that seems a bid fuzzy ^_^<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:33:43)</span> <b>marian:</b></span> yeah, that's why I wondered ... it is a bit fuzzy process :slightly_smiling_face:<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:34:26)</span> <b>marian:</b></span> we may need to add <tt>os="ubutnu18,linux-ubuntu18"</tt> to support your request, I'll check back with Jeff as I did it also long ago whether anything changed in the process<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:35:55)</span> <b>marian:</b></span> I'll file the request in JIRA for Factory Ops<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:36:58)</span> <b>marian:</b></span> oh, I see you just did, thanks<br/>
+</body>
+</html>

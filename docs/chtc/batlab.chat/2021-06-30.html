@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jun 30, 2021 : #batlab (chtc)</title>
+</head>
+<body>
+<h3>Wed Jun 30, 2021 : #batlab (chtc)</h3>
+<span style="color: #d58247"><span style="font-size: small">(09:45:27)</span> <b>gthain:</b></span> 3 all green build/tests yesterday!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:28:17)</span> <b>tlmiller:</b></span> (But now I have to fix the greenness-detector to find all of them.)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:19:39)</span> <b>johnkn:</b></span> I'd be happier if I didn't know it's mostly because we run docker tests on a machine that is kept at about 10% utilization at most<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:21:44)</span> <b>tlmiller:</b></span> It's a little embarrassing that our tests fail under load, and it's more embarrassing that we cause so much load, but I don't think we're hiding real bugs as a result.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:26:02)</span> <b>johnkn:</b></span> I'd bet on a couple of real bugs, but mostly yeah.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:47:23)</span> <b>johnkn:</b></span> I think id like to add a custom resource (PORTS?) to our docker test machine and have the docker test jobs request an amount of that resource.  something with a large quantity so we can play with the amounts.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:47:51)</span> <b>johnkn:</b></span> Could we run a STARTD_CRON job along with this that could push port usage into the slot ads?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:48:09)</span> <b>johnkn:</b></span> or at the very least into the p-slot ad?<br/>
+<span style="color: #d58247"><span style="font-size: small">(11:50:03)</span> <b>gthain:</b></span> Each docker container that is nat'ed gets its own virtual interface, and the port namespace is per-interface<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:52:11)</span> <b>johnkn:</b></span> the comment in the config on that host indicates that that's not true for 127.0.0.1<br/>
+<span style="color: #d58247"><span style="font-size: small">(11:52:33)</span> <b>gthain:</b></span> I was confused when we reverted the nat change<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:52:43)</span> <b>johnkn:</b></span> ok.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:53:50)</span> <b>johnkn:</b></span> I still think this is useful, but maybe call it  something arbitrary.   <tt>FIGS</tt> or something<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:55:54)</span> <b>tlmiller:</b></span> We could call it <tt>NEWTONS</tt> and really confuse our physicist friends.<br/>
+<span style="color: #d58247"><span style="font-size: small">(11:56:25)</span> <b>gthain:</b></span> <tt>SLUGS</tt> ?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:57:47)</span> <b>johnkn:</b></span> <tt>ERGS</tt><br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:14:31)</span> <b>tlmiller:</b></span> <tt>DYNES</tt>.  Everbody loves a good old analog dyne.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:14:40)</span> <b>tlmiller:</b></span> (cyber-dynes are right out.)<br/>
+<span style="color: #d58247"><span style="font-size: small">(12:15:30)</span> <b>gthain:</b></span> <tt>DYNES</tt>-O-<tt>MITE</tt> !<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:17:15)</span> <b>tlmiller:</b></span> o/~ I'm <tt>TNT</tt>, I'm <tt>DYNES</tt>-O-<tt>MITE</tt> o/~<br/>
+<span style="color: #d58247"><span style="font-size: small">(12:18:57)</span> <b>gthain:</b></span> Is that a new regexp format?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:21:12)</span> <b>tlmiller:</b></span> Huh!  Turns out <tt>dynes</tt> are metric.  (Also, <tt>mites</tt> are also a unit.)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:21:46)</span> <b>tlmiller:</b></span> So you can't have a dyne of mites, but you can have dynes-per-mite.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(12:22:56)</span> <b>jfrey:</b></span> We still don’t have a timstamp in the machine ad for when the pslot last created or re-absorbed a dslot, do we?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:23:16)</span> <b>tlmiller:</b></span> That would occasionally be useful, so I assume not.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(12:28:33)</span> <b>jfrey:</b></span> It’s something I’ve wanted in the past, and a question on condor-users could use it now.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:30:14)</span> <b>tlmiller:</b></span> Make a ticket?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(12:30:39)</span> <b>jfrey:</b></span> I think I will. In the mean time, I’ll offer hacky workarounds to the user. :disappointed:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:31:27)</span> <b>tlmiller:</b></span> I like the idea of a ticket titled "Avoid offering hacky work-arounds to the user".  We could just file all of our work under it forever.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:50:58)</span> <b>johnkn:</b></span> I'm not sure a d-slot creation timestamp would be a useful as they think, but we should definitely add it.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:51:13)</span> <b>johnkn:</b></span> and then a rollup of those in the pslot<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:52:04)</span> <b>johnkn:</b></span> a single pslot timestamp for d-slot creation/destruction would be really hard to use I think<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:53:56)</span> <b>johnkn:</b></span> mites is a unti of what?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:54:08)</span> <b>tlmiller:</b></span> weight, apparently.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:54:16)</span> <b>tlmiller:</b></span> er, mass.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:54:17)</span> <b>tlmiller:</b></span> Sorry.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:54:54)</span> <b>johnkn:</b></span> so dyno-o-mite is a power to weight ratio?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:54:57)</span> <b>tlmiller:</b></span> The metric mite is 1/20 of a gram, it seems, and the imperial might is 1/20 of grain?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:55:01)</span> <b>tlmiller:</b></span> Would seem to be.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:55:10)</span> <b>tlmiller:</b></span> Well, dynes/mite.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:55:39)</span> <b>johnkn:</b></span> how else would you write 'o ?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:56:23)</span> <b>tlmiller:</b></span> "x o' y" is usually "x of y", e.g., "gallons of milk", but I don't think that works for dynes and mites.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:56:49)</span> <b>johnkn:</b></span> by the power of mites?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:57:03)</span> <b>johnkn:</b></span> sounds like an invocation?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:57:18)</span> <b>tlmiller:</b></span> By the dynes of mites, I propel thee?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:57:56)</span> <b>johnkn:</b></span> *"Mites* are small arachnids"<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:58:09)</span> <b>johnkn:</b></span> so this is spiderman's tagline<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:21:30)</span> <b>johnkn:</b></span> here's a build/test run that fixes a couple of tests and increases default logging.<br/><a href="https://batlab.chtc.wisc.edu/results/test-details.php?runid=548361&amp;testids=548381,548382,548383,548385,548386,548388,548390,548393,548394,548396,548397,548398,548404&amp;group=johnkn:%20workspace:%20Auto-Test%20Suite">https://batlab.chtc.wisc.edu/results/test-details.php?runid=548361&amp;testids=548381,54838[…]8398,548404&amp;group=johnkn:%20workspace:%20Auto-Test%20Suite</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:21:54)</span> <b>johnkn:</b></span> note that tests are running in about 40 minutes except on MAC where it's 60 min<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(13:32:09)</span> <b>jfrey:</b></span> For the recent post on condor-users, they want to detect pslots that have been completely idle for over an hour. Currently, I don’t see a way to do that with a query.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(13:32:38)</span> <b>jfrey:</b></span> If we had a last-change-in-dslots-timestamp attribute in the plsot, they could do this: NumDynamicSlots==0 &amp;&amp; time()&gt;LastDSlotChange+3600<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:50:28)</span> <b>johnkn:</b></span> hmm. maybe one of the windowed recent* stats would serve here.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:51:16)</span> <b>tlmiller:</b></span> For the use in question, couldn't they just run up the "turn off on idle" standard bits of config?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:54:54)</span> <b>johnkn:</b></span> found it.  how about<br/><pre>NumDynamicSlots==0 &amp;&amp; RecentJobStarts==0 &amp;&amp; ((time() - DaemonStartTime) &gt; 3600)</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:56:08)</span> <b>johnkn:</b></span> RecentJobStarts is not ideal,  but it does not appear that we have a Recent stat for job exits.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:56:46)</span> <b>tlmiller:</b></span> How long is Recent?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:57:16)</span> <b>johnkn:</b></span> Configurable, but i think 40 minutes by default?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:57:36)</span> <b>tlmiller:</b></span> Longer than I thought.  OK.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:57:50)</span> <b>tlmiller:</b></span> Anyway, I think the condor-users post right before that one is more interesting for TJ and I.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:58:01)</span> <b>johnkn:</b></span> MIght be 20 min, it's the same for all Recent stats.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(14:05:49)</span> <b>jfrey:</b></span> If jobs run for longer than 20-40 minutes, then your expression would trigger immediately after the last dslot goes away.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:06:39)</span> <b>johnkn:</b></span> yes, not ideal.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:08:45)</span> <b>johnkn:</b></span> I think ToddM's suggestion is probably the best. although you could maybe synthesize a LastDslotTime using STARTD_CRON.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(14:09:16)</span> <b>jfrey:</b></span> That was one of my hacky suggestions to the user.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:10:01)</span> <b>johnkn:</b></span> for their purposes, it would be best to put an IdleTime attribute in the p-slot.  (well, all slot really).<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:10:16)</span> <b>johnkn:</b></span> I can see that being more useful than a lastDslotChange time<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:10:41)</span> <b>tlmiller:</b></span> TJ, are you going to reply to Javier Barbero?  I don't actually know the multi-GPU-&gt;multi-pslot config.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(14:10:48)</span> <b>jfrey:</b></span> Where IdleTime is defined as the amount of time (or timestamp) of not having any dslots?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:10:48)</span> <b>johnkn:</b></span> Jus tdid<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(14:11:09)</span> <b>jfrey:</b></span> Or time in non-claimed state for static slots?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:11:22)</span> <b>johnkn:</b></span> right<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:11:22)</span> <b>tlmiller:</b></span> Hadn't seen that yet, thanks.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:11:25)</span> <b>tlmiller:</b></span> ... you didn't include the multi-p-slot config?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:11:44)</span> <b>johnkn:</b></span> I did not.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:11:46)</span> <b>tlmiller:</b></span> Do we not want people doing that?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:12:01)</span> <b>johnkn:</b></span> He said he did not want to.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:12:25)</span> <b>tlmiller:</b></span> &gt; Is there a way to specify in the submit file a specific capability or device name while keeping it a single partitionable slot?<br/>&gt; <br/>&gt; In case it is not possible I would like to create 3 different partitionable slots, each one including GPUs of the same type. How can I achieve this?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:13:06)</span> <b>johnkn:</b></span> that's not released yet.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:13:27)</span> <b>johnkn:</b></span> I did say something for that was coming, but did not show the future config<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:13:32)</span> <b>tlmiller:</b></span> ..?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:13:33)</span> <b>tlmiller:</b></span> Isn't there a glorious hack involving assuming/forcing the GPUs to be ordered by type?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:13:48)</span> <b>johnkn:</b></span> for assuming<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:14:15)</span> <b>johnkn:</b></span> but you still end up with props of all GPUs in all slots which is pretty broken.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:14:53)</span> <b>tlmiller:</b></span> Ah, right.  I'd forgotten about that.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:15:50)</span> <b>tlmiller:</b></span> Thanks.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:17:20)</span> <b>johnkn:</b></span> not that I care a lot, but we seemed to have turned the batlab channel in to fw discussion.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:24:44)</span> <b>johnkn:</b></span> Oh ho!  there is an effective timestamp for job exit.<br/><pre>NumDynamicSlots==0 &amp;&amp; RecentJobStarts==0 &amp;&amp; RecentJobBusyTime==0 ((time() - DaemonStartTime) &gt; 3600)</pre><br/><br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:26:09)</span> <b>johnkn:</b></span> updated when we destroy a Claim::Claim object in the startd,  JobBusyTime is essentially starter lifetime.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:27:11)</span> <b>johnkn:</b></span> it's a Miron probe, so I might have the name wrong.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:28:09)</span> <b>johnkn:</b></span> plus it looks it may not be published when the value is 0... comment seems to imply that anyway.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:08:31)</span> <b>tlmiller:</b></span> Any objection to pulling <tt>cmd_now</tt> off the 9.1.1 branch?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:08:53)</span> <b>tlmiller:</b></span> (We've removed it from <tt>master</tt> and <tt>V9_0-branch</tt>, so we know we don't care about it.)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:30:23)</span> <b>johnkn:</b></span> no objection.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:31:05)</span> <b>tlmiller:</b></span> OK.  I'll cherry-pick the commit and push shortly here.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:32:01)</span> <b>tlmiller:</b></span> ... the 9.0.2 branch also has <tt>cmd_now</tt>; same deal?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:46:06)</span> <b>johnkn:</b></span> same deal.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:15:45)</span> <b>johnkn:</b></span> Windows boxes are out for a late lunch apparently.  I pined operations about it.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:16:09)</span> <b>tlmiller:</b></span> Did they ash you any questions? ;)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:16:18)</span> <b>johnkn:</b></span> nope<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:16:38)</span> <b>tlmiller:</b></span> [can't tell if TJ is playing straight man or just ignoring typos]<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:17:07)</span> <b>johnkn:</b></span> what typ I don't see typofs ?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:17:27)</span> <b>tlmiller:</b></span> Well, at least you didn't accidentally the verb.<br/>
+</body>
+</html>

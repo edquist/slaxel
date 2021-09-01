@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Apr 7, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Fri Apr 7, 2017 : #gracc (osg)</h3>
+<span style="color: #3c8c69"><span style="font-size: small">(09:06:34)</span> <b>kretzke:</b></span> shoot, I wasn’t getting notifications yesterday… hum<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:56:01)</span> <b>marian:</b></span> that's ok, no worries!<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:07:31)</span> <b>efajardo:</b></span> @bbockelm ok I will check<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:08:05)</span> <b>bbockelm:</b></span> What data is being sent to RabbitMQ?  Who is the current consumers?<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:08:30)</span> <b>efajardo:</b></span> I am sending the exact same Messages we are sending to the ActiveMQ at CERN<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:09:06)</span> <b>bbockelm:</b></span> And who is the consumer?<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:11:11)</span> <b>efajardo:</b></span> On the RabbitMQ?<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:11:46)</span> <b>efajardo:</b></span> I do not know, you told me that @dweitzel was going to setup the consumer to pass it to the gracc<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:11:58)</span> <b>dweitzel:</b></span> yup, haven't done that yet.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:14:57)</span> <b>bbockelm:</b></span> ah, so it's probably just piling up?<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:18:31)</span> <b>efajardo:</b></span> yes<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:18:47)</span> <b>efajardo:</b></span> but if I understand right<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:19:14)</span> <b>efajardo:</b></span> you want me to stop the piling up? if the queue is full? and then what form the probes perspectiv? discard those?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:39:30)</span> <b>bbockelm:</b></span> Yeah - if the queue doesn't provide an ACK for the sent data, then have the probe end in an error and don't update the checkpoint file..<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:40:15)</span> <b>efajardo:</b></span> Well we are only checkpoinint when posting to the OSG Centran Network Data Store<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:40:46)</span> <b>efajardo:</b></span> so basically this has to be well thought, sicne publishing to these MQ was always thought to be good if it works and just keep going if it does not<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:41:36)</span> <b>bbockelm:</b></span> yeah - but now we want the ability to also ensure everything goes to RabbitMQ; this allows us to have an "escape mechanism" in case if we want to move completely from the data store into ElasticSearch + FNAL tape backup.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:41:56)</span> <b>bbockelm:</b></span> So we should have the ability (maybe a flag) to only checkpoint if everything has been ACK'd.<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:44:09)</span> <b>efajardo:</b></span> ahh so we want to only checkpoint if things made it to the RabbitMQ?<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:45:42)</span> <b>efajardo:</b></span> Got it<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:45:48)</span> <b>efajardo:</b></span> I will have to change the code today then<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:46:19)</span> <b>efajardo:</b></span> I originally thought we were treating it as the ActiveMQ<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:50:43)</span> <b>bbockelm:</b></span> sure, no problem!  @kretzke - in that case, can you put a finite limit on the queue size?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:00:10)</span> <b>kretzke:</b></span> @bbockelm I cannot, no. Marina could set it using rabbitmqctl, or it can be set by the client when the queue is declared with the “x-max-length” argument.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:00:31)</span> <b>bbockelm:</b></span> alright, let's go to GOC tickets perhaps?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:01:11)</span> <b>kretzke:</b></span> I think the client setting it would be the best approach.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:01:20)</span> <b>bbockelm:</b></span> The other thing that came up while Derek and I were brainstorming -- how do we serialize the configuration of Grafana and Kibana?  Do we have a github repo for the dashboards?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:02:20)</span> <b>kretzke:</b></span> no. I have some local copies made with <a href="https://github.com/utkarshcmu/wizzy">https://github.com/utkarshcmu/wizzy</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:03:36)</span> <b>bbockelm:</b></span> alright, let's at least create a JIRA ticket for that - that's something we'd need as we're thinking about a completely independent ITB setup.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:04:02)</span> <b>kretzke:</b></span> kibana? well, it’s just docs in elasticsearch, so putting those into git would be straighforward<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:11:47)</span> <b>bbockelm:</b></span> Yeah -- I'm less worried about Kibana as we let users self-explore things there.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:23:22)</span> <b>kretzke:</b></span> <a href="https://jira.opensciencegrid.org/browse/GRACC-98">https://jira.opensciencegrid.org/browse/GRACC-98</a><br/>
+</body>
+</html>

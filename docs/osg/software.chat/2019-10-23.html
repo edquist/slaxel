@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Oct 23, 2019 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Oct 23, 2019 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(13:03:49)</span> <b>blin:</b></span> @bockjoo i think i found the walltime problem<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:04:37)</span> <b>blin:</b></span> this line should be <tt>$(ROUTED_JOB_MAX_TIME)*60</tt> <a href="https://github.com/htcondor/htcondor-ce/blob/master/src/condor_ce_router_defaults#L100">https://github.com/htcondor/htcondor-ce/blob/master/src/condor_ce_router_defaults#L100</a><br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:56:37)</span> <b>bockjoo:</b></span> Ah ok thanks!<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:08:18)</span> <b>blin:</b></span> it'll go into the next htcondor-ce 4 release: <a href="https://github.com/htcondor/htcondor-ce/pull/269">https://github.com/htcondor/htcondor-ce/pull/269</a><br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:32:25)</span> <b>bockjoo:</b></span> Tim asked me to test blah. Is there any correlation between the blah and this?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:33:25)</span> <b>blin:</b></span> nope, there shouldn't be<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:33:39)</span> <b>blin:</b></span> we just have a new version of the blahp ready<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:35:52)</span> <b>jthiltges:</b></span> Is the new blahp (1.18.45) intended to be released with condor 8.8 in OSG 3.4?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:36:17)</span> <b>blin:</b></span> well 8.8's already out in 3.4<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:36:24)</span> <b>blin:</b></span> but yeah, they'll be going hand-in-hand<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:37:54)</span> <b>jthiltges:</b></span> Oops. I overlooked it in the list!<br/>We're running condor 8.6.13, and I ran into library dependency issues updating to the new blahp... and this sorts it out. Thank you.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(16:44:08)</span> <b>bockjoo:</b></span> @blin I have updated blahp:<br/>
+<span style="color: #7d414c"><span style="font-size: small">(16:44:20)</span> <b>bockjoo:</b></span> [root@cms ~]# rpm -qf  /etc/blahp/slurm_local_submit_attributes.sh<br/>blahp-1.18.45-1.osg35.el7.x86_64<br/>[root@cms ~]# grep -v ^# /etc/blahp/slurm_local_submit_attributes.sh.rpmnew | grep -v ^$<br/>if [ -n "$Walltime" ]; then<br/>    let Walltime=Walltime/60<br/>    echo "#SBATCH --time=$Walltime"<br/>fi<br/>
+<span style="color: #7d414c"><span style="font-size: small">(16:44:53)</span> <b>bockjoo:</b></span> So, I guess the issue will go away with pull 269.<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:01:34)</span> <b>blin:</b></span> yup<br/>
+</body>
+</html>

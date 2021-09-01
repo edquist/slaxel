@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jul 20, 2020 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Mon Jul 20, 2020 : #xcache (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(12:57:54)</span> <b>blin:</b></span> @efajardo here's the issue that brian was talking about: <a href="https://github.com/xrootd/xrootd/issues/1254">https://github.com/xrootd/xrootd/issues/1254</a><br/>
+<span style="color: #e96699"><span style="font-size: small">(14:56:55)</span> <b>lincoln:</b></span> hi, if I'm registering a StashCache in Topology, can I specify a port number ? (it's a container)<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:58:45)</span> <b>matyas:</b></span> Not really; you can mention it in the "Description" field for either the service or the resource, but that's not going to be parsed by anything.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:59:02)</span> <b>lincoln:</b></span> ok, so the FQDN isn't used then for the actual federation?<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:59:20)</span> <b>lincoln:</b></span> what i'm getting at is-  can i register a containerized cache and have it work properly?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:59:22)</span> <b>matyas:</b></span> It's mostly used for getting the Authfiles<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:59:28)</span> <b>lincoln:</b></span> got it<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:01:08)</span> <b>matyas:</b></span> If what you have in topology doesn't match <tt>hostname -f</tt> then you'll need to make a systemd override to change the FQDN that gets looked up -- see <a href="https://opensciencegrid.org/docs/data/stashcache/install-cache/#manually-setting-the-fqdn-optional">https://opensciencegrid.org/docs/data/stashcache/install-cache/#manually-setting-the-fqdn-optional</a><br/>
+<span style="color: #e96699"><span style="font-size: small">(15:01:32)</span> <b>lincoln:</b></span> OK, I think hostname will match at least.<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:02:35)</span> <b>lincoln:</b></span> is XC_RESOURCENAME in StashCache's config supposed to match a particular field in Topology?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:02:47)</span> <b>blin:</b></span> it should be the topology resource name<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:02:51)</span> <b>lincoln:</b></span> got it<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:04:05)</span> <b>lincoln:</b></span> Here's what I'm putting in Topology:<br/><pre><br/>Resources:<br/>  MWT2_IU_STASHCACHE:<br/>    Active: true<br/>    Description: MWT2-IU StashCache XRootD cache server<br/>    ID:<br/>    ContactLists:<br/>      Administrative Contact:<br/>        Primary:<br/>          ID: 0a22bab3de2d83d723811e3fb1ebca904e924a97<br/>          Name: Lincoln Bryant<br/>        Secondary:<br/>          ID: a418fbc5dd33637bba264c01d84d52dd317f2813<br/>          Name: Judith Stephen<br/>      Security Contact:<br/>        Primary:<br/>          ID: 0a22bab3de2d83d723811e3fb1ebca904e924a97<br/>          Name: Lincoln Bryant<br/>    FQDN: <a href="http://iut2-slate.mwt2.org">iut2-slate.mwt2.org</a><br/>    Services:<br/>      XRootD cache server:<br/>        Description: StashCache cache server<br/>    AllowedVOs:<br/>      - ANY</pre><br/>look ok?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:04:37)</span> <b>blin:</b></span> maybe add judith as a secondary sec contact?<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:04:38)</span> <b>lincoln:</b></span> and then in my cache slate config I have:<br/><pre>Site:<br/>  # The name that the cache will use for itself ehen reporting to OSG<br/>  # infrastructure<br/>  Name: "MWT2_IU_STASHCACHE"</pre><br/>which should get embedded into XC_RESOURCENAME<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:04:41)</span> <b>lincoln:</b></span> sure<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:05:16)</span> <b>blin:</b></span> lgtm<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:05:24)</span> <b>lincoln:</b></span> OK, PR will be incoming shortly. thanks!!<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:05:31)</span> <b>matyas:</b></span> use 1072 as the ID for the resource<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:05:57)</span> <b>lincoln:</b></span> I'm making a new file called IUCachingInfrastructre.yaml under topology/Indiana University/MWT2 ATLAS IU<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:06:12)</span> <b>lincoln:</b></span> what should i use for GroupID and SupportCenter ?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:06:18)</span> <b>matyas:</b></span> use 541 as the GroupID<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:06:25)</span> <b>lincoln:</b></span> ok done<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:07:06)</span> <b>lincoln:</b></span> SupportCenter... UChicago? :grimacing: i have no idea<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:07:17)</span> <b>matyas:</b></span> pick something from <a href="https://github.com/opensciencegrid/topology/blob/master/topology/support-centers.yaml">https://github.com/opensciencegrid/topology/blob/master/topology/support-centers.yaml</a><br/>
+<span style="color: #e96699"><span style="font-size: small">(15:07:36)</span> <b>lincoln:</b></span> OK, Ill just put UChicago<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:07:48)</span> <b>blin:</b></span> look for "self" or whatever<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:07:56)</span> <b>lincoln:</b></span> ah, Self Supported?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:07:58)</span> <b>matyas:</b></span> yeah you can also use "Self Supported"<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:08:00)</span> <b>blin:</b></span> yeah<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:08:04)</span> <b>lincoln:</b></span> OK will do<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:08:18)</span> <b>blin:</b></span> we didn't complete our "burn support centers to the ground" plan :disappointed:<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:08:26)</span> <b>lincoln:</b></span> :smile:<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:10:04)</span> <b>matyas:</b></span> does anybody know who uses them?<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:10:06)</span> <b>lincoln:</b></span> last thing I wanted to ask about, we're listening on two diff ports for XRootD and HTTP protocols<br/><pre>$ slate instance info instance_sjstiaLY27U<br/>Fetching instance information...<br/>Name               Started                         App Version Chart Version     Group Cluster ID<br/>stashcache-iu-mwt2 2020-Jul-20 19:57:42.076258 UTC v4.12.0-rc2 stashcache-0.1.15 mwt2  mwt2-iu instance_sjstiaLY27U<br/><br/>Services:<br/>Name                     Cluster IP     External IP     Ports          URL<br/>stashcache-iu-mwt2-http  10.99.231.73   149.165.225.214 8000:30030/TCP 149.165.225.214:30030<br/>stashcache-iu-mwt2-xroot 10.105.212.194 149.165.225.214 1094:32120/TCP 149.165.225.214:32120</pre><br/>is that the canonical configuration now, or is it preferred to have both protocols on 1 port? We haven't touched the SLATE config for a while and I was hoping to get all of our MWT2 sub-sites switched over to SLATE-based cache deployment<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:17:10)</span> <b>lincoln:</b></span> PR submitted<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:20:27)</span> <b>matyas:</b></span> sorry, I forgot-- you need to add a DN for your cache<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:56:59)</span> <b>lincoln:</b></span> does it have to have a cert? its unauthenticated<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:57:57)</span> <b>lincoln:</b></span> the docs claim:<br/><pre>There are extra requirements for serving non-public data:<br/><br/>In addition to the cache allowing a VO in the AllowedVOs list, that VO must also allow the cache in its AllowedCaches list. See the page on getting your VO's data into StashCache.<br/>There must be an authenticated XRootD instance on the cache server.<br/>There must be a DN attribute in the resource registration with the subject DN of the host certificate</pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(15:58:03)</span> <b>lincoln:</b></span> but I do not plan to serve non-public data :slightly_smiling_face:<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:02:47)</span> <b>matyas:</b></span> I think you also need a cert to report to the collector<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:04:57)</span> <b>blin:</b></span> that's true but our docs could be clearer<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:07:02)</span> <b>matyas:</b></span> Will you still need a DN in our GSI-less future?<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:07:57)</span> <b>lincoln:</b></span> so i _do_ need a cert ? grumble :slightly_smiling_face:<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:08:07)</span> <b>lincoln:</b></span> I can arrange that.<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:08:42)</span> <b>blin:</b></span> yup, you'll need a cert even without GSI (our alternative is SSL auth to the central collector)<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:09:46)</span> <b>lincoln:</b></span> _shakes tiny fist_:fist:<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:14:00)</span> <b>blin:</b></span> we may be able to get rid of that requirement with the central collector registry but caches aren't on the timeline atm, only CEs<br/>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jun 10, 2021 : #batlab (chtc)</title>
+</head>
+<body>
+<h3>Thu Jun 10, 2021 : #batlab (chtc)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(10:32:15)</span> <b>johnkn:</b></span> Ok, we have our dedicated batlab test node.  I just got a direct slack about it.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:32:21)</span> <b>johnkn:</b></span> <pre>Hi TJ,<br/>I have the dedicated SSDs exec node for FW group ready. It is a PowerEdge C6525, hostname is <a href="http://e2460.chtc.wisc.edu">e2460.chtc.wisc.edu</a><br/>I have a START expr in /etc/condor/condor_config.flightworthy_testing that prevents it to land other jobs except yours START = (TARGET.Owner == "johnkn"). There is probably a better way to restrict this to the FW group, I'll leave that to you.<br/>Also this is part of the new purchased exec nodes and they are not supposed to be in the pool yet, so I think we don't have to worry about backfill for now.</pre><br/>
+<span style="color: #d58247"><span style="font-size: small">(10:36:13)</span> <b>gthain:</b></span> So, given that we don't have any release builds that need to happen in the near term, I'd kind of like to point all the batlab test runs at this machine<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:39:53)</span> <b>johnkn:</b></span> The docker ones at least.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:40:26)</span> <b>johnkn:</b></span> I'd be tempted to send the docker builds there also initially.<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:45:34)</span> <b>gthain:</b></span> Wow.  128 cores.<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:45:41)</span> <b>gthain:</b></span> err.  128 "threads"<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:56:37)</span> <b>tlmiller:</b></span> So, has anyone fixed the START expression yet?<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:56:54)</span> <b>gthain:</b></span> Yup<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:57:13)</span> <b>tlmiller:</b></span> I presume it is now <tt>"condorauto"</tt>?<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:57:40)</span> <b>gthain:</b></span> <pre># condor_config_val Start<br/>(TARGET.nmi_run_type == "test")</pre><br/>
+<span style="color: #d58247"><span style="font-size: small">(10:57:45)</span> <b>gthain:</b></span> Also<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:57:54)</span> <b>tlmiller:</b></span> That seems... insufficient.<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:58:14)</span> <b>gthain:</b></span> DedicatedForBatlab = true<br/>STARTD_ATTRS = $(STARTD_ATTRS) DedicatedForBatlab<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:59:12)</span> <b>tlmiller:</b></span> I'll have to check if we can supply different requirements for the builds and tests.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:59:51)</span> <b>tlmiller:</b></span> (Your last implies that the requirement should be <tt>DedicateForBaTLab == true</tt>.)<br/>
+<span style="color: #d58247"><span style="font-size: small">(11:00:00)</span> <b>gthain:</b></span> First pass is to just run tests there<br/>
+<span style="color: #d58247"><span style="font-size: small">(11:00:13)</span> <b>gthain:</b></span> If that seems robust, then add builds<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:00:17)</span> <b>tlmiller:</b></span> I know what you want.<br/>
+<span style="color: #d58247"><span style="font-size: small">(11:00:50)</span> <b>gthain:</b></span> Yeah, we need something on the submit side to send all tests to this machine<br/>
+<span style="color: #d58247"><span style="font-size: small">(11:01:05)</span> <b>gthain:</b></span> something like<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:02:44)</span> <b>tlmiller:</b></span> Ah, good, we actually do already have code in condor_nmi_submit to set different requirements.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:06:32)</span> <b>tlmiller:</b></span> ... OK, test run kicked off.  I think we were clever and it will use the condor_nmi_submit it was originally submitted with to submit the test jobs.<br/>
+<span style="color: #d58247"><span style="font-size: small">(11:08:12)</span> <b>gthain:</b></span> I wish the startd would advertise whether execute is an ssd -- is there a good way to detect this?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:08:37)</span> <b>tlmiller:</b></span> ... that's a good question.<br/>
+<span style="color: #d58247"><span style="font-size: small">(11:09:13)</span> <b>gthain:</b></span> It occurs to me that the worst possible thing condor could do for test robustness is to run a disk benchmark at startd boot time<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:10:18)</span> <b>tlmiller:</b></span> Indeed.<br/>
+<span style="color: #d58247"><span style="font-size: small">(11:12:35)</span> <b>gthain:</b></span> This new machine identifies itself as <tt>AMD EPYC 7452 32-Core Processor</tt><br/>
+<span style="color: #d58247"><span style="font-size: small">(11:13:09)</span> <b>gthain:</b></span> cat /proc/cpuinfo has 128 entries -- is it 4 hyperthreads per core, or are there two cpus in the machine?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:13:59)</span> <b>tlmiller:</b></span> I thought /proc/cpuinfo would tell you, but...<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:14:26)</span> <b>tlmiller:</b></span> Here, let me Google that for you:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:14:27)</span> <b>tlmiller:</b></span> <a href="https://www.amd.com/en/products/cpu/amd-epyc-7452">https://www.amd.com/en/products/cpu/amd-epyc-7452</a><br/>
+<span style="color: #d58247"><span style="font-size: small">(13:05:27)</span> <b>gthain:</b></span> Sigh.<br/>
+<span style="color: #d58247"><span style="font-size: small">(13:05:37)</span> <b>gthain:</b></span> Good news -- the tests are now running on our fancy new machine<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:05:53)</span> <b>tlmiller:</b></span> Oh, I missed that.<br/>
+<span style="color: #d58247"><span style="font-size: small">(13:05:56)</span> <b>gthain:</b></span> Bad news -- the shadow memory test consistently goes over on the Debian 10 image<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:05:58)</span> <b>tlmiller:</b></span> I made a typo in my test.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:06:08)</span> <b>tlmiller:</b></span> Only on the new machine?<br/>
+<span style="color: #d58247"><span style="font-size: small">(13:06:12)</span> <b>gthain:</b></span> Yeah.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:06:16)</span> <b>tlmiller:</b></span> That's... bizarre.<br/>
+<span style="color: #d58247"><span style="font-size: small">(13:06:40)</span> <b>gthain:</b></span> I wonder if there's something about the hardware that isn't virtualized by docker that's causing us to use more heap<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:06:48)</span> <b>tlmiller:</b></span> I'm glad that containers are the answer to portability/reproducibility problems, aren't you?<br/>
+<span style="color: #d58247"><span style="font-size: small">(13:06:50)</span> <b>gthain:</b></span> e.g. if sysapi allocates memory based on # of cores<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:09:52)</span> <b>tlmiller:</b></span> To answer your previous question: <tt>lsblk -o name,rota</tt> and/or <tt>cat /sys/block/&lt;device&gt;/queue/rotational</tt> should do the job.<br/>
+<span style="color: #d58247"><span style="font-size: small">(13:11:28)</span> <b>gthain:</b></span> How do people feel about adding that to the startd<br/>
+<span style="color: #d58247"><span style="font-size: small">(13:11:41)</span> <b>gthain:</b></span> <tt>ExecuteIsRotational</tt><br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:13:10)</span> <b>tlmiller:</b></span> There could be nontrivial mapping between <tt>EXECUTE</tt> the filesystem path and the block device(s) backing it.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:14:53)</span> <b>tlmiller:</b></span> ... although, shockingly, <tt>lsblk</tt> is currently getting rotation correct for the <tt>md</tt> devices on my system.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:15:37)</span> <b>tlmiller:</b></span> I wonder if that works for LVM?<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(13:19:35)</span> <b>tim:</b></span> I looked at the dashboard and I only saw a few tests on the new machine. The runs still seem to be spread across the pool.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:19:52)</span> <b>tlmiller:</b></span> Yes.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:20:08)</span> <b>tlmiller:</b></span> The change I made is still in testing, and quite properly too, since it had a typo.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:21:30)</span> <b>tlmiller:</b></span> ... and that change doesn't actually work, either.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:21:34)</span> <b>tlmiller:</b></span> *sigh*<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:32:30)</span> <b>tlmiller:</b></span> Well, some shared port daemons just blew up on the new machine.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:32:41)</span> <b>tlmiller:</b></span> (In the C2.)<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(13:33:14)</span> <b>tim:</b></span> The C2 would be running the latest release (9.1.0).<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:33:24)</span> <b>tlmiller:</b></span> Oops, sorry.  A startd and a shared port daemon.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:33:52)</span> <b>tlmiller:</b></span> Both with status 44.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:37:43)</span> <b>tlmiller:</b></span> ... I'm not seeing a way to make hand-submitted tests against a particular build almost all run against the same machine, unless we add <tt>DedicatedForBaTLab</tt> to the Windows and Mac machines.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:38:01)</span> <b>tlmiller:</b></span> Doing so would also dramatically simplify the code for the usual test-after-build case.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(13:39:09)</span> <b>tim:</b></span> Windows, Mac, and the lone CentOS7 machine?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:39:47)</span> <b>tlmiller:</b></span> Ah, indeed.<br/>
+<span style="color: #d58247"><span style="font-size: small">(13:40:08)</span> <b>gthain:</b></span> I'm fine with <tt>DedicatedForBatlab</tt> for those machines<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:40:39)</span> <b>tlmiller:</b></span> OK.  I'm pretty sure I can't log into the Windows machines, and I don't know about the Macs.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:41:01)</span> <b>tlmiller:</b></span> I can make the change on the CentOS7 machine.<br/>
+<span style="color: #d58247"><span style="font-size: small">(13:41:15)</span> <b>gthain:</b></span> TJ can make changes to the Windows machines<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:41:25)</span> <b>tlmiller:</b></span> I don't want to push the change until they other platforms are changed.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:41:32)</span> <b>tlmiller:</b></span> And Jaime can do the Macs, I'm sure.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:49:54)</span> <b>tlmiller:</b></span> Unreliable, but for the tests I forced to all run on the new machine, every last one of them failed the shadow memory usage test.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:50:00)</span> <b>tlmiller:</b></span> Although we got some gems in our error messages:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:50:03)</span> <b>tlmiller:</b></span> <pre>Shadow private memory use is 1452 which is 759.8 more than allowed value of 1016.2 for X86_64 CentOS8</pre><br/><br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:50:53)</span> <b>tlmiller:</b></span> ... actually, maybe they all do their match wrong, but that's the most obviously egregious.<br/>
+<span style="color: #d58247"><span style="font-size: small">(13:51:38)</span> <b>gthain:</b></span> There's the "expected value", and the "allowed value", which is some delta more than expected<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:51:42)</span> <b>tlmiller:</b></span> <pre>libcrypto.so using 52 of data, increasing allowed memory to 728.2<br/>Shadow private memory use is 1404 which is 675.8 more than allowed value of 952.2 for X86_64 AmazonLinux2</pre><br/><br/>
+<span style="color: #d58247"><span style="font-size: small">(13:51:54)</span> <b>gthain:</b></span> I think this message is actually printing the "expected" value where it says "allowed"<br/>
+<span style="color: #d58247"><span style="font-size: small">(13:53:32)</span> <b>gthain:</b></span> It may be that shadow memory usage depends, somehow, on the physical resources of the machine, which is worthwhile to know (and ideally, to fix)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:53:37)</span> <b>tlmiller:</b></span> <pre>PID:Process            Total Dynamic =(Heap+Stack+Anon) LibRO LibData =(Exec+Utils+Clasad+Globus+System) Clean<br/>5747:condor_shadow      1404     928    792    40    96   324     152     72     0      0      0    404      0<br/>libcrypto.so using 52 of data, increasing allowed memory to 728.2<br/>Shadow private memory use is 1404 which is 675.8 more than allowed value of 952.2 for X86_64 AmazonLinux2</pre><br/>failing above, passing below<br/><pre>PID:Process            Total Dynamic =(Heap+Stack+Anon) LibRO LibData =(Exec+Utils+Clasad+Globus+System) Clean<br/>6083:condor_shadow       904     424    288    40    96   324     156     76     0      0      0    404      0<br/>libcrypto.so using 52 of data, increasing allowed memory to 728.2<br/>Shadow private memory use is 904, which is 175.8 more than expected, but address randomization is using 324, so the test passes with a warning</pre><br/><br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:54:40)</span> <b>tlmiller:</b></span> Indeed.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:55:07)</span> <b>johnkn:</b></span> I can login to windows boxen.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:56:25)</span> <b>tlmiller:</b></span> Thanks.  I've made the change to the CentOS 7 box; does anyone care if I interrupt the ... eight runs on it?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(13:56:33)</span> <b>jfrey:</b></span> I can handle the macs<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:57:07)</span> <b>tlmiller:</b></span> ... let me check if a reconfig actually works first, I guess.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:57:36)</span> <b>tlmiller:</b></span> Huh!  It totally did.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:57:42)</span> <b>tlmiller:</b></span> Nevermind, sorry about that.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:57:55)</span> <b>johnkn:</b></span> reconfig for STARTD_ATTRS?  yeah, that works.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(14:03:58)</span> <b>jfrey:</b></span> macs are updated<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:05:22)</span> <b>johnkn:</b></span> Win8 updated<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:10:51)</span> <b>johnkn:</b></span> Win10 updated<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:42:31)</span> <b>johnkn:</b></span> Win7 updated<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:46:10)</span> <b>tlmiller:</b></span> Patch pushed to stable and master.<br/>
+</body>
+</html>

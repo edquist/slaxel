@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jun 29, 2021 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue Jun 29, 2021 : #software (osg)</h3>
+<span style="color: #de5f24"><span style="font-size: small">(11:58:23)</span> <b>justas.balcas:</b></span> Hi Folks, Do you know if gridftp-hdfs plugin does ckecksum calculation on the fly during the transfer? Same for xrootd-hdfs? What about xrootd without plugin (multiuser) ?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:58:50)</span> <b>justas.balcas:</b></span> @bbockelm I am sure you know this ;))<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:07:46)</span> <b>andrew.melo:</b></span> I know this, one sec<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:08:02)</span> <b>andrew.melo:</b></span> I based gridftp-lstore on the hdfs version...<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:10:40)</span> <b>andrew.melo:</b></span> I'm like 99% sure it does.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:11:05)</span> <b>andrew.melo:</b></span> since HDFS is append-only, it's trivial to just "append" the checksums as they come in<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:14:40)</span> <b>andrew.melo:</b></span> adler32 is nice because you can concatenate the checksums together even if the data comes in out of order<br/>
+<span style="color: #de5f24"><span style="font-size: small">(12:21:09)</span> <b>justas.balcas:</b></span> ok - but what I see that xrootd/gridftp without plugins do not do that - that is an issue (and will be in near future)<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:22:50)</span> <b>andrew.melo:</b></span> The xrootd source is heiroglyphics to me, so if you say that's the case then I believe you :slightly_smiling_face:<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:23:10)</span> <b>andrew.melo:</b></span> And yeah, we don't want to transfer a 2GB file, then re-read the whole thing to calculate the checksums<br/>
+<span style="color: #de5f24"><span style="font-size: small">(12:24:46)</span> <b>justas.balcas:</b></span> That is what I have to do now :smile:<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:27:01)</span> <b>andrew.melo:</b></span> Sigh.... I have no idea of how difficult it'd be to add that functionality in, but we definitely need it<br/>
+<span style="color: #de5f24"><span style="font-size: small">(12:29:26)</span> <b>justas.balcas:</b></span> 2gb is not an issue - but when prod transfers 20gb or 40gb unmerged file - oh boy… gfal timeouts sooner than checksum done<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:29:37)</span> <b>dweitzel:</b></span> It was my understanding that checksums are added to the extended attributes of the file on write.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:29:56)</span> <b>dweitzel:</b></span> In fact, the multiuser plugin includes checksum integration that only works in 5.2.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:30:16)</span> <b>andrew.melo:</b></span> I guess the issue is that it doesn't calculate the checksum "on the way through", so it writes the file to disk first, then reads the file to get the checksum<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:33:28)</span> <b>bbockelm:</b></span> Just took a look at the code.  xrootd-hdfs does checksums on the fly when writing.  The http-tpc plugin invokes xrootd-hdfs through the plugin layer and reorders all writes to be append only -- so checksums are done on the fly for HDFS sites.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:34:00)</span> <b>andrew.melo:</b></span> So I guess the POSIX plugin needs something similar?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:34:03)</span> <b>bbockelm:</b></span> One could lift the code from HDFS to xrootd-multiuser.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:34:31)</span> <b>bbockelm:</b></span> Or one could ask XRootD to make that part of the framework so we don't copy/paste the same code from plugin to plugin.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(12:34:46)</span> <b>justas.balcas:</b></span> xrootd git issue?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:35:38)</span> <b>bbockelm:</b></span> sure!  And if that fails, @dweitzel can do the copy/paste for xrootd-multiuser.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:35:59)</span> <b>dweitzel:</b></span> @bbockelm could you point me to the hdfs code?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(12:38:33)</span> <b>justas.balcas:</b></span> <a href="https://github.com/xrootd/xrootd/issues/1473">https://github.com/xrootd/xrootd/issues/1473</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:46:29)</span> <b>bbockelm:</b></span> @dweitzel - <a href="https://github.com/opensciencegrid/xrootd-hdfs/blob/master/src/XrdHdfsChecksumCalc.cc">https://github.com/opensciencegrid/xrootd-hdfs/blob/master/src/XrdHdfsChecksumCalc.cc</a> that's for calculating the checksums themselves.  <a href="https://github.com/opensciencegrid/xrootd-hdfs/blob/master/src/XrdHdfsChecksum.cc">https://github.com/opensciencegrid/xrootd-hdfs/blob/master/src/XrdHdfsChecksum.cc</a> this implements the checksum plugin API.  Look at m_state <a href="https://github.com/opensciencegrid/xrootd-hdfs/blob/master/src/XrdHdfs.cc#L739-L742">https://github.com/opensciencegrid/xrootd-hdfs/blob/master/src/XrdHdfs.cc#L739-L742</a> for how this is invoked directly by XrdHdfs while writing.<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:21:51)</span> <b>tim.theisen:</b></span> I am looking a what I can release. @justas.balcas Have you tried out xrootd-multiuser 1.1.0?<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:25:09)</span> <b>tim.theisen:</b></span> @lincoln: Would you be willing to test frontier-squid out of osg-testing? The is a bug fix where log rotation was not happening is log compression was not selected.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(16:26:59)</span> <b>justas.balcas:</b></span> This:<br/><pre>[root@transfer-10 ~]# yum list installed | grep xrootd-multiuser<br/>xrootd-multiuser.x86_64              1.1.0-1.osg35up.el7            @osg-upcoming-testing</pre><br/>?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(16:28:38)</span> <b>justas.balcas:</b></span> I think both us (@bockjoo and me) running this release already for some time<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:37:30)</span> <b>tim.theisen:</b></span> Cool, thank you. I'll release it this Thursday.<br/>
+</body>
+</html>

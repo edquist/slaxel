@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Sep 14, 2020 : #icecube-condor (osg)</title>
+</head>
+<body>
+<h3>Mon Sep 14, 2020 : #icecube-condor (osg)</h3>
+<span style="color: #50a0cf"><span style="font-size: small">(07:36:37)</span> <b>dschultz:</b></span> as far as I know for adding another schedd, you just create another one on a different host and point it at the CM.  there's nothing special, as long as you get the auth right.  note that schedds do not share a job queue, so it's something for users to be aware of<br/>
+<span style="color: #827327"><span style="font-size: small">(11:50:47)</span> <b>jamie.rajewski:</b></span> If I was to bind mount the same directory to <tt>/var/lib/condor/spool</tt> on both schedd's, would that allow them to share or would that just cause horrible issues @dschultz? I dont think it is a big deal, just curious<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:03:02)</span> <b>matyas:</b></span> Depends if you want to run them at the same time, or if you just want failover.<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:03:07)</span> <b>matyas:</b></span> <a href="https://htcondor.readthedocs.io/en/latest/admin-manual/high-availability.html">https://htcondor.readthedocs.io/en/latest/admin-manual/high-availability.html</a><br/>
+<span style="color: #827327"><span style="font-size: small">(12:07:40)</span> <b>jamie.rajewski:</b></span> Interesting, thanks for the reference. I was just thinking of how feasible it might be to mimic what, for example, our Cedar cluster does right now where it has two submission nodes that share the queue across both in real time (so to the user, it doesnt matter where they are, their jobs will show up on either). However, this cluster uses Slurm so that may handle things differently. I want to design it in a way that is easiest for users to understand, and I imagine running two separate queues concurrently might confuse them. However, that isnt the end of the world as we dont have a ton of users so educating people shouldnt be an issue<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:08:23)</span> <b>matyas:</b></span> At CHTC we assign people to specific submit nodes.<br/>
+<span style="color: #827327"><span style="font-size: small">(12:08:44)</span> <b>jamie.rajewski:</b></span> that is an interesting idea. What happens if one goes down though?<br/>
+<span style="color: #827327"><span style="font-size: small">(12:08:54)</span> <b>jamie.rajewski:</b></span> Do you just have a backup like in this reference to take it over?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:08:55)</span> <b>matyas:</b></span> :fire:<br/>
+<span style="color: #827327"><span style="font-size: small">(12:09:00)</span> <b>jamie.rajewski:</b></span> hahaha<br/>
+<span style="color: #827327"><span style="font-size: small">(12:09:29)</span> <b>jamie.rajewski:</b></span> @dschultz how does madison do it?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:21:14)</span> <b>matyas:</b></span> I just asked... if one of our submit nodes goes down, we try to bring it up as quickly as possible; if it dies, we move users to another submit nodes.<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(12:34:20)</span> <b>dschultz:</b></span> yeah, condor doesn't share queues across nodes.  don't bind-mount it to two schedds, bad things will happen<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(12:34:49)</span> <b>dschultz:</b></span> Madison puts all the users onto one schedd, and uses others for production work where we can handle being split off<br/>
+<span style="color: #827327"><span style="font-size: small">(12:35:44)</span> <b>jamie.rajewski:</b></span> Yep I figured something messy would happen, good to have clarification though<br/>
+</body>
+</html>

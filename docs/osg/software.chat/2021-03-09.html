@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Mar 9, 2021 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue Mar 9, 2021 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(08:56:11)</span> <b>blin:</b></span> i'm shocked by the number of folks that want to try 3.6! you're all brave souls<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:58:46)</span> <b>blin:</b></span> @justas.balcas i think you want condor 8.9.11 from the OSG 3.5 upcoming repositories (make sure you've got the latest <tt>osg-release</tt> RPM isntalled)<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:59:10)</span> <b>blin:</b></span> <tt>osg-release-3.5-5.osg35.el7</tt><br/>
+<span style="color: #de5f24"><span style="font-size: small">(08:59:17)</span> <b>justas.balcas:</b></span> Also WN?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(08:59:41)</span> <b>justas.balcas:</b></span> Collector is 3.5-upcoming, but WN is from 3.6 (or it will not work?)<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:00:12)</span> <b>blin:</b></span> i think that depends on how you have your pool setup. the only difference between 3.5 condor and 3.6 condor is that the latter is built without GSI support<br/>
+<span style="color: #de5f24"><span style="font-size: small">(09:00:47)</span> <b>justas.balcas:</b></span> So on WN - I get this error:<br/><pre>03/08/21 18:13:47 Filtering authentication methods (GSI) prior to offering them remotely.<br/>03/08/21 18:13:47 Ignoring GSI method because it is not available to this build of HTCondor.<br/>03/08/21 18:13:47 SECMAN: no auth methods, but a feature was required! failing...<br/>03/08/21 18:13:47 SECMAN: ERROR: The security policy is invalid.<br/>03/08/21 18:13:47 ERROR: SECMAN:2002:Configuration Problem: The security policy is invalid.<br/>03/08/21 18:13:47 Failed to start non-blocking update to &lt;10.3.10.124:9618&gt;.<br/>03/08/21 18:14:37 Getting monitoring info for pid 2295864</pre><br/>What config I miss?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(09:02:13)</span> <b>justas.balcas:</b></span> afaik - it should communicate with IDTokens, but I have not see any documentation on osg website about this<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:04:07)</span> <b>blin:</b></span> yeah, unfortunately we're waiting on upstream for some production-ready IDTOKEN documentation<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:04:43)</span> <b>blin:</b></span> looking at that log it sounds like you're using GSI authentication within your pool so I'd definitely install the 3.5 upcoming 8.9.11<br/>
+<span style="color: #de5f24"><span style="font-size: small">(09:07:03)</span> <b>justas.balcas:</b></span> Ok, let me know once documentation is ready :wink:<br/>
+<span style="color: #de5f24"><span style="font-size: small">(09:07:06)</span> <b>justas.balcas:</b></span> Thanks<br/>
+<span style="color: #de5f24"><span style="font-size: small">(09:24:22)</span> <b>justas.balcas:</b></span> Also, 3.5-upcoming condor startd has some new features (singularity tests) which are failing:<br/><pre>03/09/21 07:23:24 (pid:2755327) Running job via singularity.<br/>03/09/21 07:23:24 (pid:2755327) Disabling filesystem remapping; singularity will perform these features.<br/>03/09/21 07:23:24 (pid:2755327) sing test:0<br/>03/09/21 07:23:24 (pid:2755327) Non zero return code 65280 from singularity test of /usr/bin/singularity test -S /tmp -S /var/tmp --pwd /srv -B /wntmp/condor/execute/dir_2755327:/srv -B /cvmfs -B /mnt/hadoop -B /storage --no-home -C /cvmfs/singularity.opensciencegrid.org/bbockelm/cms:rhel7<br/>03/09/21 07:23:24 (pid:2755327) Failed to start job, exiting</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(09:30:43)</span> <b>blin:</b></span> hrm, i'm less familiar with the new singularity bits. maybe @rynge @gthain @tim.theisen would know more?<br/>
+<blockquote>
+<span style="color: #e0a729"><span style="font-size: small">(2021-03-10 08:47:18)</span> <b>gthain:</b></span> Before running a singularity job for real, the starter runs "singularity test", which runs the test script inside the container, to verify that everything is fine with this container.  Looks like this one is failing for some reason -- can we run it by hand?<br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-03-10 08:54:05)</span> <b>blin:</b></span> I think Justas was able to sort it out<br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-03-10 08:54:34)</span> <b>blin:</b></span> just for my own edification, though. what's the location of the test script inside the container that condor expects?<br/>
+<span style="color: #73769d"><span style="font-size: small">(2021-03-10 08:59:26)</span> <b>tim.theisen:</b></span> There can be a user defined test script in the container.See the singularity documentation: <a href="https://sylabs.io/guides/3.7/user-guide/cli/singularity_test.html">https://sylabs.io/guides/3.7/user-guide/cli/singularity_test.html</a><br/>
+<span style="color: #e0a729"><span style="font-size: small">(2021-03-10 09:14:43)</span> <b>gthain:</b></span> 99.99% of containers never explicitly create a test script, and the default is just "exit 0"<br/>
+</blockquote>
+<span style="color: #de5f24"><span style="font-size: small">(09:31:33)</span> <b>justas.balcas:</b></span> <a href="https://htcondor-wiki.cs.wisc.edu/index.cgi/tktview?tn=7801">https://htcondor-wiki.cs.wisc.edu/index.cgi/tktview?tn=7801</a><br/>
+<span style="color: #de5f24"><span style="font-size: small">(09:43:32)</span> <b>justas.balcas:</b></span> I should change my tests from bbockelm/cms:rhel7 to /cvmfs/singularity.opensciencegrid.org/cmssw/cms:rhel7.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(17:08:43)</span> <b>bockjoo:</b></span> how can I disable ipv6 xrootd servers and a redirector?<br/>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Mar 15, 2021 : #ligo-condor (osg)</title>
+</head>
+<body>
+<h3>Mon Mar 15, 2021 : #ligo-condor (osg)</h3>
+<span style="color: #5870dd"><span style="font-size: small">(06:25:16)</span> <b>duncan.macleod:</b></span> random question, what would lead to a large difference (days) between <tt>EnteredCurrentStatus</tt> and <tt>JobFinishedHookDone</tt>?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:53:13)</span> <b>bbockelm:</b></span> Which one is older?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:53:26)</span> <b>bbockelm:</b></span> I assume <tt>JobFinishedHookDone&lt;&lt;EnteredCurrentStatus</tt> ?<br/>
+<span style="color: #5870dd"><span style="font-size: small">(09:53:43)</span> <b>duncan.macleod:</b></span> no, I don't think so, but I can double check<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:58:11)</span> <b>bbockelm:</b></span> Anyhow, my guess is the answer to your question is that <tt>EnteredCurrentStatus</tt> is referring to an unexpected status change.  E.g., did the job go on hold after it ran?  Was it using some attribute that caused it to linger in the queue for a long amount of time?<br/>
+<span style="color: #5870dd"><span style="font-size: small">(10:00:06)</span> <b>duncan.macleod:</b></span> ok, so for a (not at all) randomly chosen day _most_ jobs have a difference between the two of 0 or 1 second (with <tt>EnteredCurrentStatus</tt> being the older (smaller)), but there are some jobs for which <tt>EnteredCurrentStatus</tt> is tens of thousands of seconds older than <tt>JobFinishedHookDone</tt><br/>
+<span style="color: #5870dd"><span style="font-size: small">(10:00:32)</span> <b>duncan.macleod:</b></span> I think this might be a result of jobs going on hold and then being removed via <tt>condor_rm</tt> or similar, which sounds like your experience as well<br/>
+<span style="color: #5870dd"><span style="font-size: small">(10:04:50)</span> <b>duncan.macleod:</b></span> am I right in thinking that <tt>JobFinishedHookDone</tt> essentially tells you when the job was finally removed from the queue?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:38:49)</span> <b>bbockelm:</b></span> I _think_ so but that @gthain is probably the one to confirm.<br/>
+<span style="color: #5870dd"><span style="font-size: small">(10:49:34)</span> <b>duncan.macleod:</b></span> another random question, what order are entries written into the history? we are currently using <tt>-since 'JobFinishedHookDone &lt; {starttime}'</tt> to speed up history queries when accounting, but I worry that this will miss jobs if the history log isn't actually ordered by <tt>JobFinishedHookDone</tt><br/>
+</body>
+</html>

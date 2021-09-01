@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Apr 7, 2020 : #open-science-ce (osg)</title>
+</head>
+<body>
+<h3>Tue Apr 7, 2020 : #open-science-ce (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(07:55:02)</span> <b>blin:</b></span> @efajardo ^^<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:13:07)</span> <b>blin:</b></span> @matyas next step is to figure out why the job you submitted isn't showing up in the accounting<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:13:08)</span> <b>blin:</b></span> <a href="https://gracc.opensciencegrid.org/dashboard/db/covid-19-research?orgId=1&amp;refresh=5m&amp;from=now-2d&amp;to=now">https://gracc.opensciencegrid.org/dashboard/db/covid-19-research?orgId=1&amp;refresh=5m&amp;from=now-2d&amp;to=now</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(09:11:28)</span> <b>matyas:</b></span> @cnweaver /@lincoln can you give Brian and I the privs to exec into our SLATE containers on River? We'd like to poke around but don't know specifically what we're looking for.<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:12:47)</span> <b>blin:</b></span> why don't we take down the SLATE instance and just <tt>helm install</tt> manually?<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:12:53)</span> <b>lincoln:</b></span> Yeah can do shortly. I need coffee first :)<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:14:34)</span> <b>matyas:</b></span> @blin I do that every time I'm testing, but 1. it's annoying going back and forth and 2. I'd like to look at the current logs before they get deleted<br/>
+<span style="color: #e85d72"><span style="font-size: small">(09:17:49)</span> <b>cnweaver:</b></span> @matyas See if that did it?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:19:34)</span> <b>blin:</b></span> also fwiw, i gave enmr the green light to start submitting test jobs<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:21:43)</span> <b>matyas:</b></span> Chris, works for me. Thanks!<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:41:43)</span> <b>matyas:</b></span> Gratia _claims_ to have successfully sent records:<br/><pre>00:06:12 UTC Gratia:                           handshake records sent successfully: 1<br/>00:06:12 UTC Gratia:                           handshake records failed: 0<br/>00:06:12 UTC Gratia:                           bundle of records sent successfully: 1<br/>00:06:12 UTC Gratia:                           bundle of records failed: 0</pre><br/><br/>
+<span style="color: #43761b"><span style="font-size: small">(09:42:15)</span> <b>blin:</b></span> to kibana!<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:44:04)</span> <b>blin:</b></span> i see a record<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:44:42)</span> <b>blin:</b></span> @dweitzel any idea why this record isn't showing up in the dashboard? <a href="https://gracc.opensciencegrid.org/kibana/goto/3a0786fb1d89fec858bcf90eafa5855d">https://gracc.opensciencegrid.org/kibana/goto/3a0786fb1d89fec858bcf90eafa5855d</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:33:13)</span> <b>dweitzel:</b></span> ResourceType: Batch<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:33:19)</span> <b>dweitzel:</b></span> Dashboard only shows Payload records.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:34:07)</span> <b>blin:</b></span> doh<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:23:58)</span> <b>blin:</b></span> aha, tricky<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:25:57)</span> <b>blin:</b></span> we depend on <tt>SUBMIT_ATTRS</tt> on the submit side to get the proper attr in the job to differentiate between pilots and payloads<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:26:16)</span> <b>blin:</b></span> but <tt>SUBMIT_ATTRS</tt> only get added upon <tt>condor_submit</tt> or python equivalent<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:26:28)</span> <b>blin:</b></span> and since we're routing jobs directly into the local schedd, we don't pick up submit attrs<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:26:56)</span> <b>dweitzel:</b></span> so just set something in the route?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:28:45)</span> <b>blin:</b></span> yup!<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:29:00)</span> <b>blin:</b></span> i just ran a test job to make sure the record came back as expected<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:49:33)</span> <b>blin:</b></span> @matyas fix is in for the slate app. could you delete and redeploy the current instance?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:49:47)</span> <b>matyas:</b></span> sure<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:50:02)</span> <b>matyas:</b></span> did you update the values?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:51:02)</span> <b>blin:</b></span> nope, i made changes to the chart itself<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:51:07)</span> <b>blin:</b></span> same values should be fine<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:07:10)</span> <b>blin:</b></span> woooo ENMR test pilots have been submitted and completed successfully!!<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:09:04)</span> <b>matyas:</b></span> :cake:<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:48:30)</span> <b>blin:</b></span> @rynge andre's got a question about number of slots they can "expect" for their covid jobs:<br/>&gt; I confirm that WeNMR COVID jobs are successfully executed at the <a href="http://OSG.OSG.us">OSG.OSG.us</a> site. This allows me <br/>&gt; to ask the following practical question: how many job slots we can count on ? I will then configure<br/>&gt; the pilot factory to maintain about the correct submission rate.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:49:30)</span> <b>rynge:</b></span> I want to start slower to see all the pieces here work<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:49:35)</span> <b>rynge:</b></span> But tell them 10k<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:50:21)</span> <b>blin:</b></span> dayummm, really? i only see 9.5k available in flock right now<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:51:38)</span> <b>rynge:</b></span> Those are the "normal" slots<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:51:51)</span> <b>rynge:</b></span> Still working out the last piece of GSI for the new flock cert<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:51:58)</span> <b>rynge:</b></span> Once that is done, we should be good to go again<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:52:10)</span> <b>rynge:</b></span> Just queue'em up!<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:52:19)</span> <b>blin:</b></span> haha, nice ok<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:52:24)</span> <b>blin:</b></span> let's see what we can break :smile:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:53:10)</span> <b>rynge:</b></span> That's the spirit!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:54:40)</span> <b>dweitzel:</b></span> I got ~7k peak just on my COVID load tests<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:54:54)</span> <b>dweitzel:</b></span> and I wasn't trying hard<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:20:16)</span> <b>rynge:</b></span> @blin The cert problem has been resolved so we are ready. However, I don't see any work from ce1<br/>
+</body>
+</html>

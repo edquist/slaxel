@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue May 25, 2021 : #collaboration-support (osg)</title>
+</head>
+<body>
+<h3>Tue May 25, 2021 : #collaboration-support (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(10:03:50)</span> <b>ruben.lara:</b></span> @rynge: what is the fix we can try? I don’t think we are getting any GPU glideins for now.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:07:25)</span> <b>rynge:</b></span> @ruben.lara So what is going is that we get pilot jobs, but they are not detecting the GPUs. I suspect that is on our side and we are looking at it<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:07:30)</span> <b>rynge:</b></span> Just hang tight for now<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:07:59)</span> <b>ruben.lara:</b></span> that’s what I thought. Thanks for the update; please tag me when it’s time for us to do anything.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:13:40)</span> <b>rynge:</b></span> @ruben.lara I want to verify that GPU pilots are routed correctly. Can you let me know if <tt><a href="http://atl1-1-02-014-4-l.pace.gatech.edu">atl1-1-02-014-4-l.pace.gatech.edu</a></tt> is a GPU node or not?<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:34:50)</span> <b>paschos:</b></span> that is not a gpu node<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:36:08)</span> <b>paschos:</b></span> <pre>atl1-1-01-002-11: |  No running processes found                                                 |<br/>atl1-1-01-002-13: |  No running processes found                                                 |<br/>atl1-1-01-002-15: |  No running processes found                                                 |<br/>atl1-1-01-002-17: |  No running processes found                                                 |<br/>atl1-1-01-002-19: |  No running processes found                                                 |<br/>atl1-1-01-002-21: |  No running processes found                                                 |<br/>atl1-1-01-002-23: |  No running processes found                                                 |<br/>atl1-1-01-002-25: |  No running processes found                                                 |<br/>atl1-1-01-002-27: |  No running processes found                                                 |<br/>atl1-1-01-002-29: |  No running processes found                                                 |<br/>atl1-1-01-002-31: |  No running processes found                                                 |<br/>atl1-1-01-002-9: |  No running processes found                                                 |</pre><br/>list of gpu nodes @rynge<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:37:01)</span> <b>rynge:</b></span> Ok, so the then routing is still not working correctly<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:39:56)</span> <b>paschos:</b></span> from the CE -&gt; WN?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:40:42)</span> <b>rynge:</b></span> Yeah, we wanted GPUs and ended up on <tt>atl1-1-02-014-4-l</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:41:10)</span> <b>blin:</b></span> on the CE and login nodes, you should check if jobs have <tt>RequestGPUs</tt> set in the job ads<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:53:59)</span> <b>paschos:</b></span> for local jobs a script like this:<br/><pre>universe = vanilla<br/>Requirements = (HAS_SINGULARITY == True) &amp;&amp; (HasGPU =?=true)<br/>request_cpus = 1<br/>request_gpus = 1<br/>request_memory = 1 GB<br/>request_disk = 1 GB<br/><br/>+SingularityImage = "/cvmfs/singularity.opensciencegrid.org/opensciencegrid/tensorflow-gpu:latest"<br/>+WantGPU = true<br/>Executable = job-wrapper.sh<br/>Arguments =<br/>transfer_input_files = /storage/home/hcodaman1/rlara3/tests/condor/test.py<br/>#transfer_output_files =<br/>Error = $(Cluster).$(Process).error<br/>Output = $(Cluster).$(Process).output<br/>Log = $(Cluster).log<br/>queue 1</pre><br/> works<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:59:54)</span> <b>blin:</b></span> i'm more interested in what the pilots are doing<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:03:20)</span> <b>paschos:</b></span> is there a collection of logs from the CE that it can help diagnose this?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:04:08)</span> <b>blin:</b></span> not exactly. the best thing to do would be to look at the jobs on the CE and login node<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:04:41)</span> <b>blin:</b></span> you want to find a GPU pilot and see what it has for <tt>RequestGPUs</tt> for both jobs on the CE and its corresponding job on the login node<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:06:52)</span> <b>paschos:</b></span> ok --- we. can work. on that<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:53:04)</span> <b>ruben.lara:</b></span> A quick clarification: the list above, all those nodes are GPU nodes.<br/>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed May 19, 2021 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Wed May 19, 2021 : #gfactory (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(12:06:53)</span> <b>bbockelm:</b></span> @jdost321 / @marian - CHTC (@moate and @gthain) are hitting a specific condor bug that prevents us from getting starter logs back -- which is then preventing us from diagnosing a Singularity problem.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:06:59)</span> <b>bbockelm:</b></span> Is 8.9.13 an option?<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:50:39)</span> <b>moate:</b></span> I can probably figure it out - just need to see if there's an 8.9.13 docker image available -<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:51:09)</span> <b>moate:</b></span> If not , somebody would need to make one.  I think Edgar probably used to do it<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:11:55)</span> <b>bbockelm:</b></span> I see the 8.9.13 tarballs staged but not enabled.  Will need someone from the factory side to enable.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:12:53)</span> <b>bbockelm:</b></span> I also see the 9.0.0 binaries enabled in the ITB factory but not the production one.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:13:17)</span> <b>bbockelm:</b></span> @moate - can you start requesting 9.0.x for the ITB instance just to ensure those work well?<br/>
+<span style="color: #aba727"><span style="font-size: small">(14:05:33)</span> <b>moate:</b></span> @bbockelm I think so<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:06:20)</span> <b>bbockelm:</b></span> @jdost321 / @marian -- any reason why to not copy that tarball over to production as well?<br/>
+<span style="color: #aba727"><span style="font-size: small">(15:10:16)</span> <b>moate:</b></span> @bbockelm on closer inspection, I can't easily request 9.0.x for ITB vo-frontend-glow;  There are only two <tt>glideinwms/gwmsfrontend</tt> docker images, one tagged <tt>:dev</tt>, one tagged <tt>:stable</tt>;  we're running <tt>:dev</tt>.  So, there's no docker image that has 9.0.x.  I can maybe track down the source for the docker image, edit it to use 9.0.x, publish the new docker image elsewhere and use it.<br/>
+<span style="color: #aba727"><span style="font-size: small">(15:10:47)</span> <b>moate:</b></span> Image website here -&gt; <a href="https://hub.docker.com/r/glideinwms/gwms-frontend/tags?page=1&amp;ordering=last_updated">https://hub.docker.com/r/glideinwms/gwms-frontend/tags?page=1&amp;ordering=last_updated</a><br/>
+<span style="color: #aba727"><span style="font-size: small">(15:11:42)</span> <b>moate:</b></span> Ah, well, the source git repository was listed there, so that was easy<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:12:39)</span> <b>matyas:</b></span> are you making changes to the itb vo-frontend-glow?<br/>
+<span style="color: #aba727"><span style="font-size: small">(15:13:36)</span> <b>moate:</b></span> I will be<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:14:08)</span> <b>matyas:</b></span> OK. I copied the frontend.xml out of manifests/base/vo-frontend-glow into manifests/development/vo-frontend-glow so you will have to make your changes there<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:15:13)</span> <b>matyas:</b></span> I was planning on experimenting with it today but I haven't started yet so I think it's in a normal condition right now<br/>
+<span style="color: #aba727"><span style="font-size: small">(15:15:24)</span> <b>moate:</b></span> :thumbsup:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:38:58)</span> <b>bbockelm:</b></span> @moate - to be clear, the worker node condor version is simply a setting that the frontend and factory put in to determine which tarball is downloaded.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:39:07)</span> <b>bbockelm:</b></span> Independent of the frontend Docker image itself.<br/>
+<span style="color: #aba727"><span style="font-size: small">(15:44:48)</span> <b>moate:</b></span> ah;  I'd assumed HTCondor was staged in the <tt>web-area</tt> on the frontend and then distributed via HTTP to the <tt>glidein_startup.sh</tt> script<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:27:41)</span> <b>bbockelm:</b></span> Close.  It's staged in the <tt>web-area</tt> on the _factory_ and the frontend requests a specific version, then that is distributed via HTTP.<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:29:35)</span> <b>matyas:</b></span> I'm pretty much done for the night; @moate can you let me know tomorrow when you're done making changes to the frontend?<br/>
+<span style="color: #aba727"><span style="font-size: small">(18:18:10)</span> <b>moate:</b></span> @matyas will do<br/>
+</body>
+</html>

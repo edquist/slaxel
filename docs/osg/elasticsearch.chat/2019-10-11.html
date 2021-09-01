@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Oct 11, 2019 : #elasticsearch (osg)</title>
+</head>
+<body>
+<h3>Fri Oct 11, 2019 : #elasticsearch (osg)</h3>
+<span style="color: #53b759"><span style="font-size: small">(10:57:07)</span> <b>marian:</b></span> good to know, @kretzke! thanks!<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:58:10)</span> <b>marian:</b></span> I have a plan upgrade ES@GRACC next week ... should I take a risk going straight to series 7.x from 5.6.5?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:59:02)</span> <b>kretzke:</b></span> are you deploying a new cluster and migrating data? You can’t do an in-place upgrade from 5 to 7 afaik<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:59:33)</span> <b>marian:</b></span> actually, I'm not ... only Frontend node I'll add, not data nodes ...<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:00:08)</span> <b>marian:</b></span> but I can from 5 to 6 and then from 6 to 7?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:01:57)</span> <b>kretzke:</b></span> yes, but there’s a big caveat: <pre>5.x indices are not compatible with 7.4.0. You must remove or reindex them to upgrade to 7.4.0. The default Beats and Logstash mapping templates also need to be updated to work with 7.4.0.</pre><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:02:03)</span> <b>kretzke:</b></span> <a href="https://www.elastic.co/guide/en/elastic-stack/7.4/upgrading-elastic-stack.html">https://www.elastic.co/guide/en/elastic-stack/7.4/upgrading-elastic-stack.html</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:03:33)</span> <b>kretzke:</b></span> so you have to reindex old data _anyways_ when upgrading to 7. I’d really suggest considering a migration, especially since you’re virtualized so can easily deploy new nodes<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:04:54)</span> <b>kretzke:</b></span> likewise note that 2.x indices are not compatible with 6 - as I recall GRACC was initially deployed on 2.x, so there may be some of those indices around<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:13:46)</span> <b>marian:</b></span> so it seems like setting up new cluster based on 7 series, adding to the 5 series and relocate things would be less pain in general... you're saying<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:14:13)</span> <b>marian:</b></span> and then just shut off old 5 series cluster<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:14:21)</span> <b>kretzke:</b></span> yes<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:15:50)</span> <b>marian:</b></span> glad I asked ... I'd go that direction then ... would take couple of days but sounds like a smooth way to go<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:17:00)</span> <b>marian:</b></span> we have enough of resources on our openstack that I could afford create extra 5 data nodes basically<br/>
+<blockquote>
+<span style="color: #3c8c69"><span style="font-size: small">(11:37:02)</span> <b>kretzke:</b></span> you could also just start with three then scale to five after the 5.x cluster is shut down<br/>
+</blockquote>
+<span style="color: #3c8c69"><span style="font-size: small">(11:17:49)</span> <b>kretzke:</b></span> you’ll also need to upgrade and test services that talk to elasticsearch - logstash, elasticsearch-py libraries, etc<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:19:05)</span> <b>kretzke:</b></span> I can give you (or PR) updated logstash configs and mapping templates for some services (well, for 6… don’t know about 7 yet)<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:23:11)</span> <b>marian:</b></span> that'll be great!<br/>
+<blockquote>
+<span style="color: #3c8c69"><span style="font-size: small">(11:25:48)</span> <b>kretzke:</b></span> do you deploy the gracc-stash services from the gracc-docker repo? <a href="https://github.com/opensciencegrid/gracc-docker/">https://github.com/opensciencegrid/gracc-docker/</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:26:14)</span> <b>kretzke:</b></span> or the standalone, e.g. <a href="https://github.com/opensciencegrid/gracc-raw">https://github.com/opensciencegrid/gracc-raw</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(12:36:21)</span> <b>marian:</b></span> :thumbsup_all:<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:36:41)</span> <b>marian:</b></span> ah, moment<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:36:53)</span> <b>marian:</b></span> on a meeting, will reply later<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:50:29)</span> <b>marian:</b></span> but no, I think that needs an update, have own set of docker files for gracc components that are distributed via puppet<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:52:11)</span> <b>kretzke:</b></span> ah. Well I can send a PR for gracc-docker (since that’s what we forked) and you can cherry-pick from there?<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:52:29)</span> <b>marian:</b></span> sure, why not!<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(2019-10-15 14:49:36)</span> <b>kretzke:</b></span> <a href="https://github.com/opensciencegrid/gracc-docker/pull/7">https://github.com/opensciencegrid/gracc-docker/pull/7</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(2019-10-17 15:27:23)</span> <b>marian:</b></span> looking at docke-compose in gracc we still used 3.3.1 image<br/>
+<span style="color: #53b759"><span style="font-size: small">(2019-10-17 15:27:45)</span> <b>marian:</b></span> I guess we'd need a new image build based on your last PR, right?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(2019-10-17 15:28:11)</span> <b>kretzke:</b></span> yes<br/>
+<span style="color: #53b759"><span style="font-size: small">(2019-10-17 15:28:15)</span> <b>marian:</b></span> 3.3.2 or jump to 3.4, what you think?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(2019-10-17 15:28:47)</span> <b>kretzke:</b></span> 3.4 sounds fine<br/>
+<span style="color: #53b759"><span style="font-size: small">(2019-10-17 15:34:33)</span> <b>marian:</b></span> could you remind me how to make a new build in dockerhub? also, not sure I can do things under opensciencegrid, but that's another thing<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(2019-10-17 16:02:05)</span> <b>kretzke:</b></span> oh wait, so you’re pulling opensciencegrid/gracc-stash-raw<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(2019-10-17 16:02:48)</span> <b>kretzke:</b></span> that’s automatically built from the gracc-stash-raw repo on github<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(2019-10-17 16:05:17)</span> <b>kretzke:</b></span> no I take that back, it’s from gracc-docker<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(2019-10-17 16:06:00)</span> <b>kretzke:</b></span> maybe just tagging gracc-docker will do it. I don’t have access to OSG docker hub any more. Ask Brian Lin for access<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(2019-10-17 16:07:36)</span> <b>kretzke:</b></span> or try merging the PR and see if it builds a new <tt>latest</tt> tag<br/>
+<span style="color: #53b759"><span style="font-size: small">(2019-10-17 16:19:49)</span> <b>marian:</b></span> yeah, it doesn't seem automatic build ...<br/>
+<span style="color: #53b759"><span style="font-size: small">(2019-10-17 16:20:37)</span> <b>marian:</b></span> in docker-compose I call <tt>image: opensciencegrid/gracc-stash-raw:3.3.1</tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(2019-10-17 16:20:41)</span> <b>marian:</b></span> that pulls the stuff<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(2019-10-17 16:21:17)</span> <b>kretzke:</b></span> are you sure? I thought it was automatic<br/>
+<span style="color: #53b759"><span style="font-size: small">(2019-10-17 16:21:32)</span> <b>marian:</b></span> <a href="https://hub.docker.com/r/opensciencegrid/gracc-stash-raw/builds">https://hub.docker.com/r/opensciencegrid/gracc-stash-raw/builds</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(2019-10-17 16:21:40)</span> <b>marian:</b></span> ¯\_(ツ)_/¯<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(2019-10-17 16:24:23)</span> <b>kretzke:</b></span> may only show recent ones. Mine only shows the one this week for instance <a href="https://hub.docker.com/r/retzkek/gracc-stash-raw-auto/builds">https://hub.docker.com/r/retzkek/gracc-stash-raw-auto/builds</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(2019-10-17 16:26:09)</span> <b>kretzke:</b></span> I mean, it’s not hard to find out… just merge the PR or add a tag<br/>
+<span style="color: #53b759"><span style="font-size: small">(2019-10-17 16:30:59)</span> <b>marian:</b></span> oh, crap, one needs to merge this first!<br/>
+<span style="color: #53b759"><span style="font-size: small">(2019-10-17 16:31:00)</span> <b>marian:</b></span> <a href="https://github.com/opensciencegrid/gracc-docker/pull/7">https://github.com/opensciencegrid/gracc-docker/pull/7</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(2019-10-17 16:31:52)</span> <b>marian:</b></span> thought I merged, but I don't have permission there iether ...<br/>
+<span style="color: #53b759"><span style="font-size: small">(2019-10-17 16:32:04)</span> <b>marian:</b></span> talked to BrianL, sorting it out ... thanks<br/>
+<span style="color: #53b759"><span style="font-size: small">(2019-10-17 16:32:10)</span> <b>marian:</b></span> ttyl, gotta go<br/>
+<span style="color: #53b759"><span style="font-size: small">(2019-10-17 16:39:59)</span> <b>marian:</b></span> ah, cool, so it did built<br/>
+<span style="color: #53b759"><span style="font-size: small">(2019-10-17 16:40:25)</span> <b>marian:</b></span> so use tag <tt>latest</tt> I assume in the my docker-compose file<br/>
+<span style="color: #53b759"><span style="font-size: small">(2019-10-17 16:40:37)</span> <b>marian:</b></span> instead of previously used 3.3.1<br/>
+<span style="color: #53b759"><span style="font-size: small">(2019-10-17 16:41:51)</span> <b>marian:</b></span> or just this should do it I guess: <tt>image: opensciencegrid/gracc-stash-raw</tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(2019-10-17 16:42:01)</span> <b>marian:</b></span> that'll take latest I assume?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(2019-10-18 11:20:43)</span> <b>kretzke:</b></span> sorry missed the notifications. yeah you could just use latest/no tag<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(2019-10-18 11:20:59)</span> <b>kretzke:</b></span> remember you (or someone) will need to update gracc-stash-summary too<br/>
+<span style="color: #53b759"><span style="font-size: small">(2019-10-18 12:29:37)</span> <b>marian:</b></span> ah, right!<br/>
+<span style="color: #53b759"><span style="font-size: small">(2019-10-18 12:29:40)</span> <b>marian:</b></span> forgot about that!<br/>
+<span style="color: #53b759"><span style="font-size: small">(2019-10-18 15:26:07)</span> <b>marian:</b></span> updating -summary part ... shouldn't it Makefile got updated too?<br/>
+<span style="color: #53b759"><span style="font-size: small">(2019-10-18 15:26:27)</span> <b>marian:</b></span> or doesn't really matter as there are build on dockerhub side set...<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(2019-10-18 15:27:41)</span> <b>kretzke:</b></span> you can update it if you want, but yeah it’s not used<br/>
+<span style="color: #53b759"><span style="font-size: small">(2019-10-18 16:02:13)</span> <b>marian:</b></span> I think I updated -summary ... assigned you as reviewer ... there are few other 'old' commits I forgot about added though<br/>
+</blockquote>
+<span style="color: #3c8c69"><span style="font-size: small">(11:24:42)</span> <b>kretzke:</b></span> BTW I was curious to see what versions of Elasticsearch our indices were created at so looked it up, you can get that from the index settings API with <tt>human</tt> option: <pre>curl -s 'localhost:9200/&lt;index&gt;/_settings?pretty&amp;human'</pre><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:27:21)</span> <b>kretzke:</b></span> here’s a command using <tt>jq</tt> to pull the version out and get the index count by version <pre>curl -s 'localhost:9200/_all/_settings?pretty&amp;human' | jq -r '.[] | .settings.index.version.created_string' | sort | uniq -c<br/>      1 5.2.2<br/>     89 5.3.1<br/>    270 5.6.3<br/>    842 5.6.9<br/>    777 6.8.0</pre><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:29:12)</span> <b>kretzke:</b></span> here it is for gracc, there are some old 2.x indices out there like I suspected <pre>curl -s '<a href="https://gracc.opensciencegrid.org/q/_all/_settings?pretty&amp;human">https://gracc.opensciencegrid.org/q/_all/_settings?pretty&amp;human</a>' | jq -r '.[] | .settings.index.version.created_string' | sort | uniq -c<br/>     14 2.2.0<br/>    222 5.1.1<br/>   2672 5.6.5</pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(12:51:04)</span> <b>marian:</b></span> :thumbsup:<br/>
+</body>
+</html>

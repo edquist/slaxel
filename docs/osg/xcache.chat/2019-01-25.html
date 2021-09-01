@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jan 25, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Fri Jan 25, 2019 : #xcache (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(09:45:12)</span> <b>matyas:</b></span> thanks @bbockelm, I'll take a look<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:45:31)</span> <b>matyas:</b></span> @blin, I've changed my mind on the VO registration instructions. I'll put them in a separate page in the docs area<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:46:00)</span> <b>matyas:</b></span> we have VO instructions in other parts of the docs area too, so it should be fine<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:46:12)</span> <b>blin:</b></span> where are you thinking of putting the page?<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:47:57)</span> <b>matyas:</b></span> <tt>/data/stashcache/add-vo.md</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(09:49:22)</span> <b>blin:</b></span> the filename itself sounds like it would be a cache/origin admin adding the VO<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:50:10)</span> <b>matyas:</b></span> I will have links from those two pages, but they're already getting too big<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:50:46)</span> <b>matyas:</b></span> oh sorry, misunderstood<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:51:16)</span> <b>matyas:</b></span> i will probably have something saying 'coordinate with your VO manager for doing this'<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:52:35)</span> <b>blin:</b></span> i'm confused, isn't this doc targeted at VO managers?<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:53:59)</span> <b>matyas:</b></span> well it's something that has to be done with both a site admin and a vo manager<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:54:26)</span> <b>matyas:</b></span> the admin needs to add the VO to AllowedVOs<br/>and the VO manager needs to add the origin/cache to the AllowedOrigins or AllowedCaches<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:56:22)</span> <b>matyas:</b></span> (or the VO manager needs to approve the admin adding the origin/cache to the AllowedOrigins or AllowedCaches)<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:02:39)</span> <b>matyas:</b></span> can we use the term "protected data" to refer to data that needs authentication to access?<br/>"authenticated data" sounds wrong (it's not the data itself that gets authenticated) and IMO "private data" promises too much...<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:02:29)</span> <b>bbockelm:</b></span> I like protected data<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:03:12)</span> <b>bbockelm:</b></span> @matyas - I’m out Miron-ing today.  Can you take over the PR for the origin overhaul?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:04:45)</span> <b>blin:</b></span> (noting that we shouldn't merge it until we release xcache 1.0+)<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:05:19)</span> <b>blin:</b></span> we can give @isfiligoi the link to the markdown once we think it's in an acceptable state, though<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:07:11)</span> <b>isfiligoi:</b></span> BTW: I will have to install the origin on a non-default port…<br/>What is the proper way to advertise what port it is running on?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:08:34)</span> <b>blin:</b></span> can't you just handle that on the k8s end?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:09:14)</span> <b>blin:</b></span> i.e. let the container use the default ports and then map them to the ports you need to use in your deployment?<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:11:40)</span> <b>isfiligoi:</b></span> no… the public facing ports cannot be the default ones<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:11:40)</span> <b>matyas:</b></span> @bbockelm: sure<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:13:01)</span> <b>isfiligoi:</b></span> list port<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:13:04)</span> <b>isfiligoi:</b></span> listen port<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:13:08)</span> <b>blin:</b></span> yeah, i'm saying that we keep the ports within the container, the ones that xrootd thinks it's using, and map those default ports to whatever you can use via the k8s layer<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:13:35)</span> <b>isfiligoi:</b></span> my question was:<br/>How do I tell the world how to talk to my origin?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:13:54)</span> <b>bbockelm:</b></span> @blin - can you merge the origin updates to the ITB link?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:16:05)</span> <b>bbockelm:</b></span> @isfiligoi - there’s a directive you can give to the cmsd to override the port if the xrootd server doesn’t know its “real” port<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:16:10)</span> <b>bbockelm:</b></span> Lemme go find it<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:17:13)</span> <b>isfiligoi:</b></span> Put it another way:<br/>Do I just put the server name in the OSG topology yaml, and the port will be magically discovered (somehow)<br/>Or is there anything else I need to do?<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:18:21)</span> <b>isfiligoi:</b></span> Oh… and I may want to host multiple pods on the same host, listening on a different port<br/>Would that be a problem?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:18:51)</span> <b>bbockelm:</b></span> <a href="http://xrootd.org/doc/dev49/cms_config.htm#_Toc520504673">http://xrootd.org/doc/dev49/cms_config.htm#_Toc520504673</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:19:49)</span> <b>bbockelm:</b></span> So the origin server advertises the port the xrootd server knows. That altds directive allows you to override it with a different, “real” port<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:20:29)</span> <b>isfiligoi:</b></span> OK, so I just put the host name in the yaml<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:20:34)</span> <b>bbockelm:</b></span> Right<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:20:42)</span> <b>bbockelm:</b></span> The origin port isn’t registered.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:21:29)</span> <b>bbockelm:</b></span> The cache port should be, but that isn’t documented currently as the discovery process for caches is still manual (ie - open a ticket)<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:41:15)</span> <b>blin:</b></span> @bbockelm @isfiligoi documentation based off of your overhaul is up here: <a href="https://opensciencegrid.org/docs-itb/data/stashcache/install-origin/">https://opensciencegrid.org/docs-itb/data/stashcache/install-origin/</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:41:39)</span> <b>blin:</b></span> @tim.theisen ^^ if you need to use the ITB, please let us know<br/>
+<span style="color: #73769d"><span style="font-size: small">(13:52:16)</span> <b>tim.theisen:</b></span> Not currently using it. It's up to date with the latest release. It has HTCondor 8.8.0 on the nodes designated as test nodes.<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:57:23)</span> <b>isfiligoi:</b></span> I tried to build an image based on the preliminary branch<br/>dockerhub build failed with<br/>Step 1/7 : FROM opensciencegrid/xcache<br/>pull access denied for opensciencegrid/xcache, repository does not exist or may require ‘docker login’<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:57:58)</span> <b>isfiligoi:</b></span> @blin @bbockelm Any suggestions?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:58:44)</span> <b>blin:</b></span> i was just building it all locally since it's all a WIP<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:59:10)</span> <b>isfiligoi:</b></span> ok, so I need to build xcache myself, too<br/>correct?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:59:23)</span> <b>blin:</b></span> so <tt>docker build -t opensciencegrid/xcache xcache</tt> from the root of the repo<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:00:39)</span> <b>isfiligoi:</b></span> master is ok?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:01:11)</span> <b>blin:</b></span> er, check out the <tt>wip/xcache</tt> branch<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:01:20)</span> <b>blin:</b></span> from my fork<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:01:30)</span> <b>blin:</b></span> sorry, it's all a bit of a mess right now<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:01:45)</span> <b>isfiligoi:</b></span> ok<br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:42:37)</span> <b>bbockelm:</b></span> How’d it go?<br/>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Dec 16, 2016 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Fri Dec 16, 2016 : #gracc (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(10:23:24)</span> <b>dweitzel:</b></span> Invite @marian<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:35:36)</span> <b>kretzke:</b></span> @dweitzel <b>@edquist</b> as @sbhat just discovered, make sure you upgrade your elasticsearch client libraries to v5+, there were some breaking changes in the search api<br/>
+<span style="color: #aba727"><span style="font-size: small">(10:35:59)</span> <b>sbhat:</b></span> doing the upgrade in one case fixed a report<br/>
+<span style="color: #aba727"><span style="font-size: small">(10:36:05)</span> <b>sbhat:</b></span> but you might have to change your code<br/>
+<span style="color: #aba727"><span style="font-size: small">(10:36:09)</span> <b>sbhat:</b></span> as I will with the Efficiency report<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:36:28)</span> <b>dweitzel:</b></span> hum.... is that going to change the summaries?<br/>
+<span style="color: #aba727"><span style="font-size: small">(10:37:20)</span> <b>sbhat:</b></span> like in the summary agent?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:37:25)</span> <b>dweitzel:</b></span> yes<br/>
+<span style="color: #aba727"><span style="font-size: small">(10:37:29)</span> <b>sbhat:</b></span> shouldn't<br/>
+<span style="color: #aba727"><span style="font-size: small">(10:37:42)</span> <b>sbhat:</b></span> since we're not using the elasticsearch python libraries to query anything there<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:38:53)</span> <b>kretzke:</b></span> @dweitzel request agent failed to start, I haven’t had a chance to look into it more. looks like a config error actually<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:39:54)</span> <b>dweitzel:</b></span> did auto-udpate get run?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:40:07)</span> <b>dweitzel:</b></span> looks like everything moved to an rpmsave file.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:40:19)</span> <b>dweitzel:</b></span> (I need to change the RPM, bad dev, bad)<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:41:29)</span> <b>kretzke:</b></span> I did a <tt>yum update</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:41:46)</span> <b>dweitzel:</b></span> ah, ok.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:41:49)</span> <b>dweitzel:</b></span> that's it.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:41:58)</span> <b>dweitzel:</b></span> I got it working again.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:44:20)</span> <b>kretzke:</b></span> great, thanks<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:46:37)</span> <b>dweitzel:</b></span> <pre>{"error":{"root_cause":[{"type":"illegal_argument_exception","reason":"No search type for [scan]"}],"type":"illegal_argument_exception","reason":"No search type for [scan]"},"status":400}</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:46:52)</span> <b>dweitzel:</b></span> <pre>ET /gracc.corrections/project/_search?search_type=scan&amp;scroll=10m [status:400 request:0.001s]<br/>Dec 16 16:45:28 gratiav2-1.novalocal graccreq[976]: DEBUG:elasticsearch:&gt; None<br/>Dec 16 16:45:28 gratiav2-1.novalocal graccreq[976]: DEBUG:elasticsearch:&lt; {"error":{"root_cause":[{"type":"illegal_argument_exception","reason":"No search type for [scan]"}],"type":"illegal_argument_exception","reason":"No search type for [scan]"},"status":400}<br/></pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:46:56)</span> <b>dweitzel:</b></span> For the corrections.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:57:18)</span> <b>kretzke:</b></span> d’oh. ok I’ll try to look at that today, should be a pretty simple fix. buried under user support stuff right now though :disappointed:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:59:06)</span> <b>dweitzel:</b></span> no worries, there's some other problem with graccreq too right now.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:00:23)</span> <b>kretzke:</b></span> and the cluster is currently in a panic <a href="https://gracc.opensciencegrid.org/dashboard/db/grace-elasticsearch-monitor">https://gracc.opensciencegrid.org/dashboard/db/grace-elasticsearch-monitor</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:00:26)</span> <b>dweitzel:</b></span> Ah, so something changed in the API.  Now I'm getting: "size must be positive, got 0"<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:00:45)</span> <b>dweitzel:</b></span> I used to say size=0 to get all the records.  I wonder if there's another setting I need to give now.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:02:14)</span> <b>kretzke:</b></span> here’s some light reading <a href="https://www.elastic.co/guide/en/elasticsearch/reference/5.0/breaking-changes-5.0.html">https://www.elastic.co/guide/en/elasticsearch/reference/5.0/breaking-changes-5.0.html</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:04:38)</span> <b>kretzke:</b></span> there’s been a lot of i/o “hangs” this morning. anything going on with ceph?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:04:54)</span> <b>dweitzel:</b></span> not that I know of, let me poke the admin.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:07:44)</span> <b>dweitzel:</b></span> &gt; size: 0 is no longer valid for the terms, significant terms and geohash grid aggregations. Instead a size should be explicitly specified with a number greater than zero.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:08:01)</span> <b>dweitzel:</b></span> Ugh, so I'm going with what, max int?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:10:52)</span> <b>dweitzel:</b></span> From Cloud admin:<br/>&gt; ECC errors on one of the Ceph nodes, working on it.  But still usable<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:11:43)</span> <b>dweitzel:</b></span> so, maybe down a replica of the data while it rebalances?<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:12:02)</span> <b>sbhat:</b></span> @dweitzel that error should get fixed if you upgrade the libraries<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:12:05)</span> <b>sbhat:</b></span> at least it did for me<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:12:15)</span> <b>dweitzel:</b></span> ah, ok.  What libraries did you update?<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:12:36)</span> <b>sbhat:</b></span> elasticsearch and elasticsearch-dsl<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:12:55)</span> <b>sbhat:</b></span> scan should use the scroll API automatically<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:13:03)</span> <b>sbhat:</b></span> I guess there's no real scan API anymore<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:13:11)</span> <b>dweitzel:</b></span> how did you update?  I had to build the RPM's myself.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:13:17)</span> <b>dweitzel:</b></span> or are you using pip or something?<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:13:21)</span> <b>sbhat:</b></span> yep<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:13:25)</span> <b>sbhat:</b></span> I'm using pip<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:13:35)</span> <b>dweitzel:</b></span> ah, ok.  The RPM's are from pip, so maybe I can make this work.<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:13:37)</span> <b>sbhat:</b></span> I should say - I did it locally<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:14:03)</span> <b>sbhat:</b></span> the node we run the reports from is owned by a different group, so I'm testing from my laptop until everything works<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:14:15)</span> <b>sbhat:</b></span> and then I'll ask them to do any upgrades to the production node<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:15:01)</span> <b>sbhat:</b></span> my reports were working until the cluster freaked out<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:15:36)</span> <b>sbhat:</b></span> as far as size goes, I'm using a billion<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:15:42)</span> <b>sbhat:</b></span> perhaps max int is a more sensible number<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:20:25)</span> <b>dweitzel:</b></span> in python, there's a <tt>sys.maxint</tt><br/>
+<span style="color: #aba727"><span style="font-size: small">(11:38:47)</span> <b>sbhat:</b></span> I'll switch my reports to that. <br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:42:40)</span> <b>kretzke:</b></span> now we’re getting kernel errors again… we managed to go for a number of months without seeing these<br/><pre>Dec 16 17:24:09 gratiav2-1.novalocal kernel: INFO: task xfsaild/dm-1:27730 blocked for more than 120 seconds.<br/>Dec 16 17:24:09 gratiav2-1.novalocal kernel: "echo 0 &gt; /proc/sys/kernel/hung_task_timeout_secs" disables this message.<br/>Dec 16 17:24:09 gratiav2-1.novalocal kernel: xfsaild/dm-1    D ffff88049c26c000     0 27730      2 0x00000080<br/>Dec 16 17:24:09 gratiav2-1.novalocal kernel:  ffff880496fe7d58 0000000000000046 ffff880a74213ec0 ffff880496fe7fd8<br/>Dec 16 17:24:09 gratiav2-1.novalocal kernel:  ffff880496fe7fd8 ffff880496fe7fd8 ffff880a74213ec0 ffff8800376dee00<br/>Dec 16 17:24:09 gratiav2-1.novalocal kernel:  0000000000000000 ffff880a74213ec0 ffff880ef365cd28 ffff88049c26c000<br/>Dec 16 17:24:09 gratiav2-1.novalocal kernel: Call Trace:<br/>Dec 16 17:24:09 gratiav2-1.novalocal kernel:  [&lt;ffffffff8168b899&gt;] schedule+0x29/0x70<br/>Dec 16 17:24:09 gratiav2-1.novalocal kernel:  [&lt;ffffffffa020897d&gt;] _xfs_log_force+0x1bd/0x2b0 [xfs]<br/>Dec 16 17:24:09 gratiav2-1.novalocal kernel:  [&lt;ffffffff810c4fe0&gt;] ? wake_up_state+0x20/0x20<br/>Dec 16 17:24:09 gratiav2-1.novalocal kernel:  [&lt;ffffffffa0208a96&gt;] xfs_log_force+0x26/0x80 [xfs]<br/>Dec 16 17:24:09 gratiav2-1.novalocal kernel:  [&lt;ffffffffa0214360&gt;] ? xfs_trans_ail_cursor_first+0x90/0x90 [xfs]<br/>Dec 16 17:24:09 gratiav2-1.novalocal kernel:  [&lt;ffffffffa02144ba&gt;] xfsaild+0x15a/0x660 [xfs]<br/>Dec 16 17:24:09 gratiav2-1.novalocal kernel:  [&lt;ffffffffa0214360&gt;] ? xfs_trans_ail_cursor_first+0x90/0x90 [xfs]<br/>Dec 16 17:24:09 gratiav2-1.novalocal kernel:  [&lt;ffffffff810b064f&gt;] kthread+0xcf/0xe0<br/>Dec 16 17:24:09 gratiav2-1.novalocal kernel:  [&lt;ffffffff810b0580&gt;] ? kthread_create_on_node+0x140/0x140<br/>Dec 16 17:24:09 gratiav2-1.novalocal kernel:  [&lt;ffffffff81696718&gt;] ret_from_fork+0x58/0x90<br/>Dec 16 17:24:09 gratiav2-1.novalocal kernel:  [&lt;ffffffff810b0580&gt;] ? kthread_create_on_node+0x140/0x140</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:21:00)</span> <b>dweitzel:</b></span> IO hangs?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:26:32)</span> <b>kretzke:</b></span> yes, when iops drops and processes are idle waiting on IO. see the IO Time graph on <a href="https://gracc.opensciencegrid.org/dashboard/db/grace-system-monitoring">https://gracc.opensciencegrid.org/dashboard/db/grace-system-monitoring</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:29:04)</span> <b>kretzke:</b></span> even if it only affects one node, it drags down the whole cluster<br/>
+</body>
+</html>

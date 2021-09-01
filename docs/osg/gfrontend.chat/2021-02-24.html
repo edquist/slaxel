@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Feb 24, 2021 : #gfrontend (osg)</title>
+</head>
+<body>
+<h3>Wed Feb 24, 2021 : #gfrontend (osg)</h3>
+<span style="color: #e0a729"><span style="font-size: small">(17:20:46)</span> <b>gthain:</b></span> Look at all the cool folks here!<br/>
+<span style="color: #e0a729"><span style="font-size: small">(17:21:03)</span> <b>gthain:</b></span> So, I'm trying to debug some problems with condor_ssh_to_job into glideins running singularity<br/>
+<span style="color: #e0a729"><span style="font-size: small">(17:21:40)</span> <b>gthain:</b></span> And I think the root of the problem is that the glidein-generated condor_config file needs a BIN entry that points at where condor_docker_enter is installed<br/>
+<span style="color: #e0a729"><span style="font-size: small">(17:22:09)</span> <b>gthain:</b></span> or (and probably better still), a RELEASE_DIR entry pointed on above that<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:42:23)</span> <b>marian:</b></span> :wave:<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:44:11)</span> <b>marian:</b></span> I believe @marcom has the best idea where to hack this? I assume this is not something that one can do in the config .xml, or is it?<br/>
+<span style="color: #e0a729"><span style="font-size: small">(20:02:26)</span> <b>gthain:</b></span> I suspect it *could* be done in the .xml, but I think it *should* be done in the startup script.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:16:59)</span> <b>bbockelm:</b></span> @gthain - which frontend is this?<br/><br/>If you're certain the <tt>condor_docker_enter</tt> is actually deployed in the glidein, I suppose you could start <tt>STARTER.BIN</tt> in the config via a startup script.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:27:56)</span> <b>bbockelm:</b></span> Found a random OSG pilot.  Indeed, <tt>BIN</tt> is completely unset, so it's defaulting to <tt>/tmp/condorinstall0/bin</tt>.  Which _really really_ makes me want to create <tt>/tmp/condorinstall0/bin/condor_docker_enter</tt> across the OSG and see what happens.<br/>
+<span style="color: #e0a729"><span style="font-size: small">(20:41:56)</span> <b>gthain:</b></span> This does seem like a very bad default for condor<br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:46:25)</span> <b>bbockelm:</b></span> Is this the GLOW FE?  You can make the change if you want.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:48:53)</span> <b>bbockelm:</b></span> <a href="https://github.com/opensciencegrid/tiger-osg-config/blob/master/manifests/base/vo-frontend-glow/frontend.xml#L120">https://github.com/opensciencegrid/tiger-osg-config/blob/master/manifests/base/vo-frontend-glow/frontend.xml#L120</a> &lt;~ here's what you're looking for<br/>
+<span style="color: #e0a729"><span style="font-size: small">(21:07:33)</span> <b>gthain:</b></span> It is the LIGO FE<br/>
+<span style="color: #a63024"><span style="font-size: small">(23:17:44)</span> <b>efajardo:</b></span> @gthain I think you need to make a pull request to @marcom here <a href="https://github.com/glideinWMS/glideinwms/blob/69154bdf676124611342fe87a4c30c18ad277838/creation/web_base/condor_config#L18">https://github.com/glideinWMS/glideinwms/blob/69154bdf676124611342fe87a4c30c18ad277838/creation/web_base/condor_config#L18</a><br/>Adding <tt>BIN = $(CONDOR_DIR)/bin</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(23:18:04)</span> <b>efajardo:</b></span> That should be enough cause the tarball has the<br/>
+<span style="color: #a63024"><span style="font-size: small">(23:18:05)</span> <b>efajardo:</b></span> <a href="https://github.com/glideinWMS/glideinwms/blob/fdb898406e81937c8c9d8484cbac50378119bf88/creation/lib/cgWCreate.py#L36">https://github.com/glideinWMS/glideinwms/blob/fdb898406e81937c8c9d8484cbac50378119bf88/creation/lib/cgWCreate.py#L36</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(23:18:20)</span> <b>efajardo:</b></span> right binaries<br/>
+</body>
+</html>

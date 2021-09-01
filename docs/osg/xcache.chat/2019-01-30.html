@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jan 30, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Wed Jan 30, 2019 : #xcache (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(13:04:46)</span> <b>blin:</b></span> ugh, this damn error again:<br/>&gt; 190130 18:55:21 112 XrdFileCache_Cache::ConfigParameters(): pfc.diskusage should have lowWatermark &lt; highWatermark.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:04:50)</span> <b>blin:</b></span> <pre><br/>grep -R diskusage /etc/xrootd<br/>/etc/xrootd/config.d/40-osg-xcache.cfg:pfc.diskusage 0.90 0.95<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:06:41)</span> <b>blin:</b></span> it's weird because the logs shows <tt>40-osg-xcache.cfg</tt> loading and the pfc.diskusage config above, starts loading other config, THEN fails<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:06:48)</span> <b>blin:</b></span> &gt; =====&gt; pfc.diskusage 0.90 0.95<br/>&gt; Config continuing with file /etc/xrootd/config.d/50-stash-cache-authz.cfg ...<br/>&gt; Config continuing with file /etc/xrootd/config.d/50-stash-cache-logging.cfg ...<br/>&gt; 190130 18:55:21 112 XrdFileCache_Cache::ConfigParameters(): pfc.diskusage should have lowWatermark &lt; highWatermark.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:27:49)</span> <b>bbockelm:</b></span> <a href="https://github.com/xrootd/xrootd/issues/871">https://github.com/xrootd/xrootd/issues/871</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(15:28:17)</span> <b>matyas:</b></span> forreal, that's what it was?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:29:16)</span> <b>bbockelm:</b></span> yup<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:30:35)</span> <b>bbockelm:</b></span> It's basically doing:<br/><pre><br/>cache_space = &lt;ahhh! file not found ... let's quietly assume 0 and see if anyone notices&gt;<br/>lowWatermark = 0.90 * $(cache space) = 0<br/>highWatermark = 0.95 * $(cache space) = 0<br/>ASSERT( lowWatermark &lt; highWatermark )<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:30:39)</span> <b>blin:</b></span> lol<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:31:48)</span> <b>blin:</b></span> hrm, weird. the directory should exist<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:40:42)</span> <b>blin:</b></span> separately, should we ship <tt>10-cache-site-local.cfg</tt> in the xcache RPM? <tt>40-osg-paths.cfg</tt> depends on the sitename variable being defined<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:40:45)</span> <b>blin:</b></span> and cachedir is generic enough<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:48:38)</span> <b>matyas:</b></span> no it doesn't<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:48:58)</span> <b>matyas:</b></span> 40-osg-paths.cfg just sets all.adminpath and all.pidpath<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:50:08)</span> <b>blin:</b></span> sorry, i meant <tt>40-osg-monitoring.cfg</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:59:53)</span> <b>blin:</b></span> anyone know what this error message means? @ivukotic?<br/>&gt; 190130 21:57:22 058 XrdFileCache_Cache::ConfigParameters(): error obtaining stat info for space  data<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:03:16)</span> <b>blin:</b></span> i figured out why my cachedir didn't exist. I specify it in an environment file with <tt>CACHEDIR="/stash"</tt> and set it in the xrootd config with <tt>set cachedir = $CACHEDIR</tt>. Turns out the quotes got included and xrootd is not a fan of them<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:04:01)</span> <b>bbockelm:</b></span> ermwhat?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:04:26)</span> <b>bbockelm:</b></span> <tt>CACHEDIR="/stash"</tt> was specified in a shell?  Or something else that was passing things literally?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:10:29)</span> <b>blin:</b></span> <pre><br/>$ head -n 1 environ.dev<br/>CACHEDIR="/stash"<br/>$ tail -n 2 Dockerfile<br/>RUN echo -e "set cachedir = \$CACHEDIR\nset sitename = \$SITENAME\n" &gt;&gt; \<br/>    /etc/xrootd/config.d/10-cache-site-local.cfg<br/>$ docker exec 10b45db4a3cb cat /var/log/xrootd/atlas-xcache/xrootd.log<br/>190130 21:46:19 051 oss_Config: invalid space path -  "/stash"/xrdcinfos<br/>=====&gt; <a href="http://oss.space">oss.space</a> meta "/stash"/xrdcinfos<br/></pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(17:45:01)</span> <b>matyas:</b></span> @blin yes, it's in <tt>configs/xcache</tt> then it should be in the xcache rpm<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:45:29)</span> <b>matyas:</b></span> which is where it is<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:45:45)</span> <b>matyas:</b></span> oh sorry, you meant the site-local ones<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:45:56)</span> <b>matyas:</b></span> uhhh maybe we need a 10-sitename.cfg?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:49:18)</span> <b>blin:</b></span> why? sitename is already in <tt>10-cache-site-local.cfg</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(17:53:37)</span> <b>matyas:</b></span> it's also in <tt>10-origin-site-local.cfg</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(17:54:14)</span> <b>blin:</b></span> ah ok<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:54:57)</span> <b>blin:</b></span> i see why they're split up now<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:55:32)</span> <b>blin:</b></span> atlas-xcache needs a cachedir + sitename, too<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:55:34)</span> <b>matyas:</b></span> is that osg monitoring going to be for all xcache users, or just stash origins and caches?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:56:02)</span> <b>blin:</b></span> we're going to make it opt out<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:56:18)</span> <b>blin:</b></span> i just had discussions with brian and ilija about that separately<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:56:52)</span> <b>matyas:</b></span> a flag that enables/disables monitoring?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:57:55)</span> <b>blin:</b></span> the OSG monitoring, yeah<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:58:12)</span> <b>blin:</b></span> now if i could only find how <tt>if</tt> statements work in xrootd...<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:58:23)</span> <b>matyas:</b></span> horribly<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:59:29)</span> <b>blin:</b></span> what's the leading <tt>?</tt> mean?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:59:54)</span> <b>blin:</b></span> and is there an <tt>if undefined</tt> or <tt>if not defined</tt>?<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:01:33)</span> <b>matyas:</b></span> the leading <tt>?</tt> is how you refer to variables in that section of xrootd and there is no negation so if you want <tt>if not defined</tt> you'll have to do <pre><br/>if defined ?foo<br/># do nothing<br/>else<br/>&lt;stuff goes here&gt;<br/>fi<br/></pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(18:01:39)</span> <b>matyas:</b></span> then take a shot<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:04:46)</span> <b>blin:</b></span> <pre><br/>if defined ?foo<br/># take a shot<br/>else<br/>&lt;stuff goes here&gt;<br/># still take a shot<br/>fi<br/></pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(18:05:19)</span> <b>matyas:</b></span> ship it<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:11:50)</span> <b>blin:</b></span> ugh but that checks definition<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:12:36)</span> <b>blin:</b></span> how do we do value comparison? particularly for a boolean<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:14:21)</span> <b>matyas:</b></span> I don't see a way so I think we might have to do something like<br/><pre><br/># uncomment this if you do not want to report to osg monitoring<br/># set plzDontTrackMe = 1<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(18:15:57)</span> <b>blin:</b></span> and put that in <tt>10-yet-another-10-file.cfg</tt>?<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:17:16)</span> <b>matyas:</b></span> we're probably gonna have a <tt>10-common-site-local.cfg</tt> for the sitename and maybe some other stuff<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:17:26)</span> <b>matyas:</b></span> like just use one var for both the cache dir and the origin dir<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:18:54)</span> <b>matyas:</b></span> like instead of <tt>set cachedir=/mnt/stash</tt> and <tt>set origindir=/mnt/stash</tt> just <tt>set rootdir=/mnt/stash</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(18:19:04)</span> <b>blin:</b></span> yes please<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:27:13)</span> <b>blin:</b></span> ok making a PR<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:33:18)</span> <b>matyas:</b></span> dang you beat me to it<br/>
+</body>
+</html>

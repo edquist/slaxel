@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Dec 10, 2018 : #operations (osg)</title>
+</head>
+<body>
+<h3>Mon Dec 10, 2018 : #operations (osg)</h3>
+<span style="color: #16569E"><span style="font-size: small">(16:28:59)</span> <b>edquist:</b></span> Hi @jthiltges &amp; @dweitzel, i could use some help debugging the httpd configuration on topology-itb.  The issue is still that the <tt>/webhook</tt> prefix does not seem to be getting mapped or handled properly with <tt>WSGIScriptAlias</tt> config in <tt>/etc/httpd/conf.d/topology-itb.conf</tt>  (more details are in the email i sent)<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:29:23)</span> <b>edquist:</b></span> Would either of you be able to help look at it with me today or tomorrow?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:33:51)</span> <b>dweitzel:</b></span> I was reading through the email, and honestly I think you did everything I would have done.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:34:21)</span> <b>dweitzel:</b></span> so the webhook is getting the requests?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:34:24)</span> <b>dweitzel:</b></span> but still returning 404?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:35:06)</span> <b>dweitzel:</b></span> What's the repo for the webhook?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:35:06)</span> <b>matyas:</b></span> we have no idea _which_ python script is actually receiving the requests<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:35:57)</span> <b>matyas:</b></span> for testing, we tried sticking routes for <tt>/webhook</tt> in <tt>app.py</tt> in various directories but still kept getting 404s<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:37:30)</span> <b>edquist:</b></span> just to note it here, if we commented out the <tt>/webhook</tt> prefix <tt>WSGIScriptAlias</tt> line, or put it after the <tt>/</tt> one, then we don't get 404s, as the main <tt>app.py</tt> in that case does handle it<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:38:02)</span> <b>edquist:</b></span> but apparently with the <tt>/webhook</tt> mapping working it doesn't go to the separate webhook app like it should<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:38:07)</span> <b>edquist:</b></span> one second for the repo links<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:40:49)</span> <b>edquist:</b></span> my topology branch:<br/><a href="https://github.com/edquist/topology/tree/SOFTWARE-3325.separate-webhook-app/">https://github.com/edquist/topology/tree/SOFTWARE-3325.separate-webhook-app/</a><br/><br/>github compare:<br/><a href="https://github.com/opensciencegrid/topology/compare/master...edquist:SOFTWARE-3325.separate-webhook-app">https://github.com/opensciencegrid/topology/compare/master...edquist:SOFTWARE-3325.separate-webhook-app</a><br/><br/>config files for topology-itb:<br/><a href="https://github.com/edquist/topology-config">https://github.com/edquist/topology-config</a><br/>
+<span style="color: #16569E"><span style="font-size: small">(16:42:26)</span> <b>edquist:</b></span> I'm not convinced anything is receiving the /webhook requests<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:43:54)</span> <b>edquist:</b></span> but in any case yeah there's a 404 returned<br/>
+<span style="color: #e06b56"><span style="font-size: small">(16:44:31)</span> <b>jthiltges:</b></span> webhook debugging is high on my list for tomorrow. (Daughter was sick at daycare, so had to skip out early today.)<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:45:09)</span> <b>edquist:</b></span> no worries, thanks John!<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:49:40)</span> <b>edquist:</b></span> Oh, but,<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:50:56)</span> <b>edquist:</b></span> @dweitzel, the repo in use on <tt>topology-itb</tt> is under <tt>/opt/topology-itb-webhook</tt><br/>
+<span style="color: #16569E"><span style="font-size: small">(16:51:32)</span> <b>edquist:</b></span> which is slightly modified to have some test <tt>/webhook</tt> handlers<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:51:39)</span> <b>edquist:</b></span> <pre><br/>diff --git a/src/app.py b/src/app.py<br/>index f07b21a..002ca17 100755<br/>--- a/src/app.py<br/>+++ b/src/app.py<br/>@@ -72,6 +72,11 @@ def map():<br/>     return _fix_unicode(render_template('iframe.html.j2', resourcegroups=rgsummary["ResourceSummary"]["ResourceGroup"]))<br/> <br/> <br/>+@app.route('/webhook')<br/>+def webhook():<br/>+    return Response('right directory, wrong file')<br/>+<br/>+<br/> @app.route('/schema/&lt;xsdfile&gt;')<br/> def schema(xsdfile):<br/>     if xsdfile in ["vosummary.xsd", "rgsummary.xsd", "rgdowntime.xsd", "miscuser.xsd", "miscproject.xsd"]:<br/>diff --git a/src/webhook_app.py b/src/webhook_app.py<br/>index b50e9c3..3fb345b 100755<br/>--- a/src/webhook_app.py<br/>+++ b/src/webhook_app.py<br/>@@ -54,6 +54,14 @@ def _fix_unicode(text):<br/>     return text.encode('utf-8', 'surrogateescape').decode('utf-8')<br/> <br/> <br/>+@app.route("/webhook", methods=["GET", "POST"])<br/>+def webhook_test_route_0():<br/>+    return Response('Greetings')<br/>+<br/>+@app.route("/webhook/test", methods=["GET", "POST"])<br/>+def webhook_test_route():<br/>+    return Response('Greetings')<br/>+<br/> @app.route("/webhook/pull_request", methods=["GET", "POST"])<br/> def pull_request_hook():<br/>     event = request.headers.get('X-GitHub-Event')<br/></pre><br/>
+<span style="color: #16569E"><span style="font-size: small">(16:53:40)</span> <b>edquist:</b></span> the main itb app is under <tt>/opt/topology-itb</tt><br/>
+<span style="color: #16569E"><span style="font-size: small">(16:53:48)</span> <b>edquist:</b></span> and is also slightly modified<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:54:00)</span> <b>edquist:</b></span> <pre><br/>diff --git a/src/app.py b/src/app.py<br/>index 1cb77db..e2543dd 100755<br/>--- a/src/app.py<br/>+++ b/src/app.py<br/>@@ -76,6 +76,10 @@ def _fix_unicode(text):<br/> def homepage():<br/>     return render_template('homepage.html.j2')<br/> <br/>+@app.route("/webhook", methods=["GET", "POST"])<br/>+def webhook_test_route_0():<br/>+    return Response('Greetings, but this is not the /webhook i was looking for... :(')<br/>+<br/> @app.route('/map/iframe')<br/> def map():<br/>     rgsummary = global_data.get_topology().get_resource_summary()<br/></pre><br/>
+<span style="color: #16569E"><span style="font-size: small">(16:55:17)</span> <b>edquist:</b></span> this <tt>/webhook</tt> route Response is the one i see if i comment out the <tt>/webhook</tt> <tt>WSGIScriptAlias</tt> line, or put it after <tt>/</tt><br/>
+<span style="color: #16569E"><span style="font-size: small">(16:55:51)</span> <b>edquist:</b></span> but currently i just get a 404, without anything apparently handling it<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:56:53)</span> <b>dweitzel:</b></span> ok, figured it out.<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:56:58)</span> <b>edquist:</b></span> ???<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:57:00)</span> <b>edquist:</b></span> !!!<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:57:13)</span> <b>edquist:</b></span> do tell<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:57:15)</span> <b>dweitzel:</b></span> in file <tt>/opt/topology-itb-webhook/src/webhook_app.py </tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:57:26)</span> <b>dweitzel:</b></span> you need to catch the <tt>/</tt> route<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:57:28)</span> <b>dweitzel:</b></span> I added it for you.<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:57:33)</span> <b>edquist:</b></span> what.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:57:46)</span> <b>dweitzel:</b></span> so <tt>/webhook</tt> looks to flask like <tt>/</tt> because of how the application is mounted.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:58:12)</span> <b>dweitzel:</b></span> I turned up apache logging to <tt>info</tt> level, and saw it was loading the webhook app.<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:58:26)</span> <b>edquist:</b></span> oh....<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:59:08)</span> <b>edquist:</b></span> so you're saying all the routes in webhook_app.py should be relative to the prefix from the <tt>WSGIScriptAlias</tt> line<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:59:15)</span> <b>dweitzel:</b></span> probably<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:59:34)</span> <b>edquist:</b></span> wow i had no idea<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:59:40)</span> <b>edquist:</b></span> thank you<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:59:44)</span> <b>edquist:</b></span> good catch<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:59:50)</span> <b>dweitzel:</b></span> yup, because <tt>/webhook/webhook</tt> works.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:00:17)</span> <b>dweitzel:</b></span> ok, I'll turn down the apache logging now.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:00:42)</span> <b>dweitzel:</b></span> btw, this is the line in the <tt>error_log</tt> that confirmed that apache was loading the right thing:<br/><pre><br/>[Mon Dec 10 16:59:36.667299 2018] [wsgi:info] [pid 3601] [remote 129.93.227.98:33503] mod_wsgi (pid=3601, process='topomerge', application='<a href="http://topology-itb.opensciencegrid.org">topology-itb.opensciencegrid.org</a>'): Loading Python script file '/opt/topology-itb-webhook/src/topology-itb-webhook.wsgi'.<br/></pre><br/>
+<span style="color: #16569E"><span style="font-size: small">(17:02:57)</span> <b>edquist:</b></span> yeah it was confusing because it did seem to be loading the webhook app, and i got it to the point where there didn't seem to be any errors for that, and /webhook worked for just the regular app.py but not when mapped to the webhook app<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:03:02)</span> <b>edquist:</b></span> wow<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:03:03)</span> <b>edquist:</b></span> well<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:03:12)</span> <b>edquist:</b></span> i'm glad it was something simple and dumb<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:03:23)</span> <b>matyas:</b></span> weird, I tried <tt>webhook/webhook</tt> last friday and it didn't work<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:03:39)</span> <b>matyas:</b></span> <pre><a href="http://dyn-72-33-0-134.uwnet.wisc.edu">dyn-72-33-0-134.uwnet.wisc.edu</a> - - [07/Dec/2018:16:58:17 -0600] "GET /webhook/webhook/ HTTP/1.1" 404 233 "-" "Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:63.0) Gecko/20100101 Firefox/63.0"</pre><br/>
+<span style="color: #16569E"><span style="font-size: small">(17:04:46)</span> <b>edquist:</b></span> trailing slash :stuck_out_tongue:<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:04:56)</span> <b>matyas:</b></span> you've gotta be kidding me<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:06:07)</span> <b>dweitzel:</b></span> yeah, @matyas i tried webhook/webhook/ today as well.  Didn't work either.  was confused until I figured that out too.<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:08:53)</span> <b>edquist:</b></span> @dweitzel, just curious, did anything give it away in the verbose httpd logs?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:09:29)</span> <b>dweitzel:</b></span> for the "mount point" problem?  Nope, just a theory.<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:10:03)</span> <b>edquist:</b></span> ah, well in any case thank you very much!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:10:21)</span> <b>dweitzel:</b></span> for loading the right module, see the <tt>error_log</tt> line I copied above.<br/>
+</body>
+</html>

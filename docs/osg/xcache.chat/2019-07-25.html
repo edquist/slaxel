@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jul 25, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Thu Jul 25, 2019 : #xcache (osg)</h3>
+<span style="color: #a63024"><span style="font-size: small">(11:12:36)</span> <b>efajardo:</b></span> yes<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:14:17)</span> <b>blin:</b></span> and things are working ok?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:15:19)</span> <b>blin:</b></span> p.s. ilija mentioned a proxy issue yesterday that required him to restart containers<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:15:35)</span> <b>blin:</b></span> i mentioned the corn fix but he thinks it's an issue in xrootd itself<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:18:20)</span> <b>blin:</b></span> @efajardo if things are working ok, could you give me the sha256 image digest of the containers that you're running?<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:19:39)</span> <b>efajardo:</b></span> The proxy is independent of xrootd<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:20:05)</span> <b>efajardo:</b></span> so far everything looks good<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(11:29:00)</span> <b>blin:</b></span> @tim.theisen am i cleared to promote the image that edgar's using to <tt>stable</tt>?<br/>
+<span style="color: #73769d"><span style="font-size: small">(13:34:07)</span> <b>tim.theisen:</b></span> Cleared to promote<br/>
+</blockquote>
+<span style="color: #a63024"><span style="font-size: small">(11:22:04)</span> <b>efajardo:</b></span> <pre>Containers:<br/>  stashcache:<br/>    Container ID:   <a href="docker://ffb9ba5fd93323123c65cb19af62fca8c4b6ced224b0a68200e0d73cda1c44e6">docker://ffb9ba5fd93323123c65cb19af62fca8c4b6ced224b0a68200e0d73cda1c44e6</a><br/>    Image:          opensciencegrid/stash-cache:fresh<br/>    Image ID:       <a href="docker-pullable://opensciencegrid/stash-cache@sha256:d52635d2618a29c97d55164795a1dc537083b6a40c08a5b5f0ab4b30c99c389d">docker-pullable://opensciencegrid/stash-cache@sha256:d52635d2618a29c97d55164795a1dc537083b6a40c08a5b5f0ab4b30c99c389d</a><br/>    Port:           &lt;none&gt;<br/>    Host Port:      &lt;none&gt;<br/>    State:          Running<br/>      Started:      Tue, 23 Jul 2019 09:11:33 -0700<br/>    Ready:          True<br/></pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(11:22:08)</span> <b>efajardo:</b></span> @blin<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:25:03)</span> <b>blin:</b></span> thanks<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:25:29)</span> <b>blin:</b></span> i think what ilija was saying yesterday was that the proxy was being refreshed properly, it's just that xrootd wasn't picking it up<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:25:02)</span> <b>blin:</b></span> @bbockelm question about osg-xrootd: do we want to enable HTTPS for xrootd standalone/xrootd SE?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:29:16)</span> <b>dweitzel:</b></span> @bockjoo could you update to the newest scitokens-cpp in osg-development?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:29:19)</span> <b>dweitzel:</b></span> should be 0.3.2<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:29:23)</span> <b>dweitzel:</b></span> and test again.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:30:45)</span> <b>bockjoo:</b></span> I updated it but I have some issue with ipv6 to <a href="https://scitokens.org/cms">https://scitokens.org/cms</a><br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:33:05)</span> <b>bockjoo:</b></span> It works now!<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:33:23)</span> <b>bockjoo:</b></span> curl --capath /etc/grid-security/certificates -H "Authorization: Bearer $token" <a href="https://cmsio3.rc.ufl.edu:1094//store/user/bockjoo/hello_world.txt">https://cmsio3.rc.ufl.edu:1094//store/user/bockjoo/hello_world.txt</a><br/>hello world!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:38:02)</span> <b>dweitzel:</b></span> great!<br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:43:58)</span> <b>bockjoo:</b></span> By the way, we have<br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:44:03)</span> <b>bockjoo:</b></span> [root@cmsio4 ~]# wget -O /dev/null <a href="https://scitokens.org/">https://scitokens.org/</a><br/>--2019-07-25 15:43:09--  <a href="https://scitokens.org/">https://scitokens.org/</a><br/>Resolving <a href="http://scitokens.org">scitokens.org</a> (<a href="http://scitokens.org">scitokens.org</a>)... 2606:4700:30::6818:7fec, 2606:4700:30::6818:7eec, 104.24.127.236, ...<br/>Connecting to <a href="http://scitokens.org">scitokens.org</a> (<a href="http://scitokens.org">scitokens.org</a>)|2606:4700:30::6818:7fec|:443...<br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:44:41)</span> <b>bockjoo:</b></span> ipv6 at my site is not routed via commodity. So, I have to use ipv4.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:45:27)</span> <b>dweitzel:</b></span> interesting, so you can dns resolve an ipv6 address at your site, but you can't reach it.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:46:42)</span> <b>dweitzel:</b></span> <a href="http://scitokens.org">scitokens.org</a> is actually a cloudflare cached website.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:46:43)</span> <b>bockjoo:</b></span> This is the statement from my network engineer:<br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:46:57)</span> <b>bockjoo:</b></span> &gt;&gt; Both of these are going over the commodity Internet or direct peering,<br/>&gt;&gt; but not over Internet2.  We only provide Internet2 routes to the CRN<br/>&gt;&gt; network using ipv6.  Just wondering why a host which is critical to<br/>&gt;&gt; CMS isn't reachable via Internet2 or some research network?  If you<br/>&gt;&gt; need to hit it, you may just need to use IPv4 for now until we are<br/>&gt;&gt; authorized to bring commodity Internet onto campus with IPv6.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:48:19)</span> <b>bockjoo:</b></span> owned by amazon<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:53:06)</span> <b>dweitzel:</b></span> "owned by amazon"?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(15:07:51)</span> <b>bockjoo:</b></span> Isn't <a href="http://scitoken.org">scitoken.org</a> owned by amazon?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:08:42)</span> <b>dweitzel:</b></span> <a href="http://scitokens.org">scitokens.org</a> domain is owned by the grant.  Cloudflare is it's own independent company.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:25:32)</span> <b>bbockelm:</b></span> Cloudflare has had one (and it wasn’t a total) downtime in the past decade or so.  In terms of reliability, it can’t be beat.  We also move something like 2 KB at a time through it, so the total traffic is negligible.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:26:27)</span> <b>bbockelm:</b></span> That said, for CMS, we are transitioning to the issuer at <a href="http://cmsweb.cern.ch">cmsweb.cern.ch</a>.  So that might help a bit<br/>
+<span style="color: #7d414c"><span style="font-size: small">(16:35:41)</span> <b>bockjoo:</b></span> So, I guess I don't have to worry about setting ipv4 precedence over ipv6 for <a href="http://scitoken.org">scitoken.org</a> because <a href="http://scitoken.org">scitoken.org</a> is not used by anything?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:53:04)</span> <b>andrew.melo:</b></span> <pre>Just wondering why a host which is critical to<br/>&gt; CMS isn't reachable via Internet2 or some research network?</pre><br/>lol let's make N internets<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:09:30)</span> <b>bbockelm:</b></span> Not for CMS, but it is used by OSG jobs pretty regularly.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(17:12:56)</span> <b>andrew.melo:</b></span> uh, also, presumably users will be getting scitokens from .. everywhere<br/>
+<span style="color: #a72f79"><span style="font-size: small">(17:13:26)</span> <b>andrew.melo:</b></span> oh, wait<br/>
+<span style="color: #a72f79"><span style="font-size: small">(17:13:42)</span> <b>andrew.melo:</b></span> don't roast me brian, I see how I goofed<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:13:45)</span> <b>bbockelm:</b></span> For CMS - I think some CAs might distribute CRLs through commercial providers.  CILogon comes to mind.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:14:59)</span> <b>bbockelm:</b></span> DigiCert CRLs could be commercial too<br/>
+<span style="color: #a72f79"><span style="font-size: small">(17:16:10)</span> <b>andrew.melo:</b></span> Yeah, their educational stuff is a very very small portion of their total business<br/>
+</body>
+</html>

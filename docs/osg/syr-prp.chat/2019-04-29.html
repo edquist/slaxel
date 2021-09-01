@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Apr 29, 2019 : #syr-prp (osg)</title>
+</head>
+<body>
+<h3>Mon Apr 29, 2019 : #syr-prp (osg)</h3>
+<span style="color: #8f4a2b"><span style="font-size: small">(07:45:06)</span> <b>dabrown:</b></span> @dfinstad I know what the problem is. Our workflow uses a custom stastcp plugin that's missing from the PRP nodes.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(07:45:33)</span> <b>dabrown:</b></span> @isfiligoi please can you modify the docker image to add a file <tt>/usr/libexec/condor/stashcp_plugin</tt> that contains<br/><pre><br/>#!/bin/bash<br/>if [ "x$1" = "x-classad" ]; then<br/>   echo "PluginVersion = \"0.1\""<br/>   echo "PluginType = \"FileTransfer\""<br/>   echo "SupportedMethods = \"stash\""<br/>   exit 0<br/>fi<br/>FULLSRC=$1<br/>LOC=$2<br/>SRC=$(echo $FULLSRC | cut -d':' -f2-)<br/>stashcp $SRC $LOC &gt; /dev/null 2&gt;&amp;1<br/></pre><br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(07:46:01)</span> <b>dabrown:</b></span> The file should be world readable and executable, and you need to add <tt>$(LIBEXEC)/stashcp_plugin</tt> to <tt>FILETRANSFER_PLUGINS</tt> in your condor config.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(07:46:22)</span> <b>dabrown:</b></span> Since you install condor on top of my node, it's probably best to do this in your layer.<br/>
+<span style="color: #53b759"><span style="font-size: small">(07:46:45)</span> <b>isfiligoi:</b></span> Why is it looking for it in /usr/libexec/condor?<br/>
+<span style="color: #53b759"><span style="font-size: small">(07:47:10)</span> <b>isfiligoi:</b></span> Isn’t this something the pilot is using?<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(07:47:40)</span> <b>dabrown:</b></span> On our cluster, the jobs run natively.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(07:47:59)</span> <b>dabrown:</b></span> Whatever startd is controlling Daniel's jobs needs to be able to use that plugin.<br/>
+<span style="color: #53b759"><span style="font-size: small">(07:48:01)</span> <b>isfiligoi:</b></span> Right, but on PRP it is “just a Grid job”<br/>
+<span style="color: #53b759"><span style="font-size: small">(07:48:28)</span> <b>isfiligoi:</b></span> so, it is the pilot… my Condor just starts the Pilot<br/>@efajardo @rynge<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(07:48:30)</span> <b>dabrown:</b></span> So, Mats needs to make this available?<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(07:48:36)</span> <b>dabrown:</b></span> Got it.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(07:49:19)</span> <b>dabrown:</b></span> Brian told me that the next version of condor will be able to take these plugins in with the job, but that's not there yet.<br/>
+<span style="color: #53b759"><span style="font-size: small">(07:49:34)</span> <b>isfiligoi:</b></span> :+1:<br/>
+<span style="color: #53b759"><span style="font-size: small">(07:50:17)</span> <b>isfiligoi:</b></span> Out of curiosity:<br/>Don’t you run the same jobs somewhere else on the Grid, too?<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(07:51:59)</span> <b>dabrown:</b></span> No, these have only been run on our local cluster. This is the first time we're using OSG for this class of jobs.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:02:49)</span> <b>rynge:</b></span> Hi - catching up on the thread now...<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:05:47)</span> <b>isfiligoi:</b></span> We need stash file trasfer plugin for the glideins<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:06:19)</span> <b>rynge:</b></span> Yeah, I have it already - checking if it still works<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:06:33)</span> <b>rynge:</b></span> You have cvmfs on the nodes, right?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:44:26)</span> <b>rynge:</b></span> I fixed an issue with the plugin - can you give it another try?<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(10:48:29)</span> <b>dabrown:</b></span> @dfinstad can you restart the workflow? It might be helpful to paste in the <tt>transfer_input_files</tt> line from one of your failing job's <tt>.sub</tt> files so Mats can check it.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(10:54:02)</span> <b>dfinstad:</b></span> Yep, I’ll try restarting now<br/>
+<span style="color: #a72f79"><span style="font-size: small">(11:12:24)</span> <b>dfinstad:</b></span> the inference job is in the queue now, and the <tt>transfer_input_files</tt> entry from its <tt>.sub</tt> file is:<br/><pre><br/>transfer_input_files = stash:///user/dfinstad/public/psd/asd_june_2016/aLIGO_design.txt,/usr1/daniel.finstad/pycbc-tmp.ataZtW9kvU/work/././osg_test-main_ID0000001.000/./create_injections-L1_ID0_ID0000001.meta,/usr1/daniel.finstad/pycbc-tmp.ataZtW9kvU/work/././osg_test-main_ID0000001.000/./stage_in_remote_local_1_0.meta,/usr/share/pegasus/sh/pegasus-lite-common.sh,/usr1/daniel.finstad/pycbc-tmp.ataZtW9kvU/work/././osg_test-main_ID0000001.000/pegasus-worker-4.9.2dev-x86_64_rhel_7.tar.gz<br/></pre><br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:14:19)</span> <b>rynge:</b></span> <pre><br/>$ condor_status -const 'GLIDEIN_Site == "SDSC-PRP"' -af HasFileTransferPluginMethods<br/>stash,data<br/></pre><br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:14:26)</span> <b>rynge:</b></span> So it does find the stash plugin<br/>
+<span style="color: #a72f79"><span style="font-size: small">(11:19:07)</span> <b>dfinstad:</b></span> the job is held now, with the same error as before:<br/><pre><br/>Error from slot1_1@glidein_104374_572944918@osg-wn-sugwg-opt-5cc587c96c-7m6gl: STARTER at 10.244.79.38 failed to receive file /var/lib/condor/execute/dir_104370/glide_8BUWxN/exec<br/>ute/dir_115018/aLIGO_design.txt: FILETRANSFER:1:non-zero exit (256) from /var/lib/condor/execute/dir_104370/glide_8BUWxN/stashcp_plugin<br/></pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(11:24:46)</span> <b>isfiligoi:</b></span> FYI:<br/>I tried the following from one of the PRP wns, and it works file (returns 0):<br/><pre><br/>stashcp -d ///user/dfinstad/public/psd/asd_june_2016/aLIGO_design.txt a.txt<br/></pre><br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:27:22)</span> <b>rynge:</b></span> Hmm, we have a -r in there which seems to cause the problem<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:27:25)</span> <b>rynge:</b></span> @dweitzel<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:27:47)</span> <b>rynge:</b></span> <pre><br/>stashcp -r ///user/dfinstad/public/psd/asd_june_2016/aLIGO_design.txt a.txt<br/>[ERROR] Internal error<br/></pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(11:28:29)</span> <b>isfiligoi:</b></span> works fine without -r<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:28:35)</span> <b>rynge:</b></span> Right<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:28:40)</span> <b>rynge:</b></span> I will change the glidein<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:28:54)</span> <b>rynge:</b></span> Please stop submitting again so the old ones go away<br/>
+<span style="color: #a72f79"><span style="font-size: small">(11:29:38)</span> <b>dfinstad:</b></span> okay, removed<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:45:12)</span> <b>rynge:</b></span> You can try again<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:24:40)</span> <b>isfiligoi:</b></span> I see a few jobs running now… let us know how it goes<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:27:58)</span> <b>dfinstad:</b></span> Yep, I submitted once and I think the transfer succeeded, but the job failed because I gave it the wrong relative path to the file. Trying again now<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:50:30)</span> <b>dfinstad:</b></span> Okay, looks like the workflow jobs are completing successfully<br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:16:10)</span> <b>dfinstad:</b></span> @dabrown I think this is ready to scale up to the full PP test. For a single-detector test is it enough to just run with L1 only, at design sensitivity, for all injections?<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(14:59:29)</span> <b>dabrown:</b></span> @dfinstad great. This sounds good, go for it. <br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:20:14)</span> <b>dfinstad:</b></span> Okay, hounds are released, some are running already. I’ll keep an eye on them<br/>
+</body>
+</html>

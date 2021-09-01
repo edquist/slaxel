@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jan 22, 2021 : #software (osg)</title>
+</head>
+<body>
+<h3>Fri Jan 22, 2021 : #software (osg)</h3>
+<span style="color: #8d4b84"><span style="font-size: small">(08:08:53)</span> <b>kherner:</b></span> Has anyone noticed anything strange with Freshdesk in the past day or two? I am trying to deal with ticket 66345 and it claims there is no such ticket now:<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(08:09:07)</span> <b>kherner:</b></span> Yet it was fine for me as recently as Tuesday.<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:22:44)</span> <b>blin:</b></span> hrm, i can see it just fine. that's weird. could you open a ticket with freshdesk?<br/>
+<blockquote>
+<span style="color: #8d4b84"><span style="font-size: small">(2021-01-23 14:07:09)</span> <b>kherner:</b></span> Done. What's really odd is that when I search by ticket number it claims it doesn't even exist.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2021-01-25 11:59:22)</span> <b>bbockelm:</b></span> I think Janet was tinkering with permissions / assigning seats.  Maybe some access got bumped?<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(2021-01-25 12:19:45)</span> <b>kherner:</b></span> Yeah, that's Freshdesk's working assumption.<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(2021-01-25 12:48:50)</span> <b>kherner:</b></span> Janet just fixed it.<br/>
+</blockquote>
+<span style="color: #e96699"><span style="font-size: small">(10:10:34)</span> <b>lincoln:</b></span> hi software, has anyone seen this?<br/>on login05 we have a hang due to CVMFS, i.e., from tracing <tt>df</tt>:<br/><pre>stat("/cvmfs/ligo.osgstorage.org",</pre><br/>In /var/log/messages, I see some messages from yesterday:<br/><pre>[root@login05 log]# grep "cvmfs" /var/log/messages | grep ligo<br/>Jan 21 15:18:46 login05 cvmfs2: (<a href="http://ligo.osgstorage.org">ligo.osgstorage.org</a>) looks like cvmfs has been crashed previously<br/>Jan 21 15:18:46 login05 cvmfs2: (<a href="http://ligo.osgstorage.org">ligo.osgstorage.org</a>) geographic order of servers retrieved from <a href="http://cvmfs-s1fnal.opensciencegrid.org">cvmfs-s1fnal.opensciencegrid.org</a><br/>Jan 21 15:18:46 login05 cvmfs2: (<a href="http://ligo.osgstorage.org">ligo.osgstorage.org</a>) geographic order of servers retrieved from <a href="http://cvmfs-s1fnal.opensciencegrid.org">cvmfs-s1fnal.opensciencegrid.org</a><br/>Jan 21 15:18:46 login05 cvmfs2: (<a href="http://ligo.osgstorage.org">ligo.osgstorage.org</a>) CernVM-FS: linking /cvmfs/ligo.osgstorage.org to repository <a href="http://ligo.osgstorage.org">ligo.osgstorage.org</a><br/>Jan 21 15:18:46 login05 cvmfs2: (<a href="http://ligo.osgstorage.org">ligo.osgstorage.org</a>) starting authz helper /cvmfs/config-osg.opensciencegrid.org/libexec/authz/cvmfs_scitoken_helper<br/>Jan 21 15:18:47 login05 cvmfs2: (<a href="http://ligo.osgstorage.org">ligo.osgstorage.org</a>) authz helper /cvmfs/config-osg.opensciencegrid.org/libexec/authz/cvmfs_scitoken_helper enters fail state, no more authorization<br/>Jan 21 15:27:26 login05 cvmfs2: (<a href="http://ligo.osgstorage.org">ligo.osgstorage.org</a>) starting authz helper /cvmfs/config-osg.opensciencegrid.org/libexec/authz/cvmfs_scitoken_helper<br/>Jan 21 15:27:26 login05 cvmfs_scitoken_helper: (<a href="http://ligo.osgstorage.org">ligo.osgstorage.org</a>) Support for Globus authz is enabled.<br/>Jan 21 15:27:26 login05 cvmfs_scitoken_helper: (<a href="http://ligo.osgstorage.org">ligo.osgstorage.org</a>) Support for VOMS authz is enabled.<br/>Jan 21 15:27:26 login05 cvmfs_scitoken_helper: (<a href="http://ligo.osgstorage.org">ligo.osgstorage.org</a>) x509 authz helper invoked, connected to cvmfs process 1906869</pre><br/>In ps:<br/><pre>root     2033626  0.0  0.0 118800  4812 ?        D    Jan21   0:00  \_ /usr/libexec/cvmfs/authz/cvmfs_scitoken_helper</pre><br/><br/>
+<span style="color: #e96699"><span style="font-size: small">(10:10:58)</span> <b>lincoln:</b></span> not sure if hung CVMFS causing hung helper, or hung helper causing hung CVMFS :thinking_face:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:12:21)</span> <b>dweitzel:</b></span> is that hanging other CVMFS other than just ligo<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:12:25)</span> <b>dweitzel:</b></span> also, that's my fault... sorry<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:12:48)</span> <b>dweitzel:</b></span> Putting together a demo for accessing ligo data.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(10:13:17)</span> <b>andrew.melo:</b></span> Speaking of x509 &amp; LIGO -- is the caching for their protected .. area different than "standard" CVMFS data? (we just provisioned LIGO pilots @ Vanderbilt for a local PI)<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:13:55)</span> <b>lincoln:</b></span> @dweitzel other repos seem ok<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:15:28)</span> <b>dweitzel:</b></span> It gets complicated.  But I think the short answer is no, no different.  Cached ligo data will live beside the cached other data.  But, accessing it through CVMFS requires authentication (x509 or now scitokens).<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:18:59)</span> <b>lincoln:</b></span> should i just kill things? or is there any debugging we can do<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:22:24)</span> <b>dweitzel:</b></span> I will need to debug at some later time.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:22:28)</span> <b>dweitzel:</b></span> kill all the things.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:22:45)</span> <b>dweitzel:</b></span> ligo never worked on the login node.  The cvmfs-x509-helper was never installed.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:22:52)</span> <b>dweitzel:</b></span> so we went from not working to not working, so no change.<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:27:39)</span> <b>lincoln:</b></span> ok<br/>
+</body>
+</html>

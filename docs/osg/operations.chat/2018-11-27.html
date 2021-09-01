@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Nov 27, 2018 : #operations (osg)</title>
+</head>
+<body>
+<h3>Tue Nov 27, 2018 : #operations (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(10:09:12)</span> <b>dweitzel:</b></span> @jdost321 I'm here.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:09:51)</span> <b>dweitzel:</b></span> so frank just wants the what we are sending to the WLCG<br/>
+<span style="color: #385a86"><span style="font-size: small">(10:11:29)</span> <b>jdost321:</b></span> Hi @dweitzel<br/>
+<span style="color: #385a86"><span style="font-size: small">(10:12:45)</span> <b>jdost321:</b></span> How do we access it?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:16:55)</span> <b>dweitzel:</b></span> would have to go to WLCG websites to get the data.  We extract the data, transform it to meet their specifications, then send it to WLCG<br/>
+<span style="color: #385a86"><span style="font-size: small">(10:18:48)</span> <b>jdost321:</b></span> is there a way to get some kind of table or visualization from the gracc side instead given we know the raw data we're sending?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:19:46)</span> <b>dweitzel:</b></span> Here's the WLCG side, just Oct.  Scroll down to see the USA sites: <a href="https://accounting.egi.eu/wlcg/report/tier2/2018/10/2018/10/hours/">https://accounting.egi.eu/wlcg/report/tier2/2018/10/2018/10/hours/</a><br/>
+<span style="color: #385a86"><span style="font-size: small">(10:23:10)</span> <b>jdost321:</b></span> well i guess that's all the data we need, i can use this as a starting point. I just feel weird depending on WLCG sites but then I don't really understand hepspec and they already include that as well for us here<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:24:00)</span> <b>dweitzel:</b></span> well, we have the normalization factor in our records.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:24:06)</span> <b>dweitzel:</b></span> we do that.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:24:32)</span> <b>dweitzel:</b></span> here's core hours by WLCG site: <a href="https://gracc.opensciencegrid.org/kibana/goto/21e92966c65e66846005ceebeae1487f">https://gracc.opensciencegrid.org/kibana/goto/21e92966c65e66846005ceebeae1487f</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:25:17)</span> <b>dweitzel:</b></span> I forgot to change the dates.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:25:20)</span> <b>dweitzel:</b></span> probably will want to do that.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:26:23)</span> <b>dweitzel:</b></span> Lets see, other ways ops provides value to WLCG...  AGIS queries our htcondor collectors at <a href="http://collector.opensciencegrid.org">collector.opensciencegrid.org</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:27:42)</span> <b>dweitzel:</b></span> PerfSonar information flows through several services hosted by ops, including our message bus, before being shoveled to WLCG's monit...<br/>
+<span style="color: #385a86"><span style="font-size: small">(10:36:56)</span> <b>jdost321:</b></span> Thanks Derek! I think that's a good starting point. I also see the wlcg page has as csv export option, that makes it easy for me to give frank a table of just the US sites.<br/>
+<span style="color: #385a86"><span style="font-size: small">(10:51:23)</span> <b>jdost321:</b></span> @dweitzel are you able to make the kibana plot match the numbers in the wlcg after adjusting the dates?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:51:57)</span> <b>dweitzel:</b></span> the WLCG numbers factor in the normalization factor.<br/>
+<span style="color: #385a86"><span style="font-size: small">(10:52:02)</span> <b>jdost321:</b></span> i may be misunderstanding the kiban interface, but I tried the range Oct 1 to Oct 31, then changed x axis to endtime Monthly<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:52:12)</span> <b>dweitzel:</b></span> we don't store the corehours * normalization<br/>
+<span style="color: #385a86"><span style="font-size: small">(10:53:17)</span> <b>jdost321:</b></span> ah ok, i misread the wlcg columns, I thought some were w/ and some w/o but the first columns were the pledges<br/>
+<span style="color: #385a86"><span style="font-size: small">(10:57:01)</span> <b>jdost321:</b></span> i see the factor in the y axis fields, is there a way to multiply it after summing core hours in the kibana query?<br/>
+<span style="color: #385a86"><span style="font-size: small">(10:57:33)</span> <b>jdost321:</b></span> not that i actually want to, just curious if it can be done<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:00:15)</span> <b>dweitzel:</b></span> nope, I don't think kibana is fancy enough to do math in within the queries.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:00:33)</span> <b>dweitzel:</b></span> though, we could make a "calculated" field, which might work.<br/>
+<span style="color: #385a86"><span style="font-size: small">(11:03:40)</span> <b>jdost321:</b></span> yeah no worries, i just looked at the UCSD factor, when multiplying it by core hours multiplies it looks like the wlcg stats<br/>
+<span style="color: #385a86"><span style="font-size: small">(11:04:09)</span> <b>jdost321:</b></span> just wanted a quick sanity check to make sure I understood what I was looking at on both sides<br/>
+</body>
+</html>

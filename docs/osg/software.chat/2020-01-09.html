@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jan 9, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu Jan 9, 2020 : #software (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(10:23:39)</span> <b>bbockelm:</b></span> @efajardo - is that a container?  Various environment variable overrides on a system could possibly trigger a separate policy.<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:23:53)</span> <b>efajardo:</b></span> nop that is on bare metal<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:24:07)</span> <b>efajardo:</b></span> We could not reproduce it on a containe<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:24:37)</span> <b>bbockelm:</b></span> Right.  There might be more environment variables hanging around on bare metal.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:25:22)</span> <b>bbockelm:</b></span> I'd look at <tt>cat /proc/$PID/environ | tr '\0' '\n' | grep LCMAP</tt>  for the PID of the xrootd process and see if it is helpful.<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:29:28)</span> <b>efajardo:</b></span> <pre> cat /proc/15907/environ<br/>LANG=en_US.UTF-8PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/binHOME=/var/spool/xrootdLOGNAME=xrootdUSER=xrootdSHELL=/sbin/nologin</pre><br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(12:32:26)</span> <b>didavila:</b></span> I found the issue, it has to do with the xrootd-lcmaps plugin, I’ve created a PR that fixs it: <a href="https://github.com/opensciencegrid/xrootd-lcmaps/pull/40">https://github.com/opensciencegrid/xrootd-lcmaps/pull/40</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:33:50)</span> <b>blin:</b></span> thanks!<br/>
+</body>
+</html>

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jul 24, 2018 : #general (osg)</title>
+</head>
+<body>
+<h3>Tue Jul 24, 2018 : #general (osg)</h3>
+<span style="color: #dc7dbb"><span style="font-size: small">(00:23:12)</span> <b>carsten.aulbert:</b></span> Nope, data on NFS servers are strictly striped across in a round-robin fashion, i.e. clients requiring data as it was recorded will hop from one to the next. Also, all our nodes are on the same subnet - even the very same "collision" domain and that works surprisingly well :slightly_smiling_face:. Thus, I think we will try with a single parent first with say 5 squids the nodes may talk to at random and see how we fare.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:04:24)</span> <b>andrew.melo:</b></span> As an aside -- I'm real surprised you have that many nodes on the same L2 segment w/o any issues. You must have some nice hardware/engineers!<br/>
+<span style="color: #dc7dbb"><span style="font-size: small">(09:07:22)</span> <b>carsten.aulbert:</b></span> not really, we started with about 1000 nodes on the same segment and every told us, you need to separate them or you will have constant ARP storms or worse... did not happen. We then expanded and expanded and everything is still working with a moderate ARP background noise. Hardware is simple stuff from the shelf, Supermicro, Asus, Huawei, nothing fancy. Switching is HP/HPE and besides LACP everything stock ethernet.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:08:54)</span> <b>andrew.melo:</b></span> Huh. Well that rules pretty hard. :+1:<br/>
+<span style="color: #99a949"><span style="font-size: small">(09:13:16)</span> <b>dwd:</b></span> @carsten.aulbert if you’re able to work OK with 5 squids, which I expect you will, then I would not use a parent for them because it would be a single point of failure; just them them all contact the stratum 1s, it should be fine.  That’s what the 4 squids at CERN &amp; FNAL do.  In fact, they each have 3 workers which independently contact the stratum 1s, and it works fine.<br/>
+</body>
+</html>

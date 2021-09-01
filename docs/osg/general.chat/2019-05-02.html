@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu May 2, 2019 : #general (osg)</title>
+</head>
+<body>
+<h3>Thu May 2, 2019 : #general (osg)</h3>
+<span style="color: #7d414c"><span style="font-size: small">(09:21:11)</span> <b>bockjoo:</b></span> Add a line like data_interface <a href="http://xxx.xxx.xxx.xxx">xxx.xxx.xxx.xxx</a> in /etc/gridftp.conf<br/>
+<span style="color: #7d414c"><span style="font-size: small">(09:22:13)</span> <b>bockjoo:</b></span> and  data_interface yy:y:y:yyyyy in  /etc/gridftp.d/ipv6.conf<br/>
+<span style="color: #7d414c"><span style="font-size: small">(11:09:46)</span> <b>bockjoo:</b></span> I installed Slack on my Android but I can not see the Channel. Is this expected?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:11:02)</span> <b>blin:</b></span> @bockjoo the #general channel or the entire OSG workspace?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:11:24)</span> <b>blin:</b></span> because you have to add each slack workspace manually<br/>
+<span style="color: #7d414c"><span style="font-size: small">(11:12:40)</span> <b>bockjoo:</b></span> I can not see any Channel. I see your message appear and disappear from my phone momentarily, though.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:15:00)</span> <b>blin:</b></span> i'm not sure, i didn't have to do too much setup after installing the app and adding the workspace<br/>
+<span style="color: #7d414c"><span style="font-size: small">(11:16:39)</span> <b>bockjoo:</b></span> I am too old for this. I had to click the OSG logo.<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:17:51)</span> <b>isfiligoi:</b></span> @bockjoo I did try to add data_interface, but it did not make any difference<br/>
+<span style="color: #7d414c"><span style="font-size: small">(11:20:30)</span> <b>bockjoo:</b></span> Mine looks like<br/>
+<span style="color: #7d414c"><span style="font-size: small">(11:20:34)</span> <b>bockjoo:</b></span> [root@cmsio6 ~]# grep -v ^# /etc/gridftp.conf | grep -v ^$<br/>$GLOBUS_HOSTNAME <a href="http://cmsio6.rc.ufl.edu">cmsio6.rc.ufl.edu</a><br/>port 2811<br/>log_level ERROR,WARN,INFO,TRANSFER<br/>log_single /var/log/gridftp-auth.log<br/>log_transfer /var/log/gridftp.log<br/>data_interface <a href="http://cmsio6.rc.ufl.edu">cmsio6.rc.ufl.edu</a><br/>epsv_ip 1<br/>disable_usage_stats 1<br/>[root@cmsio6 ~]# grep -v ^# /etc/gridftp.d/ipv6.conf | grep -v ^$<br/>data_interface 2620:104:1f:1000:92e2:baff:fe2b:9538<br/>epsv_ip 1<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:24:59)</span> <b>bbockelm:</b></span> @isfiligoi - if you are using <tt>globus-url-copy</tt>, then you can add the <tt>-dbg</tt> flag to see what IP address the server is responding with.<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:27:10)</span> <b>isfiligoi:</b></span> I checked… It always sends back the private IP<br/>Cannot seem to force him to an alternative one<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:27:51)</span> <b>bbockelm:</b></span> ok, the next question is whether GridFTP is picking up the correct config file.<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:27:51)</span> <b>isfiligoi:</b></span> For context, this is on AWS, and the instance only has the private IP in the list of interfaces, but there is a public IP managed by the NAT<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:28:10)</span> <b>bbockelm:</b></span> If you end up with the non-OSG variant, the configs might be in different locations.<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:28:46)</span> <b>isfiligoi:</b></span> the gridftp definitely uses /etc/gridftp.conf… not sure how to check what globus-url-copy uses<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:29:46)</span> <b>isfiligoi:</b></span> oh, and this is only for the parallel mode… in streaming/passive mode things work just fine<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:31:38)</span> <b>isfiligoi:</b></span> globus-url-copy -p 16 -fast <a href="ftp://remoteserver/blah">ftp://remoteserver/blah</a> file:///local/file fails (private callback ip)<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:32:17)</span> <b>isfiligoi:</b></span> globus-url-copy <a href="ftp://remoteserver/blah">ftp://remoteserver/blah</a> file:///local/file works<br/>
+<span style="color: #7d414c"><span style="font-size: small">(11:33:34)</span> <b>bockjoo:</b></span> @isfiligoi Is there an error message or just hanging? Did you try -nodcau option?<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:39:31)</span> <b>isfiligoi:</b></span> it timesout… and -dbg shows it is trying the wrong IP<br/>
+<span style="color: #7d414c"><span style="font-size: small">(11:43:55)</span> <b>bockjoo:</b></span> Does -p 1 have the same issue?<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:49:00)</span> <b>isfiligoi:</b></span> yes<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:53:48)</span> <b>bbockelm:</b></span> parallel mode -&gt; client needs ports open potentially<br/>
+<span style="color: #2b6836"><span style="font-size: small">(12:36:03)</span> <b>daues:</b></span> I see a reference to "set GLOBUS_HOSTNAME to the IP address of the interface you want to sent the data through";  give that a try ?<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:14:51)</span> <b>isfiligoi:</b></span> tried that… did not work<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:48:45)</span> <b>bbockelm:</b></span> Can you post the <tt>rpm -qa | grep globus</tt> output?<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:59:30)</span> <b>isfiligoi:</b></span> Stopped the instance since… But will retry later this afternoon or tomorrow<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:49:41)</span> <b>bbockelm:</b></span> :wave: hi steve!<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(16:00:18)</span> <b>barnet:</b></span> Hey Brian! They found me!<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(16:04:34)</span> <b>barnet:</b></span> Found some old doc that suggested this:<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(16:05:39)</span> <b>barnet:</b></span> as flags on the server side. Not sure if that's still possible, but I recall that we had to do that (way) back in the day when we ran gridftp servers behind NAT.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:06:19)</span> <b>bbockelm:</b></span> yeah - that should be equivalent to what Igor was trying<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:06:30)</span> <b>bbockelm:</b></span> I wonder if, perhaps, he should try a public hostname instead...<br/>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Aug 17, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Mon Aug 17, 2020 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(14:21:32)</span> <b>blin:</b></span> @andrew.melo could you try downgrading to balhp 1.18.45? there were some changes to <tt>slurm_status.py</tt> which i wonder may be the cause of your issues<br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:22:37)</span> <b>andrew.melo:</b></span> OK, lemme try that<br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:23:26)</span> <b>andrew.melo:</b></span> lemme check the history of those servers. @eric.appelt did some forensics and we found the day all this started happening (jul 13th), so I wanna see if I made an update around then<br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:27:16)</span> <b>andrew.melo:</b></span> (a good avantage of spacewalk)<br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:30:15)</span> <b>andrew.melo:</b></span> @blin actually, it looks like one machine is still @ 1.18.45:<br/><pre>blahp.x86_64                      1.18.45-1.osg35.el7            @centos_7_osg_35_prod       </pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:30:33)</span> <b>blin:</b></span> and it has the same issues?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:31:04)</span> <b>andrew.melo:</b></span> yeah<br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:31:31)</span> <b>andrew.melo:</b></span> IT wouldn't be as bad if only half the jobs got killed, In the limit the other CE would get all the jobs :wink:<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:34:50)</span> <b>blin:</b></span> did you see any blahp updates around jul 13?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:36:02)</span> <b>blin:</b></span> if you were really backversioned, we had made some proxy handling changes in 1.18.40<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:37:06)</span> <b>eric.appelt:</b></span> Just as an potentially interesting small data point, I saw a brief set of jobs get cancelled on June 11th, but no more until the July 13 start.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:42:13)</span> <b>blin:</b></span> were there any changes to the shared FS around that date?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:47:42)</span> <b>andrew.melo:</b></span> July 13th is a weird coincidence because that's when we asked to move ce5/6 into production<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:02:04)</span> <b>blin:</b></span> argh, of course :anguished:<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:24:34)</span> <b>andrew.melo:</b></span> But maybe in the process of those changes, a setting was mistakenly changed?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:26:10)</span> <b>blin:</b></span> perhaps<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:26:22)</span> <b>blin:</b></span> so 5/6 are your new prod CEs. do you have old ones that are still up?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:30:26)</span> <b>andrew.melo:</b></span> we turned them off a couple weeks back,. We might still have the VM image around<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:40:53)</span> <b>andrew.melo:</b></span> Old ones had <a href="https://pokey.accre.vanderbilt.edu/rhn/software/packages/Details.do?pid=216599">blahp-1.18.45-1.osg34.el7</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:03:53)</span> <b>blin:</b></span> how about the condor version?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:10:27)</span> <b>andrew.melo:</b></span> <a href="https://pokey.accre.vanderbilt.edu/rhn/software/packages/Details.do?pid=242748">condor-8.8.8-1.osg34.el7</a><br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:10:40)</span> <b>andrew.melo:</b></span> <a href="https://pokey.accre.vanderbilt.edu/rhn/software/packages/Details.do?pid=232161">htcondor-ce-3.4.0-1.osg34.el7</a><br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:14:27)</span> <b>andrew.melo:</b></span> We turned the old CEs off, but the images are still there, we could bring them back up if that's helpful (we'd need to start sending jobs to them again too)<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:23:32)</span> <b>blin:</b></span> nah that's fine for now. i was wondering if it was a condor 8.6 issue<br/>
+</body>
+</html>

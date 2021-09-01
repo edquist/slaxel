@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Feb 11, 2021 : #uscms (osg)</title>
+</head>
+<body>
+<h3>Thu Feb 11, 2021 : #uscms (osg)</h3>
+<span style="color: #de5f24"><span style="font-size: small">(11:08:38)</span> <b>justas.balcas:</b></span> As I just learned (unmerged is not under Rucio accounting) -  What is the unmerged space usage at your sites?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:09:16)</span> <b>justas.balcas:</b></span> Since phedex/dynamo off - unmerged keeps growthing and now is 350tb (while under dynamo/phedex was always below 100tb)<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:10:07)</span> <b>justas.balcas:</b></span> Do you see same trend?<br/>
+<span style="color: #d1707d"><span style="font-size: small">(13:59:15)</span> <b>gattebury:</b></span> Oof, ours is up to 266.17TB right now (before replication!) — in the past I think it always hovered in the ~100TB or less as well.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:40:25)</span> <b>bockjoo:</b></span> Does anyone have the HS06 number for AMD EPYC 7742 64-Core Processor?<br/>
+<blockquote>
+<span style="color: #de5f24"><span style="font-size: small">(17:37:25)</span> <b>justas.balcas:</b></span> not hs06 - but I have slides with spec2017 numbers<br/>
+<span style="color: #7d414c"><span style="font-size: small">(17:39:34)</span> <b>bockjoo:</b></span> I want to use the info for the facility plan so I need HS06. Otherwise, I will have to ask my HPC to run the software to calculate HS06. Thanks anyway!<br/>
+<span style="color: #de5f24"><span style="font-size: small">(17:41:16)</span> <b>justas.balcas:</b></span> if you run HS06 on this CPU - let me know. I am interested on numbers (with hyperthreading on/off)<br/>
+<span style="color: #7d414c"><span style="font-size: small">(17:41:57)</span> <b>bockjoo:</b></span> AMD does not have hyperthreading in the past. Does that change?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(17:45:39)</span> <b>justas.balcas:</b></span> it does - called SMT in Bios<br/>
+<span style="color: #7d414c"><span style="font-size: small">(17:46:40)</span> <b>bockjoo:</b></span> OK, I will ask that value too.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(2021-02-15 23:25:57)</span> <b>bockjoo:</b></span> They did not run the software yet.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(2021-02-15 23:26:22)</span> <b>bockjoo:</b></span> But BenchmarkDB12 gives you the value roughly:<br/>
+<span style="color: #7d414c"><span style="font-size: small">(2021-02-15 23:29:17)</span> <b>bockjoo:</b></span> <a href="https://es-cms.cern.ch/kibana/app/kibana#/visualize/edit/benchDB12-pre-site?_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now%2Fw,to:now%2Fw))&amp;_a=(filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'cms-20*',key:Site,negate:!f,params:(query:T2_US_Purdue),type:phrase,value:T2_US_Purdue),query:(match:(Site:(query:T2_US_Purdue,type:phrase))))),linked:!f,query:(language:lucene,query:'*'),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(field:BenchmarkJobDB12,percents:!(50)),schema:metric,type:median),(enabled:!t,id:'2',params:(field:CPUModel,missingBucket:!f,missingBucketLabel:Missing,order:desc,orderBy:_key,otherBucket:!f,otherBucketLabel:Other,size:100),schema:segment,type:terms)),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,categoryAxes:!((id:CategoryAxis-1,labels:(show:!t,truncate:100),position:bottom,scale:(type:linear),show:!t,style:(),title:(),type:category)),defaultYExtents:!f,grid:(categoryLines:!f),legendPosition:right,mode:stacked,scale:linear,seriesParams:!((data:(id:'1',label:'Median%20BenchmarkJobDB12'),mode:stacked,show:true,type:histogram,valueAxis:ValueAxis-1)),setYExtents:!f,shareYAxis:!t,times:!(),type:histogram,valueAxes:!((id:ValueAxis-1,labels:(filter:!f,rotate:0,show:!t,truncate:100),name:LeftAxis-1,position:left,scale:(defaultYExtents:!f,mode:normal,setYExtents:!f,type:linear),show:!t,style:(),title:(text:'Median%20BenchmarkJobDB12'),type:value)),yAxis:()),title:'benchDB12%20pre%20site',type:histogram))">https://es-cms.cern.ch/kibana/app/kibana#/visualize/edit/benchDB12-pre-site?_g=(filters:!(),r[…]:()),title:'benchDB12%20pre%20site',type:histogram))</a><br/>
+</blockquote>
+<span style="color: #235e5b"><span style="font-size: small">(17:16:23)</span> <b>spiperov:</b></span> @justas.balcas Our /store/unmerged is currently at 280TB. We consider it normal when it is around 100TB, but it naturally varies.<br/>Rucio is not managing unmerged yet, but I was assured on Tuesday that DYNAMO is still supposed to be doing that until Rucio is prepared to take over later this year.<br/>In <a href="http://dynamo.mit.edu/consistency/">http://dynamo.mit.edu/consistency/</a> I see entries from today, so it's clearly still running, but - yes - as you said the supposed deletions listed in the last column <tt>Unmerged Cleaned (logs)</tt> did not happen - I still see the files in our storage.<br/><br/>In situations like this we normally just fire up a local deletion script to do the job instead of Dynamo.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(17:19:31)</span> <b>justas.balcas:</b></span> Yea, seems it is unclear if Rucio will track unmerged at any point. Same here - I consider normal 100, max 150, but not 360<br/>
+<span style="color: #a72f79"><span style="font-size: small">(17:47:51)</span> <b>andrew.melo:</b></span> I agree<br/>
+<span style="color: #d1707d"><span style="font-size: small">(18:50:33)</span> <b>gattebury:</b></span> @justas.balcas maybe you said this (multiple times even) but what EC ratio were you planning on using with your CEPH for the primary Tier2 needs?<br/>
+<blockquote>
+<span style="color: #de5f24"><span style="font-size: small">(2021-02-12 09:42:47)</span> <b>justas.balcas:</b></span> We go with this (so far sweet spot for us):<br/>(120%) EC(11,2) - /store/temp<br/>(126%) EC(11,3) - /store/{mc,data,unmerged}<br/>(131%) EC(11,4) - /store/{user,group}<br/>
+</blockquote>
+</body>
+</html>

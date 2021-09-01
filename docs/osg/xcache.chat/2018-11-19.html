@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Nov 19, 2018 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Mon Nov 19, 2018 : #xcache (osg)</h3>
+<span style="color: #e06b56"><span style="font-size: small">(13:28:49)</span> <b>jthiltges:</b></span> @matyas Looks like the condor_mapfile on collector2 is missing a mapping for InCommon certs.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:30:48)</span> <b>matyas:</b></span> that would do it<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:41:33)</span> <b>jthiltges:</b></span> I updated <tt>/etc/condor-ce/condor_mapfile</tt> on <a href="http://collector2.opensciencegrid.org">collector2.opensciencegrid.org</a> to match collector1. These two lines were absent:<br/><pre>GSI "^/DC=org/DC=incommon/.*/CN=([a-zA-Z0-9\.-]+)$" \1@daemon.opensciencegrid.org<br/>GSI "^/CN=([-.A-Za-z0-9/= ]+)$" \1@daemon.opensciencegrid.org</pre><br/>Restarting the condor service now.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:54:14)</span> <b>jthiltges:</b></span> @matyas That mapping change seems to have fixed the issue with the stashcache-reporter service on <a href="http://hcc-stash.unl.edu">hcc-stash.unl.edu</a>. Could you try running yours again?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:55:32)</span> <b>matyas:</b></span> <pre>Nov 19 13:55:07 <a href="http://sc-cache.chtc.wisc.edu">sc-cache.chtc.wisc.edu</a> stashcache[445573]: WARNING: Could not advertise to <a href="http://collector1.opensciencegrid.org:9619,collector2.opensciencegrid.org:9619">collector1.opensciencegrid.org:9619,collector2.opensciencegrid.org:9619</a>: Failed to advertise to collector</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(13:56:10)</span> <b>matyas:</b></span> let me just check the host's cert<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:57:05)</span> <b>matyas:</b></span> <pre>$ openssl x509 -in /etc/grid-security/hostcert.pem -noout -issuer -subject<br/>issuer= /C=US/ST=MI/L=Ann Arbor/O=Internet2/OU=InCommon/CN=InCommon RSA Server CA<br/>subject= /C=US/postalCode=53706/ST=WI/L=Madison/street=1210 West Dayton Street/O=University of Wisconsin-Madison/OU=OCIS/CN=<a href="http://sc-cache.chtc.wisc.edu">sc-cache.chtc.wisc.edu</a></pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(13:59:20)</span> <b>matyas:</b></span> umm. how are we going to match against that.<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:45:35)</span> <b>matyas:</b></span> could you just add that and <a href="http://sc-origin.chtc.wisc.edu">sc-origin.chtc.wisc.edu</a> (similar subject) to the mapfile? or do you have a better idea?<br/>
+</body>
+</html>

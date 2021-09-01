@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Aug 31, 2020 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Mon Aug 31, 2020 : #gfactory (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(14:02:37)</span> <b>bbockelm:</b></span> @jdost321 - can you send me some of the gfactory logs from the entry point <tt>OSG_US_AMNH-ARES</tt>?  I'm curious as to why the requested idle is so low from the factory (2 glideins)<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:06:38)</span> <b>jdost321:</b></span> request idle 2 isn't coming from us it's from the frontend, you'll want to ask Mats why there isn't much user pressure there<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:07:17)</span> <b>rynge:</b></span> A lot of jobs are failing there<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:07:56)</span> <b>rynge:</b></span> <pre>Executing /tmp/glide_aAKT82/client/clock-check<br/>ERROR: My clock is behind 240 minutes</pre><br/><br/>
+<span style="color: #385a86"><span style="font-size: small">(14:08:02)</span> <b>jdost321:</b></span> i see now, pilots are failing validation <a href="http://gfactory-2.opensciencegrid.org/factory/monitor/factoryStatus.html?entry=OSG_US_AMNH-ARES">http://gfactory-2.opensciencegrid.org/factory/monitor/factoryStatus.html?entry=OSG_US_AMNH-ARES</a><br/>
+<span style="color: #385a86"><span style="font-size: small">(14:08:12)</span> <b>jdost321:</b></span> not sure why that affects idle pressure from the FE?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:08:41)</span> <b>rynge:</b></span> They are failing fast<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:08:49)</span> <b>jdost321:</b></span> I think I saw this last week and asked @marco.mascheroni to look, clock skew would definitely be a reason though<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:08:58)</span> <b>rynge:</b></span> On HEL:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:09:01)</span> <b>rynge:</b></span> <pre>mktemp: failed to create directory via template '/scratch_space/glide_XXXXXX': Permission denied</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:09:44)</span> <b>rynge:</b></span> Also, I see both <tt>COVID19_US_AMNH-HEL</tt> and <tt>COVID19_US_AMNH_HEL</tt><br/>
+<span style="color: #385a86"><span style="font-size: small">(14:10:01)</span> <b>jdost321:</b></span> HEL is interesting, i see a subset of running pilots working<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:10:02)</span> <b>jdost321:</b></span> <a href="http://gfactory-2.opensciencegrid.org/factory/monitor/factoryStatus.html?entry=COVID19_US_AMNH-HEL">http://gfactory-2.opensciencegrid.org/factory/monitor/factoryStatus.html?entry=COVID19_US_AMNH-HEL</a><br/>
+<span style="color: #385a86"><span style="font-size: small">(14:10:10)</span> <b>jdost321:</b></span> it must be a subset of nodes that don't have /scratch_space<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:10:29)</span> <b>jdost321:</b></span> yes, <tt>COVID19_US_AMNH_HEL</tt> is the old non-slate entry<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:10:36)</span> <b>bbockelm:</b></span> @rynge - are the frontend logs available?  I'll be happy to poke inside.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:10:58)</span> <b>rynge:</b></span> Are you renaming stuff?<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:11:08)</span> <b>jdost321:</b></span> following a more strict convention<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:11:21)</span> <b>rynge:</b></span> Ok, yeah I see a few more renames<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:11:35)</span> <b>jdost321:</b></span> the duplicates will go away when we turn off the old CEs<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:11:43)</span> <b>rynge:</b></span> @bbockelm I use my shortcut: <a href="http://flock.opensciencegrid.org/overview/glideins.php">http://flock.opensciencegrid.org/overview/glideins.php</a><br/>
+<span style="color: #385a86"><span style="font-size: small">(14:11:45)</span> <b>jdost321:</b></span> we just wanted to be sure the new SLATE ones are working first<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:11:54)</span> <b>rynge:</b></span> I also have rsynced logs available on xd-login<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:12:10)</span> <b>jdost321:</b></span> I think at this point we can contact the site with the 2 issues observed, clock skew and missing scratch space<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:12:19)</span> <b>jdost321:</b></span> i'll take care of that<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:12:30)</span> <b>rynge:</b></span> Thanks!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:13:05)</span> <b>bbockelm:</b></span> @rynge - actually, I was interested in looking at the frontend logs, not the pilot logs... curious about why it's asking for so few glideins.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:13:20)</span> <b>rynge:</b></span> Ah, hang on, need go find the URL<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:14:02)</span> <b>rynge:</b></span> <a href="http://flock.opensciencegrid.org/gwms-logs/">http://flock.opensciencegrid.org/gwms-logs/</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:16:19)</span> <b>bbockelm:</b></span> Also, notice there's a <tt>OSG_US_AMNH-ARES</tt>  and <tt>OSG_US_AMNH_ARES</tt><br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:16:32)</span> <b>rynge:</b></span> That is the renaming Jeff mentioned<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:19:18)</span> <b>jdost321:</b></span> I pinged the admin about the wn issues<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:24:26)</span> <b>bbockelm:</b></span> ah - and for AMNH-ARES, it seems we put a hard limit of 2 idle pilots.  Do we remember why?<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:24:40)</span> <b>jdost321:</b></span> who's we? is it in the factory entry?<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:25:12)</span> <b>jdost321:</b></span> not us<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:25:12)</span> <b>bbockelm:</b></span> sorry - that's the frontend<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:25:15)</span> <b>jdost321:</b></span> <pre>               &lt;default_per_frontend glideins="100" held="10" idle="20"/&gt;<br/>               &lt;per_entry glideins="100" held="10" idle="20"/&gt;</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:25:37)</span> <b>rynge:</b></span> Which group?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:25:39)</span> <b>bbockelm:</b></span> <tt>git blame</tt> suggests that Mats knows (or has forgotten) the answer<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:25:50)</span> <b>bbockelm:</b></span> <a href="https://github.com/opensciencegrid/osg-flock/commit/5b858fc6cec964fb240b49b651a96b1d366c3488">https://github.com/opensciencegrid/osg-flock/commit/5b858fc6cec964fb240b49b651a96b1d366c3488</a><br/>
+<span style="color: #385a86"><span style="font-size: small">(14:26:27)</span> <b>jdost321:</b></span> ah, this is cluster restricted to AMNH users only is that correct?<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:26:30)</span> <b>jdost321:</b></span> from their submit host<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:26:36)</span> <b>rynge:</b></span> Ah, yeah from their host<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:26:47)</span> <b>jdost321:</b></span> we have a special vo name inthe entry to filter this OSGVO_AMNH<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:26:49)</span> <b>rynge:</b></span> It is one of these odd loopback things<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:28:28)</span> <b>bbockelm:</b></span> (is there a missing <tt>match_expr</tt> on that group then?)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:29:23)</span> <b>rynge:</b></span> Looks like the resources are not supporting OSGVO<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:29:41)</span> <b>rynge:</b></span> Only configured for the special OSGVO_AMNH VO<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:29:55)</span> <b>rynge:</b></span> <tt>condor_status -any -pool <a href="http://gfactory-2.opensciencegrid.org">gfactory-2.opensciencegrid.org</a> -constraint 'stringListMember("OSGVO_AMNH", GLIDEIN_Supported_VOs)'</tt><br/>
+<span style="color: #385a86"><span style="font-size: small">(14:30:05)</span> <b>jdost321:</b></span> i think an exceptoin was made for covid research as well though we have a different entry for that<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:30:06)</span> <b>bbockelm:</b></span> I mean, shouldn't the job query only look for jobs from AMNH users?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:30:19)</span> <b>rynge:</b></span> right, we do get covid slots<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:31:06)</span> <b>rynge:</b></span> It does - we currently do not have any of those<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:32:06)</span> <b>rynge:</b></span> I wonder if they this is the policy they intended<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:32:16)</span> <b>rynge:</b></span> Or if they just want local users to go first<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:33:10)</span> <b>rynge:</b></span> Ah, we got banned for bad memory jobs<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:34:00)</span> <b>rynge:</b></span> Well we should have a discussion about what policy they want<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:46:11)</span> <b>bbockelm:</b></span> Gotcha.  Next question: Clarkson (<tt>OSG_US_Clarkson-ACRES</tt>)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:46:41)</span> <b>bbockelm:</b></span> In the frontend logs (<tt>group_main</tt>), I see requested idle in 20-30.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:46:59)</span> <b>bbockelm:</b></span> But when it gets to the factory (<a href="http://gfactory-2.opensciencegrid.org/factory/monitor/factoryStatus.html?entry=OSG_US_Clarkson-ACRES">http://gfactory-2.opensciencegrid.org/factory/monitor/factoryStatus.html?entry=OSG_US_Clarkson-ACRES</a>) there's far fewer requested - mostly zero.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:47:24)</span> <b>bbockelm:</b></span> It looks like there's a cutoff being hit but I sure can't figure out what<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:49:58)</span> <b>bbockelm:</b></span> ah, that's in the non-XML auto-generated YAML.  There's a limit of 10 glideins.<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:50:49)</span> <b>jdost321:</b></span> i can dig up the freshdesk but i'm assuming the Clarkson admin requested that limit<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:51:38)</span> <b>bbockelm:</b></span> Sounds good.  If you can find it in Freshdesk in 10 seconds, provide me with the link!<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:52:54)</span> <b>rynge:</b></span> I also see an instance of:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:52:57)</span> <b>rynge:</b></span> <pre>=== Validation error in /scratch/glide_2zgtbC/main/setup_x509.sh ===<br/>Mon Aug 31 11:09:26 EDT 2020 Error running '/scratch/glide_2zgtbC/main/setup_x509.sh'<br/>    Proxy not valid in 1 minute, only -1 seconds left!<br/>    Not enough time to do anything with it.</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:53:03)</span> <b>rynge:</b></span> Could also be a clock skew<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:56:24)</span> <b>jdost321:</b></span> <a href="https://support.opensciencegrid.org/a/tickets/64981">https://support.opensciencegrid.org/a/tickets/64981</a> but they actually asked to increase to 20 and we missed that request<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:56:38)</span> <b>jdost321:</b></span> btw 1 pilot is 20 cores so these are significantly sized pilots<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:58:24)</span> <b>bbockelm:</b></span> Ah, ok.  Let's follow up on the increase, another 200 cores for science!<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:58:32)</span> <b>jdost321:</b></span> on it<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:04:02)</span> <b>jdost321:</b></span> Clarkson is increased to 20<br/>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jul 25, 2019 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu Jul 25, 2019 : #software (osg)</h3>
+<span style="color: #73769d"><span style="font-size: small">(10:21:58)</span> <b>tim.theisen:</b></span> @jthiltges: Gearing up for today's release. Have you tested XRootD 4.10.0?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:24:43)</span> <b>jthiltges:</b></span> We've been running rc5 and 4.10.0 for several days now. I don't know of any problems, aside from an issue with the scitokens plugin that @dweitzel is currently working on.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:27:21)</span> <b>dweitzel:</b></span> indeed, there is a bug in scitokens-cpp and it should not be shipped as is right now.<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:28:01)</span> <b>matyas:</b></span> what's the bug? did you mention it in the ticket?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:28:43)</span> <b>dweitzel:</b></span> just discovered late yesterday.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:29:09)</span> <b>dweitzel:</b></span> <a href="https://github.com/scitokens/scitokens-cpp/pull/12">https://github.com/scitokens/scitokens-cpp/pull/12</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:29:25)</span> <b>dweitzel:</b></span> and there's another one that is less a bug, and more a difference in parsing between python and c++.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:34:59)</span> <b>blin:</b></span> ok then i think we have to pull all the xrootd packages from the release<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:36:04)</span> <b>matyas:</b></span> is it a regression or was it a problem in the existing version?<br/>
+<span style="color: #73769d"><span style="font-size: small">(10:38:07)</span> <b>tim.theisen:</b></span> @jthiltges: Any problems with the new Singularity?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:39:19)</span> <b>jthiltges:</b></span> No issues noted with the new singularity. We've got workers running cmsprod jobs OK.<br/>
+<span style="color: #73769d"><span style="font-size: small">(10:40:28)</span> <b>tim.theisen:</b></span> Thank you<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:41:01)</span> <b>dweitzel:</b></span> pull all xrootd packages?  This only affects the scitokens-cpp.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:41:13)</span> <b>dweitzel:</b></span> which is required by xrootd-scitokens.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:41:33)</span> <b>dweitzel:</b></span> @matyas regression.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:41:39)</span> <b>jthiltges:</b></span> Could rebuild the previous plugin version against the new xrootd.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:42:08)</span> <b>blin:</b></span> yeah, i don't think we have time for that today<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:42:16)</span> <b>blin:</b></span> so i'd rather just punt to next week<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:42:42)</span> <b>matyas:</b></span> make a 3.4.33 next week or punt 3.4.32 to next week?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:44:01)</span> <b>blin:</b></span> the former<br/>
+<span style="color: #73769d"><span style="font-size: small">(10:44:06)</span> <b>tim.theisen:</b></span> We will have a 3.4.33 next week. Need to release VO client and frontier-squid security release today.<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:44:18)</span> <b>matyas:</b></span> ok<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:44:47)</span> <b>matyas:</b></span> time to mass relabel tickets again :slightly_smiling_face:<br/>
+<span style="color: #73769d"><span style="font-size: small">(10:45:19)</span> <b>tim.theisen:</b></span> Yup.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:50:35)</span> <b>dweitzel:</b></span> @matyas could you rebuild the new 0.3.2 version of scitokens-cpp?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:50:45)</span> <b>dweitzel:</b></span> (newly tagged and released!)<br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:55:32)</span> <b>bockjoo:</b></span> @dweitzel I have [root@cmsio3 ~]# rpm -qa | grep scitokens-cpp<br/>scitokens-cpp-0.3.0-4.osg34.el7.x86_64<br/>which is the latest scitokens-cpp that I pulled from osg-development repo. Just wondering what happened to 0.3.1.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:57:06)</span> <b>dweitzel:</b></span> it looks like it was never built in OSG.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:57:33)</span> <b>dweitzel:</b></span> it had updates that didn't affect OSG though, I think they were made for our ligo debian friends.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:57:51)</span> <b>dweitzel:</b></span> support for newer OpenSSL, new gcc compiler complaints...<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:04:10)</span> <b>matyas:</b></span> @dweitzel sure<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:05:36)</span> <b>dweitzel:</b></span> thanks!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:12:58)</span> <b>dweitzel:</b></span> Sorry Tim.  I just saw the jira emails.<br/>10:04: Scitokens-cpp is ready for release!<br/>10:32: Scitokens-cpp bug, back to drawing board.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:13:08)</span> <b>dweitzel:</b></span> I just imagine Tim happy, then disappointed..<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:11:23)</span> <b>dweitzel:</b></span> @matyas you're not gonna like me.  But... I have another release of scitokens-cpp for you to build :slightly_smiling_face:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:11:26)</span> <b>dweitzel:</b></span> just tagged.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:11:43)</span> <b>dweitzel:</b></span> fix bug in token verification.<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:14:20)</span> <b>matyas:</b></span> ok<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:18:22)</span> <b>matyas:</b></span> builds launched:<br/><a href="https://koji.opensciencegrid.org/koji/taskinfo?taskID=295511">https://koji.opensciencegrid.org/koji/taskinfo?taskID=295511</a><br/><a href="https://koji.opensciencegrid.org/koji/taskinfo?taskID=295512">https://koji.opensciencegrid.org/koji/taskinfo?taskID=295512</a><br/>gonna go back to docs now<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:32:13)</span> <b>matyas:</b></span> is there any way to shut down CEView temporarily without shutting down the rest of the CE?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:32:42)</span> <b>matyas:</b></span> i'm trying to update our instructions for Let's Encrypt<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:33:24)</span> <b>matyas:</b></span> and we need to open port 80 for certbot to work but people shouldn't have to shut down the whole CE for this<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:44:02)</span> <b>jthiltges:</b></span> Our lousy solution was to run nginx on port 80 and proxy to the ce_view service. =/<br/>Though it shouldn't be too horrible to get cherrypy to serve static content for the verification.<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:13:26)</span> <b>blin:</b></span> <a href="https://cdcvs.fnal.gov/redmine/issues/22962">https://cdcvs.fnal.gov/redmine/issues/22962</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:13:31)</span> <b>blin:</b></span> @tim.theisen @matyas<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:14:33)</span> <b>blin:</b></span> @efajardo is this the bug that we're tripping over?<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:14:52)</span> <b>efajardo:</b></span> no this fails even without debug<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:15:04)</span> <b>efajardo:</b></span> the problem is the way glideiwnms test if singularirt is available<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:15:11)</span> <b>efajardo:</b></span> does not work in newwer versions of singularriy<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:15:19)</span> <b>efajardo:</b></span> @marcom told me it should be fixed on this<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:15:20)</span> <b>efajardo:</b></span> <a href="https://github.com/glideinWMS/glideinwms/commit/37c312101523d1944f5b10755f4e0ac9dbaaa5c7">https://github.com/glideinWMS/glideinwms/commit/37c312101523d1944f5b10755f4e0ac9dbaaa5c7</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(16:15:23)</span> <b>efajardo:</b></span> commit<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:15:40)</span> <b>efajardo:</b></span> We can use the OSG Validation scripts meanshiel<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:16:54)</span> <b>matyas:</b></span> should we patch our 3.4.5 with that?<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:22:10)</span> <b>efajardo:</b></span> we could try<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:22:42)</span> <b>efajardo:</b></span> in this host <tt><a href="http://itb-host-2.chtc.wisc.edu">itb-host-2.chtc.wisc.edu</a></tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(16:22:51)</span> <b>efajardo:</b></span> as a non root user<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:22:52)</span> <b>efajardo:</b></span> run<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:25:47)</span> <b>efajardo:</b></span> <pre> singularity exec --home "$PWD":/srv --pwd /srv --ipc --pid  /cvmfs/singularity.opensciencegrid.org/markito3/gluex_docker_prod:latest printenv | grep singularity</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(16:25:54)</span> <b>efajardo:</b></span> can you try that @matyas?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:26:01)</span> <b>matyas:</b></span> sure<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:26:59)</span> <b>matyas:</b></span> <pre><br/>WARNING: container does not have /.singularity.d/actions/exec, calling printenv directly<br/>SINGULARITY_CONTAINER=/cvmfs/singularity.opensciencegrid.org/markito3/gluex_docker_prod:latest<br/>_=/usr/bin/singularity<br/></pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(16:30:10)</span> <b>efajardo:</b></span> interesting<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:30:12)</span> <b>efajardo:</b></span> whcih version<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:30:16)</span> <b>efajardo:</b></span> of singularirt it is?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:30:30)</span> <b>matyas:</b></span> singularity-3.2.1-1.osg34.el6.x86_64<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:30:52)</span> <b>efajardo:</b></span> Unfortuanly this is the only thing I see<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:30:54)</span> <b>efajardo:</b></span> <pre>singularity_setup.j7pbIp.sh: OK<br/>Signature OK for main:singularity_setup.j7pbIp.sh.<br/>INFO  Sourcing add config line: /var/lib/condor/execute/dir_4311/glide_WqGIrK/add_config_line.source<br/>INFO  Checking for singularity...<br/>INFO  Singularity at /usr/bin/singularity failed<br/>INFO  Singularity at /usr/bin/singularity failed<br/>Thu Jul 25 15:44:03 CDT 2019 Singularity not found in PATH, and module<br/>=== validation OK in /var/lib/condor/execute/dir_4311/glide_WqGIrK/main/singularity_setup.sh (0) ===</pre><br/>
+<span style="color: #dd8527"><span style="font-size: small">(16:31:00)</span> <b>marcom:</b></span> I just pushed a version that works on local tests both on singularity 2.6 and 3.3: it is bd9eafef15eeb7be07e4f0f383224a129dd2b88d :<br/><a href="https://github.com/glideinWMS/glideinwms/commit/bd9eafef15eeb7be07e4f0f383224a129dd2b88d">https://github.com/glideinWMS/glideinwms/commit/bd9eafef15eeb7be07e4f0f383224a129dd2b88d</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(16:39:42)</span> <b>efajardo:</b></span> @matyas do you want to try to patch glidein3<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:39:45)</span> <b>efajardo:</b></span> or you want me to do it<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:42:48)</span> <b>matyas:</b></span> what do you mean patch glidein3? i thought this was a change in glideinwms itself<br/>
+<span style="color: #dd8527"><span style="font-size: small">(16:44:16)</span> <b>marcom:</b></span> It is. The files testing singularity are different. singularity_setup.sh and singularity_lib.sh<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:45:07)</span> <b>matyas:</b></span> so we should turn these commits into patches and build a new RPM with them applied<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:48:00)</span> <b>blin:</b></span> yeah, probably both of these patches -- unless you think you'll have a new release soon @marcom<br/>
+<span style="color: #dd8527"><span style="font-size: small">(16:50:42)</span> <b>marcom:</b></span> There start to be a number of urgent patches. I'm doing a release next week, 3.4.6<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:51:25)</span> <b>blin:</b></span> got an expected date?<br/>
+<span style="color: #dd8527"><span style="font-size: small">(17:56:40)</span> <b>marcom:</b></span> I'd like to include also <a href="https://cdcvs.fnal.gov/redmine/issues/22779">https://cdcvs.fnal.gov/redmine/issues/22779</a> that should be almost ready according to Dennis. I'll let you know tomorrow<br/>
+</body>
+</html>

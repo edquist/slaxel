@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Dec 10, 2020 : #operations (osg)</title>
+</head>
+<body>
+<h3>Thu Dec 10, 2020 : #operations (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(12:41:12)</span> <b>blin:</b></span> hey @jthiltges another central collector question: do you guys serve the CE view itself through apache or do you just use it for handling the registry + LE requests?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:42:29)</span> <b>jthiltges:</b></span> CE view is behind Apache for the OIDC support for <tt>/registry</tt><br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:43:10)</span> <b>jthiltges:</b></span> And just using <tt>ProxyPass</tt><br/>
+<span style="color: #73769d"><span style="font-size: small">(15:43:59)</span> <b>tim.theisen:</b></span> @matyas Is repo-update-cadist supposed to running via cron on <a href="http://repo.opensciencegrid.org">repo.opensciencegrid.org</a>?<br/>
+<span style="color: #73769d"><span style="font-size: small">(15:44:38)</span> <b>tim.theisen:</b></span> I am waiting for cert updates and I haven't seen anything in the log files since late October.<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:45:43)</span> <b>matyas:</b></span> it's _supposed_ to be<br/>
+<span style="color: #73769d"><span style="font-size: small">(15:46:46)</span> <b>tim.theisen:</b></span> No root crontab<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:47:18)</span> <b>matyas:</b></span> check /etc/cron.d?<br/>
+<span style="color: #73769d"><span style="font-size: small">(15:49:09)</span> <b>tim.theisen:</b></span> Looks like it's a systemd timer now.<br/>
+<span style="color: #73769d"><span style="font-size: small">(15:51:12)</span> <b>tim.theisen:</b></span> It doesn't show up in <tt>systemctl list-timers --all</tt><br/>
+<span style="color: #73769d"><span style="font-size: small">(15:53:13)</span> <b>tim.theisen:</b></span> systemd tells me its disabled<br/>
+<span style="color: #73769d"><span style="font-size: small">(15:58:46)</span> <b>tim.theisen:</b></span> Oh well, I enabled and started the timer.<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:01:44)</span> <b>blin:</b></span> i could've sworn we checked this recently<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:01:51)</span> <b>blin:</b></span> that wouldn't have had any affect on OASIS CAs/CRLs, right?<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:02:21)</span> <b>tim.theisen:</b></span> Oh great, now the web page is broken.<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:03:13)</span> <b>tim.theisen:</b></span> It still points the to the 1.89 OSG CA bundle (HTML 404). But, the 1.90 on is there.<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:05:59)</span> <b>matyas:</b></span> do the logs say anything?<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:07:22)</span> <b>tim.theisen:</b></span> Nothing bad, I think it may be a bug in the script. This is the first time we updated the OSG CAs without updating the IGTF CAs.<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:10:06)</span> <b>tim.theisen:</b></span> So, the OSG CA pages have the right links. It just that index.html links to the IGTF page.<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:12:28)</span> <b>tim.theisen:</b></span> Luckily, the osg-update-data script will still pull down the newer OSG CA certs<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:15:00)</span> <b>matyas:</b></span> are the <tt>cacerts_sha256sum*</tt> files ok?<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:23:58)</span> <b>tim.theisen:</b></span> Everything checks out, it's just the igtf web page that's bad.<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:24:26)</span> <b>tim.theisen:</b></span> I don't time for this. I have to compose the release announcement.<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:29:02)</span> <b>matyas:</b></span> sure. I'm debugging.<br/>
+</body>
+</html>

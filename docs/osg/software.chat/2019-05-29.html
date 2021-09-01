@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed May 29, 2019 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed May 29, 2019 : #software (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(08:51:40)</span> <b>dweitzel:</b></span> I don't know all the details.  But if you are doing SSL for ceview, then you have to run it behind a apache / nginx anyways.  letsencrypt supports plugins to both of those servers.  I wouldn't be surprised if you didn't have to restart or do anything funny with ceview to get certbot working.<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:07:53)</span> <b>matyas:</b></span> ok. i think we'll need to do some experimenting and provide more instructions on how to use let's encrypt in the osg<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:08:09)</span> <b>matyas:</b></span> puerto rico won't be able to get an incommon cert and doug johnson says colorado won't be able to either<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:09:02)</span> <b>matyas:</b></span> he says:<br/>&gt;&gt;&gt;Our tests indicate that a site will mostly function. There are a few things that will fail; SUM tests, xrootd from UPRM to Europe, PhEDEx from UPRM to anywhere, etc.<br/>You can see the test results at:<br/><br/>       <a href="https://docs.google.com/document/d/1Rr1wOIyMfjw3zFkZ_B40UYrNt4xeavOcAToVzlPx-pk/edit?usp=sharing">https://docs.google.com/document/d/1Rr1wOIyMfjw3zFkZ_B40UYrNt4xeavOcAToVzlPx-pk/edit?usp=sharing</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:10:12)</span> <b>bbockelm:</b></span> Can you ask Doug to enable comments on that host?  There are a few tricks to get Xrootd and PhEDEx working, I suspect.<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:10:28)</span> <b>matyas:</b></span> comments on the doc, you mean?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:10:41)</span> <b>bbockelm:</b></span> bah, yes<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:11:13)</span> <b>matyas:</b></span> ok, just checking. i wouldn't be surprised if cms made a way for people to comment on hosts somehow :slightly_smiling_face:<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:57:04)</span> <b>blin:</b></span> wrt the CEView, it's a minor service so if everything's working /but/ the CEView, we can live with that for a while<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:57:51)</span> <b>matyas:</b></span> sure but if people ask me questions, i wanna know the answers<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:29:17)</span> <b>andrew.melo:</b></span> Does anyone know if the ce software believes in SANs? (both the CE side and the client side(s))<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:32:03)</span> <b>blin:</b></span> yes...though it depends what you mean exactly<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:32:13)</span> <b>blin:</b></span> condor will map using the subject DN, not any of the SANs<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:32:17)</span> <b>blin:</b></span> <a href="https://htcondor-wiki.cs.wisc.edu/index.cgi/tktview?tn=6135">https://htcondor-wiki.cs.wisc.edu/index.cgi/tktview?tn=6135</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:36:09)</span> <b>blin:</b></span> @matyas: @didavila can't access <tt>/p/vdt/...</tt> does he have the right perms?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:36:30)</span> <b>matyas:</b></span> /p/vdt/what specifically?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:37:20)</span> <b>blin:</b></span> <pre><br/>[didavila@moria] (11)$ ls /p/vdt/public/html/<br/>ls: cannot open directory /p/vdt/public/html/: Permission denied<br/></pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(14:37:33)</span> <b>matyas:</b></span> so the answer is no<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:38:24)</span> <b>matyas:</b></span> augh his name is didavila?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:39:09)</span> <b>matyas:</b></span> I'm not sure I have the perms to add him to the group. ask the lab to add him to the group "condor:osgcontributor"<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:42:39)</span> <b>matyas:</b></span> actually hold on<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:42:53)</span> <b>blin:</b></span> oops, already sent the lab email<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:43:05)</span> <b>matyas:</b></span> ok that's fine<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:44:34)</span> <b>matyas:</b></span> i figured out how to add him so you can send a "never mind" email. (i needed to do <tt>kalog condor</tt> first)<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:45:30)</span> <b>blin:</b></span> ah, cool<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:45:44)</span> <b>blin:</b></span> (did you end up getting <tt>ksu</tt> working?)<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:45:45)</span> <b>matyas:</b></span> we should make a google doc in the team drive for this<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(14:46:36)</span> <b>didavila:</b></span> I still don’t have access<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:48:26)</span> <b>tim.theisen:</b></span> You have to log out and login again<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(14:51:08)</span> <b>didavila:</b></span> yes<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:52:01)</span> <b>matyas:</b></span> ah, /p/vdt/public/html did not have the right acl<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:52:08)</span> <b>matyas:</b></span> try again<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:54:38)</span> <b>matyas:</b></span> it's weird that "system:anyuser" doesn't have read perms for /p/vdt/public/html<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:54:42)</span> <b>matyas:</b></span> it's public so...<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(14:57:39)</span> <b>didavila:</b></span> it worked! thanks<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:05:47)</span> <b>matyas:</b></span> sure<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:22:04)</span> <b>andrew.melo:</b></span> @blin I mean if I have a SAN certificate on my CE, will condor barf<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:39:06)</span> <b>blin:</b></span> @andrew.melo nope, that'll work<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:39:44)</span> <b>andrew.melo:</b></span> nice -- they're $144/ea, so I'm trying to minimize the number I end up buyhing<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:40:29)</span> <b>blin:</b></span> wait, are you using the same cert for multiple CEs?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:41:09)</span> <b>andrew.melo:</b></span> Yeah, I'd (preferrably) like to buy just a single cert with each individual host listed as a SAN<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:41:50)</span> <b>blin:</b></span> i don't think that'll work because of the ticket i linked<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:42:09)</span> <b>blin:</b></span> if you have a cert with a main subject for <a href="http://ce1.vanderbilt.edu">ce1.vanderbilt.edu</a> with SANs for ce2, ce3, etc<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:42:20)</span> <b>blin:</b></span> condor will auth them all as ce1 because it just uses the main subject<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:42:36)</span> <b>andrew.melo:</b></span> damnit :disappointed:<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:42:44)</span> <b>andrew.melo:</b></span> yeah I misread this as a good outcome<br/><pre><br/>2017-Dec-13 16:01:18 by jfrey: <br/>I'm resolving this ticket as the intended SAN support is working.<br/></pre><br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:44:57)</span> <b>andrew.melo:</b></span> I wish the security chumps would just let use use LE certs, this is really becoming a hassle -- I gotta get some documentation together that a) Vanderbilt is an organization and b) I have the authority to get certs issued for <tt>*.<a href="http://accre.vanderbilt.edu">accre.vanderbilt.edu</a></tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:47:59)</span> <b>blin:</b></span> oh btw, how'd you guys get the sweet deal with digicert?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:48:04)</span> <b>blin:</b></span> UPRM needs certs<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:48:14)</span> <b>andrew.melo:</b></span> does the PR stand for puerto rico?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:50:14)</span> <b>matyas:</b></span> yeah<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:51:21)</span> <b>andrew.melo:</b></span> Long story short -- it's taken over a month to convince them to take my money, but I think we're on track -- for now, other institutions should make an account at <a href="http://digicert.com">digicert.com</a> and then give me their account# (which is in the top right of the digicert portal thingy). The sales guy I'm working with doesn't quite understand that I don't know everyone in CMS that needs a cert, so for now, I'm just emailing him acct #s + email so he can add the right flags to their accounts, but hopefully there will be a more slick way in the future<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:52:45)</span> <b>andrew.melo:</b></span> They have a nice feature (?) where you can generate a cert and post-bill it, and as long as you revoke the cert before your billing cycle, you don't pay for it. I"m trying to get a bunch of certs generated to test with, and whatever doesn't work, I'll revoke and try again<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:59:56)</span> <b>andrew.melo:</b></span> Once UPRM mails me back, I'll get Angelo (dude @ digicert) to flip the bits<br/>
+</body>
+</html>

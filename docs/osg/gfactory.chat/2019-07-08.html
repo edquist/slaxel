@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jul 8, 2019 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Mon Jul 8, 2019 : #gfactory (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(11:23:24)</span> <b>dweitzel:</b></span> I'm seeing this error on my resource from pilots: <pre>Mon Jul 8 11:03:55 CDT 2019 GLOBUS_PATH not defined and /usr/etc/globus-user-env.sh does not exist.<br/>Mon Jul 8 11:03:56 CDT 2019 Continuing like nothing happened<br/>Setting X509_USER_PROXY  to canonical path /work/grid_home/condor/1866/0/cluster11866.proc0.subproc0/credential_osg-flock-grid-iu-edu_OSG_gWMSFrontend.main_291573<br/>Mon Jul 8 11:03:56 CDT 2019 Unable to identify Startup dir for the glidein.</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:23:32)</span> <b>dweitzel:</b></span> Ny ideas what the Startup dir means?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:24:37)</span> <b>matyas:</b></span> what's GLOBUS_PATH and how is it different from GLOBUS_LOCATION?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:25:03)</span> <b>dweitzel:</b></span> I think that error is non-fatal.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:25:05)</span> <b>dweitzel:</b></span> so eh<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:25:14)</span> <b>dweitzel:</b></span> that last line is troubling.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:25:21)</span> <b>dweitzel:</b></span> <a href="https://github.com/glideinWMS/glideinwms/blob/0bd8fec33d6d4ae1305cdab707151a3f71579e3a/creation/web_base/glidein_startup.sh#L1085">https://github.com/glideinWMS/glideinwms/blob/0bd8fec33d6d4ae1305cdab707151a3f71579e3a/creation/web_base/glidein_startup.sh#L1085</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(11:35:19)</span> <b>matyas:</b></span> I don't see how that can possibly happen unless the CWD gets deleted from underneath the script<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:36:43)</span> <b>dweitzel:</b></span> I see now, on the resource, OSG_WN_TMP is set to empty:<br/><pre>OSG_WN_TMP=</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:36:52)</span> <b>dweitzel:</b></span> I presume it doesn't like that.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:37:32)</span> <b>matyas:</b></span> right but lines 1081 to 1083 should be a fallback<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:37:56)</span> <b>matyas:</b></span> ...wait<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:38:16)</span> <b>matyas:</b></span> nvm, it's probably line 1074 that's the issue<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:38:19)</span> <b>dweitzel:</b></span> yup<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:38:24)</span> <b>dweitzel:</b></span> exactly what I was thinking.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:53:23)</span> <b>matyas:</b></span> so should we make a PR to catch the variables being empty in 1069-1076 or should that continue to be an error (just perhaps a better phrased one)?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:26:01)</span> <b>dweitzel:</b></span> I guess that’s a good question for glideinwms devs.<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:27:19)</span> <b>blin:</b></span> @marcom ^^<br/>
+<span style="color: #dd8527"><span style="font-size: small">(13:02:36)</span> <b>marcom:</b></span> I think error is OK. Let me check later today. Now I'm running to a meeting until 4pm<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:59:07)</span> <b>dweitzel:</b></span> what's the current factory monitoring link?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:59:19)</span> <b>dweitzel:</b></span> @marian<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:59:25)</span> <b>jthiltges:</b></span> <a href="http://gfactory-2.opensciencegrid.org/factory/monitor/">http://gfactory-2.opensciencegrid.org/factory/monitor/</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:59:54)</span> <b>dweitzel:</b></span> thanks<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:24:16)</span> <b>rynge:</b></span> I need help figuring out why my GPU glideins goes into held on HCC Crane: <a href="http://gfactory-2.opensciencegrid.org/factory/monitor/factoryEntryStatusNow.html?entry=HCC_US_Omaha_crane_gpu">http://gfactory-2.opensciencegrid.org/factory/monitor/factoryEntryStatusNow.html?entry=HCC_US_Omaha_crane_gpu</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:24:47)</span> <b>rynge:</b></span> Can a factory operator provide logs/reason for that entry and the osg flock frontend?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(20:56:40)</span> <b>dweitzel:</b></span> figured it out, crane CE problem.<br/>
+</body>
+</html>

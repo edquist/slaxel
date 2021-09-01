@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jan 29, 2021 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Fri Jan 29, 2021 : #gracc (osg)</h3>
+<span style="color: #16569E"><span style="font-size: small">(13:09:04)</span> <b>edquist:</b></span> @dweitzel or anyone else who might know - it appears the Last 24 Hours column of the panels at the bottom of the gracc dashboard homepage are all showing 0<br/>
+<span style="color: #16569E"><span style="font-size: small">(13:09:06)</span> <b>edquist:</b></span> <a href="https://gracc.opensciencegrid.org/">https://gracc.opensciencegrid.org/</a><br/>
+<span style="color: #16569E"><span style="font-size: small">(13:09:15)</span> <b>edquist:</b></span> i don't remember that being the case before<br/>
+<span style="color: #16569E"><span style="font-size: small">(13:09:39)</span> <b>edquist:</b></span> could this be something different happening since a recent gracc upgrade?<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(13:19:37)</span> <b>cat:</b></span> @dweitzel is out for the rest of the day. Please submit a Freshdesk ticket ASAP!<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(13:19:54)</span> <b>cat:</b></span> (I see the same thing, too.)<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(13:20:41)</span> <b>cat:</b></span> This looks wrong, too: &lt;<a href="https://gracc.opensciencegrid.org/d/000000079/site-summary?orgId=1">https://gracc.opensciencegrid.org/d/000000079/site-summary?orgId=1</a>&gt;.<br/>
+<span style="color: #16569E"><span style="font-size: small">(13:21:30)</span> <b>edquist:</b></span> &gt;@dweitzel is out for the rest of the day. Please submit a Freshdesk ticket ASAP!<br/><br/>ah, thanks, will do<br/>
+<span style="color: #16569E"><span style="font-size: small">(13:25:45)</span> <b>edquist:</b></span> <a href="https://support.opensciencegrid.org/a/tickets/66683">https://support.opensciencegrid.org/a/tickets/66683</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:32:46)</span> <b>blin:</b></span> fyi @jdost321 ^^<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:46:17)</span> <b>jdost321:</b></span> Thanks for letting me know. Marian is looking<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:46:19)</span> <b>marian:</b></span> we're looking at it ... those 0 are certainly not from current update because that starts next week ... if it's related to the previous upgrade this must be there for 3 months now<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:47:20)</span> <b>jdost321:</b></span> But @marian the 30 day column is non-zero?<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:47:39)</span> <b>jdost321:</b></span> i wonder why just the 24h column is wrong<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:47:49)</span> <b>marian:</b></span> ah, good point<br/>
+<span style="color: #16569E"><span style="font-size: small">(13:48:01)</span> <b>edquist:</b></span> maybe it has something to do with the timing of summarizations? i am not sure<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:48:05)</span> <b>marian:</b></span> I was changing time frame on top only<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:50:53)</span> <b>marian:</b></span> certainly something along JobUsageRecordSummary that the query starts with ... not very familiar with composition of that particular query but I try to have a look<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:51:24)</span> <b>jdost321:</b></span> carl's other link above site summary is also concerning.. did we stop receiving gracc data for 24h??<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:51:35)</span> <b>jdost321:</b></span> this one .<a href="https://gracc.opensciencegrid.org/d/000000079/site-summary?orgId=1">https://gracc.opensciencegrid.org/d/000000079/site-summary?orgId=1</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(13:55:29)</span> <b>marian:</b></span> from this dashboard it looks like we did receive for yesterday, not for the day before yesterday and not for today either<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:59:28)</span> <b>marian:</b></span> this "maybe" narrows down to some issue with summarizer, @jthiltges is looking<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:00:50)</span> <b>jthiltges:</b></span> I'm guessing summarizer. Looking at the last week of the gracc.osg.raw index in kibana, not seeing any gaps. So unlikely to have missing data. <a href="https://gracc.opensciencegrid.org/kibana/app/discover#/?_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-7d,to:now))&amp;_a=(columns:!(_source),filters:!(),index:ae11d8b0-20eb-11ea-a256-c94cd65423ab,interval:auto,query:(language:kuery,query:''),sort:!())">https://gracc.opensciencegrid.org/kibana/app/discover#/?_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-7d,to:now))&amp;_a=(columns:!(_source),filters:!(),index:ae11d8b0-20eb-11ea-a256-c94cd65423ab,interval:auto,query:(language:kuery,query:''),sort:!())</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:05:38)</span> <b>dweitzel:</b></span> Problem was gracc-request on tiger was not querying gracc's public interface.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:05:48)</span> <b>dweitzel:</b></span> <a href="https://github.com/opensciencegrid/gracc-request/pull/80">https://github.com/opensciencegrid/gracc-request/pull/80</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:06:02)</span> <b>dweitzel:</b></span> Deployed to tiger now, waiting on the next summary iteration.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:06:41)</span> <b>dweitzel:</b></span> @jthiltges our summary alerting failed... could you follow up with huijun on why that is.<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(14:12:23)</span> <b>cat:</b></span> @dweitzel (if you’re still around), or anyone: Can someone please translate the info above into English?<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:12:50)</span> <b>jdost321:</b></span> @cat derek gives up vacation to save the day<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(14:13:06)</span> <b>cat:</b></span> Sigh<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(14:13:16)</span> <b>cat:</b></span> Did we lose any data?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:13:23)</span> <b>dweitzel:</b></span> nope.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:13:32)</span> <b>dweitzel:</b></span> Summarization process was broken.<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(14:13:33)</span> <b>cat:</b></span> When will the “missing” data be available?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:13:41)</span> <b>dweitzel:</b></span> minutes*<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(14:13:46)</span> <b>cat:</b></span> Excellent, thank you.<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(14:14:14)</span> <b>cat:</b></span> Sorry about your failed vacation, @dweitzel. I was hoping that others could pick up on this ticket and deal with it.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:16:05)</span> <b>dweitzel:</b></span> eh, they were on the right track.<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:56:09)</span> <b>jdost321:</b></span> dashboards are looking much better now<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(15:04:33)</span> <b>cat:</b></span> Agreed!<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(15:04:37)</span> <b>cat:</b></span> Thanks.<br/>
+</body>
+</html>

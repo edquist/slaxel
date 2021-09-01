@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jul 25, 2019 : #operations (osg)</title>
+</head>
+<body>
+<h3>Thu Jul 25, 2019 : #operations (osg)</h3>
+<span style="color: #e96699"><span style="font-size: small">(10:47:59)</span> <b>lincoln:</b></span> hi folks. MWT2 is really idle right now and we're not getting many glideins from OSG<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:48:04)</span> <b>lincoln:</b></span> could someone on the factory side take a look?<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:48:34)</span> <b>lincoln:</b></span> i have 11000+ slots idle and only ~400 OSG jobs running<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:49:21)</span> <b>blin:</b></span> could you shoot an email to the factory ops list?<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:49:40)</span> <b>lincoln:</b></span> Yep<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:50:01)</span> <b>lincoln:</b></span> can you remind me what that list is ? :slightly_smiling_face:<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:50:44)</span> <b>blin:</b></span> <a href="mailto:osg-gfactory-support@physics.ucsd.edu">osg-gfactory-support@physics.ucsd.edu</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:51:29)</span> <b>dweitzel:</b></span> @lincoln <a href="http://osg-gk.mwt2.org">osg-gk.mwt2.org</a> CE?<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:52:04)</span> <b>lincoln:</b></span> uct2-gk<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:52:09)</span> <b>lincoln:</b></span> iut2-gk and mwt2-gk<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:52:36)</span> <b>dweitzel:</b></span> looking at some of the factory monitoring, indeed, it appears there is demand, just the factory isn't sending glideins: <a href="http://gfactory-2.opensciencegrid.org/factory/monitor/factoryEntryStatusNow.html?entry=Engage_US_MWT2_uct2_condce">http://gfactory-2.opensciencegrid.org/factory/monitor/factoryEntryStatusNow.html?entry=Engage_US_MWT2_uct2_condce</a><br/>
+<span style="color: #e96699"><span style="font-size: small">(10:52:57)</span> <b>lincoln:</b></span> <pre><br/># dcmd.sh "condor_q -global idle | grep 'Total for all users' " login[02-03].<a href="http://osgconnect.net">osgconnect.net</a> <a href="http://login.ci-connect.uchicago.edu">login.ci-connect.uchicago.edu</a> <a href="http://login.duke.ci-connect.net">login.duke.ci-connect.net</a> | awk '{print $12,$13}'<br/>1038 idle,<br/>38 idle,<br/>0 idle,<br/>17486 idle,<br/>8311 idle,<br/>1 idle,<br/>1054 idle,<br/></pre><br/><br/>from OSG Connect's side of the house I see a lot of idle jobs<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:54:24)</span> <b>blin:</b></span> i see a precipitous drop a couple of days ago <a href="http://gfactory-2.opensciencegrid.org/factory/monitor/factoryStatus.html?entry=OSG_US_MWT2_mwt2_condce&amp;frontend=total&amp;infoGroup=running&amp;elements=StatusRunningCores,ClientCoresTotal,ClientCoresRunning,ClientCoresIdle,&amp;rra=0&amp;window_min=0&amp;window_max=0&amp;timezone=-5">http://gfactory-2.opensciencegrid.org/factory/monitor/factoryStatus.html?entry=OSG_US_MWT2_mwt2_condce&amp;frontend=total&amp;infoGroup=running&amp;elements=StatusRunningCores,ClientCoresTotal,ClientCoresRunning,ClientCoresIdle,&amp;rra=0&amp;window_min=0&amp;window_max=0&amp;timezone=-5</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:54:37)</span> <b>blin:</b></span> was there an issue with your site on the 23rd?<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:56:02)</span> <b>jlstephen:</b></span> uiuc was having issues so we were only running opportunistic/osg jobs for a while on all of our uiuc workers<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:56:33)</span> <b>jlstephen:</b></span> i think that's about when we turned atlas back on<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:56:52)</span> <b>blin:</b></span> i know the factory does some throttling if it sees a lot of pilot failures but i'm not sure what the recovery time is for that<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:58:35)</span> <b>dweitzel:</b></span> I don't see any held jobs, which is usually the surest sign of failures.<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:59:51)</span> <b>lincoln:</b></span> <pre><br/>uct2-gk: 445 jobs; 1 completed, 0 removed, 10 idle, 434 running, 0 held, 0 suspended<br/>iut2-gk: 0 jobs; 0 completed, 0 removed, 0 idle, 0 running, 0 held, 0 suspended<br/>mwt2-gk: 426 jobs; 0 completed, 0 removed, 29 idle, 351 running, 46 held, 0 suspended<br/>osg-gk: 540 jobs; 2 completed, 0 removed, 18 idle, 520 running, 0 held, 0 suspended<br/></pre><br/><br/>for the <tt>osg</tt> user heres what i see<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:00:04)</span> <b>lincoln:</b></span> is Condor at our site not matching/starting them quickly enough perhaps?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:01:03)</span> <b>blin:</b></span> idk, it's not like there are a lot of idle jobs<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:01:32)</span> <b>dweitzel:</b></span> if only we knew some factory ops people!<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:02:46)</span> <b>lincoln:</b></span> OK, I am going to send an email, we can continue the discussion there<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:02:52)</span> <b>lincoln:</b></span> I suspect there may be some mix of factory config / site config that needs to happen<br/>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon May 20, 2019 : #software (osg)</title>
+</head>
+<body>
+<h3>Mon May 20, 2019 : #software (osg)</h3>
+<span style="color: #73769d"><span style="font-size: small">(11:44:16)</span> <b>tim.theisen:</b></span> It looks the glideins are not working on the Madison ITB. Also, the time on glidein3 is 5 hours in the future.<br/>
+<span style="color: #73769d"><span style="font-size: small">(11:44:37)</span> <b>tim.theisen:</b></span> Do I need to make an adjustment?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:44:50)</span> <b>blin:</b></span> yeah, i think GSI gets mad with a discrepancy that large<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:44:55)</span> <b>blin:</b></span> do we not run NTP on glidein3?<br/>
+<span style="color: #73769d"><span style="font-size: small">(11:45:33)</span> <b>tim.theisen:</b></span> NTP died<br/>
+<span style="color: #73769d"><span style="font-size: small">(11:46:18)</span> <b>tim.theisen:</b></span> Thanks for the tip. I'll get it synced up.<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:02:07)</span> <b>efajardo:</b></span> @tim.theisen<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:02:16)</span> <b>efajardo:</b></span> let me know if you need soem help debugging glidein3<br/>
+<span style="color: #73769d"><span style="font-size: small">(12:02:51)</span> <b>tim.theisen:</b></span> I got the time reset.<br/>
+<span style="color: #73769d"><span style="font-size: small">(12:03:06)</span> <b>tim.theisen:</b></span> Waiting to see if jobs start.<br/>
+<span style="color: #73769d"><span style="font-size: small">(12:07:13)</span> <b>tim.theisen:</b></span> I don't think it is working @efajardo<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:08:19)</span> <b>efajardo:</b></span> YEa<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:08:26)</span> <b>efajardo:</b></span> I can see it is not talking to the factory<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:08:28)</span> <b>efajardo:</b></span> <pre>QueryError: Error executing htcondor query to pool <a href="http://gfactory-1.t2.ucsd.edu">gfactory-1.t2.ucsd.edu</a> with constraint (GlideinMyType=?="glidefactoryclient") &amp;&amp; (ReqClientName=?="chtc3.main") &amp;&amp; ((True) &amp;&amp; ((stringListMember("GLOWITB", GLIDEIN_Supported_VOs) || stringListMember("glowVO", GLIDEIN_Supported_VOs)) &amp;&amp; GLIDEIN_ResourceName =!= "GLOW")) and format_list None: Error querying pool <a href="http://gfactory-1.t2.ucsd.edu">gfactory-1.t2.ucsd.edu</a> using python bindings: Failed communication with collector.. Env is {'UPSTART_EVENTS': 'runlevel', 'LOGNAME': 'frontend', 'USER': 'frontend', 'HOME': '/var/lib/gwms-frontend', 'PATH': '/sbin:/usr/sbin:/bin:/usr/bin', 'previous': 'N', 'LANG': 'en_US.UTF-8', 'TERM': 'linux', 'SHELL': '/bin/bash', 'SHLVL': '3', 'PREVLEVEL': 'N', 'LANGSH_SOURCED': '1', 'X509_USER_PROXY': '/etc/condor/certs/glidein.proxy', 'UPSTART_INSTANCE': '', 'runlevel': '3', 'CONSOLETYPE': 'vt', 'X509_CERT_DIR': '/etc/grid-security/certificates', 'UPSTART_JOB': 'rc', '_': '/usr/sbin/glideinFrontend', 'PWD': '/', 'GRIDMAP': '/etc/condor/certs/grid-mapfile', 'RUNLEVEL': '3', '_CONDOR_CERTIFICATE_MAPFILE': '/var/lib/gwms-frontend/vofrontend/group_main/group.mapfile', 'CONDOR_CONFIG': '/var/lib/gwms-frontend/vofrontend/frontend.condor_config'}</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:09:34)</span> <b>efajardo:</b></span> Most likely factory folks need to update the DN<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:09:38)</span> <b>efajardo:</b></span> Let me send an email<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:10:34)</span> <b>blin:</b></span> did we update the host cert..?<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:11:50)</span> <b>efajardo:</b></span> hmm never mind<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:11:55)</span> <b>efajardo:</b></span> I see it cannot query factory<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:11:58)</span> <b>efajardo:</b></span> but I cannto see why<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:12:02)</span> <b>efajardo:</b></span> in the factory<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:12:14)</span> <b>efajardo:</b></span> the cert is correctly<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:12:16)</span> <b>efajardo:</b></span> <pre>[efajardo@glidein3 group_main]$ sudo voms-proxy-info --file /etc/condor/certs/glidein.proxy -all<br/>subject   : /DC=org/DC=incommon/C=US/postalCode=53706/ST=WI/L=Madison/street=1210 West Dayton Street/O=University of Wisconsin-Madison/OU=OCIS/CN=<a href="http://glidein3.chtc.wisc.edu/CN=1609364164">glidein3.chtc.wisc.edu/CN=1609364164</a><br/>issuer    : /DC=org/DC=incommon/C=US/postalCode=53706/ST=WI/L=Madison/street=1210 West Dayton Street/O=University of Wisconsin-Madison/OU=OCIS/CN=<a href="http://glidein3.chtc.wisc.edu">glidein3.chtc.wisc.edu</a><br/>identity  : /DC=org/DC=incommon/C=US/postalCode=53706/ST=WI/L=Madison/street=1210 West Dayton Street/O=University of Wisconsin-Madison/OU=OCIS/CN=<a href="http://glidein3.chtc.wisc.edu">glidein3.chtc.wisc.edu</a><br/>type      : RFC compliant proxy<br/>strength  : 1024 bits<br/>path      : /etc/condor/certs/glidein.proxy<br/>timeleft  : 28:19:28<br/>key usage : Digital Signature, Key Encipherment, Data Encipherment</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:12:37)</span> <b>efajardo:</b></span> <pre>[1011] root@gfactory-1 /etc/condor/certs# cat condor_mapfile | grep glow -i<br/>GSI "^\/DC\=org\/DC\=opensciencegrid\/O\=Open\ Science\ Grid\/OU\=Services\/CN\=glidein\/glidein2\.chtc\.wisc\.edu$" feglow<br/>GSI "^\/DC\=org\/DC\=incommon\/C\=US\/postalCode\=53706\/ST\=WI\/L=Madison\/street\=1210\ West\ Dayton\ Street\/O\=University\ of\ Wisconsin-Madison\/OU\=OCIS\/CN\=glidein3\.chtc\.wisc\.edu$" feglowitb</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:17:04)</span> <b>efajardo:</b></span> I only asee this<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:17:10)</span> <b>efajardo:</b></span> in the Collector in the factory<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:17:12)</span> <b>efajardo:</b></span> <pre>05/20/19 10:14:24 (pid:2733834) DC_AUTHENTICATE: required authentication of 128.104.100.46 failed: AUTHENTICATE:1003:Failed to authenticate with any method|AUTHENTICATE:1004\<br/>:Failed to authenticate using GSI|GSI:5004:COMMON Failed to authenticate (655360:0)</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:17:27)</span> <b>blin:</b></span> where are you seeing that error?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:17:32)</span> <b>blin:</b></span> ah in the factory<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:19:01)</span> <b>efajardo:</b></span> yes<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:19:05)</span> <b>efajardo:</b></span> ANd the errors are so untelling<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:19:20)</span> <b>efajardo:</b></span> <pre>05/20/19 10:18:23 (pid:2733834) This process has a valid certificate &amp; key<br/>05/20/19 10:18:23 (pid:2733834) Condor GSI authentication failure<br/>GSS Major Status: Authentication Failed<br/>GSS Minor Status Error Chain:<br/>(null)<br/>05/20/19 10:18:23 (pid:2733834) This process has a valid certificate &amp; key<br/>05/20/19 10:18:23 (pid:2733834) Condor GSI authentication failure<br/>GSS Major Status: Authentication Failed<br/>GSS Minor Status Error Chain:<br/>(null)<br/>05/20/19 10:18:23 (pid:2733834) DC_AUTHENTICATE: required authentication of 128.104.100.46 failed: AUTHENTICATE:1003:Failed to authenticate with any method|AUTHENTICATE:1004\<br/>:Failed to authenticate using GSI|GSI:5004:COMMON Failed to authenticate (655360:0)<br/>05/20/19 10:18:23 (pid:2733834) DC_AUTHENTICATE: required authentication of 128.104.100.46 failed: AUTHENTICATE:1003:Failed to authenticate with any method|AUTHENTICATE:1004\<br/>:Failed to authenticate using GSI|GSI:5004:COMMON Failed to authenticate (655360:0)</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:25:25)</span> <b>efajardo:</b></span> Ok I found a why to replicate it<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:25:28)</span> <b>efajardo:</b></span> <pre>[root@glidein3 ~]# sudo -u frontend CONDOR_CONFIG=/var/lib/gwms-frontend/vofrontend/frontend.condor_config X509_USER_PROXY=/etc/condor/certs/glidein.proxy condor_status -pool <a href="http://gfactory-1.t2.ucsd.edu">gfactory-1.t2.ucsd.edu</a> -any<br/>Error: communication error<br/>AUTHENTICATE:1003:Failed to authenticate with any method<br/>AUTHENTICATE:1004:Failed to authenticate using GSI<br/>GSI:5004:Failed to authenticate.  Globus is reporting error (655360:8)<br/>Error: Couldn't contact the condor_collector on <a href="http://gfactory-1.t2.ucsd.edu">gfactory-1.t2.ucsd.edu</a> <br/>(&lt;169.228.38.36:9618&gt;). <br/></pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:26:31)</span> <b>efajardo:</b></span> <pre>sudo -u frontend CONDOR_CONFIG=/var/lib/gwms-frontend/vofrontend/frontend.condor_config X509_USER_PROXY=/etc/condor/certs/glidein.proxy condor_status -pool <a href="http://gfactory-1.t2.ucsd.edu">gfactory-1.t2.ucsd.edu</a> -any -debug <br/>05/20/19 12:26:08 Condor GSI authentication failure<br/>GSS Major Status: Authentication Failed<br/>GSS Minor Status Error Chain:<br/>globus_gss_assist: Error during context initialization<br/>globus_gsi_gssapi: Unable to verify remote side's credentials<br/>globus_gsi_gssapi: Unable to verify remote side's credentials: Couldn't verify the remote certificate<br/>OpenSSL Error: s3_pkt.c:1275: in library: SSL routines, function SSL3_READ_BYTES: sslv3 alert bad certificate SSL alert number 42<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:29:40)</span> <b>blin:</b></span> errr, let's just double check that glidein3 has updated ca certs + CRLs before running that again<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:29:54)</span> <b>efajardo:</b></span> I did<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:30:29)</span> <b>efajardo:</b></span> osg-ca-certs-1.75-1.osg33.el6.noarch<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:30:43)</span> <b>efajardo:</b></span> maybe we should upgade glidein3 to 3.4?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:31:05)</span> <b>blin:</b></span> sigh, probably<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:35:47)</span> <b>efajardo:</b></span> Hmm<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:35:49)</span> <b>efajardo:</b></span> I am stick<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:35:52)</span> <b>efajardo:</b></span> <pre>--&gt; Finished Dependency Resolution<br/>Error: Package: python-condor-8.6.11-1.el6.x86_64 (epel)<br/>           Requires: condor = 8.6.11-1.el6<br/>           Removing: condor-8.6.10-1.osg34.el6.x86_64 (@osg)<br/>               condor = 8.6.10-1.osg34.el6<br/>           Updated By: condor-8.6.13-1.2.osg34.el6.x86_64 (osg)<br/></pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:36:02)</span> <b>efajardo:</b></span> but the yum priorities are good<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:38:09)</span> <b>blin:</b></span> ugh yeah, that's an annoying bug that we're working on working around<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:38:31)</span> <b>efajardo:</b></span> fixed it<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:38:47)</span> <b>efajardo:</b></span> but there was a kernel update<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:38:57)</span> <b>efajardo:</b></span> so this nodes will have to be rebooted sooner or later<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:39:07)</span> <b>blin:</b></span> ok<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:45:02)</span> <b>efajardo:</b></span> No dice<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:45:05)</span> <b>efajardo:</b></span> same error after upgrade<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:47:00)</span> <b>efajardo:</b></span> Hmm I think it is this bug <a href="https://cdcvs.fnal.gov/redmine/issues/22245#change-69902">https://cdcvs.fnal.gov/redmine/issues/22245#change-69902</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:47:28)</span> <b>blin:</b></span> yeah i was going to say because i just tried this on glidein2 and that fails, too<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:48:01)</span> <b>blin:</b></span> ok i gotta grab lunch<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:55:08)</span> <b>efajardo:</b></span> I feel glidein2<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:55:10)</span> <b>efajardo:</b></span> is working fine<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:55:12)</span> <b>efajardo:</b></span> it is requesting<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:06:21)</span> <b>efajardo:</b></span> I am lost<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:06:24)</span> <b>efajardo:</b></span> on what is going on here<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:16:31)</span> <b>matyas:</b></span> @efajardo upgrade condor and condor-python separately<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:16:55)</span> <b>matyas:</b></span> i.e. do yum upgrade condor as one command<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:17:05)</span> <b>efajardo:</b></span> both are upgraded to latest<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:17:07)</span> <b>matyas:</b></span> oh ok<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:17:24)</span> <b>efajardo:</b></span> <pre>[root@glidein3 group_main]# rpm -qv condor<br/>condor-8.6.13-1.2.osg34.el6.x86_64<br/>[root@glidein3 group_main]# rpm -qv condor-python<br/>condor-python-8.6.13-1.2.osg34.el6.x86_64<br/>[root@glidein3 group_main]# <br/></pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(13:17:32)</span> <b>matyas:</b></span> +1<br/>
+<span style="color: #73769d"><span style="font-size: small">(15:17:25)</span> <b>tim.theisen:</b></span> @efajardo: Jobs are still not starting<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:19:06)</span> <b>blin:</b></span> i think we're still trying to sort it out in #gfactory<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:33:20)</span> <b>efajardo:</b></span> The problem is the FE cannot talk to the factory<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:33:22)</span> <b>efajardo:</b></span> and we do not know why<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:47:27)</span> <b>efajardo:</b></span> @tim.theisen you should be good now<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:51:31)</span> <b>blin:</b></span> what was the issue?<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:51:48)</span> <b>tim.theisen:</b></span> Yup, it is working for me.<br/>
+</body>
+</html>

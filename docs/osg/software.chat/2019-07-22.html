@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jul 22, 2019 : #software (osg)</title>
+</head>
+<body>
+<h3>Mon Jul 22, 2019 : #software (osg)</h3>
+<span style="color: #e06b56"><span style="font-size: small">(10:32:16)</span> <b>jthiltges:</b></span> Still on the subject of xrootd version dependencies: the rc builds add a bit of complication. I'd like to use the plugins from the previous version during testing of the rc. And forcing a rebuild of all the plugins at the beginning of each rc process seems tedious (rather than at the end, or as needed.)<br/><br/>As a possible solution, here's an example for a xrootd v4.9 plugin:<br/><pre>BuildRequires: xrootd &gt;= 4.9, xrootd &lt; 4.10.0-1<br/>Requires: xrootd &gt;= 4.9, xrootd &lt; 4.10.0-1</pre><br/><br/>This should still allow rc builds to satisfy the dependency:<br/><pre>$ rpmdev-vercmp 4.10.0-0.rc5.osg34.el7 4.10.0-1<br/>4.10.0-0.rc5.osg34.el7 &lt; 4.10.0-1</pre><br/><br/>But not the release build:<br/><pre>$ rpmdev-vercmp 4.10.0-1.osg34.el7 4.10.0-1<br/>4.10.0-1.osg34.el7 &gt; 4.10.0-1</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:43:31)</span> <b>matyas:</b></span> @jthiltges sounds good.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:45:02)</span> <b>blin:</b></span> @jthiltges do you need us to rebuild the plugins with this change to test 4.10.0?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:45:22)</span> <b>matyas:</b></span> I think it would be useful to try this out on at least one of them<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:45:44)</span> <b>matyas:</b></span> maybe not all of them<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:46:46)</span> <b>blin:</b></span> just an fyi, github's got some issues: <a href="https://www.githubstatus.com/">https://www.githubstatus.com/</a><br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:46:56)</span> <b>jthiltges:</b></span> I don't have a strong opinion of timeline. If testing looks OK, and it can be included in the v4.11 release, I'll be happy. :slightly_smiling_face:<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:46:58)</span> <b>matyas:</b></span> it might also be useful to try it out on something we build on el6 as well<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:47:42)</span> <b>matyas:</b></span> just to see if it can be used as a general solution. if not, we should put in the comment that this trick only works on el7<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:49:05)</span> <b>blin:</b></span> xrootd-lcmaps is a plugin that we build for both el6/el7<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:49:24)</span> <b>matyas:</b></span> old versions of yum might be buggy or just plain not support the version ranges in the requirements<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:50:34)</span> <b>matyas:</b></span> ok, let's try this out for xrootd-lcmaps<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:23:03)</span> <b>dweitzel:</b></span> where is the authoritative blahp repo now?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:30:48)</span> <b>blin:</b></span> got a fix? i would submit it against htcondor/blah<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:33:47)</span> <b>dweitzel:</b></span> gratia stuff.  We are getting remote user cpu, but not system.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:45:53)</span> <b>blin:</b></span> for what batch system?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:47:06)</span> <b>dweitzel:</b></span> Slurm, when using htcondor-ce probe.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:47:08)</span> <b>dweitzel:</b></span> fixing...<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:59:07)</span> <b>blin:</b></span> @jthiltges so are you trying out xrootd 4.10.0 at UNL?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:08:53)</span> <b>jthiltges:</b></span> @blin Running on one SE at the moment, yes. But no objections to upgrading more.<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:09:19)</span> <b>blin:</b></span> i don't think there's a need, which xrootd plugins are you running?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:12:26)</span> <b>jthiltges:</b></span> We're running the new builds of plugins on the v4.10.0 system:<br/>- xrootd-cmstfc<br/>- xrootd-hdfs<br/>- xrootd-lcmaps<br/>- xrootd-scitokens<br/><br/>Looks like we're running 4.10rc5 on the rest of the SEs and local redirector, (for Brian B reasons :slightly_smiling_face:), so there's really not much reason to avoid upgrading to the final release.<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:13:29)</span> <b>blin:</b></span> oh yeah, an upgrade to the official release would be great<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:13:55)</span> <b>blin:</b></span> also there's a new singularity in testing and condor 8.8.4 in upcoming testing if you're interested<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:14:05)</span> <b>blin:</b></span> but i understand if you don't want to upgrade multiple pieces at a time :stuck_out_tongue:<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:15:46)</span> <b>jthiltges:</b></span> Ooh, nice. We'd upgraded a gatekeeper and a couple workers to condor 8.8.3-1.osgup, and it's seemed OK so far.<br/>
+</body>
+</html>

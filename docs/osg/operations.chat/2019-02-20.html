@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Feb 20, 2019 : #operations (osg)</title>
+</head>
+<body>
+<h3>Wed Feb 20, 2019 : #operations (osg)</h3>
+<span style="color: #53b759"><span style="font-size: small">(11:01:07)</span> <b>marian:</b></span> Just fyi - UNL and UNO (Lincoln/Omaha) offices and public schools are closed due weather advisory... I’m around in case of fires but mostly shoveling driveway and around the plus keeping kids busy while they’re not at school...<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:24:04)</span> <b>blin:</b></span> hey @rynge are you using an InCommon or Let's Encrypt host cert for the OSG frontend? (cc @jdost321, we'd like the DN for the email we send tomorrow. sorry that i'm jumping the gun here)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:26:13)</span> <b>rynge:</b></span> <tt>/DC=org/DC=incommon/C=US/postalCode=53706/ST=WI/L=Madison/street=1210 West Dayton Street/O=University of Wisconsin-Madison/OU=OCIS/CN=<a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a></tt><br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:27:13)</span> <b>rynge:</b></span> The pilots are still using a <tt>/DC=org/DC=opensciencegrid/O=Open Science Grid</tt> cert<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:27:22)</span> <b>rynge:</b></span> Expires in April<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:27:45)</span> <b>rynge:</b></span> It was unclear to us how to handle service certs<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:22:01)</span> <b>blin:</b></span> it's probably unclear to everyone ._.<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:22:07)</span> <b>blin:</b></span> we're gonna use the host cert moving forward<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:22:45)</span> <b>blin:</b></span> which we should probabblyyy update<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:23:06)</span> <b>blin:</b></span> is that hosted at chicago?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:23:48)</span> <b>blin:</b></span> @jdost321 ^^ we need to start identifying other frontends that are using an OSG CA issued cert for their pilots<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:27:36)</span> <b>blin:</b></span> @rynge sorry for the delay, had a meeting. see my comments above<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:29:22)</span> <b>rynge:</b></span> We have two of the OSG CA certs on that host, OSG VO and XENON VO<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:30:03)</span> <b>rynge:</b></span> Expires Apr 11 and Jun 14<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:30:05)</span> <b>blin:</b></span> do you have access to the XENON VOMS cert?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:30:29)</span> <b>rynge:</b></span> Yes, we are submitting some glideins for them using that same frontend<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:30:58)</span> <b>rynge:</b></span> Sorry no<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:31:09)</span> <b>rynge:</b></span> They are still running an actual voms server<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:31:11)</span> <b>blin:</b></span> ok so you can use the host cert for both OSG and XENON pilots but you'll sign one with the OSG VOMS cert and the other with the XENON VOMS cert<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:31:12)</span> <b>blin:</b></span> oh<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:31:13)</span> <b>rynge:</b></span> In Europe<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:31:39)</span> <b>blin:</b></span> then you'll need to get the host cert registered in their voms server and be able to get the pilot role or w/e<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:31:50)</span> <b>rynge:</b></span> RIght - it is registered<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:31:59)</span> <b>blin:</b></span> the host cert?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:32:21)</span> <b>rynge:</b></span> No, the OSGCA cert that is valid until June 14<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:32:42)</span> <b>rynge:</b></span> <pre><br/>        Validity<br/>            Not Before: May 15 21:55:01 2018 GMT<br/>            Not After : Jun 14 22:00:01 2019 GMT<br/>        Subject: DC=org,DC=opensciencegrid,O=Open Science Grid,OU=Services,CN=pilot/xe1t-gwms.mwt2.org<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:32:45)</span> <b>blin:</b></span> sure ok<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:33:10)</span> <b>blin:</b></span> but when that expires, we'll need to be able to use the host cert as the xenon pilot<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:33:14)</span> <b>rynge:</b></span> That is probably one case where we do not want to use the host cert<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:33:19)</span> <b>blin:</b></span> and to do that, we'll need xenon voms attr<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:33:32)</span> <b>rynge:</b></span> Having the same hostcert in two different VOs is going to be confusing<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:33:43)</span> <b>blin:</b></span> why? you can have membership in multiple VOs<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:34:24)</span> <b>rynge:</b></span> Let met thing about that - we need to keep them separate inside the frontend as well<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:34:38)</span> <b>rynge:</b></span> Maybe we created this problem by running inside one FE<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:34:44)</span> <b>blin:</b></span> well you'll be generating two different proxies<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:34:56)</span> <b>rynge:</b></span> Right<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:34:59)</span> <b>blin:</b></span> but yeah, lmk what you think is appropriate<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:35:11)</span> <b>rynge:</b></span> Let's not worry about it right now - it might not even be a problem<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:35:28)</span> <b>blin:</b></span> the OSG VO is my immediate concern though<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:35:42)</span> <b>blin:</b></span> HTCondor-CEs in the OSG need to be updated ASAP, otherwise they'll stop accepting pilots<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:35:44)</span> <b>rynge:</b></span> OSG VO cert is expiring in Apr, and that one I do have the VO cert for<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:36:13)</span> <b>rynge:</b></span> What is with the ASAP? Will something happen before Apr 11?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:36:25)</span> <b>blin:</b></span> (since the plan is to start using the host cert as the pilot cert)<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:36:50)</span> <b>blin:</b></span> nothing will happen before april 11 but getting sites to upgrade en masse by Apr 11 will be difficult<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:37:33)</span> <b>blin:</b></span> anywho -- is flock hosted at uchicago?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:37:39)</span> <b>rynge:</b></span> Yes<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:37:51)</span> <b>rynge:</b></span> So, the OSG VO voms cert will also be an issue:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:37:55)</span> <b>rynge:</b></span> <pre><br/>        Validity<br/>            Not Before: Apr 13 17:22:54 2018 GMT<br/>            Not After : May 13 17:27:54 2019 GMT<br/>        Subject: DC=org,DC=opensciencegrid,O=Open Science Grid,OU=Services,CN=<a href="http://voms.grid.iu.edu">voms.grid.iu.edu</a><br/></pre><br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:38:25)</span> <b>rynge:</b></span> Step one would be to get a new voms cert registered, right?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:38:25)</span> <b>blin:</b></span> there were some discussions about incommon certs and how they should be issued by the host's institution<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:38:34)</span> <b>blin:</b></span> @lincoln how quickly can you get an IGTF incommon host cert?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:38:55)</span> <b>blin:</b></span> yeah, we need to get a new voms cert, too<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:38:57)</span> <b>blin:</b></span> lovely<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:39:00)</span> <b>lincoln:</b></span> &lt;48h<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:39:37)</span> <b>rynge:</b></span> VOMS cert should be for some other host? That has to be a host cert as well, right?<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(16:41:15)</span> <b>blin:</b></span> yeah, it should be a host cert<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:41:23)</span> <b>blin:</b></span> let me double check the vomses info<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:42:05)</span> <b>blin:</b></span> do you not have a cert with the following subject?<br/><tt>/DC=org/DC=incommon/C=US/postalCode=53706/ST=WI/L=Madison/street=1210 West Dayton Street/O=University of Wisconsin-Madison/OU=OCIS/CN=<a href="http://voms.opensciencegrid.org">voms.opensciencegrid.org</a></tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(17:02:15)</span> <b>blin:</b></span> anyways, that's one of the DNs we have registered in our VO data so if you have that cert, that should be ok<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:02:38)</span> <b>blin:</b></span> but we should think about updating that to a chicago DN...<br/>
+</blockquote>
+<span style="color: #43761b"><span style="font-size: small">(16:40:08)</span> <b>blin:</b></span> could you get one for <a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a>? with a SAN if necessary for whatever the uchicago hostname is<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:40:40)</span> <b>blin:</b></span> @dweitzel has gotten an OSG domain host cert at UNL, you'll want to ask for CNAME domain control validation<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:50:38)</span> <b>lincoln:</b></span> i don't think we'll need a SAN. i can set the fwd/reverse DNS and all that<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:50:43)</span> <b>lincoln:</b></span> I will issue one tomorrow<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:50:46)</span> <b>lincoln:</b></span> or request one rather<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:53:46)</span> <b>blin:</b></span> great, thanks<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:58:04)</span> <b>blin:</b></span> @rynge just a heads up, our plan is to have you use the host cert as a pilot cert for a small % of pilots as another way to tease out sites that are having issues<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:58:20)</span> <b>blin:</b></span> idk how easy that is for you to do but brian seemed to think it was possible<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:58:23)</span> <b>rynge:</b></span> Ok, can do<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:58:35)</span> <b>rynge:</b></span> Yeah, that is no problem<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:58:39)</span> <b>blin:</b></span> cooool<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:58:51)</span> <b>rynge:</b></span> But, remember we keep glideins in the queues<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:59:05)</span> <b>rynge:</b></span> And they can sit there for a long time<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:59:20)</span> <b>rynge:</b></span> Also, gwms is probably where those errors will pop up<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:59:29)</span> <b>rynge:</b></span> I don't think I will see them in the fe<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:59:43)</span> <b>blin:</b></span> you mean in the factory? that sounds right<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:00:18)</span> <b>rynge:</b></span> Right<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:45:15)</span> <b>bbockelm:</b></span> @rynge - we'll need to do the VOMS cert Right Now.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:45:37)</span> <b>bbockelm:</b></span> :slightly_smiling_face: any chance we can predict the DN so we can the VO package rolling?<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:46:12)</span> <b>blin:</b></span> VOMS cert is fine we already have this: <a href="https://github.com/opensciencegrid/osg-vo-config/blob/master/vomsdir/osg/voms.opensciencegrid.org.lsc">https://github.com/opensciencegrid/osg-vo-config/blob/master/vomsdir/osg/voms.opensciencegrid.org.lsc</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(18:46:32)</span> <b>blin:</b></span> well, "fine", because it should probably be a UChicago InCommon cert instead of a UW one<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:46:55)</span> <b>rynge:</b></span> That is confusing as that is not the cert I'm using<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:47:25)</span> <b>blin:</b></span> it's not but we can transition to it easily and sites will already have the right VOMS info to do auth<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:48:14)</span> <b>rynge:</b></span> And that cert already exists?<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:49:01)</span> <b>blin:</b></span> we can get it relatively easily<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:49:50)</span> <b>rynge:</b></span> Alright, well get me a copy and I will switch to that one.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:50:17)</span> <b>rynge:</b></span> @bbockelm And that one is already in vomses, so no changes required in the VO package, right?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:50:33)</span> <b>rynge:</b></span> <pre><br/>$ cat /etc/vomses  | grep osg<br/>"osg" "<a href="http://voms.opensciencegrid.org">voms.opensciencegrid.org</a>" "15027" "/DC=org/DC=incommon/C=US/postalCode=53706/ST=WI/L=Madison/street=1210 West Dayton Street/O=University of Wisconsin-Madison/OU=OCIS/CN=<a href="http://voms.opensciencegrid.org">voms.opensciencegrid.org</a>" "osg"<br/>"osg" "<a href="http://voms1.opensciencegrid.org">voms1.opensciencegrid.org</a>" "15027" "/DC=org/DC=opensciencegrid/O=Open Science Grid/OU=Services/CN=<a href="http://voms1.opensciencegrid.org">voms1.opensciencegrid.org</a>" "osg"<br/>"osg" "<a href="http://voms2.opensciencegrid.org">voms2.opensciencegrid.org</a>" "15027" "/DC=org/DC=opensciencegrid/O=Open Science Grid/OU=Services/CN=<a href="http://voms2.opensciencegrid.org">voms2.opensciencegrid.org</a>" "osg"<br/>"osg" "<a href="http://voms.grid.iu.edu">voms.grid.iu.edu</a>" "15027" "/DC=org/DC=opensciencegrid/O=Open Science Grid/OU=Services/CN=<a href="http://voms.grid.iu.edu">voms.grid.iu.edu</a>" "osg"<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(18:51:04)</span> <b>blin:</b></span> oh, i actually think i have it already<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:51:13)</span> <b>blin:</b></span> i'll get it to you tomorrow<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:52:28)</span> <b>rynge:</b></span> ok - well I'm still slightly confused about what I need to do, and when<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:52:37)</span> <b>rynge:</b></span> So please nudge me along if we get stuck<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:52:57)</span> <b>blin:</b></span> will do<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:34:04)</span> <b>bbockelm:</b></span> (sorry - put the kids to bed in the meantime)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:35:18)</span> <b>bbockelm:</b></span> @rynge - what we need to do is have ASAP a separate frontend group with the new pilot credential (and new VOMS).  Brian Lin will work to count the # of sites that accepts the new credential versus the old credential and do a targeted outreach campaign accordingly.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(19:35:46)</span> <b>rynge:</b></span> Ok<br/>
+</body>
+</html>

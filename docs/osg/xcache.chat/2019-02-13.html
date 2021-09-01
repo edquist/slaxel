@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Feb 13, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Wed Feb 13, 2019 : #xcache (osg)</h3>
+<span style="color: #53b759"><span style="font-size: small">(08:46:38)</span> <b>isfiligoi:</b></span> I opened the 1094 equivalent, but does not seem to be enough<br/>(and this is an origin)<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:06:03)</span> <b>isfiligoi:</b></span> BTW: I verified I can start a httpd on that same port and get the data back<br/>But xrdfs xroot:// just hangs there,<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:13:28)</span> <b>dweitzel:</b></span> Anything interesting when using the debug option to xrdcp?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:13:35)</span> <b>dweitzel:</b></span> Or xrdfs<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:15:02)</span> <b>isfiligoi:</b></span> How do I do that?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:15:39)</span> <b>dweitzel:</b></span> I think it’s just the -d option. The help message on both tools will show the usage<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:15:50)</span> <b>isfiligoi:</b></span> [0708] isfiligoi@test-012 ~/github/kubernetes$ xrdfs -d <a href="xroot://stashcache-origin-merra2.nautilus.optiputer.net:31094/">xroot://stashcache-origin-merra2.nautilus.optiputer.net:31094/</a> ls /merra2/<br/>[ERROR] Command not found<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:17:04)</span> <b>dweitzel:</b></span> I don’t think you should put the ending slash after the port number. <br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:17:22)</span> <b>dweitzel:</b></span> It’s suppose to be hostname and port, not really a url I think. <br/>
+<span style="color: #53b759"><span style="font-size: small">(09:17:46)</span> <b>isfiligoi:</b></span> makes no difference<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:19:37)</span> <b>isfiligoi:</b></span> actually… xrdcp works!<br/>It is just xrdfs that hangs!<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:20:08)</span> <b>isfiligoi:</b></span> xrdcp <a href="xroot://stashcache-origin-merra2.nautilus.optiputer.net:31094//merra2/robots.txt">xroot://stashcache-origin-merra2.nautilus.optiputer.net:31094//merra2/robots.txt</a> a.txt<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:20:55)</span> <b>isfiligoi:</b></span> PS: If you want, you should be able to reproduce it<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:24:55)</span> <b>dweitzel:</b></span> Does the IP "10.244.22.49" ring a bell?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:25:02)</span> <b>dweitzel:</b></span> is that the internal ip of that node?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:25:57)</span> <b>dweitzel:</b></span> what may be happening is that <tt>xrdfs</tt> talks to the cmsd on the node, which probably needs to run on a different port.  I think usually 1095.  But I'm not sure.<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:26:36)</span> <b>isfiligoi:</b></span> yes, that seems the internal node<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:26:47)</span> <b>isfiligoi:</b></span> and that seems a good explanation….<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:27:07)</span> <b>matyas:</b></span> where is cmsd configured to run on a different port?<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:27:24)</span> <b>isfiligoi:</b></span> Right, that was going to be my next question<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:27:43)</span> <b>isfiligoi:</b></span> I only changed the xrootd port<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:29:24)</span> <b>matyas:</b></span> we want the authed origin to run on 1095<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:29:32)</span> <b>dweitzel:</b></span> right, maybe not 1095.<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:33:02)</span> <b>isfiligoi:</b></span> Found the docs:<br/>if exec cmsd &amp;&amp; named public<br/>xrd.port 2131<br/>else<br/>xrd.port 1094<br/>fi<br/>Don’t think we normally set it, but seems easy enought to change<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:34:06)</span> <b>matyas:</b></span> is the config named "xrootd-public.cfg" though?<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:34:14)</span> <b>isfiligoi:</b></span> But how do I tell it to use the public IP address instead of the private one?<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:34:57)</span> <b>isfiligoi:</b></span> You mentioned that it was trying to connect to the private one<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:35:06)</span> <b>isfiligoi:</b></span> BTW: How did you see that?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:35:38)</span> <b>dweitzel:</b></span> <pre>XRD_LOGLEVEL=Debug xrdfs <a href="root://stashcache-origin-merra2.nautilus.optiputer.net:31094">root://stashcache-origin-merra2.nautilus.optiputer.net:31094</a> ls /merra2/</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:35:53)</span> <b>dweitzel:</b></span> (I had to look up the man page for xrdfs for that environment variable)<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:38:03)</span> <b>isfiligoi:</b></span> I see… it is re-trying 31094 port again, just with a different IP; so I don’t think thats cmsd…  :disappointed:<br/>Looks like I have to force xrootd to use the external DNS name<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:38:48)</span> <b>isfiligoi:</b></span> I see “private IPv4: false” in the debug message… That may be the thing to change<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:49:37)</span> <b>isfiligoi:</b></span> I see this in the log file<br/>=====&gt; all.export /merra2<br/>Config exporting /merra2<br/>Config warning: ‘xrootd.seclib’ not specified; strong authentication disabled!<br/>Config Routing for 10.244.22.49: local pub4 prv4<br/>Config Route all4: 10.244.22.49 Dest=[::10.244.22.49]:31094<br/>++++++ File system initialization started.<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:49:50)</span> <b>isfiligoi:</b></span> So, this is the part that needs to be changed<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:50:00)</span> <b>isfiligoi:</b></span> I am using<br/>[root@stashcache-origin-merra2-6bbd895cc4-9bt2z stash-origin]# cat /etc/xrootd/public-origin-authfile<br/>u * /merra2 rl<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:50:04)</span> <b>isfiligoi:</b></span> any suggestions?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:50:47)</span> <b>dweitzel:</b></span> That doesn't sound like a authfile issue.<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:58:29)</span> <b>isfiligoi:</b></span> FYI: Looking at xrd.network routes<br/>
+</body>
+</html>

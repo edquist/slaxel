@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Nov 5, 2020 : #security (osg)</title>
+</head>
+<body>
+<h3>Thu Nov 5, 2020 : #security (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(10:01:52)</span> <b>matyas:</b></span> hey, thunderbird is complaining about the PGP signature for your latest announcement... probably because the key is for <a href="mailto:security@opensciencegrid.org">security@opensciencegrid.org</a> and the message is from <a href="mailto:help@opensciencegrid.org">help@opensciencegrid.org</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:02:10)</span> <b>matyas:</b></span> 1. is 6E5F 4DD8 7ABC 9F68 A49B F3CA 15E3 B3AD 7FD4 2669 the correct key?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:03:07)</span> <b>matyas:</b></span> 2. should we change the from address in osg-notify and set <a href="mailto:help@opensciencegrid.org">help@opensciencegrid.org</a> in the reply-to instead? Or add <a href="mailto:help@opensciencegrid.org">help@opensciencegrid.org</a> to the key?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:12:42)</span> <b>blin:</b></span> i think that means that the announcement was sent with a missing option<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:13:11)</span> <b>blin:</b></span> (see the security requirements tip: <a href="https://opensciencegrid.org//operations/services/sending-announcements/#sending-the-announcement">https://opensciencegrid.org//operations/services/sending-announcements/#sending-the-announcement</a>)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:07:16)</span> <b>stanfiem:</b></span> @matyas yeah that is the right key<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:08:13)</span> <b>stanfiem:</b></span> maybe Brian, @drakejc sent the message so he could confirm...that said it shows up as from "owner-security" to me, which is how they usually show up<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:09:43)</span> <b>blin:</b></span> hrm, nvm, looking at the tool it doesn't have security@ in there anywhere<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:10:10)</span> <b>blin:</b></span> did the key change?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:10:38)</span> <b>stanfiem:</b></span> nope<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:10:49)</span> <b>matyas:</b></span> the warning said the key was valid but didn't match the email address<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:16:18)</span> <b>blin:</b></span> well i'm confused, because we haven't changed the notify script in 9 months<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:18:03)</span> <b>matyas:</b></span> past announcements have the same issue, I just haven't noticed it until now<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:18:55)</span> <b>blin:</b></span> ah, i see<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:18:56)</span> <b>blin:</b></span> oof<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:19:11)</span> <b>matyas:</b></span> the lesson here is:<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:19:17)</span> <b>matyas:</b></span> nobody gives a shit about certificates<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:19:46)</span> <b>matyas:</b></span> we can add <a href="mailto:help@opensciencegrid.org">help@opensciencegrid.org</a> to the key, though, right?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:22:03)</span> <b>blin:</b></span> or send emails from <a href="mailto:security@opensciencegrid.org">security@opensciencegrid.org</a> when sending security announcements?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:22:23)</span> <b>matyas:</b></span> that too. Let's make sure we set the reply-to if we do that though<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:25:52)</span> <b>stanfiem:</b></span> yeah i expect the number of people looking at the gpg signature to be almost zero<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:26:15)</span> <b>matyas:</b></span> I only look at it because you phished me once when I didn't :wink:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:26:19)</span> <b>stanfiem:</b></span> hahaha<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:26:59)</span> <b>stanfiem:</b></span> yeah i'd rather just have the emails coming from security@<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:29:07)</span> <b>matyas:</b></span> I'll make a JIRA ticket<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:33:32)</span> <b>blin:</b></span> go ahead and assign it to me, i've got a commit halfway-done<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:34:15)</span> <b>matyas:</b></span> done <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-4349">https://opensciencegrid.atlassian.net/browse/SOFTWARE-4349</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(12:37:16)</span> <b>matyas:</b></span> Got a general PGP question -- if I add my signature to your key and you add a new email address to the key, do I need to re-sign it?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:41:07)</span> <b>stanfiem:</b></span> i don't think so, as the key fingerprint _shouldn't_ change<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:41:12)</span> <b>stanfiem:</b></span> but i've never actually tried it<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:41:38)</span> <b>stanfiem:</b></span> pgp is a clunky mess<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:43:22)</span> <b>matyas:</b></span> Hm. That seems like it's a hole, no? My key has <a href="mailto:matyas@cs.wisc.edu">matyas@cs.wisc.edu</a>; you sign it, then people who trust you will trust me, then I add <a href="mailto:passwordreset@google.com">passwordreset@google.com</a> to my key and phish people who trust you...?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:44:42)</span> <b>stanfiem:</b></span> yeah that is the problem with signature systems based on trust<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:45:03)</span> <b>stanfiem:</b></span> x.509 has similar problems<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:49:07)</span> <b>stanfiem:</b></span> well the CA ecosystem does anyway<br/>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jun 18, 2021 : #batlab (chtc)</title>
+</head>
+<body>
+<h3>Fri Jun 18, 2021 : #batlab (chtc)</h3>
+<span style="color: #bb86b7"><span style="font-size: small">(08:54:04)</span> <b>tim:</b></span> This happens to me with a minicondor installation on Debian.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(08:56:23)</span> <b>tim:</b></span> When I get back next week. I'll do the experiment and see if the problem is still present.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:27:06)</span> <b>johnkn:</b></span> The last two builds yesterday were green except for cmd_drain_scavenging_vacation (and once cmd_drain_scavenging) which failed intermittently.<br/>The test output is pretty consistent.  It behaves like it's seeing the eviction event for job 1.2 twice, and the second time causes the test to fail.<br/><pre>Waiting for last job to start...<br/>Removing evicted job 1.2...<br/><br/>+-------------------------------------------------------------------------------<br/>+ CMD[18:23:21]: condor_rm<br/>+ SIGNALED: NO, RETURNED: 0, TIME 0.458457 <br/>+ BEGIN STDOUT<br/>Job 1.2 marked for removal<br/>+ END STDOUT<br/>+-------------------------------------------------------------------------------<br/>Removing evicted job 1.2...<br/><br/>+-------------------------------------------------------------------------------<br/>+ CMD[18:23:28]: condor_rm<br/>+ SIGNALED: NO, RETURNED: 1, TIME 1.123708 <br/>+ BEGIN STDERR<br/><br/>Job 1.2 not found<br/>+ END STDERR<br/>+-------------------------------------------------------------------------------<br/>****** STDOUT ******<br/>****** STDOUT ******<br/>****** STDERR ******<br/><br/><br/>Job 1.2 not found<br/><br/>****** STDERR ******<br/>Expectation Failed on cmd &lt;condor_rm&gt;</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:33:01)</span> <b>johnkn:</b></span> Yep, looking that the log from one of the test runs,  job 1.2 was evicted, started again, was evicted again, and then removed<br/>
+<span style="color: #d58247"><span style="font-size: small">(11:16:32)</span> <b>gthain:</b></span> I have a fix for this working it's way through<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:16:46)</span> <b>johnkn:</b></span> Cool.<br/>
+<span style="color: #d58247"><span style="font-size: small">(11:17:04)</span> <b>gthain:</b></span> I don't think it started again, I think we remove it, and the remove event looks like an eviction<br/>
+<span style="color: #d58247"><span style="font-size: small">(11:17:24)</span> <b>gthain:</b></span> and we try to remove it twice, so the 2nd removal fails<br/>
+<span style="color: #d58247"><span style="font-size: small">(11:17:50)</span> <b>gthain:</b></span> cmd_drain_scavenging (without the _vacation) may have a similar issue<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:18:47)</span> <b>johnkn:</b></span> it does<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:19:56)</span> <b>johnkn:</b></span> The first removal happens while processing the eviction event in the log,  so how can that removal look like an eviction?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:20:06)</span> <b>johnkn:</b></span> a race condition in the schedd?<br/>
+<span style="color: #d58247"><span style="font-size: small">(11:22:57)</span> <b>gthain:</b></span> 1. job 1.2 is evicted while file xfer is still happening<br/>2. we see eviction event<br/>3. we see file xfer ended event<br/>4. we see eviction event again<br/>
+<span style="color: #d58247"><span style="font-size: small">(11:25:11)</span> <b>gthain:</b></span> ...<br/>004 (001.002.000) 2021-06-17 18:25:46 Job was evicted.<br/>	(0) CPU times<br/>		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Remote Usage<br/>		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage<br/>	0  -  Run Bytes Sent By Job<br/>	0  -  Run Bytes Received By Job<br/>	Partitionable Resources :    Usage  Request Allocated<br/>	   Cpus                 :        0        1         1<br/>	   Disk (KB)            :       15        1    863888<br/>	   Memory (MB)          :        5        1       128<br/>...<br/>004 (001.003.000) 2021-06-17 18:25:46 Job was evicted.<br/>	(0) CPU times<br/>		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Remote Usage<br/>		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage<br/>	0  -  Run Bytes Sent By Job<br/>	0  -  Run Bytes Received By Job<br/>	Partitionable Resources :    Usage  Request Allocated<br/>	   Cpus                 :        0        1         1<br/>	   Disk (KB)            :       15        1    863888<br/>	   Memory (MB)          :        5        1       128<br/>...<br/>040 (001.002.000) 2021-06-17 18:27:23 Finished transferring input files<br/>...<br/>004 (001.002.000) 2021-06-17 18:27:23 Job was evicted.<br/>	(0) CPU times<br/>		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Remote Usage<br/>		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage<br/>	0  -  Run Bytes Sent By Job<br/>	0  -  Run Bytes Received By Job<br/>	Partitionable Resources :    Usage  Request Allocated<br/>	   Cpus                 :        0        1         1<br/>	   Disk (KB)            :       11       15    863888<br/>	   Memory (MB)          :        8        8       128<br/>...<br/>009 (001.002.000) 2021-06-17 18:27:23 Job was aborted.<br/>	via condor_rm (by user slot15)<br/>...<br/>
+<span style="color: #d58247"><span style="font-size: small">(11:26:28)</span> <b>gthain:</b></span> Is that a bug?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:27:04)</span> <b>johnkn:</b></span> I wondered about that.<br/>
+<span style="color: #d58247"><span style="font-size: small">(11:27:42)</span> <b>gthain:</b></span> Interesting that the resource usage report changes<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:27:46)</span> <b>johnkn:</b></span> Perhaps technically not, since repeating events is rare but permitted.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:30:07)</span> <b>johnkn:</b></span> So we spin up a second shadow for file transfer, right?<br/>
+<span style="color: #d58247"><span style="font-size: small">(11:32:04)</span> <b>gthain:</b></span> I think we fork the shadow so that we release memory for security, etc.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:32:11)</span> <b>johnkn:</b></span> right<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:15:01)</span> <b>tlmiller:</b></span> Isn't the problem with that log the lack of a start event between the eviction and transferring input files?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:15:11)</span> <b>tlmiller:</b></span> (The second eviction is for a different job.)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:16:23)</span> <b>tlmiller:</b></span> And, @gthain when you've got a patch let me know; IIRC, the <tt>cmd_drain_scavenging*</tt> tests have some subtleties.<br/>
+<span style="color: #d58247"><span style="font-size: small">(14:45:52)</span> <b>gthain:</b></span> patch is in<br/>
+<span style="color: #d58247"><span style="font-size: small">(14:46:29)</span> <b>gthain:</b></span> I didn't cut &amp; paste the whole log<br/>
+<span style="color: #d58247"><span style="font-size: small">(14:46:47)</span> <b>gthain:</b></span> there are submit &amp; execute events earlier<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:47:12)</span> <b>tlmiller:</b></span> There needs to be one between eviction and input file transfer, though.<br/>
+<span style="color: #d58247"><span style="font-size: small">(14:47:14)</span> <b>gthain:</b></span> it appears that if we evict during input file xfer, we get "evict, then file xfer complete, then a 2nd evict"<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:47:37)</span> <b>tlmiller:</b></span> Could you send me the whole log?  (or point me at it)<br/>
+<span style="color: #d58247"><span style="font-size: small">(14:47:44)</span> <b>gthain:</b></span> (emailed')<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:47:52)</span> <b>tlmiller:</b></span> Thanks.<br/>
+<span style="color: #d58247"><span style="font-size: small">(14:49:47)</span> <b>gthain:</b></span> I guess there could be a missing start event, that seems ... unlikely<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:50:32)</span> <b>tlmiller:</b></span> I'll look at the log, but what you're describing and the log fragment you posted don't seem to have anything to do with each other.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:03:11)</span> <b>tlmiller:</b></span> So job 001.002 records:<br/>• 18:24:27 Job submitted from host<br/>• 18:24:45 Finished transferring input files<br/>• 18:24:46 Job executing on host<br/>• 18:24:55 Image size of job updated<br/>• 18:25:46 Job was evicted<br/>• 18:27:23 Finished transferring input files<br/>• 18:27:23 Job was evicted<br/>So we _already finished_ transferring input files 61 seconds before the first eviction was recorded.  Now, I do notice that we don't record the job starting on the host until _after_ it transferred input files the first time, so maybe that's part of what's going on here -- the job was evicted before it actually began.  (Note that it can't have been evicted during file transfer, because it never actually _started_ transferring files, either!)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:04:00)</span> <b>tlmiller:</b></span> So it seems necessary to check that (a) the job actually _has_ input to transfer and (b) if the startd accepted two different claim activations for this job.<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:04:09)</span> <b>gthain:</b></span> Still having port problems ---<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:04:12)</span> <b>gthain:</b></span> <pre>error: condor_submit failed (returned 1)<br/>error: couldn't find cluster id in condor_submit output:<br/> Submitting job(s)06/18/21 14:20:15 Sock::bind failed: errno = 98 Address already in use<br/><br/>ERROR: Failed to connect to local queue manager<br/>CEDAR:6001:Failed to connect to &lt;127.0.0.1:56491?addrs=127.0.0.1-56491&amp;alias=condorauto-665501.0-e2460.chtc.wisc.edu&amp;noUDP&amp;sock=schedd_116101_3525&gt;</pre><br/>
+<span style="color: #d58247"><span style="font-size: small">(15:04:42)</span> <b>gthain:</b></span> This in batlab, in a docker container<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:04:44)</span> <b>tlmiller:</b></span> Well, that clearly shouldn't be happening.  That was in a NAT'd container?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:05:42)</span> <b>tlmiller:</b></span> And if (b), to figure how the job was evicted between claim activation and forking the starter, because otherwise we failed to log an event.<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:06:15)</span> <b>gthain:</b></span> I guess 127.0.0.1 isn't a virtualized interface<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:07:04)</span> <b>tlmiller:</b></span> ... damn, you're probably right.  Probably even deliberately.  Seems like there should be a Docker knob to change that (isolate it), though.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:07:15)</span> <b>tlmiller:</b></span> ... and only if _that_ condition occurred is it safe for the test not to fail in this way.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:08:13)</span> <b>tlmiller:</b></span> &gt;  patch is in<br/>I don't see anything yet?<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:09:26)</span> <b>gthain:</b></span> Got sucked into a merge.  SHA is<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:09:27)</span> <b>gthain:</b></span> 8ab5834f8d423beaffa3036d4cd504bbbc26e48d<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:10:24)</span> <b>tlmiller:</b></span> Yeah, I totally disagree with that patch.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:37:07)</span> <b>johnkn:</b></span> The wierd part here is that the test will condor_rm the job when reads the *first* eviction event from the log.  and yet the job is still starting again and getting evicted a second time.  when the test reads the second eviction event it tries to condor_rm the job again, and then aborts when the job is not found.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:38:59)</span> <b>johnkn:</b></span> So I think maybe the real problem here is that the job is getting to start up again before the test reads the first eviction event from the log.<br/>maybe we just need to fix the job so it can't be started more than once<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:50:48)</span> <b>gthain:</b></span> There's no way to tell condor "bind on any interface except localhost", is there?<br/>
+<blockquote>
+<span style="color: #9e3997"><span style="font-size: small">(15:54:02)</span> <b>tlmiller:</b></span> Not that I'm aware of, although it might not be too hard to add.<br/>
+</blockquote>
+<span style="color: #9e3997"><span style="font-size: small">(15:57:09)</span> <b>tlmiller:</b></span> If we can confirm that the problem is a race condition -- that the test couldn't <tt>condor_rm</tt> the job before it got another chance to run -- then, pending a review of a test, I'd probably be OK with TJ's idea.<br/>
+<blockquote>
+<span style="color: #235e5b"><span style="font-size: small">(16:15:43)</span> <b>johnkn:</b></span> There is no doubt this race condition exists, even if it is not clear that all of the failures are because of this race condition.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:01:37)</span> <b>tlmiller:</b></span> Good point.<br/>
+</blockquote>
+<span style="color: #d58247"><span style="font-size: small">(15:57:25)</span> <b>gthain:</b></span> I fear the only way to get the tests to run reliably in the face of port exhaustion is to limit the number of tests slots on a machine to some number -- 32 (?)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:57:49)</span> <b>tlmiller:</b></span> Did you look into configuring Docker to not forward localhost through?<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:58:01)</span> <b>gthain:</b></span> Couldn't find a way<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:58:13)</span> <b>tlmiller:</b></span> That seems wrong and bad, actually.<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:58:42)</span> <b>gthain:</b></span> DNS may need it<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:59:03)</span> <b>tlmiller:</b></span> That's what domain sockets are for, right?<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:59:33)</span> <b>gthain:</b></span> one would hope.  Not sure all services needed inside a container are accessible via domain sockets<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:59:52)</span> <b>tlmiller:</b></span> Could we instead force Docker to provide a well-known address (e.g., 172.10.1.1 or whatever) and configure the tests to use that instead?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:00:06)</span> <b>tlmiller:</b></span> (Heck, even 192.168.0.1 would be better.)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:00:50)</span> <b>tlmiller:</b></span> (What _is_ the address of the NAT'd interface?  Does it already do this and we've just been using loopback because it's easier?)<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:02:37)</span> <b>gthain:</b></span> We bind all interfaces by default<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:03:21)</span> <b>tlmiller:</b></span> If we bind all interfaces by default in the tests, that mean we're only seeing 127.0.0.1 as an IP, because it's dead last on our list of preferences.<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:07:43)</span> <b>gthain:</b></span> [$ROLE.Personal]¬<br/>    description=Settings for Personal HTCondor (i.e. the whole pool is on a single machine)¬<br/>    default : @end¬<br/>   CONDOR_HOST=127.0.0.1¬<br/>   COLLECTOR_HOST=$(CONDOR_HOST):0¬<br/>   DAEMON_LIST=MASTER COLLECTOR NEGOTIATOR STARTD SCHEDD¬<br/>   RunBenchmarks=0¬<br/> @end¬<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:08:44)</span> <b>tlmiller:</b></span> Assuming this is beause we set <tt>use role:personal</tt> in the usual case for testing: yeah, I thought so.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:10:20)</span> <b>tlmiller:</b></span> So if we can ask Docker to virtualize/NAT a specific IP, we can probably set CONDOR_HOST and go from there...<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:12:12)</span> <b>gthain:</b></span> Seems like could be a headache for the cases where we want to run tests outside of docker<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:13:08)</span> <b>tlmiller:</b></span> True.  But we run a _lot_ of code in the BaTLab that we don't run anywhere else; I don't see why changing the bound IP address to something useful shouldn't be part of it.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:13:49)</span> <b>tlmiller:</b></span> (Or if you really care, we can make the test suite pick it up from an environment variable set by the test glue or something.)<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:14:28)</span> <b>gthain:</b></span> Maybe we should write a "this is condor's preferred interface to use" tool that we run before starting personal condors<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:15:34)</span> <b>tlmiller:</b></span> ??<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:18:42)</span> <b>johnkn:</b></span> I for one have no problem with restricting the testing machine to 40 ish slots that are willing to run test jobs.  we can have some slots only willing to run build jobs or just have more cores in the slots.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:26:46)</span> <b>tlmiller:</b></span> We'll lose some test scenarios if we do that, but I don't know if they're ones we care about any more.  (It's also not so good for the longer term, but I guess we're not worrying about that right now, either.)  It would be interesting to make, say, 12 8-core build-only slots, direct all the Docker builds to that machine (if that's easy to do), and (temporarily) change the builds to run <tt>make -j 12</tt>.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:29:52)</span> <b>johnkn:</b></span> I'd love to do that while also having a bunch of test slots and see what sort of failures pop up in the tests<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:30:23)</span> <b>gthain:</b></span> There's still going to be no end of test failures that will pop up randomly now<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:31:04)</span> <b>johnkn:</b></span> Yeah. now the hard problem of fixing the race conditions<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:33:00)</span> <b>gthain:</b></span> @tlmiller Feel free to fix the drain_scavenging tests ...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:39:28)</span> <b>johnkn:</b></span> Good work on the testing push this week everyone!  I think we made a ton of progress!<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:40:38)</span> <b>gthain:</b></span> the NAT and the port exhaustion was the big breakthrough<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:40:59)</span> <b>tlmiller:</b></span> @gthain I'll write a ticket up, but the first step is going to be reverting your patch, because AFAICT, you didn't do the research to justify it.<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:41:34)</span> <b>gthain:</b></span> I'm sure Miron will say that condor should keep track of how many sockets are in use and we should advertise and monitor that...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:42:24)</span> <b>johnkn:</b></span> Back of the envelope math says we should be consuming about 10x fewer ports than we actually consume.  there's still a mystery here.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:43:07)</span> <b>johnkn:</b></span> but it's also an artefact of the testing setup, not really a condor bug<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:43:47)</span> <b>gthain:</b></span> Problem is the socket stay in TIME_WAIT for 60 (?) seconds, and we can run 10 tests in that time<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:44:03)</span> <b>johnkn:</b></span> don't we set a flag to prevent that?<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:44:10)</span> <b>gthain:</b></span> We can't<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:44:15)</span> <b>johnkn:</b></span> ah.<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:44:22)</span> <b>gthain:</b></span> Stay inTIME_WAIT for 60 (?) seconds after they are closed<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:44:34)</span> <b>gthain:</b></span> maybe 120 seconds?  I forget<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:45:02)</span> <b>johnkn:</b></span> So a possible solution is to run multiple tests on a single condor instance.<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:45:21)</span> <b>gthain:</b></span> Think the problem is really the tools talking to condor<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:45:56)</span> <b>johnkn:</b></span> I wonder how much of that is just condor_who polling for startup and shutdown<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:46:20)</span> <b>gthain:</b></span> I'm sure that's some, but a tool may talk to both the collector and another daemon<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:46:42)</span> <b>gthain:</b></span> condor_submit, condor_q, condor_q, condor_q, condor_rm ... it adds up<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:48:38)</span> <b>johnkn:</b></span> the tools that talk to a local schedd almost never hit the collector.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:49:05)</span> <b>johnkn:</b></span> but that's still a port for each invocation<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:57:04)</span> <b>gthain:</b></span> Seems like the overwhelming majority of our sockets don't bind to localhost:<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:57:17)</span> <b>gthain:</b></span> <pre>$ netstat -an | grep TIME | wc<br/>   5410   32460  432800<br/>$ netstat -an | grep TIME | grep 127.0.0.1 | wc<br/>     88     528    7040</pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:00:43)</span> <b>tlmiller:</b></span> Where do they bind?<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:05:28)</span> <b>gthain:</b></span> (this is on chevre, to <a href="http://chevre.cs.wisc.edu">chevre.cs.wisc.edu</a>)<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:05:45)</span> <b>gthain:</b></span> on the test machine, e2460,  inside a docker container running tests:<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:06:13)</span> <b>gthain:</b></span> <pre>$ netstat -an | grep -c TIME_WAIT<br/>32355<br/>$ netstat -an | grep TIME_WAIT | grep -c 127.0.0.1<br/>6900</pre><br/>
+<span style="color: #d58247"><span style="font-size: small">(17:06:58)</span> <b>gthain:</b></span> 32,355 seems like a lot<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:07:50)</span> <b>tlmiller:</b></span> It rather does.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:08:47)</span> <b>johnkn:</b></span> how would we go about tracing them back to commands and/or daemons?<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:09:03)</span> <b>gthain:</b></span> Good question<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:09:43)</span> <b>gthain:</b></span> If the "mostly condor tools" theory is correct, we could get the dprintf logs out of the tools and correlate them<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:09:46)</span> <b>tlmiller:</b></span> <tt>netstat -a -n -p</tt><br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:10:00)</span> <b>tlmiller:</b></span> But I'm assuming that only works for processes that are still around.<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:10:19)</span> <b>gthain:</b></span> <pre>$ netstat -a -n -p | grep TIME_WAIT | tail -1<br/>tcp        0      0 172.17.0.1:38876        172.17.0.1:34129        TIME_WAIT   -    </pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:10:22)</span> <b>johnkn:</b></span> we can't currently get dprintf logs out of tools.  but I could fix the code to make that work.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:10:37)</span> <b>tlmiller:</b></span> It the daemons were to log inbound connections, we could check those logs, instead?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:11:14)</span> <b>tlmiller:</b></span> ... I guess we don't even need inbound logs if we have the destination port...<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:15:54)</span> <b>gthain:</b></span> Huh.<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:16:33)</span> <b>gthain:</b></span> <pre>[root@e2460 gthain]# netstat -a -n -p | grep :39355 | grep -c TIME_W<br/>5760<br/>[root@e2460 gthain]# netstat -a -n -p | grep :39355 | grep -v TIME_W<br/>tcp        0      0 172.17.0.1:39355        0.0.0.0:*               LISTEN      44062/condor_starte </pre><br/>
+<span style="color: #d58247"><span style="font-size: small">(17:20:02)</span> <b>gthain:</b></span> For the record, that's the c1 starter<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:20:21)</span> <b>gthain:</b></span> Wonder if the problem is the chirp updates that come from inside the container<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:20:59)</span> <b>tlmiller:</b></span> ... the C2's job does do a lot of chirping.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:21:09)</span> <b>tlmiller:</b></span> er...<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:21:22)</span> <b>tlmiller:</b></span> ... wait, not the C2.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:21:24)</span> <b>johnkn:</b></span> So this is the streaming of stdin and out?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:21:55)</span> <b>tlmiller:</b></span> "streaming i/o" is done by HTCondor, and is how you get pass/fail results before the test suite finishes.<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:22:41)</span> <b>gthain:</b></span> I need to call it a day.  But something is talking to the C1 starter frequently<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:22:41)</span> <b>tlmiller:</b></span> chirping the test logs is how you get the stdout &amp; stderr of the tests before the test suite finishes.<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:23:07)</span> <b>gthain:</b></span> one condor_chirp per test run?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:23:13)</span> <b>tlmiller:</b></span> But yeah, the Metronome code running in the C1 runs a _lot_ of chirp commands.<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:23:39)</span> <b>gthain:</b></span> Maybe we need a chirp tunnel<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:23:40)</span> <b>johnkn:</b></span> Hmm.  can they be batched?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:24:19)</span> <b>tlmiller:</b></span> I'd have to look at the code.  I think they already are?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:24:33)</span> <b>tlmiller:</b></span> ... I also have to call it a day soon.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:24:52)</span> <b>johnkn:</b></span> I've had a beer in my hand for 1/2 hour already :wink:<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:25:54)</span> <b>gthain:</b></span> You need to drink faster<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:26:14)</span> <b>tlmiller:</b></span> He didn't say it was the _same_ beer the whole time. ;)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:26:16)</span> <b>johnkn:</b></span> We have guests coming at 6.  want to be sober when the *arrive*<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:26:28)</span> <b>gthain:</b></span> Always the gentleman<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:27:30)</span> <b>tlmiller:</b></span> Without looking too hard at the chirp command-line options, it looks like we check each log every five seconds, and all of the data that got added to that log in those five seconds is chirp'd back.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:27:50)</span> <b>tlmiller:</b></span> (Rather, we do all the checking and chirping and then sleep for five seconds.)<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(17:28:41)</span> <b>jfrey:</b></span> Add an option for chirp to listen on a domain socket or a named pipe?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:38:00)</span> <b>johnkn:</b></span> maybe run a python script that polls and chirps?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:38:27)</span> <b>johnkn:</b></span> that would keep the chirp socket open, right?<br/>
+</body>
+</html>

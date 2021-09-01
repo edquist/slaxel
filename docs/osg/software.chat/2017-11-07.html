@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Nov 7, 2017 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue Nov 7, 2017 : #software (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(14:12:37)</span> <b>bbockelm:</b></span> @matyas - any reason why we shouldn't just upstream the osg-sysconfig.patch for gridftp-hdfs?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:15:29)</span> <b>matyas:</b></span> nope. should totally do it<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:28:28)</span> <b>bbockelm:</b></span> alright - good news / bad news<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:28:34)</span> <b>bbockelm:</b></span> I just found and fixed a bug in gridftp-hdfs<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:28:47)</span> <b>bbockelm:</b></span> (that's the bad news)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:29:11)</span> <b>bbockelm:</b></span> good news is that it's not in a code path that's used in production anywhere ... just something I _want_ to use in production<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:32:24)</span> <b>matyas:</b></span> what does it do?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:32:40)</span> <b>bbockelm:</b></span> <a href="https://github.com/opensciencegrid/gridftp-hdfs/pull/19/files">https://github.com/opensciencegrid/gridftp-hdfs/pull/19/files</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:33:14)</span> <b>bbockelm:</b></span> one is a crash when checksum type X is requested but only checksums of type Y and Z are present.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:33:24)</span> <b>bbockelm:</b></span> the other is a deadlock when crashes occur.<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:36:16)</span> <b>matyas:</b></span> I didn't realize printf wasn't thread-safe<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:36:41)</span> <b>bbockelm:</b></span> Well, async signal safe.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:37:18)</span> <b>bbockelm:</b></span> typically, the problem is when a signal handler is invoked while a <tt>malloc</tt> is holding an internal lock -- and the signal handler also wants to invoke malloc.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:37:31)</span> <b>bbockelm:</b></span> <pre><br/>Thread 1 (Thread 0x7f9fcdb75840 (LWP 18125)):<br/>#0  0x00007f9fcc983eec in __lll_lock_wait_private () from /lib64/libc.so.6<br/>#1  0x00007f9fcc90105d in _L_lock_14730 () from /lib64/libc.so.6<br/>#2  0x00007f9fcc8fe163 in malloc () from /lib64/libc.so.6<br/>#3  0x00007f9fcc98a59e in backtrace_symbols () from /lib64/libc.so.6<br/>#4  0x00007f9fc6552515 in segv_handler (sig=&lt;optimized out&gt;) at /usr/src/debug/gridftp-hdfs-1.1/src/gridftp_hdfs.c:106<br/>#5  0x00007f9fc5cf31bd in os::Linux::chained_handler(int, siginfo_t*, void*) () from /usr/lib/jvm/java/jre/lib/amd64/server/libjvm.so<br/>#6  0x00007f9fc5cf7d21 in JVM_handle_linux_signal () from /usr/lib/jvm/java/jre/lib/amd64/server/libjvm.so<br/>#7  &lt;signal handler called&gt;<br/>#8  0x00007f9fcc8fb9dd in _int_malloc () from /lib64/libc.so.6<br/>#9  0x00007f9fcc8fe10c in malloc () from /lib64/libc.so.6<br/>#10 0x00007f9fcd2dc52d in globus_object_construct () from /lib64/libglobus_common.so.0<br/>#11 0x00007f9fcd2dc51b in globus_object_construct () from /lib64/libglobus_common.so.0<br/>#12 0x00007f9fcd2d4876 in globus_error_construct_error () from /lib64/libglobus_common.so.0<br/>#13 0x00007f9fcd079557 in globus_l_xio_system_cancel_cb () from /lib64/libglobus_xio.so.0<br/>#14 0x00007f9fcd05f844 in globus_l_xio_timeout_callback () from /lib64/libglobus_xio.so.0<br/>#15 0x00007f9fcd06f63c in globus_i_xio_timer_poller_callback () from /lib64/libglobus_xio.so.0<br/>#16 0x00007f9fcd2cb603 in globus_callback_space_poll_nothreads () from /lib64/libglobus_common.so.0<br/>#17 0x00007f9fcd2eb268 in globus_l_thread_none_cond_wait () from /lib64/libglobus_common.so.0<br/>#18 0x000055ef0eade96e in main ()<br/></pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:41:57)</span> <b>bbockelm:</b></span> anywho - just cut a gridftp-hdfs 1.1.1 release.<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:53:56)</span> <b>matyas:</b></span> how come you're printing to stdout instead of stderr?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:54:29)</span> <b>bbockelm:</b></span> because there's a separate thread that redirects stdout to the gridftp log.<br/>
+</body>
+</html>

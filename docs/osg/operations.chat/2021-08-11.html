@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Aug 11, 2021 : #operations (osg)</title>
+</head>
+<body>
+<h3>Wed Aug 11, 2021 : #operations (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(10:55:34)</span> <b>blin:</b></span> @lmichael for the singularity (?) messages leaking into the user's err files, Marco Mambelli said that this could be caused by glidein config (either in the factory/frontend) <tt>userjob</tt> in the <tt>GLIDEIN_DEBUG_OPTIONS</tt> variable<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:55:47)</span> <b>blin:</b></span> so we should make sure that that's not set before reporting a bug upstream<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:56:06)</span> <b>matyas:</b></span> no that specific message is an error<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:56:18)</span> <b>matyas:</b></span> it is not affected by userjob<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(10:57:50)</span> <b>blin:</b></span> how do we know this?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:02:50)</span> <b>matyas:</b></span> userjob sets $GLIDEIN_QUIET which is tested by the logging functions used in the wrapper scripts: they don't print anything if $GLIDEIN_QUIET is set<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:03:20)</span> <b>matyas:</b></span> any error messages printed by external programs (such as cp) go to stderr as usual<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:05:32)</span> <b>blin:</b></span> i'm not sure i understand: <tt>userjob</tt> only affects the behavior of the logging functions in wrapper scripts?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:06:12)</span> <b>matyas:</b></span> if I'm reading the code correctly, yes<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:06:26)</span> <b>blin:</b></span> gotcha<br/>
+</blockquote>
+<span style="color: #c386df"><span style="font-size: small">(10:56:46)</span> <b>matyas:</b></span> (er, sorry, the _cp_ message you were talking about in #gfactory)<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:57:03)</span> <b>blin:</b></span> there were a couple of them, iirc<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:06:42)</span> <b>blin:</b></span> regardless, we should enumerate all of these issues in tickets. otherwise they'll get lost<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:07:08)</span> <b>matyas:</b></span> can you give me the list of messages from one of the jobs?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:10:31)</span> <b>matyas:</b></span> or just give me one of the stderr files (unless it's huge)<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:33:15)</span> <b>blin:</b></span> i don't have any of this output but one of @lmichael @christinalk @emelie @rynge  probably do<br/>
+<span style="color: #db3150"><span style="font-size: small">(12:56:59)</span> <b>christinalk:</b></span> <pre>cp: cannot overwrite directory 'condor/lib' with non-directory<br/>WARNING  glidein_config not defined () in singularity_lib.sh. Some functions like advertise and error_gen will be limited.</pre><br/>
+<span style="color: #db3150"><span style="font-size: small">(12:57:52)</span> <b>christinalk:</b></span> or this<br/><pre>cp: cannot overwrite directory 'condor/lib' with non-directory<br/>WARNING  glidein_config not defined () in singularity_lib.sh. Some functions like advertise and error_gen will be limited.<br/>WARNING  String '/execute/dir_' in X509_USER_PROXY (/var/lib/condor/execute/dir_16716/glide_Hx09cu/ticket/myproxy), the conversion to run in Singularity may be incorrect<br/>WARNING  String '/execute/dir_' in X509_USER_CERT (/var/lib/condor/execute/dir_16716/glide_Hx09cu/hostcert.pem), the conversion to run in Singularity may be incorrect<br/>WARNING  String '/execute/dir_' in X509_USER_KEY (/var/lib/condor/execute/dir_16716/glide_Hx09cu/hostkey.pem), the conversion to run in Singularity may be incorrect<br/>WARNING  String '/execute/dir_' in _CONDOR_EXECUTE (/var/lib/condor/execute/dir_16716/glide_Hx09cu/execute), the conversion to run in Singularity may be incorrect</pre><br/>
+<span style="color: #db3150"><span style="font-size: small">(12:58:29)</span> <b>christinalk:</b></span> do y’all have sudo powers on <a href="http://login05.osgconnect.net">login05.osgconnect.net</a>? these errors came from a job in <tt>/home/ckoch5/tests/lolcow-singularity</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(13:03:58)</span> <b>matyas:</b></span> I do not.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:04:54)</span> <b>matyas:</b></span> or at least, it asks me for a password when I try to sudo and I don't have a password<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:07:50)</span> <b>matyas:</b></span> (but thank you for using lolcow as your test :slightly_smiling_face: )<br/>
+<blockquote>
+<span style="color: #db3150"><span style="font-size: small">(14:09:12)</span> <b>christinalk:</b></span> new OSG school exercise :joy: <a href="https://opensciencegrid.org/virtual-school-2021/materials/software/part4-ex1-singularity-options/#option-3-cowsay">https://opensciencegrid.org/virtual-school-2021/materials/software/part4-ex1-singularity-options/#option-3-cowsay</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(14:14:40)</span> <b>matyas:</b></span> :cow2: :grin:<br/>
+</blockquote>
+<span style="color: #c386df"><span style="font-size: small">(13:17:12)</span> <b>matyas:</b></span> WARNING messages appear not to take into account $GLIDEIN_QUIET i.e. they are always printed to stderr, regardless of userjob<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:57:59)</span> <b>blin:</b></span> @marcom ^^<br/>
+<span style="color: #dd8527"><span style="font-size: small">(14:59:08)</span> <b>marcom:</b></span> Thanks, I'll change that<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:02:12)</span> <b>matyas:</b></span> the cp error comes from <a href="https://github.com/glideinWMS/glideinwms/blob/branch_v3_9/creation/web_base/singularity_lib.sh#L1720-L1721">https://github.com/glideinWMS/glideinwms/blob/branch_v3_9/creation/web_base/singularity_lib.sh#L1720-L1721</a><br/>looks like you can get that error if <tt>../../main/condor/lib</tt> is a symlink instead of a directory<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:04:04)</span> <b>matyas:</b></span> you could do either <tt>cp -r ../../main/condor/lib/* condor/lib/</tt><br/>or just drop the <tt>mkdir -p condor/lib</tt><br/>
+</body>
+</html>

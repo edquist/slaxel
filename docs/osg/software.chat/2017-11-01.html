@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Nov 1, 2017 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Nov 1, 2017 : #software (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(08:48:19)</span> <b>matyas:</b></span> victory is mine! although I had to dummy out a test because it was timing out travis<br/>
+<span style="color: #9e3997"><span style="font-size: small">(08:48:35)</span> <b>bbockelm:</b></span> Great!  Which test times out?<br/>
+<span style="color: #c386df"><span style="font-size: small">(08:48:51)</span> <b>matyas:</b></span> <tt>xio/src/test/timeout-test.pl</tt><br/>
+<span style="color: #9e3997"><span style="font-size: small">(08:49:02)</span> <b>bbockelm:</b></span> hm.  That's suspiciously named.<br/>
+<span style="color: #c386df"><span style="font-size: small">(08:49:48)</span> <b>matyas:</b></span> from the code: <pre><br/>my @timeout_vals;<br/>push(@timeout_vals, "500000");<br/>push(@timeout_vals, "600000");<br/>push(@timeout_vals, "900000");<br/></pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(08:51:04)</span> <b>matyas:</b></span> although <tt>timeout_test.c</tt> might be controlling the length of the timeout<br/>
+<span style="color: #c386df"><span style="font-size: small">(08:51:26)</span> <b>matyas:</b></span> (<tt>#define USEC_THRESHOLD 500000</tt>)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(08:51:50)</span> <b>bbockelm:</b></span> Hm - am I counting the zeros correctly?  timeouts should be less than a second, right?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:33:21)</span> <b>matyas:</b></span> on a related subject, i don't like the way gsi-openssh is handled in gct<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:33:54)</span> <b>matyas:</b></span> we literally keep patches in the repo, then when we run autoconf, it downloads openssh and applies the patches<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:39:29)</span> <b>matyas:</b></span> can we track <a href="https://github.com/globus/gsi-openssh">https://github.com/globus/gsi-openssh</a> instead and make tarballs from that?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:14:37)</span> <b>bbockelm:</b></span> hm - that's one where I'd perhaps ask Jim Basney for advice.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:31:01)</span> <b>bbockelm:</b></span> fyi - since I'm quite lazy and it takes forever to type "<a href="http://opensciencegrid.github.io/docs">opensciencegrid.github.io/docs</a>" on my phone, I put up this and enabled auto-updates: <a href="https://openhtc.org/docs">https://openhtc.org/docs</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(13:37:03)</span> <b>matyas:</b></span> "openhtc"?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:41:29)</span> <b>bbockelm:</b></span> yeah, that's my toy website<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:41:50)</span> <b>bbockelm:</b></span> notice it has only 7 characters versus 15.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:43:37)</span> <b>matyas:</b></span> nice<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:42:53)</span> <b>bbockelm:</b></span> does anyone know why SLURM is in osg-contrib?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:54:55)</span> <b>matyas:</b></span> <pre>Because there do not seem to be any public yum repos with slurm, we have to<br/>build it from source every time we want to install it (for, say, testing<br/>gratia-probe-slurm).  Let's make the rpms available in contrib for now.<br/></pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:58:50)</span> <b>bbockelm:</b></span> what ticket did you find that in?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:03:07)</span> <b>matyas:</b></span> found it in the README file in osg-3.4-contrib/slurm<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:03:23)</span> <b>bbockelm:</b></span> heh.  so there's probably a git log then.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:05:57)</span> <b>dweitzel:</b></span> What's the proper "repo" to build to end up in 3.4 contrib?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:07:38)</span> <b>matyas:</b></span> build in development as usual<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:08:00)</span> <b>matyas:</b></span> we use a different promotion route<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:08:04)</span> <b>dweitzel:</b></span> ah, ok.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:10:55)</span> <b>bbockelm:</b></span> <a href="https://jira.opensciencegrid.org/browse/SOFTWARE-2171">https://jira.opensciencegrid.org/browse/SOFTWARE-2171</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(15:27:27)</span> <b>matyas:</b></span> Derek, do you have a JIRA ticket for the scitokens you're building in contrib?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:27:44)</span> <b>dweitzel:</b></span> nope<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:27:49)</span> <b>dweitzel:</b></span> I'll make that.<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:28:03)</span> <b>matyas:</b></span> OK. Add the 'contrib' label so we'll know where it goes<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:29:39)</span> <b>dweitzel:</b></span> @matyas seems some problem with my github.source file? <a href="https://koji.chtc.wisc.edu/koji/getfile?taskID=255730&amp;name=mock_output.log&amp;offset=-4000">https://koji.chtc.wisc.edu/koji/getfile?taskID=255730&amp;name=mock_output.log&amp;offset=-4000</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:29:43)</span> <b>dweitzel:</b></span> worked for scratch builds.<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:30:49)</span> <b>matyas:</b></span> weird. I'll take a look<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:43:43)</span> <b>matyas:</b></span> ok, wait for the createrepo tasks for osg-3.4 to finish (<a href="https://koji.chtc.wisc.edu/koji/tasks?state=all&amp;owner=kojira/koji.chtc.wisc.edu&amp;view=tree&amp;method=all&amp;order=-id">https://koji.chtc.wisc.edu/koji/tasks?state=all&amp;owner=kojira/koji.chtc.wisc.edu&amp;view=tree&amp;method=all&amp;order=-id</a>) and try your build again<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:44:00)</span> <b>dweitzel:</b></span> kk<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:17:37)</span> <b>dweitzel:</b></span> Did I forget a step?<br/><pre><br/>FAILED: BuildError: package python-scitokens not in list for tag osg-3.4-el7-development<br/></pre><br/><a href="https://koji.chtc.wisc.edu/koji/taskinfo?taskID=255845">https://koji.chtc.wisc.edu/koji/taskinfo?taskID=255845</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(16:27:40)</span> <b>matyas:</b></span> the directory name does not match the package name<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:27:48)</span> <b>dweitzel:</b></span> ah, ok.<br/>
+</body>
+</html>

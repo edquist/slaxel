@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Apr 8, 2021 : #operations (osg)</title>
+</head>
+<body>
+<h3>Thu Apr 8, 2021 : #operations (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(11:54:54)</span> <b>blin:</b></span> @marian did you inherit jlab submit host support from edgar?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:16:13)</span> <b>blin:</b></span> ah i hear Marian's out: jlab's running into CVMFS issues at utah + elsa <a href="https://support.opensciencegrid.org/a/tickets/67091">https://support.opensciencegrid.org/a/tickets/67091</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:17:07)</span> <b>blin:</b></span> we should reach out to those admins/maybe add some more validation to the jlab FE but in the meantime, what's the proper way to configure a schedd so that folks can avoid specific sites?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:32:53)</span> <b>rynge:</b></span> I think @paschos might be helping out as well<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:34:05)</span> <b>rynge:</b></span> Probably best to just avoid those sites in the user's submit file<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:34:15)</span> <b>rynge:</b></span> I wish we could detect this a little bit better<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:34:49)</span> <b>rynge:</b></span> I have a feature request with gwms about running our validation scripts periodically, but until then, we can't really detect changes on the node while the glidein is running<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:35:08)</span> <b>rynge:</b></span> That is, if cvmfs works when the glidein starts up, but fails later, we can't do anything about it<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:38:47)</span> <b>blin:</b></span> ya, sure<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:42:16)</span> <b>bbockelm:</b></span> Wait - there _is_ a periodic validation feature, no?<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:21:27)</span> <b>paschos:</b></span> (reading backscroll)<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:23:47)</span> <b>paschos:</b></span> perhaps loop in @lincoln on this in order to find the proper contact there. I think they are part of the slate team.<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:24:26)</span> <b>paschos:</b></span> in the meantime, i agree that jlab should skip those sites<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:29:15)</span> <b>lincoln:</b></span> i see that i've been summoned..<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:29:18)</span> <b>lincoln:</b></span> reading the backscroll<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:29:52)</span> <b>lincoln:</b></span> For Utah you can ping Mitchell Steinman<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:43:16)</span> <b>blin:</b></span> yeah for sure but i think we should give them the quick fix to avoid the sites and follow up with the sites in parallel<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:48:37)</span> <b>rynge:</b></span> We used to have periodic validation<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:49:07)</span> <b>rynge:</b></span> I know for sure we can't do it inside singularity<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:49:13)</span> <b>rynge:</b></span> Maybe the outside one is working<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:49:30)</span> <b>rynge:</b></span> (but then we should be able to "test" away this problem for jlab)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:56:43)</span> <b>rynge:</b></span> Ok, so the "base" validation script runs every 3 minutes. This is where we do cvmfs testing.<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:57:26)</span> <b>paschos:</b></span> anyone know how many slots those sites provide together?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:57:49)</span> <b>rynge:</b></span> @blin Do you know what the actual error is?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:59:38)</span> <b>blin:</b></span> i don't see any mention of it<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:59:43)</span> <b>blin:</b></span> there's another related ticket but it's not there either <a href="https://support.opensciencegrid.org/a/tickets/67077">https://support.opensciencegrid.org/a/tickets/67077</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:00:32)</span> <b>rynge:</b></span> Do you mind if I ask him?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:07:28)</span> <b>blin:</b></span> go for it<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:17:46)</span> <b>jthiltges:</b></span> OSG mirror <a href="http://mirror.hep.wisc.edu/upstream">http://mirror.hep.wisc.edu/upstream</a> being down is a known thing? Not that it's causing problems.<br/>(Except for me personally, trying to run the update_mirror.py script. But sorted out now.)<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:18:43)</span> <b>blin:</b></span> hrmm, @ajit may know about that<br/>
+<span style="color: #674b1b"><span style="font-size: small">(19:44:07)</span> <b>rynge:</b></span> <pre>Unable to find image 'opensciencegrid/osgvo-docker-pilot:release' locally<br/>docker: Error response from daemon: toomanyrequests: You have reached your pull rate limit. You may increase the limit by authenticating and upgrading: <a href="https://www.docker.com/increase-rate-limit">https://www.docker.com/increase-rate-limit</a>.<br/>See 'docker run --help'.</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(19:44:08)</span> <b>rynge:</b></span> Bah!<br/>
+<span style="color: #674b1b"><span style="font-size: small">(19:44:45)</span> <b>rynge:</b></span> @bbockelm If you need some ammunition for your pet project...<br/>
+<span style="color: #e475df"><span style="font-size: small">(21:51:34)</span> <b>ajit:</b></span> @blin Just saw the message about mirror.hep<br/>
+<span style="color: #e475df"><span style="font-size: small">(21:59:31)</span> <b>ajit:</b></span> Looks like it's in trouble.. will check tomorrow<br/>
+</body>
+</html>

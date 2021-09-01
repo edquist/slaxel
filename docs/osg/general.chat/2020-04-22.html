@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Apr 22, 2020 : #general (osg)</title>
+</head>
+<body>
+<h3>Wed Apr 22, 2020 : #general (osg)</h3>
+<span style="color: #5a4592"><span style="font-size: small">(08:41:21)</span> <b>lmichael:</b></span> anyone know why Alex Bondyakov (cern) would be requesting an OSG Connect account for “Install and setup HTCondor CE” ? <a href="https://support.opensciencegrid.org/a/tickets/64843">https://support.opensciencegrid.org/a/tickets/64843</a><br/>
+<span style="color: #5a4592"><span style="font-size: small">(08:41:32)</span> <b>lmichael:</b></span> ^owned to @paschos for now<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:01:11)</span> <b>andrew.melo:</b></span> Is there a way to add more than 3 contacts per "group" in the topology repo? GGUS uses the "admin contacts" contacts to determine the CC list, and there's 4 people who need to be notified :disappointed:<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:01:37)</span> <b>matyas:</b></span> sssorta<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:01:48)</span> <b>matyas:</b></span> categorize one of them as "Tertiary Contact 2"<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:02:37)</span> <b>andrew.melo:</b></span> Ah, OK, I'll give that a shot. I tried "Quartenary Contact" to no avail :slightly_smiling_face:<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:02:47)</span> <b>matyas:</b></span> that oughta work too<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:02:59)</span> <b>andrew.melo:</b></span> Hmm, maybe I can't spell. That's also a possibility<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:03:00)</span> <b>blin:</b></span> we really gotta turn that into a list on our end<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:03:18)</span> <b>andrew.melo:</b></span> Does it end up as a list on the ... xml side (or whatever gets parsed by WLCG)<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:03:21)</span> <b>matyas:</b></span> does ggus specifically look at "Primary Contact", "Secondary Contact", "Tertiary Contact"?<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:03:36)</span> <b>matyas:</b></span> if not, you can add anything<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:04:32)</span> <b>andrew.melo:</b></span> Not sure. I tried adding people as "miscelaneous contact", which didn't get the desired result (I cargo-culted it elsewhere) and got the following response from the GGUS folks<br/><pre>Currently they are listed under &lt;ContactType&gt;Miscellaneous Contact&lt;/ContactType&gt;.<br/>Please move them to &lt;ContactType&gt;Administrative Contact&lt;/ContactType&gt;.<br/><br/>GGUS only uses the &lt;ContactType&gt;Administrative Contact&lt;/ContactType&gt;<br/>I forgot to point this out.</pre><br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:04:59)</span> <b>andrew.melo:</b></span> So the keys of that list (map/dict?) don't matter?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:05:18)</span> <b>andrew.melo:</b></span> Wow, I really can't spell this morning and it's only 9 :disappointed:<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:05:21)</span> <b>matyas:</b></span> let me source-dive a bit<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:06:33)</span> <b>andrew.melo:</b></span> If you wouldn't mind, I'd appreciate it a lot -- the GGUS folks are on EU time, so once you include waiting for the different crons to wake up/update things, the debug cycle is quite long<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:13:25)</span> <b>matyas:</b></span> So here's how it looks in the yaml:<br/><pre>    ContactLists:<br/>      Administrative Contact:<br/>        Primary:<br/>          ID: 11107327543306be8c340cfa2281444a2d428318<br/>          Name: Andrew Malone Melo<br/>        Secondary:<br/>          ID: dc620971c7c33ae6874f3691d41b5cd156ce0c63<br/>          Name: Paul Sheldon</pre><br/>and in the XML this gets turned into<br/><pre>&lt;ContactList&gt;<br/>  &lt;ContactType&gt;Administrative Contact&lt;/ContactType&gt;<br/>  &lt;Contacts&gt;<br/>    &lt;Contact&gt;<br/>      &lt;Name&gt;Andrew Malone Melo&lt;/Name&gt;<br/>      &lt;ContactRank&gt;Primary&lt;/ContactRank&gt;<br/>    &lt;/Contact&gt;<br/>    &lt;Contact&gt;<br/>      &lt;Name&gt;Paul Sheldon&lt;/Name&gt;<br/>      &lt;ContactRank&gt;Secondary&lt;/ContactRank&gt;<br/>    &lt;/Contact&gt;<br/>  &lt;/Contacts&gt;<br/>&lt;/ContactList&gt;</pre><br/><br/>
+<span style="color: #c386df"><span style="font-size: small">(09:13:48)</span> <b>matyas:</b></span> the "Primary", "Secondary", "Tertiary", etc. gets put into &lt;ContactRank&gt;<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:14:44)</span> <b>matyas:</b></span> you can't have 2 "Tertiary" because it's a hash in the YAML, but if you put "Tertiary 2", then it will put "Tertiary 2" into &lt;ContactRank&gt;<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:15:34)</span> <b>matyas:</b></span> if GGUS cares about the actual ContactRank then it won't work, but if it doesn't, you can just do that<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:16:49)</span> <b>matyas:</b></span> does that make sense?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:20:21)</span> <b>andrew.melo:</b></span> I think so! I kinda vaguely remember the topology bot bouncing back ranks that weren't primary/secondary/tertiary, but it's equally possible I screwed up the indentation on the YAML or something. I just realized I have a thing due @ 11:30, so I'll work on that first, but once it's done, I'll try and update the repo. FWIW - do you know how often a) the XML gets updated and b) how often it gets scraped by WLCG?<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:21:11)</span> <b>matyas:</b></span> a) every 5 minutes-ish; b) let me check the server logs<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:27:49)</span> <b>andrew.melo:</b></span> Thanks a ton, I appreciate it<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:29:56)</span> <b>matyas:</b></span> no prob<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:35:26)</span> <b>matyas:</b></span> Here are all the hosts from cern that downloaded the resource information this morning. I don't know which ones are used for GGUS though.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:36:33)</span> <b>andrew.melo:</b></span> OK, looks at least to be more frequent than "every 12 hours" or something, which I was afraid of<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:42:46)</span> <b>matyas:</b></span> looks like all the cric hosts check every 4 hours<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:10:00)</span> <b>blin:</b></span> i think GGUS is going to be separate from CRIC queries?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:10:43)</span> <b>blin:</b></span> you may be able to see guenter's DN in the logs<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:11:54)</span> <b>matyas:</b></span> I stopped logging DNs a while ago<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:12:09)</span> <b>blin:</b></span> oh hrm<br/>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Mar 21, 2017 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue Mar 21, 2017 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(08:57:27)</span> <b>blin:</b></span> multiple network interfaces: <a href="https://twiki.grid.iu.edu/bin/view/Documentation/Release3/InstallHTCondorCE#NetworkInterfaces">https://twiki.grid.iu.edu/bin/view/Documentation/Release3/InstallHTCondorCE#NetworkInterfaces</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(08:57:45)</span> <b>blin:</b></span> there's also a <tt>condor_ce_host_network_check</tt> tool that's helpful when debugging network<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:58:07)</span> <b>blin:</b></span> i don't *think* we have had any luck putting a CE behind a NAT, just worker nodes<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:58:10)</span> <b>blin:</b></span> but i may be wrong<br/>
+<span style="color: #bd9336"><span style="font-size: small">(09:49:28)</span> <b>mkandes:</b></span> Thanks, Brian. I'll have a closer look at that section and the tool.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:00:15)</span> <b>mkandes:</b></span> @blin @matyas @efajardo: Has anyone ever had to use this option? If so, when would you use it?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:00:18)</span> <b>mkandes:</b></span> vi /etc/sysconfig/condor-ce<br/>                                                                                                                                                                       <br/># Example: Have the HTCondor-CE use a different hostname from the rest of<br/># the system.<br/># export CONDORCE_HOSTNAME=<a href="http://condorce.example.com">condorce.example.com</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:10:33)</span> <b>blin:</b></span> i haven't seen that touched in a long while and it escapes me as to why we added it in the first place<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:13:18)</span> <b>mkandes:</b></span> Okay, yeah. I was curious about it after digging into condor_ce_host_network_check a bit.<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:13:34)</span> <b>blin:</b></span> commit message:<br/><pre><br/>Use 'unshare' to allow the HTCondor-CE processes to have a different<br/>hostname from the rest of the system.<br/><br/>This allows the HTCondor-CE to function on systems where the default<br/>system hostname differs from the one used on the public Internet<br/>(common on dual-networked hosts).<br/></pre><br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:14:15)</span> <b>mkandes:</b></span> Ah. Key. Maybe I will give it a try then. That's sort of what it sounded like.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:15:02)</span> <b>mkandes:</b></span> But what is actually reading CONDORCE_HOSTNAME?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:16:06)</span> <b>blin:</b></span> condor_ce_env_bootstrap i think<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:18:58)</span> <b>mkandes:</b></span> Okay, I'll dig around there a bi then and see what actions happen when setting CONDORCE_HOSTNAME<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:21:27)</span> <b>blin:</b></span> nvm, you'll want to check out <tt>condor_ce_startup</tt><br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:21:57)</span> <b>mkandes:</b></span> Ah, cool. Thanks.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:30:31)</span> <b>mkandes:</b></span> @blin: Also, probably an easier question ... Is there any good reason HTCondor-CE does not automatically set FS authentication too ... i.e., SEC_DEFAULT_AUTHENTICATION_METHODS = FS,GSI<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:31:29)</span> <b>mkandes:</b></span> the default is SEC_DEFAULT_AUTHENTICATION_METHODS = GSI ... but then all the daemons on the CE host are forced to do GSI?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:31:50)</span> <b>blin:</b></span> we set it for client commands <tt>SEC_CLIENT_AUTHENTICATION_METHODS=FS,GSI</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:32:08)</span> <b>blin:</b></span> but yea, daemon comm has to happen over GSI<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:32:33)</span> <b>mkandes:</b></span> But is there a reason for that?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:34:49)</span> <b>mkandes:</b></span> I understand remote daemons should have to use GSI. But didn't quite understand why local daemons must as well.<br/>
+</body>
+</html>

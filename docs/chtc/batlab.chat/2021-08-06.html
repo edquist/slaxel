@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Aug 6, 2021 : #batlab (chtc)</title>
+</head>
+<body>
+<h3>Fri Aug 6, 2021 : #batlab (chtc)</h3>
+<span style="color: #bb86b7"><span style="font-size: small">(10:40:33)</span> <b>tim:</b></span> @gthain How does Docker image caching work on an execute node? On e2460 the Docker Image Cache Size it set to 2 and there are 11 Docker images.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(10:41:59)</span> <b>tim:</b></span> Shouldn't some of those be cleaned up? And shouldn't we expand the cache size since we will have more like 15 distinct images in play at once. And that number may go up.<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:42:29)</span> <b>gthain:</b></span> I thought we upped this to something like 32?<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(10:43:23)</span> <b>tim:</b></span> <pre>[tim@e2460 ~]$ condor_config_val -dump| grep DOCKER_IMAGE<br/>DOCKER_IMAGE_CACHE_SIZE = 2</pre><br/>
+<span style="color: #d58247"><span style="font-size: small">(10:43:27)</span> <b>gthain:</b></span> I guess we didn't<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:43:38)</span> <b>gthain:</b></span> I'm going to up it now to.. 16, I guess<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(10:44:18)</span> <b>tim:</b></span> The images are about 2 Gb and we have 64 gig in the partition for Docker images. So, 24 should be safe.<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:44:35)</span> <b>gthain:</b></span> 24 it is<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:44:58)</span> <b>gthain:</b></span> I still hate that we have to manage this ourselves<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:45:11)</span> <b>gthain:</b></span> Perhaps I should look again, and see if docker has a way to manage them<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(10:45:46)</span> <b>tim:</b></span> Yes, and it should be managed more by size than number of images.<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:46:04)</span> <b>gthain:</b></span> What I'd really like is a way to mark some images as "these are owned by HTCondor and can be removed at any time if not in use"<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:46:24)</span> <b>gthain:</b></span> I really don't want condor removing an image that someone else created, that may not exist in any other repo<br/>
+</body>
+</html>

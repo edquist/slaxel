@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Mar 5, 2021 : #collaboration-support (osg)</title>
+</head>
+<body>
+<h3>Fri Mar 5, 2021 : #collaboration-support (osg)</h3>
+<span style="color: #a63024"><span style="font-size: small">(12:50:48)</span> <b>paschos:</b></span> @marian i am going to get some gatech/pace guys here<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:51:24)</span> <b>marian:</b></span> ok, thanks<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:51:41)</span> <b>marian:</b></span> or they can join #gfrontend<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:51:46)</span> <b>marian:</b></span> either way<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:52:52)</span> <b>paschos:</b></span> ok we can move them as soon as they join. they are not on the osg workspace. consider. this the front dooor<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:53:44)</span> <b>paschos:</b></span> @ruben.lara @tnightingale6 when you can join here for direct com with osg<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:55:26)</span> <b>paschos:</b></span> @marian they did report earlier that tthey are getting this error on their worker nodes:<br/><br/><pre>Mar 05 09:55:34 <a href="http://atl1-1-01-002-36-l.pace.gatech.edu">atl1-1-01-002-36-l.pace.gatech.edu</a> cvmfs2[20526]: (<a href="http://ligo-containers.opensciencegrid.org">ligo-containers.opensciencegrid.org</a>) switching host from <a href="http://cvmfs-s1fnal.opensciencegrid.org:8000/cvmfs/ligo-containers.opensciencegrid.org">http://cvmfs-s1fnal.opensciencegrid.org:8000/cvmfs/ligo-containers.opensciencegrid.org</a> to <a href="http://cvmfs-s1bnl.opensciencegrid.org:8000/cvmfs/ligo-containers.opensciencegrid.org">http://cvmfs-s1bnl.opensciencegrid.org:8000/cvmfs/ligo-containers.opensciencegrid.org</a> (host returned HTTP error)<br/>Mar 05 09:55:34 <a href="http://atl1-1-01-002-36-l.pace.gatech.edu">atl1-1-01-002-36-l.pace.gatech.edu</a> cvmfs2[20526]: (<a href="http://ligo-containers.opensciencegrid.org">ligo-containers.opensciencegrid.org</a>) failed to fetch file catalog at <a href="http://ligo-containers.opensciencegrid.org:/">ligo-containers.opensciencegrid.org:/</a> (hash: 0000000000000000000000000000000000000000, error 9 [host returned HTTP error])<br/>Mar 05 09:55:34 <a href="http://atl1-1-01-002-36-l.pace.gatech.edu">atl1-1-01-002-36-l.pace.gatech.edu</a> cvmfs2[20526]: (<a href="http://ligo-containers.opensciencegrid.org">ligo-containers.opensciencegrid.org</a>) Failed to initialize root file catalog (16 - file catalog failure)</pre><br/><br/>
+<span style="color: #53b759"><span style="font-size: small">(12:56:32)</span> <b>marian:</b></span> this is something else I'm trying to investigate ...<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:57:16)</span> <b>marian:</b></span> I could, however, think about this one, too<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:11:01)</span> <b>marian:</b></span> for the error from the worker node - that depends on the context. It generally means that the http connection failed. Did the node used to work? It may be a problem with the squid<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:16:04)</span> <b>paschos:</b></span> hmm… yeah. --- this is slate deployed… i will need to ask Lincoln<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:17:19)</span> <b>paschos:</b></span> check edit in <a href="https://github.com/opensciencegrid/osg-gfactory/blob/master/10-noncms-osg.xml">https://github.com/opensciencegrid/osg-gfactory/blob/master/10-noncms-osg.xml</a> .. i’ll move some of this to the frontend but i want to minimize noise<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:37:40)</span> <b>marian:</b></span> looks good to me, have you pushed this to master already it seems?<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:40:43)</span> <b>paschos:</b></span> i made a pull request — someone needs to commit<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:44:17)</span> <b>marian:</b></span> ah, misunderstood what you meant, that link was to a master branch ... do you have PR link?<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:46:43)</span> <b>paschos:</b></span> <a href="https://github.com/opensciencegrid/osg-gfactory/pull/13">https://github.com/opensciencegrid/osg-gfactory/pull/13</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(13:50:32)</span> <b>marian:</b></span> ok, found it, thanks<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:50:44)</span> <b>marian:</b></span> I'll set Jeff as reviewer<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:53:08)</span> <b>marian:</b></span> actually, I reviewed and mergerd<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:53:21)</span> <b>paschos:</b></span> yeah. .. and. that CE not having jobs flowing… i don’t understand.. it was working for OSG jobs before Lincooln updated it with the ligo VO. I’ll need someone from the facttory to help diagnose this<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:53:56)</span> <b>marian:</b></span> hmm, what Lincoln changed?<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:54:05)</span> <b>marian:</b></span> it shouldn't affect at least OSGVO<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:54:14)</span> <b>marian:</b></span> that was previously supported VO<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:54:48)</span> <b>marian:</b></span> so there is change on the CE we may try to look at and review ... I can lookup for the pilot logs, though<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:55:39)</span> <b>marian:</b></span> but there is too many spinning plates and I thought discuss here first problem with submit host I posted in the gfrontend channel :slightly_smiling_face:<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:55:56)</span> <b>marian:</b></span> this is another, decoupled issue what you started up here<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:57:05)</span> <b>marian:</b></span> I was previously curious about the following:<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:57:09)</span> <b>marian:</b></span> glancing through the UCSD IGWN collector logs this makes me suspicious:<br/><pre>03/03/21 23:24:10 PERMISSION DENIED to <a href="mailto:anonymous@osg-ligo-1.t2.ucsd.edu">anonymous@osg-ligo-1.t2.ucsd.edu</a> from host 130.207.168.70 for command 1 (UPDATE_SCHEDD_AD), access level ADVERTISE_SCHEDD: reason: cached result for ADVERTISE_SCHEDD; see first case for the full reason</pre><br/>that's <tt><a href="http://osg-login1.pace.gatech.edu">osg-login1.pace.gatech.edu</a></tt> submitter<br/>has anything changed on that host let's say certificate-wise?<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:01:31)</span> <b>paschos:</b></span> @ruben.lara ^<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:02:44)</span> <b>ruben.lara:</b></span> On <tt><a href="http://osg-login1.pace.gatech.edu">osg-login1.pace.gatech.edu</a></tt> , nothing has changed.<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:02:50)</span> <b>paschos:</b></span> @marian the only. thing that Lincoln changed in the CE configurartion is this:<br/><pre>VoRemoteUserMapping:<br/>  - /osg/Role=NULL/Capability=NULL: osg<br/>  - /osg/ligo/Role=NULL/Capability=NULL: ligo<br/>  - /virgo/ligo/Role=NULL/Capability=NULL: ligo</pre><br/>--- adding extra two lines<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:02:56)</span> <b>paschos:</b></span> under osg<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:03:15)</span> <b>paschos:</b></span> although the 3rd one is probably not needed<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:04:53)</span> <b>marian:</b></span> @ruben.lara: can you check if <a href="http://osg-login1.pace.gatech.edu">osg-login1.pace.gatech.edu</a> talks to any collector? Maybe check SchedLog there?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:51:41)</span> <b>ruben.lara:</b></span> I’m not that familiar with the commands. Can you please send me the command to use?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(15:53:34)</span> <b>mehmet.belgin:</b></span> :wave:<br/>
+<span style="color: #965d1b"><span style="font-size: small">(15:57:21)</span> <b>semir.sarajlic:</b></span> Hi!<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:58:17)</span> <b>marian:</b></span> :wave:<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:58:42)</span> <b>marian:</b></span> @ruben.lara... sorry for the silence, was catching up with few other things<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:59:40)</span> <b>marian:</b></span> I'll have to run for today, I may reply later tonight or I try follow up over the weekend ... this was mega busy week<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:00:09)</span> <b>marian:</b></span> you can also diagnose with commands like <tt>condor_status -any</tt> for example and grep for Collector<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:00:29)</span> <b>marian:</b></span> SchedLog is usually located at <tt>/var/log/condor/SchedLog</tt><br/>
+</body>
+</html>

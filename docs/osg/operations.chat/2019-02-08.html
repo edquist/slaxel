@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Feb 8, 2019 : #operations (osg)</title>
+</head>
+<body>
+<h3>Fri Feb 8, 2019 : #operations (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(10:09:55)</span> <b>blin:</b></span> hey @marco.mascheroni any luck finding the changes suchandra was talking about?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:13:40)</span> <b>marco.mascheroni:</b></span> yes, I applied them. I also fixed a few configurations in the factory (e.g.: required_os to any, max held that was capping the submission). BTW, I set requiredOS to any, which is what we usually do if th site has singularity, but I am not sure they have it installed.. I am wondering if I shbould set it to rhel7<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:15:03)</span> <b>marco.mascheroni:</b></span> In 10 minute I'll let you know if the last round of test succeds<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:20:05)</span> <b>blin:</b></span> yeah, i don't think they have singularity<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:20:08)</span> <b>blin:</b></span> we should probably set it to rhel7<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:51:17)</span> <b>marco.mascheroni:</b></span> Let's double check this with @rynge, Mats, what are you using to match the architecture between what user jobs request and what is in the Factory/worker node. I mean, if I set Required_OS to any in the factory, and the site does not have singularity, what happens? AFAIU glidein_startup and condor runs anyhow, but user jobs might segfault if they were expecting a rhel6 architecture (and got rhel7). Or are you using one of the validation scripts to set the correct OS, and avvertise it, so that user jobs asking for rhel6 won't match?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:52:07)</span> <b>marco.mascheroni:</b></span> AMNH cluster is up and running! Glideins are runnign since 40 mins with core registered (black line here <a href="http://gfactory-1.t2.ucsd.edu/factory/monitor/factoryStatus.html?entry=OSG_US_AMNH_ARES">http://gfactory-1.t2.ucsd.edu/factory/monitor/factoryStatus.html?entry=OSG_US_AMNH_ARES</a>)<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:59:02)</span> <b>marco.mascheroni:</b></span> Actually Mats is not in this channel..<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:04:42)</span> <b>blin:</b></span> @rynge<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:04:59)</span> <b>rynge:</b></span> Hello<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:05:11)</span> <b>blin:</b></span> hey, see marco's question above ^^<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:05:41)</span> <b>rynge:</b></span> We have a diverse user base, so we do not need to specifically match via the factory. We get the mix of el6 and el7 resources, with the idea is that we always have some user that can use it<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:05:49)</span> <b>rynge:</b></span> Does that make sense? We just request for any glidein, and then let the fe match jobs to whatever we get<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:06:53)</span> <b>rynge:</b></span> We advertise the OS of the default image, so for example, our recommended requirements expression:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:07:19)</span> <b>rynge:</b></span> <pre><br/>requirements = OSGVO_OS_STRING == "RHEL 7" &amp;&amp; Arch == "X86_64" &amp;&amp; HAS_MODULES == True<br/></pre><br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:07:41)</span> <b>rynge:</b></span> So for singularity sites, we don't care what the site is running<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:08:00)</span> <b>rynge:</b></span> We decide on a default image, and advertise that one<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:08:16)</span> <b>blin:</b></span> so for non-singularity sites, it's important to set the Required_OS?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:08:22)</span> <b>rynge:</b></span> No, we never use that<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:08:41)</span> <b>rynge:</b></span> We have enough users, that any el6 or el7 glidein can be used<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:11:23)</span> <b>rynge:</b></span> Are we just talking about <tt>Arch</tt> or the actual OS?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:12:05)</span> <b>marco.mascheroni:</b></span> the actual OS, who sets OSGVO_OS_STRING ?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:12:22)</span> <b>rynge:</b></span> That is from our glidein validation script. Hang on<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:12:24)</span> <b>marco.mascheroni:</b></span> is it a validation script of the OSGVO frontend?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:12:37)</span> <b>marco.mascheroni:</b></span> ok, everything makes perfect sense<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:13:16)</span> <b>rynge:</b></span> <a href="https://github.com/opensciencegrid/osg-flock/blob/master/node-check/osgvo-node-advertise#L533">https://github.com/opensciencegrid/osg-flock/blob/master/node-check/osgvo-node-advertise#L533</a><br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:13:22)</span> <b>marco.mascheroni:</b></span> I got confused because CMS does something different (IIRC matches using GLIDEIN_REQUIRED_OS isntead of OSGVO_OS_STRING<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:14:02)</span> <b>rynge:</b></span> But note how this script is re-execed in Singularity - that is, we are advertising what is inside the default Singularity container and _not_ the os provided by the site<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:15:08)</span> <b>rynge:</b></span> OSGVO_OS_STRING is basically the same as OpSysAndVer, but at a higher level. OpSysAndVer is advertising the host OS, OSGVO_OS_STRING the actual job env<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:15:43)</span> <b>rynge:</b></span> On a non-singularity site, OpSysAndVer and OSGVO_OS_STRING is advertising the same thing. On a singularity site, they _might_ be different<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:19:41)</span> <b>marco.mascheroni:</b></span> Thanks Mats, it's nice to compare the differences bwtween CMS and OSG<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:20:56)</span> <b>marco.mascheroni:</b></span> CMS just has  TARGET.OpSys == "LINUX" in the requirements, but then IIUC the validation scripts starts a container based on REQUIRED_OS = "rhel6" advertized by the user jobs<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:21:06)</span> <b>rynge:</b></span> RIght, but also keep in mind that some of this might change when we move to the gwms singularity setup. I think it will be very similar but not sure yet.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:21:28)</span> <b>rynge:</b></span> We still run on sites which do not have singularity<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:21:40)</span> <b>marco.mascheroni:</b></span> yeah I guess that's the main difference<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:21:49)</span> <b>marco.mascheroni:</b></span> and why things are done differently<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:21:53)</span> <b>rynge:</b></span> OSG VO can't really dictate what the site should look like - we just have to take what we can get<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:22:32)</span> <b>rynge:</b></span> <pre><br/>Singularity version counts:<br/><br/>   2616 2.2.1<br/>   2424 2.6.1-dist<br/>     73 singularity version 3.0.2-1.3.osgup.el6<br/>    303 singularity version 3.0.2-1.el6<br/>     75 singularity version 3.0.3-1.osgup.el6<br/><br/>Percentage of sites which has Singularity support:<br/><br/>    50.6%<br/><br/>OS Breakdown and number of glideins with 0 jobs started:<br/><br/>              Total 0-jobs<br/>  RHEL 6       2780      7<br/>  RHEL 7       7877     13<br/></pre><br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:22:52)</span> <b>rynge:</b></span> So at the moment, only half of the sites we are running on are Singularity enabled<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:23:19)</span> <b>rynge:</b></span> And as you can see we have a mix of el6 and el7<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:26:07)</span> <b>marco.mascheroni:</b></span> nice stats!<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:26:46)</span> <b>rynge:</b></span> It is just a snapshot - we don't keep history<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:30:19)</span> <b>marco.mascheroni:</b></span> @blin I just increased the limits of the AMNH CE to 30. For the moment only the OSG flock frontend is able to run, I havent added other VO user and mapping routes in the hosted CE yet. Shoud I, or are we just good with the OSG frontend? -- @jdost321 test<br/>
+<span style="color: #385a86"><span style="font-size: small">(11:38:55)</span> <b>jdost321:</b></span> @marco.mascheroni it worked, thanks!<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:06:15)</span> <b>blin:</b></span> @marco.mascheroni i think we're just ok with OSG jobs for now<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:07:11)</span> <b>blin:</b></span> i think allowing multiple VOs in hosted CEs is probably something that @cat would be interested in but there's discussion to be had<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(13:30:02)</span> <b>cat:</b></span> Why would we start with the assumption that only OSG-VO jobs would run somewhere?<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(13:30:23)</span> <b>cat:</b></span> Start with the assumption that *all* jobs will run at a place, until we hear otherwise!<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(13:30:45)</span> <b>cat:</b></span> Or are you just trolling me, @blin?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:33:51)</span> <b>blin:</b></span> yeah, that's my working assumption, however that has technical implications: either all VOs run under the same user at the site or we have the site create accounts for each VO<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:34:57)</span> <b>blin:</b></span> is the former ok within our own policy guidelines? is it ok with VOs?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:47:50)</span> <b>marco.mascheroni:</b></span> Creating one account on the sumbisison node at the site per VO has scaling implications. Say we add a VO, you need to contact all the site admins (probably creating a ticket), wait that they add a new user on the sbumit host, do the changes on your side on the hsoted CE, wait that they say it's ok, close the ticket, etc. As long as you just add a user on the hosted Ce it's fine, you puppetize it, but having a user per VO on the submit host.. IMHO It only make sense if the site admin explicitly request it because they want to balance themselves the shares and priority of the different VOs at the batch system level. Which btw, we can (probably) also do it at the hsoted ce level (?).<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:49:35)</span> <b>blin:</b></span> agreed, which is why i think the latter is a non-starter<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:49:55)</span> <b>blin:</b></span> and the former has policy implications that i think needed to be addressed at a higher level<br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:51:57)</span> <b>marco.mascheroni:</b></span> Also, don't ligo/gluex/other jobs have different requirements to run the user applications? Wouln't we need to install something at the site (I have no idea, but say a VO needs cvmfs)?<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(14:02:10)</span> <b>cat:</b></span> @blin, if there is a policy question, then please write it as a brief question to the ET and we’ll try to get it answered quickly.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:02:33)</span> <b>blin:</b></span> ok, will do<br/>
+</body>
+</html>

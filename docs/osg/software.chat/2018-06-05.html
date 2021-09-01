@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jun 5, 2018 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue Jun 5, 2018 : #software (osg)</h3>
+<span style="color: #e06b56"><span style="font-size: small">(10:07:26)</span> <b>jthiltges:</b></span> Hi <b>@edquist</b>. The OSG zookeeper RPM seems to need a symlink for <tt>slf4j-log4j12.jar</tt><br/><br/>With the latest osgup hadoop, we're seeing messages like this:<br/><pre>$ hdfs dfs -ls /<br/>SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".<br/>SLF4J: Defaulting to no-operation (NOP) logger implementation<br/>SLF4J: See <a href="http://www.slf4j.org/codes.html#StaticLoggerBinder">http://www.slf4j.org/codes.html#StaticLoggerBinder</a> for further details.</pre><br/><br/>It seems to be related to a broken symlink. The OSG hadoop package includes the following link:<br/><pre>/usr/lib/hadoop/lib/slf4j-log4j12.jar -&gt; /usr/lib/zookeeper/lib/slf4j-log4j12.jar</pre><br/><br/>But OSG zookeeper doesn't provide that file, only <tt>/usr/lib/zookeeper/lib/slf4j-log4j12-1.6.1.jar</tt>.<br/><br/>The CDH5 zookeeper RPM includes a symlink:<br/><pre>/usr/lib/zookeeper/lib/slf4j-log4j12.jar -&gt; slf4j-log4j12-1.x.x.jar</pre><br/><br/>I'd guess that adding that symlink (or updating zookeeper to CDH5) should fix it.<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:28:40)</span> <b>edquist:</b></span> Interesting, thanks @jthiltges for reporting, i can open a ticket for this...<br/>
+<span style="color: #e06b56"><span style="font-size: small">(11:28:50)</span> <b>jthiltges:</b></span> Thank you!<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:50:42)</span> <b>edquist:</b></span> New JIRA ticket:<br/><a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-3280">https://opensciencegrid.atlassian.net/browse/SOFTWARE-3280</a><br/><br/>feel free to add comments there with any new info<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:58:24)</span> <b>blin:</b></span> <b>@edquist</b> only osg staff currently have jira accounts<br/>
+<span style="color: #16569E"><span style="font-size: small">(13:36:41)</span> <b>edquist:</b></span> ah, my mistake - in that case feel free to continue getting ahold of me here if you have any further info about it. I suspect we'll do one of your suggestions, adding a symlink to the current zookeeper packaging, or updating to the cdh5 version<br/>
+</body>
+</html>

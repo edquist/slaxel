@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jul 1, 2021 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu Jul 1, 2021 : #software (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(10:50:26)</span> <b>dweitzel:</b></span> In topology, I can't figure this out.  Our goal is to have multiple token issuers for the ligo directory.  Here is the yaml line: <a href="https://github.com/opensciencegrid/topology/blob/master/virtual-organizations/LIGO.yaml#L83">https://github.com/opensciencegrid/topology/blob/master/virtual-organizations/LIGO.yaml#L83</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:51:09)</span> <b>dweitzel:</b></span> How do we specify multiple?  Just another <tt>- SciTokens:</tt>  in that namespace?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:59:49)</span> <b>matyas:</b></span> That should work<br/>
+<span style="color: #de5f24"><span style="font-size: small">(13:54:43)</span> <b>justas.balcas:</b></span> Hi All, Follow up on the checksum. Seems Andrew H. does not want to add this into xrootd code and there was many other things why not. Changing an Experiment not do to adler32 and depend on xrootd and FS doing crc32 or other and ensure data is correct - that is a major work. So I think the only way to go is to add adler32 checksum calculation on the fly into xrootd-multiuser or another oss plugin (mainly take out xrootd-hdfs checksum calculation). Without XrootD/GridFTP not doing checksum on the fly (until experiment either decides to move to another file validity) is a huge step back now - with unmerged or prod big files - &gt;4gb - gfal time out faster than checksum is calculated. @mtadel - add anything else if needed<br/>@dweitzel @andrew.melo @bbockelm<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:55:52)</span> <b>andrew.melo:</b></span> I think we have to put it in xrootd-multiuser, unfortunately. I think that we discusse that in one of these channels<br/>
+<span style="color: #de5f24"><span style="font-size: small">(13:56:44)</span> <b>justas.balcas:</b></span> yes, on this <tt>software</tt>  channel on Tuesday, June 29th<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:57:03)</span> <b>andrew.melo:</b></span> Moving away from adler is a non-starter, IMO<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:57:48)</span> <b>andrew.melo:</b></span> I can't think of any other option than putting it into xrootd-multiuser<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:59:48)</span> <b>dweitzel:</b></span> We could always stack it into another plugin. But then it’s another plugin…. Yeah, multiuser makes sense. <br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:01:21)</span> <b>justas.balcas:</b></span> No rush on this (just gentle saying - i really need this) - but what would be ETA?:)))<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:21:22)</span> <b>andrew.melo:</b></span> The Q is if they;'ll accept it in the multiuser plugin<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:21:48)</span> <b>justas.balcas:</b></span> they - who?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:25:49)</span> <b>andrew.melo:</b></span> the xrootd folks -- is xrootd-multiuser run by them?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:26:40)</span> <b>blin:</b></span> nope, that's OSG<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:43:38)</span> <b>andrew.melo:</b></span> oh, then we're good :sunglasses:<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:02:52)</span> <b>tim.theisen:</b></span> @blin @matyas @dweitzel I am drafting the release notes/announcement and the ticket for xrootd-multiuser does not have the release note blurb in the ticket. The best that I can find is in the RPM changelog:<br/><pre>- Add file mask on creation<br/>- Disable POSC</pre><br/>
+<span style="color: #73769d"><span style="font-size: small">(16:03:09)</span> <b>tim.theisen:</b></span> Anyone have a nice short english summary for the announcement?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:04:41)</span> <b>dweitzel:</b></span> xrootd-multiuser is... me!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:05:23)</span> <b>dweitzel:</b></span> I have no idea what POSC is, it was a request from Andy to turn it off.<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:05:39)</span> <b>tim.theisen:</b></span> Me neither.<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:06:10)</span> <b>tim.theisen:</b></span> What problem did this release fix?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:06:42)</span> <b>dweitzel:</b></span> for file mask:<br/>&gt; Add back the configuration option "multiuser.umask" that was previously supported by an earlier version of the multiuser.  This allows the admin to specify the default umask new files should be created.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:06:57)</span> <b>dweitzel:</b></span> Feel free to clean up my english<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:07:13)</span> <b>tim.theisen:</b></span> Cool, that'll do.<br/>
+<span style="color: #dd8527"><span style="font-size: small">(18:52:34)</span> <b>mtadel:</b></span> why is transition to crc32c off the table? it's a much better checksum, can be calculated with sse4 instructions, and it is associative, i.e., it can be calculated for independent blocks and then merged.<br/>xrootd already supports in-flight checksumming using crc32c for 4k blocks so calculating the full checksum of a received file is just the question of merging the per-block data.<br/>Andy also says adding this in dCache shouldn't be a major issue if CMS asks for it.<br/>Other then having to put all incoming buffers in order (which makes it useless/wasteful for multi stream), apparently adler32 becomes very bad for large files that we are moving towards, it seems.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(19:36:38)</span> <b>andrew.melo:</b></span> Because inertia, literally everything we do assumes adler32<br/>
+<span style="color: #a72f79"><span style="font-size: small">(19:37:10)</span> <b>andrew.melo:</b></span> And TBH, not worthwhile to do a very large migration to save what'll probably end up being 200-odd lines of code<br/>
+<span style="color: #a72f79"><span style="font-size: small">(19:38:00)</span> <b>andrew.melo:</b></span> &gt;  xrootd already supports in-flight checksumming using crc32c for 4k blocks so calculating the full checksum of a received file is just the question of merging the per-block data<br/>Well then I don't understand why Xrootd devs don't want to add the functionality because you can do the exact same thing with adler32<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:38:35)</span> <b>bbockelm:</b></span> And that also assumes someone is using that transfer mechanism, which no one does and isn’t the direction of the WLCG.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:40:37)</span> <b>bbockelm:</b></span> Why change every single data and storage management system in the WLCG to save what, a dollar of CPU time a year?<br/>
+</body>
+</html>

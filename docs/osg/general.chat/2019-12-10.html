@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Dec 10, 2019 : #general (osg)</title>
+</head>
+<body>
+<h3>Tue Dec 10, 2019 : #general (osg)</h3>
+<span style="color: #5a4592"><span style="font-size: small">(13:40:19)</span> <b>lmichael:</b></span> Ticket like “Please add a new CVMFS repository to OASIS for BNL using the URL…” goes to what team/area?<br/>
+<span style="color: #5a4592"><span style="font-size: small">(13:41:05)</span> <b>lmichael:</b></span> Software? Ops?<br/>
+<span style="color: #5a4592"><span style="font-size: small">(13:42:39)</span> <b>lmichael:</b></span> I’ll pass to @dweitzel for now. <a href="https://support.opensciencegrid.org/a/tickets/63887">https://support.opensciencegrid.org/a/tickets/63887</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:50:13)</span> <b>blin:</b></span> yeah, that should be an ops thing<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:59:40)</span> <b>dweitzel:</b></span> Thanks Lauren.  End the end, Marian does oasis ops.<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:27:02)</span> <b>isfiligoi:</b></span> The gracc is not showing JetStreamTACC Payloads…<br/>How can I debug and fix this?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:27:34)</span> <b>blin:</b></span> what dashboard are you looking at?<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:28:24)</span> <b>isfiligoi:</b></span> <a href="https://gracc.opensciencegrid.org/dashboard/db/payload-jobs-summary?orgId=1">https://gracc.opensciencegrid.org/dashboard/db/payload-jobs-summary?orgId=1</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(14:28:34)</span> <b>isfiligoi:</b></span> it has JetStreamIU but not JetStreamTACC<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:30:49)</span> <b>blin:</b></span> @dweitzel or @marian may know where the JetStreamIU facility is coming from<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:30:54)</span> <b>blin:</b></span> because i don't see it in topology anywhere<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:31:44)</span> <b>isfiligoi:</b></span> Should be this<br/><a href="https://github.com/opensciencegrid/topology/blob/master/topology/Indiana%20University/JetStream/Jetstream.yaml">https://github.com/opensciencegrid/topology/blob/master/topology/Indiana%20University/JetStream/Jetstream.yaml</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(14:32:13)</span> <b>isfiligoi:</b></span> Did I push the wrong thing?<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:32:47)</span> <b>marian:</b></span> and factory has that one configured <a href="http://js-157-32.jetstream-cloud.org">js-157-32.jetstream-cloud.org</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(14:32:57)</span> <b>isfiligoi:</b></span> this is the TACC equivalents (the one missing from GRACC):<br/><a href="https://github.com/opensciencegrid/topology/blob/master/topology/Texas%20Advanced%20Computing%20Center/Stampede2/JetStreamTACC.yaml">https://github.com/opensciencegrid/topology/blob/master/topology/Texas%20Advanced%20Computing%20Center/Stampede2/JetStreamTACC.yaml</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:33:30)</span> <b>blin:</b></span> yeah i see the jetstream CE registered but the literal string <tt>JetStreamIU</tt> isn't anywhere that i can find in topology<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:34:13)</span> <b>isfiligoi:</b></span> It is in my 40-siteconf<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:34:53)</span> <b>blin:</b></span> could you give me the line?<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:36:45)</span> <b>isfiligoi:</b></span> I take it back… it is not in there<br/>I do call it<br/><pre>resource_group = JetStream</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:37:03)</span> <b>blin:</b></span> what do you set <tt>resource</tt> to?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:37:41)</span> <b>blin:</b></span> this could be something that's being set in the factory<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:38:13)</span> <b>isfiligoi:</b></span> this is in 3-gip:<br/><pre>[Subcluster JetStream IU]<br/><br/>name = JetStream IU</pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(14:38:58)</span> <b>isfiligoi:</b></span> Anyway, I am more interested in figuring out how to account for the TACC CE<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:39:28)</span> <b>marian:</b></span> in factory we have GLIDEIN_ResourceName="JetStreamIU" as well as GLIDEIN_Site="JetStreamIU"<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:39:34)</span> <b>marian:</b></span> fyi<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:39:58)</span> <b>blin:</b></span> how about for the tacc CE?<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:41:35)</span> <b>marian:</b></span> GLIDEIN_ResourceName="JetStreamTACC" and GLIDEIN_Site="JetStreamTACC"<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:42:31)</span> <b>marian:</b></span> the CE there is: <a href="http://js-129-114-19-48.jetstream-cloud.org">js-129-114-19-48.jetstream-cloud.org</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:42:57)</span> <b>blin:</b></span> this will be helpful for troubleshooting: <a href="https://docs.google.com/document/d/1tHMaYnU5mHaBPmias7J6QWCuL9IpLF5PXtRlWuDannU/edit?ts=5beb2bc3#heading=h.3q7x7nkk4azj">https://docs.google.com/document/d/1tHMaYnU5mHaBPmias7J6QWCuL9IpLF5PXtRlWuDannU/edit?ts=5beb2bc3#heading=h.3q7x7nkk4azj</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(14:44:00)</span> <b>isfiligoi:</b></span> Essentially, GRACC accepts the wrong label and discards the good one? :stuck_out_tongue:<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:44:40)</span> <b>isfiligoi:</b></span> tacc name is what is in topology, right?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:44:42)</span> <b>blin:</b></span> depends whose point of view you're talking about<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:45:05)</span> <b>isfiligoi:</b></span> or are you saying it is globbing it with Stampede2?<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:47:31)</span> <b>isfiligoi:</b></span> to reiterate, the CE is registered here:<br/><a href="https://github.com/opensciencegrid/topology/blob/master/topology/Texas%20Advanced%20Computing%20Center/Stampede2/JetStreamTACC.yaml">https://github.com/opensciencegrid/topology/blob/master/topology/Texas%20Advanced%20Computing%20Center/Stampede2/JetStreamTACC.yaml</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:47:32)</span> <b>blin:</b></span> errr, is <a href="http://js-129-114-19-48.jetstream-cloud.org">js-129-114-19-48.jetstream-cloud.org</a> just a CE?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:47:49)</span> <b>blin:</b></span> because i'm seeing both payload and batch records coming from that host in the past 7 days<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:48:05)</span> <b>isfiligoi:</b></span> just the CE<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:48:10)</span> <b>dweitzel:</b></span> Yes, lets be clear on some things.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:48:27)</span> <b>dweitzel:</b></span> Igor, you linked to the payload GRACC page, so lets ignore everything on the CE<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:48:34)</span> <b>dweitzel:</b></span> for payload records, nothing on the CE matters.<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:48:51)</span> <b>isfiligoi:</b></span> ok, I definitely messed that up :disappointed:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:49:08)</span> <b>dweitzel:</b></span> Which do you care about, payload or pilot records?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:49:12)</span> <b>dweitzel:</b></span> what do you want to see?<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:49:53)</span> <b>isfiligoi:</b></span> I am actually must interested in seing accounting for any job that goes through the CE<br/>But I would like all records to be correct, of course<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:50:14)</span> <b>dweitzel:</b></span> Goes through the CE is different than 'Runs on the resource'<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:50:47)</span> <b>dweitzel:</b></span> Goes through CE = Pilot.  Runs on the resource = Pilot or Payload<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:51:26)</span> <b>isfiligoi:</b></span> I guess pilot then<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:51:51)</span> <b>isfiligoi:</b></span> In particular, I have also pilots from CMS that do not use the gfactory… is that accounted for?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:52:33)</span> <b>dweitzel:</b></span> CMS does not send the OSG the payload records, but since the CE is an OSG one, the CE will send pilot records.<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:53:21)</span> <b>isfiligoi:</b></span> OK, is this the proper url?<br/><a href="https://gracc.opensciencegrid.org/dashboard/db/pilot-jobs-summary?orgId=1&amp;var-VOName=All&amp;var-Facility=All&amp;var-ExitCode=All&amp;var-Probe=All&amp;var-interval=1d">https://gracc.opensciencegrid.org/dashboard/db/pilot-jobs-summary?orgId=1&amp;var-VOName=All&amp;var-Facility=All&amp;var-ExitCode=All&amp;var-Probe=All&amp;var-interval=1d</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:53:31)</span> <b>dweitzel:</b></span> Yes, good starting point.<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:53:34)</span> <b>isfiligoi:</b></span> Again, not JetStreamTACC&lt; but I do see Stampede2<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:53:49)</span> <b>dweitzel:</b></span> What's the CE's hostname?  That one above that BrianL linked?<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:54:08)</span> <b>isfiligoi:</b></span> yes.. see my last url to topology, too<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:54:35)</span> <b>dweitzel:</b></span> <a href="https://gracc.opensciencegrid.org/dashboard/db/pilot-jobs-summary?orgId=1&amp;var-VOName=All&amp;var-Facility=All&amp;var-ExitCode=All&amp;var-Probe=condor:js-129-114-19-48.jetstream-cloud.org&amp;var-interval=1d">https://gracc.opensciencegrid.org/dashboard/db/pilot-jobs-summary?orgId=1&amp;var-VOName=All&amp;var-Facility=All&amp;var-ExitCode=All&amp;var-Probe=condor:js-129-114-19-48.jetstream-cloud.org&amp;var-interval=1d</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(14:54:49)</span> <b>isfiligoi:</b></span> OK, found it in the probe name<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:54:58)</span> <b>isfiligoi:</b></span> so, it is mapped to Stampede2… good to know<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:55:03)</span> <b>isfiligoi:</b></span> but I don’t see any CMS pilots<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:55:42)</span> <b>isfiligoi:</b></span> any gracc url that would capture those?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:56:35)</span> <b>dweitzel:</b></span> Ok, looked at the raw records.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:56:45)</span> <b>dweitzel:</b></span> All of the CMS usage is coming in as "Payload" records.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:57:50)</span> <b>dweitzel:</b></span> For a condor CE, this would require that GLIDEIN_ResourceName is defined in condor somewhere.  /etc/condor/config.d/...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:58:01)</span> <b>dweitzel:</b></span> It would be very odd to have that defined.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:58:07)</span> <b>dweitzel:</b></span> on a CE<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:58:16)</span> <b>isfiligoi:</b></span> ok, so we basically are not counting that<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:58:31)</span> <b>dweitzel:</b></span> the CE is misconfigured and the usage is being mis-labeled<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:58:35)</span> <b>isfiligoi:</b></span> I thought the CE itself was sending something for GRACC<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:58:54)</span> <b>isfiligoi:</b></span> ok, so, how do I I fix it…<br/>I am the admin :tophat:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:59:11)</span> <b>dweitzel:</b></span> is GLIDEIN_ResourceName anywhere in /etc/condor/config.d/*<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:59:14)</span> <b>dweitzel:</b></span> ?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:59:33)</span> <b>blin:</b></span> (or <tt>condor_config_val -dump | grep -i glidein_resourcename</tt>)<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:59:49)</span> <b>isfiligoi:</b></span> Nope… not part of the “CE for dummies” OSG docs..<br/>I just followed those<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:01:51)</span> <b>dweitzel:</b></span> Ok, so the gratia probe would only label the usage as "payload" if GLIDEIN_ResourceName is in the completed job file.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:02:32)</span> <b>dweitzel:</b></span> out of curiosity, could you do a quick grep through recently completed jobs on the CE, see if it's there?  something like <tt>condor_history -match 10 -l | grep GLIDEIN_Resourcename</tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(15:02:50)</span> <b>isfiligoi:</b></span> none<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:02:51)</span> <b>dweitzel:</b></span> (grep -i)<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:03:15)</span> <b>isfiligoi:</b></span> <pre>MATCH_EXP_JOBGLIDEIN_ResourceName = "<a href="http://cms-wn-2-3.osg.tacc.jetstream-cloud.org">cms-wn-2-3.osg.tacc.jetstream-cloud.org</a>"<br/><br/>JOBGLIDEIN_ResourceName = "$$([IfThenElse(IsUndefined(TARGET.GLIDEIN_ResourceName), IfThenElse(IsUndefined(TARGET.GLIDEIN_Site), IfThenElse(IsUndefined(TARGET.FileSystemDomain), \"Local Job\", TARGET.FileSystemDomain), TARGET.GLIDEIN_Site), TARGET.GLIDEIN_ResourceName)])"<br/><br/>MATCH_EXP_JOBGLIDEIN_ResourceName = "<a href="http://cms-wn-2-1.osg.tacc.jetstream-cloud.org">cms-wn-2-1.osg.tacc.jetstream-cloud.org</a>"<br/><br/>JOBGLIDEIN_ResourceName = "$$([IfThenElse(IsUndefined(TARGET.GLIDEIN_ResourceName), IfThenElse(IsUndefined(TARGET.GLIDEIN_Site), IfThenElse(IsUndefined(TARGET.FileSystemDomain), \"Local Job\", TARGET.FileSystemDomain), TARGET.GLIDEIN_Site), TARGET.GLIDEIN_ResourceName)])"<br/><br/>MATCH_EXP_JOBGLIDEIN_ResourceName = "<a href="http://cms-wn-2-4.osg.tacc.jetstream-cloud.org">cms-wn-2-4.osg.tacc.jetstream-cloud.org</a>"</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:03:39)</span> <b>dweitzel:</b></span> yup, so it is defined.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:03:55)</span> <b>dweitzel:</b></span> where was that from?  <tt>condor_history</tt> ?<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:04:06)</span> <b>isfiligoi:</b></span> you command above, with -i<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:04:38)</span> <b>isfiligoi:</b></span> these are definitely CMS jobs, since they ran on the nodes reserved for them<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:05:05)</span> <b>dweitzel:</b></span> <tt>condor_config_val -dump | grep -i resourcename</tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(15:05:14)</span> <b>isfiligoi:</b></span> empty<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:05:44)</span> <b>dweitzel:</b></span> <tt>condor_ce_history -match 10 -l | grep -i GLIDEIN_Resourcename</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:05:49)</span> <b>dweitzel:</b></span> (check the CE history)<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:06:02)</span> <b>isfiligoi:</b></span> <pre>MATCH_EXP_JOBGLIDEIN_ResourceName = "Local Job"<br/><br/>JOBGLIDEIN_ResourceName = "$$([IfThenElse(IsUndefined(TARGET.GLIDEIN_ResourceName), IfThenElse(IsUndefined(TARGET.GLIDEIN_Site), IfThenElse(IsUndefined(TARGET.FileSystemDomain), \"Local Job\", TARGET.FileSystemDomain), TARGET.GLIDEIN_Site), TARGET.GLIDEIN_ResourceName)])"<br/><br/>MATCH_EXP_JOBGLIDEIN_ResourceName = "Local Job"<br/><br/>JOBGLIDEIN_ResourceName = "$$([IfThenElse(IsUndefined(TARGET.GLIDEIN_ResourceName), IfThenElse(IsUndefined(TARGET.GLIDEIN_Site), IfThenElse(IsUndefined(TARGET.FileSystemDomain), \"Local Job\", TARGET.FileSystemDomain), TARGET.GLIDEIN_Site), TARGET.GLIDEIN_ResourceName)])"</pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(15:06:26)</span> <b>isfiligoi:</b></span> looks like it is trying to find GLIDEIN_Site, which is not defined, and then falling back to FileSystemDomain, which is the hostname<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:06:37)</span> <b>dweitzel:</b></span> how are the CMS jobs being submitted to the CE?<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:06:47)</span> <b>isfiligoi:</b></span> FermiCloud (I think)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:06:53)</span> <b>dweitzel:</b></span> GlideinWMS?<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:06:58)</span> <b>isfiligoi:</b></span> no clue<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:07:28)</span> <b>isfiligoi:</b></span> anyway, shouldn’t GRATIA have a hardcoded ResourceName???<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:07:38)</span> <b>isfiligoi:</b></span> i.e. from the CE config?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:07:54)</span> <b>dweitzel:</b></span> Since ResourceName is defined in the CE records, I suspect that the original job is coming in with it already defined.<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:08:37)</span> <b>isfiligoi:</b></span> I think it is just picking the FullHostname from the xpression above<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:08:48)</span> <b>isfiligoi:</b></span> and indeed I do see some weird entries in GRACC<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:08:50)</span> <b>dweitzel:</b></span> Right, but where is that expression coming from?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:09:11)</span> <b>dweitzel:</b></span> It's coming from the original jobs from FermiCloud, or wherever.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:09:15)</span> <b>dweitzel:</b></span> GlideinWMS doesn't define that.<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:09:28)</span> <b>isfiligoi:</b></span> likely… probably to deal with how CMS sites are usually configured<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:10:09)</span> <b>isfiligoi:</b></span> I guess I can define GLIDEIN_Site in the startds…<br/>that will fix it<br/>But still surprised gratia just accepts it on face value<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:10:31)</span> <b>dweitzel:</b></span> No, it won't fix it.  Because these are not Payload records.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:10:46)</span> <b>dweitzel:</b></span> These are pilot records.  And should be labeled as such.<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:11:21)</span> <b>isfiligoi:</b></span> I guess… although I don’t necessarily agree with the semantics<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:11:44)</span> <b>dweitzel:</b></span> Whatever is submitting these jobs is submitting exactly the right job to change the label.<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:11:50)</span> <b>isfiligoi:</b></span> anyway… I think I know how to fix it for my current use case<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:12:53)</span> <b>dweitzel:</b></span> Alright, but these jobs should be label Pilot jobs, because that is what they are.  And as long as you have a submitter sending jobs with that expression, then the jobs will be mislabeled.<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:13:51)</span> <b>isfiligoi:</b></span> ok, maybe we should just take it to the Fermi folks @timm<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:39:58)</span> <b>tiradani:</b></span> @isfiligoi coming late to the discussion… What is the problem you are trying to solve?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:42:29)</span> <b>blin:</b></span> cms jobs submitted to the jetstream TACC CE are being reported as payload jobs<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:42:38)</span> <b>blin:</b></span> because they're coming in with <tt>JOBGLIDEIN_ResourceName</tt> defined<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:43:16)</span> <b>tiradani:</b></span> ok.  I will ask about that here then.  I don’t know off the top of my head anything that would set that.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:43:37)</span> <b>tiradani:</b></span> (in that last statement here is defined as FNAL :wink: )<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(15:44:03)</span> <b>timm:</b></span> I am not usually logged into OSG slack but watching now<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(15:44:47)</span> <b>timm:</b></span> HEPCloud is gliding in to Jetstream TACC from the hepcloud factory<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(15:45:48)</span> <b>timm:</b></span> In our factory config we define GLIDEIN_RESOURCE_Name=="JetStreamTACC"<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(15:46:14)</span> <b>timm:</b></span> GLIDEIN_SITE=="JetStreamTACC"<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(15:46:27)</span> <b>timm:</b></span> GLIDEIN_CMSSite=="T3_US_OSG"  (as instructed by CMS people)<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(15:48:36)</span> <b>timm:</b></span> hepcloud factory = <a href="http://fermifactory02.fnal.gov">fermifactory02.fnal.gov</a><br/>
+<span style="color: #50a0cf"><span style="font-size: small">(15:48:54)</span> <b>timm:</b></span> the cms jobs are on wmagents cmsgwms-submit3 through <a href="http://cmsgwms-submit8.fnal.gov">cmsgwms-submit8.fnal.gov</a><br/>
+<span style="color: #50a0cf"><span style="font-size: small">(15:51:38)</span> <b>timm:</b></span> We cloned the entry we are using, from the OSG factory<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(15:51:49)</span> <b>timm:</b></span> if there is any more info you need, let me know<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:52:39)</span> <b>blin:</b></span> when you say<br/>&gt; the cms jobs are on wmagents cmsgwms-submit3 through <a href="http://cmsgwms-submit8.fnal.gov">cmsgwms-submit8.fnal.gov</a><br/>does this mean the user jobs or the jobs that are being submitted to the JetStreamTACC CE?<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(15:52:55)</span> <b>timm:</b></span> Those are the user jobs<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(15:53:11)</span> <b>timm:</b></span> We (fermilab) are submitting only pilots to the Jetstream TACC CE<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(15:53:40)</span> <b>timm:</b></span> anything that's coming from <a href="http://fermifactory02.fnal.gov">fermifactory02.fnal.gov</a> is us<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:53:43)</span> <b>blin:</b></span> is it possible to query the jobs on the hepcloud factory that are being submitted to the TACC CE?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:53:58)</span> <b>blin:</b></span> i'd like to see a job ad from your guys' end<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(15:53:59)</span> <b>timm:</b></span> I don't think we have it open to the outside.. what do you need to don<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(15:54:02)</span> <b>timm:</b></span> know<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(15:54:12)</span> <b>timm:</b></span> I can do condor_q -l on one of the glideins and paste it in<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:55:11)</span> <b>blin:</b></span> i mainly want to see if <tt>JOBGLIDEIN_ResourceName</tt> is set but i'd be ok with a whole classad<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(15:56:27)</span> <b>timm:</b></span> <br/>
+<span style="color: #50a0cf"><span style="font-size: small">(15:56:32)</span> <b>timm:</b></span> There you go<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:56:50)</span> <b>isfiligoi:</b></span> line 58<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(15:57:10)</span> <b>timm:</b></span> OK that is just weird<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(15:58:37)</span> <b>timm:</b></span> this glidein corresponds to job 4822 on Igor's schedd<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(15:59:52)</span> <b>timm:</b></span> and for completeness this is the machine classad as we see it call back to our user pool<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:00:23)</span> <b>timm:</b></span> <br/>
+<span style="color: #53b759"><span style="font-size: small">(16:00:24)</span> <b>isfiligoi:</b></span> 4822 finished  a while ago, but here is what I saw:<br/><pre>[root@js-129-114-19-48 centos]# condor_history -l 4822 |grep JOBGLIDEIN_ResourceName<br/><br/>JOBGLIDEIN_ResourceName = "$$([IfThenElse(IsUndefined(TARGET.GLIDEIN_ResourceName), IfThenElse(IsUndefined(TARGET.GLIDEIN_Site), IfThenElse(IsUndefined(TARGET.FileSystemDomain), \"Local Job\", TARGET.FileSystemDomain), TARGET.GLIDEIN_Site), TARGET.GLIDEIN_ResourceName)])"<br/><br/>MATCH_EXP_JOBGLIDEIN_ResourceName = "<a href="http://cms-wn-1-1.osg.tacc.jetstream-cloud.org">cms-wn-1-1.osg.tacc.jetstream-cloud.org</a>"</pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(16:00:46)</span> <b>isfiligoi:</b></span> I guess the mapping is not the same, but no matter<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:00:47)</span> <b>timm:</b></span> so for the values of that expression we have<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:01:35)</span> <b>blin:</b></span> it seems to me that the factory may be misconfigured since pilots are including that line<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:01:37)</span> <b>isfiligoi:</b></span> @dweitzel tells us that that attributes should not be set for pilot jobs<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:01:38)</span> <b>blin:</b></span> it comes from this config: <a href="https://github.com/opensciencegrid/gratia-probe/blob/master/condor/99_gratia-gwms.conf">https://github.com/opensciencegrid/gratia-probe/blob/master/condor/99_gratia-gwms.conf</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:02:03)</span> <b>blin:</b></span> which ships with the gratia-probe-glideinwms package<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:02:20)</span> <b>blin:</b></span> which is intended for frontends<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:02:38)</span> <b>timm:</b></span> condor_status slot1@glidein_<a href="mailto:10021_794614235@cms-wn-4-30.osg.tacc.jetstream-cloud.org">10021_794614235@cms-wn-4-30.osg.tacc.jetstream-cloud.org</a> -af Glidein_ResourceName GLIDEIN_Site FileSystemDomain<br/>JetStreamTACC JetStreamTACC cms-wn-4-30<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:03:13)</span> <b>isfiligoi:</b></span> right… the problem is that gratia on the CE is confused<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:03:25)</span> <b>timm:</b></span> So why hasn't OSG caught this in 2 years we have been running this factory?<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:03:56)</span> <b>timm:</b></span> although we just did successfully start using jetstream a couple of weeks ago<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:04:21)</span> <b>isfiligoi:</b></span> yes, I just checked GRACC today, due to your ramp up<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:05:41)</span> <b>blin:</b></span> that's a good question, @timm.<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:05:49)</span> <b>timm:</b></span> I am not sure even where or how JOBGLIDEIN_ResourceName is set<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:05:52)</span> <b>timm:</b></span> in the factory<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:06:12)</span> <b>isfiligoi:</b></span> do you have the abovementioned 99_* config file in place?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:06:26)</span> <b>blin:</b></span> try <tt>condor_config_val | grep -i jobglidein_resourcename</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:06:40)</span> <b>blin:</b></span> and then if you get a key/value back, <tt>condor_config_val -v &lt;VALUE</tt><br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:06:55)</span> <b>timm:</b></span> a condor_config_val value wouldn't go into every single job, would it?<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:07:14)</span> <b>isfiligoi:</b></span> if it is a system setup, it would<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:07:15)</span> <b>timm:</b></span> This is an expression that's somehow in the condor submit every time a glidein is submitted<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:07:36)</span> <b>isfiligoi:</b></span> SUBMIT_ATTRS<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:07:42)</span> <b>timm:</b></span> [root@fermifactory02 gwms-factory]# condor_config_val -dump | grep JOBGLIDEIN<br/>JOBGLIDEIN_ResourceName = "$$([IfThenElse(IsUndefined(TARGET.GLIDEIN_ResourceName), IfThenElse(IsUndefined(TARGET.GLIDEIN_Site), IfThenElse(IsUndefined(TARGET.FileSystemDomain), \"Local Job\", TARGET.FileSystemDomain), TARGET.GLIDEIN_Site), TARGET.GLIDEIN_ResourceName)])"<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:08:08)</span> <b>timm:</b></span> ok it's there in condor_config_val but still not sure how it gets into the classad of every glidein submitted<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:08:15)</span> <b>isfiligoi:</b></span> SUBMIT_ATTRS<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:08:45)</span> <b>blin:</b></span> yeah, a line like this: <a href="https://github.com/opensciencegrid/gratia-probe/blob/master/condor/99_gratia-gwms.conf#L22">https://github.com/opensciencegrid/gratia-probe/blob/master/condor/99_gratia-gwms.conf#L22</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(16:09:06)</span> <b>isfiligoi:</b></span> see if you indeed have<br/>/etc/conodr/config.d/99_gratia-gwms.conf<br/>in place<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:09:11)</span> <b>timm:</b></span> we don't<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:10:29)</span> <b>isfiligoi:</b></span> condor_config_val SUBMIT_ATTRS<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:10:36)</span> <b>blin:</b></span> what about <tt>condor_config_val -v SUBMIT_ATTRS</tt> ? Does that include <tt>JOBGLIDEIN_ResourceName</tt>?<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:10:47)</span> <b>timm:</b></span> no<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:10:57)</span> <b>timm:</b></span> but there are &lt;submit_attrs&gt; defined in the factory I am looking<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:11:11)</span> <b>timm:</b></span> I still dont' understand though how a glidein can break a htcondor-ce's gratia config<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:11:20)</span> <b>timm:</b></span> dont' all the other glidein factories have that defined?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:11:28)</span> <b>blin:</b></span> nope<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:11:45)</span> <b>blin:</b></span> we only define the match expression for glidein frontend submit hosts<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:12:14)</span> <b>timm:</b></span> how do the returning glideins get GLIDEIN_ResourceName set then?<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:13:20)</span> <b>isfiligoi:</b></span> <pre>GlideinEntryName = "OSG_US_TACC_JETSTREAM"</pre><br/>and as arguments to the glidein<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:13:57)</span> <b>timm:</b></span> OK although we do not have the 99_gratia.conf we have the same essential directives<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:14:05)</span> <b>timm:</b></span> 01_cms_gpgrid_factory:JOBGLIDEIN_ResourceName="$$([IfThenElse(IsUndefined(TARGET.GLIDEIN_ResourceName), IfThenElse(IsUndefined(TARGET.GLIDEIN_Site), IfThenElse(IsUndefined(TARGET.FileSystemDomain), \"Local Job\", TARGET.FileSystemDomain), TARGET.GLIDEIN_Site), TARGET.GLIDEIN_ResourceName)])"<br/>01_cms_gpgrid_factory:SUBMIT_EXPRS = $(SUBMIT_EXPRS) JOBGLIDEIN_ResourceName<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:14:10)</span> <b>timm:</b></span> So this is what I don't understand<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:14:16)</span> <b>timm:</b></span> you guys are saying that has to be there, and it is<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:14:32)</span> <b>isfiligoi:</b></span> Who is “you guys”?<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:14:33)</span> <b>timm:</b></span> that's what my JOBGLIDEIN_ResourceName expression looks like in all the job classads of the factory<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:14:40)</span> <b>timm:</b></span> Brian is saying that, isn't he?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:14:43)</span> <b>blin:</b></span> no, we're saying that it should /not/ be there<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:14:49)</span> <b>blin:</b></span> not for factories<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:14:53)</span> <b>timm:</b></span> ok why should it be out, then?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:14:56)</span> <b>blin:</b></span> for frontend schedds, yes<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:15:18)</span> <b>timm:</b></span> there are no schedd's on a frontend<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:15:35)</span> <b>isfiligoi:</b></span> schedds served by a frontend<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:15:47)</span> <b>blin:</b></span> because <tt>MATCH_EXP_JOBGLIDEIN_ResourceName</tt> is how the gratia/gracc differentiate between pilot and payload jobs<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:16:16)</span> <b>blin:</b></span> when it's set, we treat it as a payload job<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:16:23)</span> <b>blin:</b></span> when it's not, we treat it as a pilot job<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:16:25)</span> <b>isfiligoi:</b></span> so the factory should not add it to the pilot classad, as that ends on the CE, which gratia than treats as a user schedd (not a pilot schedd)<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:16:40)</span> <b>timm:</b></span> ok<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:16:54)</span> <b>timm:</b></span> but that's been there an extra extra long time..we haven't changed that in 3/10's of forever<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:17:07)</span> <b>timm:</b></span> I would have thought something should have broken before now<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:17:23)</span> <b>isfiligoi:</b></span> maybe we will finally get proper accounting for all CMS jobs :smile:<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:17:45)</span> <b>blin:</b></span> i imagine that things have been broken but there are so many issues with accounting that we didn't notice it<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:17:49)</span> <b>timm:</b></span> the stuff we send through the hosted ce's at U of C there is no accounting at all as far as I now<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:17:51)</span> <b>timm:</b></span> know<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:18:19)</span> <b>blin:</b></span> you mean hepcloud pilots submitted to hosted CEs?<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:18:22)</span> <b>timm:</b></span> right<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:18:32)</span> <b>timm:</b></span> we've never seen anything in GRACC for any of that stuff<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:18:49)</span> <b>isfiligoi:</b></span> maybe we finally know why<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:19:03)</span> <b>timm:</b></span> I had just assumed that the hosted ce's were misconfigured<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:19:08)</span> <b>timm:</b></span> or unconfigured<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:19:50)</span> <b>timm:</b></span> we have done several million hours at T3_US_PSC a.k.a. "Bridges" do you see any of it?<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:20:48)</span> <b>timm:</b></span> OK well I don't want to change a production factory close to closing time but I think I know what we need to take out of  the hepcloud factory config and i will try to get it done<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:20:55)</span> <b>isfiligoi:</b></span> @timm If you remove that attribute, we can a least see if it fixes the JetStream accounting<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:21:08)</span> <b>isfiligoi:</b></span> and, yes, can wait anotherr day<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:21:12)</span> <b>timm:</b></span> it will take a long time for the new submitted glideins to get through<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:21:16)</span> <b>timm:</b></span> a couple days<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:21:37)</span> <b>isfiligoi:</b></span> I can remove the old ones in the queue at any time<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:21:53)</span> <b>timm:</b></span> so can I for that matter, at least the idle ones<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:21:55)</span> <b>isfiligoi:</b></span> starting with the ones in idle state, to not waste any resoures<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:22:24)</span> <b>timm:</b></span> this is a production factory any changes on this Krista has to ok and she is gone for the day.. I will get it tomorrow<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:22:31)</span> <b>isfiligoi:</b></span> anyway… we can wait a few day, if that’s needed<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:22:44)</span> <b>timm:</b></span> I had no idea this feature was even in the factory.<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:22:44)</span> <b>isfiligoi:</b></span> np<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:23:13)</span> <b>timm:</b></span> and may I say that relying on the absence of a field to tell the difference between pilots and payload is not exactly the most robust model<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:24:41)</span> <b>blin:</b></span> yeah, don't get me started<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:08:39)</span> <b>dweitzel:</b></span> @timm What is the PSC gatekeeper hostname?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:08:57)</span> <b>dweitzel:</b></span> I can check if we have the records, albeit, mislabeled.<br/>
+</body>
+</html>

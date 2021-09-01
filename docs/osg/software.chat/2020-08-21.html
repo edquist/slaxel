@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Aug 21, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Fri Aug 21, 2020 : #software (osg)</h3>
+<span style="color: #a63024"><span style="font-size: small">(10:44:07)</span> <b>efajardo:</b></span> Hi <b>@here</b> what is the plan for <tt>osg-configure</tt> for EL8?<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:44:18)</span> <b>efajardo:</b></span> <pre>yum install osg-xrootd-standalone --enablerepo=osg-development<br/>Failed to set locale, defaulting to C.UTF-8<br/>Last metadata expiration check: 0:00:09 ago on Fri Aug 21 15:43:03 2020.<br/>Error: <br/> Problem: cannot install the best candidate for the job<br/>  - nothing provides osg-configure-misc needed by osg-xrootd-standalone-3.5-13.osg35.el8.noarch<br/>(try to add '--skip-broken' to skip uninstallable packages or '--nobest' to use not only best candidate packages)</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:45:04)</span> <b>matyas:</b></span> <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-4191">https://opensciencegrid.atlassian.net/browse/SOFTWARE-4191</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(10:48:35)</span> <b>efajardo:</b></span> ok<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:48:44)</span> <b>efajardo:</b></span> and how high is in yor prrio list<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:50:55)</span> <b>blin:</b></span> we should bump it in prio since we want htcondor-ce in EL8 by the end of september<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:52:38)</span> <b>matyas:</b></span> bumped<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:07:58)</span> <b>efajardo:</b></span> thanks<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:58:03)</span> <b>dweitzel:</b></span> I think xrootd-scitokens needs to be promoted to upcoming testing. <a href="https://koji.opensciencegrid.org/koji/buildinfo?buildID=13829">https://koji.opensciencegrid.org/koji/buildinfo?buildID=13829</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(16:01:20)</span> <b>matyas:</b></span> yep, you're right<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:17:53)</span> <b>dweitzel:</b></span> Ok, in that case, xcache-1.5.2-1.osg35.el7.x86_64 + xrootd-server-devel-5.0.1-1.1.osgup.el7.x86_64 works.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:17:57)</span> <b>dweitzel:</b></span> Now on to scitokens tests...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:35:51)</span> <b>dweitzel:</b></span> scitokens works.  client -&gt; cache -&gt; origin.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:36:11)</span> <b>dweitzel:</b></span> HCC origin now support scitokens reads.<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:36:26)</span> <b>matyas:</b></span> cool!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:36:35)</span> <b>dweitzel:</b></span> now to search jira for all the tickets I need to mark as "tested"<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:50:22)</span> <b>dweitzel:</b></span> How do you feel about adding 5.0+ only options into the stash-origin package?  Specifically TLS options?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:52:24)</span> <b>blin:</b></span> can we ifdef them?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:52:50)</span> <b>blin:</b></span> if we can't, then we'd need to ship an xcache specifically for upcoming :disappointed:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:56:03)</span> <b>dweitzel:</b></span> good question on ifdef.  I don't have much experience on that.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:57:06)</span> <b>dweitzel:</b></span> as far as I can tell from the documentation on ifdef, you cannot use version in the <tt>if</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:59:03)</span> <b>blin:</b></span> can we compare strings or do int comparisons?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:00:14)</span> <b>blin:</b></span> idea: ship two different <tt>osg-xrootd</tt>'s for release vs upcoming with a variable set to their xrootd major vers<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:00:49)</span> <b>blin:</b></span> then in xcache use that for the ifdef<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:02:08)</span> <b>dweitzel:</b></span> .... Yeah, I think that would work.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:02:11)</span> <b>dweitzel:</b></span> ugh, what a mess.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:02:37)</span> <b>dweitzel:</b></span> here's a question, if xrootd doesn't understand a config line, does it bail?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:03:02)</span> <b>blin:</b></span> good question, no idea<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:03:03)</span> <b>dweitzel:</b></span> anyone got a pre 5.0 xrootd server sitting around?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:03:08)</span> <b>dweitzel:</b></span> I can give you the lines to test.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:03:30)</span> <b>dweitzel:</b></span> <pre>xrd.tls /etc/grid-security/xrd/xrdcert.pem /etc/grid-security/xrd/xrdkey.pem<br/>xrd.tlsca noverify</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(17:06:10)</span> <b>blin:</b></span> add it to the config here <a href="https://github.com/opensciencegrid/osg-test/blob/master/osgtest/tests/test_150_xrootd.py">https://github.com/opensciencegrid/osg-test/blob/master/osgtest/tests/test_150_xrootd.py</a>, submit a PR, and see what happens in the CI?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:22:39)</span> <b>dweitzel:</b></span> <a href="https://github.com/opensciencegrid/osg-test/pull/199">https://github.com/opensciencegrid/osg-test/pull/199</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:47:01)</span> <b>dweitzel:</b></span> well, it didn't fail<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:48:06)</span> <b>matyas:</b></span> yeah<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:48:16)</span> <b>matyas:</b></span> kinda surprised me actually<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:48:38)</span> <b>matyas:</b></span> I _thought_ xrootd didn't like unrecognized options<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:51:43)</span> <b>dweitzel:</b></span> Did I add the options right?<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:53:18)</span> <b>matyas:</b></span> yeah, looks good to me<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:54:57)</span> <b>matyas:</b></span> you might also want to add those lines to META_XROOTD_CFG_TEXT; XROOTD_CFG_TEXT doesn't get used if 'osg-xrootd-standalone' is installed (i.e. for testing TPC)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(20:26:48)</span> <b>dweitzel:</b></span> Trying it.<br/>
+</body>
+</html>

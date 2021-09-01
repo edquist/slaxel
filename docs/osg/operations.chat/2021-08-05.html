@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Aug 5, 2021 : #operations (osg)</title>
+</head>
+<body>
+<h3>Thu Aug 5, 2021 : #operations (osg)</h3>
+<span style="color: #e96699"><span style="font-size: small">(08:28:41)</span> <b>lincoln:</b></span> just to loop back around to this, we fixed this yesterday afternoon around 3:30 PM. There was a Docker-CE update that came along a few nights ago that wedged several nodes (e.g., Docker stuck in i/o wait and wouldn't terminate, yum reported 2 versions being installed simultaneously, that fun stuff).<br/><br/>we fixed all of those issuese, found some machines weren't starting k8s due to Docker using cgroup driver=systemd and k8s was using driver cgroupfs. Fixed them all to use systemd (latest recommendation).<br/><br/>Kyverno, which has a mutating webhook, was overwhelming the API server after restart, something like 1k entries/minute if not more. Apparently causing it to be so busy that the k8s scheduler and controller manager were crashing from context deadline exceeded errs. so we removed that for now and will put it back into place later, need to investigate some rate limiting there<br/>
+<blockquote>
+<span style="color: #e06b56"><span style="font-size: small">(09:52:33)</span> <b>jthiltges:</b></span> I'd be interested to know what you find out on kyverno issues. We were running it for a while at Nebraska, then everything fell over. And I still haven't gotten back to troubleshooting and re-enabling it.<br/><br/>Best description at the time of our problem was a comment in this (unfortunately closed) issue:<br/>&gt;  when I install kyverno is API server becomes almost entirely unresponsive and then the kubernetes controller-manager and scheduler pods begin to timeout making API calls and crash and the entire cluster gets into a weird state.<br/><a href="https://github.com/kyverno/kyverno/issues/1456#issuecomment-764880366">https://github.com/kyverno/kyverno/issues/1456#issuecomment-764880366</a><br/>
+<span style="color: #e96699"><span style="font-size: small">(10:05:05)</span> <b>lincoln:</b></span> sure, I'll let you know if we find out any more! and yeah... troubleshooting by picking through closed issues is easily the worst part of K8S. at least it wasn't a robot closing it for inactivity.<br/>
+</blockquote>
+</body>
+</html>

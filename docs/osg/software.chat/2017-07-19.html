@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jul 19, 2017 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Jul 19, 2017 : #software (osg)</h3>
+<span style="color: #965d1b"><span style="font-size: small">(12:45:40)</span> <b>briedel:</b></span> any gfal experts around?<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:45:53)</span> <b>briedel:</b></span> i have some weird behavior that i do not understand<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(13:49:31)</span> <b>kherner:</b></span> @briedel Far from an expert but happy to take a stab at it<br/>
+<span style="color: #965d1b"><span style="font-size: small">(13:50:29)</span> <b>briedel:</b></span> <pre><br/>Arg 6: <a href="gsiftp://gridftp.grid.uchicago.edu:2811/cephfs/srm/xenon/xenon1t_processed/pax_v6.6.6/170716_1457/XENON1T-11309-000019000-000019987-000000988.root">gsiftp://gridftp.grid.uchicago.edu:2811/cephfs/srm/xenon/xenon1t_processed/pax_v6.6.6/170716_1457/XENON1T-11309-000019000-000019987-000000988.root</a><br/>/cvmfs/oasis.opensciencegrid.org/mis/osg-wn-client/3.3/3.3.24/el6-x86_64/etc/gfal2.d<br/>/cvmfs/oasis.opensciencegrid.org/mis/osg-wn-client/3.3/3.3.24/el6-x86_64/usr/lib64/gfal2-plugins/<br/>/cvmfs/oasis.opensciencegrid.org/mis/osg-wn-client/3.3/3.3.24/el6-x86_64/usr/bin/gfal-copy<br/>gfal-copy -v --cert /scratch/rcc_ciconnect.ruc.ciconnect/rcc.uafkagC96Y/execute.149.165.225.80-2600256/dir_3263169/user_cert -T 36000 -t 36000 -f -p --checksum md5 file:///scratch/rcc_ciconnect.ruc.ciconnect/rcc.uafkagC96Y/execute.149.165.225.80-2600256/dir_3263169/output/170716_1457.root <a href="gsiftp://gridftp.grid.uchicago.edu:2811/cephfs/srm/xenon/xenon1t_processed/pax_v6.6.6/170716_1457/XENON1T-11309-000019000-000019987-000000988.root">gsiftp://gridftp.grid.uchicago.edu:2811/cephfs/srm/xenon/xenon1t_processed/pax_v6.6.6/170716_1457/XENON1T-11309-000019000-000019987-000000988.root</a><br/>gfal-copy error: 93 (Protocol not supported) - Protocol not supported or path/url invalid: gsiftp:/<br/></pre><br/>
+<span style="color: #965d1b"><span style="font-size: small">(13:51:20)</span> <b>briedel:</b></span> <tt>GFAL_CONFIG_DIR</tt> and <tt>GFAL_PLUGIN_DIR</tt> are set<br/>
+<span style="color: #965d1b"><span style="font-size: small">(13:53:08)</span> <b>briedel:</b></span> this worked like 4 days ago<br/>
+<span style="color: #965d1b"><span style="font-size: small">(13:53:39)</span> <b>briedel:</b></span> and ironically i can use gfal earlier in teh script to download files<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:59:02)</span> <b>rynge:</b></span> Looks like the old srm problem when somebody messed up the URL schema and required three /<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:59:24)</span> <b>rynge:</b></span> Try: gsiftp:///gridftp.grid.uchicago.edu:2811<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:59:34)</span> <b>rynge:</b></span> (which is obviously wrong, but...)<br/>
+<span style="color: #965d1b"><span style="font-size: small">(14:01:33)</span> <b>briedel:</b></span> on all versions of the OSG repo?<br/>
+<span style="color: #965d1b"><span style="font-size: small">(14:01:47)</span> <b>briedel:</b></span> i have tried 3.4.1, 3.3.25, and 3.3.24<br/>
+<span style="color: #965d1b"><span style="font-size: small">(14:05:29)</span> <b>briedel:</b></span> <pre><br/>INFO Event triggered: BOTH GFAL2:CORE:COPY LIST:EXIT<br/>DEBUG  -&gt; Gfal::Transfer::start_local_copy<br/>INFO Event triggered: SOURCE GFAL2:CORE:COPY:LOCAL CHECKSUM:ENTER<br/>DEBUG gfal2_open2 -&gt;<br/>DEBUG  gfal_plugin_openG -&gt;<br/>DEBUG  &lt;- gfal_plugin_closeG<br/>INFO Event triggered: SOURCE GFAL2:CORE:COPY:LOCAL CHECKSUM:EXIT<br/>DEBUG   -&gt; [gfal_gridftp_statG]<br/>DEBUG  -&gt; [GridFTPModule::stat]<br/>DEBUG  -&gt; [Gridftp_stat_module::globus_gass_stat]<br/>DEBUG no session associated with this hostname, try find generic one ....<br/>DEBUG no session found in cache for <a href="gsiftp://gridftp.grid.uchicago.edu:2811">gsiftp://gridftp.grid.uchicago.edu:2811</a>!<br/>DEBUG  impossible to get integer parameter GRIDFTP PLUGIN:BLOCK_SIZE, set to default value 0, err  Configuration Error : No configuration parameter with this value found<br/>DEBUG GSIFTP using certificate /scratch/rcc_ciconnect.ruc.ciconnect/rcc.XeQCEGlVnk/execute.192.170.226.45-2456362/dir_2412771/user_cert<br/>DEBUG GSIFTP using private key /scratch/rcc_ciconnect.ruc.ciconnect/rcc.XeQCEGlVnk/execute.192.170.226.45-2456362/dir_2412771/user_cert<br/>DEBUG   [gfal_gridftp_statG]&lt;-<br/>DEBUG   -&gt; [gfal_gridftp_mkdirG]<br/>DEBUG  -&gt; [GridFTPModule::mkdir]<br/></pre><br/>
+<span style="color: #965d1b"><span style="font-size: small">(14:05:33)</span> <b>briedel:</b></span> more debug output<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(14:09:22)</span> <b>kherner:</b></span> There was a goc email that the worker node tarballs were just re-released<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(14:09:58)</span> <b>kherner:</b></span> At 12:24 CT:<br/>A minor configuration issue in the 3.3.26 and 3.4.1 worker-node tarballs<br/>prevented the GFAL tools from functioning. We have created updated<br/>tarballs with the correct configuration.<br/><br/>If you installed OSG worker-node tarballs directly, between July 12th and<br/>18th, you should consider reinstalling them using the latest builds<br/>(labeled as version 3.3.26-2 or 3.4.1-2). The tarball installations<br/>on OASIS have been updated.<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(14:10:27)</span> <b>kherner:</b></span> Could the problem have been present in 3.3.25 and 3.3.24 too, and no one noticed?<br/>
+<span style="color: #965d1b"><span style="font-size: small">(14:10:27)</span> <b>briedel:</b></span> yeah i filed that ticket<br/>
+<span style="color: #965d1b"><span style="font-size: small">(14:10:50)</span> <b>briedel:</b></span> the issue with 3.3.26 and 3.4.1 is that <tt>libjson</tt> got installed in the wrong place<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(14:10:54)</span> <b>kherner:</b></span> But it's odd that you say it works elsewhere in the script<br/>
+<span style="color: #965d1b"><span style="font-size: small">(14:11:00)</span> <b>briedel:</b></span> yeah<br/>
+<span style="color: #965d1b"><span style="font-size: small">(14:11:17)</span> <b>briedel:</b></span> we do invoke an environment in between<br/>
+<span style="color: #965d1b"><span style="font-size: small">(14:11:25)</span> <b>briedel:</b></span> and then invoke the OSG environment again<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(14:11:28)</span> <b>kherner:</b></span> hmmm<br/>
+<span style="color: #965d1b"><span style="font-size: small">(14:11:32)</span> <b>briedel:</b></span> but that shouldnt break anything<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(14:11:40)</span> <b>kherner:</b></span> Nothing in the other env touches any of the variables, does it?<br/>
+<span style="color: #965d1b"><span style="font-size: small">(14:11:48)</span> <b>briedel:</b></span> it shouldnt<br/>
+<span style="color: #965d1b"><span style="font-size: small">(14:12:16)</span> <b>briedel:</b></span> yet i have no idea what magic <tt>source deactivate</tt> does for an environment created by anaconda<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(14:18:45)</span> <b>kherner:</b></span> not sure myself<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(14:19:10)</span> <b>kherner:</b></span> Is it possible to invoke the same gfal command without switching to the other environment first?<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(14:19:23)</span> <b>kherner:</b></span> That would at least rule out any environmental issue<br/>
+<span style="color: #965d1b"><span style="font-size: small">(14:19:33)</span> <b>briedel:</b></span> yeah i will do that<br/>
+<span style="color: #965d1b"><span style="font-size: small">(20:45:28)</span> <b>briedel:</b></span> so after some more massaging i got gfal to at least timeout on me<br/>
+<span style="color: #965d1b"><span style="font-size: small">(20:45:41)</span> <b>briedel:</b></span> it somehow it ignores the <tt>-T</tt> and <tt>-t</tt> option<br/>
+<span style="color: #965d1b"><span style="font-size: small">(20:50:25)</span> <b>briedel:</b></span> i am running <tt>gfal-copy -vvvvvv -T 36000 -t 36000 -f -p --checksum md5</tt> and the log output is <pre>DEBUG    [GridFTP_Request_state::wait_callback] setup gsiftp timeout to 300 seconds<br/>DEBUG    [GridFTP_Request_state::wait_callback] Operation timeout of 300 seconds expired, canceling...</pre><br/>
+</body>
+</html>

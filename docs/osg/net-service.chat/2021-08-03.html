@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Aug 3, 2021 : #net-service (osg)</title>
+</head>
+<body>
+<h3>Tue Aug 3, 2021 : #net-service (osg)</h3>
+<span style="color: #e475df"><span style="font-size: small">(12:07:44)</span> <b>ajit:</b></span> I installed a fresh 4.4.0-1.el7 perfSonar on a new hardware. While all services are running, the test (latency) results can't be accessed from esmond archive.<br/>
+<span style="color: #e475df"><span style="font-size: small">(12:08:12)</span> <b>ajit:</b></span> I see the following error in the django.log file :<br/>
+<span style="color: #e475df"><span style="font-size: small">(12:08:24)</span> <b>ajit:</b></span> File "/usr/lib/esmond/lib/python3.6/site-packages/django/db/backends/base/base.py", line 213, in ensure_connection<br/>    self.connect()<br/>  File "/usr/lib/esmond/lib/python3.6/site-packages/django/db/backends/base/base.py", line 189, in connect<br/>    self.connection = self.get_new_connection(conn_params)<br/>  File "/usr/lib/esmond/lib/python3.6/site-packages/django/db/backends/postgresql/base.py", line 176, in get_new_connection<br/>    connection = Database.connect(**conn_params)<br/>  File "/usr/lib64/python3.6/site-packages/psycopg2/__init__.py", line 130, in connect<br/>    conn = _connect(dsn, connection_factory=connection_factory, **kwasync)<br/>django.db.utils.OperationalError: FATAL:  remaining connection slots are reserved for non-replication superuser connections<br/>
+<span style="color: #e475df"><span style="font-size: small">(12:11:17)</span> <b>ajit:</b></span> @smckee Any suggestions on how to address/fix it ?<br/>
+<span style="color: #e475df"><span style="font-size: small">(12:11:42)</span> <b>ajit:</b></span> In /var/lib/pgsql/10/data/postgresql.conf<br/>
+<span style="color: #e475df"><span style="font-size: small">(12:11:59)</span> <b>ajit:</b></span> I see this :<br/>
+<span style="color: #e475df"><span style="font-size: small">(12:12:01)</span> <b>ajit:</b></span> max_connections = 100<br/>
+<span style="color: #e475df"><span style="font-size: small">(12:13:15)</span> <b>ajit:</b></span> and I see a lot of processes like this :<br/>
+<span style="color: #e475df"><span style="font-size: small">(12:13:17)</span> <b>ajit:</b></span> postgres: pscheduler pscheduler [local] idle<br/>
+<span style="color: #e475df"><span style="font-size: small">(12:15:33)</span> <b>ajit:</b></span> This is the new perfsonar link : <a href="http://perfsonar01.hep.wisc.edu/toolkit/">http://perfsonar01.hep.wisc.edu/toolkit/</a><br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:23:50)</span> <b>jthiltges:</b></span> @ajit We ran into that problem as well at Nebraska. I blamed the high number of tests we run and unfortunately didn't report the issue further.<br/>The number of pscheduler connections occasionally rises above 100. Bumping postgres up to <tt>max_connections = 500</tt> has been stable so far.<br/>
+<span style="color: #e475df"><span style="font-size: small">(12:28:02)</span> <b>ajit:</b></span> Thanks @jthiltges for the hint. Ok, I will increase that number and see it takes care of the issue.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:28:32)</span> <b>smckee:</b></span> This would be good to send to the perfSONAR mailing list (problem and possible solution).<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:28:46)</span> <b>smckee:</b></span> Thanks @jthiltges for the quick response<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:29:15)</span> <b>smckee:</b></span> <a href="mailto:perfsonar-user@internet2.edu">perfsonar-user@internet2.edu</a><br/>
+<span style="color: #e475df"><span style="font-size: small">(12:48:32)</span> <b>ajit:</b></span> Bumping max_connectiongs to 500 and restarting postgresql-10.service cleared up the issue. Thanks again @jthiltges!<br/>
+</body>
+</html>

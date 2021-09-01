@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Aug 26, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Mon Aug 26, 2019 : #xcache (osg)</h3>
+<span style="color: #53b759"><span style="font-size: small">(14:55:44)</span> <b>isfiligoi:</b></span> Any suggestions on how to tune xrootd and/or xrdcp to fill a 10G network pipe?<br/>I cannot seem to exceed 1Gbps, even with multiple streams<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:56:34)</span> <b>isfiligoi:</b></span> and I mean the origin<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:57:51)</span> <b>blin:</b></span> there are some ATLAS-specific configurations here: <a href="https://docs.google.com/document/d/1Cxuzy6onOgcjTalkpkT5sBqO2yQqt6ko3zGEk3whMVI/edit?usp=sharing">https://docs.google.com/document/d/1Cxuzy6onOgcjTalkpkT5sBqO2yQqt6ko3zGEk3whMVI/edit?usp=sharing</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:58:04)</span> <b>blin:</b></span> there's a bunch of tuning stuff for caches but i'm not sure if that'll help for origins<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:00:18)</span> <b>jthiltges:</b></span> Out of curiosity, does it seem CPU-bound, with either high xrootd or kernel usage?<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:01:20)</span> <b>isfiligoi:</b></span> have not really checked… just running xrdcp and not getting more than 1 Gbps<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:03:08)</span> <b>isfiligoi:</b></span> never seems to use more than a single CPU<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:03:35)</span> <b>isfiligoi:</b></span> and the system is almost idle<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:05:14)</span> <b>jthiltges:</b></span> Huh. That's client side, server side, or both? And getting 90%+ on that single CPU?<br/>Sometimes, <tt>perf top</tt> is handy to quickly see if there's a single function holding things up.<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:05:41)</span> <b>isfiligoi:</b></span> server<br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:12:28)</span> <b>bbockelm:</b></span> What’s the underlying filesystem?<br/>
+<span style="color: #53b759"><span style="font-size: small">(20:40:10)</span> <b>isfiligoi:</b></span> ramdisk :slightly_smiling_face:<br/>
+<span style="color: #53b759"><span style="font-size: small">(20:40:30)</span> <b>isfiligoi:</b></span> talked to Matevz in the meantime; the magic client option is<br/>-DICPParallelChunks 16<br/>
+<span style="color: #53b759"><span style="font-size: small">(20:40:41)</span> <b>isfiligoi:</b></span> default is only 4<br/>
+<span style="color: #53b759"><span style="font-size: small">(20:41:11)</span> <b>isfiligoi:</b></span> curiously enough, raising the number of streams does not seem to help nearly as much<br/>
+<span style="color: #9e3997"><span style="font-size: small">(21:01:00)</span> <b>bbockelm:</b></span> Hm, there was a ticket about this.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(21:01:36)</span> <b>bbockelm:</b></span> <a href="https://github.com/xrootd/xrootd/issues/20">https://github.com/xrootd/xrootd/issues/20</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(21:05:12)</span> <b>bbockelm:</b></span> There was some speedup by simply using <tt>curl</tt>.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(21:05:34)</span> <b>bbockelm:</b></span> Similar to what you report, the start with a higher number of chunks.<br/>
+<span style="color: #53b759"><span style="font-size: small">(21:06:39)</span> <b>isfiligoi:</b></span> I managed to get 30Gbps Chicago to NY<br/>
+<span style="color: #53b759"><span style="font-size: small">(21:07:05)</span> <b>isfiligoi:</b></span> is the http interface enabled by default?<br/>if not, how do I enable it?<br/>Testing with curl, too, would indeed be interesting<br/>
+<span style="color: #53b759"><span style="font-size: small">(21:07:35)</span> <b>isfiligoi:</b></span> reminder, this is a origin, not a cache<br/>
+<span style="color: #9e3997"><span style="font-size: small">(21:14:28)</span> <b>bbockelm:</b></span> Not from the base Xrootd RPM.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(21:16:04)</span> <b>bbockelm:</b></span> To enable HTTP, enable:<br/><pre><br/>xrd.protocol XrdHttp:8000 /usr/lib64/libXrdHttp.so<br/>http.cadir /etc/grid-security/certificates<br/>http.cert  /etc/grid-security/bbockelm/hostcert.pem<br/>http.key   /etc/grid-security/bbockelm/hostkey.pem<br/></pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(21:16:19)</span> <b>bbockelm:</b></span> (adjust the port number <tt>8000</tt> as necessary.  Can be the same as the Xrootd protocol port)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(21:16:42)</span> <b>bbockelm:</b></span> If you provide the certificate and key, HTTPS is automatically enabled.<br/>
+<span style="color: #53b759"><span style="font-size: small">(21:18:06)</span> <b>isfiligoi:</b></span> works without certs? don’t care too much about auth<br/>
+<span style="color: #9e3997"><span style="font-size: small">(21:32:48)</span> <b>bbockelm:</b></span> yup, certainly works as plain HTTP.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(21:32:58)</span> <b>bbockelm:</b></span> (I find HTTPS more interesting, even without auth)<br/>
+</body>
+</html>

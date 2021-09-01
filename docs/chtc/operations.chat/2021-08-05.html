@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Aug 5, 2021 : #operations (chtc)</title>
+</head>
+<body>
+<h3>Thu Aug 5, 2021 : #operations (chtc)</h3>
+<span style="color: #99a949"><span style="font-size: small">(10:04:29)</span> <b>matyas:</b></span> Icinga is complaining that puppet didn't run on sc-origin and sc-cache. I acknowledged the warnings until the end of Friday; can someone take a look?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(10:12:58)</span> <b>wiscmoate:</b></span> @matyas will get it fixed in a jif, already know what the issue is<br/>
+<blockquote>
+<span style="color: #99a949"><span style="font-size: small">(13:47:41)</span> <b>matyas:</b></span> Thanks for fixing it!<br/>
+</blockquote>
+<span style="color: #3c989f"><span style="font-size: small">(11:19:47)</span> <b>wiscmoate:</b></span> Yeesh -&gt;<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:19:54)</span> <b>wiscmoate:</b></span> Something's up<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:20:23)</span> <b>johnkn:</b></span> I'm seeing down...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:21:20)</span> <b>johnkn:</b></span> is this a graph of actual CPU use? or just cpus allocated to jobs?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:21:29)</span> <b>wiscmoate:</b></span> The latter<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:37:38)</span> <b>wiscmoate:</b></span> It might be memory overutlization - I don't see the same dip in memory utilization that I see in CPU utilization<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:40:16)</span> <b>johnkn:</b></span> <tt>condor_status -compact</tt> would show that<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:42:42)</span> <b>johnkn:</b></span> yeah, seeing lots of machines with low free memory and high free cpus<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:45:04)</span> <b>wiscmoate:</b></span> Here's our three highest memory "abusers":<br/><pre>Owner             : <a href="mailto:rdscott3@chtc.wisc.edu">rdscott3@chtc.wisc.edu</a><br/>Total Unused  (MB):                6790114<br/>Avg Requested (MB):                  12288<br/>Avg Used      (MB):                   5624<br/>Highest Used  (MB):                   7171<br/>Busy Jobs in Pool :                   1019<br/><br/>Owner             : <a href="mailto:aketz@chtc.wisc.edu">aketz@chtc.wisc.edu</a><br/>Total Unused  (MB):             3808831<br/>Avg Requested (MB):               16384<br/>Avg Used      (MB):                2224<br/>Highest Used  (MB):                6211<br/>Busy Jobs in Pool :                 269<br/><br/>Owner             : <a href="mailto:yshen84@chtc.wisc.edu">yshen84@chtc.wisc.edu</a><br/>Total Unused  (MB):               2974305<br/>Avg Requested (MB):                 61440<br/>Avg Used      (MB):                 14966<br/>Highest Used  (MB):                 30870<br/>Busy Jobs in Pool :                    64</pre><br/>
+<span style="color: #e7392d"><span style="font-size: small">(11:45:28)</span> <b>ckoch5:</b></span> you were faster than me. :joy:<br/>
+<span style="color: #e7392d"><span style="font-size: small">(11:48:19)</span> <b>ckoch5:</b></span> I can email these folks<br/>
+<blockquote>
+<span style="color: #9f69e7"><span style="font-size: small">(12:33:52)</span> <b>lmichael:</b></span> Can I take any. with rdscott, put their jobs on hold.<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(12:34:57)</span> <b>lmichael:</b></span> 6TB of waste is a LOT, cuz they have &gt;1k jobs.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(12:37:26)</span> <b>ckoch5:</b></span> if you can do it, that’d be great<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(12:41:02)</span> <b>lmichael:</b></span> You emailed them yet?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(12:44:01)</span> <b>ckoch5:</b></span> I haven’t, had an engagement at 12:00<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(12:44:20)</span> <b>lmichael:</b></span> :+1: I’ll do all three.<br/>
+</blockquote>
+<span style="color: #235e5b"><span style="font-size: small">(11:49:41)</span> <b>johnkn:</b></span> All have a highest use of &gt; 50% of the request.  that doesn't seem out of line to me.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:51:19)</span> <b>wiscmoate:</b></span> Yeah, not egregious<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:51:24)</span> <b>johnkn:</b></span> what's the nominal GB per core in the pool these days?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:55:17)</span> <b>wiscmoate:</b></span> Still somewhere around 2GiB/core<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:57:13)</span> <b>johnkn:</b></span> thought so.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:58:42)</span> <b>johnkn:</b></span> cpark229 is using 4GB, 1 core, so that's contributing to the under<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(12:37:07)</span> <b>lmichael:</b></span> @johnkn with a higher request of 12 or 16GB, that adds u to a lot of wasted capacity. rdscott3 has 1k jobs running, and aketz isn’t using 50% at the highest.<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(12:37:41)</span> <b>lmichael:</b></span> So they really could match to a lot more resources if they requested lower, including resources that won’t exist (for anyone!) until they do.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:38:30)</span> <b>johnkn:</b></span> Yeah,  rdscott3 could drop down to 8Gb or even 6GB for most jobs, that would help a huge amount.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(12:38:50)</span> <b>ckoch5:</b></span> most of <tt>rdscott3</tt> finish with 8GB<br/>
+<span style="color: #e7392d"><span style="font-size: small">(12:39:02)</span> <b>ckoch5:</b></span> so 6GB would probably introduce some badput<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:39:08)</span> <b>johnkn:</b></span> ok.<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(12:43:56)</span> <b>lmichael:</b></span> We REALLY need a working mechanism for dynamically-increasing (and capped) memory request.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:46:09)</span> <b>johnkn:</b></span> Know anyone who has jobs that want 16 cores and 1/gb of ram ?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:46:44)</span> <b>johnkn:</b></span> (or really 1/2 GB)<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(12:47:21)</span> <b>lmichael:</b></span> yup!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:47:40)</span> <b>johnkn:</b></span> today is his day :wink:<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(12:48:02)</span> <b>lmichael:</b></span> or, well, close.<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(12:48:17)</span> <b>lmichael:</b></span> they’re not running today …<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:48:34)</span> <b>johnkn:</b></span> (ok, 15 cores....)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:49:45)</span> <b>johnkn:</b></span> at least a dozen machines look like that.<br/><pre>Machine             Platform    Slots Cpus Gpus  TotalGb FreCpu  FreeGb  CpuLoad ST Jobs/Min MaxSlotGb<br/><br/><a href="http://e3223.chtc.wisc.edu">e3223.chtc.wisc.edu</a> x64/CentOS7     9   24         20.52     15     0.52    0.09 **     0.10     12.00</pre><br/>
+<span style="color: #9f69e7"><span style="font-size: small">(12:50:15)</span> <b>lmichael:</b></span> @wiscmoate condor_history is pretty consistently listing 7325 as the highest RAM for rdscott3 (for MANY jobs) and not jobs with 7171. Any reasons for the disrepancy?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:07:01)</span> <b>wiscmoate:</b></span> @lmichael must be something about the difference between the <tt>MemoryUsage</tt> attribute published in the jobad (<tt>condor_history</tt> is jobad) and <tt>MemoryUsage</tt> attribute in the slotad (<tt>/usr/local/bin/memory_use.py</tt> reads from the slotads)<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:07:53)</span> <b>wiscmoate:</b></span> Compare these two:<br/>• <tt>condor_q rdscott3 -af memoryusage | sort | uniq -c</tt> (jobad)<br/>• <tt>condor_status -const 'Activity =?= "Busy" &amp;&amp; RemoteOwner =?= "<a href="mailto:rdscott3@chtc.wisc.edu">rdscott3@chtc.wisc.edu</a>"' -af memoryusage | sort | uniq -c</tt> (slotad)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:08:53)</span> <b>johnkn:</b></span> There definitely is<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:09:20)</span> <b>johnkn:</b></span> these numbers are never exactly in sync<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:10:06)</span> <b>johnkn:</b></span> it's mostly an issue for jobs that have memory that grows and his highest at exit<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:15:51)</span> <b>wiscmoate:</b></span> @lmichael I suspect we have very little <tt>WantFlocking</tt> <tt>WantGlidein</tt> <tt>is_resumable</tt> or incoming glidein job pressure right now<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:16:14)</span> <b>wiscmoate:</b></span> The new PowerEdge c6525s and all bologna batch nodes are idle<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:16:55)</span> <b>wiscmoate:</b></span> The only "interruptible" jobs I've seen recently come from either incoming glideins, batlab, <tt>nu_shenx3</tt> (submit-1) or <tt><a href="mailto:sknaack@discovery.wisc.edu">sknaack@discovery.wisc.edu</a></tt><br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:25:44)</span> <b>wiscmoate:</b></span> Or perhaps we're having communication problems with the HEP CE.....<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:29:50)</span> <b>wiscmoate:</b></span> I renewed the hostcert on <a href="http://cm.chtc.wisc.edu">cm.chtc.wisc.edu</a> yesterday, I bet its causing issues<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:33:08)</span> <b>wiscmoate:</b></span> Yep<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:33:45)</span> <b>wiscmoate:</b></span> Sorry, I ran some tests yesterday, they were obviously flawed.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:38:31)</span> <b>wiscmoate:</b></span> This is likely the core problem<br/>
+<span style="color: #2b6836"><span style="font-size: small">(13:47:00)</span> <b>jcpatton:</b></span> (Speaking of certs, <tt>wwwapps0000</tt>’s has expired)<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:47:35)</span> <b>wiscmoate:</b></span> Doh....<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:52:14)</span> <b>wiscmoate:</b></span> @matyas I consider you to be our OSG cert expert;  Our new IGTF cert (or that's what I asked DoIT for at lest) for <a href="http://cm.chtc.wisc.edu">cm.chtc.wisc.edu</a> has the following root CA cert -&gt;<br/><pre>-----BEGIN CERTIFICATE-----<br/>MIIEMjCCAxqgAwIBAgIBATANBgkqhkiG9w0BAQUFADB7MQswCQYDVQQGEwJHQjEb<br/>MBkGA1UECAwSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHDAdTYWxmb3JkMRow<br/>GAYDVQQKDBFDb21vZG8gQ0EgTGltaXRlZDEhMB8GA1UEAwwYQUFBIENlcnRpZmlj<br/>YXRlIFNlcnZpY2VzMB4XDTA0MDEwMTAwMDAwMFoXDTI4MTIzMTIzNTk1OVowezEL<br/>MAkGA1UEBhMCR0IxGzAZBgNVBAgMEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UE<br/>BwwHU2FsZm9yZDEaMBgGA1UECgwRQ29tb2RvIENBIExpbWl0ZWQxITAfBgNVBAMM<br/>GEFBQSBDZXJ0aWZpY2F0ZSBTZXJ2aWNlczCCASIwDQYJKoZIhvcNAQEBBQADggEP<br/>ADCCAQoCggEBAL5AnfRu4ep2hxxNRUSOvkbIgwadwSr+GB+O5AL686tdUIoWMQua<br/>BtDFcCLNSS1UY8y2bmhGC1Pqy0wkwLxyTurxFa70VJoSCsN6sjNg4tqJVfMiWPPe<br/>3M/vg4aijJRPn2jymJBGhCfHdr/jzDUsi14HZGWCwEiwqJH5YZ92IFCokcdmtet4<br/>YgNW8IoaE+oxox6gmf049vYnMlhvB/VruPsUK6+3qszWY19zjNoFmag4qMsXeDZR<br/>rOme9Hg6jc8P2ULimAyrL58OAd7vn5lJ8S3frHRNG5i1R8XlKdH5kBjHYpy+g8cm<br/>ez6KJcfA3Z3mNWgQIJ2P2N7Sw4ScDV7oL8kCAwEAAaOBwDCBvTAdBgNVHQ4EFgQU<br/>oBEKIz6W8Qfs4q8p74Klf9AwpLQwDgYDVR0PAQH/BAQDAgEGMA8GA1UdEwEB/wQF<br/>MAMBAf8wewYDVR0fBHQwcjA4oDagNIYyaHR0cDovL2NybC5jb21vZG9jYS5jb20v<br/>QUFBQ2VydGlmaWNhdGVTZXJ2aWNlcy5jcmwwNqA0oDKGMGh0dHA6Ly9jcmwuY29t<br/>b2RvLm5ldC9BQUFDZXJ0aWZpY2F0ZVNlcnZpY2VzLmNybDANBgkqhkiG9w0BAQUF<br/>AAOCAQEACFb8AvCb6P+k+tZ7xkSAzk/ExfYAWMymtrwUSWgEdujm7l3sAg9g1o1Q<br/>GE8mTgHj5rCl7r+8dFRBv/38ErjHT1r0iWAFf2C3BUrz9vHCv8S5dIa2LX1rzNLz<br/>Rt0vxuBqw8M0Ayx9lt1awg6nCpnBBYurDC/zXDrPbDdVCYfeU0BsWO/8tqtlbgT2<br/>G9w84FoVxp7Z8VlIMCFlA2zs6SFz7JsDoeA3raAVGI/6ugLOpyypEBMs1OUIJqsi<br/>l2D4kF501KKaU73yqWjgom7C12yxow+ev+to51byrvLjKzg6CYG1a4XXvi3tPxq3<br/>smPi9WIsgtRqAEFQ8TmDn5XpNpaYbg==<br/>-----END CERTIFICATE-----</pre><br/>I just updated <tt>osg-ca-certs</tt> on <a href="http://cm.chtc.wisc.edu">cm.chtc.wisc.edu</a>, and I'm not finding this cert in there -<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:52:24)</span> <b>wiscmoate:</b></span> Am I missing something?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:53:25)</span> <b>wiscmoate:</b></span> I searched for a file named after it's hash like so:<br/><tt>[moate@cm3000 condor]$ sudo find /etc/grid-security/ -name '*ee64a828*'</tt><br/>
+<span style="color: #99a949"><span style="font-size: small">(13:55:01)</span> <b>matyas:</b></span> can I take a look at the cert file itself?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:55:32)</span> <b>wiscmoate:</b></span> The cert for <a href="http://cm3000.chtc.wisc.edu">cm3000.chtc.wisc.edu</a> is at <tt>/etc/grid-security/hostcert.pem</tt> -<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:55:47)</span> <b>wiscmoate:</b></span> If you want the full chain I can drop it somewhere for you<br/>
+<span style="color: #684b6c"><span style="font-size: small">(13:56:23)</span> <b>bbockelman:</b></span> Yes - IGTF CA has multiple potential signing chains.  Sometimes InCommon puts more than one.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:56:33)</span> <b>wiscmoate:</b></span> <pre>[moate@cm3000 condor]$ openssl crl2pkcs7 -nocrl -certfile /etc/grid-security/hostcert.pem | openssl pkcs7 -print_certs -noout<br/>subject=/DC=org/DC=incommon/C=US/ST=Wisconsin/L=Madison/O=University of Wisconsin-Madison/OU=OCIS/CN=<a href="http://cm.chtc.wisc.edu">cm.chtc.wisc.edu</a><br/>issuer=/C=US/O=Internet2/OU=InCommon/CN=InCommon IGTF Server CA<br/><br/>subject=/C=US/O=Internet2/OU=InCommon/CN=InCommon IGTF Server CA<br/>issuer=/C=GB/ST=Greater Manchester/L=Salford/O=COMODO CA Limited/CN=COMODO RSA Certification Authority<br/><br/>subject=/C=GB/ST=Greater Manchester/L=Salford/O=COMODO CA Limited/CN=COMODO RSA Certification Authority<br/>issuer=/C=GB/ST=Greater Manchester/L=Salford/O=Comodo CA Limited/CN=AAA Certificate Services</pre><br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:57:09)</span> <b>wiscmoate:</b></span> That last issuer is the CA I pasted further up<br/>
+<span style="color: #684b6c"><span style="font-size: small">(13:58:08)</span> <b>bbockelman:</b></span> Yes, it's a mulitple chain issue.  osg-ca-certs ships a self-signed root certificate named <tt>/C=GB/ST=Greater Manchester/L=Salford/O=COMODO CA Limited/CN=COMODO RSA Certification Authority</tt><br/>
+<span style="color: #684b6c"><span style="font-size: small">(13:58:40)</span> <b>bbockelman:</b></span> So, starting from the host, the chain for OSG would be:<br/><pre>subject=/DC=org/DC=incommon/C=US/ST=Wisconsin/L=Madison/O=University of Wisconsin-Madison/OU=OCIS/CN=<a href="http://cm.chtc.wisc.edu">cm.chtc.wisc.edu</a><br/>issuer=/C=US/O=Internet2/OU=InCommon/CN=InCommon IGTF Server CA<br/><br/>subject=/C=US/O=Internet2/OU=InCommon/CN=InCommon IGTF Server CA<br/>issuer=/C=GB/ST=Greater Manchester/L=Salford/O=COMODO CA Limited/CN=COMODO RSA Certification Authority<br/><br/>subject=/C=GB/ST=Greater Manchester/L=Salford/O=COMODO CA Limited/CN=COMODO RSA Certification Authority<br/>issuer=/C=GB/ST=Greater Manchester/L=Salford/O=COMODO CA Limited/CN=COMODO RSA Certification Authority</pre><br/>
+<span style="color: #684b6c"><span style="font-size: small">(13:59:23)</span> <b>bbockelman:</b></span> OpenSSL gets really screwy (and confused) when there are multiple chains available.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:59:38)</span> <b>wiscmoate:</b></span> Dammit - so I need to get rid of that last cert in the chain, yes?<br/>
+<span style="color: #684b6c"><span style="font-size: small">(14:00:01)</span> <b>bbockelman:</b></span> yup.  In general, I'd highly recommend that "grid stuff" only gets the host cert, not the chain.<br/>
+<span style="color: #684b6c"><span style="font-size: small">(14:00:11)</span> <b>bbockelman:</b></span> (since OSG explicitly ships the intermediates)<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:04:56)</span> <b>wiscmoate:</b></span> Sure enough:<br/><pre>[moate@cm3000 condor]$ sudo openssl x509 -in /etc/grid-security/certificates/d6325660.0 -subject -noout<br/>subject= /C=GB/ST=Greater Manchester/L=Salford/O=COMODO CA Limited/CN=COMODO RSA Certification Authority</pre><br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:05:07)</span> <b>wiscmoate:</b></span> Issuer of the issuer of the cert<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:30:47)</span> <b>ckoch5:</b></span> @tjslauson have you moved the login nodes yet?<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(14:31:15)</span> <b>tjslauson:</b></span> nope<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(14:32:05)</span> <b>tjslauson:</b></span> that'll happen in a week and a half<br/>
+<blockquote>
+<span style="color: #e7392d"><span style="font-size: small">(17:03:49)</span> <b>ckoch5:</b></span> hmmm. I have an HPC user who is having new instruction set errors.<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(17:06:01)</span> <b>tjslauson:</b></span> hmm.  Know if it's one of the AVXs they need, or something else?<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(17:07:21)</span> <b>tjslauson:</b></span> and they're running it on a login node?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(2021-08-06 09:04:23)</span> <b>ckoch5:</b></span> they shouldn’t be…<br/>
+</blockquote>
+<span style="color: #3c989f"><span style="font-size: small">(15:15:43)</span> <b>wiscmoate:</b></span> Things looking better -&gt;<br/>
+</body>
+</html>

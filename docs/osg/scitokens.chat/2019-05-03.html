@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri May 3, 2019 : #scitokens (osg)</title>
+</head>
+<body>
+<h3>Fri May 3, 2019 : #scitokens (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(09:45:01)</span> <b>dweitzel:</b></span> I'm running through the scitokens install in prep for OSG's upgrade on monday.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:45:08)</span> <b>dweitzel:</b></span> Is the CREDD needed on the worker nodes?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:45:15)</span> <b>dweitzel:</b></span> I thought the starter handles all of that.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:45:38)</span> <b>dweitzel:</b></span> @zmiller ^<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:17:14)</span> <b>zmiller:</b></span> @dweitzel No CREDD Is needed on the worker nodes.  All magic is handled on submit, and the starter just fetches any needed creds from the shadow.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:17:24)</span> <b>dweitzel:</b></span> ah, great.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:18:06)</span> <b>dweitzel:</b></span> also, I'm running the local credmon now that creates it's own scitokens.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:18:29)</span> <b>dweitzel:</b></span> It appears I need to have the line:<pre>use_oauth_services = scitokens</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:18:30)</span> <b>dweitzel:</b></span> in the submit file<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:18:38)</span> <b>dweitzel:</b></span> otherwise, it doesn't transfer the scitoken.<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:20:40)</span> <b>zmiller:</b></span> correct<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:21:03)</span> <b>dweitzel:</b></span> ok, what would be the best way to automatically fill that in.  SUBMIT_ATTRS ?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:21:16)</span> <b>dweitzel:</b></span> I have: <pre>OAuthServicesNeeded = "scitokens"<br/>SUBMIT_ATTRS = OAuthServicesNeeded</pre> working<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:22:05)</span> <b>zmiller:</b></span> that seems reasonable<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:22:28)</span> <b>dweitzel:</b></span> What if people want to also use box?  Do I need to get fancy with my expression?<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:23:32)</span> <b>zmiller:</b></span> okay, let's back up...<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:24:55)</span> <b>zmiller:</b></span> you want to force all submit files to specify that they want scitokens, but users may or may not put in their submit file that they want box?  (i.e. they would manually add "use_oath_services = box") ?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:25:19)</span> <b>dweitzel:</b></span> yes.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:25:26)</span> <b>dweitzel:</b></span> I want to give users the option to include box.<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:26:14)</span> <b>zmiller:</b></span> i don't know if that's going to work but you can try it.  certainly if they specify "use_oauth_services = scitokens, box" it would work.<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:26:18)</span> <b>zmiller:</b></span> the problem is this:<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:28:31)</span> <b>zmiller:</b></span> the use_oauth_services parameter is looked for BEFORE talking to the Schedd, starting a transaction.  Therefore, there is no actual job classad.  so when you insert that attribute (OAuthServicesNeeded) that informs the starter to do the transfer, but what it doesn't do is cause submit to check with the credd first to see if tokens are present.<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:29:06)</span> <b>zmiller:</b></span> in your case, it seems you have pre-created the scitoken for them, so submit would never return a message that says, "go to <a href="http://blah.blah/abc123">http://blah.blah/abc123</a> to get tokens".<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:29:45)</span> <b>zmiller:</b></span> but if you add box to the mix, submit WOULD need to check with the credd for existing box tokens and if not present give them the URL for them to obtain them.<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:30:56)</span> <b>zmiller:</b></span> i'm just not sure how using submit_attrs would work...  you'd have two different mechanisms trying to set/change the value.<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:31:27)</span> <b>zmiller:</b></span> perhaps using submit transforms this would be possible?  i'm not familiar with them or their capabilities but that's probably worth looking at.<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:32:00)</span> <b>zmiller:</b></span> did any or all of that make sense?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:32:11)</span> <b>dweitzel:</b></span> I think we can talk about it more at 1:30<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:32:20)</span> <b>dweitzel:</b></span> but I think I understand.<br/>
+<span style="color: #902d59"><span style="font-size: small">(14:28:05)</span> <b>zmiller:</b></span> @dweitzel Did you also add SendCredential to the job ad?<br/>
+<span style="color: #902d59"><span style="font-size: small">(14:28:24)</span> <b>zmiller:</b></span> Seems like without that it also wouldn't transfer the scitoken.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:29:16)</span> <b>dweitzel:</b></span> that was already there.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:29:19)</span> <b>dweitzel:</b></span> not sure how that was added.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:29:30)</span> <b>dweitzel:</b></span> Maybe the credential_producer line?<br/>
+<span style="color: #902d59"><span style="font-size: small">(14:32:21)</span> <b>zmiller:</b></span> perhaps... I should look into that.  but you shouldn't need that for oauth stuff<br/>
+<span style="color: #902d59"><span style="font-size: small">(14:41:45)</span> <b>zmiller:</b></span> okay, here you go:<br/>
+<span style="color: #902d59"><span style="font-size: small">(14:41:52)</span> <b>zmiller:</b></span> JOB_TRANSFORM_NAMES = $(JOB_TRANSFORM_NAMES) AddSciToken<br/>JOB_TRANSFORM_AddSciToken @=end<br/>[<br/>  Eval_Set_OAuthServicesNeeded = strcat( "scitokens ", OAuthServicesNeeded ?: "");<br/>  Set_SendCredential = TRUE;<br/>]<br/>@end<br/>
+<span style="color: #902d59"><span style="font-size: small">(14:42:21)</span> <b>zmiller:</b></span> <br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:46:25)</span> <b>dweitzel:</b></span> Works!  Thanks!<br/>
+<span style="color: #902d59"><span style="font-size: small">(15:00:41)</span> <b>zmiller:</b></span> cool!  you should be able to get rid of SEC_CREDENTIAL_PRODUCER as well. (but test it of course! :)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:49:12)</span> <b>dweitzel:</b></span> @zmiller that causes the shadow to fail to transfer the credential.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:49:37)</span> <b>dweitzel:</b></span> <pre>CONDOR_getcreds: ERROR reading contents of /var/lib/condor/credentials/dweitzel/scitokens.use</pre><br/>
+<span style="color: #902d59"><span style="font-size: small">(15:55:15)</span> <b>zmiller:</b></span> isn't your credmon creating that file?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:57:17)</span> <b>dweitzel:</b></span> It should be.  But apparently not?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:57:34)</span> <b>dweitzel:</b></span> apparently not if the producer is not set.<br/>
+<span style="color: #902d59"><span style="font-size: small">(15:59:21)</span> <b>zmiller:</b></span> you have a custom credmon, right?  that creates it's own scitokens?  does it only create the scitoken.use if the <a href="http://scitoken.top">scitoken.top</a> is there?  i guess then you are depending on the producer to drop that file in there as a signal to create a token for that user.<br/>
+<span style="color: #902d59"><span style="font-size: small">(16:00:19)</span> <b>zmiller:</b></span> different use case than I was testing.  so, my apologies, you do need the producer to signal to your credmon "this user submitted a job".<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:09:49)</span> <b>dweitzel:</b></span> ok.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:09:53)</span> <b>dweitzel:</b></span> as long as we know.<br/>
+<span style="color: #902d59"><span style="font-size: small">(16:25:06)</span> <b>zmiller:</b></span> it's a little hacky.  maybe I can think of a better way but I'm about to head out for the day.<br/>
+</body>
+</html>

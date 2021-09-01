@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue May 14, 2019 : #uscms (osg)</title>
+</head>
+<body>
+<h3>Tue May 14, 2019 : #uscms (osg)</h3>
+<span style="color: #e06b56"><span style="font-size: small">(09:55:23)</span> <b>jthiltges:</b></span> At Nebraska, the checksums indeed get created by xrootd-hdfs. Not as xattrs, but in a separate directory tree under '/cksums'.<br/>(I'd much rather have xattrs, but the checksum files also include CVMFS hash data. The volume of checksum data would overwhelm the HDFS metadata server, which has to keep the whole metadata set in memory.)<br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:46:38)</span> <b>bockjoo:</b></span> Thanks John! There must be a way to plug in the checksum calculator for POSIX in xrootd like libXrdPOSIX or something.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(21:38:01)</span> <b>bbockelm:</b></span> Hi Bockjoo!  Sorry, been out a lot in the last week.  I think you need to query the attribute with <tt>attr -ql</tt> to see the set attributes.  Seems that Xrootd is happy with your setup though?  What happens when you use the <tt>gfal-sum</tt> utility against the endpoint?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(21:44:49)</span> <b>bbockelm:</b></span> hm - if I checksum a fairly large file (<tt><a href="davs://cmsio10.rc.ufl.edu:1094//store/PhEDEx_LoadTest07/LoadTest07_Debug_Florida/LoadTest07_Florida_50</tt>">davs://cmsio10.rc.ufl.edu:1094//store/PhEDEx_LoadTest07/LoadTest07_Debug_Florida/LoadTest07_Florida_50`</a>) multiple times, it takes multiple minutes each time.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(21:45:06)</span> <b>bbockelm:</b></span> That suggests Xrootd is happily figuring out how to generate the checksum but unable to store it.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(21:45:24)</span> <b>bbockelm:</b></span> that should be enough to make transfers function, although not particularly efficient.  Any complaints in the logfile from xrootd?<br/>
+</body>
+</html>

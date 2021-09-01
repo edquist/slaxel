@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jan 31, 2018 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Jan 31, 2018 : #software (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(10:50:15)</span> <b>matyas:</b></span> @bbockelm @blin @dweitzel for osg-build's pulling sources from github thing, I want to make the hash check optional for scratch and local builds. Should that require a command-line flag or just emit a warning on mismatch?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:50:55)</span> <b>dweitzel:</b></span> Hash or tag check?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:51:38)</span> <b>matyas:</b></span> hash matches tag check<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:52:11)</span> <b>dweitzel:</b></span> Ah, ok. So basically, put any old hash in there, and ignore the tag for scratch builds?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:52:32)</span> <b>matyas:</b></span> ignore the hash, yeah<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:53:10)</span> <b>dweitzel:</b></span> I get confused when you say ignore the hash. So what are you going to download from git?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:53:39)</span> <b>matyas:</b></span> by hash I mean the 40-character thing. by tag I mean what you specify to <tt>git checkout</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:55:34)</span> <b>matyas:</b></span> it will run git checkout and git archive on the tag you specify but may first check that <tt>git rev-parse $tag</tt> == <tt>$hash</tt><br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:56:12)</span> <b>bbockelm:</b></span> What do we do when there's uncommitted files?  Warn or flag?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:56:19)</span> <b>dweitzel:</b></span> For scratch builds, wouldn’t it be better to use the hash and not the tag?  So you can test a build before officially tagging it?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:57:36)</span> <b>matyas:</b></span> brian: only non-scratch builds even notice uncommitted files<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:57:47)</span> <b>matyas:</b></span> derek: you can use tag=master<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:58:14)</span> <b>matyas:</b></span> if you don't mind your tarball being called $software-master.tar.gz<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:58:33)</span> <b>blin:</b></span> i vote requiring a cmd line flag<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:59:26)</span> <b>bbockelm:</b></span> I dunno, I think it'd be nice to behave the same as not-checked-in work.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:00:16)</span> <b>blin:</b></span> uncommitted files don't warn for scratch builds and they completely halt non-scratch builds<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:00:59)</span> <b>blin:</b></span> i agree with derek, if there is a mismatch, i'd prefer using the hash<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:01:17)</span> <b>matyas:</b></span> that's gonna suck<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:01:25)</span> <b>matyas:</b></span> suppose you want to use the spec file from github thing<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:01:33)</span> <b>blin:</b></span> that way, you get the properly versioned tarball<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:01:48)</span> <b>matyas:</b></span> uh ignore my last sentence<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:02:51)</span> <b>matyas:</b></span> so you'd specify "tag=v2.0 hash=2958347239857312" and it will check out that hash and name the tarball foo-2.0.tar.gz ?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:03:13)</span> <b>blin:</b></span> yea, exactly<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:03:29)</span> <b>matyas:</b></span> how about if we just let the user optionally specify the tarball name?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:03:44)</span> <b>matyas:</b></span> because looking up the hash is the annoying bit of updating that thing<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:04:18)</span> <b>blin:</b></span> because the workflow would presumably be:<br/>1) have untagged candidate src<br/>2) cut scratch build<br/>3) tag hash on successful scratch build<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:06:07)</span> <b>matyas:</b></span> suppose I want to test a new version of osg-build &amp; install it from rpm<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:06:47)</span> <b>matyas:</b></span> every time I make a commit I have to click-click-copy-edit-paste the hash?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:11:23)</span> <b>matyas:</b></span> or how about I just make a branch called v2.0-pre, make commits to that branch, and make the tag when I'm done?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:15:14)</span> <b>matyas:</b></span> in which case I don't want to update the upstream/.source file every time I make a commit<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:32:44)</span> <b>bbockelm:</b></span> You make a koji build every time you make a commit?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:33:10)</span> <b>matyas:</b></span> just a scratch build with <tt>--getfiles</tt> so I get the RPMs back<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:33:26)</span> <b>bbockelm:</b></span> I guess I build from the in-source spec in whatever project I'm working on, and only switch to osg-build once I'm ready (or near-ready) to make a tag.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:34:15)</span> <b>matyas:</b></span> yeah but if you need to make changes to the spec file you have to update the hash<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:36:20)</span> <b>matyas:</b></span> osg-build can also do local (rpmbuild or mock) builds, not just koji ones<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:33:25)</span> <b>matyas:</b></span> Another idea: make a <tt>branch</tt> attribute, mutually exclusive with the <tt>tag</tt> attribute.<br/>If scratch/local then allow using <tt>branch</tt> and skip hash check<br/>If non-scratch then require <tt>tag</tt> and do hash check<br/>Either way, make sure that <tt>branch</tt> points to a branch and <tt>tag</tt> points to a tag<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:04:36)</span> <b>ian_cancercomputer:</b></span> what's the need or advantage of checking the hash against the tag?  Tags are just names for a particular hash aren't they?  You aren't allowing a tag to be updated/changed in the git repos right?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:05:55)</span> <b>blin:</b></span> we don't necessarily control the git repos we build from so it's a safety check<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:06:09)</span> <b>ian_cancercomputer:</b></span> ah.<br/>
+</body>
+</html>

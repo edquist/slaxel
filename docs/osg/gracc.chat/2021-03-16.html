@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Mar 16, 2021 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Tue Mar 16, 2021 : #gracc (osg)</h3>
+<span style="color: #16569E"><span style="font-size: small">(10:37:47)</span> <b>edquist:</b></span> has anybody here ever had to re-send quarantined gratia records?<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:38:07)</span> <b>edquist:</b></span> i am trying to figure out what the procedure for that would be<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:39:33)</span> <b>edquist:</b></span> i'm thinking maybe manually moving the record files from /var/lib/gratia/data/quarantine to /var/lib/gratia/tmp/gratiafiles/subdir.&lt;PROBE&gt;/outbox/, but i am not sure that is correct<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:43:56)</span> <b>dweitzel:</b></span> I think that is correct.  Moving the data files should be enough.<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:45:11)</span> <b>edquist:</b></span> Ok, thanks.  Sorry derek to bug you on your day off.  It appears the custom purdue probe was quarantining the records because i did not tell them to set QuarantineUnknownVORecords="0"<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:45:32)</span> <b>dweitzel:</b></span> any idea why they were quarantined?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:45:39)</span> <b>dweitzel:</b></span> Ah, that makes sense.<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:48:21)</span> <b>edquist:</b></span> yeah, probably what i should have done for the custom probe was comment out the lines<br/><br/><pre><br/>        elif Config.get_QuarantineUnknownVORecords() and (not VOName or VOName == 'Unknown'):<br/>            reason ='unknown or null VOName, will be quarantined in %s' % (os.path.join(os.path.join(Config.get_DataFolder(), "quarantine")))<br/>            isQuarantined = True<br/></pre><br/><br/>... but i did not<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:48:46)</span> <b>edquist:</b></span> so QuarantineUnknownVORecords needs to be set to 0<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:55:19)</span> <b>dweitzel:</b></span> Interesting that the VOName was set to unknown though for the probe.  I thought we did the user-&gt; vo mapping so that it would be set<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:25:27)</span> <b>edquist:</b></span> oh<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:25:31)</span> <b>edquist:</b></span> that is interesting<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:25:59)</span> <b>edquist:</b></span> good point<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:26:04)</span> <b>edquist:</b></span> and now i am second guessing myself<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:28:18)</span> <b>edquist:</b></span> i think the short answer is<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:28:28)</span> <b>edquist:</b></span> i set VOName elsewhere<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:28:37)</span> <b>edquist:</b></span> in a different function<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:28:47)</span> <b>edquist:</b></span> afterwards<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:15:47)</span> <b>dweitzel:</b></span> ah, ok.<br/>
+</body>
+</html>

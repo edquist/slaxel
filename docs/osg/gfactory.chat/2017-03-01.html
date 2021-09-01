@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Mar 1, 2017 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Wed Mar 1, 2017 : #gfactory (osg)</h3>
+<span style="color: #53b759"><span style="font-size: small">(11:07:01)</span> <b>marian:</b></span> @mkandes: about GOC upgrade windows ... this is what I have in my notes: 1st and 3rd Tuesdays are ITB upgrade days, and 2nd and 4th Tuesdays are GOC upgrade days<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:07:23)</span> <b>marian:</b></span> so it looks like today it's ITB time<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:08:08)</span> <b>marian:</b></span> if we'd have gWMS 3.2.18 at disposal that'll be maybe good opportunity to deploy on GOC-ITB Factory ... if not, we can plan for that next week<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:10:29)</span> <b>marian:</b></span> and, problem connecting to SDCS factory disappeared, so all good ... haven't checked if github access works too ...<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:29:12)</span> <b>marian:</b></span> btw, httpd was down on <a href="http://test-frontend-1.t2.ucsd.edu">test-frontend-1.t2.ucsd.edu</a> ... brought it up ... my test jobs were failing on: Wed Mar 1 10:47:01 CST 2017 wget <a href="http://test-frontend-1.t2.ucsd.edu/vofrontend/stage/description.g6o8eA.cfg">http://test-frontend-1.t2.ucsd.edu/vofrontend/stage/description.g6o8eA.cfg</a> --user-agent wget/glidein/OSG_US_Hosted_Chicago/schedd_glideins5@glidein-itb.grid.iu.edu/212286.1/test-frontend-1-t2-ucsd-edu_OSG_gWMSFrontend.main --quiet --output-document /scratch/osg/glide_juK98X/client/description.g6o8eA.cfg failed. version:GNU Wget 1.12 built on linux-gnu. exit code 4 stderr:<br/>Wed Mar 1 10:47:01 CST 2017 Failed to load file 'description.g6o8eA.cfg' from '<a href="http://test-frontend-1.t2.ucsd.edu/vofrontend/stage">http://test-frontend-1.t2.ucsd.edu/vofrontend/stage</a>'.<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:29:31)</span> <b>marian:</b></span> testing Suchandra's new entry OSG_US_Hosted_Chicago<br/>
+<span style="color: #bd9336"><span style="font-size: small">(11:53:07)</span> <b>mkandes:</b></span> All sounds good. Thanks, Marian. I think we'll want to put 3.2.18 on GOC-ITB as soon as possible since I suspect OSG Software team will include it in next release.<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:57:22)</span> <b>marian:</b></span> sure<br/>
+<span style="color: #bd9336"><span style="font-size: small">(12:33:05)</span> <b>mkandes:</b></span> @marian, @klarson1: Since I was digging in the HTCondor documentation, here are the descriptions for the proxy-related attributes we discussed in the meeting.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(12:33:07)</span> <b>mkandes:</b></span> ELEGATE_JOB_GSI_CREDENTIALS<br/>A boolean value that defaults to True for HTCondor version 6.7.19 and more recent versions. When True, a job's GSI X.509 credentials are delegated, instead of being copied. This results in a more secure communication when not encrypted.<br/><br/>DELEGATE_FULL_JOB_GSI_CREDENTIALS<br/>A boolean value that controls whether HTCondor will delegate a full or limited GSI X.509 proxy. The default value of False indicates the limited GSI X.509 proxy.<br/><br/>DELEGATE_JOB_GSI_CREDENTIALS_LIFETIME<br/>An integer value that specifies the maximum number of seconds for which delegated proxies should be valid. The default value is one day. A value of 0 indicates that the delegated proxy should be valid for as long as allowed by the credential used to create the proxy. The job may override this configuration setting by using the delegate_job_GSI_credentials_lifetime submit file command. This configuration variable currently only applies to proxies delegated for non-grid jobs and HTCondor-C jobs. It does not currently apply to globus grid jobs, which always behave as though the value is 0. This variable has no effect if DELEGATE_JOB_GSI_CREDENTIALS is False.<br/><br/>DELEGATE_JOB_GSI_CREDENTIALS_REFRESH<br/>A floating point number between 0 and 1 that indicates the fraction of a proxy's lifetime at which point delegated credentials with a limited lifetime should be renewed. The renewal is attempted periodically at or near the specified fraction of the lifetime of the delegated credential. The default value is 0.25. This setting has no effect if DELEGATE_JOB_GSI_CREDENTIALS is False or if DELEGATE_JOB_GSI_CREDENTIALS_LIFETIME is 0. For non-grid jobs, the precise timing of the proxy refresh depends on SHADOW_CHECKPROXY_INTERVAL. To ensure that the delegated proxy remains valid, the interval for checking the proxy should be, at most, half of the interval for refreshing it.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(12:33:48)</span> <b>mkandes:</b></span> Again, I'll make sure we ask @jdost321 about the history here on the lifetime setting.<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:11:01)</span> <b>marian:</b></span> sounds good, thanks<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:34:07)</span> <b>bbockelm:</b></span> @klarson1 - who is the appropriate person to bribe to get Singularity on the FNAL T1?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(13:38:19)</span> <b>klarson1:</b></span> dave mason happens to be in my office and he said mine.  she needs to sign off on something from a security standpoint<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:38:47)</span> <b>bbockelm:</b></span> Sounds good to me.  Will poke via emails.<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:03:14)</span> <b>marian:</b></span> @mkandes @jdost321: this is weird, today I have problem push to git from GOC-ITB ...<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:03:18)</span> <b>marian:</b></span> 2017-03-01 21:01:46 UTC [gfactory@glidein-itb:/etc/osg-gfactory]$ git push<br/>ERROR: Permission to opensciencegrid/osg-gfactory.git denied to zvada.<br/>fatal: The remote end hung up unexpectedly<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:03:45)</span> <b>marian:</b></span> yesterday from GOC-ITB it worked just fine, it didn't from from production SDSC ...<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:04:40)</span> <b>marian:</b></span> has anything changed for the repo? some changes on the top level "opensciencegrid" repo?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:16:07)</span> <b>mkandes:</b></span> @marian: Not that I am aware of. What happens if you ssh -A <a href="http://jump.iu.grid.edu">jump.iu.grid.edu</a> first, instead of one of the uafs?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:16:31)</span> <b>mkandes:</b></span> I think I mean <a href="http://jump.grid.iu.edu">jump.grid.iu.edu</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(15:18:35)</span> <b>marian:</b></span> I tried those alternatives<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:18:44)</span> <b>marian:</b></span> I can't push from any factory<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:18:58)</span> <b>marian:</b></span> just experimenting now<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:19:04)</span> <b>mkandes:</b></span> Hmm. Let me see if it gives me the same error.<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:19:09)</span> <b>marian:</b></span> please, try<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:19:23)</span> <b>marian:</b></span> commit works<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:20:04)</span> <b>mkandes:</b></span> Okay, no problem for me.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:20:05)</span> <b>mkandes:</b></span> 2017-03-01 21:19:35 UTC [gfactory@glidein-itb:/etc/osg-gfactory]$ git push<br/>Counting objects: 7, done.<br/>Delta compression using up to 8 threads.<br/>Compressing objects: 100% (4/4), done.<br/>Writing objects: 100% (4/4), 632 bytes, done.<br/>Total 4 (delta 3), reused 0 (delta 0)<br/>remote: Resolving deltas: 100% (3/3), completed with 3 local objects.<br/>To git@github.com:opensciencegrid/osg-gfactory.git<br/>   1a791a6..0facaf9  master -&gt; master<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:21:29)</span> <b>mkandes:</b></span> It looks like there may be some "key confusion" that's causing the error.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:21:30)</span> <b>mkandes:</b></span> <a href="https://help.github.com/articles/error-permission-to-user-repo-denied-to-user-other-repo/">https://help.github.com/articles/error-permission-to-user-repo-denied-to-user-other-repo/</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(15:21:48)</span> <b>marian:</b></span> well that I read, too<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:22:02)</span> <b>marian:</b></span> but beyond that point I'm not sure what has changed for me<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:22:16)</span> <b>marian:</b></span> ok, so did you push local things for me now?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:22:31)</span> <b>mkandes:</b></span> Yes, COWBOY was pushed.<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:22:34)</span> <b>marian:</b></span> cool<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:22:44)</span> <b>marian:</b></span> gonna restart things before I jump on other stuff I have<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:22:56)</span> <b>mkandes:</b></span> Did you use your regular ssh key as a delay key in a separate GitHub repo?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:23:01)</span> <b>mkandes:</b></span> *deploy<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:23:13)</span> <b>marian:</b></span> well I didn't change anything to my keys<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:23:31)</span> <b>mkandes:</b></span> But have you setup any other GitHub repos recently?<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:23:45)</span> <b>marian:</b></span> for other repo I guess I used other commits<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:24:07)</span> <b>marian:</b></span> but certainly not in last three days and push worked for me yesterday to gfactory git<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:24:21)</span> <b>mkandes:</b></span> Hmmm. Strange.<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:24:26)</span> <b>marian:</b></span> only from GOC-ITB, thoiugh<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:24:31)</span> <b>marian:</b></span> today not from there<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:24:45)</span> <b>marian:</b></span> yeah, there is something funky I don't understand well about git<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:29:15)</span> <b>mkandes:</b></span> It looks like git push has a --verbose option. Maybe try that next time to see if there is something more enlightening.<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:30:41)</span> <b>marian:</b></span> alright, thanks<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:32:48)</span> <b>mkandes:</b></span> Sorry, not much of a git expert either. But it looks like there are  plenty of discussions about a similar problem on google/stackoverflow/etc.<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:33:18)</span> <b>marian:</b></span> yeah, that I skimmed trought before I tried bother here :slightly_smiling_face:<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:33:58)</span> <b>marian:</b></span> (didn't find there anything what helped me)<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:35:28)</span> <b>marian:</b></span> maybe it's something temporarily, too ... let's see<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:35:39)</span> <b>marian:</b></span> thanks for help though1<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:36:48)</span> <b>mkandes:</b></span> No problem.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:32:37)</span> <b>rynge:</b></span> UCD is still having squid problems<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:32:39)</span> <b>rynge:</b></span> <a href="http://xd-login.opensciencegrid.org/monitoring/glideins/entry_CMS_T3_US_UCD_cms/job.4869837.4.out.txt">http://xd-login.opensciencegrid.org/monitoring/glideins/entry_CMS_T3_US_UCD_cms/job.4869837.4.out.txt</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:33:57)</span> <b>rynge:</b></span> Puerto Rico seems to have some networking issue<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:34:08)</span> <b>rynge:</b></span> <a href="http://xd-login.opensciencegrid.org/monitoring/glideins/entry_CMS_T3_US_PuertoRico_UPRM/MasterLog.txt">http://xd-login.opensciencegrid.org/monitoring/glideins/entry_CMS_T3_US_PuertoRico_UPRM/MasterLog.txt</a><br/>
+</body>
+</html>

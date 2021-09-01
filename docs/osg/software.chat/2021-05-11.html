@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue May 11, 2021 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue May 11, 2021 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(09:51:33)</span> <b>blin:</b></span> @matyas <b>@edquist</b> thoughts ^^?<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:54:21)</span> <b>edquist:</b></span> you want to be able to downgrade glideinwms-vofrontend (standalone, core, httpd) from 3.7.3 to 3.6.5 ?<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:55:12)</span> <b>edquist:</b></span> is this related to the thing brian b was saying we don't want to promise downgrades will go smoothly ?<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:55:17)</span> <b>matyas:</b></span> yep<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:07:07)</span> <b>matyas:</b></span> run <tt>yum shell</tt> ; then in the shell, run<br/><pre>uninstall glideinwms-vofrontend-core<br/>uninstall glideinwms-vofrontend-httpd<br/>downgrade glideinvms-vofrontend-standalone &lt; 3.7<br/>commit</pre><br/>
+<span style="color: #16569E"><span style="font-size: small">(10:07:21)</span> <b>edquist:</b></span> there is a yum shell<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:07:26)</span> <b>edquist:</b></span> whoa man<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:07:53)</span> <b>matyas:</b></span> yeah it lets you do multiple things in a single transaction<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:08:15)</span> <b>matyas:</b></span> before they made <tt>yum swap</tt>, this was how you swapped out, e.g. <tt>osg-ca-certs</tt> for <tt>igtf-ca-certs</tt><br/>
+<span style="color: #16569E"><span style="font-size: small">(10:10:58)</span> <b>edquist:</b></span> somehow i have never discovered this<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:12:11)</span> <b>matyas:</b></span> I think you need stackoverflow to find out about this<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:01:08)</span> <b>bbockelm:</b></span> :exploding_head:<br/>
+<span style="color: #dd8527"><span style="font-size: small">(15:37:08)</span> <b>marcom:</b></span> @matyas. @dbox tried it bu did not work<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:38:01)</span> <b>matyas:</b></span> same result?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:40:16)</span> <b>dbox:</b></span> this *almost* worked:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:40:18)</span> <b>dbox:</b></span> remove glideinwms-vofrontend-core<br/>remove glideinwms-vofrontend-httpd<br/>downgrade glideinwms-vofrontend glideinwms-vofrontend-core glideinwms-libs glideinwms-glidecondor-tools glideinwms-condor-common-config glideinwms-minimal-condor  glideinwms-common-tools glideinwms-usercollector glideinwms-userschedd glideinwms-vofrontend-standalone<br/>run<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:40:52)</span> <b>dbox:</b></span> it downgraded the right rpms, but it blew away enough of my original configuration that I can<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:40:58)</span> <b>dbox:</b></span> not do a reconfig<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:43:51)</span> <b>dbox:</b></span> so I guess if I know to save my config first it works<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:46:51)</span> <b>matyas:</b></span> did it move your old config to .rpmsave files?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:57:44)</span> <b>dbox:</b></span> haven't found any rpmsave files yet....<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:58:11)</span> <b>matyas:</b></span> @justas.balcas, did you get a chance to try gridftp for EL8?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(17:59:13)</span> <b>justas.balcas:</b></span> No, I did not. still on todo<br/>
+</body>
+</html>

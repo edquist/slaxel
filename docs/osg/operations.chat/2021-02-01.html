@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Feb 1, 2021 : #operations (osg)</title>
+</head>
+<body>
+<h3>Mon Feb 1, 2021 : #operations (osg)</h3>
+<span style="color: #5a4592"><span style="font-size: small">(09:57:20)</span> <b>lmichael:</b></span> @blin are you the right person to meet with Aaron (Villanova) and cluster vendor to discuss minimum head node requirements for hosted CE integration? <a href="https://support.opensciencegrid.org/a/tickets/66692">https://support.opensciencegrid.org/a/tickets/66692</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:19:10)</span> <b>blin:</b></span> sure<br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:47:35)</span> <b>jthiltges:</b></span> Regarding the topology DNS switchover to tiger... (FD#66599, OPS-45), time to pull the trigger? @dweitzel <b>@edquist</b><br/>Hostname notes: <a href="https://github.com/opensciencegrid/tiger-osg-config/tree/master/manifests/base/osg-topology#production-services">https://github.com/opensciencegrid/tiger-osg-config/tree/master/manifests/base/osg-topology#production-services</a><br/>
+<span style="color: #16569E"><span style="font-size: small">(10:48:09)</span> <b>edquist:</b></span> @matyas too<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:48:49)</span> <b>matyas:</b></span> go ahead, give it a whirl!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:48:56)</span> <b>dweitzel:</b></span> lets do it!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:49:27)</span> <b>dweitzel:</b></span> is the first step me switching the DNS?<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:49:37)</span> <b>edquist:</b></span> i have no objections<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:49:43)</span> <b>edquist:</b></span> do we have to update the webhook payload url?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:50:14)</span> <b>dweitzel:</b></span> in the freshdesk, John notes:<br/><pre>Separately, the topology repo webhooks will need to be updated in Github (coordinated with Carl Edquist?):<br/>prod: <a href="http://topology-webhook.osg.chtc.io">topology-webhook.osg.chtc.io</a><br/>itb: <a href="http://topology-webhook.osgdev.chtc.io">topology-webhook.osgdev.chtc.io</a></pre><br/>
+<span style="color: #16569E"><span style="font-size: small">(10:51:01)</span> <b>edquist:</b></span> that looks right to me<br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:51:14)</span> <b>jthiltges:</b></span> My understanding is that the webhook changes _should_ be done, but whenever it's convenient. As long as they're being handled by a correctly configured host, it doesn't matter where they're run.<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:51:41)</span> <b>edquist:</b></span> erm<br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:52:25)</span> <b>jthiltges:</b></span> _Uncertainty intensifies_<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:52:31)</span> <b>edquist:</b></span> i think the issue we ran into in itb was that the <a href="http://topology-itb.opensciencegrid.org">topology-itb.opensciencegrid.org</a> url was actually a round-robin for two hosts<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:52:46)</span> <b>edquist:</b></span> each of which handled the webhook payloads<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:52:50)</span> <b>dweitzel:</b></span> ok, DNS switched!<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:52:54)</span> <b>edquist:</b></span> which was not what we wanted<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:52:57)</span> <b>dweitzel:</b></span> let the brokeness start!<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:53:06)</span> <b>edquist:</b></span> Enough Thinking!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:53:12)</span> <b>dweitzel:</b></span> map doesn't work.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:53:30)</span> <b>jthiltges:</b></span> Ah, yes on the round-robin issues. The <tt>topology-webhook</tt> entries point to a separate _single_ container.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:53:40)</span> <b>dweitzel:</b></span> topology works.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:53:51)</span> <b>dweitzel:</b></span> <a href="http://map.opensciencegrid.org">map.opensciencegrid.org</a> gives a 404<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:54:43)</span> <b>edquist:</b></span> my only point is that i think the webhook payload url has to change in order for it to continue working<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:54:54)</span> <b>edquist:</b></span> (as opposed to whenever convenient)<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:56:05)</span> <b>edquist:</b></span> anyway, i'll update them now<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:58:03)</span> <b>edquist:</b></span> (updated)<br/>
+<span style="color: #e06b56"><span style="font-size: small">(11:13:35)</span> <b>jthiltges:</b></span> Fixed traefik ingress rule. <a href="http://map.opensciencegrid.org">map.opensciencegrid.org</a> should be working now.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(11:14:19)</span> <b>jthiltges:</b></span> (I hadn't realized CloudFlare would leave the original <tt>Host</tt> header, which in hindsight was a poor assumption)<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:14:39)</span> <b>edquist:</b></span> webhook / auto-merge seems to work<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:14:40)</span> <b>edquist:</b></span> <a href="https://github.com/opensciencegrid/topology/pull/1586">https://github.com/opensciencegrid/topology/pull/1586</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:16:55)</span> <b>dweitzel:</b></span> map works!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:17:24)</span> <b>dweitzel:</b></span> Ok, so everything is working?  How do we update topology software now?<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:18:58)</span> <b>edquist:</b></span> oh wow<br/>
+<span style="color: #e06b56"><span style="font-size: small">(11:19:30)</span> <b>jthiltges:</b></span> Here's what I'd written on updates: <a href="https://github.com/opensciencegrid/tiger-osg-config/tree/master/manifests/base/osg-topology#deploying-updates-proposed">https://github.com/opensciencegrid/tiger-osg-config/tree/master/manifests/base/osg-topology#deploying-updates-proposed</a><br/>Edits or suggestions are welcome!<br/>TLDR: Add tag to github repo, edit <tt>osg-topology/kustomize.yaml</tt> to point to new tag.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:20:19)</span> <b>dweitzel:</b></span> no auto flux update?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(11:21:13)</span> <b>jthiltges:</b></span> I hadn't looked into or configured that. We could certainly do it, but wanted to play it safe to start.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:51:06)</span> <b>matyas:</b></span> let's not do an auto flux update<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:51:17)</span> <b>edquist:</b></span> maybe eventually for itb<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:51:27)</span> <b>edquist:</b></span> def not for prod i imagine<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:52:38)</span> <b>matyas:</b></span> also until we split out topology-client from topology-the-webapp, there will be tags that will have nothing to do with webapp updates<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:58:54)</span> <b>matyas:</b></span> I just found out you can watch a freshdesk ticket by using the star icon to the left of the reply button on the top.<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:59:09)</span> <b>matyas:</b></span> or even add other people as watchers<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:00:05)</span> <b>matyas:</b></span> useful since apparently you don't start watching tickets you don't own even if you add a reply to them (in the web interface)<br/>
+</body>
+</html>

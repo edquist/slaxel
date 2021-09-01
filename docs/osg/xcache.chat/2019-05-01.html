@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed May 1, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Wed May 1, 2019 : #xcache (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(11:22:18)</span> <b>matyas:</b></span> @marian, can you test xcache 1.0.4 from osg-minefield? <tt>yum update --enablerepo=osg-minefield stash\*</tt>.  it's changes to the systemd files to make sure the services wait for the network to start up first, so you just need to update, reboot, and see if things come up successfully<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:24:58)</span> <b>marian:</b></span> yeah, can do ... I'm finishing up last ticket prior to 1.0.3 release (<a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-3544">https://opensciencegrid.atlassian.net/browse/SOFTWARE-3544</a>) ... then will update from osg-minefield if ok?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:25:09)</span> <b>matyas:</b></span> sure<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:34:30)</span> <b>marian:</b></span> @matyas, when testing SOFTWARE-3544 I considered one scenario not listed in the ticket -  we don't want <tt>xrootd@</tt> daemon stop if we explicitelly stop only <tt>cmsd@</tt> ... I think it makes sense, right? However, we want that stopping <tt>xrootd@</tt> first stops also <tt>cmsd@</tt>...<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:55:10)</span> <b>matyas:</b></span> that should be how it works right now<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:55:39)</span> <b>matyas:</b></span> starting xrootd starts cmsd; stopping cmsd only stops cmsd; stopping xrootd stops cmsd as well<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:01:39)</span> <b>marian:</b></span> I have couple of things from the scratch install update documention ... should I file SW tickets or should we discuss separate first?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:05:05)</span> <b>matyas:</b></span> can you make comments in <a href="https://github.com/opensciencegrid/docs/pull/527">https://github.com/opensciencegrid/docs/pull/527</a>?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:06:16)</span> <b>matyas:</b></span> we're waiting for the software release before we merge that pr so we can make changes in the meantime<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:18:33)</span> <b>marian:</b></span> ok, quite a big and several threads ... I try to scan through and see where my comments can fit or create a new PR on top, if OK<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:25:11)</span> <b>marian:</b></span> can you add me there as reviewer, @matyas?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:26:49)</span> <b>matyas:</b></span> done<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:19:25)</span> <b>matyas:</b></span> sorry @marian, can you run the same 'reboot' test on xcache 1.0.5? turns out the services should start after <tt>network-online.target</tt>, not <tt>network.target</tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(15:32:36)</span> <b>marian:</b></span> ok, actually, I will be doing it just now<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:06:39)</span> <b>marian:</b></span> @matyas: actually, shouldn't that be just in the override for given instance (i.e. in /stash-{origin,cache}.service.d/) rather than <tt>{cmsd,xrootd}@.service</tt>?<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:01:05)</span> <b>marian:</b></span> btw, reboot worked... running currently stash-origin on v1.0.5 on my test node, @matyas<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:18:15)</span> <b>marian:</b></span> <b>@here</b>: one picky thing, in the config file <tt>/etc/xrootd/config.d/10-common-site-local.cfg</tt> we have line <tt>set DisableOsgMonitoring = 1</tt>, I'd suggest replace Osg-&gt;OSG or DisableOsgMonitoring-&gt;DisableOSGmonitoring - for the sake of clarity and branding of OSG :wink: ... (dis)agree?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(17:22:43)</span> <b>jthiltges:</b></span> I'd vote for consistency. There's <tt>rootdir</tt>, <tt>resourcename</tt>, and <tt>DisableOsgMonitoring</tt>.<br/>Camel-, snake-, lower-case? Eh. Long as it matches!<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:47:04)</span> <b>marian:</b></span> rigth, for me most matters OSG, should be capitalized... what’s convention for OSG software folks in other packages? We could also do simpler variable: disablemonitoring (no OSG in the varname, similarly to resourcename var)<br/>
+</body>
+</html>

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jun 3, 2020 : #ligo-rucio (osg)</title>
+</head>
+<body>
+<h3>Wed Jun 3, 2020 : #ligo-rucio (osg)</h3>
+<span style="color: #a2a5dc"><span style="font-size: small">(11:41:56)</span> <b>james.clark:</b></span> Hi <b>@channel</b>, no luck i'm afraid:  they've restarted the gridftp service but no change.    Should I read anything into the fact FTS is trying to connect on port 56108 (etc) but their config file TCP port range only goes up to 51000 ?<br/><br/>E.g., From their log:<br/><pre>[3249] Thu Jun  4 01:36:01 2020 :: New connection from: <a href="http://fts.mwt2.org:56108">fts.mwt2.org:56108</a><br/>[3249] Thu Jun  4 01:36:02 2020 :: Closed connection from <a href="http://fts.mwt2.org:56108">fts.mwt2.org:56108</a></pre><br/>and their config file they have:<br/><pre>[ldr@pegasus-01 ~]$ grep PORT_RANGE /etc/gridftp.conf<br/>$GLOBUS_TCP_PORT_RANGE 50000,51000</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:20:19)</span> <b>paschos:</b></span> which gridftp service was restarted?<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:20:31)</span> <b>paschos:</b></span> ah pegasus<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:21:29)</span> <b>paschos:</b></span> can you ask if they have made any changes in their port range? did the restart defaulted those?<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:23:13)</span> <b>paschos:</b></span> our gridftp conf has the same range<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:24:08)</span> <b>paschos:</b></span> does the log contain anything in regards to why the connection is closed?<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(12:27:30)</span> <b>james.clark:</b></span> no, the only stuff that ever comes up is:<br/><pre>[3243] Thu Jun  4 01:36:00 2020 :: Configuration read from /etc/gridftp.conf.<br/>[3243] Thu Jun  4 01:36:00 2020 :: Server started in inetd mode.<br/>[3243] Thu Jun  4 01:36:00 2020 :: New connection from: <a href="http://fts.mwt2.org:55896">fts.mwt2.org:55896</a><br/>[3243] Thu Jun  4 01:36:02 2020 :: Closed connection from <a href="http://fts.mwt2.org:55896">fts.mwt2.org:55896</a><br/>[3248] Thu Jun  4 01:36:01 2020 :: GFork functionality not enabled.:<br/>globus_gfork_lib.c:gfork_l_get_env_fd:458:<br/>GFork error: Env not set</pre><br/><br/>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Sep 26, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Tue Sep 26, 2017 : #gracc (osg)</h3>
+<span style="color: #3c8c69"><span style="font-size: small">(09:39:11)</span> <b>kretzke:</b></span> I’m going to have to set up forwarding from the FNAL GRACC instance to OSG GRACC for our dCache probe… in theory I can use the request agent, but then we need an account on GOC RabbitMQ. @marian should I open a GOC ticket for that?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:40:15)</span> <b>kretzke:</b></span> Or I can use something like the gracc-reprocess script to send records to the gracc-collector, although that’s more the “gratia way”<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:59:59)</span> <b>marian:</b></span> maybe let's do in JIRA and GOC (assuming we don't need anything from GOC people except new account in RabbitMQ?) ... if you can do whole process yourself please keep record of steps for further reference in the JIRA, that we know what has been done. Is that ok, @kretzke? And, cc <a href="mailto:gracc-support@listserv.unl.edu">gracc-support@listserv.unl.edu</a> on GOC ticket for RabbitMQ account request, please ...<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:05:40)</span> <b>kretzke:</b></span> Ok, sounds good, thanks<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:01:38)</span> <b>dweitzel:</b></span> Break everything Tuesday?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:27:03)</span> <b>kretzke:</b></span> isn’t it break everything anyday now?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:32:14)</span> <b>dweitzel:</b></span> Good question.  Not sure.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:32:31)</span> <b>dweitzel:</b></span> @marian could you start back up all the archivers.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:32:38)</span> <b>dweitzel:</b></span> event seems back up (and growing in queue size)<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:34:34)</span> <b>marian:</b></span> yeah, I think it's the day ... is something breaking?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:35:05)</span> <b>dweitzel:</b></span> did you see all the check_mk messages?<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:35:31)</span> <b>marian:</b></span> ah, yeas ... for archivers ...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:35:47)</span> <b>dweitzel:</b></span> yup, restart those<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:36:18)</span> <b>marian:</b></span> will do....<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:36:48)</span> <b>marian:</b></span> I'll check logs for failures too<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:51:35)</span> <b>dweitzel:</b></span> @marian Event is starting to fill up.  Looks like it might crash soon.  What's the status of the archivers?<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:52:34)</span> <b>marian:</b></span> problem with restart graccarchive@transfer.service<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:53:24)</span> <b>dweitzel:</b></span> start the ps archivers, they have a lot of data.<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:53:32)</span> <b>marian:</b></span> that is up<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:54:08)</span> <b>dweitzel:</b></span> nope, they are down.<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:54:31)</span> <b>marian:</b></span> ps-prod.service?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:55:05)</span> <b>dweitzel:</b></span> ps-itb<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:55:31)</span> <b>marian:</b></span> thougth prod would be enough, gotcha<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:55:39)</span> <b>dweitzel:</b></span> I think prod has a bunch of data too.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:55:47)</span> <b>dweitzel:</b></span> but I think some is going to ITB too.<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:56:40)</span> <b>marian:</b></span> ps-itb has an issues to start<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:57:02)</span> <b>dweitzel:</b></span> ok, prod seems like it's clearing the queues.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:57:08)</span> <b>dweitzel:</b></span> maybe ITB doesn't have much data anyways<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:57:34)</span> <b>marian:</b></span> yeah, for prod count increases<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:57:44)</span> <b>marian:</b></span> of cleared queue<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:38:56)</span> <b>dweitzel:</b></span> Yeah. Looks good I think. <br/>
+<span style="color: #53b759"><span style="font-size: small">(13:49:36)</span> <b>marian:</b></span> figuring out ps-itb not working ... looks like something with even-itb changes, talking to Marina now...<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:49:59)</span> <b>marian:</b></span> and, it's all break Tue for production release, indeed<br/>
+</body>
+</html>

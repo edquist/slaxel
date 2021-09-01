@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Nov 17, 2016 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu Nov 17, 2016 : #software (osg)</h3>
+<span style="color: #e96699"><span style="font-size: small">(15:21:16)</span> <b>lincoln:</b></span> <pre><br/>11/17/16 14:41:04 (pid:14391) Submitting machine is "<a href="http://login02.osgconnect.net">login02.osgconnect.net</a>"<br/>Stack dump for process 14391 at timestamp 1479415264 (12 frames)<br/>/usr/lib64/libcondor_utils_8_4_9.so(dprintf_dump_stack+0x12d)[0x7fc8f926e59d]<br/>/usr/lib64/libcondor_utils_8_4_9.so(+0x195c92)[0x7fc8f9248c92]<br/>/lib64/libpthread.so.0(+0x3a3a00f7e0)[0x7fc8f48b27e0]<br/>/lib64/libc.so.6(+0x3a39d3382f)[0x7fc8f464282f]<br/>condor_starter(_ZN9JICShadow18publishStarterInfoEPN14compat_classad7ClassAdE+0x84)[0x55d51a2872f4]<br/>condor_starter(_ZN9JICShadow19registerStarterInfoEv+0x31)[0x55d51a287791]<br/>condor_starter(_ZN9JICShadow4initEv+0xbc)[0x55d51a288f4c]<br/>condor_starter(_ZN8CStarter4InitEP19JobInfoCommunicatorPKcbiii+0x580)[0x55d51a25eee0]<br/>condor_starter(_Z9main_initiPPc+0x67)[0x55d51a274ef7]<br/>/usr/lib64/libcondor_utils_8_4_9.so(_Z7dc_mainiPPc+0x1790)[0x7fc8f9363950]<br/>/lib64/libc.so.6(__libc_start_main+0xfd)[0x7fc8f452dd1d]<br/>condor_starter(+0x24409)[0x55d51a258409]<br/></pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(15:21:18)</span> <b>lincoln:</b></span> my birdie keeps dying<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:23:24)</span> <b>lincoln:</b></span> this is on EL6 on a machine behind a NAT with no unusual config as far as I can tell<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:23:49)</span> <b>lincoln:</b></span> <pre><br/>UID_DOMAIN = <a href="http://login01.osgconnect.net">login01.osgconnect.net</a><br/>TRUST_UID_DOMAIN = True<br/>ALLOW_WRITE = 10.0.0.0/8, 192.170.226.0/23, 127.0.0.1<br/>ALLOW_READ  = 10.0.0.0/8, 192.170.226.0/23, 127.0.0.1<br/>ALLOW_ADMINISTRATOR = 10.0.0.0/8, 192.170.226.0/23, 127.0.0.1<br/><br/>DAEMON_LIST = MASTER, STARTD<br/>START       = (WantStash == True)<br/><br/># Setup partionable slots on this node<br/>SLOT_TYPE_1               = 100%<br/>SLOT_TYPE_1_PARTITIONABLE = TRUE<br/>NUM_SLOTS                 = 1<br/>NUM_SLOTS_TYPE_1          = 1<br/>SlotWeight                = Cpus<br/><br/>CONDOR_HOST = 192.170.227.1<br/>CCB_ADDRESS = $(CONDOR_HOST)<br/><br/>STARTD_CRON_JOBLIST = $(STARTD_CRON_JOBLIST) osgvo<br/>STARTD_CRON_osgvo_EXECUTABLE = /usr/local/bin/osgvo-node-advertise<br/>STARTD_CRON_osgvo_PERIOD = 30m<br/>STARTD_CRON_osgvo_MODE = periodic<br/>STARTD_CRON_osgvo_RECONFIG = true<br/>STARTD_CRON_osgvo_KILL = true<br/>STARTD_CRON_osgvo_ARGS = NONE<br/><br/>HasStash = True<br/>STARTD_EXPRS = HasStash<br/><br/>USER_JOB_WRAPPER=$(LIBEXEC)/wrapper.sh<br/></pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(15:23:52)</span> <b>lincoln:</b></span> any ideas on how to debug?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:25:19)</span> <b>dweitzel:</b></span> did it create a core file?<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:25:29)</span> <b>lincoln:</b></span> where does condor usually spit them out?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:25:36)</span> <b>bbockelm:</b></span> I'm guessing it's choking on the output of the startd_cron.<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:25:46)</span> <b>lincoln:</b></span> alright, ill try removing that and the job wrapper<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:25:50)</span> <b>bbockelm:</b></span> happen to have some quoting / syntax issue?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:25:57)</span> <b>bbockelm:</b></span> nah, it's definitely not the job wrapper.<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:25:59)</span> <b>lincoln:</b></span> alright<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:26:59)</span> <b>dweitzel:</b></span> may not be needed to debug this, but core files should end up in the $(LOG) directory (/var/log/condor ?)<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:27:14)</span> <b>lincoln:</b></span> no core file<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:27:15)</span> <b>dweitzel:</b></span> but you may want to check the value of <tt>CREATE_CORE_FILES</tt> config<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:27:34)</span> <b>lincoln:</b></span> true<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:28:10)</span> <b>lincoln:</b></span> i should also mention it has a 8.5.7 central manager if that matters<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:28:19)</span> <b>lincoln:</b></span> anyhow, trying without the startd cron<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:45:20)</span> <b>lincoln:</b></span> yeah, still getting dumps<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:45:26)</span> <b>lincoln:</b></span> even with the startd cron removed ;(<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:25:38)</span> <b>lincoln:</b></span> looks like it was related to DNS not beign set up correclty on the node. no idea why this makes the startd dump core but whatever. ¯\_(ツ)_/¯<br/>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri May 14, 2021 : #software (osg)</title>
+</head>
+<body>
+<h3>Fri May 14, 2021 : #software (osg)</h3>
+<span style="color: #e96699"><span style="font-size: small">(10:32:01)</span> <b>lincoln:</b></span> can HTCondor compress logs?<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:32:27)</span> <b>lincoln:</b></span> my CE schedd audit logs are sometimes 300MB/day<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:49:23)</span> <b>blin:</b></span> @tannenba ^^<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:57:59)</span> <b>bbockelm:</b></span> @lincoln - send it to syslog instead and "do fancy stuff there".<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:58:12)</span> <b>lincoln:</b></span> ok<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:58:47)</span> <b>bbockelm:</b></span> (actually not sure if audit log can be sent to syslog like normal condor logs can)<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:58:54)</span> <b>lincoln:</b></span> its ok, i have bash and cron<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:59:27)</span> <b>bbockelm:</b></span> I think it's something like <tt>SCHEDD_AUDIT_LOG = SYSLOG</tt> ?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:08:47)</span> <b>bbockelm:</b></span> Some fun plots here...<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:14:52)</span> <b>blin:</b></span> you can transfer files with ROOT?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:21:52)</span> <b>dweitzel:</b></span> I think root means the xroot protocol?  i could be wrong.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:25:55)</span> <b>blin:</b></span> ahh that makes more sense<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:29:06)</span> <b>bbockelm:</b></span> Yeah.  I think that page uses the URL scheme (e.g., <tt>root://</tt>)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:29:37)</span> <b>bbockelm:</b></span> Looking at the FTS plots, I think HTTPS is ~45% of the global FTS traffic by volume.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:30:08)</span> <b>bbockelm:</b></span> (the above graph was just ATLAS)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:30:20)</span> <b>bbockelm:</b></span> Assuming @didavila keeps pushing things through on the CMS side, we should crest over 50% in the next week or so.<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(11:32:58)</span> <b>didavila:</b></span> With 30% of the sites enabling ‘davs’ on Prod, this is how things look at CMS for the last 24hrs<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(11:33:01)</span> <b>didavila:</b></span> <br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:34:06)</span> <b>bbockelm:</b></span> Forward progress!<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(11:54:16)</span> <b>cat:</b></span> Do you have a “before” snapshot, so that we can understand what percentage of transferred data was using GSI-FTP before?<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(11:54:59)</span> <b>cat:</b></span> E.g., are the SRM and Root slices basically unaffected, such that “before” had the GSI-FTP slice as big as the current GSI-FTP + DAVS?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:06:11)</span> <b>bbockelm:</b></span> Well, before if you go back to 2020 davs was simply at zero :slightly_smiling_face: .  I bet we can ask the monit folks to do a percentage-as-a-function-of-time.<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(12:16:32)</span> <b>cat:</b></span> I was just wondering if you had a sense of what davs was taking away from — whether all GridFTP or some of each, etc.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:22:16)</span> <b>bbockelm:</b></span> Ah - to some extent, the "pie" is fixed and HTTP is eating away at GridFTP and SRM.<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(12:27:30)</span> <b>cat:</b></span> Ok, that’s what I was looking for. Thanks!<br/>
+<span style="color: #de5f24"><span style="font-size: small">(13:42:23)</span> <b>macosta:</b></span> Any HTCondor IDTOKEN experts here? I am issuing an idtoken with <tt>-authz ALLOW_DAEMON</tt> and handing it to a remote Schedd, however I’m seeing this authorization issue in logs:<br/><pre>05/14/21 13:35:34 DC_AUTHENTICATE: authentication of &lt;xyz:26541&gt; was successful but result<br/>ed in a limited authorization which did not include this command (1 UPDATE_SCHEDD_AD), so aborting.</pre><br/><br/>
+<span style="color: #de5f24"><span style="font-size: small">(13:42:40)</span> <b>macosta:</b></span> Isn’t DAEMON the highest htcondor auth level before ADMINISTRATOR?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(13:43:10)</span> <b>macosta:</b></span> (Also sorry if this is not the channel to ask these questions at)<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:44:37)</span> <b>matyas:</b></span> with tokens, DAEMON doesn't imply WRITE or READ<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:45:11)</span> <b>matyas:</b></span> so I think you'll need to do <tt>-authz ALLOW_DAEMON -authz ALLOW_WRITE</tt> (and <tt>-authz ALLOW_READ</tt> just in case)<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:47:56)</span> <b>blin:</b></span> does <tt>WRITE</tt> give you <tt>UPDATE_SCHEDD_AD</tt>?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:51:46)</span> <b>matyas:</b></span> dunno. @bbockelm?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(13:56:56)</span> <b>macosta:</b></span> Got another token with <tt>-authz ALLOW_DAEMON -authz ALLOW_READ -authz ALLOW_WRITE</tt> but this time it’s the <tt>UPDATE_MASTER_AD</tt> my collector is complaining about:<br/><pre>05/14/21 13:53:17 DC_AUTHENTICATE: authentication of &lt;130.199.185.32:3376&gt; was successful but resulted in a limited authorization which did not include this command (2 UPDATE_MASTER_AD), so aborting.<br/>05/14/21 13:53:17 DC_AUTHENTICATE: sending session ad:<br/>ReturnCode = "DENIED"<br/>Sid = "dunegpcoll01:216824:1621018397:133"<br/>TriedAuthentication = true<br/>User = "condor_bnl@dune"<br/>ValidCommands = "60029,67,15,2"</pre><br/><br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(13:59:30)</span> <b>blin:</b></span> what's this daemon for? are you advertising the startd to the collector?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:00:27)</span> <b>macosta:</b></span> This token is being placed in a Schedd<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:02:03)</span> <b>matyas:</b></span> try adding <tt>-authz ADVERTISE_MASTER</tt> <tt>-authz ADVERTISE_SCHEDD</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:02:14)</span> <b>blin:</b></span> try <tt>READ</tt> , <tt>ADVERTISE_SCHEDD</tt>, <tt>ADVERTISE_MASTER</tt> as a minimal set<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:02:15)</span> <b>blin:</b></span> ^^<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:02:19)</span> <b>macosta:</b></span> On it<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:05:55)</span> <b>macosta:</b></span> This worked :tada: so it seems like we have to add more granular authz when generating tokens?<br/><pre>condor_token_create -identity condor_bnl@dune -authz ADVERTISE_MASTER -authz ADVERTISE_SCHEDD -authz ALLOW_DAEMON -authz ALLOW_READ</pre><br/><br/>
+</blockquote>
+<span style="color: #73769d"><span style="font-size: small">(13:57:39)</span> <b>tim.theisen:</b></span> DAEMON and ADMINISTRATOR imply WRITE access.<br/>
+<span style="color: #73769d"><span style="font-size: small">(13:58:13)</span> <b>tim.theisen:</b></span> WRITE, NEGOTIATOR, and CONFIG access implies READ access.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:58:25)</span> <b>matyas:</b></span> in ALLOW statements in the config, yes<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:58:28)</span> <b>matyas:</b></span> not in tokens<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:58:42)</span> <b>matyas:</b></span> (got bitten by that one)<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:00:12)</span> <b>tim.theisen:</b></span> ALLOW_DAEMON gives you ALLOW_ADVERTISE_SCHEDD if it is not defined.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:01:07)</span> <b>blin:</b></span> it doesn't appear to in a token?<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:02:22)</span> <b>tim.theisen:</b></span> Yeah, I am talking about config not tokens.<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:02:53)</span> <b>tim.theisen:</b></span> Just found out that they're not consistent.<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:03:06)</span> <b>matyas:</b></span> yep!<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:05:55)</span> <b>macosta:</b></span> This worked :tada: so it seems like we have to add more granular authz when generating tokens?<br/><pre>condor_token_create -identity condor_bnl@dune -authz ADVERTISE_MASTER -authz ADVERTISE_SCHEDD -authz ALLOW_DAEMON -authz ALLOW_READ</pre><br/><br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(13:59:30)</span> <b>blin:</b></span> what's this daemon for? are you advertising the startd to the collector?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:00:27)</span> <b>macosta:</b></span> This token is being placed in a Schedd<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:02:03)</span> <b>matyas:</b></span> try adding <tt>-authz ADVERTISE_MASTER</tt> <tt>-authz ADVERTISE_SCHEDD</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:02:14)</span> <b>blin:</b></span> try <tt>READ</tt> , <tt>ADVERTISE_SCHEDD</tt>, <tt>ADVERTISE_MASTER</tt> as a minimal set<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:02:15)</span> <b>blin:</b></span> ^^<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:02:19)</span> <b>macosta:</b></span> On it<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:05:55)</span> <b>macosta:</b></span> This worked :tada: so it seems like we have to add more granular authz when generating tokens?<br/><pre>condor_token_create -identity condor_bnl@dune -authz ADVERTISE_MASTER -authz ADVERTISE_SCHEDD -authz ALLOW_DAEMON -authz ALLOW_READ</pre><br/><br/>
+</blockquote>
+<span style="color: #43761b"><span style="font-size: small">(14:06:56)</span> <b>blin:</b></span> is <tt>ALLOW_DAEMON</tt> required?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:07:11)</span> <b>matyas:</b></span> I don't think so<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:07:59)</span> <b>blin:</b></span> and technically i think it's <tt>READ</tt> instead of <tt>ALLOW_READ</tt>  but i could be wrong on that one<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:08:47)</span> <b>matyas:</b></span> one sec<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:09:59)</span> <b>matyas:</b></span> <tt>-authz ADVERTISE_MASTER -authz ADVERTISE_SCHEDD -authz READ</tt> according to <a href="https://github.com/htcondor/htcondor/tree/master/build/docker/services#using-the-submit-container">https://github.com/htcondor/htcondor/tree/master/build/docker/services#using-the-submit-container</a><br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:11:26)</span> <b>macosta:</b></span> We just tested, <tt>ALLOW_DAEMON</tt> is in fact not necessary. Thanks guys @matyas @blin @tim.theisen<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:12:25)</span> <b>macosta:</b></span> Also important to note that idtoken authz != config authz … I’ll put in a documentation PR in a sec<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:26:31)</span> <b>bbockelm:</b></span> The authorization name is <tt>DAEMON</tt>, not <tt>ALLOW_DAEMON</tt>.<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:28:58)</span> <b>matyas:</b></span> ah right. I should make a feature request to condor_token_create to strip off <tt>ALLOW_</tt> from the arguments<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:29:06)</span> <b>matyas:</b></span> I've fallen for that one too<br/>
+<span style="color: #a72f79"><span style="font-size: small">(19:31:07)</span> <b>andrew.melo:</b></span> oh hey -- <a href="https://stackoverflow.blog/2021/05/11/testing-software-so-its-reliable-enough-for-space/">https://stackoverflow.blog/2021/05/11/testing-software-so-its-reliable-enough-for-space/</a><br/><br/><pre>The CI environment is based on [HT Condor], a workload management system for compute-intensive jobs that originated with the High Throughput Computing Group at the University of Wisconsin Madison. It's prized at SpaceX for its powerful queueing, job prioritization, and resource management capabilities – particularly for the HITL testbeds (more on those later).<br/><br/>Condor manages workloads similar to a traditional batch system, but can make better use of idle computer resources. Ishimoticha says, "we run about a million CI builds a month."</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(19:32:44)</span> <b>matyas:</b></span> nice!<br/>
+<span style="color: #a72f79"><span style="font-size: small">(19:33:15)</span> <b>andrew.melo:</b></span> pretty nice shoutout there to the Condor folks<br/>
+<span style="color: #c386df"><span style="font-size: small">(19:34:08)</span> <b>matyas:</b></span> good find! I passed it on<br/>
+</body>
+</html>

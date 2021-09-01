@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Aug 24, 2018 : #software (osg)</title>
+</head>
+<body>
+<h3>Fri Aug 24, 2018 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(10:12:23)</span> <b>blin:</b></span> @sthapa @efajardo do you guys have access to a test xrootd instance?<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:29:19)</span> <b>efajardo:</b></span> Well I have access to many, but now a days xrootd is used for everything, do you need a cache? or just an xrootd door? or a redirector?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:32:42)</span> <b>blin:</b></span> doesn't matter to me as long as it's using xrootd-lcmaps<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:33:03)</span> <b>blin:</b></span> i want to see if the <tt>--policy</tt> option works with xrootd-lcmap's <tt>authzfunparms</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(11:33:17)</span> <b>blin:</b></span> Bockjoo says that it doesn't work, even with the latest xrootd-lcmaps<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:38:28)</span> <b>efajardo:</b></span> Well<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:38:44)</span> <b>efajardo:</b></span> I have some containers we can try it on, although at least the lcmaps part<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:38:53)</span> <b>efajardo:</b></span> otherwise we can ask @tmartin<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:44:30)</span> <b>blin:</b></span> yeah, i'm curious to see if you can set <tt>--policy,authorize_only</tt> and use the standard lcmaps.db that we recommend for voms lcmaps authz<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:21:35)</span> <b>efajardo:</b></span> ok<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:22:01)</span> <b>efajardo:</b></span> hmmm<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:22:10)</span> <b>efajardo:</b></span> let me think about that in a cache or in a door?<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(12:23:48)</span> <b>blin:</b></span> i don't think it matters? whatever's easiest to set up<br/>
+</blockquote>
+<span style="color: #a72f79"><span style="font-size: small">(12:22:51)</span> <b>andrew.melo:</b></span> Is it possible to add <tt>.cvmfsdirtab</tt> entries to the oasis repo?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:23:07)</span> <b>andrew.melo:</b></span> btw, @blin I have an extra xrootd box sitting around<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:23:57)</span> <b>blin:</b></span> does it use xrootd-lcmaps?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:24:15)</span> <b>andrew.melo:</b></span> I turned off GUMS, so I presume it does<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:36:25)</span> <b>efajardo:</b></span> @blin so the default lcmpas.db<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:41:25)</span> <b>blin:</b></span> well, the default lcmaps.db is different than say what you get after you run osg-configure<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:41:33)</span> <b>efajardo:</b></span> <tt>  -authzfunparms:--policy,authorize_only,--lcmapscfg,/etc/lcmaps.db,--loglevel,5|useglobals </tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:41:37)</span> <b>efajardo:</b></span> ?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:42:25)</span> <b>blin:</b></span> <br/>
+<span style="color: #43761b"><span style="font-size: small">(12:42:32)</span> <b>blin:</b></span> yeah, that looks good<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:44:31)</span> <b>efajardo:</b></span> The default one looks bad<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:44:34)</span> <b>efajardo:</b></span> <pre>lcmaps[1137]   LOG_DEBUG: 2018-08-24.17:42:47Z: lcmaps.mod-lcmaps_startPluginManager(): initializing plugin lcmaps_gums_client.mod (db entry 0)<br/>lcmaps[1137]   LOG_DEBUG: 2018-08-24.17:42:47Z: Looking for lcmaps_gums_client.mod at /usr/lib64/lcmaps/lcmaps_gums_client.mod...<br/>lcmaps[1137]     LOG_ERR: 2018-08-24.17:42:47Z: lcmaps.mod-PluginInit(): plugin lcmaps_gums_client.mod not found (arguments: -resourcetype ce -actiontype execute-now -capath /etc/grid-security/certificates -cert   /etc/grid-security/hostcert.pem -key    /etc/grid-security/hostkey.pem --cert-owner root --endpoint <a href="https://yourgums.yourdomain:8443/gums/services/GUMSXACMLAuthorizationServicePort)">https://yourgums.yourdomain:8443/gums/services/GUMSXACMLAuthorizationServicePort)</a><br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:45:59)</span> <b>blin:</b></span> try the one i attached above<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:46:35)</span> <b>efajardo:</b></span> I feel with all due respect<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:46:52)</span> <b>efajardo:</b></span> that the fact the default <tt>/etc/lcmaps.db</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:47:10)</span> <b>efajardo:</b></span> fails immediatly<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:47:16)</span> <b>efajardo:</b></span> is very bad<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:49:25)</span> <b>efajardo:</b></span> @blin<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:49:27)</span> <b>efajardo:</b></span> This is the result<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:50:04)</span> <b>efajardo:</b></span> <br/>
+<span style="color: #43761b"><span style="font-size: small">(12:50:48)</span> <b>blin:</b></span> i forget the exact decision behind retaining the original lcmaps.db, @matyas may remember<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:51:34)</span> <b>blin:</b></span> it may just be a holdover from how we offered gums vs gridmap vs lcmaps voms as separate options so we couldn't have a single lcmaps.db that satisfied all of them<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:51:43)</span> <b>matyas:</b></span> yeah probably that<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:52:04)</span> <b>blin:</b></span> so instead we have users configure it after installation, either via osg-configure or via documentation<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:52:08)</span> <b>matyas:</b></span> the default lcmaps.db used to be gums and the host wasn't configured so people were used to having to edit it anyway<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:52:32)</span> <b>matyas:</b></span> i.e. it never worked out of the box, it always had to be configured<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:52:48)</span> <b>matyas:</b></span> on the other hand, lcmaps was not turned on by default<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:53:19)</span> <b>matyas:</b></span> you had to stick some magic file into your grid-security directory to tell globus to use lcmaps<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:53:22)</span> <b>matyas:</b></span> or something like that<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:53:55)</span> <b>andrew.melo:</b></span> my config management is cargo-culted to hell with a bunch of attempts to get lcmaps turned on, I never figured out what was the minimal set of changes<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:54:13)</span> <b>matyas:</b></span> :man-facepalming:<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:54:20)</span> <b>matyas:</b></span> not surprised though<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:55:02)</span> <b>matyas:</b></span> basically the reason we have lcmaps stuff in osg-configure was because lcmaps is such a pain to configure<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:55:41)</span> <b>efajardo:</b></span> @blin do you want some more xrootd tests?<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(12:55:59)</span> <b>blin:</b></span> nope, that tells me enough. thanks!<br/>
+</blockquote>
+<span style="color: #c386df"><span style="font-size: small">(12:55:57)</span> <b>matyas:</b></span> but people that use config management no longer run osg-configure<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:56:10)</span> <b>andrew.melo:</b></span> Yeah, unfortunately getting osg-configure to work right with config management was a bear. I ended up doing osg-configure manually once, seeing what changed and then put that into management<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:57:36)</span> <b>matyas:</b></span> yeah we never figured out how to deal with that<br/>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jun 9, 2021 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Jun 9, 2021 : #software (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(13:27:05)</span> <b>dweitzel:</b></span> Is koji running on Tiger now?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:27:29)</span> <b>matyas:</b></span> not the hub or website<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:28:12)</span> <b>dweitzel:</b></span> thanks!<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:28:25)</span> <b>blin:</b></span> we have a dev and prod builder on there<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:31:12)</span> <b>dweitzel:</b></span> Should we split the "Koji" line in the service catalog to "Website" and "Builders"?  That way we can say "Yes" to the builders being in service Orchestration?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:32:03)</span> <b>blin:</b></span> well, we don't have /all/ the builders in there so uhh, it's your call<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:33:04)</span> <b>dweitzel:</b></span> Yes, as leader of Ops... wait a minute...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:33:16)</span> <b>dweitzel:</b></span> I don't think it's my call at all.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:33:26)</span> <b>dweitzel:</b></span> But I will have the discussion with BrianB.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:34:01)</span> <b>dweitzel:</b></span> FWIW, I also need to talk to him about GRACC.  GRACC, all ~15 or so containers, are 1 line in the service catalog.  So at what point do we say it's in service orchestration?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:34:07)</span> <b>dweitzel:</b></span> When we tip over 50%?  100%?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:34:42)</span> <b>matyas:</b></span> The "primary" builders are in k8s<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:35:20)</span> <b>matyas:</b></span> actually all the builders that are currently enabled are in k8s<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:36:20)</span> <b>matyas:</b></span> we have a VM that we haven't decommissioned just-in-case<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:36:30)</span> <b>blin:</b></span> oh, sick<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:36:47)</span> <b>matyas:</b></span> I'm a pack rat :slightly_smiling_face:<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:37:17)</span> <b>matyas:</b></span> actually we can probably turn it off at this point; it's el7 only and I told Lincoln we no longer need his el8 builder<br/>
+<blockquote>
+<span style="color: #c386df"><span style="font-size: small">(13:43:00)</span> <b>matyas:</b></span> @blin I made an inf ticket to get rid of it<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:43:20)</span> <b>blin:</b></span> :tada: now we're really cooking with devops<br/>
+</blockquote>
+<span style="color: #c386df"><span style="font-size: small">(13:37:29)</span> <b>matyas:</b></span> so if both our kubernetes builders go down, we're screwed anyway<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:40:45)</span> <b>matyas:</b></span> yeah so Derek if you split Koji into builders and website, then builders are in service orchestration.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:03:21)</span> <b>rynge:</b></span> For sites, what is the relationship between <tt>OSG_SQUID_LOCATION</tt> and <tt>http_proxy</tt>? Is <tt>http_proxy</tt> never touched, and is just set separately from <tt>OSG_SQUID_LOCATION</tt>?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:43:31)</span> <b>bbockelm:</b></span> :ducks:<br/><br/><tt>OSG_SQUID_LOCATION</tt> was what grid people invented before they realized that <tt>http_proxy</tt> already existed.  The difference is so muddied and subjective...<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:49:39)</span> <b>rynge:</b></span> Yeah, this is related to our transfer method discussion<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:50:35)</span> <b>rynge:</b></span> Looks like OSG VO check http_proxy and OSG_SQUID_LOCATION in that order, and if it works, will set http_proxy in the job wrapper<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:51:16)</span> <b>rynge:</b></span> But that does not mean http_proxy is set for the htcondor daemons, and thus modifying <tt>HasFileTransferPluginMethods</tt> might be incorrect<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:54:30)</span> <b>rynge:</b></span> But I think I have it implemented as we discussed<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:55:03)</span> <b>matyas:</b></span> Is OSG_SQUID_LOCATION used for CVMFS?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:02:02)</span> <b>bbockelm:</b></span> nope.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:03:45)</span> <b>bbockelm:</b></span> So - worst case scenario, we don't allow URL-based file transfers for <tt>http://</tt> in some cases where it would have worked?  I'm OK with that.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:25:51)</span> <b>rynge:</b></span> Yeah, I figured - that is how it is implemented<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:26:05)</span> <b>rynge:</b></span> At least we should be able to identify some sites with bad config<br/>
+</body>
+</html>

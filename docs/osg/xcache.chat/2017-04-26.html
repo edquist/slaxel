@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Apr 26, 2017 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Wed Apr 26, 2017 : #xcache (osg)</h3>
+<span style="color: #84b22f"><span style="font-size: small">(08:55:08)</span> <b>ivukotic:</b></span> hi again… looking at the data collected:<br/>
+<span style="color: #84b22f"><span style="font-size: small">(08:55:52)</span> <b>ivukotic:</b></span> I see a lot of timeouts for a single user. When I tried accessing his data using xrdcp everything worked:<br/>
+<span style="color: #84b22f"><span style="font-size: small">(08:55:52)</span> <b>ivukotic:</b></span> ~ &gt;xrdcp  -f  <a href="root://redirector.osgstorage.org://user/ldunwoo/public/kinc-1492724350/00/00/Hsapiens-9606-20170413-467-Quantile_Normalized-CGGA_NormalBrain_CufflinksHisatFPKM-v1_SMALL_RANGE_REMOVED.tar.gz">root://redirector.osgstorage.org://user/ldunwoo/public/kinc-1492724350/00/00/Hsapiens-9606-20170413-467-Quantile_Normalized-CGGA_NormalBrain_CufflinksHisatFPKM-v1_SMALL_RANGE_REMOVED.tar.gz</a> /dev/null<br/>[349.9MB/349.9MB][100%][==================================================][349.9MB/s]<br/>
+<span style="color: #84b22f"><span style="font-size: small">(08:57:29)</span> <b>ivukotic:</b></span> it also works with stashcp.<br/>
+<span style="color: #84b22f"><span style="font-size: small">(08:58:11)</span> <b>ivukotic:</b></span> do you have any idea why does it timeout for him/her?<br/>
+<span style="color: #84b22f"><span style="font-size: small">(09:09:25)</span> <b>ivukotic:</b></span> Also can you point me to the docs explaining error codes we write? In this case the first two tries ended with error codes 52<br/>
+<span style="color: #84b22f"><span style="font-size: small">(09:12:56)</span> <b>ivukotic:</b></span> Also what is “destination_space” ? It seems to always be 1.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(09:14:29)</span> <b>bala:</b></span> Here is error from the user - srcole<br/>
+<span style="color: #e7392d"><span style="font-size: small">(09:14:31)</span> <b>bala:</b></span> Username: srcole<br/>21 jobs out of 203 failed<br/><br/>Error message<br/>-----------------<br/>hostname: Unknown host<br/>Run: [ERROR] Operation expired<br/>2017-04-25T16:37:42+0000 root         WARNING  XrdCP from cache failed on <a href="root://its-condor-xrootd1.syr.edu">root://its-condor-xrootd1.syr.edu</a>, pulling from main redirector<br/>Run: [ERROR] Operation expired<br/>2017-04-25T16:39:28+0000 root         ERROR    stashcp failed after 3 attempts<br/><br/>Failed Caches<br/>----------------<br/><br/> 1 <a href="root://hcc-stash.unl.edu">root://hcc-stash.unl.edu</a><br/> 16 <a href="root://its-condor-xrootd1.syr.edu">root://its-condor-xrootd1.syr.edu</a><br/> 29 <a href="root://mwt2-stashcache.campuscluster.illinois.edu">root://mwt2-stashcache.campuscluster.illinois.edu</a><br/> 3 <a href="root://xrd-cache-1.t2.ucsd.edu">root://xrd-cache-1.t2.ucsd.edu</a><br/>
+<span style="color: #e7392d"><span style="font-size: small">(09:15:30)</span> <b>bala:</b></span> For this user the failure rate is about 20% (21 out of 203)<br/>
+<span style="color: #84b22f"><span style="font-size: small">(09:20:30)</span> <b>ivukotic:</b></span> well I checked this user and got only 99 transfers all of them successes. The first record I have from his jobs was at 21:13..<br/>
+<span style="color: #e7392d"><span style="font-size: small">(09:24:20)</span> <b>bala:</b></span> the failed jobs were  attempted on Apr 25 around 11 - 12.30<br/>
+<span style="color: #84b22f"><span style="font-size: small">(09:26:01)</span> <b>ivukotic:</b></span> that we don’t have recorded as I was changing collector at that time.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:13:30)</span> <b>dweitzel:</b></span> Has this user continued to see failures?  I know the stash origin was heavily overloaded yesterday: <a href="http://ganglia.mwt2.org/?r=week&amp;cs=&amp;ce=&amp;m=load_one&amp;c=Head&amp;h=stash.osgconnect.net&amp;tab=m&amp;vn=&amp;hide-hf=false&amp;mc=2&amp;z=medium&amp;metric_group=ALLGROUPS">http://ganglia.mwt2.org/?r=week&amp;cs=&amp;ce=&amp;m=load_one&amp;c=Head&amp;h=stash.osgconnect.net&amp;tab=m&amp;vn=&amp;hide-hf=false&amp;mc=2&amp;z=medium&amp;metric_group=ALLGROUPS</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:13:46)</span> <b>dweitzel:</b></span> If the origin can't send the data to the caches, that could certainly explain the failures.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:26:53)</span> <b>bala:</b></span> ah, ok. could be the origin. let me ask him to submit additional jobs and see if he sees any trouble.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:31:20)</span> <b>bala:</b></span> ok, send a message to srcole.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:33:02)</span> <b>bala:</b></span> a related q. if origin fails, we also have problem in collecting the failure or should we have that data available in the collector (or in ES index)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:54:48)</span> <b>dweitzel:</b></span> That data should be in the ES index.<br/>
+</body>
+</html>

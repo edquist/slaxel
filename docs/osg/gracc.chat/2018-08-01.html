@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Aug 1, 2018 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Wed Aug 1, 2018 : #gracc (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(09:28:21)</span> <b>blin:</b></span> hey @sbhat what would it take to get a monthly report of the top-10 CEs in core hours that have <tt>OIM_Site</tt> set to <tt>N/A</tt>?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:42:59)</span> <b>blin:</b></span> also, does GRACC ignore CEs that are marked as inactive?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:44:15)</span> <b>blin:</b></span> both the AGLT2 and FNAL CE are both in the topology but their <tt>OIM_Site</tt> is still coming up as <tt>N/A</tt> <a href="https://gracc.opensciencegrid.org/kibana/app/kibana#/visualize/create?type=table&amp;indexPattern=gracc.osg.summary&amp;_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now%2Fy,mode:quick,to:now))&amp;_a=(filters:!(),linked:!f,query:(query_string:(query:'OIM_Site:%22N%2FA%22')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(field:CoreHours),schema:metric,type:sum),(enabled:!t,id:'2',params:(field:ProbeName,order:desc,orderBy:'1',size:5),schema:bucket,type:terms)),listeners:(),params:(perPage:10,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum,type:table),title:'New%20Visualization',type:table))">https://gracc.opensciencegrid.org/kibana/app/kibana#/visualize/create?type=table&amp;indexPattern=gracc.osg.summary&amp;_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now%2Fy,mode:quick,to:now))&amp;_a=(filters:!(),linked:!f,query:(query_string:(query:'OIM_Site:%22N%2FA%22')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(field:CoreHours),schema:metric,type:sum),(enabled:!t,id:'2',params:(field:ProbeName,order:desc,orderBy:'1',size:5),schema:bucket,type:terms)),listeners:(),params:(perPage:10,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum,type:table),title:'New%20Visualization',type:table))</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(09:54:00)</span> <b>blin:</b></span> @dweitzel maybe you know more about the GRACC summary wrt to inactive sites in the topology<br/>
+<span style="color: #aba727"><span style="font-size: small">(10:26:52)</span> <b>sbhat:</b></span> hi @blin:  it shouldn't take much, but I'm not sure we (FNAL) have the effort to work on it now.  How soon would you like it?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:06:26)</span> <b>blin:</b></span> it's not an emergency<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:28:01)</span> <b>blin:</b></span> @sbhat can you speak to the GRACC summary records wrt to CEs marked as inactive in topology?<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:50:26)</span> <b>sbhat:</b></span> I want to say that yes, we ignore inactive ones, but I'm checking<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:54:46)</span> <b>blin:</b></span> if we do, we shouldn't<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:55:39)</span> <b>sbhat:</b></span> here's the wonderfully long OIM topology URL we get the topology info from<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:55:42)</span> <b>blin:</b></span> active = false means that the site wants to stop accepting jobs<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:55:42)</span> <b>sbhat:</b></span> <a href="https://my.opensciencegrid.org/rgsummary/xml?summary_attrs_showhierarchy=on&amp;summary_attrs_showwlcg=on&amp;summary_attrs_showservice=on&amp;summary_attrs_showfqdn=on&amp;summary_attrs_showvoownership=on&amp;summary_attrs_showcontact=on&amp;gip_status_attrs_showtestresults=on&amp;downtime_attrs_showpast=&amp;account_type=cumulative_hours&amp;ce_account_type=gip_vo&amp;se_account_type=vo_transfer_volume&amp;bdiitree_type=total_jobs&amp;bdii_object=service&amp;bdii_server=is-osg&amp;all_resources=on&amp;facility_sel%5B%5D=10009&amp;gridtype=on&amp;gridtype_1=on&amp;active=on&amp;active_value=1&amp;disable_value=1">https://my.opensciencegrid.org/rgsummary/xml?summary_attrs_showhierarchy=on&amp;summary_attrs_showwlcg=on&amp;summary_attrs_showservice=on&amp;summary_attrs_showfqdn=on&amp;summary_attrs_showvoownership=on&amp;summary_attrs_showcontact=on&amp;gip_status_attrs_showtestresults=on&amp;downtime_attrs_showpast=&amp;account_type=cumulative_hours&amp;ce_account_type=gip_vo&amp;se_account_type=vo_transfer_volume&amp;bdiitree_type=total_jobs&amp;bdii_object=service&amp;bdii_server=is-osg&amp;all_resources=on&amp;facility_sel%5B%5D=10009&amp;gridtype=on&amp;gridtype_1=on&amp;active=on&amp;active_value=1&amp;disable_value=1</a><br/>
+<span style="color: #aba727"><span style="font-size: small">(11:56:09)</span> <b>sbhat:</b></span> so if a CE isn't listed there, we won't bring in topology info for it<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:56:19)</span> <b>blin:</b></span> i think you want to get rid of <tt>&amp;active=on&amp;active_value=1</tt><br/>
+<span style="color: #aba727"><span style="font-size: small">(11:56:24)</span> <b>sbhat:</b></span> exactly<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:56:28)</span> <b>sbhat:</b></span> let me see if that works<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:56:32)</span> <b>sbhat:</b></span> because then it's a quick change<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:57:10)</span> <b>sbhat:</b></span> <tt>active=on</tt> shows the active field, right?<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:57:16)</span> <b>sbhat:</b></span> or am I mistaken?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:57:32)</span> <b>blin:</b></span> <tt>active=on</tt> turns on filtering based on the <tt>active</tt> field<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:57:45)</span> <b>sbhat:</b></span> ah<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:57:55)</span> <b>blin:</b></span> <tt>active_value=1</tt> filters out the inactive resources<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:58:08)</span> <b>sbhat:</b></span> and yep - taking both of those out makes AGLT2 and the FNAL CE show up<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:58:15)</span> <b>blin:</b></span> yup, perfect<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:58:21)</span> <b>sbhat:</b></span> so I'll submit a PR<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:58:44)</span> <b>sbhat:</b></span> since :shocked_face_with_exploding_head: we have it hardcoded (it's one of those things we wanted to move out to the config....when there was effort<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:58:53)</span> <b>blin:</b></span> what repo controls the summary stuff?<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:59:04)</span> <b>sbhat:</b></span> <a href="https://github.com/opensciencegrid/gracc-request/">https://github.com/opensciencegrid/gracc-request/</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(11:59:20)</span> <b>blin:</b></span> i was looking for it to submit a PR but couldn't find it - granted i didn't look very long<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:59:20)</span> <b>sbhat:</b></span> the module in question for topology is <a href="https://github.com/opensciencegrid/gracc-request/blob/master/src/graccreq/oim/OIMTopology.py">https://github.com/opensciencegrid/gracc-request/blob/master/src/graccreq/oim/OIMTopology.py</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(11:59:30)</span> <b>blin:</b></span> cool thanks<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:59:37)</span> <b>sbhat:</b></span> np<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:59:38)</span> <b>blin:</b></span> maybe next time ill submit PRs instead of harassing you to do it :slightly_smiling_face:<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:59:40)</span> <b>sbhat:</b></span> LOL<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:00:12)</span> <b>sbhat:</b></span> I'm happy to help and do these quick ones - whatever I can justify to my superiors as "no, I'm not spending effort that we don't have on OSG stuff..."<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:00:31)</span> <b>blin:</b></span> and that's much appreciated!<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:04:17)</span> <b>sbhat:</b></span> oh thank god<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:04:23)</span> <b>sbhat:</b></span> we did have time to move it to the config file<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:04:34)</span> <b>sbhat:</b></span> I missed that in my initial look at this<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:04:37)</span> <b>sbhat:</b></span> so it's just a config file change<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:04:52)</span> <b>sbhat:</b></span> @dweitzel, @marian - do you need a PR for that or should I just give you the new URL?<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:10:14)</span> <b>sbhat:</b></span> (this is for gracc-request)<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:11:39)</span> <b>marian:</b></span> I'd suggest keep the history, so do PR as you're at it ... does that part go into rpm? should I rebuild?<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:13:32)</span> <b>sbhat:</b></span> cool - will do the PR.  I'm not sure about the RPM.  Derek handles that, I believe<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:13:48)</span> <b>sbhat:</b></span> I can check the spec file<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:14:26)</span> <b>sbhat:</b></span> it looks like it does go into the RPM:<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:14:58)</span> <b>sbhat:</b></span> <a href="https://github.com/opensciencegrid/gracc-request/blob/master/config/gracc-request.spec#L68">https://github.com/opensciencegrid/gracc-request/blob/master/config/gracc-request.spec#L68</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(12:16:52)</span> <b>matyas:</b></span> wait I thought active=false meant the site wasn't ready _yet_<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:17:30)</span> <b>matyas:</b></span> s/site/resource<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:17:58)</span> <b>matyas:</b></span> and disable=true means the resource is... done existing?<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:20:20)</span> <b>ian_cancercomputer:</b></span> ...this sounds problematic for other reasons too — for instance, is there a case where a resource (ie CE) or site is disabled due to being down/removed and then reinstated?  I could see CancerComputer triggering this case at some point..<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:21:10)</span> <b>matyas:</b></span> hmm. isn't that what downtime is for? or is downtime wlcg-specific and others don't look at it?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:21:23)</span> <b>blin:</b></span> active = false, effectively means that the site isn't taking jobs<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:21:55)</span> <b>blin:</b></span> disable = true, the resource is done existing, like you said<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:22:15)</span> <b>blin:</b></span> we can only move from active = false -&gt; disable = true after 1y after the last gracc record<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:22:16)</span> <b>ian_cancercomputer:</b></span> In CCs case, we don’t own the DCs we are in, so if there is a management change or a buyout (which is happening a lot), we may have to tear down and renegotiate our existence in that DC.  <br/>
+<span style="color: #e96699"><span style="font-size: small">(12:22:53)</span> <b>ian_cancercomputer:</b></span> Thx Brian, that clears up what would happen for all cases I could conceive<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:24:14)</span> <b>matyas:</b></span> wait, I thought we moved from disable = true to deleting it 1y after the last gracc record<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:25:35)</span> <b>sbhat:</b></span> @blin: <a href="https://github.com/opensciencegrid/gracc-request/pull/70">https://github.com/opensciencegrid/gracc-request/pull/70</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:25:36)</span> <b>blin:</b></span> looking at the link shreyas gave us, they completely ignore disabled resources<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:25:59)</span> <b>blin:</b></span> so <tt>disabled = true</tt> == deleted, effectively<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:26:52)</span> <b>matyas:</b></span> ugh. can we document what these things mean? i feel like they keep changing<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:34:47)</span> <b>matyas:</b></span> does that mean we can just get rid of the 'disable' attrib in the yamls, always have it be false, and delete stuff instead of marking it disabled?<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(12:54:46)</span> <b>blin:</b></span> yea, i think that's the case for resources since presumably no one is looking at disabled resources<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:07:26)</span> <b>matyas:</b></span> cern appears to be<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:08:25)</span> <b>matyas:</b></span> <tt><a href="http://dashb-ssb-002.cern.ch">dashb-ssb-002.cern.ch</a> - - [01/Aug/2018:13:05:54 -0500] "GET /rgdowntime/xml?datasource=downtime&amp;account_type=cumulative_hours&amp;start_type=7daysago&amp;end_type=now&amp;all_resources=on&amp;voown=on&amp;voown_3=on&amp;active_value=1&amp;disable_value=1&amp;downtime_attrs_showpast=9 HTTP/1.0" 200 8633 "-" "Python-urllib/1.17"</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(13:08:40)</span> <b>matyas:</b></span> ... wait a minute<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:09:11)</span> <b>matyas:</b></span> they are not actually filtering for disabled resources, they only think they are<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:26:53)</span> <b>blin:</b></span> because they don't set <tt>disable=on</tt>?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:34:32)</span> <b>matyas:</b></span> yep<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:38:37)</span> <b>blin:</b></span> can you cross-reference that against the queries we have in our design doc to see who's asking for that?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:39:09)</span> <b>blin:</b></span> if it's not in the design doc we should probably reach out to stephan lammel, alexey, and guenter<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:07:02)</span> <b>matyas:</b></span> maybe we should go through the server logs and list all the ones we see in queries that are redundant or used incorrectly<br/>
+<span style="color: #43761b"><span style="font-size: small">(2018-08-02 13:34:04)</span> <b>blin:</b></span> that sounds pretty good to me<br/>
+<span style="color: #43761b"><span style="font-size: small">(2018-08-02 13:34:22)</span> <b>blin:</b></span> though it'd be good to be able to link hosts making the requests to people<br/>
+</blockquote>
+<span style="color: #43761b"><span style="font-size: small">(12:53:07)</span> <b>blin:</b></span> they keep changing because we keep learning new things, unfortunately<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:53:39)</span> <b>blin:</b></span> and/or we're not looking closely enough at the queries that people are using<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:55:57)</span> <b>sbhat:</b></span> Brian - how urgent is this change?<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:56:14)</span> <b>sbhat:</b></span> can it wait on the order of a few days/few weeks?<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:56:14)</span> <b>sbhat:</b></span> (hopefully the former)<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:57:00)</span> <b>sbhat:</b></span> one of the unit tests failed because it uses outdated information<br/>
+</body>
+</html>

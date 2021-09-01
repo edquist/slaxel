@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Mar 9, 2021 : #uscms (osg)</title>
+</head>
+<body>
+<h3>Tue Mar 9, 2021 : #uscms (osg)</h3>
+<span style="color: #7d414c"><span style="font-size: small">(13:31:58)</span> <b>bockjoo:</b></span> My xrootd redirector is not visible from the global redirector:<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:32:16)</span> <b>bockjoo:</b></span> <tt>xrdcp -d 1 -f <a href="root://cmsio5.rc.ufl.edu//store/mc/SAM/GenericTTbar/AODSIM/CMSSW_9_0_0_90X_mcRun1_realistic_v4-v1/10000/28B9D1FB-8B31-E711-AA4E-0025905B85B2.root">root://cmsio5.rc.ufl.edu//store/mc/SAM/GenericTTbar/AODSIM/CMSSW_9_0_0_90X_mcRun1_realistic_v4-v1/10000/28B9D1FB-8B31-E711-AA4E-0025905B85B2.root</a> /dev/null</tt><br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:32:23)</span> <b>bockjoo:</b></span> is OK, but not<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:32:32)</span> <b>bockjoo:</b></span> xrdcp -d 1 -f  <a href="root://cms-xrd-global.cern.ch//store/test/xrootd/T2_US_Florida//store/mc/SAM/GenericTTbar/AODSIM/CMSSW_9_0_0_90X_mcRun1_realistic_v4-v1/10000/28B9D1FB-8B31-E711-AA4E-0025905B85B2.root">root://cms-xrd-global.cern.ch//store/test/xrootd/T2_US_Florida//store/mc/SAM/GenericTTbar/AODSIM/CMSSW_9_0_0_90X_mcRun1_realistic_v4-v1/10000/28B9D1FB-8B31-E711-AA4E-0025905B85B2.root</a> /dev/null<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:32:55)</span> <b>bockjoo:</b></span> I restarted xrootd redirector and servers, but no good.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:33:35)</span> <b>bockjoo:</b></span> What are the direct upstream redirectors for USCMS T2? <a href="http://xrootd.unl.edu">xrootd.unl.edu</a> and ?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:35:24)</span> <b>jthiltges:</b></span> And <a href="http://cmsxrootd2.fnal.gov">cmsxrootd2.fnal.gov</a><br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:41:55)</span> <b>bockjoo:</b></span> Thanks @jthiltges! Both does not recognize the Florida redirector.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:42:22)</span> <b>jthiltges:</b></span> From <a href="http://xrootd.unl.edu">xrootd.unl.edu</a> logs (in CST)<br/><pre>210309 11:42:49 11253 Drop_Node: supervisor.14357:41@cmsio5.rc.ufl.edu:1094 dropped.</pre><br/>Anything interesting in the cmsd logs around that time?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:46:26)</span> <b>bockjoo:</b></span> <pre>210309 12:52:13 14408 XrdOpen: Unable to connect socket to <a href="http://cmsxrootd2.fnal.gov">cmsxrootd2.fnal.gov</a>; connection timed out<br/>210309 12:52:13 14411 XrdOpen: Unable to connect socket to <a href="http://xrootd.unl.edu">xrootd.unl.edu</a>; connection timed out</pre><br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:50:16)</span> <b>bockjoo:</b></span> <pre>[root@cmsio5 ~]# telnet <a href="http://cmsxrootd2.fnal.gov">cmsxrootd2.fnal.gov</a> 1215<br/>Trying 2620:6a:0:187::184:17...<br/>^C<br/>[root@cmsio5 ~]# telnet -4 <a href="http://cmsxrootd2.fnal.gov">cmsxrootd2.fnal.gov</a> 1215<br/>Trying 131.225.184.17...<br/>telnet: connect to address 131.225.184.17: Connection refused</pre><br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:51:07)</span> <b>jthiltges:</b></span> Hmm. IPv6 issues?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:52:58)</span> <b>bockjoo:</b></span> OK, I will ask around.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:59:27)</span> <b>bockjoo:</b></span> If you run a command similar to the one above from Nebraska, how does it look?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:00:43)</span> <b>jthiltges:</b></span> Seems to try both ~ports~ _addresses_ and returns immediately<br/><pre>[root@xrootd-local ~]# telnet <a href="http://cmsxrootd2.fnal.gov">cmsxrootd2.fnal.gov</a> 1215<br/>Trying 2620:6a:0:187::184:17...<br/>telnet: connect to address 2620:6a:0:187::184:17: Connection refused<br/>Trying 131.225.184.17...<br/>telnet: connect to address 131.225.184.17: Connection refused</pre><br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:11:30)</span> <b>bockjoo:</b></span> Thanks @jthiltges!<br/>
+<span style="color: #7d414c"><span style="font-size: small">(15:39:11)</span> <b>bockjoo:</b></span> How do I turn off ipv6 part of xrootd/gridftp?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:43:55)</span> <b>andrew.melo:</b></span> ip6tables?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(15:50:04)</span> <b>bockjoo:</b></span> <tt>ip6tables -I INPUT 1 -p tcp --dport 1213 ...?</tt><br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:51:32)</span> <b>andrew.melo:</b></span> Something like that should be able to block incoming connections to 1213<br/>
+<span style="color: #7d414c"><span style="font-size: small">(15:51:33)</span> <b>bockjoo:</b></span> Or should it be --sport ?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:52:11)</span> <b>andrew.melo:</b></span> I think in general sport doesn't do what you want it to do since the source is usually some random ephemeral port<br/>
+<span style="color: #7d414c"><span style="font-size: small">(16:10:05)</span> <b>bockjoo:</b></span> I tried<br/>
+<span style="color: #7d414c"><span style="font-size: small">(16:10:11)</span> <b>bockjoo:</b></span> <tt>ip6tables -I INPUT 1 -p tcp --dport 1213 -s 2620:104:1f:1000:92e2:baff:fe2b:97e0 -j REJECT</tt><br/>
+<span style="color: #7d414c"><span style="font-size: small">(16:10:31)</span> <b>bockjoo:</b></span> <tt>ip6tables -I INPUT 1 -p tcp --sport 1213 -d 2620:104:1f:1000:92e2:baff:fe2b:97e0 -j REJECT</tt><br/>
+<span style="color: #7d414c"><span style="font-size: small">(16:10:58)</span> <b>bockjoo:</b></span> But cmsd is not being registered to the global redirector.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:29:41)</span> <b>andrew.melo:</b></span> What are you trying to do? keep <a href="http://cmsio5.rc.ufl.edu">cmsio5.rc.ufl.edu</a> from talking to other people via ipv6 or keeping <a href="http://cmsio5.rc.ufl.edu">cmsio5.rc.ufl.edu</a> from being contacted on ipv6?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(17:42:03)</span> <b>bockjoo:</b></span> I want to publish my redirector and xrootd servers are ipv4 only.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(17:48:57)</span> <b>bockjoo:</b></span> <pre>I think I am able to publish ipv4-only xrootd now after disabling the ipv6 through </pre><br/>
+<span style="color: #7d414c"><span style="font-size: small">(17:49:01)</span> <b>bockjoo:</b></span> <pre>echo net.ipv6.conf.all.disable_ipv6 = 1 &gt;&gt; /etc/sysctl.conf<br/>echo net.ipv6.conf.default.disable_ipv6 = 1 &gt;&gt; /etc/sysctl.conf<br/>sysctl -p </pre><br/>
+<span style="color: #7d414c"><span style="font-size: small">(17:49:39)</span> <b>bockjoo:</b></span> It looks like once I did that, the ipv6 ip disappears from the interface.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(17:49:54)</span> <b>bockjoo:</b></span> Hopefully, this works for the gridftp too.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(18:41:10)</span> <b>andrew.melo:</b></span> Gridftp probably won't without a DNS change to drop the AAAA records<br/>
+</body>
+</html>

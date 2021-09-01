@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Aug 10, 2021 : #operations (osg)</title>
+</head>
+<body>
+<h3>Tue Aug 10, 2021 : #operations (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(09:51:56)</span> <b>bbockelm:</b></span> @marian / @jpeterson -- from some Lamar logs:<br/><pre>Sat Aug  7 01:39:07 CDT 2021 Searching and testing the singularity binary<br/>Sat Aug  7 01:39:08 CDT 2021 Falling back to no Singularity, error: Unable to find valid singularity in locations and PATH=/mnt/home/osg01/bosco-osg-wn-client/usr/bin:/mnt/home/osg01/bosco-osg-wn-client/usr/sbin:/cm/local/apps/environment-modules/4.0.0//bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin<br/>Sat Aug  7 01:39:08 CDT 2021 Not using singularity (PREFERRED)<br/>HAS_SINGULARITY = False</pre><br/>It's not finding Singularity hence no JLab matches.  It does look like it's finding CVMFS<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:54:36)</span> <b>jpeterson:</b></span> there should still be a “$module load singularity/2.6.1” in there from February. hopefully. or the module version might have changed since then<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:55:24)</span> <b>bbockelm:</b></span> I'm guessing it got lost.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:57:16)</span> <b>jpeterson:</b></span> <tt>bosco_override/glite/etc/blahp/slurm_local_submit_attributes.sh</tt>  still shows it<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:59:33)</span> <b>jpeterson:</b></span> login node still shows that is the right module name<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:59:38)</span> <b>bbockelm:</b></span> potentially the module changed if the PATH looks like this: "PATH=/mnt/home/osg01/bosco-osg-wn-client/usr/bin:/mnt/home/osg01/bosco-osg-wn-client/usr/sbin:/cm/local/apps/environment-modules/4.0.0//bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:00:10)</span> <b>bbockelm:</b></span> In stderr, I see <tt>LOADEDMODULES=gcc/7.2.0:slurm/17.11.5:matlab/R2021a/R2021a:singularity/2.6.1</tt>.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:00:51)</span> <b>jpeterson:</b></span> <pre>[osg01@login001 ~]$ module list<br/>Currently Loaded Modulefiles:<br/> 1) gcc/7.2.0   2) slurm/17.11.5   3) matlab/R2021a/R2021a<br/>[osg01@login001 ~]$ module load singularity/2.6.1<br/>[osg01@login001 ~]$ module list<br/>Currently Loaded Modulefiles:<br/> 1) gcc/7.2.0   2) slurm/17.11.5   3) matlab/R2021a/R2021a   4) singularity/2.6.1</pre><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:01:15)</span> <b>jpeterson:</b></span> <pre>[osg01@login001 ~]$ which singularity<br/>/cm/local/apps/singularity/current/bin/singularity</pre><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:02:31)</span> <b>jpeterson:</b></span> although the local submit file isn’t showing as chmod executable<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:03:18)</span> <b>bbockelm:</b></span> Ok, so potentially something is overwriting <tt>$PATH</tt>?  @blin - is it possible that "something" is hijacking the path after the module load?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:04:33)</span> <b>blin:</b></span> yeah, i think that's the case with blahp: env vars get set after local submit attrs. that's why we had to hardcode paths for singularity for AMNH<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:06:21)</span> <b>bbockelm:</b></span> hm.  That's ... a bummer.  On the upside, I only see a single env var (<tt>PATH</tt>) that needs to be hand hardcoded.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:07:57)</span> <b>bbockelm:</b></span> @jpeterson - can you set it real quick?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:10:04)</span> <b>jpeterson:</b></span> was checking for the ANMH overrides to see what was done there<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:10:12)</span> <b>jpeterson:</b></span> not seeing it<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:11:00)</span> <b>bbockelm:</b></span> <a href="https://github.com/opensciencegrid/hosted-ce-config/blob/master/AMNH-ARES/hosted-ce.yaml#L114">https://github.com/opensciencegrid/hosted-ce-config/blob/master/AMNH-ARES/hosted-ce.yaml#L114</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:11:28)</span> <b>jpeterson:</b></span> ah, I was still checking the bosco override areas<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:19:08)</span> <b>jpeterson:</b></span> redeployed with the path override to match what I was getting on the login node after loading the module<br/>
+<span style="color: #619a4f"><span style="font-size: small">(11:43:56)</span> <b>clundstedt:</b></span> My Google-fu is weak today, what's the condor mapping/ token generation magic to enable daemons to authenticate via IDTokens in a Condor cluster?  I did a naive thing of generating a token for my scheduler with an identity like <a href="mailto:red-gw3@daemon.unl.edu">red-gw3@daemon.unl.edu</a> and I can talk to my collector (condor_status and condor_q) work.  Jobs submit but I get:<br/>"ERROR: SECMAN:2010:Received "DENIED" from server for user <a href="mailto:red-gw3@deamon.unl.edu">red-gw3@deamon.unl.edu</a> using method IDTOKENS."<br/>
+<span style="color: #619a4f"><span style="font-size: small">(11:44:22)</span> <b>clundstedt:</b></span> my /bin/hostname job matches machines but doesn't run.<br/>
+<span style="color: #619a4f"><span style="font-size: small">(11:45:27)</span> <b>clundstedt:</b></span> (out of my 652 Slack channels, is the the best to ask this in?)<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:47:25)</span> <b>blin:</b></span> probably a good question for #software :slightly_smiling_face:<br/>
+</body>
+</html>

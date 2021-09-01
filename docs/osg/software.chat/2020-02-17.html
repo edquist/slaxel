@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Feb 17, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Mon Feb 17, 2020 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(09:13:14)</span> <b>blin:</b></span> @cnweaver what sort of errors do you see for users that can't run <tt>condor_q</tt>?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:17:07)</span> <b>blin:</b></span> i'm not sure about seeing the ads that are being sent -- maybe they show up if you specify <tt>ALL_DEBUG = D_FULLDEBUG</tt> ?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:18:22)</span> <b>blin:</b></span> this is pushing my htcondor knowledge, though, so you may want to reach out to <a href="mailto:htcondor-users@cs.wisc.edu">htcondor-users@cs.wisc.edu</a><br/>
+<span style="color: #e85d72"><span style="font-size: small">(10:18:57)</span> <b>cnweaver:</b></span> @blin The error I get is:<br/><pre>$ condor_q<br/>-- Failed to fetch ads from: &lt;10.0.2.15:0?alias=minikube&amp;sock=schedd_281_5233_2&gt; : minikube<br/>CEDAR:6001:Failed to connect to &lt;10.0.2.15:0?alias=minikube&amp;sock=schedd_281_5233_2&gt;</pre><br/>The source from which it's attempting and failing to fetch the ads is what it read from /var/lib/condor/spool/.schedd_address; note that it specifies port 0, when the correct port is 36697 in this case. I'm not sure what the <tt>sock=schedd_281_5233_2</tt> part is about.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:21:57)</span> <b>bbockelm:</b></span> What's the contents of <tt>.schedd_address</tt>?  Is it <tt>&lt;10.0.2.15:0?alias=minikube&amp;sock=schedd_281_5233_2&gt;</tt>?<br/>
+<span style="color: #e85d72"><span style="font-size: small">(10:24:52)</span> <b>cnweaver:</b></span> Indeed, plus two other lines of version information.<br/>
+<span style="color: #e85d72"><span style="font-size: small">(10:25:10)</span> <b>cnweaver:</b></span> I can post those, but they seemed unlikely to be relevant.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:26:20)</span> <b>bbockelm:</b></span> ok.  In that case, it sounds like the schedd is confused about what it's own address is.  That is going to have other knock-on effects even if you can override things by whacking the address file.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:26:46)</span> <b>bbockelm:</b></span> if you do <tt>condor_status -schedd -name &lt;name of schedd&gt; -af MyAddress</tt> , what do you get?<br/>
+<span style="color: #e85d72"><span style="font-size: small">(10:36:01)</span> <b>cnweaver:</b></span> An error; apparently <tt>-name</tt> is not a valid option? If I omit is and use the output of <tt>condor_config_val SCHEDD_NAME</tt> (minikube) as the schedd name I get "condor_status: unknown host minikube".<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:40:57)</span> <b>bbockelm:</b></span> you'll be able to find it via <tt>condor_status -schedd -af Name MyAddress</tt>  -- that just will give you all the schedds.<br/>
+<span style="color: #e85d72"><span style="font-size: small">(10:42:54)</span> <b>cnweaver:</b></span> That gives no output, which may not be surprising if <tt>condor_status</tt> is querying the collector, given my other problem (the collector rejecting all schedd ads for not containing this data).<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:48:07)</span> <b>bbockelm:</b></span> alright.  So the next thing we'll need to look at is the schedd log file -- can you post the first hundred or so lines after startup?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:48:17)</span> <b>bbockelm:</b></span> (are you meaning to use a shared port daemon?)<br/>
+<span style="color: #e85d72"><span style="font-size: small">(10:58:14)</span> <b>cnweaver:</b></span> Here's the start of my SchedLog<br/>
+<span style="color: #e85d72"><span style="font-size: small">(10:59:26)</span> <b>cnweaver:</b></span> For the shared port demon, I wasn't making any effort to avoid it? I think I would generally prefer it, if I understand the benefits for substantial numbers of running jobs correctly.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:17:03)</span> <b>bbockelm:</b></span> (sorry, meandered off mentally to go work on slides).  Yeah - the next thing is to look at the shared port side.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:17:23)</span> <b>bbockelm:</b></span> Although it's worth mentioning <tt>/var/lock_condor/shared_port_ad</tt> is a strange path -- the default is <tt>/var/lock/condor/shared_port_ad</tt> .  Is the change intentional?<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:28:12)</span> <b>cnweaver:</b></span> Maybe? @lincoln do you remember why you put <tt>LOCK = $(LOCAL_DIR)/lock_condor</tt> in the submit node config?<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:28:41)</span> <b>lincoln:</b></span> I don't remember why :slightly_smiling_face:<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:30:54)</span> <b>cnweaver:</b></span> I'll try commenting that out and redeploying to see if it makes any difference.<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:52:11)</span> <b>cnweaver:</b></span> That made no particular difference.<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:56:26)</span> <b>cnweaver:</b></span> Something which is confusing me is that despite having explicitly set <tt>USE_SHARED_PORT = true</tt> and <tt>DAEMON_LIST = MASTER, SCHEDD, SHARED_PORT</tt>, I do not seem to have a condor_shared_port running or any log messages about what happened to it.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:56:56)</span> <b>blin:</b></span> you don't need to include the shared port in the daemon list<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:57:24)</span> <b>cnweaver:</b></span> I know; I was just getting paranoid.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:58:55)</span> <b>blin:</b></span> and <tt>USE_SHARED_PORT = true</tt> is the default<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:59:16)</span> <b>blin:</b></span> you should see messages about shared port in the MasterLog after the daemon starts up<br/>
+<span style="color: #e85d72"><span style="font-size: small">(11:59:21)</span> <b>cnweaver:</b></span> It seems that Lincoln hid the master logs from me but I have now found them. Now I have all sorts of exciting new error messages to ponder.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:59:36)</span> <b>blin:</b></span> <pre>[root@fermicloud068 ~]# grep -i shared /var/log/condor-ce/MasterLog<br/>02/17/20 11:58:06 (D_ALWAYS) The SHARED_PORT (pid 2596450) exited with status 0<br/>02/17/20 11:58:09 (D_ALWAYS) SharedPortEndpoint: waiting for connections to named socket 541388_3a79<br/>02/17/20 11:58:09 (D_ALWAYS) SharedPortEndpoint: failed to open /var/lock/condor-ce/shared_port_ad: No such file or directory<br/>02/17/20 11:58:09 (D_ALWAYS) SharedPortEndpoint: did not successfully find SharedPortServer address. Will retry in 60s.<br/>02/17/20 11:58:09 (D_ALWAYS) Adding SHARED_PORT to DAEMON_LIST, because USE_SHARED_PORT=true (to disable this, set AUTO_INCLUDE_SHARED_PORT_IN_DAEMON_LIST=False)<br/>02/17/20 11:58:09 (D_ALWAYS:2) ::RealStart; SHARED_PORT on_hold=0<br/>02/17/20 11:58:09 (D_ALWAYS) Started DaemonCore process "/usr/libexec/condor/condor_shared_port -f", pid and pgroup = 541439<br/>02/17/20 11:58:09 (D_ALWAYS) Waiting for /var/lock/condor-ce/shared_port_ad to appear.<br/>02/17/20 11:58:10 (D_ALWAYS) Found /var/lock/condor-ce/shared_port_ad.<br/>02/17/20 11:58:10 (D_ALWAYS:2) Starting collector with shared port id collector<br/>02/17/20 11:58:10 (D_ALWAYS:2) Starting daemon with shared port id collector</pre><br/><br/>
+<span style="color: #e85d72"><span style="font-size: small">(12:02:10)</span> <b>cnweaver:</b></span> I'm somewhat confused by seeing <tt>02/17/20 17:46:40 Starting Collector on port 31942</tt>. Does it really mean a collector, or is that actually the shared port daemon?<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(12:09:49)</span> <b>blin:</b></span> i see this message on my CE with a shared port daemon so i think it means the shared port<br/>
+</blockquote>
+<span style="color: #c386df"><span style="font-size: small">(12:03:48)</span> <b>matyas:</b></span> try setting <tt>CREATE_CORE_FILES=true</tt>  and restarting... then look for a core file in <tt>$(LOG)</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(12:05:24)</span> <b>matyas:</b></span> also <tt>ABORT_ON_EXCEPTION=true</tt> and <tt>NOT_RESPONDING_WANT_CORE=true</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(12:06:21)</span> <b>matyas:</b></span> actually try it without those second two first<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:07:14)</span> <b>matyas:</b></span> basically I'd like to see if the shared port daemon is exiting because it's unhappy, or actually crashing<br/>
+<span style="color: #e85d72"><span style="font-size: small">(12:07:17)</span> <b>cnweaver:</b></span> With just <tt>CREATE_CORE_FILES=true</tt> it doesn't seem to create any.<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:10:41)</span> <b>blin:</b></span> if you don't see the master trying to start up the shared port, i don't think you'd get a core file<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:11:31)</span> <b>matyas:</b></span> &gt;  02/17/20 11:58:09 (D_ALWAYS) Started DaemonCore process "/usr/libexec/condor/condor_shared_port -f", pid and pgroup = 541439<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:11:44)</span> <b>matyas:</b></span> looks like it was trying to start it up<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:11:53)</span> <b>blin:</b></span> that's my log<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:11:59)</span> <b>matyas:</b></span> oh<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:12:49)</span> <b>matyas:</b></span> Chris, is this your CE or your Condor?<br/>
+<span style="color: #e85d72"><span style="font-size: small">(12:16:25)</span> <b>cnweaver:</b></span> This is my plain-condor submit node, no CE  involved.<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:16:43)</span> <b>matyas:</b></span> running inside minikube?<br/>
+<span style="color: #e85d72"><span style="font-size: small">(12:17:05)</span> <b>cnweaver:</b></span> Yes.<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:17:20)</span> <b>matyas:</b></span> can you log in to the minikube vm, outside of the container?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:17:44)</span> <b>matyas:</b></span> I'd like to find out what container runtime it's using<br/>
+<span style="color: #e85d72"><span style="font-size: small">(12:17:44)</span> <b>cnweaver:</b></span> I can, yes.<br/>
+<span style="color: #e85d72"><span style="font-size: small">(12:20:05)</span> <b>cnweaver:</b></span> Selected output of <tt>docker info</tt>:<br/><pre>Server Version: 18.09.6<br/>Storage Driver: overlay2<br/> Backing Filesystem: extfs<br/>Cgroup Driver: cgroupfs<br/>Plugins:<br/> Volume: local<br/> Network: bridge host macvlan null overlay<br/> Log: awslogs fluentd gcplogs gelf journald json-file local logentries splunk syslog<br/>Runtimes: runc<br/>Default Runtime: runc</pre><br/>
+<span style="color: #e85d72"><span style="font-size: small">(12:25:02)</span> <b>cnweaver:</b></span> As part of its deeply-held belief that it is the collector, that shared port daemon seems to be determined to run on COLLECTOR_PORT instead of SHARED_PORT_PORT.<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:26:04)</span> <b>matyas:</b></span> that should be fine... what's the value of COLLECTOR_USES_SHARED_PORT?<br/>
+<span style="color: #e85d72"><span style="font-size: small">(12:26:54)</span> <b>cnweaver:</b></span> Lincoln had the submit node using <tt>hostNetwork: true</tt> for reasons which he has explained to me before, but this meant it was doomed to failure because the kubenetes was already listening on that port to forward traffic actual collector, over in the otehr container.<br/>
+<span style="color: #e85d72"><span style="font-size: small">(12:27:19)</span> <b>cnweaver:</b></span> <tt>COLLECTOR_USES_SHARED_PORT = true</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(12:29:41)</span> <b>matyas:</b></span> does that mean if you change COLLECTOR_PORT it works?<br/>
+<span style="color: #e85d72"><span style="font-size: small">(12:30:33)</span> <b>cnweaver:</b></span> I thought that the answer was no, because it then doesn't contact the real collector on the right port, but now I'm unsure.<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:31:07)</span> <b>matyas:</b></span> I think the default for SHARED_PORT_PORT is <tt>$(COLLECTOR_PORT)</tt><br/>
+<span style="color: #e85d72"><span style="font-size: small">(12:31:09)</span> <b>cnweaver:</b></span> Disabling host networking, so it can have its own, namespaced copy of that port allows it to start up, and makes things less broken than they were.<br/>
+<span style="color: #e85d72"><span style="font-size: small">(12:31:25)</span> <b>cnweaver:</b></span> Indeed, it is, but I deliberately overrode it after I learned that.<br/>
+<span style="color: #e85d72"><span style="font-size: small">(12:34:04)</span> <b>cnweaver:</b></span> In fact, disabling host networking just made everything work, as far as I can tell. I just submitted a job and had it run to completion.<br/>
+<span style="color: #e85d72"><span style="font-size: small">(12:35:13)</span> <b>cnweaver:</b></span> I shall remonstrate with Lincoln about this wild goose chase when he gets back from lunch.<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:35:34)</span> <b>matyas:</b></span> :slightly_smiling_face:<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:35:47)</span> <b>matyas:</b></span> speaking of lunch, I'm gonna get some of it now<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:26:59)</span> <b>lincoln:</b></span> so we have noticed that if you run HTCondor with an unprivileged container execution engine (e.g. podman) AND HTcondor believes it is root inside the container, things will go sideways when the collector and some other daemons start up and try to set their max file descriptor limit to some large value. I believe they just get stuck into a loop where the master keeps launching them indefinitely.<br/><br/>we worked around it for now by setting: COLLECTOR_MAX_FILE_DESCRIPTORS and SHARED_PORT_MAX_FILE_DESCRIPTORS to 1024.<br/><br/>does this sound sufficiently bug-like to report?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:27:57)</span> <b>matyas:</b></span> I think what you want to do is set KERNEL_TUNING_SCRIPT=False<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:28:02)</span> <b>matyas:</b></span> let me double-check the knob name<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:28:40)</span> <b>matyas:</b></span> it's ENABLE_KERNEL_TUNING=False<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:29:57)</span> <b>lincoln:</b></span> OK, thanks. Will apply that. do you think this is a bug or working as intended?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:31:44)</span> <b>matyas:</b></span> dunno. Is there a way for something to tell that it's not _really_ root?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:33:40)</span> <b>matyas:</b></span> or just plain, that it's in a container?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:40:58)</span> <b>matyas:</b></span> Condor should probably check that it has permissions to tune the kernel before attempting to tune the kernel<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:41:27)</span> <b>matyas:</b></span> and checking for EUID==0 isn't enough anymore<br/>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri May 21, 2021 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Fri May 21, 2021 : #gfactory (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(16:23:13)</span> <b>blin:</b></span> @jdost321 does the factory keep track of downtime updates? <a href="https://github.com/opensciencegrid/topology/pull/1842#issuecomment-846250109">https://github.com/opensciencegrid/topology/pull/1842#issuecomment-846250109</a><br/>
+<span style="color: #385a86"><span style="font-size: small">(16:44:47)</span> <b>jdost321:</b></span> as long as the dt xml we parse reflects the update the factory will update: <a href="https://topology.opensciencegrid.org/rgdowntime/xml">https://topology.opensciencegrid.org/rgdowntime/xml</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:46:34)</span> <b>blin:</b></span> hrm yeah, it should<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:46:40)</span> <b>jdost321:</b></span> <pre>[1446] root@gfactory-2 /etc/osg-gfactory# gwms-factory statusdown -entry OSG_US_GATech_osg-sched2<br/>OSG_US_GATech_osg-sched2       Up  	All:All</pre><br/>
+<span style="color: #385a86"><span style="font-size: small">(16:48:46)</span> <b>jdost321:</b></span> a new one for me<br/><pre>5116069.5   gfactory        5/21 14:34 held remotely with no hold reason</pre><br/>
+<span style="color: #385a86"><span style="font-size: small">(16:49:02)</span> <b>jdost321:</b></span> i guess they must be (self) hosted ce in front of condor?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:50:28)</span> <b>blin:</b></span> yup, they are<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:51:35)</span> <b>blin:</b></span> oh yeah, they also have strict firewalls so i can't query the CE &gt;.&gt;<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:51:57)</span> <b>blin:</b></span> maybe @paschos has the power<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:52:09)</span> <b>jdost321:</b></span> was just going to @ him<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:53:54)</span> <b>paschos:</b></span> umm CE should be accessible over port 9619<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:54:13)</span> <b>paschos:</b></span> no other changes besiides the new release for the CE<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:54:56)</span> <b>paschos:</b></span> firewall rules remained the. same as before the maintainnce. cpu jobs were flowing then<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:55:49)</span> <b>paschos:</b></span> So. is this understood at this point? cause this held remotely with no hold reason i idon’t understand<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:57:17)</span> <b>paschos:</b></span> <pre> curl <a href="https://128.61.166.235:9619">https://128.61.166.235:9619</a><br/>11:13:24.244554 IP osg-login2.pace.gatech.edu.31522 &gt; osg-sched2.pace.gatech.edu.9619: Flags [S], seq 1807818909, win 26880, options [mss 8960,sackOK,TS val 89653195 ecr 0,nop,wscale 10], length 0<br/>11:13:24.245356 IP osg-sched2.pace.gatech.edu.9619 &gt; osg-login2.pace.gatech.edu.31522: Flags [S.], seq 3147630493, ack 1807818910, win 27760, options [mss 1400,sackOK,TS val 475024919 ecr 89653195,nop,wscale 10], length 0<br/>11:13:24.245368 IP osg-login2.pace.gatech.edu.31522 &gt; osg-sched2.pace.gatech.edu.9619: Flags [.], ack 1, win 27, options [nop,nop,TS val 89653195 ecr 475024919], length 0<br/>11:13:24.309164 IP osg-login2.pace.gatech.edu.31522 &gt; osg-sched2.pace.gatech.edu.9619: Flags [P.], seq 1:178, ack 1, win 27, options [nop,nop,TS val 89653259 ecr 475024919], length 177<br/>11:13:24.310291 IP osg-sched2.pace.gatech.edu.9619 &gt; osg-login2.pace.gatech.edu.31522: Flags [.], ack 178, win 29, options [nop,nop,TS val 475024984 ecr 89653259], length 0<br/>11:13:24.310571 IP osg-sched2.pace.gatech.edu.9619 &gt; osg-login2.pace.gatech.edu.31522: Flags [R.], seq 1, ack 178, win 29, options [nop,nop,TS val 0 ecr 89653259], length 0</pre><br/><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:57:24)</span> <b>blin:</b></span> yeah it's open on 9619 but iirc, they restrict access to a few IPs<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:57:46)</span> <b>blin:</b></span> my requests just hang<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:58:00)</span> <b>jdost321:</b></span> Pascal, CE seems functional, the problem is why are the pilots going held in the batch condor at the site<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:00:05)</span> <b>paschos:</b></span> can you move this to the #collaboration-support  channel --- they have. access. there<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:00:22)</span> <b>paschos:</b></span> their local condor submissionss arre working<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:00:36)</span> <b>paschos:</b></span> i suspect a step iis miissing<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:00:57)</span> <b>paschos:</b></span> @blin can you give me an IP addrerss. to open access for diagnostics<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:01:43)</span> <b>blin:</b></span> nah it's ok. if jeff can see hold messages from the factory side that's enough<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:02:23)</span> <b>paschos:</b></span> a large number of local jobs were submitted for testing purposees about 45 minutes ago --- perhaps are holdiing pilots for that reason<br/>
+</body>
+</html>

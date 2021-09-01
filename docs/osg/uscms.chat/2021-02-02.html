@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Feb 2, 2021 : #uscms (osg)</title>
+</head>
+<body>
+<h3>Tue Feb 2, 2021 : #uscms (osg)</h3>
+<span style="color: #7d414c"><span style="font-size: small">(12:51:47)</span> <b>bockjoo:</b></span> Do you or anyone else here have good memories with JBOD?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:24:38)</span> <b>andrew.melo:</b></span> We have good luck with large SAS expanders and 36 drive chasses<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:27:56)</span> <b>justas.balcas:</b></span> @bockjoo what do you mean by memories?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:31:54)</span> <b>bockjoo:</b></span> I am wondering if JBOD is reliably OK or potentially problem.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:33:39)</span> <b>justas.balcas:</b></span> We have migrating all to JBODs and have a mix of old (older than 5 years) and new ones (few year and or few months old). If in terms of maintenance/support - 99% better than mixing with compute (from my own experience) Maybe because I personally dont like mixing storage and compute<br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:34:31)</span> <b>bockjoo:</b></span> Do you use ZFS?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:34:45)</span> <b>justas.balcas:</b></span> in past - we were having 1 to 2 nodes die weekly and require manual intervention (out of memory, kernel panics and so on). In jbods - only hdfs or ceph runs<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:35:02)</span> <b>justas.balcas:</b></span> no, we use xfs for hdfs<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:35:32)</span> <b>justas.balcas:</b></span> for ceph - bluestore<br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:46:11)</span> <b>bockjoo:</b></span> I was asking because we are considering a JBOD with a ZFS for our next Lustre expansion, saving a RAID controller.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:51:21)</span> <b>justas.balcas:</b></span> We are happy with JBODs, but we also buy only from one company the new ones - others were unable to beat that low price.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:53:00)</span> <b>bockjoo:</b></span> We usually get units from one company too.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:53:34)</span> <b>justas.balcas:</b></span> how much $/tb?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:53:53)</span> <b>justas.balcas:</b></span> just for jbod - without headnode<br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:55:33)</span> <b>bockjoo:</b></span> We never bought jbod before. But got a one-time sales offer of $19200 for 720TB ( 60 x 12TB), but we didn't take it at that time (2019).<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:58:23)</span> <b>justas.balcas:</b></span> Similar to ours. If interested:<br/>Columns are: HDD Size; Total Size; Total Price; $/tb<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:59:21)</span> <b>justas.balcas:</b></span> first 5 are 60 disk jbod, last 4 - 102 disk jbod<br/>
+<span style="color: #7d414c"><span style="font-size: small">(15:05:21)</span> <b>bockjoo:</b></span> Thanks! An excellent reference for comparison later.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:09:39)</span> <b>justas.balcas:</b></span> We got these quotes last week and mainly I wanted to know if 102 disk JBOD is worth it -  seems not the case so far. We would need also to install new deeper rack (+ ~5k$) and the price is not better than 60 disk JBOD.  My experience with JBODs is only positive :wink:<br/>
+<blockquote>
+<span style="color: #73769d"><span style="font-size: small">(2021-02-03 05:50:11)</span> <b>smithnp:</b></span> yes, we just got one of these and have to re-configure a rack to get it to go in.  Luckily we are retiring about a rack and a half of older storage nodes so we were able to evacuate one to reconfigure for max depth.  That seems to be our biggest issue with the JBOD so far is physically getting it installed. :joy:<br/>
+</blockquote>
+<span style="color: #a72f79"><span style="font-size: small">(15:25:26)</span> <b>andrew.melo:</b></span> Wel, and you have to remember too that as you get to these high density machines, you make it so that there are fewer failure domains<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:28:28)</span> <b>justas.balcas:</b></span> Yes - that is also. 8pb - you can have it with-in 4 jbods - forget about any EC k+m &lt;= 4.  Or if go at OSD failure level - that is more risky.<br/>
+<span style="color: #d1707d"><span style="font-size: small">(16:16:45)</span> <b>gattebury:</b></span> We’ve had a few dozen JBODs of various shapes and sizes at Nebraska (not all in Tier2) over the years without any major issues. Occasional backplane hiccup with a slot, but the same could be said for any physical server with disks as well.<br/><br/>We’ve had 6x of the WD Data60 enclosures in the Tier2 w/60x 12TB drives each for a while now and I think they’re quite solid. We don’t do ZFS across them (just split across multiple physical servers which use the individual disks as HDFS data drives) but all the SAS bits and controller management bits have been solid.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:18:39)</span> <b>andrew.melo:</b></span> we had an issue back in the day with old chenbro chassis who were designed for 6 drives all moving more ore less in sync (as a raid device) completely falling apart when used as a jbod. We figured out that the vibrations were actually causing the connectors on the backplane to fail<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:22:13)</span> <b>andrew.melo:</b></span> (the chassies was designed for groups of 6 drives to be in the same raid array, is what I meant to say)<br/>
+<span style="color: #a72f79"><span style="font-size: small">(19:58:33)</span> <b>andrew.melo:</b></span> Also, I gotta say -- you guys are way off in a different part of the phase space. We have ~80 disk servers and 2k disks or so<br/>
+<span style="color: #a72f79"><span style="font-size: small">(19:58:54)</span> <b>andrew.melo:</b></span> So we can do 6+3 parity encoding and if a machine is down over a weekend it's not a big deal<br/>
+</body>
+</html>

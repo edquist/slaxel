@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon May 15, 2017 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Mon May 15, 2017 : #xcache (osg)</h3>
+<span style="color: #674b1b"><span style="font-size: small">(10:54:47)</span> <b>rynge:</b></span> $ stashcp /user/osguser60/public/my_hello_world.txt $HOME/<br/>[ERROR] Server responded with an error: [3011] No servers are available to read the file.<br/><br/>Unable to find size of file<br/><br/>None<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:55:36)</span> <b>rynge:</b></span> $ stashcp -d /user/osguser60/public/my_hello_world.txt $HOME/<br/>2017-05-15T10:55:18+0000 root         DEBUG    Trying geoip site of: <a href="http://cvmfs-s1bnl.opensciencegrid.org:8000/cvmfs/oasis.opensciencegrid.org">http://cvmfs-s1bnl.opensciencegrid.org:8000/cvmfs/oasis.opensciencegrid.org</a><br/>2017-05-15T10:55:18+0000 root         DEBUG    Querying for closest cache: <a href="http://cvmfs-s1bnl.opensciencegrid.org:8000/cvmfs/oasis.opensciencegrid.org/api/v1.0/geo/stashcp/xrd-cache-1.t2.ucsd.edu,mwt2-stashcache.campuscluster.illinois.edu,hcc-stash.unl.edu,osgxroot.usatlas.bnl.gov,its-condor-xrootd1.syr.edu,stashcache.grid.uchicago.edu">http://cvmfs-s1bnl.opensciencegrid.org:8000/cvmfs/oasis.opensciencegrid.org/api/v1.0/geo/stashcp/xrd-cache-1.t2.ucsd.edu,mwt2-stashcache.campuscluster.illinois.edu,hcc-stash.unl.edu,osgxroot.usatlas.bnl.gov,its-condor-xrootd1.syr.edu,stashcache.grid.uchicago.edu</a><br/>2017-05-15T10:55:19+0000 root         DEBUG    Got error code 200 from <a href="http://cvmfs-s1bnl.opensciencegrid.org:8000/cvmfs/oasis.opensciencegrid.org">http://cvmfs-s1bnl.opensciencegrid.org:8000/cvmfs/oasis.opensciencegrid.org</a><br/>2017-05-15T10:55:19+0000 root         DEBUG    Got response ['6', '2', '3', '5', '4', '1']<br/>2017-05-15T10:55:19+0000 root         DEBUG    Returning closest cache: <a href="root://stashcache.grid.uchicago.edu">root://stashcache.grid.uchicago.edu</a><br/>2017-05-15T10:55:19+0000 root         DEBUG    Using Cache <a href="root://stashcache.grid.uchicago.edu">root://stashcache.grid.uchicago.edu</a><br/>2017-05-15T10:55:19+0000 root         DEBUG    Checking if the CVMFS file exists: /cvmfs/stash.osgstorage.org/user/osguser60/public/my_hello_world.txt<br/>2017-05-15T10:55:19+0000 root         DEBUG    CVMFS File does not exist<br/>2017-05-15T10:55:19+0000 root         DEBUG    Checking size of file.<br/>[ERROR] Server responded with an error: [3011] No servers are available to read the file.<br/><br/>Unable to find size of file<br/><br/>None<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:55:57)</span> <b>rynge:</b></span> @lincoln Is that maybe your server that is down?<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:56:07)</span> <b>lincoln:</b></span> hm!<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:56:08)</span> <b>lincoln:</b></span> let me check<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:56:11)</span> <b>lincoln:</b></span> i did see a nag over the weekend<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:58:23)</span> <b>lincoln:</b></span> <pre><br/>170515 10:58:09 3418224 XrdAccept: Unable to perform accept; too many open files<br/>170515 10:58:09 3418224 XrdAccept: Unable to perform accept; too many open files<br/>170515 10:58:09 3418224 XrdAccept: Unable to perform accept; too many open files<br/>170515 10:58:09 3418224 XrdAccept: Unable to perform accept; too many open files<br/>170515 10:58:09 3418224 XrdAccept: Unable to perform accept; too many open files<br/>170515 10:58:09 3418224 XrdAccept: Unable to perform accept; too many open files<br/>170515 10:58:09 3418224 XrdAccept: Unable to perform accept; too many open files<br/></pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:58:47)</span> <b>dweitzel:</b></span> When all else fails, restart it?<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:59:24)</span> <b>lincoln:</b></span> maybe it needs some tunings for max oepn files.<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:59:35)</span> <b>lincoln:</b></span> <tt>lsof</tt> is hanging. so thats a good sign.<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:01:37)</span> <b>lincoln:</b></span> stopped hanging after running <tt>systemctl stop  xrootd@stashcache-cache-server.service</tt><br/>
+<span style="color: #e96699"><span style="font-size: small">(11:01:37)</span> <b>lincoln:</b></span> hrm<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:03:22)</span> <b>lincoln:</b></span> file limits were at the default, increased those &amp; restarted the stashcache-cache-server service<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:03:28)</span> <b>lincoln:</b></span> maybe that’ll help<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:14:12)</span> <b>dweitzel:</b></span> yeah, shouldn't hurt.<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:19:05)</span> <b>marian:</b></span> the default should be actually 65535<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:19:23)</span> <b>marian:</b></span> isn't it the case? xrootd should set is default within systems<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:19:26)</span> <b>marian:</b></span> systemd<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:25:23)</span> <b>marian:</b></span> <tt>LimitNOFILE=65536</tt> in <tt>/lib/systemd/system/xrootd@.service</tt>, do you have that in, @lincoln?<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:26:43)</span> <b>marian:</b></span> I may add some "OS tweak" sections in the docs, though ... there are few tune ups recommended for rh7 systems when it consumes lot of mem ... jmalloc thing etc ... some people may benefit from it<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:12:38)</span> <b>lincoln:</b></span> @marian yep its there<br/>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Nov 16, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Thu Nov 16, 2017 : #gracc (osg)</h3>
+<span style="color: #965d1b"><span style="font-size: small">(13:55:56)</span> <b>briedel:</b></span> does gracc store the memory usage?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:01:36)</span> <b>dweitzel:</b></span> yes<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:01:44)</span> <b>dweitzel:</b></span> but we can't guarantee it's accuracy.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:01:57)</span> <b>dweitzel:</b></span> (can we guarantee gracc's accuracy of anything?)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:02:49)</span> <b>dweitzel:</b></span> FWIW, batch systems tend to be really bad at measuring memory usage as well.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:02:57)</span> <b>dweitzel:</b></span> Looking for something in particular?<br/>
+<span style="color: #965d1b"><span style="font-size: small">(14:19:40)</span> <b>briedel:</b></span> yeah wantt o check how many of the jobs request more than 2 GB<br/>
+<span style="color: #965d1b"><span style="font-size: small">(14:19:45)</span> <b>briedel:</b></span> and how many use more than 2 GB<br/>
+<span style="color: #965d1b"><span style="font-size: small">(14:20:07)</span> <b>briedel:</b></span> currently using <br/><pre><br/>s.aggs.bucket('vo', 'terms', field='DN', size=100000, order={'WallHours':'desc'}) \<br/>    .metric('WallHours', 'sum', field='CoreHours') \<br/>    .metric('UserCpuSeconds', 'sum', field='CpuDuration_user') \<br/>    .metric('SysCpuSeconds', 'sum', field='CpuDuration_system')<br/></pre><br/>
+<span style="color: #965d1b"><span style="font-size: small">(14:20:14)</span> <b>briedel:</b></span> to get the CPU efficiency<br/>
+<span style="color: #965d1b"><span style="font-size: small">(14:20:22)</span> <b>briedel:</b></span> trying to see RAM "efficiency"<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:24:55)</span> <b>dweitzel:</b></span> What it sounds like you want is "RequestedMemory / UsedMemory" ?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:25:09)</span> <b>dweitzel:</b></span> I don't think we collect "RequestedMemory", only "UsedMemory"<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:28:31)</span> <b>dweitzel:</b></span> NVM, memory is not available for Payload jobs.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:28:37)</span> <b>dweitzel:</b></span> not entirely sure why, but it's not there.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:33:33)</span> <b>dweitzel:</b></span> Just looked through the condor probe, it doesn't collect memory information.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:33:39)</span> <b>dweitzel:</b></span> It probably could, but it doesn't.<br/>
+<span style="color: #965d1b"><span style="font-size: small">(14:37:06)</span> <b>briedel:</b></span> okay thanks<br/>
+<span style="color: #965d1b"><span style="font-size: small">(14:37:09)</span> <b>briedel:</b></span> i think it should<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:38:12)</span> <b>lincoln:</b></span> well, i answered the question with the power of awk for now :slightly_smiling_face:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:57:27)</span> <b>bbockelm:</b></span> @dweitzel - I think you just created yourself some work!<br/>
+</body>
+</html>

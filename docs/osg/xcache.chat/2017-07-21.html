@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jul 21, 2017 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Fri Jul 21, 2017 : #xcache (osg)</h3>
+<span style="color: #674b1b"><span style="font-size: small">(11:37:10)</span> <b>rynge:</b></span> What are the chances of getting stashcp (and deps) working under Ubuntu? I have a user asking if we can put it in TensorFlow Singularity image<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:53:22)</span> <b>lincoln:</b></span> hm<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:53:38)</span> <b>lincoln:</b></span> looks liek the XRoot team only puts out tarballs and RPMs<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:55:23)</span> <b>lincoln:</b></span> so.. maybe?<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:55:43)</span> <b>lincoln:</b></span> well and sources of course<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:57:47)</span> <b>rynge:</b></span> Maybe I will try the convince the user to use stash-over-cvmfs instead<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:58:28)</span> <b>lincoln:</b></span> i suspect if its easy to compile xrd on ubuntu then the rest will be easy enough<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:58:32)</span> <b>lincoln:</b></span> but yeah<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:58:32)</span> <b>lincoln:</b></span> :slightly_smiling_face:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:59:16)</span> <b>rynge:</b></span> Benedikt has convinced me that xrootd is a horrible build<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:15:45)</span> <b>briedel:</b></span> Gfal is <br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:15:55)</span> <b>briedel:</b></span> I am just assuming xrootd is as well<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:16:07)</span> <b>briedel:</b></span> Cause it has been touched by cern<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:21:18)</span> <b>lincoln:</b></span> doesnt seem too bad<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:29:20)</span> <b>lincoln:</b></span> well i built it but it doesn't work :smile:<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:29:24)</span> <b>lincoln:</b></span> <tt>xrdcp: error while loading shared libraries: libXrdCl.so.2: cannot open shared object file: No such file or directory</tt> whomp whomp<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:29:31)</span> <b>lincoln:</b></span> <pre><br/>FROM ubuntu:latest<br/><br/>RUN apt update -y<br/>RUN apt install cmake gcc g++ zlib1g-dev libxml2-dev libssl-dev libsystemd-dev  libreadline-dev git -y<br/><br/>RUN git clone <a href="https://github.com/xrootd/xrootd">https://github.com/xrootd/xrootd</a><br/>RUN cd xrootd ; mkdir build ; cd build ; cmake .. &amp;&amp; make &amp;&amp; make install<br/><br/>RUN xrdcp --version<br/></pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(12:30:02)</span> <b>lincoln:</b></span> whomp whomp<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:35:31)</span> <b>briedel:</b></span> :scream:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:50:48)</span> <b>rynge:</b></span> Great!<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:51:10)</span> <b>rynge:</b></span> Well it is using cmake so it still sucks a little bit, but at least it builds<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:38:07)</span> <b>lincoln:</b></span> ya<br/>
+</body>
+</html>

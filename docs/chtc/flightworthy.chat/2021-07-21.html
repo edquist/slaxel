@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jul 21, 2021 : #flightworthy (chtc)</title>
+</head>
+<body>
+<h3>Wed Jul 21, 2021 : #flightworthy (chtc)</h3>
+<span style="color: #5a4592"><span style="font-size: small">(14:01:54)</span> <b>tannenba:</b></span> @tlmiller ToddM, can you take lead of the technical items on the agenda for our call with Google this afternoon (specifically, the proposal linked in the agenda for normalizing cloud provider namings)?   Meanwhile I will attempt to make progress on the legal form before the call.  Thanks.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:02:43)</span> <b>tlmiller:</b></span> Yes, I've already looked at that document.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:02:54)</span> <b>tlmiller:</b></span> (and thanks for handling the legal side of things)<br/>
+<span style="color: #4cc091"><span style="font-size: small">(14:27:26)</span> <b>blin:</b></span> what's a "merged ad" in a StartLog?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:57:02)</span> <b>johnkn:</b></span> what message?  is it about failing to find Requirements?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:02:31)</span> <b>johnkn:</b></span> like this ?<br/><pre>Failed to find requirements in merged ad?</pre><br/>
+<span style="color: #4cc091"><span style="font-size: small">(15:04:33)</span> <b>blin:</b></span> nah, i'm just trying to figure out what a particular attr in some ad corresponds to:<br/><pre>07/19/21 22:51:17 Failed to find requirements in merged ad?<br/>07/19/21 22:51:17 job_ad<br/><br/>    [<br/>        MachineAttrGLIDEIN_ResourceName1 = "NDSU-Lancium-Backfill"; <br/>        MachineAttrGLIDEIN_ResourceName0 = "NDSU-Lancium-Backfill"; <br/>&lt;snip&gt;<br/>07/19/21 22:51:17 merged_ad<br/><br/>    [<br/>        MachineAttrGLIDEIN_ResourceName1 = "NDSU-Lancium-Backfill"; <br/>        MachineAttrGLIDEIN_ResourceName0 = "NDSU-Lancium-Backfill"; <br/>        MachineAttrCpus2 = 1; </pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:09:17)</span> <b>johnkn:</b></span> The "merged ad" in that message is the machine ad merged with the output of <tt>condor_starter -classad</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:11:15)</span> <b>johnkn:</b></span> it's part of the logic of making sure that we pick the "right" starter for the job, which used to be a thing back when we still had std universe<br/>
+<span style="color: #4cc091"><span style="font-size: small">(15:11:41)</span> <b>blin:</b></span> ah, ok<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:12:24)</span> <b>johnkn:</b></span> is it perhaps a std universe job?<br/>
+<span style="color: #4cc091"><span style="font-size: small">(15:13:16)</span> <b>blin:</b></span> oh god  i'd hope not!<br/>
+<span style="color: #4cc091"><span style="font-size: small">(15:13:36)</span> <b>blin:</b></span> nope, it's vanilla<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:13:40)</span> <b>edquist:</b></span> i miss stdu<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:14:28)</span> <b>gthain:</b></span> Note we never supported std uni in OSG, as it didn't support CCB<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:17:05)</span> <b>johnkn:</b></span> that message would seem to indicate that the job's requirements expression is invalid or missing in some way.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:19:49)</span> <b>johnkn:</b></span> not sure, but from my reading of the code if requirements evaluated to undefined or error, that could trigger the message<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:20:25)</span> <b>johnkn:</b></span> that seems like a bug to me since undefined should be just the same as false for requirements evaluation.<br/>
+</body>
+</html>

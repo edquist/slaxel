@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Dec 12, 2016 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Mon Dec 12, 2016 : #gfactory (osg)</h3>
+<span style="color: #bd9336"><span style="font-size: small">(14:42:35)</span> <b>mkandes:</b></span> less /etc/gwms-factory/glideinWMS.downtimes<br/>
+<span style="color: #bd9336"><span style="font-size: small">(14:53:58)</span> <b>mkandes:</b></span> cd /var/log/gwms-factory/client/user_feosgflock/glidein_gfactory_instance/entry_CMSHTPC_T2_US_Florida_osg<br/>
+<span style="color: #bd9336"><span style="font-size: small">(14:57:39)</span> <b>mkandes:</b></span> cd /var/log/gwms-factory/client/user_fecmsglobal/glidein_gfactory_instance/entry_CMSHTPC_T2_US_Florida_osg<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:05:21)</span> <b>mkandes:</b></span> cat_StartdLog job.3596776.3.err | grep "^12/" | less<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:11:17)</span> <b>mkandes:</b></span> Marking ldap:nisMapName=auto.scratch,dc=hpc,dc=ufl,dc=edu-&gt;/scratch as a shared-subtree autofs mount failed. (errno=1, Operation not permitted)<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:16:25)</span> <b>mkandes:</b></span> entry_q CMSHTPC_T2_US_Florida_osg -const "jobstatus==5"<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:17:15)</span> <b>mkandes:</b></span> entry_rm CMSHTPC_T2_US_Florida_osg -const "jobstatus==5"<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:31:28)</span> <b>mkandes:</b></span> CMSHTPC_T2_UK_London_IC_ceprod08_long<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:34:48)</span> <b>mkandes:</b></span> cat_StartdLog job.3980183.0.err | grep "^12/" | less<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:39:43)</span> <b>mkandes:</b></span> cat_MasterLog job.3980183.0.err | less<br/>
+<span style="color: #bd9336"><span style="font-size: small">(15:42:01)</span> <b>mkandes:</b></span> cat_StarterLog job.3980183.0.err | less<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:02:13)</span> <b>mkandes:</b></span> sudo -i<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:02:57)</span> <b>mkandes:</b></span> yum update<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:02:59)</span> <b>mkandes:</b></span> yum install epel-release<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:08:38)</span> <b>mkandes:</b></span> yum install yum-plugin-priorities<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:09:16)</span> <b>mkandes:</b></span> 2. The HTCondor package will automatically add a condor user/group, <br/>   if it does not exist already. Sites wishing to control the attributes<br/>   of this user/group should add the condor user/group manually before <br/>   installation. <br/><br/>	groupadd condor<br/>	useradd condor -g condor<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:10:29)</span> <b>mkandes:</b></span> 3. Download and install the meta-data that describes the appropriate YUM repository.<br/><br/>	cd /etc/yum.repos.d<br/>	wget <a href="http://research.cs.wisc.edu/htcondor/yum/repo.d/condor-stable-rhel6.repo">http://research.cs.wisc.edu/htcondor/yum/repo.d/condor-stable-rhel6.repo</a><br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:11:48)</span> <b>mkandes:</b></span> 4. Import signing key.<br/><br/>	wget <a href="http://research.cs.wisc.edu/htcondor/yum/RPM-GPG-KEY-HTCondor">http://research.cs.wisc.edu/htcondor/yum/RPM-GPG-KEY-HTCondor</a><br/>	rpm --import RPM-GPG-KEY-HTCondor<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:12:40)</span> <b>mkandes:</b></span> 5. Install HTCondor.<br/><br/>	yum install condor-all.x86_64<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:16:04)</span> <b>mkandes:</b></span> service condor start<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:16:21)</span> <b>mkandes:</b></span> service condor status<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:17:53)</span> <b>mkandes:</b></span> vi test.sh<br/><br/>#!/bin/bash<br/>whoami<br/>date<br/>uname -a<br/>MIN=3600<br/>MAX=10800<br/>RANDO=$(($RANDOM%($MAX+1-$MIN)+$MIN))<br/>echo $RANDO<br/>sleep $RANDO<br/>date<br/><br/>chmod +x test.sh<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:19:32)</span> <b>mkandes:</b></span> vi test.vanilla<br/><br/>universe=vanilla<br/>executable=test.sh<br/>should_transfer_files = YES<br/>when_to_transfer_output = ON_EXIT<br/>log=test.log<br/>output=test.out.$(Cluster).$(Process)<br/>error=test.err.$(Cluster).$(Process)<br/>queue 1<br/><br/>condor_submit test.vanilla<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:44:57)</span> <b>mkandes:</b></span> @vaibhav2.g : hi<br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:07:18)</span> <b>mkandes:</b></span> @vaibhav2.g: Can you access GGUS tickets like this one? <a href="https://ggus.eu/?mode=ticket_info&amp;ticket_id=123947">https://ggus.eu/?mode=ticket_info&amp;ticket_id=123947</a><br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:07:56)</span> <b>mkandes:</b></span> You may need a grid certificate to do so.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:08:34)</span> <b>mkandes:</b></span> For example, this ticket is related to this Jira ticket: <a href="https://jira.opensciencegrid.org/browse/GFACTOPS-993">https://jira.opensciencegrid.org/browse/GFACTOPS-993</a><br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:09:37)</span> <b>mkandes:</b></span> It's one of the more involved examples of a problem that affected many sites this year, but took awhile to nail down. Mostly, I just want to know if you can access GGUS tickets publicly so you can read examples.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:12:09)</span> <b>mkandes:</b></span> Here is a ticket example with the OSG ticketing system: <a href="https://jira.opensciencegrid.org/browse/GFACTOPS-860">https://jira.opensciencegrid.org/browse/GFACTOPS-860</a><br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:12:23)</span> <b>mkandes:</b></span> Let me know if you can access the links there as well.<br/>
+</body>
+</html>

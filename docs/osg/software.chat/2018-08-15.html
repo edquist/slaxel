@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Aug 15, 2018 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Aug 15, 2018 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(11:25:37)</span> <b>blin:</b></span> @dweitzel @dwd a few weeks ago, @efajardo mentioned that sites were having difficulty with validating their secure CVMFS installation, especially since LIGO is the only user so you need LIGO credentials<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:27:39)</span> <b>blin:</b></span> naively: would it be possible to set up an area in CVMFS that requires x509 authN so users with a valid proxy can validate secure CVMFS?<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:32:24)</span> <b>dwd:</b></span> Yes, that’s an issue.   I have developer access to a test file on <a href="http://ligo.osgstorage.org">ligo.osgstorage.org</a>, but it wouldn’t be practical to list every site admin’s DN as a developer there.  We could set up a separate test area, but it would need to be a separate repository.  I’m not sure if it could be set up with a server that would accept any valid proxy.<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:32:53)</span> <b>efajardo:</b></span> Hi @dwd asssuming I have a valid LIGO credential<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:33:05)</span> <b>efajardo:</b></span> how can I test a new secure stashcache that I isntaled<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:33:20)</span> <b>efajardo:</b></span> kind of the equivalent of the <tt>curl</tt> tests for non secure stashcache?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:33:47)</span> <b>blin:</b></span> oh, so it's a DN whitelist for secure access?<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:35:50)</span> <b>dwd:</b></span> Edgar, you would set CVMFS_SERVER_URL in /etc/cvmfs/config.d/ligo.osgstorage.org.local.    Brian, yes, for ligo at least it is a DN whitelist.  I’m sure that it’s enforced at least on the server, and I’m not sure about the client, whether or not it could accept a wildcard DN list from the server.  @dweitzel or @bbockelm could probably answer that.<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:36:15)</span> <b>dwd:</b></span> No Edgar, I mean CVMFS_EXTERNAL_SERVER_URL<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:39:41)</span> <b>dwd:</b></span> Oh Edgar, it’s more than that though, because not all stashcache servers are used for ligo.  It needs to be authorized and have an https interface.  It needs additional configuration which Derek knows about; he maintains the existing two servers.  I think they may not be stashcache at all, but complete mirrors of the data.<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:39:58)</span> <b>efajardo:</b></span> Well<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:40:15)</span> <b>efajardo:</b></span> I followed the instructions here<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:40:16)</span> <b>efajardo:</b></span> <a href="http://opensciencegrid.org/docs/data/stashcache/install-cache/#authenticated-cache-server">http://opensciencegrid.org/docs/data/stashcache/install-cache/#authenticated-cache-server</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(11:40:27)</span> <b>efajardo:</b></span> and I have several authenticated cache servers<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:40:42)</span> <b>efajardo:</b></span> @dweitzel tild me about modifying <tt>/etc/cvmfs/config.d/ligo.osgstorage.org.local</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(11:40:55)</span> <b>efajardo:</b></span> but I was wondering if there was a less invasive way to test<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:41:00)</span> <b>efajardo:</b></span> but I can try with that<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:41:45)</span> <b>dwd:</b></span> I’m quite sure that more needs to be done than that, but Derek would know<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:59:18)</span> <b>dweitzel:</b></span> Yes. You have to send me the server cert, and I add that as an authorized client on the origin here at Nebraska. <br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:59:32)</span> <b>dweitzel:</b></span> Send just the DN. <br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:00:16)</span> <b>dweitzel:</b></span> And you have the systemd service that renews the proxy?<br/>
+<span style="color: #965d1b"><span style="font-size: small">(13:10:04)</span> <b>briedel:</b></span> can anybody help me with condor config for singularity? @blin?<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:17:33)</span> <b>dwd:</b></span> @briedel The direct support in condor for singularity is badly out of date, nobody uses that.  They use wrapper scripts.  @efajardo is probably most familiar with those details.<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:18:35)</span> <b>efajardo:</b></span> Well @briedel there is some work in condor folks to improve the support of singularity<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:18:57)</span> <b>efajardo:</b></span> meanwhile the big push now is to migrate things from OSG scripts into gwms<br/>
+<span style="color: #965d1b"><span style="font-size: small">(13:20:16)</span> <b>briedel:</b></span> okay<br/>
+<span style="color: #965d1b"><span style="font-size: small">(13:20:34)</span> <b>briedel:</b></span> so the solution is to create a script that invokes the container<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:22:04)</span> <b>efajardo:</b></span> I have such a script already<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:22:27)</span> <b>efajardo:</b></span> is it for GPUS<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:22:38)</span> <b>efajardo:</b></span> I would like to know where the HTCondor folks are<br/>
+<span style="color: #965d1b"><span style="font-size: small">(13:22:40)</span> <b>briedel:</b></span> can you send it over?<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:22:56)</span> <b>efajardo:</b></span> they really wanted to avoid this proliferation of wrapper scripts<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:23:25)</span> <b>efajardo:</b></span> you need this in the config<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:23:27)</span> <b>efajardo:</b></span> <pre>HAS_SINGULARITY = True<br/>STARTD_ATTRS = HAS_SINGULARITY, $(STARTD_ATTRS)<br/>USER_JOB_WRAPPER = $(LIBEXEC)/singularity-job-wrapper.sh</pre><br/>
+<span style="color: #965d1b"><span style="font-size: small">(13:24:30)</span> <b>briedel:</b></span> thanks<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:32:42)</span> <b>dwd:</b></span> I believe that it is @bbockelm’s intention to migrate the singularity support from glideinWMS to HTCondor later, after there has been more experience with it in glideinWMS.  If everybody is using glideinWMS support then they should not have to change, it will just be a negotiation between glideinWMS and HTCondor<br/>
+</body>
+</html>

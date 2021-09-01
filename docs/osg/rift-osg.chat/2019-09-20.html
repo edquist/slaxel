@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Sep 20, 2019 : #rift-osg (osg)</title>
+</head>
+<body>
+<h3>Fri Sep 20, 2019 : #rift-osg (osg)</h3>
+<span style="color: #a2a5dc"><span style="font-size: small">(09:57:01)</span> <b>james.clark:</b></span> Hi <b>@channel</b>, quick question re GPUs and condor: if i understand correctly, RIFT users are running into problems due to insufficient GPU memory.  They already have <tt>request_memory=4096</tt> but they're introducing a workaround to use <tt>cupy.cuda.Device().mem_info</tt> to check available GPU memory when the job lands.  Surely there is a way to request this already in Condor?   Seems silly that jobs should have to check their own requirements after they've been matched to a machine (apologies for the cross-post, i hit the wrong channel originally)<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:58:10)</span> <b>isfiligoi:</b></span> Not sure how this is done in the glideins, but I can certainly force it on the PRP side, if you want<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:01:01)</span> <b>isfiligoi:</b></span> Indeed… in the short term, it is probably better I just hardcode it on the PRP side; I don’t really have a good way to support this kind of micro-requests via the CE<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(10:01:30)</span> <b>james.clark:</b></span> interesting.  let me confirm the requirement with the user (who i'm about to have a call with anyway)<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:01:38)</span> <b>isfiligoi:</b></span> How much GPU memory do you need?<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:04:05)</span> <b>isfiligoi:</b></span> From a technical point of view, once condor starts, it does publish the needed info:<br/><pre><br/>CUDACapability = 1024.64<br/>CUDADeviceName = "GeForce GTX 1080"<br/>CUDADriverVersion = 10.2<br/>CUDAECCEnabled = true<br/>CUDAGlobalMemoryMb = 12248541965082<br/>CUDARuntimeVersion = 10.0<br/></pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(10:06:29)</span> <b>isfiligoi:</b></span> The question is how do we propagate the request for the glideins…<br/>and PRP is not homogeneous in GPU terms… we have cards of all generations and sizes<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:38:19)</span> <b>efajardo:</b></span> Well<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:38:34)</span> <b>efajardo:</b></span> the pilots advertise that info<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:38:55)</span> <b>efajardo:</b></span> <pre>condor_status -l slot1@glidein_14909_244510444@osg-wn-gpu-opt-7d568894b7-2d7fr.optiputer.net | grep cuda -i<br/>CUDACapability = 1024.64<br/>CUDAClockMhz = 0.0<br/>CUDAComputeUnits = 0<br/>CUDACoresPerCU = 192<br/>CUDADeviceName = "GeForce GTX 1070"<br/>CUDADriverVersion = 10.0<br/>CUDAECCEnabled = true<br/>CUDAGlobalMemoryMb = 7272198376950<br/>CUDAOpenCLVersion = 1.2<br/>CUDARuntimeVersion = 10.0<br/>OSG_SINGULARITY_IMAGE_DEFAULT = "/cvmfs/singularity.opensciencegrid.org/opensciencegrid/osgvo-el7-cuda10:latest"<br/></pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(10:39:25)</span> <b>efajardo:</b></span> so you can do in your requirmeents <tt>CUDAGlobalMemoryMb &gt;= 123</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(10:39:59)</span> <b>efajardo:</b></span> However since most sites do not have homogenous gpus this will be a nightmare to propagate so we do not reuest pilots thath insiffucient memory in the gpu card<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(10:43:23)</span> <b>james.clark:</b></span> Ok, sorry, i was on a call<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(10:44:17)</span> <b>james.clark:</b></span> so, given the heterogeneity, is it actually better to let the application itself fail / NoOp in the event of insufficient memory?<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:16:03)</span> <b>isfiligoi:</b></span> no, ideally we would only start pilots where your applications are known to suceed<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:16:22)</span> <b>isfiligoi:</b></span> The question is just how to we deliver the requirements…<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:16:56)</span> <b>isfiligoi:</b></span> I can certainly hardcode on my part, e.g. limiting you to the high end GPUs<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:17:06)</span> <b>isfiligoi:</b></span> Just need to know what the treshold, is<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:17:35)</span> <b>isfiligoi:</b></span> Having something more flexible would be better, but we can start with this<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:18:40)</span> <b>isfiligoi:</b></span> Note that, as you (James) mentioned, this is not that much different from the CPU memory request<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(11:19:47)</span> <b>james.clark:</b></span> ok, thanks - i think it's 3G but i'm waiting for confirmation<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:28:32)</span> <b>isfiligoi:</b></span> Just talked to the gwms Factory admins, and we can push through the any arbitrary attributes…<br/>So we can add the MIN_GPU_MEMORY (or alike) attribute, and I can then match on it on the PRP side.<br/>@efajardo Do you see any problems with this? Can you suggest the proper naming of the attributes?<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(11:29:38)</span> <b>james.clark:</b></span> Confirmed on our side: 3GB should do the job<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:49:57)</span> <b>efajardo:</b></span> well<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:50:14)</span> <b>efajardo:</b></span> what I would like is a value like GPU_MEMORY<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:50:38)</span> <b>efajardo:</b></span> and then we advertise that number in the entry<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:51:04)</span> <b>efajardo:</b></span> but I am actually figuring out why HTCondor is spitting those ridicuous high values to CUDAGlobalMemoryMb<br/>
+<span style="color: #53b759"><span style="font-size: small">(19:11:14)</span> <b>isfiligoi:</b></span> @james.clark Been in meetings all day… and i do not feel like making changes Fri evening… will put something in place early next week<br/>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jun 8, 2021 : #batlab (chtc)</title>
+</head>
+<body>
+<h3>Tue Jun 8, 2021 : #batlab (chtc)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(13:43:39)</span> <b>johnkn:</b></span> So I notice that the perl <tt>StartPersonalCondor</tt> method starts up the master like this<br/><pre>runCondorTool("$local/sbin/condor_master -f &amp;", ...)</pre><br/>Which seems a bit odd since if we leave off <tt>-f</tt> then <tt>&amp;</tt> is implied<br/>Am I missing something?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:44:46)</span> <b>johnkn:</b></span> Remember that the master has been changed so that when it forks into the background, the foreground condor_master will not return until the background condor_master is listening.<br/>
+<span style="color: #d58247"><span style="font-size: small">(13:51:29)</span> <b>gthain:</b></span> I believe at the time the code was written, the fork happened very early, so running with the <tt>-f &amp;</tt> could return some errors that you wouldn't see with neither<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:58:06)</span> <b>johnkn:</b></span> I submitted a workspace build where run_test.pl could return 136, but unfortunately there were no startup failures..<br/>trying again, with the startup time limit turned down to 20 sec, and with remote_task.pl also capable of returning 136<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:00:10)</span> <b>johnkn:</b></span> unfortunately, it's harder to fix the shutdown code to return 137 for shutdown failures,<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:10:47)</span> <b>johnkn:</b></span> @tlmiller Any chance you can work on submitting a test run against an existing runid with docker platforms?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:30:51)</span> <b>tlmiller:</b></span> Well, if we can swing it as part of the "two weeks of testing mayhem", I guess.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:31:51)</span> <b>tlmiller:</b></span> I wouldn't worry about the shutdown failures quite yet.  They happened to be trivial in Ornithology.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:32:46)</span> <b>johnkn:</b></span> My edit/test cycle would be a lot shorter if I didn't have to rebuild every time.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:32:48)</span> <b>tlmiller:</b></span> You can also just submit a workspace build with the perl test(s) always "failing" to start-up, if you want to check the pass-through. :)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:32:53)</span> <b>tlmiller:</b></span> Mine would be too, TJ.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:33:39)</span> <b>tlmiller:</b></span> I remember that the fix wouldn't be trivial, but I don't remember why.  I'll take a look later today, I guess.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:35:52)</span> <b>johnkn:</b></span> the startup failure is handled by a per <tt>die</tt>, found a recipe for catching that, but I'd like to see it actually work.<br/>if I have to just add an unconditional die to the startup code I will, but I was hoping to avoid that.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:38:46)</span> <b>tlmiller:</b></span> I'm guessing you really want to use <tt>exit()</tt>, but I haven't looked at the code and can't right now.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(16:05:40)</span> <b>tim:</b></span> Should we limit the MacOSX box to 4 jobs or something? (because it has a hard time handling 10 jobs)<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(16:07:00)</span> <b>tim:</b></span> We have 2 Macs and one never will get used. We'd need more than 32 jobs before we would spill over to the other one.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:17:04)</span> <b>tlmiller:</b></span> Yeah, we should certainly make use of the second one.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:17:29)</span> <b>tlmiller:</b></span> Also, TJ, I _think_ I just got a glorious hack working for submitting tests to docker platforms.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:17:52)</span> <b>tlmiller:</b></span> It has to be a for a new run (one submitted since about two minutes ago), but if you only use _condor_nmi_submit_, it should probably work.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:18:27)</span> <b>tlmiller:</b></span> (If you want to test an older run, you can submit a new one and copy the new file <tt>docker_platforms</tt> out of its run directory and into the old run directory, I guess.)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:29:52)</span> <b>johnkn:</b></span> I'm fine with submitting a new run.  do I need to refresh my sources?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:30:53)</span> <b>tlmiller:</b></span> Yes.  You need a new copy of <tt>condor_nmi_submit</tt>.  The Metronome-level change is already in place on the system.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:34:15)</span> <b>johnkn:</b></span> Looks like the changes to 136 remote_task worked.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:34:17)</span> <b>johnkn:</b></span> <a href="https://batlab.chtc.wisc.edu/nmi-runs/johnkn/2021/06/johnkn_batlabsubmit0001.chtc.wisc.edu_1623162499_1536099/userdir/nmi:x86_64_Windows10/job_cp_cclim_acctgrp_basic_van-1.out">https://batlab.chtc.wisc.edu/nmi-runs/johnkn/2021/06/johnkn_batlabsubmit0001.chtc.wisc.[…]/nmi:x86_64_Windows10/job_cp_cclim_acctgrp_basic_van-1.out</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:34:54)</span> <b>johnkn:</b></span> Interestingly, with a test run that only allowed 20 sec for condor to start, I still only had  a few failures.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:35:44)</span> <b>johnkn:</b></span> all on windows.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:36:26)</span> <b>tlmiller:</b></span> I feel like the vast majority of the time, HTCondor really does start up in a reasonable amount of time.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:36:31)</span> <b>johnkn:</b></span> I'm a little bit tempted to leave the timeout at 20 seconds<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:36:42)</span> <b>tlmiller:</b></span> Also, "errors." ;)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:36:56)</span> <b>johnkn:</b></span> ?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:37:41)</span> <b>tlmiller:</b></span> The whole point of this exercise was to distinguish between failures -- the test said something's wrong with HTCondor -- and errors, where the test wasn't successful for a nonfunctional reason.<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:37:47)</span> <b>gthain:</b></span> I think Todd is saying that "failure to launch" is not a test error<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:38:05)</span> <b>johnkn:</b></span> it's not a test error, but its a problem that the test never ran.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:38:08)</span> <b>tlmiller:</b></span> er, "failure to launch" _is_ a test error; it is not a test failure.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:38:31)</span> <b>tlmiller:</b></span> At least, using the definitions the dashboard is using now.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(16:40:00)</span> <b>tim:</b></span> @tlmiller Is it worth changing this in nmi_prepare_job, now that we have upgraded to a 9.1 submit node.<br/><pre>        if(! ($typeless_platform =~ /CentOS6/)) {<br/>            #$cmds{'docker_network_type'} = 'host'; # What we really want<br/>            $cmds{'+DockerNetworkType'} = '"host"'; # Work-around for 8.8 schedd<br/>        }</pre><br/>
+<span style="color: #bb86b7"><span style="font-size: small">(16:40:22)</span> <b>tim:</b></span> Or does it fall under, it's not broken, don't bother fixing it.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:40:40)</span> <b>tlmiller:</b></span> AFAIK, we're not building on CentOS6 any more?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:40:53)</span> <b>tlmiller:</b></span> Oh, wait, sorry, I can't read.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(16:41:15)</span> <b>tim:</b></span> Yes, but, we select host networking for everything that is not CentOS6<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:41:15)</span> <b>tlmiller:</b></span> I'm happy to change it.  It _shouldn't_ matter.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(16:41:52)</span> <b>tim:</b></span> The change would be to use the submit language rather than using a +attribute.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(16:42:21)</span> <b>tim:</b></span> You could drop the conditional.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:42:49)</span> <b>tlmiller:</b></span> Right.  And the effect of the submit language command should be identical to using the +attribute.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:43:04)</span> <b>tlmiller:</b></span> Well, I've got it open now, so I'll go ahead and change it, I guess.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:43:14)</span> <b>tlmiller:</b></span> Let me know if everything stops working. ;)<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(16:43:26)</span> <b>tim:</b></span> I don't have a strong feeling either way here.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:44:04)</span> <b>tlmiller:</b></span> Then I'd rather leave it alone, at least for a while.  I've made a lot of changes to Metronome today, I'd like to give a lot of runs a chance to go by before possibly breaking things.<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:44:17)</span> <b>gthain:</b></span> Symptom would be <tt>unit_test_sinful</tt> will fail<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:44:31)</span> <b>johnkn:</b></span> just that?<br/>
+<blockquote>
+<span style="color: #bb86b7"><span style="font-size: small">(17:18:14)</span> <b>tim:</b></span> Yup<br/>
+</blockquote>
+<span style="color: #d58247"><span style="font-size: small">(16:44:46)</span> <b>gthain:</b></span> Anything that looks at ipv6<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(16:48:59)</span> <b>tim:</b></span> I am fine with leaving it as is.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:52:17)</span> <b>johnkn:</b></span> Ok. pushed my changes to return exit code 136 when run_test.pl or remote_task.pl fail to start condor.<br/>changes went in to master.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:53:59)</span> <b>johnkn:</b></span> next step is to remove calls to StartPersonal from all tests that we possibly can and replace with the #testreq comment.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:58:05)</span> <b>johnkn:</b></span> damn.  I should have put that into V9_0-branch, shouldn't I...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:13:19)</span> <b>johnkn:</b></span> ok, cherry-picked back to stable<br/>
+</body>
+</html>

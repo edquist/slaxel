@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jul 23, 2021 : #operations (chtc)</title>
+</head>
+<body>
+<h3>Fri Jul 23, 2021 : #operations (chtc)</h3>
+<span style="color: #4cc091"><span style="font-size: small">(12:56:14)</span> <b>blin:</b></span> how do we prevent CHTC jobs from flocking if they're not specifying that they want to flock or run on in the OSG?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:07:06)</span> <b>wiscmoate:</b></span> @blin Job transform:<br/><pre># The settings below (APPEND_REQ_VANILLA, JOB_TRANSFORM_NAMES,<br/># JOB_TRANSFORM_REQUIREMENTS) are test configuration for<br/># altering the requirements expression based on:<br/># - WantGlidein job attribute<br/># - WantFlocking job attribute<br/># - RequestGpus job attribute<br/># - The default case<br/>JOB_TRANSFORM_REQUIREMENTS @= end<br/>  # Allow WantGlidein and WantFlocking to do whatever they<br/>  # want<br/>  REQUIREMENTS JobUniverse == 5 &amp;&amp; !( MY.WantGlidein?:0 ) &amp;&amp; !( MY.WantFlocking?:0 )<br/><br/>  EVALMACRO RequestGpusGtZero (RequestGpus?:0) &gt; 0<br/>  if $(RequestGpusGtZero)<br/>    # If GPUs were requested, allow flocking to the gzk nodes<br/>    SET requirements ( TARGET.PoolName == "CHTC" || regexp("^gzk", Machine) == true ) &amp;&amp; $(MY.requirements)<br/>  else<br/>    # Otherwise, restrict the jobs to run on CHTC execute nodes<br/>    SET requirements ( TARGET.PoolName == "CHTC" ) &amp;&amp; $(MY.requirements)<br/>  endif<br/>@end</pre><br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:07:38)</span> <b>wiscmoate:</b></span> And requirements expression <tt>TARGET.PoolName == "CHTC"</tt><br/>
+<span style="color: #4cc091"><span style="font-size: small">(13:08:47)</span> <b>blin:</b></span> great, thanks<br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:12:14)</span> <b>wiscmoate:</b></span> @gthain what version did we need running on pilots in order to progress on our journey to wrapperless Singularity?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:24:53)</span> <b>johnkn:</b></span> To be clear, the jobs still flock, they just can't match in the flocked pools.<br/>We don't actually have a way to restrict jobs from flocking :wink:<br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:31:39)</span> <b>wiscmoate:</b></span> :arrow_up:<br/>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed May 2, 2018 : #general (osg)</title>
+</head>
+<body>
+<h3>Wed May 2, 2018 : #general (osg)</h3>
+<span style="color: #a2a5dc"><span style="font-size: small">(09:04:56)</span> <b>james.clark:</b></span> Can anyone remind me what the requirement should be to specify a site with access to LIGO frames in CVMFS?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:08:55)</span> <b>blin:</b></span> @efajardo ^^<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(10:06:13)</span> <b>james.clark:</b></span> Also, i'm still seeing jobs idle indefinitely if i specify Desired_Sites and <tt>requirements = (HAS_SINGULARITY == TRUE) &amp;&amp; (IS_GLIDEIN=?=True)</tt>.  I'd (at least naively) expect this to run ok for sites like LIGO-CIT and Nebraska.   The jobs even idle if i remove the singularity requirement and I see the following from condor_q -bet:<br/><pre><br/>         Slots<br/>Step    Matched  Condition<br/>-----  --------  ---------<br/>[0]        3764  IS_GLIDEIN is true<br/>[1]        3764  TARGET.Arch == "X86_64"<br/>[3]        3764  TARGET.OpSys == "LINUX"<br/>[5]        3764  TARGET.Disk &gt;= RequestDisk<br/>[7]        3764  TARGET.Memory &gt;= RequestMemory<br/>[9]        3764  TARGET.HasFileTransfer<br/><br/>No successful match recorded.<br/></pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(11:06:53)</span> <b>efajardo:</b></span> Hi @james.clark one of the test checks<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:07:00)</span> <b>efajardo:</b></span> is failing<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:07:41)</span> <b>efajardo:</b></span> so no new job pilots are starting, I am corrently debugging this which is connected to an xrootd server update at Nebraska<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(11:16:46)</span> <b>james.clark:</b></span> ah, ok, thanks!<br/>
+<span style="color: #d1707d"><span style="font-size: small">(11:25:23)</span> <b>gattebury:</b></span> @efajardo is that implying we broke something with the latest updates @ Nebraska ?<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:32:04)</span> <b>efajardo:</b></span> @gattebury Kinda I am discussing it with John and Marian<br/>
+<span style="color: #d1707d"><span style="font-size: small">(11:32:29)</span> <b>gattebury:</b></span> :thumbsup: I shall run back under my rock then<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(11:51:39)</span> <b>james.clark:</b></span> btw, @efajardo can you remind me of the requirement for LIGO frames?  something like HAS_CVMFS_LIGO_FRAMES ?<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:52:49)</span> <b>efajardo:</b></span> right<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:52:51)</span> <b>efajardo:</b></span> <tt>HAS_LIGO_FRAMES</tt><br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(12:13:23)</span> <b>james.clark:</b></span> thanks<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(12:14:33)</span> <b>james.clark:</b></span> oh, while i remember, what's the difference between CONDITION==True and CONDITION=?=True?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:15:00)</span> <b>blin:</b></span> the latter better handles when CONDITION is undefined<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:15:40)</span> <b>blin:</b></span> <a href="http://research.cs.wisc.edu/htcondor/manual/v8.6/4_1HTCondor_s_ClassAd.html#SECTION00513400000000000000">http://research.cs.wisc.edu/htcondor/manual/v8.6/4_1HTCondor_s_ClassAd.html#SECTION00513400000000000000</a><br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(12:47:51)</span> <b>james.clark:</b></span> ah, thanks<br/>
+</body>
+</html>

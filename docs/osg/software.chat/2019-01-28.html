@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jan 28, 2019 : #software (osg)</title>
+</head>
+<body>
+<h3>Mon Jan 28, 2019 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(11:02:00)</span> <b>blin:</b></span> @bbockelm @matyas we should probably have a separate docker hub account for automated pushes, huh<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:03:55)</span> <b>matyas:</b></span> can we do deploy tokens like we do for github?<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:04:18)</span> <b>efajardo:</b></span> Are we having software meeting today?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:05:02)</span> <b>matyas:</b></span> yeah but half an hour later<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:05:11)</span> <b>matyas:</b></span> (11:30 CST)<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:05:19)</span> <b>blin:</b></span> yeah, it's postponed to 11:30AM CST because of the iris-hep topical meeting<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:05:22)</span> <b>blin:</b></span> (check your email)<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:05:26)</span> <b>efajardo:</b></span> ok<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:07:08)</span> <b>matyas:</b></span> we only got the meeting notice this morning<br/>
+<span style="color: #73769d"><span style="font-size: small">(11:09:05)</span> <b>tim.theisen:</b></span> We got the meeting notice on January 9th<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:10:15)</span> <b>matyas:</b></span> coulda sworn we didn't get the meeting topic until much later<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:10:24)</span> <b>matyas:</b></span> ah well. sorry for the late notice<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:10:55)</span> <b>bbockelm:</b></span> (fwiw - you can subscribe the Indico group via CalDav.<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:28:23)</span> <b>lincoln:</b></span> does anyone have a relatively simple sample config for gsi authenticated xrootd?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:29:37)</span> <b>blin:</b></span> <a href="https://github.com/opensciencegrid/xcache/blob/master/configs/config.d/50-stash-cache-authz.cfg">https://github.com/opensciencegrid/xcache/blob/master/configs/config.d/50-stash-cache-authz.cfg</a><br/>
+<span style="color: #e96699"><span style="font-size: small">(11:30:51)</span> <b>lincoln:</b></span> thanks<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:49:07)</span> <b>lincoln:</b></span> what provides /usr/lib64/libXrdSec.so? i don't have it and <tt>yum provides</tt> isnt helping.<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:57:46)</span> <b>lincoln:</b></span> oh i see how it works<br/>
+<span style="color: #73769d"><span style="font-size: small">(11:59:34)</span> <b>tim.theisen:</b></span> It is in xrootd-libs<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:02:34)</span> <b>lincoln:</b></span> sort of<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:03:09)</span> <b>lincoln:</b></span> libXrdSec-4.so is and then xrootd does some jazz-hands stuff<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:03:21)</span> <b>bbockelm:</b></span> yup.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:04:00)</span> <b>bbockelm:</b></span> Xrootd config files name plugins without the <tt>-4</tt> suffix and will load whatever version they find / support.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:30:36)</span> <b>lincoln:</b></span> any pro tips on debugging authenticated xrd?<br/><br/>I am trying to set up an XRootD configuration for South Pole Telescope (ultimately I want to them in the caching network, too). I have authenticated xrdcp working, but the problem is that it appears to allow any DN and not just the SPT production DN. I am trying to use a grid-mapfile as well, for now.<br/><br/>This is what my config looks like:<br/><pre><br/>all.export /spt<br/>oss.localroot /cephfs<br/><br/>all.adminpath /var/spool/xrootd<br/>all.pidpath /var/run/xrootd<br/><br/>xrootd.seclib /usr/lib64/libXrdSec.so<br/>sec.protocol /usr/lib64 gsi \<br/>  -certdir:/etc/grid-security/certificates \<br/>  -cert:/etc/grid-security/xrd/xrdcert.pem \<br/>  -key:/etc/grid-security/xrd/xrdkey.pem \<br/>  -gridmap:/etc/grid-security/grid-mapfile \<br/>  -crl:1 \<br/>  -gmapopt:0 \<br/>  -authzto:3600<br/>sec.protbind * gsi<br/>acc.authdb /etc/xrootd/Authfile<br/><br/>xrootd.trace emsg login stall redirect<br/>ofs.trace all<br/>xrd.trace all<br/>cms.trace all<br/></pre><br/>my authfile looks like this:<br/><pre><br/>u spt-users / r<br/></pre><br/>and my grid-mapfile looks like this:<br/><pre><br/>"/DC=org/DC=opensciencegrid/O=Open Science Grid/OU=Services/CN=production/scott.grid.uchicago.edu" spt-users<br/></pre><br/><br/>but with my personal cert I am able to also read (&amp; write!) files<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:38:05)</span> <b>bbockelm:</b></span> @lincoln - any chance you want to eat the dogfood for the new RPM packaging for this?<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:38:16)</span> <b>lincoln:</b></span> I wouldn't mind trying<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:38:22)</span> <b>bbockelm:</b></span> nom nom nom.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:38:29)</span> <b>lincoln:</b></span> :hotdog:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:38:38)</span> <b>bbockelm:</b></span> anyhow, install yourself the <tt>stash-origin</tt> RPM from osg-development.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:38:58)</span> <b>lincoln:</b></span> hm, should I do this on a relatively clean host?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:39:17)</span> <b>bbockelm:</b></span> Meh, you'll be fine.  We renamed the default systemd service.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:39:21)</span> <b>lincoln:</b></span> gotcha<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:40:08)</span> <b>lincoln:</b></span> i kind of like the xrootd@blah thing. but I do overwrite the config with my own xrootd user for whatever that's worth. I want all of the files to be written as spt-users<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:40:14)</span> <b>lincoln:</b></span> anyhow lemme try installing that.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:40:29)</span> <b>blin:</b></span> you'll want to follow this install doc: <a href="https://opensciencegrid.org/docs-itb/data/stashcache/install-origin/">https://opensciencegrid.org/docs-itb/data/stashcache/install-origin/</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:40:41)</span> <b>bbockelm:</b></span> Now, the RPM by default will auto-magically try to generate the origin <tt>Authfile</tt>, so you'll need to override that with your hand-written one.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:41:00)</span> <b>blin:</b></span> though i do have to update it with the latest changes from the PR<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:41:16)</span> <b>bbockelm:</b></span> (origin <tt>Authfile</tt> is generated from topology information, which requires you to register the origin...)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:44:10)</span> <b>bbockelm:</b></span> @lincoln - copy/pasting from the other channel, I think you need to do the following:<br/><br/>Make something like <tt>/etc/xrootd/public-origin-authfile</tt> and use these contents:<br/><pre>u spt-users /spt r</pre><br/>then put this in <tt>/etc/xrootd/config.d/10-origin-site-local.cfg</tt>:<br/><pre>set StashOriginPublicAuthfile = /etc/xrootd/public-origin-authfile</pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:44:27)</span> <b>bbockelm:</b></span> @matyas @blin - that's the second time someone asked about manual overrides today.  Can you add it to the origin overhaul PR?<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:44:48)</span> <b>lincoln:</b></span> OK will try<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:57:28)</span> <b>lincoln:</b></span> <a href="https://developers.redhat.com/blog/2018/11/20/buildah-podman-containers-without-daemons/">https://developers.redhat.com/blog/2018/11/20/buildah-podman-containers-without-daemons/</a> btw yay.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:59:37)</span> <b>bbockelm:</b></span> @lincoln - it looks like <tt>xrootd-libs</tt> is a dependency of <tt>xrootd-server</tt><br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:00:08)</span> <b>bbockelm:</b></span> so, uh, I'm a bit stumped as to how you could have been missing that RPM.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:00:12)</span> <b>bbockelm:</b></span> @matyas ^^^<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:00:13)</span> <b>lincoln:</b></span> i wasn't missing it<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:00:24)</span> <b>lincoln:</b></span> It was the prefix thing that got me<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:00:30)</span> <b>lincoln:</b></span> the -4.so vs .so<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:01:00)</span> <b>lincoln:</b></span> I figured it out after trying to specify "libXrdSec-4.so" and XrootD tried to pull in a plugin named libXrdSec-4-4 :slightly_smiling_face:<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:01:16)</span> <b>lincoln:</b></span> suffix i guess i should say.<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:02:45)</span> <b>lincoln:</b></span> the confusion came from looking at the logs and then trying <tt>yum provides /usr/lib64/libXrdSec.so</tt>. I expected a symlink or something<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:04:06)</span> <b>matyas:</b></span> ugh. can we add a symlink?<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:05:43)</span> <b>lincoln:</b></span> I think everything is Working As Intended<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:05:47)</span> <b>lincoln:</b></span> (tm)<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:05:53)</span> <b>blin:</b></span> just to make sure, we want the various docker images in separate repos, right? <tt>opensciencegrid/xcache</tt>, <tt>opensciencegrid/stash-cache</tt>, <tt>opensciencegrid/stash-origin</tt>, etc<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:06:01)</span> <b>lincoln:</b></span> XRootD is doing the right thing internally<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:06:07)</span> <b>lincoln:</b></span> the log output is just confusing<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:56:58)</span> <b>blin:</b></span> do we still build the 3.3 docker WN client? <a href="https://hub.docker.com/r/opensciencegrid/osg-wn/">https://hub.docker.com/r/opensciencegrid/osg-wn/</a><br/>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jun 14, 2017 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Wed Jun 14, 2017 : #gfactory (osg)</h3>
+<span style="color: #53b759"><span style="font-size: small">(02:11:24)</span> <b>marian:</b></span> @amjad: could we get in sync on which ticket you'll be working today that we don't step on each other toes? I'm doing Ops today and tomorrow from EU time zone, too... or if you can point me to some tickets you have trouble with I'll be glad to assist...<br/>
+<span style="color: #3c989f"><span style="font-size: small">(06:23:54)</span> <b>amjad:</b></span> @marian , there is a ticket for new CE creation for Korea site <a href="https://ggus.eu/?mode=ticket_info&amp;ticket_id=128850">https://ggus.eu/?mode=ticket_info&amp;ticket_id=128850</a>, I do not know the tool to fetch CE info by ldap search, can you help me with this?<br/>
+<span style="color: #53b759"><span style="font-size: small">(06:49:17)</span> <b>marian:</b></span> Sure I can... give me few mins...<br/>
+<span style="color: #3c989f"><span style="font-size: small">(07:02:08)</span> <b>amjad:</b></span> Thanks<br/>
+<span style="color: #53b759"><span style="font-size: small">(08:03:11)</span> <b>marian:</b></span> @amjad: do they suppose to support only CMS?<br/>
+<span style="color: #53b759"><span style="font-size: small">(08:03:27)</span> <b>marian:</b></span> we typically ask these questions when adding new site<br/>
+<span style="color: #3c989f"><span style="font-size: small">(08:03:45)</span> <b>amjad:</b></span> yes it is for CMS<br/>
+<span style="color: #3c989f"><span style="font-size: small">(08:04:21)</span> <b>amjad:</b></span> but any other VOs I did not ask<br/>
+<span style="color: #53b759"><span style="font-size: small">(08:05:16)</span> <b>marian:</b></span> @marian shared a file: <a href="https://opensciencegrid.slack.com/files/marian/F5TJFAD26/Standard_information_to_get_new_site_registered_in_Factory">Standard information to get new site registered in Factory</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(08:07:06)</span> <b>marian:</b></span> some answers you have from them, short version -- we need to know the hostname for this CE, the type of CE, the number of cores per glidein you will serve, the amount of memory available per core, and how long (wallclock time) a glidein can run here.<br/>
+<span style="color: #53b759"><span style="font-size: small">(08:07:19)</span> <b>marian:</b></span> I'll look for the ldap command now...<br/>
+<span style="color: #53b759"><span style="font-size: small">(08:13:52)</span> <b>marian:</b></span> <tt>$ ldapsearch -x -h <a href="http://lcg-bdii.cern.ch:2170">lcg-bdii.cern.ch:2170</a> -b o=grid</tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(08:54:53)</span> <b>marian:</b></span> @amjad: in general, you can look up other CMS entry and take that as example, too ... let me know if you need help with it...<br/>
+<span style="color: #3c989f"><span style="font-size: small">(08:56:46)</span> <b>amjad:</b></span> Generally I look to other related CMS entries, but because this is new entry just wanted to query all related info by ldap, by command you gave me I could get all VOs<br/>
+<span style="color: #3c989f"><span style="font-size: small">(08:57:36)</span> <b>amjad:</b></span> I only have blurry memory that ?Marty was query specific CE, I for got the command<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:22:21)</span> <b>marian:</b></span> ah, you can always do that with | less and look up specific entry ... but yes, there should be trick query just specific CE attributes ...<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(13:00:07)</span> <b>kherner:</b></span> Hi, is <a href="http://glidein-itb.grid.iu.edu">glidein-itb.grid.iu.edu</a> still using a DigiCert DN? I just noticed that in one of our development frontends.<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(13:01:35)</span> <b>kherner:</b></span> We have &lt;collector DN="/DC=com/DC=DigiCert-Grid/O=Open Science Grid/OU=Services/CN=<a href="http://glidein-itb.grid.iu.edu">glidein-itb.grid.iu.edu</a>"<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(13:07:45)</span> <b>kherner:</b></span> Ah, looks like the change didn't get propagated everywhere. I'll fix it; disregard.<br/>
+<span style="color: #965d1b"><span style="font-size: small">(15:37:53)</span> <b>briedel:</b></span> hi, i am planning on setting up a new gwms frontend for xenon. one of the EGI groups is concerned about allowing the OSG vo access to their cluster. what does factory ops need from me to make this happen<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:50:30)</span> <b>jdost321:</b></span> @briedel you might want to talk to @efajardo he has helped do exaclty this for both LIGO and IceCube. The frontend side needs to supply the correct credential, and we already have a distinct name in the factory entries, OSGVO_XENON1T<br/>
+<span style="color: #965d1b"><span style="font-size: small">(15:51:11)</span> <b>briedel:</b></span> i already got certs for the frontend and the pilot<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:52:07)</span> <b>jdost321:</b></span> ok, then i think we're good on the factory side.  As long as the sites become aware of your new credential, and whitelist you in the CEs we're already sending XENON to<br/>
+<span style="color: #965d1b"><span style="font-size: small">(15:52:34)</span> <b>briedel:</b></span> do you also need to add an entry for the frontend server?.<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:54:01)</span> <b>jdost321:</b></span> ok, sorry didn't see that part.. so this is more than just a special group in the OSG frontend, but a whole new FE? did you coordinate this with @rynge ? it seems a bit excessive to do it this way<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:55:51)</span> <b>rynge:</b></span> Yeah, we have talked about it<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:56:34)</span> <b>jdost321:</b></span> @rynge @efajardo  i thought the long term plan was to merge frontends, not create new ones<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:56:46)</span> <b>rynge:</b></span> Yeah, we will reuse what we can<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:56:53)</span> <b>rynge:</b></span> But this is really more of a separate VO<br/>
+<span style="color: #965d1b"><span style="font-size: small">(15:57:23)</span> <b>briedel:</b></span> i guess the question i have is, how can we authenticate as a different vo if we are all supposed to go through the OSG one<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:57:38)</span> <b>jdost321:</b></span> Icecube does this through the glow frontend<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:57:43)</span> <b>jdost321:</b></span> and virgo through ligo<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:57:47)</span> <b>jdost321:</b></span> but i don't know the details<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:57:54)</span> <b>rynge:</b></span> Both of those are really subvos<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:58:01)</span> <b>rynge:</b></span> Or closely related<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:58:17)</span> <b>jdost321:</b></span> the advantage is, xenon could still just run as osg in the states, and we won't have to worry about whitelisting a new vo name to us sites<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:58:29)</span> <b>rynge:</b></span> Problem here is mapping the voms/credentials/... to two different VOs<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:58:50)</span> <b>rynge:</b></span> They will run under both OSG VO and XENON for now<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:59:31)</span> <b>jdost321:</b></span> alright well @briedel the way forward will be to send <a href="mailto:osg-gfactory-support@physics.ucsd.edu">osg-gfactory-support@physics.ucsd.edu</a> an official request with the relevant info we need to register your new FE<br/>
+<span style="color: #965d1b"><span style="font-size: small">(15:59:41)</span> <b>briedel:</b></span> okay will do<br/>
+<span style="color: #965d1b"><span style="font-size: small">(15:59:42)</span> <b>briedel:</b></span> thanks<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:01:45)</span> <b>jdost321:</b></span> in your config you will have a field called security_name, we'll need the name you decide on there, as well as the frontend cert DN you will use to contact the factory with<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:02:08)</span> <b>jdost321:</b></span> once you are ready and send us the official request email, we'll give you the missing details needed to fill the factory sections of your xml<br/>
+<span style="color: #965d1b"><span style="font-size: small">(16:18:41)</span> <b>briedel:</b></span> email sent<br/>
+</body>
+</html>

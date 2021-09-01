@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Aug 10, 2021 : #icecube-condor (osg)</title>
+</head>
+<body>
+<h3>Tue Aug 10, 2021 : #icecube-condor (osg)</h3>
+<span style="color: #50a0cf"><span style="font-size: small">(15:01:38)</span> <b>dschultz:</b></span> @bbockelm is there a way to use token auth to connect new schedds to flock to <tt><a href="http://glidein-cm3000.chtc.wisc.edu">glidein-cm3000.chtc.wisc.edu</a></tt>?  and will that allow any user to see the condor_status, or only root?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:15:14)</span> <b>bbockelm:</b></span> yes, token auth can do precisely that.<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(15:19:42)</span> <b>dschultz:</b></span> I guess the question is, how?  is this something we have to coordinate, since I don't control the chtc side?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:26:07)</span> <b>bbockelm:</b></span> You can do a "condor_token_request" and coordinate with Aaron for him to approve it (token requests expire after ... 2 hours?) or just ask him to stash you a token someplace that he generates.<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(15:30:35)</span> <b>dschultz:</b></span> <pre>sub-2 ~ # condor_token_request -pool <a href="http://glidein-cm3000.chtc.wisc.edu">glidein-cm3000.chtc.wisc.edu</a> -token osg_glidein<br/>Failed to request a new token: DAEMON:1:failed to start command for token request with remote daemon at '&lt;128.105.244.51:9618?alias=glidein-cm3000.chtc.wisc.edu&gt;'.|AUTHENTICATE:1003:Failed to authenticate with any method|AUTHENTICATE:1004:Failed to authenticate using FS|AUTHENTICATE:1004:Failed to authenticate using IDTOKENS<br/>sub-2 ~ # condor_q -version<br/>$CondorVersion: 9.0.4 Jul 29 2021 BuildID: 552036 PackageID: 9.0.4-1 $<br/>$CondorPlatform: x86_64_CentOS8 $</pre><br/>that looks problematic.  wonder if we need to upgrade<br/>
+<span style="color: #aba727"><span style="font-size: small">(15:44:38)</span> <b>moate:</b></span> @dschultz might have to do this -&gt;<br/>&gt;  stash you a token someplace that he generates<br/><br/>
+<span style="color: #aba727"><span style="font-size: small">(15:45:20)</span> <b>moate:</b></span> If our daemons can't form an encrypted stream through security negotiation they can't do the token request/approval/issue (I think)<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(15:50:48)</span> <b>dschultz:</b></span> yeah, I think we're going to have to do the stash method.  we disabled X509 auth on that machine, so even though I have a grid cert that works elsewhere it doesn't work on that machine<br/>
+<span style="color: #aba727"><span style="font-size: small">(16:03:46)</span> <b>moate:</b></span> @dschultz please ping me if I don't get back to this in a reasonable manner<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:11:09)</span> <b>bbockelm:</b></span> (You may need to enable SSL as a client to get it working.  Alternately, exchange the token out of band)<br/>
+<blockquote>
+<span style="color: #50a0cf"><span style="font-size: small">(2021-08-20 17:29:44)</span> <b>dschultz:</b></span> you're right that enabling SSL allows <tt>condor_token_request</tt> against chtc collectors.  Will follow up on this next week to hopefully get tokens set up for flocking<br/>
+</blockquote>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jun 28, 2021 : #operations (chtc)</title>
+</head>
+<body>
+<h3>Mon Jun 28, 2021 : #operations (chtc)</h3>
+<span style="color: #2b6836"><span style="font-size: small">(08:17:09)</span> <b>jcpatton:</b></span> Ah… just noticed moate’s daily report <tt>CS B240 cooling outage recovery</tt> :disappointed:<br/>
+<span style="color: #e7392d"><span style="font-size: small">(08:48:24)</span> <b>ckoch5:</b></span> I didn’t see that. having fun with electricity, woohoo<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(09:07:00)</span> <b>lmichael:</b></span> @wiscmoate @tjslauson let us know how the B240 outage is going and whether you expect Docker registry (already had tickets), Squid, or other job-critical infrastructure to have gone down, beyond exec nodes. We’ll send an email ASAP to users.<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(09:14:35)</span> <b>lmichael:</b></span> Later, we can get an updated from @tjslauson on the HPC Cluster.<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(09:32:44)</span> <b>tjslauson:</b></span> @lmichael I'll be able to give you an update on the cluster later this morning - I was taking it as a given that I'd be giving updates.<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(09:33:57)</span> <b>tjslauson:</b></span> incidentally, we should talk since I missed you Friday afternoon<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(09:39:34)</span> <b>lmichael:</b></span> I’m available until 10am (could be virtual) and at noon. I’m in <a href="http://go.wisc.edu/lmzoom">go.wisc.edu/lmzoom</a> right now.<br/>
+<blockquote>
+<span style="color: #4bbe2e"><span style="font-size: small">(09:42:20)</span> <b>tjslauson:</b></span> I'll be able to join in about 10 minutes<br/>
+</blockquote>
+<span style="color: #3c989f"><span style="font-size: small">(09:43:56)</span> <b>wiscmoate:</b></span> @lmichael @ckoch5 CS B240 outage shouldn't have had much user-noticeable impact;  the only really critical servers in that room are <a href="http://ganglia.chtc.wisc.edu">ganglia.chtc.wisc.edu</a> and <a href="http://es1000.chtc.wisc.edu">es1000.chtc.wisc.edu</a> (but not necessarily in that order).  I did a cursory check to make sure all CS B240 squids and docker caches were running before powering on CS B240 execute nodes<br/>
+<span style="color: #3c989f"><span style="font-size: small">(09:44:26)</span> <b>wiscmoate:</b></span> As for <a href="http://dockerreg.chtc.wisc.edu">dockerreg.chtc.wisc.edu</a>, it lives in Discovery.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(09:45:32)</span> <b>wiscmoate:</b></span> I'll take a look at it<br/>
+<span style="color: #3c989f"><span style="font-size: small">(09:57:23)</span> <b>wiscmoate:</b></span> @lmichael @ckoch5 <a href="http://dockerreg.chtc.wisc.edu">dockerreg.chtc.wisc.edu</a> is back up;  oddly, it had been put on the wrong virtual bridge on its hypervisor - perhaps somebody was troubleshooting and forgot to undo debugging changes<br/>
+<span style="color: #e7392d"><span style="font-size: small">(09:58:57)</span> <b>ckoch5:</b></span> ^^ @jcpatton for Dave<br/>
+<span style="color: #3c989f"><span style="font-size: small">(09:59:21)</span> <b>wiscmoate:</b></span> Ah, right, should ping Jason Patton on my RCF-directed messages<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:01:13)</span> <b>jcpatton:</b></span> Thanks!<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:14:46)</span> <b>ckoch5:</b></span> sort of :fire:  - I made an account for someone on Friday on submit2 and it’s not on the server yet<br/>
+<span style="color: #3c989f"><span style="font-size: small">(10:16:22)</span> <b>wiscmoate:</b></span> @ckoch5 I'll take that one.  Which account?<br/>
+<blockquote>
+<span style="color: #e7392d"><span style="font-size: small">(10:16:49)</span> <b>ckoch5:</b></span> wtian24<br/>
+<span style="color: #3c989f"><span style="font-size: small">(10:18:26)</span> <b>wiscmoate:</b></span> ah, I just realized what's wrong.  We still have a clunky, hacky rube-goldbergesque cronjob in place that runs a script to create puppet data from the userapp database.  It requires a manual restart every time it's home server in Discovery reboots.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(10:18:43)</span> <b>wiscmoate:</b></span> Someday we need to pay against principal on that technical debt<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:19:14)</span> <b>ckoch5:</b></span> ooh, I remember TimS telling me about this once. :joy:<br/>
+<span style="color: #3c989f"><span style="font-size: small">(10:21:03)</span> <b>wiscmoate:</b></span> 4 years ago when I implemented it I swore it was a short-term solution.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:23:17)</span> <b>ckoch5:</b></span> “short-term”<br/>
+<span style="color: #3c989f"><span style="font-size: small">(10:26:08)</span> <b>wiscmoate:</b></span> @ckoch5 I initialized the script, ran it manually, verified wtian24's account in puppet data, and initiated a puppet run sans firewall rules on <a href="http://submit2.chtc.wisc.edu">submit2.chtc.wisc.edu</a>;<br/>
+<span style="color: #3c989f"><span style="font-size: small">(10:26:21)</span> <b>wiscmoate:</b></span> Now we play the waiting game<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:27:24)</span> <b>ckoch5:</b></span> thanks!<br/>
+<span style="color: #3c989f"><span style="font-size: small">(10:40:18)</span> <b>wiscmoate:</b></span> @ckoch5 the account exists on submit2 now<br/>
+</blockquote>
+<span style="color: #4bbe2e"><span style="font-size: small">(12:05:19)</span> <b>tjslauson:</b></span> @lmichael @ckoch5 @jcpatton the HPC cluster is mostly back online, though a bunch of exec nodes are still down.  Jobs are running, and I'm going to make the login nodes accessible in a few minutes.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(12:05:59)</span> <b>ckoch5:</b></span> @tjslauson do you want to check the email I drafted for accuracy?<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(12:06:09)</span> <b>tjslauson:</b></span> sure<br/>
+<span style="color: #e7392d"><span style="font-size: small">(12:06:12)</span> <b>ckoch5:</b></span> <a href="https://docs.google.com/document/d/1Waxd-OydrAAX4s_3rz0Cc858iUsRjMZ9f6musyFVrYU/edit">https://docs.google.com/document/d/1Waxd-OydrAAX4s_3rz0Cc858iUsRjMZ9f6musyFVrYU/edit</a><br/>
+<blockquote>
+<span style="color: #4bbe2e"><span style="font-size: small">(12:13:13)</span> <b>tjslauson:</b></span> LGTM<br/>
+<span style="color: #e7392d"><span style="font-size: small">(12:13:48)</span> <b>ckoch5:</b></span> @lmichael if you have a minute to review for clarity, lmk<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(12:24:55)</span> <b>lmichael:</b></span> Send it! (I added “unless removed by users”.)<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(12:25:08)</span> <b>lmichael:</b></span> Actually, I’ll send it!<br/>
+<span style="color: #e7392d"><span style="font-size: small">(12:29:05)</span> <b>ckoch5:</b></span> thank you. :grin:<br/>
+</blockquote>
+<span style="color: #4bbe2e"><span style="font-size: small">(12:13:28)</span> <b>tjslauson:</b></span> login nodes are back<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(12:25:25)</span> <b>lmichael:</b></span> I’ll send the email!<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(12:29:34)</span> <b>lmichael:</b></span> sent<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(13:25:12)</span> <b>lmichael:</b></span> @tjslauson Let me know when you have a chance to review the config of the new MRSEC hardware, per my most recent reply here: <a href="https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=102692">https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=102692</a><br/>
+<blockquote>
+<span style="color: #9f69e7"><span style="font-size: small">(15:10:07)</span> <b>lmichael:</b></span> @tjslauson I don’t currently see anything that looks like a ‘wang’ or ‘schmidt’ partition, and am not sure if you’ve got the node numbers consistent with our Ownership sheet, yet:<br/><a href="https://docs.google.com/spreadsheets/d/1X8Ppetzj0c3PRD6_XPFNK2KfYC-5eaWc0XdSsVYxUFI/edit?usp=sharing">https://docs.google.com/spreadsheets/d/1X8Ppetzj0c3PRD6_XPFNK2KfYC-5eaWc0XdSsVYxUFI/edit?usp=sharing</a><br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(2021-06-29 09:47:55)</span> <b>tjslauson:</b></span> re: both of your messages, depending on today I might be able to think about these questions tomorrow.  If not, I'd expect next week.<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(2021-06-29 09:59:48)</span> <b>lmichael:</b></span> Can someone else (@eturatsinze) comment by checking the chassis?<br/>
+<span style="color: #c386df"><span style="font-size: small">(2021-06-29 10:37:56)</span> <b>eturatsinze:</b></span> I can get to the chassis but I'll need help connecting the dots. I don't recall exactly what belongs to who<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(2021-06-29 10:39:21)</span> <b>lmichael:</b></span> I’d like to get @bbockelman’s input on how soon @tjslauson can work on this, too, mainly because (1) it’s part of getting the HPC Cluster up and running after the outage, so still ‘urgent’, (2) MRSEC has been waiting months (supposed to up and finished after the April downtime after November ordering), and (3) the MRSEC and now a ‘cnerg’ partition user (<a href="https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=103603">https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=103603</a>) have some urgency/deadlines to make up for following the outage.<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(2021-06-29 10:43:18)</span> <b>lmichael:</b></span> @eturatsinze what *I* know is in the Ownership sheet, but I don’t know what record @tjslauson has of chassis/node numbers, which is what that sheet is missing. <a href="https://docs.google.com/spreadsheets/u/1/d/1X8Ppetzj0c3PRD6_XPFNK2KfYC-5eaWc0XdSsVYxUFI/edit?usp=drive_web&amp;ouid=110225644899283445481">https://docs.google.com/spreadsheets/u/1/d/1X8Ppetzj0c3PRD6_XPFNK2KfYC-5eaWc0XdSsVYxUFI/edit?usp=drive_web&amp;ouid=110225644899283445481</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(2021-06-29 10:54:44)</span> <b>eturatsinze:</b></span> we still have a set of hpc chassis that needs provisioning - I'm planning to get to those this week. I'll just use this as an opportunity to go through and update the sheet accordingly.<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(2021-06-29 11:34:24)</span> <b>lmichael:</b></span> Great! Thanks.<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(2021-06-29 11:35:20)</span> <b>lmichael:</b></span> Sooner priorities are figuring out MRSEC and cnerg, if that helps. The newest arrivals are Morgan (1ch) and Szlufarska (2ch), and they’re the ones communicating the urgency for getting the MRSEC hardware up. cnerg is unrelated, so separately ugent.<br/>
+<span style="color: #c386df"><span style="font-size: small">(2021-06-30 17:55:28)</span> <b>eturatsinze:</b></span> @lmichael @tjslauson cnerg chassis:<br/><tt>Chassis_337-340</tt> One PSU failed badly, none of the nodes seemed to operate normally. I swapped in a psu from a spare parts chassis and all the nodes are up. I plan to resume slurm on those tomorrow<br/><tt>Chassis_341-344</tt> node hpc344 had a failed drive, replaced and rebuilding. Plan to add back to pool tomorrow<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(2021-06-30 17:58:11)</span> <b>tjslauson:</b></span> good to hear, thanks @eturatsinze<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(2021-06-30 17:58:24)</span> <b>tjslauson:</b></span> yeah, the lights on the front of 337-340 did look like a PSU issue like what we saw with 341-344<br/>
+<span style="color: #c386df"><span style="font-size: small">(2021-07-01 10:58:27)</span> <b>eturatsinze:</b></span> @lmichael Located the MRSEC hardware, it is all provisioned except for one sled/node that I had issues with. I'll work on getting those added to the pool<br/><pre>HPC Z2-R8<br/>=================<br/>RU    NODE RANGE                 CHASSIS S/N     OWNER       PO<br/>1,2   433-436                    2MXFQ53<br/>3,4   437-440                    5BZFK93                     <br/>5,6   441-444 (chassis is bad)   4TMLZB3                     MD19664 PVX0002539659<br/>7,8   445-448                    56F4ZC3         MRSEC       MD19664 PVX0002503665<br/>9,10  449-452                    56F3ZC3         MRSEC       MD19664 PVX0002503665<br/>11,12 453-456                    56F6ZC3         MRSEC       MD19664 PVX0002503665<br/>13,14 457-460 (457 is bad)       56F5ZC3         MRSEC       MD19664 PVX0002503665</pre><br/>
+<span style="color: #9f69e7"><span style="font-size: small">(2021-07-01 12:20:59)</span> <b>lmichael:</b></span> Hi Emile. The ticket and Ownership sheet I linked to both have the proper partition names (4 different ones). So we need one chassis (4 nodes) in each of morgan (existing), szlufarska (existing), wang (new, not wang3), and schmidt. <a href="https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=102692">https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=102692</a><br/>
+<span style="color: #9f69e7"><span style="font-size: small">(2021-07-01 12:21:57)</span> <b>lmichael:</b></span> Thanks for the update! I’m glad these were quick to identify/provision.<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(2021-07-01 15:16:27)</span> <b>tjslauson:</b></span> @lmichael All 8 cnerg nodes are back and ready for jobs.  We're looking at MRSEC assignments next.<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(2021-07-01 15:53:51)</span> <b>lmichael:</b></span> Yay! Phil was already running on 7 of them earlier today.<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(2021-07-06 11:09:11)</span> <b>lmichael:</b></span> ’Hope you had a good July 4th weekend. How are we looking on MRSEC node config? ’Looks like they’re not in partitions, yet?<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(2021-07-06 11:10:02)</span> <b>lmichael:</b></span> @eturatsinze @tjslauson ^<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(2021-07-06 11:12:16)</span> <b>tjslauson:</b></span> yes, we decided on Thursday to apply the config today.  I was planning on giving you an update after it's done, either later today or tomorrow.<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(2021-07-06 11:13:52)</span> <b>lmichael:</b></span> :+1:<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(2021-07-07 09:40:47)</span> <b>lmichael:</b></span> Update?<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(2021-07-07 09:43:49)</span> <b>lmichael:</b></span> @eturatsinze @tjslauson Looks like the new nodes are ‘in’ but are ‘down’ (according to SLURM) for wang and schmidt partitions?<br/>
+<span style="color: #c386df"><span style="font-size: small">(2021-07-07 10:30:22)</span> <b>eturatsinze:</b></span> I've resumed nodes in the wang partition, and as for the schmidt partition, it looks like the user is not in the webapp yet, and the corresponding group <tt>slurm_partition_schmidt</tt> has no members.<br/>Also one of the nodes on the schmidt chassis is having issues, I'd like to keep it down for ease of troubleshooting at least until the user/group situation is sorted out<br/>
+</blockquote>
+<span style="color: #e7392d"><span style="font-size: small">(15:38:23)</span> <b>ckoch5:</b></span> More userapp checkbox problems - users on the HPC cluster are also now showing up with boxes not checked for hpclogin1<br/>
+</body>
+</html>

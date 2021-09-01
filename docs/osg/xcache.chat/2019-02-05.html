@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Feb 5, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Tue Feb 5, 2019 : #xcache (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(09:59:10)</span> <b>blin:</b></span> @marian @dweitzel @matyas do we have all the stash caches registered? can we start work on <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-3470">https://opensciencegrid.atlassian.net/browse/SOFTWARE-3470</a>?<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:59:27)</span> <b>matyas:</b></span> no we don't<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:00:29)</span> <b>blin:</b></span> didn't we have a ticket for that?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:01:26)</span> <b>matyas:</b></span> sure. it was added to my pile<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:01:27)</span> <b>blin:</b></span> found it<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:01:36)</span> <b>blin:</b></span> nah, @marian owns it <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-3444">https://opensciencegrid.atlassian.net/browse/SOFTWARE-3444</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:01:47)</span> <b>matyas:</b></span> i think it got passed back and forth?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:02:02)</span> <b>blin:</b></span> yeah it did<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:04:01)</span> <b>matyas:</b></span> out of the ones listed in the ticket, we only have <a href="http://hcc-stash.unl.edu">hcc-stash.unl.edu</a> registered. (we also have <a href="http://sc-cache.chtc.wisc.edu">sc-cache.chtc.wisc.edu</a> registered)<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:07:48)</span> <b>matyas:</b></span> and we only have one VO registered (CHTC)<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:08:20)</span> <b>matyas:</b></span> (well, we have a couple of others but they have blank AllowedOrigins and/or AllowedCaches lists)<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:09:17)</span> <b>blin:</b></span> we need to get rolling on that<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:09:24)</span> <b>blin:</b></span> @marian we can help you out if you have questions<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:10:05)</span> <b>matyas:</b></span> @marian, can you tell us which origins are allowed to serve data for:<br/>- /cms<br/>- /pnfs/fnal.gov<br/>- /user<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:11:18)</span> <b>matyas:</b></span> and who's allowed to cache data under /cms<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:11:41)</span> <b>marian:</b></span> the thing is it got assigned to me a day before I left for vacation, then I was week stuck with my knee at home and last week was San Diego trip ... I was looking at that ticket yesterday and plan on working it, hopefully this afternoon I get to it...<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:11:55)</span> <b>matyas:</b></span> ok that's fine<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:12:28)</span> <b>matyas:</b></span> it took us a while to get the code in and now we need extra registration data too (AllowedOrigins, AllowedCaches, AllowedVOs)<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:18:50)</span> <b>marian:</b></span> @matyas: looking at config of origins would be best to look at, but here is my best guess:<br/>- /cms :: <a href="http://xrootd-local.unl.edu">xrootd-local.unl.edu</a><br/>- /pnfs/fnal.gov :: <a href="http://stashcache.fnal.gov">stashcache.fnal.gov</a><br/>- /user :: <a href="http://stash.osgconnect.net">stash.osgconnect.net</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(10:20:18)</span> <b>marian:</b></span> there are few more I don't know what they set: <a href="http://sugwg-scitokens.phy.syr.edu">sugwg-scitokens.phy.syr.edu</a>, <a href="http://stashcache.t2.ucsd.edu">stashcache.t2.ucsd.edu</a>, <a href="http://gordon-dm1.sdsc.edu">gordon-dm1.sdsc.edu</a> ... somehow I can figure maybe using xrdfs what they share...<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:22:45)</span> <b>marian:</b></span> I don't have root anywhere except UNL one to look at Authfile<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:25:04)</span> <b>matyas:</b></span> i don't think looking at the Authfile helps yet<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:28:55)</span> <b>matyas:</b></span> xrdfs is probably your best bet<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:30:42)</span> <b>matyas:</b></span> also, @bbockelm, did anybody but LIGO have any restricted data? maybe we can do AllowedCaches: [ANY] for the non-LIGO VOs<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:14:22)</span> <b>bbockelm:</b></span> I thought we had something by default for CMS (probably should be empty); a default of <tt>[ANY_PUBLIC]</tt> is probably fine for everyone else.<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:54:33)</span> <b>matyas:</b></span> uhh if you're not letting anybody cache your stuff then get out of the federation :slightly_smiling_face:<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:55:49)</span> <b>matyas:</b></span> also there's no ANY_PUBLIC for AllowedCaches<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:55:53)</span> <b>matyas:</b></span> just AllowedVOs<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:56:38)</span> <b>matyas:</b></span> btw @bbockelm <a href="http://hcc-briantest7.unl.edu">hcc-briantest7.unl.edu</a> is not a registered resource so stop asking for authfiles<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:57:07)</span> <b>bbockelm:</b></span> :slightly_smiling_face: it's good to test the negative code paths, no?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:58:41)</span> <b>matyas:</b></span> so CMS does have <tt>[ ]</tt> for AllowedCaches; please explain why that's OK<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:01:41)</span> <b>bbockelm:</b></span> CMS doesn't have any registered caches currently and we don't want to authorize caches to access CMS files until a plan is hashed.  Deny by default.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:01:58)</span> <b>matyas:</b></span> OK<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:03:18)</span> <b>matyas:</b></span> should we add origins or leave those blank too?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:05:08)</span> <b>matyas:</b></span> sorry @marian, it's not <tt>/cms</tt>, it's <tt>/store</tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(13:05:38)</span> <b>marian:</b></span> actually, I read it as <tt>/strore</tt> :slightly_smiling_face: ... yeah, that's cms thingy<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:06:05)</span> <b>marian:</b></span> I'll poke around with xrdfs and get back to you<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:06:12)</span> <b>matyas:</b></span> cool, thanks!<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:53:42)</span> <b>marian:</b></span> @matyas I didn't find a way how to do it via xrdfs, I think easiest would be ping each admin of every origin via slack and ask what they configure as <tt>oss.localroot/all.export</tt> lines. unless somebody has better idea...?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:56:03)</span> <b>matyas:</b></span> can you get a list of the origins?<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:15:00)</span> <b>marian:</b></span> yeah:<br/><pre><br/>      Srv <a href="http://sugwg-scitokens.phy.syr.edu:1094">sugwg-scitokens.phy.syr.edu:1094</a><br/>      Srv <a href="http://stash.osgconnect.net:1094">stash.osgconnect.net:1094</a><br/>      Srv <a href="http://stashcache.t2.ucsd.edu:11094">stashcache.t2.ucsd.edu:11094</a><br/>      Srv <a href="http://stashcache.fnal.gov:1094">stashcache.fnal.gov:1094</a><br/>      Srv <a href="http://csiu.grid.iu.edu:0">csiu.grid.iu.edu:0</a><br/>      Srv <a href="http://origin.ligo.caltech.edu:1094">origin.ligo.caltech.edu:1094</a><br/>      Srv <a href="http://gordon-dm1.sdsc.edu:31094">gordon-dm1.sdsc.edu:31094</a><br/></pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(14:28:00)</span> <b>marian:</b></span> this one is basically dead: <a href="http://csiu.grid.iu.edu:0">csiu.grid.iu.edu:0</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(14:28:23)</span> <b>marian:</b></span> don't remember why we keep it but somebody told me few months back leave it there<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:28:28)</span> <b>marian:</b></span> not sure of reasons<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:44:15)</span> <b>bbockelm:</b></span> <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-3558">https://opensciencegrid.atlassian.net/browse/SOFTWARE-3558</a> &lt;~ @matyas / @blin / @marian something to be aware of.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:44:37)</span> <b>bbockelm:</b></span> Basically, HTTP and XRootD need to be run on the same port on the origin.<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:44:56)</span> <b>matyas:</b></span> they already do<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:45:11)</span> <b>bbockelm:</b></span> :confused: the upshot of that is we have to decide which instance the cmsd associates with.<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:45:11)</span> <b>matyas:</b></span> don't they?<br/>only the cache starts a separate http plugin<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:45:31)</span> <b>matyas:</b></span> oh you mean whether to use 1094 or 1095?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:45:42)</span> <b>bbockelm:</b></span> Not sure it's plausible really to run a part public / part authenticated origin.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:46:06)</span> <b>bbockelm:</b></span> oh!  @matyas - Tony Gitter has a million microscope images that he's interested in processing.<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:47:01)</span> <b>matyas:</b></span> sounds fun<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:47:47)</span> <b>bbockelm:</b></span> (thought this might be a good case for the CHTC origin)<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:47:58)</span> <b>matyas:</b></span> sure<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:48:17)</span> <b>bbockelm:</b></span> anyhow.  Derek was hitting this issue on the Stash origin.  Might be cruft because @lincoln doesn't use our super-awesome-not-yet-released package.<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:48:27)</span> <b>lincoln:</b></span> :thinking_face:<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:49:14)</span> <b>matyas:</b></span> by "not sure if it's feasible to run a part public / part authenticated origin" -- do you mean not feasible to run stash-origin and stash-origin-auth on the same machine?<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:49:29)</span> <b>matyas:</b></span> or do you mean not feasible to run stash-origin-auth that also listens with http?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:49:34)</span> <b>bbockelm:</b></span> well, I think I told you that it might be possible to have one cmsd that represents both<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:49:39)</span> <b>bbockelm:</b></span> I think that's ... not right.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:49:56)</span> <b>bbockelm:</b></span> @lincoln - it's the greatest package never released!<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:50:43)</span> <b>matyas:</b></span> uh that sounds like a problem -- do you mean i will need to have both an <a href="http://sc-origin.chtc.wisc.edu">sc-origin.chtc.wisc.edu</a> and an <a href="http://sc-origin-auth.chtc.wisc.edu">sc-origin-auth.chtc.wisc.edu</a>?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:51:03)</span> <b>bbockelm:</b></span> no, I think that the origin will need two xrootd and two cmsd instances.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:51:10)</span> <b>bbockelm:</b></span> not two xrootd and one cmsd instance.<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:51:14)</span> <b>matyas:</b></span> oh ok<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:51:24)</span> <b>matyas:</b></span> so that's just updating the instructions, right?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:51:57)</span> <b>bbockelm:</b></span> Well, we had this discussion ... somewhere in the ticket about having the cmsd auto-enable?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:52:49)</span> <b>bbockelm:</b></span> <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-3544">https://opensciencegrid.atlassian.net/browse/SOFTWARE-3544</a> &lt;~ looks like the ticket<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:53:22)</span> <b>matyas:</b></span> i think we had a discussion here too: <a href="https://github.com/opensciencegrid/docs/pull/491#discussion_r251487925">https://github.com/opensciencegrid/docs/pull/491#discussion_r251487925</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(17:55:21)</span> <b>matyas:</b></span> re. Tony Gitter and the CHTC origin, I've been seeing this on the sc-cache xrootd logs:<br/><pre><br/>190205 13:08:02 2301778 XrootdXeq: bbockelm.22740:127@hcc-cvmfs-repo.unl.edu pub IP46 login<br/>190205 13:08:02 2301778 bbockelm.22740:127@hcc-cvmfs-repo.unl.edu ofs_opendir:  fn=/chtc/PUBLIC<br/>190205 13:08:02 2301778 acc_Audit: bbockelm.22740:127@hcc-cvmfs-repo.unl.edu grant host *@hcc-cvmfs-repo.unl.edu readdir /chtc/PUBLIC<br/>190205 13:08:02 2301778 ofs_opendir: bbockelm.22740:127@hcc-cvmfs-repo.unl.edu Unable to open directory /chtc/PUBLIC; no such file or directory<br/>190205 13:08:02 2301778 bbockelm.22740:127@hcc-cvmfs-repo.unl.edu XrootdResponse: sending err 3011: Unable to open directory /chtc/PUBLIC; no such file or directory<br/></pre><br/>little worried about the 'no such file or directory' on <tt>/chtc/PUBLIC</tt><br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:56:35)</span> <b>bbockelm:</b></span> interesting - not sure why that is getting indexed...<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:57:26)</span> <b>bbockelm:</b></span> hm - just remembered that the <tt>cmsd</tt> doesn't respect Authfiles.  We might have to actually work through a full example on this...<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:57:26)</span> <b>matyas:</b></span> oh hey my origin is not showing up on <a href="http://redirector.osgstorage.org">redirector.osgstorage.org</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(17:59:16)</span> <b>matyas:</b></span> probably because the cmsd(s) weren't running<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:59:31)</span> <b>bbockelm:</b></span> :slightly_smiling_face: so... you'll be doing the systemd dependency tonight?<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:00:10)</span> <b>matyas:</b></span> nah i solved it for me :-)<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:00:52)</span> <b>matyas:</b></span> ok, i don't really understand how cmsd fits into all this. what does it need to do with the Authfile?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:57:44)</span> <b>dweitzel:</b></span> Brian knows more than me.  But cmsd acts as the load balancer, and the "does this file exist" part of the infrastructure.  Clients always talk to xrootd daemon, xrootd daemons talk to cmsd's to answer the questions "Where is this file"<br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:59:15)</span> <b>bbockelm:</b></span> So let's say the auth and unauth xrootd are both looking at the mount <tt>/mnt/stash</tt>.  The Authfile prevents the unauth instance from exporting <tt>/mnt/stash/foo</tt>.  If a <tt>cmsd</tt> running alongside the unauth instance reports it has <tt>/foo</tt> (and wins the race with the auth instance), then the client will be redirected to the unauth instance and receive a permission denied.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(21:00:20)</span> <b>bbockelm:</b></span> so the problem I was trying to mull over is that the two <tt>cmsd</tt> instances have to "see" mutually-exclusive namespaces if they are both on the same host ... and we don't appropriately generate that configuration right now!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(21:00:56)</span> <b>bbockelm:</b></span> I suppose it's doable since we enumerate public-versus-private namespaces -- but definitely isn't done.<br/>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jun 1, 2016 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Wed Jun 1, 2016 : #gracc (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(10:22:05)</span> <b>dweitzel:</b></span> @kretzke: Do you have time to help me with an experiment with Gracc’s hosting?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:22:59)</span> <b>kretzke:</b></span> possibly<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:23:07)</span> <b>dweitzel:</b></span> The admins here have enabled a layer of caching that should increase the iops, and decrease the IO time for an instance.  All that needs to be done is to unmount and remount a volume to see the performance increase.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:23:46)</span> <b>dweitzel:</b></span> Since all of the gracc instances are doing about the same IOPS, I would be interested if we could notice if 1 of them suddenly has less IO time?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:26:00)</span> <b>kretzke:</b></span> ok, I can do that, probably this afternoon<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:34:31)</span> <b>dweitzel:</b></span> ok, thanks!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:30:22)</span> <b>dweitzel:</b></span> @kretzke: let me know when you unmount it.  I have to hit a button on the openstack side, the ‘disconnect’ volume button.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:41:04)</span> <b>kretzke:</b></span> starting process to take down node; shard allocation disabled<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:41:58)</span> <b>dweitzel:</b></span> ok, let me know when you unmounted the volume.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:42:06)</span> <b>dweitzel:</b></span> And what instance (or hostname) is this on?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:42:40)</span> <b>kretzke:</b></span> let’s do gratiav2-2<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:42:43)</span> <b>dweitzel:</b></span> k<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:46:10)</span> <b>dweitzel:</b></span> unmounted?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:47:01)</span> <b>kretzke:</b></span> not yet, flushing indices<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:47:08)</span> <b>dweitzel:</b></span> k<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:55:57)</span> <b>kretzke:</b></span> ok, /dev/vdb1 on gratiav2-2 (10.71.101.64) is unmounted<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:56:21)</span> <b>dweitzel:</b></span> ok, detached, now re-attaching<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:56:44)</span> <b>dweitzel:</b></span> ok, re-attached.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:00:08)</span> <b>kretzke:</b></span> back up and recovering. let’s see if the sync flush helps recovery<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:01:16)</span> <b>kretzke:</b></span> here’s a dashboard with just disk stats: <a href="https://gracc.opensciencegrid.org/dashboard/db/grace-system-monitoring-disk">https://gracc.opensciencegrid.org/dashboard/db/grace-system-monitoring-disk</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:08:59)</span> <b>dweitzel:</b></span> ah, are you testing a new recovery method?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:12:23)</span> <b>kretzke:</b></span> Sort of, I did a manual sync flush, although since we didn’t stop indexing I don’t think it really helped <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-synced-flush.html">https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-synced-flush.html</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:16:52)</span> <b>kretzke:</b></span> If this makes a difference we’ll take the whole cluster down,  we’re about due for an upgrade anyways<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:17:55)</span> <b>dweitzel:</b></span> the grace-system-monitoring still claims there’s a ton of unassigned shards.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:19:46)</span> <b>kretzke:</b></span> yeah, it’ll take a couple hours to recover<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:24:58)</span> <b>kretzke:</b></span> could we get another volume allocated to store snapshots? it needs to be mounted on all data nodes<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:25:46)</span> <b>dweitzel:</b></span> I don’t think you can mount a volume on more than one instance.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:25:55)</span> <b>dweitzel:</b></span> it’s a 1-to-1 relationship.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:29:15)</span> <b>kretzke:</b></span> ah, yeah that makes sense. guess I could mount it on the master and export it via nfs<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:29:39)</span> <b>dweitzel:</b></span> Sure, or I could make you another instance, and attach a volume for you.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:38:14)</span> <b>kretzke:</b></span> ok. let me do a little more research on snapshots and figure out how much space we need<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(16:09:43)</span> <b>B167BCLN5:</b></span> <br/>
+<span style="color: #A82F2F"><span style="font-size: small">(16:26:51)</span> <b>B14K7UVU4:</b></span> <br/>
+</body>
+</html>

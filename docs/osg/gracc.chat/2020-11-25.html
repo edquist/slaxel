@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Nov 25, 2020 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Wed Nov 25, 2020 : #gracc (osg)</h3>
+<span style="color: #16569E"><span style="font-size: small">(11:51:48)</span> <b>edquist:</b></span> Hello #gracc .. I am trying to migrate mappings and settings from an ES 2.x instance to ES 7.x ... I keep getting "Root mapping definition has unsupported parameters" errors for all the "properties".  Even if i boil it down to a very simple example, eg:<br/><br/><pre><br/>{<br/>    "mappings": {<br/>        "article": {<br/>            "properties": {<br/>                "UserLicense": {<br/>                    "type": "string"<br/>                },<br/>                "abstract": {<br/>                    "type": "string"<br/>                }<br/>            }<br/>        }<br/>    }<br/>}<br/></pre><br/><br/>I get back<br/><br/><pre><br/>{<br/>   "status" : 400,<br/>   "error" : {<br/>      "caused_by" : {<br/>         "type" : "mapper_parsing_exception",<br/>         "reason" : "Root mapping definition has unsupported parameters:  [article : {properties={UserLicense={type=string}, abstract={type=string}}}]"<br/>      },<br/>      "root_cause" : [<br/>         {<br/>            "reason" : "Root mapping definition has unsupported parameters:  [article : {properties={UserLicense={type=string}, abstract={type=string}}}]",<br/>            "type" : "mapper_parsing_exception"<br/>         }<br/>      ],<br/>      "reason" : "Failed to parse mapping [_doc]: Root mapping definition has unsupported parameters:  [article : {properties={UserLicense={type=string}, abstract={type=string}}}]",<br/>      "type" : "mapper_parsing_exception"<br/>   }<br/>}<br/></pre><br/><br/>Anybody here (@dweitzel ?) have any idea what might be wrong?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:52:41)</span> <b>dweitzel:</b></span> I think the mappings have a slightly different format now.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:55:33)</span> <b>dweitzel:</b></span> Here's one of our mappings: <a href="https://gracc.opensciencegrid.org/q/gracc.osg.summary3-2020/_mappings?pretty">https://gracc.opensciencegrid.org/q/gracc.osg.summary3-2020/_mappings?pretty</a><br/>
+<span style="color: #16569E"><span style="font-size: small">(11:55:45)</span> <b>edquist:</b></span> thanks for the link!<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:56:27)</span> <b>edquist:</b></span> ah<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:56:28)</span> <b>edquist:</b></span> i see<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:56:35)</span> <b>edquist:</b></span> they are grouped pretty differently<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:56:40)</span> <b>dweitzel:</b></span> I think you shouldn't have the "article" after mappings.<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:56:50)</span> <b>edquist:</b></span> all the 'properties' are in a list<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:57:23)</span> <b>edquist:</b></span> hm ok<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:57:38)</span> <b>edquist:</b></span> so<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:57:46)</span> <b>edquist:</b></span> the name of the index is outside mappings?<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:58:15)</span> <b>edquist:</b></span> that's how it looks i guess<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:01:01)</span> <b>dweitzel:</b></span> yes.  though, you don't include the name of the index when you are writing the mapping, usually.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:01:12)</span> <b>dweitzel:</b></span> Because that is explicit usually in the URL<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:01:29)</span> <b>edquist:</b></span> i see<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:01:45)</span> <b>edquist:</b></span> so,<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:01:48)</span> <b>edquist:</b></span> where the gracc one has<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:02:01)</span> <b>edquist:</b></span> <pre><br/>{<br/>  "gracc.osg.summary3-2020" : {<br/>    "mappings" : {<br/></pre><br/>
+<span style="color: #16569E"><span style="font-size: small">(12:02:12)</span> <b>edquist:</b></span> what goes in that top-most key?<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:02:37)</span> <b>edquist:</b></span> if i put "article" there i get "unknown key [article] for create index"<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:03:58)</span> <b>dweitzel:</b></span> Just "mappings"<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:04:11)</span> <b>dweitzel:</b></span> oh, you are creating a index?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:04:16)</span> <b>dweitzel:</b></span> what's the context you are using this?<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:04:53)</span> <b>edquist:</b></span> i am pulling the mappings and settings from an ES 2.x instance, and trying to re-create them on a 7.x instance<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:05:19)</span> <b>edquist:</b></span> i think i see what you mean, just put mappings at the top level<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:05:31)</span> <b>dweitzel:</b></span> yeah, try that.<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:05:39)</span> <b>edquist:</b></span> without an "article" level, since that's implicit in the url<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:06:07)</span> <b>dweitzel:</b></span> the "article" level is referring to a "doc" type, which was depreciated and removed.<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:06:46)</span> <b>edquist:</b></span> i see<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:06:51)</span> <b>edquist:</b></span> ok thank you for the help!<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:13:39)</span> <b>edquist:</b></span> any idea what the correct 7.x equivalent of "index: not_analyzed" is ?<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:16:19)</span> <b>edquist:</b></span> seems like now in 7.x, "index" takes a bool; but another page was suggesting<br/><br/>&gt;Instead of "index": "not_analyzed", you can either use keyword datatype (instead of text) or use "analyzer": "keyword".<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:19:31)</span> <b>edquist:</b></span> i think i'm just going to try index: false for now.  Seems to work, hopefully that gives the expected behavior.<br/>
+</body>
+</html>

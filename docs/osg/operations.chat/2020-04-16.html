@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Apr 16, 2020 : #operations (osg)</title>
+</head>
+<body>
+<h3>Thu Apr 16, 2020 : #operations (osg)</h3>
+<span style="color: #e06b56"><span style="font-size: small">(13:07:52)</span> <b>jthiltges:</b></span> The hosted CEs need an update to condor 8.8.8 to address the recent security vulnerabilities? There's a nice list with versions on the collector ce_view page: <a href="http://collector.opensciencegrid.org/">http://collector.opensciencegrid.org/</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:19:56)</span> <b>blin:</b></span> Hosted CEs don't<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:20:24)</span> <b>blin:</b></span> the CVEs really only affected condor pools (WNs + submit hosts)<br/>
+<span style="color: #bc3663"><span style="font-size: small">(13:20:38)</span> <b>dmason:</b></span> oh — a shopping list?  is that publicly linked anywhere?  See CMS has a couple left we’ll have to follow up on…<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(13:22:33)</span> <b>blin:</b></span> the only public link i could find for that with a cursory glance at our pages is: <a href="https://opensciencegrid.org/technology/policy/service-migrations-spring-2018/#collector">https://opensciencegrid.org/technology/policy/service-migrations-spring-2018/#collector</a><br/>
+<span style="color: #bc3663"><span style="font-size: small">(13:25:28)</span> <b>dmason:</b></span> OK — probably not a big deal, but also have seen some pretty devious things (i.e. incident here where the attacker actually went through our local training materials to find what to attack next)   Just something to keep in mind…<br/>
+<span style="color: #bc3663"><span style="font-size: small">(13:26:05)</span> <b>dmason:</b></span> Its actually a good list — now I at least know a couple sites to follow up with on our side!<br/>
+<span style="color: #bc3663"><span style="font-size: small">(14:01:12)</span> <b>dmason:</b></span> BTW we think UERJ is at 8.8.8 for a while now — is that list up to date?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:01:52)</span> <b>blin:</b></span> it's just a collector so it's info is based on when the CE last sent us an ad<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:02:46)</span> <b>blin:</b></span> there should be a timestamp in there somewhere, one sec<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:05:46)</span> <b>blin:</b></span> looks recent:<br/><pre># condor_status -schedd -pool <a href="http://collector.opensciencegrid.org:9619">collector.opensciencegrid.org:9619</a>  <a href="http://osgce2.hepgrid.uerj.br">osgce2.hepgrid.uerj.br</a> -af lastheardfrom | xargs -I {} date -d @{}<br/>Thu Apr 16 14:01:42 CDT 2020</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:06:14)</span> <b>blin:</b></span> perhaps the CE service needs to be restarted?<br/>
+<span style="color: #bc3663"><span style="font-size: small">(14:11:43)</span> <b>dmason:</b></span> @jletts just checked again —<br/><pre><a href="http://osgce2.hepgrid.uerj.br">osgce2.hepgrid.uerj.br</a><br/>      4 $CondorVersion: 8.8.8 Feb 17 2020 BuildID: 496171 $</pre><br/><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:14:33)</span> <b>blin:</b></span> i just queried the CE directly and its schedd ad says it's running 8.8.8:<br/><pre># condor_status -schedd -pool <a href="http://osgce2.hepgrid.uerj.br:9619">osgce2.hepgrid.uerj.br:9619</a> -af condorversion <br/>$CondorVersion: 8.8.7 Jan 06 2020 PackageID: 8.8.7-1 $</pre><br/>though I'm not sure when <tt>CondorVersion</tt> gets updated in the Schedd ad. could be on daemon startup<br/>
+</blockquote>
+<span style="color: #43761b"><span style="font-size: small">(13:20:46)</span> <b>blin:</b></span> with the default CE config, the CVEs weren't relevant<br/>
+</body>
+</html>

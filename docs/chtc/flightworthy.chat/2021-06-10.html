@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jun 10, 2021 : #flightworthy (chtc)</title>
+</head>
+<body>
+<h3>Thu Jun 10, 2021 : #flightworthy (chtc)</h3>
+<span style="color: #4cc091"><span style="font-size: small">(08:31:56)</span> <b>blin:</b></span> how about <a href="http://htcondor.org/foo">htcondor.org/foo</a>?<br/>
+<span style="color: #4cc091"><span style="font-size: small">(08:32:55)</span> <b>blin:</b></span> @tannenba @jfrey do you have the link handy for the GSI retirement timeline? ATLAS folks were asking about it<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(08:33:32)</span> <b>jfrey:</b></span> <a href="https://htcondor-wiki.cs.wisc.edu/index.cgi/wiki?p=PlanToReplaceGridCommunityToolkit">https://htcondor-wiki.cs.wisc.edu/index.cgi/wiki?p=PlanToReplaceGridCommunityToolkit</a><br/>
+<span style="color: #4cc091"><span style="font-size: small">(08:35:55)</span> <b>blin:</b></span> without GCT libs, will we still be able to delegate VOMS proxies?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(08:36:38)</span> <b>jfrey:</b></span> Yes. I got the delegation code working last night (borrowed from ARC CE).<br/>
+<span style="color: #4cc091"><span style="font-size: small">(08:37:08)</span> <b>blin:</b></span> nice!!<br/>
+<span style="color: #4cc091"><span style="font-size: small">(08:40:03)</span> <b>blin:</b></span> ah since this is going into 9.1, a lot of OSG sites are going to need to move to that since we're building 9.0 without GCT in the OSG<br/>
+<span style="color: #2b6836"><span style="font-size: small">(09:34:27)</span> <b>jcpatton:</b></span> Dear artists formerly known as #flightworthy, here’s a job that ran a few times and then was removed. What was the total wallclock time and last execution wallclock time for this job?<br/>
+<blockquote>
+<span style="color: #2b6836"><span style="font-size: small">(09:41:04)</span> <b>jcpatton:</b></span> My best guess…<br/><pre>Total wallclock time = RemoteWallClockTime = 76780<br/>Last execution wallclock time = ToE.When - JobCurrentStartDate = 44453</pre><br/>It seems odd to me that <tt>ToE.How = OF_ITS_OWN_ACCORD</tt>. Note how much later <tt>EnteredCurrentStatus = 1623304982</tt> is than <tt>ToE.When = 1622093785</tt>.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:03:27)</span> <b>johnkn:</b></span> The job has <tt>EditedClusterAttrs = "PeriodicRelease"</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:04:04)</span> <b>johnkn:</b></span> which suggests to me that at one time it may have had a non-trivial PeriodicRelease expression.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:04:27)</span> <b>johnkn:</b></span> which in turn might account for change to EnteredCurrentStatus<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:09:23)</span> <b>jcpatton:</b></span> It's also got OnExitHold set, it looks like it used that to retry if the executable didn't return 0.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:11:00)</span> <b>johnkn:</b></span> Seems like a good guess<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:11:08)</span> <b>jcpatton:</b></span> Is ToE.When a good measure of when a (removed) job last exited, if it ran at all?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:11:29)</span> <b>johnkn:</b></span> That's a question for ToddM.  I think so<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:19:02)</span> <b>tlmiller:</b></span> <tt>ToE.When</tt> records the last time the job terminated in the <tt>ToE.How</tt> way.  A wide variety of reasons don't generate ToE tags.  I don't know that HTCondor actually records (in the job ad) both of the pieces of information you want, or even either, depending on how you define them.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:20:44)</span> <b>jcpatton:</b></span> Miron wants the final execution of a removed job to count as goodput, which I guess is not possible to reliably calculate then<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:24:56)</span> <b>tlmiller:</b></span> To be clear: I don't know.  It's entirely possible that it is recorded in the job ad somehow.  It's certainly possible to compute from the event log.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:29:45)</span> <b>johnkn:</b></span> EnterredCurrentStatus is a pretty ephemeral value, not going to be very useful for a job in the history file.  for jobs that actually completed execution the ToE should be a good measure of the last execution attempt.  i.e. when JobLastStartExecutionDate &lt; ToE.When, you can use it.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:30:33)</span> <b>johnkn:</b></span> but when the last execution attempt did not complete, I think there may not be enough information to reconstruct the last complete execution<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:33:20)</span> <b>jcpatton:</b></span> What we're looking for is the last attempt before (or at) removal, which doesn't have to be a completed execution.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:37:06)</span> <b>johnkn:</b></span> no can do.  a periodic release will thrash enteredcurrentstatus, and an incomplete execution may not have a toe.<br/>
+</blockquote>
+<span style="color: #99a949"><span style="font-size: small">(10:32:37)</span> <b>matyas:</b></span> What's the current best practice for sites with large machines that want to run both multi-core and single-core jobs? Should I tell them to use pslots, or will that lead to starvation?<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:34:49)</span> <b>gthain:</b></span> pslots + draining work for many sites<br/>
+<span style="color: #99a949"><span style="font-size: small">(10:37:09)</span> <b>matyas:</b></span> can you automate draining somehow?<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:37:27)</span> <b>gthain:</b></span> the defrag daemon can do this in a primitive way<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:37:28)</span> <b>tlmiller:</b></span> We have a whole daemon that does nothing but..?<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:37:46)</span> <b>gthain:</b></span> Christina is also good at it...<br/>
+<blockquote>
+<span style="color: #99a949"><span style="font-size: small">(10:38:28)</span> <b>matyas:</b></span> as one RSAG commenter put it yesterday... Christina doesn't scale infinitely :slightly_smiling_face:<br/>
+</blockquote>
+<span style="color: #99a949"><span style="font-size: small">(10:37:47)</span> <b>matyas:</b></span> is this a separate daemon you need to add to the DAEMON_LIST ?<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:37:55)</span> <b>gthain:</b></span> There's one per pool, usually<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:38:13)</span> <b>johnkn:</b></span> Yes, add to your CM daemon list<br/>
+<span style="color: #99a949"><span style="font-size: small">(10:44:52)</span> <b>matyas:</b></span> OK, just found the manual. There's... um... a lot of knobs.<br/>
+<span style="color: #99a949"><span style="font-size: small">(10:44:59)</span> <b>matyas:</b></span> (<a href="https://htcondor.readthedocs.io/en/v8_8/admin-manual/policy-configuration.html?highlight=defrag#defragmenting-dynamic-slots">https://htcondor.readthedocs.io/en/v8_8/admin-manual/policy-configuration.html?highlight=defrag#defragmenting-dynamic-slots</a>)<br/>
+<span style="color: #99a949"><span style="font-size: small">(10:45:12)</span> <b>matyas:</b></span> this site has two 128-core machines<br/>
+<span style="color: #99a949"><span style="font-size: small">(10:48:19)</span> <b>matyas:</b></span> what are some good values? I'm guessing <tt>DEFRAG_DRAINING_MACHINES_PER_HOUR=1</tt> and a high <tt>DEFRAG_UPDATE_INTERVAL</tt>?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:50:28)</span> <b>johnkn:</b></span> the whole site is 2 machines?<br/>
+<span style="color: #99a949"><span style="font-size: small">(10:50:52)</span> <b>matyas:</b></span> yep<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:50:53)</span> <b>johnkn:</b></span> or those are just the biggest?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:51:31)</span> <b>johnkn:</b></span> ABJ - always be draining...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:52:21)</span> <b>johnkn:</b></span> How wide are the widest multicore jobs?  less than 128 ?<br/>
+<span style="color: #99a949"><span style="font-size: small">(10:53:11)</span> <b>matyas:</b></span> don't know the widest, but he mentioned 40-core jobs<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:55:14)</span> <b>johnkn:</b></span> Only 2 machines is tough.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:55:40)</span> <b>johnkn:</b></span> An automated drain will take one of the machines offline for new jobs pretty regularly.<br/>
+<span style="color: #99a949"><span style="font-size: small">(10:56:05)</span> <b>matyas:</b></span> yeah that's why I figured have a very high DEFRAG_UPDATE_INTERVAL<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:56:08)</span> <b>tlmiller:</b></span> Depends on what you change the START expression to.<br/>
+<span style="color: #d58247"><span style="font-size: small">(10:56:14)</span> <b>gthain:</b></span> You can config defrag daemon to only drain down to free 40 cores<br/>
+<span style="color: #99a949"><span style="font-size: small">(10:57:51)</span> <b>matyas:</b></span> <pre>DEFRAG_WHOLE_MACHINE_EXPR = Cpus &gt;= 40 &amp;&amp; Offline=!=True</pre><br/>?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:05:27)</span> <b>johnkn:</b></span> This is 9.0?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:06:01)</span> <b>johnkn:</b></span> No need to do offline check, that is now automatic.<br/><pre>	ASSERT( param(m_whole_machine_expr,"DEFRAG_WHOLE_MACHINE_EXPR") );<br/>	m_whole_machine_expr += " &amp;&amp; Offline =!= True &amp;&amp; PartitionableSlot &amp;&amp; " DEFRAG_DRAIN_REASON_CONSTRAINT;</pre><br/>
+<span style="color: #99a949"><span style="font-size: small">(11:07:10)</span> <b>matyas:</b></span> I haven't asked but I'm going to guess not; does including the offline check hurt?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:07:38)</span> <b>johnkn:</b></span> no. the effective expression will just have that test twice on 9.0<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:07:45)</span> <b>matyas:</b></span> ok<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:08:41)</span> <b>matyas:</b></span> (for full context, this is <a href="https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=103457">https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=103457</a>)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:08:48)</span> <b>johnkn:</b></span> notice also the test for Pslot,  you can't actually drain a static slot, but if they exist in the pool they will confuse an 8.8 defrag daemon.<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:09:53)</span> <b>matyas:</b></span> according to the manual, PartitionableSlot is in DEFRAG_REQUIREMENTS<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:10:57)</span> <b>johnkn:</b></span> prior to 9.0 it was in some of the clauses, but not everywhere it was needed.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:11:30)</span> <b>johnkn:</b></span> I don't really remember all of the places we expected you to put it in config<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:12:06)</span> <b>matyas:</b></span> the default DEFRAG_WHOLE_MACHINE_EXPR in 8.8 doesn't have it<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:12:07)</span> <b>johnkn:</b></span> but in 9.0 the defrag daemon will add necessary clauses automatically.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:12:23)</span> <b>coatsworth:</b></span> This is probably a super-basic classad question but I can't figure it out :disappointed: I'm trying to match a job with a condor_annex slot by using <tt>requirements = (EC2InstanceID =!= undefined)</tt>. I very clearly have 2 available slots with an <tt>EC2InstanceID</tt> attribute set. And yet these slots are rejected based on my requirements.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:12:51)</span> <b>coatsworth:</b></span> I know this requirement is the problem because I can match them just fine with a different requirement. What's the correct syntax I should be using here?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:13:11)</span> <b>johnkn:</b></span> Like i said, defrag on 8.8 doesn't necessarily work correctly in a pool that has some static slots.  its not completely broken, just doesn't work the way it's supposed to.<br/>
+<blockquote>
+<span style="color: #99a949"><span style="font-size: small">(11:21:59)</span> <b>matyas:</b></span> oh and if that's not difficult enough, he also wants to run multi-core interactive jobs and have them preempt batch jobs<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:35:29)</span> <b>johnkn:</b></span> I think he should use condor_now, perhaps not even drainging.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:36:21)</span> <b>johnkn:</b></span> with condor_now you can choose what jobs to evict in order to make a specific job (that is in the queue already) run now.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:36:58)</span> <b>johnkn:</b></span> (don't remember if you have to own all of the jobs)<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:37:03)</span> <b>matyas:</b></span> can you vacate multiple jobs? The manual only shows one vacate-job arg<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:37:26)</span> <b>johnkn:</b></span> you can. but the matchmaker may not match the job you want next.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:37:30)</span> <b>johnkn:</b></span> condor_now will.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:38:27)</span> <b>johnkn:</b></span> or you mean with condor_now.  pretty sure you can vacate multiple with condor_now<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:39:08)</span> <b>johnkn:</b></span> ToddM is the expert on this, his work.<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:49:07)</span> <b>matyas:</b></span> looks like condor_now, at least on 8.8, only lets you vacate one job<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:15:24)</span> <b>johnkn:</b></span> ah. I was assuming 9.0<br/>
+</blockquote>
+<span style="color: #9e3997"><span style="font-size: small">(11:13:35)</span> <b>tlmiller:</b></span> @coatsworth (a) what's the full requirements expression of the jobs and (b) are you checking against the correct collector?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:15:59)</span> <b>johnkn:</b></span> @coatsworth rejected where?  matchmaker? at activation time in the Startd? in condor_q -better?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:16:59)</span> <b>coatsworth:</b></span> @tlmiller The full requirements expression is what I posted above. And yes it's the correct collector. If I change the requirements expression to <tt>requirements = regexp( ".*\.ec2\.internal", Machine ) &amp;&amp; (TRUE || TARGET.OpSysMajorVer)</tt> the jobs run as expected.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:17:28)</span> <b>tlmiller:</b></span> @coatsworth You managed to turn off _all_ of the other junk in the requirements expression?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:17:51)</span> <b>tlmiller:</b></span> (I'm kind of impressed.)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:19:11)</span> <b>coatsworth:</b></span> @tlmiller Ah no, that's just what I included in the submit file. The full expression in the job ad is <tt>Requirements = (Target.OpSysMajorVer == 7) &amp;&amp; (OpSysName =!= "Debian") &amp;&amp; ((EC2InstanceID =!= undefined)) &amp;&amp; (TARGET.Arch == "X86_64") &amp;&amp; (TARGET.OpSys == "LINUX") &amp;&amp; (TARGET.Disk &gt;= RequestDisk) &amp;&amp; (TARGET.Memory &gt;= RequestMemory) &amp;&amp; ((TARGET.FileSystemDomain == MY.FileSystemDomain) || (TARGET.HasFileTransfer))</tt><br/>
+<span style="color: #9b3b45"><span style="font-size: small">(11:19:54)</span> <b>jfrey:</b></span> And for other other form, that does match?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:20:20)</span> <b>coatsworth:</b></span> @johnkn Rejected by the matchmaker<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(11:20:28)</span> <b>jfrey:</b></span> I’m suspicious of that <tt>OpSysMajorVer</tt> clause.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:20:42)</span> <b>tlmiller:</b></span> So if you make your submit-file requirements <tt>requirements = (EC2InstanceID =!= undefined) &amp;&amp; (TRUE || TARGET.OpSysMajorVer)</tt> , what happens?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(11:21:29)</span> <b>jfrey:</b></span> I suspect your explicit mention is suppressing a submit transform that adds a OpSysMajorVer check.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:21:41)</span> <b>tlmiller:</b></span> (Note that the automatically-added <tt>(Target.OpSysMajorVer == 7)</tt> will be suppressed.)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:21:52)</span> <b>tlmiller:</b></span> (...as Jaime said before I could find it in the full job ad expression.)<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(11:22:39)</span> <b>jfrey:</b></span> Also, what are <tt>OpSysMajorVer</tt> and <tt>OpSysName</tt> in these machine ads.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:23:04)</span> <b>tlmiller:</b></span> I will guess <tt>2</tt> and <tt>AmazonLinux</tt> before I head out. ;)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:24:18)</span> <b>coatsworth:</b></span> Thanks, that fixed it! I thought I already tried including the <tt>(TRUE || TARGET.OpSysMajorVer)</tt> but apparently I did not. Jobs are matching now.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:24:42)</span> <b>johnkn:</b></span> I fail to understand the value of TRUE in that clause.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:24:59)</span> <b>johnkn:</b></span> Are you afraid that OpSysMajorVer will be 0?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:27:19)</span> <b>coatsworth:</b></span> I don't remember where I got that clause from. It's definitely not something I came up with myself.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:29:08)</span> <b>johnkn:</b></span> Had a look at the transform,  I think this would also work  <tt>TARGET.OpSys =!= "WINDOWS"</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:30:03)</span> <b>johnkn:</b></span> <tt>JOB_TRANSFORM_EL = REQUIREMENTS (JobUniverse == 5) &amp;&amp; (Regexp("OpSysMajorVer", UnParse(Requirements), "i") =?= false) &amp;&amp; (Regexp("WINDOWS", UnParse(Requirements),"i") =?= false)</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:30:52)</span> <b>johnkn:</b></span> Gotta get them to change the EL transform to trigger using the <tt>unresolved</tt> classad method instead of unparse.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:32:17)</span> <b>johnkn:</b></span> Hell, this would also work <tt>("WINDOZE" != "WINDOWS")</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:32:25)</span> <b>johnkn:</b></span> lets get creative...<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:58:31)</span> <b>tlmiller:</b></span> IIRC, the clause was adapted from one used to avoid the <tt>TARGET.Arch</tt> and <tt>TARGET.OpSys</tt> clauses.  I think the idea was that short-circuit evaluation meant that it didn't matter what <tt>TARGET.OpSysMajorVer</tt> was or even maybe if it were defined.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(13:09:29)</span> <b>blin:</b></span> @jfrey we've encountered a few sites with our Hosted CEs that only have python 3 available after a <tt>module load python</tt>. We've got some hacky workarounds in for these in the bosco install but I'm not sure how you want to try to support this long term. maybe one of<br/>• Make the blahp scripts python 2/3 compatible and update <tt>bosco_cluster</tt> to mangle the shebangs based on the available python<br/>• have the blahp server call <tt>module load python</tt> before calling out to <tt>*_status.py</tt><br/>
+<span style="color: #684b6c"><span style="font-size: small">(13:18:30)</span> <b>bbockelman:</b></span> Definitely not option (2)!  That seems very finicky.  How about have the BOSCO tarball be generated with the shebang for the native platform python?<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:21:46)</span> <b>matyas:</b></span> as opposed to shebang mangling, how about a wrapper script? e.g.<br/>&gt; slurm_status.sh:<br/><pre>#!/bin/sh<br/>if command -v python &gt;/dev/null 2&gt;&amp;1; then<br/>    python=python<br/>elif command -v python3 &gt;/dev/null 2&gt;&amp;1; then<br/>    python=python3<br/>elif command -v python2 &gt;/dev/null 2&gt;&amp;1; then<br/>    python=python2<br/>elif test -x /usr/libexec/platform-python; then<br/>    python=/usr/libexec/platform-python<br/>else<br/>    echo &gt;&amp;2 "Can't find Python"<br/>    exit 255<br/>fi<br/><br/>exec "$python" slurm_status.py "$@"</pre><br/>
+<span style="color: #4cc091"><span style="font-size: small">(13:23:05)</span> <b>blin:</b></span> the blahp server would have to be updated to call <tt>slurm_status.sh</tt> directly<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:23:14)</span> <b>matyas:</b></span> ah<br/>
+<span style="color: #684b6c"><span style="font-size: small">(13:23:40)</span> <b>bbockelman:</b></span> <tt>slurm_status.sh</tt> gets invoked an insane number of times.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(13:25:51)</span> <b>tim:</b></span> If it doesn't make the tarball too big, how about just bringing Python 3 with us?<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(13:26:54)</span> <b>tim:</b></span> I think it is just Red Hat 7 systems that don't have Python 3. Correct me if I'm wrong.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(13:31:16)</span> <b>tim:</b></span> On the other hand. It is easy to edit the shebang for the bosco scripts during tarball construction. However, we would need to make them python 2/3 compatible again. (I believe that we ripped of the <tt>from __future__</tt> stuff.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(13:52:05)</span> <b>blin:</b></span> yeah, it shouldn't be hard to put back in there are only like 3 python scripts<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(13:54:54)</span> <b>jfrey:</b></span> Hmm. For pbs, the blahp daemon calls pbs_status.py directly.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(13:55:08)</span> <b>jfrey:</b></span> For all other schedulers (including slurm), it calls &lt;lrms&gt;_status.sh<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(13:55:23)</span> <b>jfrey:</b></span> And slurm_status.sh immediately calls slurm_status.py<br/>
+<span style="color: #2b6836"><span style="font-size: small">(16:25:50)</span> <b>jcpatton:</b></span> We have a user that is doing web scraping and because their jobs keep landing on the same machine, they’re getting IP banned. Is there a way to write a submit file so that no two jobs in the same cluster land on the same machine?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(16:26:27)</span> <b>jcpatton:</b></span> (There’s an ethical question here as well of whether we should allow “high-throughput scraping”)<br/>
+<blockquote>
+<span style="color: #e0a729"><span style="font-size: small">(16:37:47)</span> <b>iross:</b></span> There's a cautionary tale in xDD history of a major publisher blacklisting UW-Madison temporarily because of overzealous scraping.. but if they're scraping twitter, maybe it'd be a net productivity gain if campus got blacklisted :wink:<br/>
+</blockquote>
+<span style="color: #99a949"><span style="font-size: small">(16:27:49)</span> <b>matyas:</b></span> use whole machine slots. nailed it!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:29:53)</span> <b>johnkn:</b></span> requirements = regexp("$(ProcId)$", MACHINE_IP)<br/>
+<span style="color: #2b6836"><span style="font-size: small">(16:30:12)</span> <b>jcpatton:</b></span> I thought about that…<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:30:48)</span> <b>johnkn:</b></span> MACHINE_IP is not the right attr, but I'm sure something is.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(16:31:15)</span> <b>jcpatton:</b></span> or matching to something like <tt>e$(zero padded procid).<a href="http://chtc.wisc.edu">chtc.wisc.edu</a></tt><br/>
+<span style="color: #d58247"><span style="font-size: small">(16:33:05)</span> <b>gthain:</b></span> I think <tt>request_ioheavy</tt> will do the trick<br/>
+<span style="color: #2b6836"><span style="font-size: small">(16:33:31)</span> <b>jcpatton:</b></span> thought about too, though that’s also a little ioheavy-handed<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:33:34)</span> <b>johnkn:</b></span> <tt>Machine == "e$INT(ProcId,%04d).<a href="http://chtc.wisc.edu">chtc.wisc.edu</a>"</tt><br/>
+<span style="color: #d58247"><span style="font-size: small">(16:34:03)</span> <b>gthain:</b></span> <tt>request_ioheavy</tt>  won't shatter the autocluster<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:57:51)</span> <b>matyas:</b></span> if I wanted a startd to prefer jobs that request more cores, would <tt>RANK=RequestCPUs</tt> work?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:58:14)</span> <b>tlmiller:</b></span> Only if all of your users have the same priority. :/<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:58:24)</span> <b>matyas:</b></span> in this case they're all my jobs<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:58:39)</span> <b>tlmiller:</b></span> Than it seems like it should.<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:58:49)</span> <b>matyas:</b></span> for some reason, it isn't<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:58:58)</span> <b>matyas:</b></span> is it supposed to work with pslots?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:59:14)</span> <b>tlmiller:</b></span> I would expect so...<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:59:34)</span> <b>tlmiller:</b></span> You've restarted the startd since changing its RANK?<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:59:42)</span> <b>gthain:</b></span> only if NEGOTIATOR_PRE_JOB_RANK is a tie<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:01:20)</span> <b>matyas:</b></span> NEGOTIATOR_PRE_JOB_RANK = RemoteOwner =?= UNDEFINED<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:01:23)</span> <b>matyas:</b></span> so yep<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:01:31)</span> <b>matyas:</b></span> and I did condor_restart -startd<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:04:00)</span> <b>johnkn:</b></span> Is requestcpus a constant or an expresion?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:05:13)</span> <b>johnkn:</b></span> also your job rank will not cause the negotiator to stop matchmaking if it cant find a match for the highest ranked jobs.<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:05:56)</span> <b>matyas:</b></span> in the submit file? it's a constant.<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:06:32)</span> <b>matyas:</b></span> er, submit files plural<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:06:56)</span> <b>johnkn:</b></span> ok. I ask because if <tt>request_cpus =  cpus</tt> then prio would be undefined at the point in time that the schedd needs it to have a value.<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:07:38)</span> <b>matyas:</b></span> sure<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:08:48)</span> <b>matyas:</b></span> but no I'm not doing anything like that. I have a minicondor with a pslot with 3 CPUs; I submit 5 jobs with request_cpus=1 and 5 jobs with request_cpus=2 (in that order), and I would like at least one of the 2-cpu jobs to run before the 1-cpu job<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:09:49)</span> <b>johnkn:</b></span> yeah.  not gonna happen.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:10:14)</span> <b>johnkn:</b></span> the pslot will be split into 3 single core slots probably before you even submit the 2 core jobs<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:10:56)</span> <b>matyas:</b></span> what if I vacate the single-core jobs?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:11:44)</span> <b>tlmiller:</b></span> If you vacate the single-core jobs and then immediately drain, the 2-core jobs should get first crack.<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:12:02)</span> <b>matyas:</b></span> I need to vacate _and_ drain?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:12:17)</span> <b>johnkn:</b></span> if you have more single core jobs, the schedd might just start other single core jobs on the claims<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:12:19)</span> <b>tlmiller:</b></span> You can try submitting the 1-core jobs on hold, and the 2-core jobs on hold, and releasing both of them at the same time, maybe?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:12:35)</span> <b>tlmiller:</b></span> Vacating does _not_ change the size of the slots.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:13:00)</span> <b>tlmiller:</b></span> True.  Better to start draining and then vacate the jobs.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:13:01)</span> <b>johnkn:</b></span> it's a personal condor, so<br/><pre>condor_off -negotiator<br/>condor_submit<br/>condor_submit<br/>condor_on -negitiator</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:13:39)</span> <b>johnkn:</b></span> or alternatively, condor_off the startd<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:14:45)</span> <b>johnkn:</b></span> it takes a bit longer for a startd to startup than the negotiator though.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(17:25:05)</span> <b>ckoch5:</b></span> question from twitter<br/><pre>I run a small university cluster, ~9 machines.  Given that every machine has 4+ cores, can I configure the submit and/or central manager nodes to also be execute nodes?   </pre><br/>where should I direct him? condor-users?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:27:11)</span> <b>johnkn:</b></span> sure<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:27:32)</span> <b>johnkn:</b></span> On a cluster that side the CM can be a small slice of a machine,<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:28:01)</span> <b>johnkn:</b></span> and so can the schedd unless he wants to have a 100k jobs in the queue<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:28:34)</span> <b>johnkn:</b></span> It's a good question for condor-users<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:40:12)</span> <b>matyas:</b></span> draining didn't appear to help<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:41:18)</span> <b>matyas:</b></span> I did<br/><pre>sudo condor_drain <a href="http://siren.cs.wisc.edu">siren.cs.wisc.edu</a><br/>sudo condor_vacate <a href="http://siren.cs.wisc.edu">siren.cs.wisc.edu</a><br/>sudo condor_drain -cancel <a href="http://siren.cs.wisc.edu">siren.cs.wisc.edu</a></pre><br/>but it was still my 1-core jobs that started<br/>
+</body>
+</html>

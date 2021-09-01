@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Dec 4, 2019 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Dec 4, 2019 : #software (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(10:38:06)</span> <b>dweitzel:</b></span> Any idea what package provides <tt>%ldconfig_scriptlets</tt> RPM macro?<br/><pre>%ldconfig_scriptlets<br/>/var/tmp/rpm-tmp.x05ugX: line 37: fg: no job control</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:49:00)</span> <b>matyas:</b></span> on fedora it's redhat-rpm-config, but that package doesn't contain those macros in el7<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:50:47)</span> <b>dweitzel:</b></span> what package does include those macros in el7?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:51:42)</span> <b>matyas:</b></span> ah, looks like "epel-rpm-macros" has it<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:52:12)</span> <b>matyas:</b></span> pretty sure that one's in the buildroot for koji, at least for osg builds<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:52:17)</span> <b>matyas:</b></span> if not, it should be<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:03:25)</span> <b>dweitzel:</b></span> yup, epel-rpm-macros it was.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:03:26)</span> <b>dweitzel:</b></span> thanks.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:31:59)</span> <b>bockjoo:</b></span> My site uses Singularity pro 3.3 and I would like to add a new bind path but because CMS sends jobs with --contain it does not work. But I was told 2.6 is fine with this. Should singularity image be changed with --contain with additional bind path? If so, this is a mess to me.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:33:09)</span> <b>blin:</b></span> @dwd ^^<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:35:48)</span> <b>dwd:</b></span> Bockjoo I do not recall a problem with --contain and bind paths in 3.3.  Please give me more details such as a command to demonstrate the problem and/or the error message.  I have singularity pro so I can try to reproduce it.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:38:19)</span> <b>bockjoo:</b></span> Dave, I have this:<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:38:20)</span> <b>bockjoo:</b></span> <pre>-bash-4.2$ which singularity<br/>/bin/singularity<br/>-bash-4.2$ rpm -qf $(which singularity)</pre><br/>singularitypro31-3.1-3.el7.x86_64<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:38:49)</span> <b>bockjoo:</b></span> and<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:38:50)</span> <b>bockjoo:</b></span> <pre>-bash-4.2$ rpm -ql $(rpm -qf $(which singularity)) | grep singularity.conf<br/>/etc/singularity/singularity.conf</pre><br/>-bash-4.2$ grep /cms  /etc/singularity/singularity.conf<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:39:07)</span> <b>dwd:</b></span> oh, so it is based on 3.1<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:39:18)</span> <b>bockjoo:</b></span> <pre>bind path = /cms</pre><br/>bind path = /cmsuf<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:40:15)</span> <b>bockjoo:</b></span> But<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:40:16)</span> <b>bockjoo:</b></span> <pre>-bash-4.2$ singularity exec --home /osg/home/cmspilot:/srv --bind /cms --bind /cvmfs --contain /cvmfs/singularity.opensciencegrid.org/bbockelm/cms\:rhel7 bash -c 'ls /cmsuf'<br/>WARNING: container does not have /.singularity.d/actions/exec, calling bash directly</pre><br/>ls: cannot access /cmsuf: No such file or directory<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:42:43)</span> <b>bockjoo:</b></span> If I bind /cmsuf explicitly in the command line like so:<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:42:45)</span> <b>bockjoo:</b></span> -bash-4.2$ singularity exec --home /osg/home/cmspilot:/srv --bind /cmsuf --bind /cms --bind /cvmfs --contain /cvmfs/singularity.opensciencegrid.org/bbockelm/cms\:rhel7 bash -c 'ls /cmsuf'<br/>WARNING: container does not have /.singularity.d/actions/exec, calling bash directly<br/>ana  data  t2  test<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:42:50)</span> <b>bockjoo:</b></span> it works<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:43:17)</span> <b>bockjoo:</b></span> Also if I remove --contain, it works because now it reads the singularity system config file.<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:43:30)</span> <b>dwd:</b></span> Oh yes, the problem is that bind path in /etc/singularity/singularity.conf is ignored with --contain.  This was also the case in 2.6, I am quite sure.  I can test though with singularitypro26.  It’s a misfeature in my opinion, but it was decided to keep it that way.  I submitted PRs in both 2.x and 3.x to document the fact in singularity.conf.<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:44:08)</span> <b>dwd:</b></span> Instead, what has to be done is set SINGULARITY_BINDPATH=/cms,/cmsuf in the job environment<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:45:36)</span> <b>dwd:</b></span> The documentation is in the singularitypro31 /etc/singularity/singularity.conf that the bind path statements are ignored with --contain<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:46:55)</span> <b>dwd:</b></span> And the same note is in singularitypro26 /etc/singularity/singularity.conf<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:51:47)</span> <b>bockjoo:</b></span> export SINGULARITY_BINDPATH=/cms,/cmsuf<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:52:17)</span> <b>bockjoo:</b></span> /bin/singualrity "$@"<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:52:55)</span> <b>bockjoo:</b></span> #!/bin/bash<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:53:03)</span> <b>bockjoo:</b></span> export SINGULARITY_BINDPATH=/cms,/cmsuf<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:53:23)</span> <b>bockjoo:</b></span> /bin/singularity "$@"<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:53:30)</span> <b>bockjoo:</b></span> will works as a wrapper?<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:57:34)</span> <b>dwd:</b></span> Well it’s possible that SINGULARITY_BINDPATH would already be set at that point by the GlideinWMS script, so check for that and add to it (with separating comma) if so.  I would also use “exec” to remove the extra process.  You’d have to make sure the wrapper was in the PATH before /bin and /usr/bin.  Otherwise I believe there are other mechanisms for sites to add to a job environment, although I’m not familiar with exactly what they are.  If you set variables before the pilot, it should be safe to set SINGULARITY_BINDPATH and not extend it.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:27:58)</span> <b>bockjoo:</b></span> How about this naive one?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:27:59)</span> <b>bockjoo:</b></span> #!/bin/bash<br/>SINGULARITY_BINDPATH_NEW=/cms,/cmsuf<br/><br/>if [ "x$SINGULARITY_BINDPATH" == "x" ] ; then<br/>   export SINGULARITY_BINDPATH=$SINGULARITY_BINDPATH_NEW<br/>else<br/>   export SINGULARITY_BINDPATH=${SINGULARITY_BINDPATH},${SINGULARITY_BINDPATH_NEW}<br/>fi<br/>exec /bin/singularity "$@"<br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:28:47)</span> <b>bockjoo:</b></span> If this wrapper preceedes any PATH, this will be picked up always with the needed SINGULARITY_PATH env.<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:28:55)</span> <b>dwd:</b></span> Yes, should work<br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:29:25)</span> <b>bockjoo:</b></span> Thanks!<br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:30:18)</span> <b>bockjoo:</b></span> A simple test works fine with this!<br/>
+</body>
+</html>

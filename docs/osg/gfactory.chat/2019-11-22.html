@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Nov 22, 2019 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Fri Nov 22, 2019 : #gfactory (osg)</h3>
+<span style="color: #674b1b"><span style="font-size: small">(14:55:38)</span> <b>rynge:</b></span> Any ideas how to debug execute-side@matchsession errors? I keep seeing issues with Syracuse and I suspect it has to do with their NAT gateway again<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:55:45)</span> <b>rynge:</b></span> Shadow log example:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:55:54)</span> <b>rynge:</b></span> <pre>11/22/19 14:33:48 Initializing a VANILLA shadow for job 1349097.878<br/>11/22/19 14:33:48 (1349097.878) (4030304): Request to run on glidein_84212_39706395@CRUSH-OSG-C7-10-5-242-35 &lt;10.5.242.35:34253?CCBID=192.170.227.251:9723%3faddrs%3d192.170.227.251-9723%26alias%<a href="http://3dflock.opensciencegrid.org#237287&amp;addrs=10.5.242.35-34253&amp;noUDP">3dflock.opensciencegrid.org#237287&amp;addrs=10.5.242.35-34253&amp;noUDP</a>&gt; was ACCEPTED<br/>11/22/19 14:33:49 (1349097.878) (4030304): PERMISSION DENIED to execute-side@matchsession from host 128.230.11.9 for command 61000 (FILETRANS_UPLOAD), access level WRITE: reason: WRITE authorization policy contains no matching ALLOW entry for this request; identifiers used for this host: 128.230.11.9,<a href="http://gway-s011-008.syr.edu">gway-s011-008.syr.edu</a>, hostname size = 1, original ip address = 128.230.11.9<br/>11/22/19 14:33:49 (1349097.878) (4030304): DC_AUTHENTICATE: Command not authorized, done!<br/>11/22/19 14:33:49 (1349097.878) (4030304): ERROR "Error from glidein_84212_39706395@CRUSH-OSG-C7-10-5-242-35: Failed to transfer files" at line 565 in file /builddir/build/BUILD/condor-8.8.5/src/condor_shadow.V6.1/pseudo_ops.cpp</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:58:34)</span> <b>rynge:</b></span> <br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:59:02)</span> <b>rynge:</b></span> Any ideas?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:35:55)</span> <b>blin:</b></span> is that the same transfer file error we got last time?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:36:24)</span> <b>rynge:</b></span> This comes and goes. It seems to work fine for a while, and then we get a flood of failed jobs<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:38:07)</span> <b>rynge:</b></span> Is there a way to see a list of the current match sessions?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:42:10)</span> <b>blin:</b></span> hrm, not that i know of off-hand<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:42:16)</span> <b>blin:</b></span> i can ask the condor team in a bit<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:46:23)</span> <b>rynge:</b></span> Thanks! One interesting datapoint is that we sometimes get the permission error on upload, and sometimes download, which seems to indicate that something is changing during the job lifetime. My guess is that the glidein reconnects over a different NAT box (Syracuse have several) and that is why the session is no longer matching - however, this is just a guess<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:02:23)</span> <b>blin:</b></span> so i'm not quite sure what you mean by "match sessions"<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:02:49)</span> <b>blin:</b></span> are you talking about startds that the negotiator has handed to the schedd?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:03:51)</span> <b>blin:</b></span> at a high enough debug level todd said you should be able to see them in the schedlog<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:04:33)</span> <b>blin:</b></span> otherwise you can see each time the schedd has been given a machine in its log and the negotiator will have an equivalent line for each machine that it has given a schedd<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:04:44)</span> <b>blin:</b></span> condor_status will also tell you each startd that the schedd has claimed<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:44:19)</span> <b>rynge:</b></span> Ok, I will try dialing up the debugging, but with the number of glideins and jobs it gets overwhelming quickly<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:44:39)</span> <b>rynge:</b></span> I had it dialed up before but couldn't trace things<br/>
+</body>
+</html>

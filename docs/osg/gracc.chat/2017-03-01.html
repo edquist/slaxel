@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Mar 1, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Wed Mar 1, 2017 : #gracc (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(12:10:33)</span> <b>bbockelm:</b></span> @kretzke - I suppose I can also ask you questions here :wink:<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:12:00)</span> <b>kretzke:</b></span> nope, think I’m having technical difficulties$Adfh84a$@#s<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:12:16)</span> <b>bbockelm:</b></span> basically, when we move the aliases over, does that kill off Gratia?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:12:43)</span> <b>kretzke:</b></span> in that it stops receiving records, yes<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:13:01)</span> <b>bbockelm:</b></span> gotcha.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:13:33)</span> <b>bbockelm:</b></span> If we cutover too soon and have to switch back to Gratia, can we forward data GRACC -&gt; Gratia?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:14:22)</span> <b>kretzke:</b></span> yep, we could use the reprocessing script. it pulls records out of elasticsearch and sends them to a collector<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:15:06)</span> <b>kretzke:</b></span> <a href="https://github.com/retzkek/gracc-reprocess/blob/master/gracc-reprocess">https://github.com/retzkek/gracc-reprocess/blob/master/gracc-reprocess</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:15:36)</span> <b>bbockelm:</b></span> Ah - over HTTP, not RabbitMQ?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:15:57)</span> <b>kretzke:</b></span> right<br/>
+<span style="color: #902d59"><span style="font-size: small">(12:17:17)</span> <b>tanya:</b></span> Hi, UCSD send a lot of really crazy records during last several days.  I am planning to delete them from Gratia. How it will be done in GRACC?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:17:23)</span> <b>kretzke:</b></span> alternatively, it wouldn’t be hard to add a request forwarder to the gracc collector to send records to gratia behind the scenes<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:19:21)</span> <b>kretzke:</b></span> @tanya the 2028 records are easy, just delete the index. other stuff can be removed with the _delete_by_query api. do we know exactly what needs to be deleted?<br/>
+<span style="color: #902d59"><span style="font-size: small">(12:20:59)</span> <b>tanya:</b></span> there are two easily identifiable type of records (end in 2028, or start in 2006 and end in 2028) but there are also some other garbage. It would be easier to remove every record for particular probe starting at some day in Februrary<br/>
+<span style="color: #902d59"><span style="font-size: small">(12:21:03)</span> <b>tanya:</b></span> is it easier?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:24:02)</span> <b>kretzke:</b></span> maybe. remember records are indexed by <tt>EndTime</tt>. I can do a query to delete all records with <tt>@received</tt> greater than some date for a specific probe, yes, but it will have to hit every index. may not be a big deal<br/>
+<span style="color: #902d59"><span style="font-size: small">(12:28:03)</span> <b>tanya:</b></span> i think it would be a cleaner approach, maybe we could just delete everything with EndTime=‘2017-02-28’ for a particular probe and everything with EndTime&gt;‘2028-01-01’ - i have to check more<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:30:51)</span> <b>kretzke:</b></span> are we just looking at records from “condor:<a href="http://osg-gw-4.t2.ucsd.edu">osg-gw-4.t2.ucsd.edu</a>”?<br/>
+<span style="color: #902d59"><span style="font-size: small">(12:31:03)</span> <b>tanya:</b></span> that is what i need to check<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:32:20)</span> <b>kretzke:</b></span> check how? I think it would be a useful exercise to try to work this out in GRACC alone<br/>
+<span style="color: #902d59"><span style="font-size: small">(12:32:38)</span> <b>tanya:</b></span> i still need to clean up gratia<br/>
+<span style="color: #902d59"><span style="font-size: small">(12:33:27)</span> <b>tanya:</b></span> all records for 2028 are coming from condor:<a href="http://osg-gw-4.t2.ucsd.edu">osg-gw-4.t2.ucsd.edu</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:33:30)</span> <b>kretzke:</b></span> yes, but I mean find the bad records using gracc rather than gratia. or, I can look there and we’ll see if come up with the same records<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:34:45)</span> <b>kretzke:</b></span> yep <a href="https://gracc.opensciencegrid.org/kibana/goto/9e475b679c5dc54f1c731d696f876185">https://gracc.opensciencegrid.org/kibana/goto/9e475b679c5dc54f1c731d696f876185</a><br/>
+<span style="color: #902d59"><span style="font-size: small">(12:35:35)</span> <b>tanya:</b></span> so, all the records are coming from ucsd, endtime is by the end of month and have unbelievable wallduration time<br/>
+<span style="color: #902d59"><span style="font-size: small">(12:36:36)</span> <b>tanya:</b></span> as i said it is just a part of this , but this is correct (95 records)<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:39:47)</span> <b>kretzke:</b></span> I see 337 other records<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:40:47)</span> <b>kretzke:</b></span> wow, that was nice and quick (going back five years)… <a href="https://gracc.opensciencegrid.org/kibana/goto/74ffd15f20484d52b1d5ac56bfa3a873">https://gracc.opensciencegrid.org/kibana/goto/74ffd15f20484d52b1d5ac56bfa3a873</a><br/>
+<span style="color: #902d59"><span style="font-size: small">(12:41:17)</span> <b>tanya:</b></span> i am still waiting for Gratia :slightly_smiling_face:<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:42:25)</span> <b>kretzke:</b></span> Elasticsearch field stats for the win, it can look at most indices and go “nope, no records with CoreHours &gt; 10000 here, move along"<br/>
+<span style="color: #902d59"><span style="font-size: small">(12:42:48)</span> <b>tanya:</b></span> yeah<br/>
+<span style="color: #902d59"><span style="font-size: small">(12:43:03)</span> <b>tanya:</b></span> but we need to be sure that it is only from this probe<br/>
+<span style="color: #902d59"><span style="font-size: small">(12:43:19)</span> <b>tanya:</b></span> try to run the same for all condor*uscd*<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:45:48)</span> <b>kretzke:</b></span> I just did all probes. a bunch scattered around from many different probes. what’s a good cut-off for the core hours?<br/>
+<span style="color: #902d59"><span style="font-size: small">(12:46:08)</span> <b>tanya:</b></span> does core hours include #jobs?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:46:55)</span> <b>kretzke:</b></span> yes, assuming WallDuration is the cumulative<br/>
+<span style="color: #902d59"><span style="font-size: small">(12:47:02)</span> <b>tanya:</b></span> or just core?<br/>
+<span style="color: #902d59"><span style="font-size: small">(12:47:11)</span> <b>tanya:</b></span> ok<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:49:25)</span> <b>kretzke:</b></span> two other probes have jobs with &gt; 100K hours, gatech (thought they fixed it?) and purdue (since they’re my alma mater, I’m sure those are real :slightly_smiling_face: )<br/>
+<span style="color: #902d59"><span style="font-size: small">(12:49:49)</span> <b>tanya:</b></span> they are still trying to debug it<br/>
+<span style="color: #902d59"><span style="font-size: small">(12:49:59)</span> <b>tanya:</b></span> purdue is absolutely real<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:50:42)</span> <b>kretzke:</b></span> d’oh epoch start time there too<br/>
+<span style="color: #902d59"><span style="font-size: small">(12:51:00)</span> <b>tanya:</b></span> oh, really? when did it start?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:51:16)</span> <b>kretzke:</b></span> just six jobs, Feb 15th<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:54:06)</span> <b>kretzke:</b></span> looks like a new probe, lots of records since then with real start times<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:55:30)</span> <b>kretzke:</b></span> thought I was quarantining records with epoch start time...<br/>
+<span style="color: #902d59"><span style="font-size: small">(13:37:32)</span> <b>tanya:</b></span> all records are from the same probe:condor:<a href="http://osg-gw-4.t2.ucsd.edu">osg-gw-4.t2.ucsd.edu</a> but in gratia we have 432 records and 337 in gracc<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:41:21)</span> <b>kretzke:</b></span> 337+95=432 (the 2028 records won’t show up)<br/>
+<span style="color: #902d59"><span style="font-size: small">(13:47:18)</span> <b>tanya:</b></span> oh, yes<br/>
+<span style="color: #902d59"><span style="font-size: small">(13:47:27)</span> <b>tanya:</b></span> i deleted them from gratia summary<br/>
+<span style="color: #902d59"><span style="font-size: small">(13:48:16)</span> <b>tanya:</b></span> could you delete records from GRACC?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:51:33)</span> <b>kretzke:</b></span> done<br/>
+<span style="color: #902d59"><span style="font-size: small">(14:01:05)</span> <b>tanya:</b></span> ty!<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:44:16)</span> <b>kretzke:</b></span> I also had to delete the summary records, since the record won’t get deleted by the summarization process, only updated *if* there’s other usage matching that record that day… which there wasn't<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:53:41)</span> <b>bbockelm:</b></span> ohh!  I hadn't thought about that.  Is that something we should look for automatically?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:57:16)</span> <b>kretzke:</b></span> well, it only occurs when deleting records. so yeah, part of the procedure when deleting records needs to be deleting related summaries too, and re-summarizing<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:58:03)</span> <b>kretzke:</b></span> … or we need to rethink the summarization process<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:00:46)</span> <b>kretzke:</b></span> I wonder how bad it would be to clear-cut the summaries as new ones come in. ugh<br/>
+</body>
+</html>

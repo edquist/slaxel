@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jan 24, 2019 : #operations (osg)</title>
+</head>
+<body>
+<h3>Thu Jan 24, 2019 : #operations (osg)</h3>
+<span style="color: #e23f99"><span style="font-size: small">(06:41:34)</span> <b>marco.mascheroni:</b></span> @blin <b>@edquist</b> how I do reconfigure the gratia-probe without running osg-configrue, is there a way? Pretty sure Suchandra had some tweaks and he did not want to run osg reconfigure. Anyway that seems the problem (I restarted the condor-ce)<br/>
+<span style="color: #e23f99"><span style="font-size: small">(06:41:41)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(06:49:13)</span> <b>marco.mascheroni:</b></span> Anyway, in the logs I see:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(06:49:30)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(06:49:37)</span> <b>marco.mascheroni:</b></span> Not sure what this error means<br/>
+<span style="color: #e23f99"><span style="font-size: small">(06:50:07)</span> <b>marco.mascheroni:</b></span> But at the end it seems it sent something:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(06:50:14)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(06:50:34)</span> <b>marco.mascheroni:</b></span> This is hotedce20<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:07:25)</span> <b>dweitzel:</b></span> The records are ending up in quarentine because they don't have a "StartTime" associated with them.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:11:17)</span> <b>dweitzel:</b></span> Probably caused by this bug: <a href="https://htcondor-wiki.cs.wisc.edu/index.cgi/tktview?tn=6773">https://htcondor-wiki.cs.wisc.edu/index.cgi/tktview?tn=6773</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(09:25:29)</span> <b>blin:</b></span> oh man, i completely forgot about that<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:46:12)</span> <b>blin:</b></span> so unfortunately a lot of these records actually are garbage, then<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:46:40)</span> <b>dweitzel:</b></span> I mean, we can always edit them...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:46:46)</span> <b>dweitzel:</b></span> and put them in the right place.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:46:56)</span> <b>dweitzel:</b></span> But... that's not a low effort activity<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:47:23)</span> <b>blin:</b></span> how can we get the StartTime?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:47:32)</span> <b>dweitzel:</b></span> EndTime - WallTime<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:47:37)</span> <b>dweitzel:</b></span> Decent approximation.<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:48:13)</span> <b>blin:</b></span> sigh<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:49:07)</span> <b>dweitzel:</b></span> We have the code to calculate EndTime, if it's not available.  But in this case, EndTime and WallTime are available.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:49:28)</span> <b>dweitzel:</b></span> <a href="https://github.com/opensciencegrid/gracc-docker/blob/master/gracc-stash-raw/logstash.conf#L69-L100">https://github.com/opensciencegrid/gracc-docker/blob/master/gracc-stash-raw/logstash.conf#L69-L100</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(09:50:36)</span> <b>blin:</b></span> so is that calculation also just a decent approximation?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:56:45)</span> <b>dweitzel:</b></span> Yup<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:57:01)</span> <b>dweitzel:</b></span> EndTime is really important, as that is the "timestamp" for the job.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:57:14)</span> <b>dweitzel:</b></span> StartTime is just an attribute that is probably not used anywhere.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:57:25)</span> <b>dweitzel:</b></span> I presume this was done because EndTime is so important...<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:57:48)</span> <b>blin:</b></span> so maybe we should rethink quarantining if there isn't a StartTime?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:58:53)</span> <b>dweitzel:</b></span> I would be up for calculating the StartTime if EndTime and WallTime is present.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:59:14)</span> <b>dweitzel:</b></span> I don't see why not.  I'll take to kevin, maybe there's logic behind this that I don't understand.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:52:09)</span> <b>blin:</b></span> hey lincoln, can you give me an IP range for the hosted CEs?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:52:14)</span> <b>blin:</b></span> AMNH needs it to open up their firewall<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:36:47)</span> <b>blin:</b></span> oops, @lincoln ^^<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:39:57)</span> <b>lincoln:</b></span> 128.135.158.128/25<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:40:04)</span> <b>lincoln:</b></span> lmk if you need something more specific<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:42:54)</span> <b>blin:</b></span> will do, thanks<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:36:51)</span> <b>jthiltges:</b></span> We're working on swapping out some of the defective Dell S4048 switches at Nebraska. OpenStack VMs might see some short network interruptions. Hopefully just a couple seconds here and there.<br/>
+</body>
+</html>

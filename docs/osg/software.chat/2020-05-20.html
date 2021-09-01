@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed May 20, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed May 20, 2020 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(10:13:46)</span> <b>blin:</b></span> @tim.theisen: @marco.mascheroni just mentioned on the gwms dev call that glideinwms 3.7 (?) testing looks good on his end<br/>
+<span style="color: #73769d"><span style="font-size: small">(10:14:09)</span> <b>tim.theisen:</b></span> Cool, thank you for letting me know.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:18:27)</span> <b>blin:</b></span> @marco.mascheroni could you provide details of your testing in the ticket for posterity? <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-4051">https://opensciencegrid.atlassian.net/browse/SOFTWARE-4051</a><br/>
+<span style="color: #99a949"><span style="font-size: small">(14:06:56)</span> <b>dwd:</b></span> I’m having gsissh failures to oasis-login &amp; oasis-login-itb from an el6 client with up-to-date osg34 software.  gsissh -vvv shows:<br/><pre>GSS Minor Status Error Chain:<br/>globus_gsi_gssapi: SSL handshake problems<br/>OpenSSL Error: s3_clnt.c:1188: in library: SSL routines, function SSL3_GET_SERVER_CERTIFICATE: certificate verify failed<br/>globus_gsi_callback_module: Could not verify credential<br/>globus_gsi_callback_module: Can't get the local trusted CA certificate: Untrusted self-signed certificate in chain with hash 157753a5</pre><br/>It works with the previous osg-ca-certs, version 1.87.  The el7 oasis-login &amp; oasis-login-itb servers were not up to date with their latest osg35 software, but I just updated oasis-login-itb and rebooted, and it’s still having the same failures.<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:07:53)</span> <b>dwd:</b></span> <b>@here</b><br/>
+<span style="color: #99a949"><span style="font-size: small">(14:12:07)</span> <b>dwd:</b></span> hash 157753a5 is AddTrust-External-CA-Root which was removed in osg-ca-certs-1.88<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:12:21)</span> <b>dwd:</b></span> Had anybody tested it with gsissh?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:12:41)</span> <b>andrew.melo:</b></span> I really hate how IGTF rolled that one out<br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:13:11)</span> <b>andrew.melo:</b></span> on oasis-login is the ca bundle up-to-date?<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:13:24)</span> <b>dwd:</b></span> oasis-login-itb is, now<br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:14:29)</span> <b>andrew.melo:</b></span> the way they made the bundle, everyone has to update everything at the same time or it barfs<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:15:00)</span> <b>dwd:</b></span> It appears that barf can happen even when they do<br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:16:01)</span> <b>andrew.melo:</b></span> what does <tt>openssl -x509 -in /etc/grid-security/hostcert.pem -noout -text</tt> on that machine give?<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:17:22)</span> <b>dwd:</b></span> Here’s the beginning of it (with x509 instead of -x509):<br/><pre>Certificate:<br/>    Data:<br/>        Version: 3 (0x2)<br/>        Serial Number:<br/>            c9:34:21:e1:7b:4a:17:39:33:de:ac:d5:60:37:76:aa<br/>    Signature Algorithm: sha256WithRSAEncryption<br/>        Issuer: C=US, O=Internet2, OU=InCommon, CN=InCommon IGTF Server CA<br/>        Validity<br/>            Not Before: May  3 00:00:00 2019 GMT<br/>            Not After : Jun  1 23:59:59 2020 GMT<br/>        Subject: DC=org, DC=incommon, C=US, ST=NE, L=Lincoln, O=University of Nebraska-Lincoln, OU=Holland Computing Center, CN=<a href="http://hcc-oasis-login-itb.unl.edu">hcc-oasis-login-itb.unl.edu</a></pre><br/><br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:20:57)</span> <b>andrew.melo:</b></span> Argh, that's the wrong command (though that cert's about to expire)<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:24:24)</span> <b>dwd:</b></span> What were you looking for?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:25:51)</span> <b>andrew.melo:</b></span> I found it once when I was debugging the first time they rolled this, I'm trying to follow the chain of issuers up to the root in /etc/grid-security/certificates<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:28:31)</span> <b>dwd:</b></span> I have used openssl s_client for that, but it doesn’t work on port 22.  It works with https servers.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:33:33)</span> <b>bbockelm:</b></span> @dwd - you could hit issues if the client is old.  What's the client on?<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:34:16)</span> <b>dwd:</b></span> With respect to what?  It is completely up to date with ‘yum update’<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:34:30)</span> <b>bbockelm:</b></span> what's the version of <tt>osg-ca-certs</tt> on the client?<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:35:38)</span> <b>dwd:</b></span> 1.88 is what breaks.  It works with 1.87.  The server is also ‘yum update’ … ah, but it is osg-ca-certs 1.84.  The hcc yum mirror must be out of date.  Would that do it?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:37:56)</span> <b>bbockelm:</b></span> yes, that can potentially do it.<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:39:03)</span> <b>dwd:</b></span> “yum provides” shows it only in osg repo, and that’s coming from <a href="http://repo.opensciencegrid.org/mirror/osg/3.5/el7/release/">http://repo.opensciencegrid.org/mirror/osg/3.5/el7/release/</a> so it’s not an hcc mirror<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:41:25)</span> <b>dwd:</b></span> Ah, it’s devops<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:41:42)</span> <b>dwd:</b></span> the osg repo is disabled on the oasis* machines<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:43:10)</span> <b>bbockelm:</b></span> 1.84 is from January - it might have been the bad one from the IGTF<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:43:33)</span> <b>dwd:</b></span> Upgrading osg-ca-certs on oasis-login-itb with --enablerepo=osg fixes the problem<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:43:38)</span> <b>dwd:</b></span> Thanks for making me check<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:14:04)</span> <b>blin:</b></span> do we need to ship CA certs + vo info in the devops repo?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:23:31)</span> <b>matyas:</b></span> why is the osg repo disabled?<br/>
+<blockquote>
+<span style="color: #d1707d"><span style="font-size: small">(16:00:21)</span> <b>gattebury:</b></span> I can’t comment on why, but the OSG repos are disabled on all the *oasis* hosts via puppet. I can tell you it’s been that way for ages though.<br/><br/>I assume someone (Marian?) is in charge of said contraptions but I’d be happy to change it if that’s agreed on. Seems silly to have disabled at first though.<br/>
+<span style="color: #d1707d"><span style="font-size: small">(2020-05-21 11:41:22)</span> <b>gattebury:</b></span> @marian ^ in case you didn’t spot that and the preceding #software chatter yesterday<br/>
+<span style="color: #53b759"><span style="font-size: small">(2020-05-26 10:58:47)</span> <b>marian:</b></span> ah, because we use devops repo on those<br/>
+<span style="color: #53b759"><span style="font-size: small">(2020-05-26 10:59:16)</span> <b>marian:</b></span> can you remind me what conflict/concern is there?<br/>
+<span style="color: #53b759"><span style="font-size: small">(2020-05-26 10:59:31)</span> <b>marian:</b></span> sorry on so late reaction regarding this<br/>
+<span style="color: #c386df"><span style="font-size: small">(2020-05-26 11:00:00)</span> <b>matyas:</b></span> CA certs RPMs are not in the devops repos<br/>
+<span style="color: #c386df"><span style="font-size: small">(2020-05-26 11:01:02)</span> <b>matyas:</b></span> You'll need to enable the osg repo if you want updates<br/>
+<span style="color: #53b759"><span style="font-size: small">(2020-05-26 11:03:06)</span> <b>marian:</b></span> that's what we do in the puppet module ...<br/>
+<span style="color: #53b759"><span style="font-size: small">(2020-05-26 11:03:09)</span> <b>marian:</b></span> <pre>package { 'osg-ca-certs': ensure =&gt; latest, install_options =&gt; ['--enablerepo', 'osg'], }</pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(2020-05-26 11:03:28)</span> <b>marian:</b></span> for oasis nodes, despite the fact the default repo is devops<br/>
+<span style="color: #53b759"><span style="font-size: small">(2020-05-26 11:04:09)</span> <b>marian:</b></span> or do I still misunderstand what's going on?<br/>
+<span style="color: #c386df"><span style="font-size: small">(2020-05-26 11:04:20)</span> <b>matyas:</b></span> that _should_ work<br/>
+<span style="color: #53b759"><span style="font-size: small">(2020-05-26 11:04:36)</span> <b>marian:</b></span> I believe we have latest installed on the oasis nodes<br/>
+<span style="color: #c386df"><span style="font-size: small">(2020-05-26 11:05:05)</span> <b>matyas:</b></span> @dwd said above he ran that command by hand and it updated from 1.84 to 1.88<br/>
+<span style="color: #53b759"><span style="font-size: small">(2020-05-26 11:05:07)</span> <b>marian:</b></span> unless there is any breakage of puppet-agent running ... but shoudl be<br/>
+<span style="color: #53b759"><span style="font-size: small">(2020-05-26 11:05:32)</span> <b>marian:</b></span> interesting, it should have downloaded<br/>
+<span style="color: #99a949"><span style="font-size: small">(2020-05-26 11:14:56)</span> <b>dwd:</b></span> I didn’t know about the puppet rule explicitly for osg-ca-certs enabling osg repo. It is apparently not working as intended.  The reason for disabling the osg repo on the oasis machines is that we wanted updates of the application-specific rpms to go in a controlled manner after they’ve been tested on the itb machines and not necessarily on the osg schedule.  This is why packages need to be explicity promoted into the devops-itb and devops repos.  It’s kind of a carryover from the way things were done at IU but I think it still makes sense.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(2020-05-26 11:53:57)</span> <b>andrew.melo:</b></span> for its faults, spacewalk handles that very nicely in a centralized way<br/>
+<span style="color: #99a949"><span style="font-size: small">(2020-05-26 14:48:17)</span> <b>dwd:</b></span> I never heard of it before but see it says “Spacewalk project will be discontinued on May 31 2020.”<br/>
+<span style="color: #a72f79"><span style="font-size: small">(2020-05-26 14:49:13)</span> <b>andrew.melo:</b></span> huh, first i've heard of that, we use it for all our hosts @ vandy....<br/>
+</blockquote>
+</body>
+</html>

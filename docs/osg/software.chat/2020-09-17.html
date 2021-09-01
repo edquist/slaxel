@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Sep 17, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu Sep 17, 2020 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(08:28:18)</span> <b>blin:</b></span> @dbox i reconfigured the CE to handle IGTF certs for the SSL handshake so you should be good to go<br/>
+<span style="color: #235e5b"><span style="font-size: small">(08:28:43)</span> <b>dbox:</b></span> great I will resubmit<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:28:50)</span> <b>blin:</b></span> give it another try and i'll watch the SchedLog<br/>
+<span style="color: #235e5b"><span style="font-size: small">(08:37:29)</span> <b>dbox:</b></span> still failing to authenticate, different hold message on my end<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:43:34)</span> <b>blin:</b></span> i think you need to get a new access token<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:43:42)</span> <b>blin:</b></span> <pre>09/17/20 08:42:58 SCITOKENS:2:Failed to deserialize scitoken: token verification failed: token expired<br/>09/17/20 08:42:58 Send message (3).<br/>09/17/20 08:42:58 SciToken exchange server status: c: 4, s: 3<br/>09/17/20 08:42:58 SSL Auth: SciToken Authentication failed at token exchange.</pre><br/><br/>
+<span style="color: #43761b"><span style="font-size: small">(08:43:49)</span> <b>blin:</b></span> *shakes fist at short-lived tokens*<br/>
+<span style="color: #c386df"><span style="font-size: small">(08:45:26)</span> <b>matyas:</b></span> you know what wasn't short-lived? certificates :stuck_out_tongue:<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:47:56)</span> <b>blin:</b></span> well there are all sorts of problems with that, too :slightly_smiling_face:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:25:11)</span> <b>dbox:</b></span> @blin it looks like I have a glidein running on the CE<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:46:39)</span> <b>dbox:</b></span> @blin the glideins are failing with an 'Unable to identify Startup dir for the glidein' error.<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:46:59)</span> <b>blin:</b></span> hrm, i imagine that it's because this isn't an OSG CE!<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:47:05)</span> <b>blin:</b></span> i.e. it's not dumping in all the OSG env vars<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:47:48)</span> <b>blin:</b></span> how does a pilot handle finding the startup dir stuff for non-OSG CEs?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:52:55)</span> <b>dbox:</b></span> I don't know actually.  I can reconfigure the factory to not expect an OSG CE, but I don't know all the details of what happens then.  I will try that.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:38:03)</span> <b>dbox:</b></span> so, it looks like a glidein finally connected back to my vofrontend<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:38:31)</span> <b>blin:</b></span> great! with <tt>IDTOKENS</tt>?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:39:09)</span> <b>dbox:</b></span> almost certainly but I am checking the logs to be sure<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:40:26)</span> <b>dbox:</b></span> what is FAMILY authentication?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:41:01)</span> <b>dbox:</b></span> thats what the classad of the connecting worker node says is being used<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:56:39)</span> <b>blin:</b></span> @dbox i believe family is used for auth on the same host in the same proc family?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:56:43)</span> <b>blin:</b></span> @matyas is that right?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:58:43)</span> <b>matyas:</b></span> yep<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:02:36)</span> <b>blin:</b></span> so I don't think it would make sense for pilot startd's to reporting back to the vofrontend collector with FAMILY<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:28:19)</span> <b>bbockelm:</b></span> Looking at the top-level collector?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:29:02)</span> <b>bbockelm:</b></span> I expect the glidein to authenticate with the child via <tt>IDTOKENS</tt> and the ad is forwarded to the parent collector by the child; the child authenticates with the parent via <tt>FAMILY</tt> most likely.<br/>
+</body>
+</html>

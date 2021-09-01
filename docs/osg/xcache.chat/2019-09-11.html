@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Sep 11, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Wed Sep 11, 2019 : #xcache (osg)</h3>
+<span style="color: #53b759"><span style="font-size: small">(10:09:17)</span> <b>marian:</b></span> setting <tt>cms.fxhold noloc 20m 20m</tt> for cache redirectors ... that means 20mins for file non-existence information may be caches and 20mins file existence information may be cached ... objections?<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:26:38)</span> <b>marian:</b></span> ok, done<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:28:54)</span> <b>matyas:</b></span> bad news: the change doesn't seem to work. created the file 30 minutes ago, been querying it every 2 minutes, and it's still getting a file not found<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:38:45)</span> <b>dweitzel:</b></span> is the file <tt>/chtc/PUBLIC/tjanicki/log603.lammps</tt> ?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:38:55)</span> <b>matyas:</b></span> no that was yesterday's file. That's fine now<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:39:05)</span> <b>matyas:</b></span> <tt>/chtc/PUBLIC/matyas/testfiles/19-09-11</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(14:41:39)</span> <b>matyas:</b></span> ran <tt>xrdfs <a href="http://sc-cache.chtc.wisc.edu">sc-cache.chtc.wisc.edu</a> stat ...</tt> at 13:53, created the file at 13:54, and am running <tt>xrdfs <a href="http://sc-cache.chtc.wisc.edu">sc-cache.chtc.wisc.edu</a> stat ...</tt> in a loop with a sleep 120  in between<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:46:07)</span> <b>dweitzel:</b></span> yup, problem with config management.  The change is in our config management, just not propagating to the actual redirectors.<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:47:14)</span> <b>matyas:</b></span> out of curiosity, does that info stay cached if you kick the redirector? The way the manual is phrased<br/>&gt; Set the time file existence information is to be cached in memory.<br/>makes it sound like it doesn't persist between restarts<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:18:28)</span> <b>dweitzel:</b></span> Right. Restarting always made it work. <br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:18:55)</span> <b>dweitzel:</b></span> We fixed the issue. Try your same test over again. <br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:19:11)</span> <b>dweitzel:</b></span> Start over though. Like try to access the file when it’s not there. <br/>
+<span style="color: #c386df"><span style="font-size: small">(15:19:21)</span> <b>matyas:</b></span> yep<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:28:08)</span> <b>marian:</b></span> sorry @matyas, one of the redirectors had to be reconfig'd manually<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:29:15)</span> <b>marian:</b></span> it should be OK now contacting <a href="http://redirector.opensciencegrid.org">redirector.opensciencegrid.org</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(15:29:50)</span> <b>matyas:</b></span> you mean <a href="http://redirector.osgstorage.org">redirector.osgstorage.org</a>?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:41:09)</span> <b>matyas:</b></span> seems to work now<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:42:50)</span> <b>marian:</b></span> Yep<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:42:52)</span> <b>marian:</b></span> Ok<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:42:55)</span> <b>matyas:</b></span> initial <tt>stat</tt> at 15:20:29, created the file a few seconds later. <tt>stat</tt> at 15:38:04 didn't find the file; <tt>stat</tt> at 15:40:05 did<br/>
+<span style="color: #53b759"><span style="font-size: small">(22:13:17)</span> <b>marian:</b></span> = 20mins cache reload worked, good!<br/>
+</body>
+</html>

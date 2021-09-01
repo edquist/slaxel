@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jun 5, 2017 : #general (osg)</title>
+</head>
+<body>
+<h3>Mon Jun 5, 2017 : #general (osg)</h3>
+<span style="color: #e96699"><span style="font-size: small">(09:16:00)</span> <b>ian_cancercomputer:</b></span> Alright, i must have messed something up.  All the jobs on my CE are getting held with 'Error parsing classad or job not found', jobs -are- being submitted to my local batch system (PBS), but the working directories in condor-ce/spool seem to regularly not exist (as in, there are many,  but none of the ones listed in the details of what's currently in my local batch queue exist)..  i've checked permissions and all seems fine..  anybody have any ideas what to look at next?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:18:40)</span> <b>dweitzel:</b></span> Is there anything interesting in the GridmanagerLog.* ?  Its in /var/log/condor-ce/<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:19:48)</span> <b>ian_cancercomputer:</b></span> Not particularily..  This is where I noticed messages like: GAHP[2471759] -&gt; '7' '1' 'Error parsing classad or job not found' '0' 'N/A'  ..though.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:22:18)</span> <b>dweitzel:</b></span> Usually that error indicates that something went wrong with the querying of PBS.  Sometimes, that log file with will have something useful from the stdout or stderr of the queyr.<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:24:34)</span> <b>ian_cancercomputer:</b></span> yeah that's what i'm thinking is the issue too -- some sort of issue with PBS in terms of its synchronization with condor-ce..  I did a release of one of the held jobs earlier and I found in the pbs-server logs an error about the job-id already existing..<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:26:04)</span> <b>dweitzel:</b></span> Could you put your gridmanager log somewhere that I could take a look at it.<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:26:28)</span> <b>ian_cancercomputer:</b></span> sure..  the last 1000 lines or so sufficient?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:28:59)</span> <b>dweitzel:</b></span> Larger the better.<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:32:07)</span> <b>ian_cancercomputer:</b></span> The whole thing it is..   I added the latest of all the condor-ce logs in case they're of interest<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:37:31)</span> <b>dweitzel:</b></span> Could you try running the command on your CE:<br/><pre><br/>/usr/libexec/blahp/pbs_status.py pbs/20170605/9135<br/></pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(09:38:02)</span> <b>ian_cancercomputer:</b></span> 0[RemoteUserCpu=0; WorkerNode="fred.cancercomputer.com-0"; ImageSize=0; BatchJobId="9135"; JobStatus=4; ExitCode=0; ]<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:38:42)</span> <b>dweitzel:</b></span> hum... that seems ok.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:39:29)</span> <b>dweitzel:</b></span> I forget, if you release these jobs that are on hold, what happens?<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:39:49)</span> <b>ian_cancercomputer:</b></span> ...except of course there's nothing actually -on- fred right now (nor any other node)..  qstat shows that and the other jobs in 'W' state (waiting for execution), as they've been instructed to sit there until (in this case) 10:52 (15 more mins)<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:40:15)</span> <b>ian_cancercomputer:</b></span> sec, i'll release that particular job and we'll see<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:41:44)</span> <b>ian_cancercomputer:</b></span> that one seems to have already been dropped from condor_ce_q..<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:42:26)</span> <b>ian_cancercomputer:</b></span> what's the fallout from doing a condor_ce_rm on all held jobs on my CE?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:43:17)</span> <b>dweitzel:</b></span> no fallout<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:45:48)</span> <b>ian_cancercomputer:</b></span> thx. i'm going to clear that away so whatever jobs come in are easier to track in the logs and on the filesystem<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:59:36)</span> <b>ian_cancercomputer:</b></span> ok, so now when i check one of these held jobs, i'm getting a '1Error"JobStatus"' from that commandline you gave me (on the relevant job identifier found in GridManager.osg(<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:00:44)</span> <b>dweitzel:</b></span> That is odd.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:00:57)</span> <b>dweitzel:</b></span> What i the status of the job?<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:01:03)</span> <b>ian_cancercomputer:</b></span> hmm..  is that python script reading PBS log files?<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:01:19)</span> <b>ian_cancercomputer:</b></span> job status in ce_q is H , job status in PBS is W<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:03:46)</span> <b>dweitzel:</b></span> so, if you do a qstat -f &lt;jobid&gt;<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:03:54)</span> <b>dweitzel:</b></span> the job_state = W ?<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:03:58)</span> <b>ian_cancercomputer:</b></span> yep.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:04:11)</span> <b>dweitzel:</b></span> hum... that's not a job state pbs<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:04:20)</span> <b>dweitzel:</b></span> pbs_status.py will recognize<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:05:14)</span> <b>dweitzel:</b></span> What version of PBS are you running?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:05:16)</span> <b>dweitzel:</b></span> PBS Pro?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:05:21)</span> <b>dweitzel:</b></span> Torque?<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:05:37)</span> <b>ian_cancercomputer:</b></span> it's 'waiting for execution', which seems to indicate it'll sit in the queue until 'Execution_Time' is reached.  I'm running torque, i'll get the version i a sec<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:06:19)</span> <b>dweitzel:</b></span> The parsing code for the job_state is this: <pre><br/>status_re = re.compile("\s*job_state = ([QREFCH])")<br/></pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(10:06:23)</span> <b>ian_cancercomputer:</b></span> (pretty sure it's 4.2.10 but i just have to confirm that)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:06:24)</span> <b>dweitzel:</b></span> W isn't even caught<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:07:26)</span> <b>ian_cancercomputer:</b></span> This 'W' state to be honest isn't something i've ever recognized before, and i've been using torque for nearly a decade..  that said i've never tried setting an execution-time before either.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:08:36)</span> <b>dweitzel:</b></span> You're setting an execution-time?<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:08:42)</span> <b>ian_cancercomputer:</b></span> nope.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:09:09)</span> <b>dweitzel:</b></span> Yeah, I don't recognize that state at all.  I'll bring it up at a meeting this morning.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:09:30)</span> <b>dweitzel:</b></span> Hopefully we can just treat it as "queued", because it's not running, right?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:09:38)</span> <b>dweitzel:</b></span> Basically, it's the same as queued?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:09:50)</span> <b>dweitzel:</b></span> not running on the worker node, but will eventually?<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:10:04)</span> <b>ian_cancercomputer:</b></span> More or less, yeah.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:10:10)</span> <b>dweitzel:</b></span> ok.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:10:15)</span> <b>dweitzel:</b></span> I'l talk to some people.<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:10:39)</span> <b>ian_cancercomputer:</b></span> Is the script that queues the jobs in that same blahp dir?<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:11:29)</span> <b>ian_cancercomputer:</b></span> (the whole execution_time thing seems problematic to me in general, if i can get rid of it i'd like to)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:13:05)</span> <b>dweitzel:</b></span> It's pbs_submit.sh<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:13:21)</span> <b>ian_cancercomputer:</b></span> thx<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:15:10)</span> <b>ian_cancercomputer:</b></span> So the execution_time gets added with the '-a' option, i don't see that being set in pbs_submit.sh ...<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:16:36)</span> <b>ian_cancercomputer:</b></span> also FYI, my config is about as vanilla as it gets, no custom job-routes, nothing..<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(10:19:04)</span> <b>sthapa:</b></span> Maybe a default config for pbs?  Just curious, but what’s the execution time for jobs?  Is is set to something like 10 minutes in the future from submission or something else?<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:19:22)</span> <b>ian_cancercomputer:</b></span> about 15 mins in the future, yeah.<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(10:19:41)</span> <b>sthapa:</b></span> that’s rather odd, maybe some default in your routing or execution queues?<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:19:55)</span> <b>ian_cancercomputer:</b></span> that's what i'm searching for now, yeah..<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:30:17)</span> <b>ian_cancercomputer:</b></span> AHA, I think i've found the issue..  for whatever reason i'm getting host key verification failures between my CE and my WN's.  Which is odd given none of the host keys have changed and everything was working fine last week.  Anyhow, looks like the execution_time gets bumped by torque when such an error occurs.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:31:29)</span> <b>dweitzel:</b></span> ah, that makes some sense.<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:51:36)</span> <b>ian_cancercomputer:</b></span> OK, re-synchronized host keys and everything seems to be OK again when trying jobs by hand.  ce_q is still reporting jobs as held, while they were switched to running status in qstat after their deadline was reached (but not actually running)..  cleaned those out and now things are back processing again.<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:54:39)</span> <b>ian_cancercomputer:</b></span> I think it's safe to assume that jobs in 'W' state in pbs are only there erroneously (unless someone does make a custom route); I don't know if it's pertinent to treat it as queued or not by pbs_status.py, would doing so keep the CE from trying to run more jobs?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:06:00)</span> <b>dweitzel:</b></span> ok, sounds good.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:06:17)</span> <b>dweitzel:</b></span> so no changes needed on our end, that we can do!<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:18:54)</span> <b>lincoln:</b></span> anyone ever see issues like this?<br/><pre><br/>[root@login log]# mount -t cvmfs <a href="http://oasis.opensciencegrid.org">oasis.opensciencegrid.org</a> /mnt/cvmfs<br/>CernVM-FS: running with credentials 498:498<br/>CernVM-FS: loading Fuse module... Failed to initialize root file catalog (16 - file catalog failure)<br/>[root@login log]# grep "cvmfs" /etc/passwd<br/>cvmfs:x:498:498:CernVM-FS service account:/var/lib/cvmfs:/sbin/nologin<br/>[root@login log]# grep "cvmfs" /etc/group<br/>fuse:x:495:cvmfs<br/>cvmfs:x:494:<br/></pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(14:28:07)</span> <b>ian_cancercomputer:</b></span> nope.. but my experience with fuse-based filesystems is limited..  dmesg contain any additional info? feels to me like it's a module/driver issue of some sort<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:31:04)</span> <b>tiradani:</b></span> I’ve seen it before… is there disk space available on the partition used for the CVMFS cache?  There should be a cvmfs log somewhere in /var/log.  Does that contain any errors?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:31:12)</span> <b>tiradani:</b></span> The issue we had was a full disk<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:31:22)</span> <b>ian_cancercomputer:</b></span> ...wait..  why is it running 498:498 if :cvmfs is 494 ?<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:31:53)</span> <b>ian_cancercomputer:</b></span> /etc/group seems wrong..<br/>
+</body>
+</html>

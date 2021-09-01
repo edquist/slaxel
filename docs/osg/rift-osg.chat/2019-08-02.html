@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Aug 2, 2019 : #rift-osg (osg)</title>
+</head>
+<body>
+<h3>Fri Aug 2, 2019 : #rift-osg (osg)</h3>
+<span style="color: #a2a5dc"><span style="font-size: small">(09:27:31)</span> <b>james.clark:</b></span> Thanks @isfiligoi it looks like Jake's batch has finished so any time you're free would be great<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:52:57)</span> <b>isfiligoi:</b></span> @james.clark Abost half of all the PRP GPU nodes are now singularity enabled<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:53:09)</span> <b>isfiligoi:</b></span> Can I upgrade all of them?<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(09:54:04)</span> <b>james.clark:</b></span> I just submitted a job to test the latest version of our singularity image - i don't expect any problems<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:59:48)</span> <b>isfiligoi:</b></span> I just forced the glidein to a node with singularity<br/>
+<span style="color: #53b759"><span style="font-size: small">(09:59:59)</span> <b>isfiligoi:</b></span> <a href="http://osg-wn-gpu-suncave-64fd448574-zg7h5.optiputer.net">osg-wn-gpu-suncave-64fd448574-zg7h5.optiputer.net</a><br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(10:04:03)</span> <b>james.clark:</b></span> hm, something i've done in trying to switch to cuda v9 is now giving me:<br/><pre><br/>CUDARuntimeError: cudaErrorNoDevice: no CUDA-capable device is detected<br/></pre><br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(10:05:44)</span> <b>james.clark:</b></span> I'm just checking to see if the old setup is urgently needed.  The best thing is probably to upgrade asap and i'll get the image working again<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:06:19)</span> <b>isfiligoi:</b></span> if you are not ready, I will just keep the old setup (no singularity) for a bit longer<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:06:22)</span> <b>isfiligoi:</b></span> let me know<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(10:07:40)</span> <b>james.clark:</b></span> Let's go for it.   I had it working on PRP the other day so i can always roll back to that version and deploy a separate image for testing<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:08:16)</span> <b>isfiligoi:</b></span> you want me to enable singularity?<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(10:09:23)</span> <b>james.clark:</b></span> yes please go ahead<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:12:55)</span> <b>isfiligoi:</b></span> all PRP nodes now have singularity<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(10:13:06)</span> <b>james.clark:</b></span> Great, thanks!<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(10:24:07)</span> <b>james.clark:</b></span> oh couple of questions:  are GPU usage monitors accessible to users (i.e., me)?  I'm hoping to run some tests to pin down where the low utilization is coming from.   and is the network ok with passing in a dockerhub URL for the singularity images?  (i know that's unpopular on the OSG but it takes an hour or two for changes to images to show up in CVMFS)<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:24:48)</span> <b>isfiligoi:</b></span> if singularity supports it, I have no objections<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:26:59)</span> <b>isfiligoi:</b></span> as for GPU usage monitors, I thin our grafana is open to the world:<br/><a href="https://grafana.nautilus.optiputer.net/d/HYqsKnDWk/kubernetes-pods-gpu?orgId=1&amp;var-datasource=prometheus&amp;var-cluster=&amp;var-namespace=osggpus&amp;var-pod=osg-wn-gpu-opt-695f99d558-n269t&amp;var-container=All">https://grafana.nautilus.optiputer.net/d/HYqsKnDWk/kubernetes-pods-gpu?orgId=1&amp;var-datasource=prometheus&amp;var-cluster=&amp;var-namespace=osggpus&amp;var-pod=osg-wn-gpu-opt-695f99d558-n269t&amp;var-container=All</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(10:29:10)</span> <b>isfiligoi:</b></span> BTW: The node you originally landed seems to behave weirdly… may have been really broken… your glidein in now running on a different node… I would recommend re-run the original test again<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(11:31:14)</span> <b>james.clark:</b></span> :thumbsup:<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(16:45:47)</span> <b>james.clark:</b></span> Hi @isfiligoi, i've redeployed our singularity image and i've been able to run some RIFT jobs with no problems so we're good to go and you'll hopefully see some bigger workflows coming in again :slightly_smiling_face:<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(16:46:20)</span> <b>james.clark:</b></span> I can't quite find the GPU %-utilization figures you pointed to before in grafana, which dashboard are they on?<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:47:49)</span> <b>isfiligoi:</b></span> <a href="https://grafana.nautilus.optiputer.net/d/HYqsKnDWk/kubernetes-pods-gpu?orgId=1&amp;var-datasource=prometheus&amp;var-cluster=&amp;var-namespace=osggpus&amp;var-pod=osg-wn-gpu-opt-695f99d558-9x9qj&amp;var-container=All">https://grafana.nautilus.optiputer.net/d/HYqsKnDWk/kubernetes-pods-gpu?orgId=1&amp;var-datasource=prometheus&amp;var-cluster=&amp;var-namespace=osggpus&amp;var-pod=osg-wn-gpu-opt-695f99d558-9x9qj&amp;var-container=All</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(16:48:10)</span> <b>isfiligoi:</b></span> pick the node you are interested in… without the <a href="http://optiputer.net">optiputer.net</a> extension<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:48:25)</span> <b>isfiligoi:</b></span> node == “Pod”<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:48:39)</span> <b>isfiligoi:</b></span> all the OSG pods are in the osggpus namespace<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:49:29)</span> <b>isfiligoi:</b></span> The PRP monitoring has no visibility into which OSG user is running in the pod<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(16:49:55)</span> <b>james.clark:</b></span> right, i must be being slow but i' not sure what the units are for the GPU plot there.  is the % just obscured?<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:50:51)</span> <b>isfiligoi:</b></span> you ae right… something is not right…<br/>sigh<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:51:44)</span> <b>isfiligoi:</b></span> <a href="https://grafana.nautilus.optiputer.net/d/dRG9q0Ymz/k8s-compute-resources-namespace-gpus?orgId=1&amp;refresh=30s&amp;var-namespace=osggpus">https://grafana.nautilus.optiputer.net/d/dRG9q0Ymz/k8s-compute-resources-namespace-gpus?orgId=1&amp;refresh=30s&amp;var-namespace=osggpus</a><br/>then find the pod<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(16:53:11)</span> <b>james.clark:</b></span> ah, got it, thanks!  Is there a better way to find it than just ctrl-f?<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:53:43)</span> <b>isfiligoi:</b></span> the othe Dashboard was supposed to be the use that makes it easy…<br/>pinged the developper to see if he can figure out why it is broken<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(16:54:11)</span> <b>james.clark:</b></span> ha, ok, thanks.  I'm heading out now anyway.  Have a good weekend!<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:54:17)</span> <b>isfiligoi:</b></span> you too<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:47:34)</span> <b>isfiligoi:</b></span> FYI, dashboard fixed<br/>
+</body>
+</html>

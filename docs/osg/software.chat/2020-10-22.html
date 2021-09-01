@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Oct 22, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu Oct 22, 2020 : #software (osg)</h3>
+<span style="color: #53b759"><span style="font-size: small">(10:11:23)</span> <b>marian:</b></span> I hit this when trying to yum update my test host that is OSG35 release but ran older xrootd:<br/><pre>Transaction check error:<br/>  file /usr/lib64/libXrdSecgsiVOMS-4.so from install of vomsxrd-1:0.6.0-3.osg35.el7.x86_64 conflicts with file from package xrootd-libs-1:4.12.3-1.osg35.el7.x86_64</pre><br/>is this known and what is workaround, please? what's vomxrd for actually?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:21:16)</span> <b>matyas:</b></span> vomsxrd is the plugin that lets xrootd call VOMS. It's been moved into xrootd; kinda weird that you're getting this since the replacement should be automatic<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:21:54)</span> <b>matyas:</b></span> try this:<br/><tt>yum swap -- remove vomsxrd -- upgrade xrootd\*</tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(12:16:24)</span> <b>marian:</b></span> <pre>yum swap -- remove vomsxrd -- upgrade xrootd\*<br/>Loaded plugins: fastestmirror, langpacks, priorities<br/>No Match for argument: vomsxrd<br/>swap remove vomsxrd</pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(12:16:29)</span> <b>marian:</b></span> ^ @matyas<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:17:56)</span> <b>marian:</b></span> I may have broke this by doing <tt>yum remove vomsxrd-1:0.6.0-3.osg35.el7.x86_64</tt> before I wrote about that transaction check error above, :disappointed:<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:21:39)</span> <b>matyas:</b></span> yeah if you don't have vomsxrd installed then swapping it out won't work. I'm guessing your upgrade works now though?<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:43:07)</span> <b>marian:</b></span> it did work to upgrade xrootd after I removed vomsxrd only ... then I tried to install back vomsxrd and hence the conflict<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:43:32)</span> <b>marian:</b></span> so, I can't install vomsxrd now<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:44:57)</span> <b>matyas:</b></span> you don't have to<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:45:09)</span> <b>matyas:</b></span> like I said, its functionality was moved into xrootd-libs<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:47:35)</span> <b>marian:</b></span> aaah, good then, misunderstood that part<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:47:38)</span> <b>marian:</b></span> thanks!<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:55:52)</span> <b>rynge:</b></span> @blin for osg-flock package:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:55:55)</span> <b>rynge:</b></span> <pre>* Thu Oct 22 2020 Mats Rynge &lt;rynge@isi.edu&gt; 1.2-1<br/>- Moved to IDTOKENS on HTCondor versions greater than 8.9.6</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:56:05)</span> <b>rynge:</b></span> Do you want the tag to be <tt>1.2-1</tt>?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:57:50)</span> <b>blin:</b></span> yeah that sounds good!<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:59:31)</span> <b>rynge:</b></span> Ok, try this one: <a href="https://github.com/opensciencegrid/osg-flock/tree/1.2-1">https://github.com/opensciencegrid/osg-flock/tree/1.2-1</a><br/>
+</body>
+</html>

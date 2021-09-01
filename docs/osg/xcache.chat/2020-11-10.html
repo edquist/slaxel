@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Nov 10, 2020 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Tue Nov 10, 2020 : #xcache (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(08:50:32)</span> <b>blin:</b></span> yeah that's unexpected<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:50:40)</span> <b>blin:</b></span> what's stable?<br/>
+<span style="color: #c386df"><span style="font-size: small">(08:56:01)</span> <b>matyas:</b></span> 5.0.2<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:01:55)</span> <b>matyas:</b></span> I'll have to do something about the validation instructions for the origin; right now it says run xrdmapc against the redirector, but that now requires xrootd 5<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:17:51)</span> <b>matyas:</b></span> random thought: should we recommend that people use xrootd 5 (from upcoming) for RPM installs of new caches and origins?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:54:28)</span> <b>dweitzel:</b></span> Ah, yes, I can fix that issue with the redirector.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:01:59)</span> <b>dweitzel:</b></span> @matyas try again.  I enabled the "capable" flag for TLS<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:03:02)</span> <b>matyas:</b></span> that works<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:03:27)</span> <b>matyas:</b></span> what does that flag do?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:03:48)</span> <b>matyas:</b></span> and is there a drawback to turning it on?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:08:41)</span> <b>dweitzel:</b></span> I'm trying to figure out the drawback.  It will allow caches to do stupid things, like an old cache using a token will send it over the clear...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:08:53)</span> <b>dweitzel:</b></span> But, all of the caches should be 5.0+ now...<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:13:12)</span> <b>blin:</b></span> yeah, we should update our docs to <tt>--enablerepo=osg-upcoming</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:18:18)</span> <b>matyas:</b></span> Is there a way we can make the scitokens plugin reject tokens that were sent over the clear? I don't know if we can make xrootd pass on that information somehow...<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:18:36)</span> <b>matyas:</b></span> We also need to fix our images. Both the stash-cache:fresh and the stash-origin:fresh images have xrootd 4<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:19:24)</span> <b>dweitzel:</b></span> I have discussed this with Andy in the past.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:19:35)</span> <b>dweitzel:</b></span> short answer... no way that exists now.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:19:58)</span> <b>dweitzel:</b></span> And I haven't seen any implementation going in the direction of restricting tokens only over TLS.<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:22:21)</span> <b>matyas:</b></span> @blin our github workflow still makes :fresh and :upcoming-fresh tags (for xrootd 4 and xrootd 5)<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:22:29)</span> <b>matyas:</b></span> (for docker-xcache)<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:22:59)</span> <b>blin:</b></span> ah ok, i think we can make the switch and stop making the separate upcoming ones<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:23:07)</span> <b>blin:</b></span> the stable origin is on xrootd 5, though, right?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:23:13)</span> <b>matyas:</b></span> yeah<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:23:59)</span> <b>blin:</b></span> ok, let me add the tests on PR stuff and we can disable travis + fix the tagging<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:28:22)</span> <b>matyas:</b></span> Should we keep making the upcoming-fresh tags (but have them be identical to fresh)? What are people using for their origins/caches?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:31:43)</span> <b>blin:</b></span> @efajardo @ivukotic?<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:32:55)</span> <b>efajardo:</b></span> I use <tt>stable</tt> since it now has <tt>xrootd5</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(10:33:22)</span> <b>efajardo:</b></span> since stable and fresh both will have xrootd5<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:33:48)</span> <b>efajardo:</b></span> I do nto see the need unless at some moments you wants us to test a a container with XRtootd4<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:36:23)</span> <b>matyas:</b></span> Looks like I'm using stable for the tiger stashcache<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:36:40)</span> <b>blin:</b></span> we may as well drop the upcoming ones<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:36:48)</span> <b>matyas:</b></span> ok<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:37:27)</span> <b>matyas:</b></span> can we/should we delete upcoming-fresh from dockerhub?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:37:53)</span> <b>blin:</b></span> yeah, we could do that<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:38:24)</span> <b>matyas:</b></span> we should keep upcoming-stable and upcoming-$date but we don't want people to think we're still updating upcoming-*<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:40:53)</span> <b>blin:</b></span> sure<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:05:02)</span> <b>matyas:</b></span> Also, do we need a host cert for an origin container? Vlad says it's not mentioned in the docs.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:05:35)</span> <b>matyas:</b></span> and if so, what's the procedure for getting the host cert into the container?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:07:25)</span> <b>dweitzel:</b></span> Only if it’s an authenticated origin <br/>
+<span style="color: #c386df"><span style="font-size: small">(11:29:32)</span> <b>matyas:</b></span> also in our docs we tell people to run :fresh. Should we tell them to run :stable instead?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:30:24)</span> <b>matyas:</b></span> er, it looks like we tell people to run :stable for the cache, :fresh for the origin<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:00:59)</span> <b>efajardo:</b></span> Well the origin was cause @blin was working with JLAB on getting the new stuff in<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:01:16)</span> <b>efajardo:</b></span> I think fresh has been running for a while at JLAB fine so we should mark it as stable<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:05:47)</span> <b>matyas:</b></span> I hope they're not running xrootd 4 by accident<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:07:57)</span> <b>blin:</b></span> @wmoore which tag are you using for your stash origin?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:09:41)</span> <b>matyas:</b></span> can you exec into the pod and run <tt>rpm -q xrootd</tt>?<br/>
+</body>
+</html>

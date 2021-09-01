@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jun 29, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Mon Jun 29, 2020 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(11:42:52)</span> <b>blin:</b></span> @dweitzel @matyas could you guys give this package karma? <a href="https://bodhi.fedoraproject.org/updates/FEDORA-EPEL-2020-09ea2b3357">https://bodhi.fedoraproject.org/updates/FEDORA-EPEL-2020-09ea2b3357</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(11:43:19)</span> <b>blin:</b></span> also @marcom if you have an account, giving this karma will likely solve your issues with the upcoming <tt>osg-wn-client</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:43:36)</span> <b>dweitzel:</b></span> Got an example command to test?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:44:37)</span> <b>blin:</b></span> @efajardo can probably give you one against a cache<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:44:47)</span> <b>blin:</b></span> fwiw, edgar has done all the testing, though<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:45:22)</span> <b>efajardo:</b></span> <pre>gfal-copy -f -v <a href="http://osg-sunnyvale-stashcache.nrp.internet2.edu:8000/osgconnect/public/rynge/glidein-checks/testfile">http://osg-sunnyvale-stashcache.nrp.internet2.edu:8000/osgconnect/public/rynge/glidein-checks/testfile</a> file://<tt>pwd</tt>/</pre><br/>
+<span style="color: #e06b56"><span style="font-size: small">(11:51:25)</span> <b>jthiltges:</b></span> <pre>$ gfal-copy -f -v <a href="http://osg-sunnyvale-stashcache.nrp.internet2.edu:8000/osgconnect/public/rynge/glidein-checks/testfile">http://osg-sunnyvale-stashcache.nrp.internet2.edu:8000/osgconnect/public/rynge/glidein-checks/testfile</a> file://<tt>pwd</tt>/<br/>gfal-copy error: 112 (Host is down) - Could not stat the source: Result Could not connect to server after 1 attempts<br/>$ curl <a href="http://osg-sunnyvale-stashcache.nrp.internet2.edu:8000">http://osg-sunnyvale-stashcache.nrp.internet2.edu:8000</a><br/>curl: (7) Failed connect to <a href="http://osg-sunnyvale-stashcache.nrp.internet2.edu:8000;">osg-sunnyvale-stashcache.nrp.internet2.edu:8000;</a> Connection refused</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:51:56)</span> <b>dweitzel:</b></span> Indeed.  With curl, I see this:<br/><pre># curl -v  <a href="http://osg-sunnyvale-stashcache.nrp.internet2.edu:8000/osgconnect/public/rynge/glidein-checks/testfile">http://osg-sunnyvale-stashcache.nrp.internet2.edu:8000/osgconnect/public/rynge/glidein-checks/testfile</a><br/>* About to connect() to <a href="http://osg-sunnyvale-stashcache.nrp.internet2.edu">osg-sunnyvale-stashcache.nrp.internet2.edu</a> port 8000 (#0)<br/>*   Trying 163.253.73.2...<br/>* Connection refused<br/>*   Trying 2001:468:2809::2...<br/>* Failed to connect to 2001:468:2809::2: Cannot assign requested address<br/>* Failed connect to <a href="http://osg-sunnyvale-stashcache.nrp.internet2.edu:8000;">osg-sunnyvale-stashcache.nrp.internet2.edu:8000;</a> Cannot assign requested address<br/>* Closing connection 0<br/>curl: (7) Failed to connect to 2001:468:2809::2: Cannot assign requested address</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:16:35)</span> <b>blin:</b></span> @efajardo for the clas12 vo registration, there's a field for parentvo so you should be able to point to jlab<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:33:34)</span> <b>efajardo:</b></span> opps try it agiant this host<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:33:36)</span> <b>efajardo:</b></span> <a href="http://osg.newy32aoa.nrp.internet2.edu">osg.newy32aoa.nrp.internet2.edu</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:33:42)</span> <b>efajardo:</b></span> yes<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:33:45)</span> <b>efajardo:</b></span> I told them to do that<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:33:50)</span> <b>efajardo:</b></span> we should get a PR very soon<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:36:45)</span> <b>matyas:</b></span> <pre>gfal-copy -f -v <a href="xroot://osg.newy32aoa.nrp.internet2.edu:1094/chtc/PUBLIC/matyas/robots.txt">xroot://osg.newy32aoa.nrp.internet2.edu:1094/chtc/PUBLIC/matyas/robots.txt</a> file://<tt>pwd</tt>/</pre><br/>seems to work<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:39:18)</span> <b>dweitzel:</b></span> <pre># gfal-copy -f -v <a href="http://osg.newy32aoa.nrp.internet2.edu:8000/osgconnect/public/rynge/glidein-checks/testfile">http://osg.newy32aoa.nrp.internet2.edu:8000/osgconnect/public/rynge/glidein-checks/testfile</a> file://<tt>pwd</tt>/</pre><br/>worked<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:42:31)</span> <b>dweitzel:</b></span> That gfal update is 3 days to stable anyways.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:42:44)</span> <b>dweitzel:</b></span> did we miss when it was submitted on the 16th?<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:51:06)</span> <b>efajardo:</b></span> Should we revaluate<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:51:10)</span> <b>efajardo:</b></span> the way we build containers<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:51:22)</span> <b>efajardo:</b></span> the fact we do not have automated builds on push is such a pain<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:51:31)</span> <b>efajardo:</b></span> I just had to go through the process of creating my own<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:51:34)</span> <b>efajardo:</b></span> <a href="https://github.com/efajardo/docker-software-base">https://github.com/efajardo/docker-software-base</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:03:18)</span> <b>blin:</b></span> uhh, we do have automated builds on push<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:03:44)</span> <b>blin:</b></span> do you want automated push on the base -&gt; automated builds for all the downstream containers we own?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:41:11)</span> <b>bbockelm:</b></span> ohhh - we know how to do that with GHA now, don't we?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:43:17)</span> <b>blin:</b></span> yeah, i think i'd be ok with repo dispatch within our own org with PAT from a robot user<br/>
+</body>
+</html>

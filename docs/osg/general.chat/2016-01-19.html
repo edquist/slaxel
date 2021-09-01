@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jan 19, 2016 : #general (osg)</title>
+</head>
+<body>
+<h3>Tue Jan 19, 2016 : #general (osg)</h3>
+<span style="color: #5870dd"><span style="font-size: small">(11:06:16)</span> <b>scotwk:</b></span> I'm looking to use Bosco to allow users to connect from a submit node to a campus pool (the Karst resource at IUPUI, which uses PBS).  I'd like to do a system-wide install so that each user doesn't have to configure Bosco themselves, but I noticed that a system-level install of Bosco requires a shared login credential on the remote system.  We don't have that currently - every user has their own login.  <br/><br/>Can we get around this without a shared login?  (I can request a shared login on the Karst resource but I don't know if it will be granted.)  <br/><br/>Should I do a user-level Bosco install when we do account creation?  This seems possible, but will require lots of running Condor daemons and upgrades will be a hassle if we ever need to do that.<br/><br/>Any other tips or suggestions?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:13:53)</span> <b>dweitzel:</b></span> Hi Scot.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:15:02)</span> <b>dweitzel:</b></span> Just to be clear on your goals.  You want users on your submit node who have a login to Karst, to be able to submit to it?  Or… do you want all users, whether or not they have an account on Karst, to submit to it?<br/>
+<span style="color: #5870dd"><span style="font-size: small">(12:07:31)</span> <b>scotwk:</b></span> All users who have access to our system will also have access to Karst.  So they could go off to Karst on their own of course, but the idea of using Bosco is so that:<br/>1) They can come to our submit node to run jobs on either Karst or the OSG depending on a job variable they set (we've already connected our submit node to the OSG via flocking)<br/>2) They only have to learn Condor commands (Karst is PBS)<br/><br/>@rquick can chime in here if he wants to elaborate - there might be other compelling reasons.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:09:29)</span> <b>dweitzel:</b></span> Ok, good news and bad news.  Good news is that this is very doable.  Bad news is that it’s not going to be as quick and easy as you probably want.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:10:49)</span> <b>dweitzel:</b></span> Bosco is integrated with HTCondor.  I assume you already have HTCondor installed on the submit host?  If so, then as a user (non-root), all you have to do is run the bosco_cluster commands.<br/>
+<span style="color: #5870dd"><span style="font-size: small">(12:11:21)</span> <b>scotwk:</b></span> Yes - we are using HTCondor for the flocking so it is installed.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:11:59)</span> <b>dweitzel:</b></span> great!  And it’s a fairly new version?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:12:09)</span> <b>dweitzel:</b></span> from the OSG repos?<br/>
+<span style="color: #5870dd"><span style="font-size: small">(12:12:17)</span> <b>scotwk:</b></span> Yes, the most recent.<br/>
+<span style="color: #5870dd"><span style="font-size: small">(12:12:35)</span> <b>scotwk:</b></span> 8.2.10<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:12:51)</span> <b>dweitzel:</b></span> excellent.  I haven’t tested it recently, but it worked at one time.  Is the <tt>bosco_cluster</tt> command installed?<br/>
+<span style="color: #5870dd"><span style="font-size: small">(12:14:02)</span> <b>scotwk:</b></span> Yep (had to find the bosco env file to source it).<br/>
+<span style="color: #5870dd"><span style="font-size: small">(12:14:28)</span> <b>scotwk:</b></span> I have it installed in <tt>/opt/bosco</tt> for a system-wide install as per the twiki instructions.<br/>
+<span style="color: #5870dd"><span style="font-size: small">(12:14:47)</span> <b>scotwk:</b></span> <pre><br/>$ bosco_cluster -l<br/><a href="mailto:skronenf@csiu.grid.iu.edu">skronenf@csiu.grid.iu.edu</a>/condor<br/><a href="mailto:skronenf@karst.uits.iu.edu">skronenf@karst.uits.iu.edu</a>/pbs<br/></pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:15:07)</span> <b>dweitzel:</b></span> oh, you probably didn’t need to install a separate bosco.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:15:31)</span> <b>dweitzel:</b></span> the twiki was intended for those without HTCondor already installed, and those that don’t have root.  But this should work too.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:15:33)</span> <b>dweitzel:</b></span> probably.<br/>
+<span style="color: #5870dd"><span style="font-size: small">(12:16:03)</span> <b>scotwk:</b></span> I can easily remove it.  I didn't see <tt>bosco_cluster</tt> until I sourced <tt>/opt/bosco/bosco_setenv</tt> though.  So I don't think I had it along with my Condor distro<br/>
+<span style="color: #5870dd"><span style="font-size: small">(12:16:47)</span> <b>scotwk:</b></span> <pre>$ rpm -ql condor | grep bosco<br/></pre><br/>is empty<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:17:01)</span> <b>dweitzel:</b></span> ah, yes.  You need to install the condor-bosco RPM.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:17:05)</span> <b>dweitzel:</b></span> forgot they split that out.<br/>
+<span style="color: #5870dd"><span style="font-size: small">(12:17:31)</span> <b>scotwk:</b></span> ah ok - I can remove my manually installed bosco at /opt/bosco and install that RPM.  Before i do that though, you said "it’s not going to be as quick and easy as you probably want" ?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:17:47)</span> <b>dweitzel:</b></span> well, all users are going to have to run the bosco_cluster command.<br/>
+<span style="color: #5870dd"><span style="font-size: small">(12:17:47)</span> <b>scotwk:</b></span> So maybe I should understand that before doing more work :simple_smile:<br/>
+<span style="color: #5870dd"><span style="font-size: small">(12:17:55)</span> <b>scotwk:</b></span> just once to add a cluster?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:18:01)</span> <b>dweitzel:</b></span> yes, just once.<br/>
+<span style="color: #5870dd"><span style="font-size: small">(12:18:02)</span> <b>scotwk:</b></span> Or every time they submit?  (Sorry I'm a bosco newbie)<br/>
+<span style="color: #5870dd"><span style="font-size: small">(12:18:04)</span> <b>scotwk:</b></span> ok<br/>
+<span style="color: #5870dd"><span style="font-size: small">(12:18:30)</span> <b>scotwk:</b></span> Is that something I can automate at user creation time?  Or does it require them to type passwords?<br/>
+<span style="color: #5870dd"><span style="font-size: small">(12:18:42)</span> <b>scotwk:</b></span> I noticed bosco may be generating ssh keys (not positive about that)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:18:47)</span> <b>dweitzel:</b></span> requires them to log into the remote cluster, so bosco can install ssh keys.<br/>
+<span style="color: #5870dd"><span style="font-size: small">(12:19:29)</span> <b>scotwk:</b></span> ok, I don't think a one-time setup will be a problem.  It requires some education, but we haven't yet decided on how users will submit to Karst vs. the OSG.<br/>
+<span style="color: #5870dd"><span style="font-size: small">(12:19:39)</span> <b>scotwk:</b></span> So that means we'll probably have to educate them on local vs. OSG anyways<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:20:12)</span> <b>dweitzel:</b></span> ok, yeah, probably.  Also, the goal of routing jobs to OSG vs Karst via a single attribute in the submit file may be difficult to implement.<br/>
+<span style="color: #5870dd"><span style="font-size: small">(12:20:47)</span> <b>scotwk:</b></span> Yeah, my original plan for that was to wrap condor_submit and detect if the submit file contained a specific attribute, and do a local submission if not.<br/>
+<span style="color: #5870dd"><span style="font-size: small">(12:21:07)</span> <b>scotwk:</b></span> However that may be too much magic (e.g. a user forgets to add that and runs locally when they meant to go to the OSG)<br/>
+<span style="color: #5870dd"><span style="font-size: small">(12:21:20)</span> <b>scotwk:</b></span> So we're thinking now of having a <tt>condor_submit</tt> and a <tt>condor_local_submit</tt> or something like that.<br/>
+<span style="color: #5870dd"><span style="font-size: small">(12:21:38)</span> <b>scotwk:</b></span> The exact names aren't important, but the idea being that they are separate commands so the user is making an explicit choice.<br/>
+<span style="color: #5870dd"><span style="font-size: small">(12:22:05)</span> <b>scotwk:</b></span> (If other people have suggestions on this I'm happy to listen.  I haven't created a UI for researchers like this before so we'll happily learn from others experiences)<br/>
+<span style="color: #5870dd"><span style="font-size: small">(12:23:15)</span> <b>scotwk:</b></span> Thank you for the bosco pointers Derek!  I'll get that RPM installed and play around with it this week and talk to Rob further.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:31:21)</span> <b>dweitzel:</b></span> ok, no problem Scot.  Let me know how it goes.  I’m usually available here, just hollar.<br/>
+<span style="color: #5870dd"><span style="font-size: small">(22:09:12)</span> <b>scotwk:</b></span> If Miron needs a new image for Condor Week to replace his caravan of people here it is: <a href="http://i.imgur.com/wirmars.gifv">http://i.imgur.com/wirmars.gifv</a><br/>
+</body>
+</html>

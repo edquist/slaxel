@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Mar 6, 2019 : #general (osg)</title>
+</head>
+<body>
+<h3>Wed Mar 6, 2019 : #general (osg)</h3>
+<span style="color: #e96699"><span style="font-size: small">(09:55:39)</span> <b>lincoln:</b></span> is there anything that could change where  gsi{ssh,ftp} look for CA certificates? config files?<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:55:45)</span> <b>lincoln:</b></span> I suppose there's probably an environment var that could do it, too.<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:58:26)</span> <b>blin:</b></span> @matyas ^^<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:02:20)</span> <b>lincoln:</b></span> At GATech we ran gsissh under strace against our tert server, and it gets as far as "Delegating credentials" and then bombs out with "GSS Major status: Authentication failed"<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:02:41)</span> <b>lincoln:</b></span> when I do the same thing on my working client, gsissh starts to read through the CA certificates at that point<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:31:38)</span> <b>matyas:</b></span> let me look...<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:33:24)</span> <b>lincoln:</b></span> so we exported X509_CERT_DIR and they can now gsissh to UChicago<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:33:33)</span> <b>lincoln:</b></span> I'm wondering what could've changed this<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:38:38)</span> <b>lincoln:</b></span> @matyas related, Andre is now past the random hangs on their login node trying to GSISSH from GATech-&gt;CalTech<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:39:00)</span> <b>matyas:</b></span> great! what fixed it?<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:39:05)</span> <b>lincoln:</b></span> adding X509_CERT_DIR<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:39:26)</span> <b>lincoln:</b></span> but I'd still really like to understand how thats getting.. un..set? I thought <tt>/etc/grid-security/certificates</tt> was compiled into gsissh as a default<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:40:21)</span> <b>matyas:</b></span> which end did he need to add X509_CERT_DIR on? client or server?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:41:24)</span> <b>matyas:</b></span> was it getting unset or was it getting set to something weird?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:41:52)</span> <b>matyas:</b></span> alternatively, was there something in $HOME/.globus/certificates? because that overrides /etc/grid-security/certificates<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:42:44)</span> <b>lincoln:</b></span> client<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:42:48)</span> <b>lincoln:</b></span> ah, good q<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:42:51)</span> <b>lincoln:</b></span> I'll ask<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:43:02)</span> <b>lincoln:</b></span> It wasn't set in his environment at all from what I could tell<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:43:11)</span> <b>lincoln:</b></span> and when we ran strace, I didn't see gsissh trying to look in any directory for certs<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:53:02)</span> <b>lincoln:</b></span> @matyas yep, good call. looks like he has <tt> $HOME/.globus/certificates</tt><br/>
+<span style="color: #e96699"><span style="font-size: small">(13:35:12)</span> <b>lincoln:</b></span> @tim.theisen I updated my server to <tt>gsi-openssh-server-7.4p1-2.3.osg34.el7.x86_64</tt> and can confirm it is working for me<br/>
+<span style="color: #73769d"><span style="font-size: small">(13:35:36)</span> <b>tim.theisen:</b></span> Cool. Thank you.<br/>
+<span style="color: #db3150"><span style="font-size: small">(15:44:01)</span> <b>christinalk:</b></span> hi all - is there an updated OSG map that can be used for things like presentations?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:46:13)</span> <b>blin:</b></span> will this work? <a href="https://map.opensciencegrid.org/">https://map.opensciencegrid.org/</a><br/>
+<span style="color: #db3150"><span style="font-size: small">(15:57:01)</span> <b>christinalk:</b></span> yes. thanks!<br/>
+<span style="color: #d1707d"><span style="font-size: small">(22:27:32)</span> <b>ywang978:</b></span> cleared channel topic<br/>
+</body>
+</html>

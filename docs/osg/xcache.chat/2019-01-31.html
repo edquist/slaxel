@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jan 31, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Thu Jan 31, 2019 : #xcache (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(11:08:47)</span> <b>matyas:</b></span> are we having the weekly xcache call?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:12:55)</span> <b>blin:</b></span> @bbockelm @dweitzel ^^<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:13:05)</span> <b>dweitzel:</b></span> @marian ^<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:15:26)</span> <b>marian:</b></span> I was about to send email we cancel today ... figure you're 2hrs ahead of time, sending message "no meeting" now...<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:16:10)</span> <b>marian:</b></span> unless anybody else wants to meet? surely me, Derek and JohnT won't join...<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:16:38)</span> <b>bbockelm:</b></span> @matyas @blin - will either of you be in?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:16:38)</span> <b>matyas:</b></span> I don't really have anything new to say<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:17:01)</span> <b>blin:</b></span> in the office? i was debating coming in<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:17:08)</span> <b>matyas:</b></span> I am<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:17:35)</span> <b>marian:</b></span> ok, let me know in next 20mins if you want meeting ... otherwise I send email about canceling...<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:17:49)</span> <b>matyas:</b></span> I'm OK with cancelling<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:17:58)</span> <b>marian:</b></span> @bbockelm?<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:20:14)</span> <b>marian:</b></span> people can send short updates via email too if they have something new ... and we will resume next week ... I was also out last two weeks and have nothing new (except VMU tests errors in RC4 build that is being discussed via email)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:20:17)</span> <b>bbockelm:</b></span> I am OK with cancelling but I was going to head to CS and was hoping to chat for a few minutes on the topic with Brian and Mat <br/>
+<span style="color: #43761b"><span style="font-size: small">(11:20:56)</span> <b>blin:</b></span> the building doesn't open until noon<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:21:14)</span> <b>matyas:</b></span> it's already open<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:21:45)</span> <b>marian:</b></span> sounds good if you three can have a chat... rest of us (from UNL) are at UCSD meeting at OSG Ops F2F...<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:21:47)</span> <b>matyas:</b></span> but we can meet after noon<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:22:17)</span> <b>bbockelm:</b></span> Yeah - I was thinking about the three of us meeting at the same time (1PM) in CS<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:23:36)</span> <b>matyas:</b></span> works for me<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:06:30)</span> <b>isfiligoi:</b></span> FYi: One of my stashcache origin servers need to run under a particular UID in order to access the network file system.<br/>If I were to import the xcache image, how could I set the xrootd UID in my Dockerfile?<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:09:55)</span> <b>lincoln:</b></span> sed on <tt>/etc/passwd</tt> and chown /var/lib/xrootd, /var/spool/xrootd, and /var/run/xrootd? :neutral_face:<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:10:05)</span> <b>lincoln:</b></span> ¯\_(ツ)_/¯<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:10:23)</span> <b>lincoln:</b></span> er.. /var/log/xrootd instead of /var/spool/xrootd probably<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:10:27)</span> <b>isfiligoi:</b></span> That’s messy… ideally you want the UID to be the final one before installing the xrootd rpm<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:10:34)</span> <b>lincoln:</b></span> it is<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:11:25)</span> <b>isfiligoi:</b></span> @lincoln How can I set the UID before the xrootd rpm is installed, if I import the xcache image?<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:11:52)</span> <b>lincoln:</b></span> if you import the xcache image, then XRootD is already installed i would think?<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:12:00)</span> <b>isfiligoi:</b></span> exactly!<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:12:31)</span> <b>lincoln:</b></span> sed it is then :smile: alternatively I suppose the XCache image would need to have a configurable parameter for the xrootd uid/gid<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:13:10)</span> <b>lincoln:</b></span> you aren't the only one with this problem- btw. We also have use cases that need a uid/gid change here<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:13:50)</span> <b>isfiligoi:</b></span> Creating my own image from scratch seems much easier in this case…<br/>It is just a couple yum installs<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:14:27)</span> <b>lincoln:</b></span> as you like.. I have no horse in this race. I'm only here to make annoying comments occasionally.<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:15:25)</span> <b>isfiligoi:</b></span> Well… I want to (eventually) use OSG-provided container images, so I am voicing my needs here :slightly_smiling_face:<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:15:35)</span> <b>lincoln:</b></span> :slightly_smiling_face:<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:30:38)</span> <b>marian:</b></span> isn't it this place meant to be for xcache images: <a href="https://hub.docker.com/r/opensciencegrid/xcache">https://hub.docker.com/r/opensciencegrid/xcache</a> ? ... I think we need to consolidate a bit, the sooner the better, there are other dockerhub repos like prp-stashcache, stashcache, atlas-xcache ...<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:37:56)</span> <b>blin:</b></span> i think the consolidation will happen with prp-stashcache -&gt; xcache<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:38:03)</span> <b>blin:</b></span> but the other ones should probably stay around<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:38:55)</span> <b>blin:</b></span> <tt>docker run opensciencegrid/stash-cache:testing</tt> is a lot more user-friendly than <tt>docker run opensciencegrid/xcache:stashcache-testing</tt> or whatever<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:41:20)</span> <b>blin:</b></span> @isfiligoi i was running into the same problem with some UID/GID issue and i'm not sure if there's really a user-configurable way to create the base xcache image to allow that<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:41:20)</span> <b>lincoln:</b></span> @blin please let us know where we can help with that too- I would like to rebase the ATLAS XCache image off of the OSG provided image if possible<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:42:02)</span> <b>blin:</b></span> yeah, i'll have some stuff up here soon: <a href="https://cloud.docker.com/u/opensciencegrid/repository/docker/opensciencegrid/atlas-xcache/general">https://cloud.docker.com/u/opensciencegrid/repository/docker/opensciencegrid/atlas-xcache/general</a><br/>
+<span style="color: #e96699"><span style="font-size: small">(13:42:24)</span> <b>lincoln:</b></span> :thumbsup:<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:42:33)</span> <b>blin:</b></span> so if you guys have some way to test new images out, that'd be really helpful while we get our own testing up to speed<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:43:47)</span> <b>blin:</b></span> things to keep in mind: this will have fetch-crl/certs baked in and a new knob so people can opt out of OSG monitoring<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:45:43)</span> <b>blin:</b></span> the way i plan on specifying cache disks is slightly different, too<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:46:33)</span> <b>lincoln:</b></span> in SLATE we have been discussing our application approval workflow, based on dicussions we had with you guys and others. we are thinking that we would like to have OSG as a "trusted organization" that we would source Docker images from directly. so XCache would be a great place to start<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(13:50:18)</span> <b>blin:</b></span> agreed but what are the expectations from us? atm i'm pushing alpha-grade packaging<br/>
+</blockquote>
+<span style="color: #43761b"><span style="font-size: small">(13:48:31)</span> <b>blin:</b></span> @isfiligoi actually i can think of ways to handle it, they're all real gross, though<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:49:12)</span> <b>isfiligoi:</b></span> @blin Yes, I don’t think you can have an image with floating UID…<br/>which makes a xcache image much less useful<br/>From a user point of view, all I really need are the helper scripts you are putting in there, e.g. cron.d/fetch-crl.cron, and base config files, e.g. supervisord.conf<br/>If I could get those from a RPM,  a reference Dockerfile would be way more useful<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:53:06)</span> <b>blin:</b></span> you mean, from a developer point of view :slightly_smiling_face:<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:53:58)</span> <b>isfiligoi:</b></span> well.. “sophisticated user”… As I said UIDs are determined at image build, so anyone who has to have control of them, will need to build their own image<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:54:33)</span> <b>isfiligoi:</b></span> unless you want to mess up with changing UID at startup time, which I think is a recipe for disaster<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:55:30)</span> <b>isfiligoi:</b></span> but, yes, even more useful for “extending the container image developers”<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:56:57)</span> <b>blin:</b></span> i've added a static UID/GID for xrootd before the installation. would you be able to request getting access to the volume via that UID/GID?<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:57:50)</span> <b>isfiligoi:</b></span> no… must be “a site provided UID”<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:58:14)</span> <b>isfiligoi:</b></span> but having a a static xrootd UID/GID would definitely be very useful in other contextes<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:58:39)</span> <b>isfiligoi:</b></span> i.e. anytime you mount persistent storage<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:58:39)</span> <b>blin:</b></span> that's annoying<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:58:47)</span> <b>isfiligoi:</b></span> that’s life :slightly_smiling_face:<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:01:29)</span> <b>blin:</b></span> i think mucking around with changing IDs at startup is the only real solution, unfortunately<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:02:00)</span> <b>blin:</b></span> because avoiding yet-another-xcache image is basically the problem that we're trying to solve<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:02:11)</span> <b>isfiligoi:</b></span> well… if you want to use a pre-built image, yes<br/>But building a new image is trivial… so that may be preferred by some<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:03:21)</span> <b>isfiligoi:</b></span> personally, I don’t find a pre-built image much more convenient that “importing a Dockerfile” when extending an image<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:04:52)</span> <b>blin:</b></span> well the goal is for everyone to use a single pre-built image because proliferation of very similar images and duplication of effort doesn't help anyone<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:05:25)</span> <b>blin:</b></span> so i'll see what i can do to add this<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:05:50)</span> <b>isfiligoi:</b></span> I agree if the final image you provide is useful as-is<br/>If it has to be tweaked, not so much<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:41:15)</span> <b>matyas:</b></span> does kubernetes only work with pre-built images or can you give it a Dockerfile and some params and tell it to build it first?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:43:09)</span> <b>blin:</b></span> if it does, i can see that ending up as support nightmares<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:53:09)</span> <b>lincoln:</b></span> It only works with pre-built images<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:53:24)</span> <b>lincoln:</b></span> Well<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:53:31)</span> <b>lincoln:</b></span> You can build locally and then set an "image pull policy"<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:54:21)</span> <b>lincoln:</b></span> from the docs<br/>&gt;&gt;&gt;The default pull policy is IfNotPresent which causes the Kubelet to skip pulling an image if it already exists. If you would like to always force a pull, you can do one of the following:<br/><br/>- set the imagePullPolicy of the container to Always.<br/>- omit the imagePullPolicy and use :latest as the tag for the image to use.<br/>- omit the imagePullPolicy and the tag for the image to use.<br/>- enable the AlwaysPullImages admission controller.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:55:06)</span> <b>lincoln:</b></span> also note that if you are doing XRootd or whatever in Kubernetes, I think there's some implicit mucking about with uid/gid that you must do<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:55:25)</span> <b>lincoln:</b></span> because you have to get the system uid/gids mapped into whatever is in the container.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:55:47)</span> <b>lincoln:</b></span> actually I don't think that solves any of your problems, just adds a new one you'll have to deal with :slightly_smiling_face:<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:57:12)</span> <b>blin:</b></span> what systemd uid/gids?<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:57:24)</span> <b>lincoln:</b></span> not systemd, system. specifically if youre mounting storage from somewhere<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:57:38)</span> <b>lincoln:</b></span> that storage is going to be owned by some user/group on the host system, but in the container that doesn't necessarily map 1:1<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:58:51)</span> <b>lincoln:</b></span> e.g. if XRootD is user 300 on the host, and it owns /stashcache, I don't think that's necessarily going to be user 300 inside of the container once you mount that storage via docker volumes or whatever.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:59:41)</span> <b>lincoln:</b></span> just saying there may be some weirdness at the boundaries of the namespaces<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:00:35)</span> <b>lincoln:</b></span> I'm sure that is clear as mud :smile:<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:02:43)</span> <b>matyas:</b></span> how do people solve that problem for other file systems deployed w/ containers?<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:06:04)</span> <b>lincoln:</b></span> not sure honestly, I was trying to poke around in the docs for some Kubernetes-specific stuff about what user to run processes as<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:07:34)</span> <b>lincoln:</b></span> I thought you could do something like.. run the processes in the container as a specific uid/gid. then maybe it doesn't matter what xrootd thinks it is running as inside<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:19:02)</span> <b>blin:</b></span> there is user namespacing but i don't think it solves the specific issue that igor's having<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:19:32)</span> <b>blin:</b></span> and i think that's reserved for specific uid ranges on the host<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:05:42)</span> <b>bbockelm:</b></span> @blin @isfiligoi - I think you want the remap feature for pure Docker: <a href="https://docs.docker.com/engine/security/userns-remap/">https://docs.docker.com/engine/security/userns-remap/</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:06:18)</span> <b>bbockelm:</b></span> User namespaces specifically allow users on the outside of the namespace to have different UIDs inside.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:06:42)</span> <b>bbockelm:</b></span> So you would, in the derived container, map the site's UIDs to the appropriate one inside the container.<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:07:00)</span> <b>isfiligoi:</b></span> I can try it out<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:08:21)</span> <b>bbockelm:</b></span> Looks like k8s doesn't have support for this, however: <a href="https://github.com/kubernetes/kubernetes/issues/59152">https://github.com/kubernetes/kubernetes/issues/59152</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:09:53)</span> <b>bbockelm:</b></span> <a href="https://github.com/kubernetes/kubernetes/pull/64005">https://github.com/kubernetes/kubernetes/pull/64005</a> hm - it's at least a PR, not merged yet.  Seems the community is still trying to figure this out.<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:29:05)</span> <b>isfiligoi:</b></span> ok… will not bother with it yet, then<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:44:35)</span> <b>blin:</b></span> @lincoln @ivukotic <a href="https://hub.docker.com/r/opensciencegrid/atlas-xcache/">https://hub.docker.com/r/opensciencegrid/atlas-xcache/</a> i still need to fill out the overview but we've got something up!<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:45:10)</span> <b>lincoln:</b></span> that takes me directly to the <a href="http://hub.docker.com">hub.docker.com</a> page<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:45:15)</span> <b>lincoln:</b></span> do i need to signed in?<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:45:29)</span> <b>***lincoln:</b></span> waits with bated breath<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:45:38)</span> <b>blin:</b></span> doh<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:46:34)</span> <b>blin:</b></span> fixed<br/>
+<span style="color: #e96699"><span style="font-size: small">(18:00:36)</span> <b>lincoln:</b></span> cool<br/>
+</body>
+</html>

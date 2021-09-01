@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Dec 13, 2019 : #operations (osg)</title>
+</head>
+<body>
+<h3>Fri Dec 13, 2019 : #operations (osg)</h3>
+<span style="color: #e06b56"><span style="font-size: small">(09:24:39)</span> <b>jthiltges:</b></span> @blin Err, 404? I'm still seeing nxdomain. Was the DNS entry made? (#63043)<br/>
+<span style="color: #e06b56"><span style="font-size: small">(09:26:50)</span> <b>jthiltges:</b></span> On a similar topic, what's the process for non-urgent OSG DNS changes? I tried the ticket route, but that's apparently not it. :stuck_out_tongue_closed_eyes:<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:27:05)</span> <b>blin:</b></span> oh yeah, not a 404<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:27:17)</span> <b>blin:</b></span> i didn't look at it carefully enough :smile:<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:27:24)</span> <b>blin:</b></span> could you point me to the ticket?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:27:34)</span> <b>blin:</b></span> because that's the right route<br/>
+<span style="color: #e06b56"><span style="font-size: small">(09:27:54)</span> <b>jthiltges:</b></span> ^ #63043<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:27:57)</span> <b>blin:</b></span> idk who's on ops triage @jdost321<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:28:28)</span> <b>blin:</b></span> ah, reading is apparently not my forté right now<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:29:37)</span> <b>blin:</b></span> oh, that was 3 weeks ago &gt;.&gt;<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:29:52)</span> <b>blin:</b></span> i'll grab it, though<br/>
+<span style="color: #e06b56"><span style="font-size: small">(09:30:28)</span> <b>jthiltges:</b></span> Thanks! Once DNS magic is done, I'll update the LE cert, and it should be good to go.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(09:46:58)</span> <b>jthiltges:</b></span> Also related to collector setup, getting a LE certificate is awkward with condor_ce_view. It would be nice if it did either more or less:<br/>- More of a webserver, so it can serve static files for LE validation, and include HTTPS support<br/>- Less of a webserver, running as a WSGI thing<br/><br/>Making it more of a webserver adds complexity to the code. But WSGI setup would defeat the simplicity of condor_ce_view. ¯\_(ツ)_/¯<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:49:32)</span> <b>blin:</b></span> yeah, i'd love HTTPS support. it was a giant PITA to support last time i dove into it: <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-2828">https://opensciencegrid.atlassian.net/browse/SOFTWARE-2828</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(09:51:08)</span> <b>blin:</b></span> i think the right (but scarier? @stanfiem) thing to do is make it more of a webserver but with a really narrow scope<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:51:36)</span> <b>blin:</b></span> doing what it does right now + just handling LE cert renewal and HTTPS<br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:00:41)</span> <b>jthiltges:</b></span> For simplicity sake, I agree that adding HTTPS+LE is the best choice.<br/><br/>And if people really want to run their own webserver, proxying is still an option. That's probably less insane than trying to support both native and wsgi.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:11:07)</span> <b>stanfiem:</b></span> @blin I'm not as familiar with this piece of software as I probably should be, but I'm generally pro TLS and am not immediately opposed to the idea of serving limited files for LE<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:12:00)</span> <b>stanfiem:</b></span> A little curious as to why that is easier than just running nginx in front of it (and having that handle the cert)<br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:15:05)</span> <b>jthiltges:</b></span> The nginx option is what I ended up doing.<br/>My understanding is that a goal is to keep CE setup dead simple: install RPMs and get a working CE.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:16:01)</span> <b>blin:</b></span> so the "CE View" is a simple web server that can be optionally installed on each CE but is also installed on the central collector (<a href="http://collector.opensciencegrid.org/">http://collector.opensciencegrid.org/</a>)<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:16:52)</span> <b>blin:</b></span> basically it shows number of running pilots and which VOs are running on the CE in the site CE case<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:17:10)</span> <b>blin:</b></span> for the central collector case, it shows all running pilots/VOs running in the greater OSG<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:17:34)</span> <b>blin:</b></span> adding an nginx requirement is a little annoying for the site CE case since it makes installation more complicated<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:17:58)</span> <b>stanfiem:</b></span> Makes sense<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:18:51)</span> <b>matyas:</b></span> Don't we document the pre-hook and post-hook for certbot updates for ceview?<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(10:21:13)</span> <b>blin:</b></span> yeah, we do but i think pre/post hooks to take down the CE View are fine for a site CE but feels a little janky for a prod service<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:21:42)</span> <b>blin:</b></span> though i don't imagine anyone would notice the central collector being down for a few minutes once a month<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:21:58)</span> <b>matyas:</b></span> is it even that long?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:22:13)</span> <b>jthiltges:</b></span> Ah. Found it. <a href="https://opensciencegrid.org/docs/security/host-certs/lets-encrypt/#pre-and-post-renewal-hooks">https://opensciencegrid.org/docs/security/host-certs/lets-encrypt/#pre-and-post-renewal-hooks</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:22:16)</span> <b>blin:</b></span> ¯\_(ツ)_/¯<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:23:35)</span> <b>matyas:</b></span> we could document the nginx thing for people that want to avoid the brief downtimes but keep the certbot doc around for people that are ok with them<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:24:07)</span> <b>matyas:</b></span> so I never used nginx. how does proxying a service work?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:24:27)</span> <b>matyas:</b></span> like, what do you do?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:24:35)</span> <b>blin:</b></span> eh, for the time being, i think that adds unnecessary complication to the site CEs<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:24:40)</span> <b>blin:</b></span> the post/pre hook are fine for them<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:24:57)</span> <b>matyas:</b></span> yeah do pre/post hook for site CEs and nginx proxying for the central collector<br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:25:19)</span> <b>jthiltges:</b></span> Proxying is silly simple:<br/><pre>  location / {<br/>    proxy_pass            <a href="http://localhost:8080">http://localhost:8080</a>;<br/>  }</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:25:19)</span> <b>blin:</b></span> yeah, we can ask ops to document it :smile:<br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:26:09)</span> <b>jthiltges:</b></span> Also gotta set <tt>httpd_can_network_relay</tt> SELinux boolean, for _reasons_.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:29:09)</span> <b>jthiltges:</b></span> My thoughts behind this: getting a cert sorted out is an annoying part of making a CE. The closer to "push button, receive CE" things can be, the better. That would be my argument for having native LE support in ceview.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:29:29)</span> <b>blin:</b></span> yeah, completely agreed<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:29:44)</span> <b>blin:</b></span> especially in the GCT free world<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:30:00)</span> <b>matyas:</b></span> is CEView part of Condor or is it a separate piece of software?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:30:25)</span> <b>jthiltges:</b></span> OSG owns it, I think. Part of condor_ce.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:30:33)</span> <b>blin:</b></span> yup<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:30:51)</span> <b>blin:</b></span> it's just optional, currently<br/>
+</blockquote>
+<span style="color: #9e3997"><span style="font-size: small">(10:19:08)</span> <b>stanfiem:</b></span> Still using certbot for the certs? Minus that bit of integration it seems like it would be pretty straightforward to add.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:20:24)</span> <b>stanfiem:</b></span> Anyway, I'm getting on a plane but would be happy to discuss further, but it sounds like you have a reasonable path forward.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:20:43)</span> <b>blin:</b></span> have a safe flight!<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:37:57)</span> <b>blin:</b></span> hey john, quick question about the DNS ticket that you made. did you get an email notification that i closed it?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:38:31)</span> <b>jthiltges:</b></span> I got your reply at 9:38 AM. No other email.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:39:32)</span> <b>blin:</b></span> ok thanks<br/>
+<span style="color: #e06b56"><span style="font-size: small">(11:17:14)</span> <b>jthiltges:</b></span> collector-itb is running with the new certificate. Thanks @blin<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:59:50)</span> <b>jthiltges:</b></span> On updating collector2 to current condor (#62740), any reason I shouldn't go ahead this afternoon?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:01:06)</span> <b>dweitzel:</b></span> go for it!  Updating on a friday afternoon, nothing better!<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:01:09)</span> <b>blin:</b></span> if you're cool with friday afternoon updates lol<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:03:26)</span> <b>matyas:</b></span> dude I update koji on friday nights<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:03:36)</span> <b>matyas:</b></span> what could possibly happen?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:13:48)</span> <b>matyas:</b></span> hey folks, Purdue's OSG_ResourceGroup in the CE collector didn't match what he had in topology for about a week or so<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:13:59)</span> <b>matyas:</b></span> does that have any effects?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:18:41)</span> <b>blin:</b></span> i don't think it would, the FQDNs and site name are the most relevant for GRACC so i think it'd be fine (@dweitzel would know for sure)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:19:30)</span> <b>dweitzel:</b></span> nope, no worries<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:20:05)</span> <b>matyas:</b></span> the CE collector is the only thing that uses the resource group defined in 40-siteinfo.ini<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:20:16)</span> <b>matyas:</b></span> do we still need it?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:21:15)</span> <b>blin:</b></span> down with resource group<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:21:58)</span> <b>matyas:</b></span> does the factory use it?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:23:00)</span> <b>blin:</b></span> no, i don't believe so<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:23:52)</span> <b>blin:</b></span> <a href="https://docs.google.com/document/d/1tHMaYnU5mHaBPmias7J6QWCuL9IpLF5PXtRlWuDannU/edit?ts=5beb2bc3#heading=h.gob3bm58yx17">https://docs.google.com/document/d/1tHMaYnU5mHaBPmias7J6QWCuL9IpLF5PXtRlWuDannU/edit?ts=5beb2bc3#heading=h.gob3bm58yx17</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(13:26:59)</span> <b>matyas:</b></span> heh, we may want to change the Topology Hierarchy example in that doc since Purdue just combined all their resource groups<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:29:22)</span> <b>matyas:</b></span> What about APEL? IIRC they also use the CE collector attributes... they're the ones I implemented the <tt>Resource Entry</tt> sections for?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:29:28)</span> <b>matyas:</b></span> (in osg-configure)<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:33:26)</span> <b>blin:</b></span> i think you mean AGIS<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:33:30)</span> <b>blin:</b></span> maybe?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:33:50)</span> <b>blin:</b></span> anyway, ResourceGroup is a uniquely OSG thing so I don't think it matters to them<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:33:50)</span> <b>matyas:</b></span> they all blend together :stuck_out_tongue:<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:34:22)</span> <b>matyas:</b></span> ok. I'll tell Erik to fix up his resource_group just in case but it's no biggie<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:42:15)</span> <b>jthiltges:</b></span> collector2.osg is updated to condor-8.8.5-1.7.osg35. Hosts are slowly reappearing in <tt>condor_ce_status -any</tt> output. Seems OK so far.<br/>
+</body>
+</html>

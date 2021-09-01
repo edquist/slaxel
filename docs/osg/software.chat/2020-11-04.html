@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Nov 4, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Nov 4, 2020 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(08:42:26)</span> <b>blin:</b></span> hrmmmm...thoughts @matyas?<br/>
+<span style="color: #c386df"><span style="font-size: small">(08:45:16)</span> <b>matyas:</b></span> well, priorities is built into yum in centos 8<br/>
+<span style="color: #73769d"><span style="font-size: small">(08:46:00)</span> <b>tim.theisen:</b></span> I installed osg-wn-client in a docker image and had no difficulties. It does not pull in gfal2-all.<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:46:24)</span> <b>blin:</b></span> what OS version container?<br/>
+<span style="color: #73769d"><span style="font-size: small">(08:49:30)</span> <b>tim.theisen:</b></span> Just the base centos:8 container. It was built 3 months ago. I just added power tools, epel, and osg. It installed just fine.<br/>
+<span style="color: #73769d"><span style="font-size: small">(08:52:39)</span> <b>tim.theisen:</b></span> Hmm. Either installing from osg or osg-testing worked without difficulty in this setup.<br/>
+<span style="color: #73769d"><span style="font-size: small">(08:59:30)</span> <b>tim.theisen:</b></span> Looking closer at my installation, it pulled in XRootD 5 from EPEL.<br/>
+<span style="color: #73769d"><span style="font-size: small">(09:09:20)</span> <b>tim.theisen:</b></span> We haven't released xrootd for 3.5 EL8 yet. The last version we built and is in testing is 4.12.3. The worker node client does include the xrootd client and I get version 5 from EPEL.<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:15:47)</span> <b>blin:</b></span> yeah i think the problem is that our gfal2 el8 build requires xrootd 5<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:16:51)</span> <b>matyas:</b></span> how did that happen?<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:17:08)</span> <b>matyas:</b></span> did we build things in the wrong order?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:17:15)</span> <b>blin:</b></span> not sure, i'll follow up with <b>@edquist</b><br/>
+<span style="color: #c386df"><span style="font-size: small">(09:17:19)</span> <b>matyas:</b></span> ok<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:17:30)</span> <b>edquist:</b></span> no<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:17:32)</span> <b>matyas:</b></span> Koji doesn't use yum priorities.<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:18:08)</span> <b>edquist:</b></span> i thought the problem was our el8 build built against python2<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:18:25)</span> <b>matyas:</b></span> Koji has its own set of repo priorities that it uses when it creates the build repo. RPMs built in Koji always win over RPMs from external repos.<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:18:29)</span> <b>edquist:</b></span> i think i made a comment in the ticket<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:18:54)</span> <b>edquist:</b></span> so for el8 we have a python2-xrootd<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:18:56)</span> <b>edquist:</b></span> package<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:19:06)</span> <b>edquist:</b></span> but in epel there is a python3-xrootd<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:19:43)</span> <b>edquist:</b></span> anyway from what i remember, it seemed like we want to add logic to the xrootd build to build against python3 for el8<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:20:21)</span> <b>matyas:</b></span> isn't there already? how did the epel build build against python3?<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:20:30)</span> <b>edquist:</b></span> newer xrootd<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:21:04)</span> <b>edquist:</b></span> presumably xrootd 5 for el8 has the right logic for python3<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:21:10)</span> <b>edquist:</b></span> but our xrootd 4 does not<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:22:03)</span> <b>blin:</b></span> ah that's right<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:22:32)</span> <b>blin:</b></span> i think technically this should be fine for the <tt>osg-wn-client</tt> since it'll bring in xrootd 5 from EPEL and we're not ready to release XRootD 4 for EL8<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:25:58)</span> <b>matyas:</b></span> I don't know about EPEL's xrootd 5 but ours should have the compat libraries that allow things compiled against xrootd 4 to still work<br/>
+<span style="color: #73769d"><span style="font-size: small">(09:28:50)</span> <b>tim.theisen:</b></span> This gfal2 build built against xrootd 4 on el8 with no problems: <a href="https://koji.fedoraproject.org/koji/buildinfo?buildID=1538757">https://koji.fedoraproject.org/koji/buildinfo?buildID=1538757</a><br/>
+<span style="color: #73769d"><span style="font-size: small">(09:29:55)</span> <b>tim.theisen:</b></span> Derp wrong link, that was for el7 here is for el8 <a href="https://koji.fedoraproject.org/koji/buildinfo?buildID=1538810">https://koji.fedoraproject.org/koji/buildinfo?buildID=1538810</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(09:31:00)</span> <b>blin:</b></span> @matyas do the compat libraries build <tt>python2-xrootd</tt>?<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:32:35)</span> <b>matyas:</b></span> no, they're only the compiled binaries<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:32:44)</span> <b>matyas:</b></span> (.so files)<br/>
+<span style="color: #73769d"><span style="font-size: small">(09:42:15)</span> <b>tim.theisen:</b></span> @dweitzel @efajardo @jthiltges I am looking to see if any testing has been done with XRootD 4.12.5 or 5.0.2. Please report back if you are using either of these versions.<br/>
+<blockquote>
+<span style="color: #a63024"><span style="font-size: small">(11:32:28)</span> <b>efajardo:</b></span> I think most stashcaches if not all are 5.0.2 . And they are running fine.<br/>
+</blockquote>
+<span style="color: #dd8527"><span style="font-size: small">(09:43:13)</span> <b>marcom:</b></span> @matyas priorities is built into yum/dnf in centos 8, but the released version seems not to work because of a bug, for me it worked only after I updated libsolv from nightly as I mentioned above<br/>
+<span style="color: #e06b56"><span style="font-size: small">(09:45:02)</span> <b>jthiltges:</b></span> I just switched Nebraska's local redirector and SEs over to xrootd v5.0.2 yesterday afternoon. Seems good so far!<br/><br/>Only snag was with xrootd-lcmaps, with a segfault that required a config style change. <a href="https://github.com/opensciencegrid/xrootd-lcmaps/issues/53">https://github.com/opensciencegrid/xrootd-lcmaps/issues/53</a><br/>
+<span style="color: #dd8527"><span style="font-size: small">(09:48:59)</span> <b>marcom:</b></span> Another way I was able to use xrootd 4 was by using the dnf versionlock plugin:<br/><pre>dnf install 'dnf-command(versionlock)'<br/>dnf versionlock add --raw 'xrootd-client-4.*'<br/>dnf versionlock add --raw 'xrootd-client-lib-4.*'<br/>dnf versionlock add --raw 'xrootd-lib-4.*'</pre><br/>Probably would have been sufficient to lock xrootd-lib-4.* and dnf would have been figuring out the rest.<br/>This got me to see and install xrootd 4 but then there was no gfal plugin to go with it<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:55:52)</span> <b>edquist:</b></span> @marcom - i have untagged our xrootd 4 build from osg-testing<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:56:02)</span> <b>edquist:</b></span> for el8<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:56:22)</span> <b>edquist:</b></span> (after discussion with @blin)<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:57:10)</span> <b>edquist:</b></span> the idea is this should use all the packages from the epel xrootd build directly<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:57:41)</span> <b>edquist:</b></span> rather than having a mix of xrootd* from osg, and python3-xrootd from epel<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:57:44)</span> <b>edquist:</b></span> so<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:57:45)</span> <b>blin:</b></span> (for the time being)<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:57:51)</span> <b>edquist:</b></span> if you want to try again <br/>
+<span style="color: #16569E"><span style="font-size: small">(09:58:11)</span> <b>edquist:</b></span> the hope is it may work without needing to muck with priorities<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:58:45)</span> <b>matyas:</b></span> well but then Marco will be getting xrootd 5<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:59:06)</span> <b>edquist:</b></span> but that is consistent with what we'll be releasing<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:59:15)</span> <b>blin:</b></span> yeah but we have no choice until we release xrootd 4 for EL8<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:59:40)</span> <b>matyas:</b></span> Hmm.<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:59:53)</span> <b>matyas:</b></span> In the meantime, we should rebuild xrootd 4 for EL8 with python3 instead of python2<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:00:07)</span> <b>blin:</b></span> yeah, that's definitely on the docket to fix<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:00:26)</span> <b>edquist:</b></span> @blin do we have a JIRA ticket for that?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:01:32)</span> <b>matyas:</b></span> also if priorities is broken then it doesn't matter which version of xrootd 4 is in our repos because people will be getting xrootd 5 from EPEL<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:02:38)</span> <b>blin:</b></span> <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-4106">https://opensciencegrid.atlassian.net/browse/SOFTWARE-4106</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:03:13)</span> <b>blin:</b></span> we think yum may be broken because of the xrootd 4 from our repos that's in testing but gfal wants python3-xrootd that's only available from xrootd 5 in EPEL<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:03:39)</span> <b>matyas:</b></span> I see.<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:04:28)</span> <b>edquist:</b></span> &gt; (09:57:10) &lt;font size="3"&gt;edquist: the idea is this should use all the packages from the epel xrootd build directly<br/>&gt; (09:57:41) edquist: rather than having a mix of xrootd* from osg, and python3-xrootd from epel&lt;/font&gt;<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:04:30)</span> <b>matyas:</b></span> So you think priorities may otherwise be working?<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:05:04)</span> <b>edquist:</b></span> &gt; the idea is this should use all the packages from the epel xrootd build directly<br/>&gt; rather than having a mix of xrootd* from osg, and python3-xrootd from epel<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:05:21)</span> <b>edquist:</b></span> my guess is priorities is fine<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:05:34)</span> <b>edquist:</b></span> seems like straight up package names<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:05:43)</span> <b>edquist:</b></span> BUT<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:05:58)</span> <b>edquist:</b></span> now after untagging our xrootd from osg-testing, we should be able to verify that<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:06:52)</span> <b>matyas:</b></span> well wait a minute. We can test priorities directly, right? Just install xrootd itself, without gfal or python or anything and see which one gets pulled in-- xrootd 4 from osg, or xrootd 5 from epel<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:09:01)</span> <b>edquist:</b></span> sure<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:09:09)</span> <b>edquist:</b></span> ooh<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:09:14)</span> <b>edquist:</b></span> BUT BUT BUT<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:09:17)</span> <b>edquist:</b></span> bad news <br/>
+<span style="color: #16569E"><span style="font-size: small">(10:10:27)</span> <b>edquist:</b></span> <pre><br/>$ rpm -qp --requires gfal2-plugin-xrootd-2.18.1-1.osg35.el8.x86_64.rpm | grep Xrd<br/>libXrdCl.so.3()(64bit)<br/>libXrdPosix.so.3()(64bit)<br/>libXrdUtils.so.3()(64bit)<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:10:52)</span> <b>blin:</b></span> of course<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:11:11)</span> <b>edquist:</b></span> so<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:11:37)</span> <b>blin:</b></span> ok so when our XRootD 4 is ready to go, then we need to rebuild gfal to build against it<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:11:44)</span> <b>edquist:</b></span> i suspect our gfal2-plugin-xrootd will not work with epel's xrootd 5<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:11:57)</span> <b>blin:</b></span> and we'll probably need to carry a gfal in upcoming built against xrootd 5<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:11:58)</span> <b>matyas:</b></span> I forget... are those the old sonames or the new ones?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:12:12)</span> <b>matyas:</b></span> pretty sure EPEL ships the xrootd compat libraries<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:12:44)</span> <b>edquist:</b></span> &gt; ok so when our XRootD 4 is ready to go, then we need to rebuild gfal to build against it<br/>i think our el8 gfal2 _is_ built against our xrootd 4<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:12:56)</span> <b>edquist:</b></span> &gt;pretty sure EPEL ships the xrootd compat libraries<br/><br/>in that case we might be ok<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:13:10)</span> <b>edquist:</b></span> let's see<br/>
+<span style="color: #73769d"><span style="font-size: small">(10:13:59)</span> <b>tim.theisen:</b></span> The .3s are for xrootd 5, .2s for xrootd 4<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:14:45)</span> <b>matyas:</b></span> so our el8 gfal2 is built against xrootd 5<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:15:09)</span> <b>edquist:</b></span> well that is curious<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:16:01)</span> <b>edquist:</b></span> ok<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:16:02)</span> <b>edquist:</b></span> yeah<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:16:38)</span> <b>edquist:</b></span> so now, with our xrootd 4 out of osg-3.5-el8-testing, it works to do<br/>yum install --enablerepo=osg-testing gfal2-plugin-xrootd<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:17:03)</span> <b>edquist:</b></span> which brings in xrootd(5)-client-libs<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:17:11)</span> <b>edquist:</b></span> from epel<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:17:17)</span> <b>matyas:</b></span> sure<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:17:58)</span> <b>matyas:</b></span> which suggests that priorities in general does work<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:19:09)</span> <b>matyas:</b></span> so we rebuild gfal2-plugin-xrootd against xrootd 4 and we should be fine?<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:19:55)</span> <b>edquist:</b></span> sounds right to me<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:20:19)</span> <b>matyas:</b></span> and rebuild xrootd 4 with python3-xrootd<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:20:23)</span> <b>edquist:</b></span> i am a little surprised why our el8 gfal2 build used xrootd 5 from epel rather than our xrootd 4<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:20:29)</span> <b>edquist:</b></span> right<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:20:36)</span> <b>blin:</b></span> but then we need to ship xrootd 4<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:20:40)</span> <b>edquist:</b></span> right<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:20:41)</span> <b>edquist:</b></span> :D<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:21:17)</span> <b>edquist:</b></span> our current el8 gfal2 should work with the xrootd5 in epel<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:22:08)</span> <b>edquist:</b></span> but when we want to ship xroot4, we need to rebuild it with against python3, and we need to rebuild gfal2 against it<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:22:59)</span> <b>matyas:</b></span> right<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:23:41)</span> <b>edquist:</b></span> btw it looks like this tool still works<br/><br/><pre><br/>$ built-against-pkgs -h gfal2-2.18.1-1.osg35.el8 -b xrootd-client-devel<br/>|| Build || Built Against ||<br/>| gfal2-2.18.1-1.osg35.el8 | xrootd-client-devel-5.0.2-1.el8.x86_64 |<br/></pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:24:02)</span> <b>matyas:</b></span> nice!<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:30:42)</span> <b>edquist:</b></span> @blin - do you want me to move on rebuilding el8 xrootd (with python3) for SOFTWARE-4106?  looks like it is unassigned currently<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:31:11)</span> <b>blin:</b></span> sure, go ahead and grab the ticket<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:31:16)</span> <b>edquist:</b></span> pl<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:31:17)</span> <b>edquist:</b></span> ok<br/>
+<span style="color: #73769d"><span style="font-size: small">(13:28:33)</span> <b>tim.theisen:</b></span> @rynge: Have you tested osg-flock?<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:22:40)</span> <b>tim.theisen:</b></span> @blin @matyas <b>@edquist</b> I am trying to put together the package list for tomorrow release.<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:22:50)</span> <b>edquist:</b></span> ok<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:23:05)</span> <b>tim.theisen:</b></span> I sent to osg-software. But, it has not appeared.  What is the plan for gfal2 and el8?<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:23:29)</span> <b>tim.theisen:</b></span> We make tarballs for el8 and cvmfs has an update.<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:26:53)</span> <b>edquist:</b></span> @blin for this release we are shipping el8 gfal2 that's built against epel's xrootd 5, right?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:27:41)</span> <b>blin:</b></span> Yes<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:29:06)</span> <b>tim.theisen:</b></span> Cool. Then I think my list is correct. I did not hear back about osg-flock. So, I think I can release it since it is a non-critical package.<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:29:24)</span> <b>edquist:</b></span> yeah your list looks right as far as gfal2<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:30:47)</span> <b>blin:</b></span> Though I'm starting to lose track of the chain of events...I'm starting to think that gfal2 isn't necessary for el8. The req in the client should pick up gfal and xrootd from epel, no?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:31:39)</span> <b>edquist:</b></span> i don't see why not<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:31:43)</span> <b>tim.theisen:</b></span> Yes, you are right. I was able to install osg-wn-client out of the release repository without difficulty.<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:32:06)</span> <b>tim.theisen:</b></span> So, I don't think we need a gfal2 in el8 for this release.<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:32:32)</span> <b>edquist:</b></span> yeah - agreed<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:32:39)</span> <b>edquist:</b></span> i lost track of the chain of events also<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:32:51)</span> <b>edquist:</b></span> the whole point of us building gfal2 was for xrootd4 support<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:33:04)</span> <b>edquist:</b></span> right?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:33:06)</span> <b>edquist:</b></span> the whole point of us building gfal2 was for xrootd4 support<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:34:53)</span> <b>tim.theisen:</b></span> Yes, the previous EL8 tarball pulls in xrootd 4.12.3 from the osg repositories. The new one would get xrootd 5 from EPEL. Is that a desirable change?<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:36:02)</span> <b>tim.theisen:</b></span> Just the client stuff of course.<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:39:04)</span> <b>edquist:</b></span> &gt; Is that a desirable change?<br/><br/>i can't speak for the tarball<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:39:21)</span> <b>matyas:</b></span> I would say so. The xrootd 5 client is capable of talking to TLS-encrypted servers like our redirector<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:39:38)</span> <b>matyas:</b></span> (our stashcache redirector)<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:40:07)</span> <b>tim.theisen:</b></span> OK. That sounds good to me.<br/>
+</body>
+</html>

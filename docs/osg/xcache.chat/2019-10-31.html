@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Oct 31, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Thu Oct 31, 2019 : #xcache (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(13:05:41)</span> <b>matyas:</b></span> <b>@here</b> xcache call is going on - just me, Edgar, and John Hicks right now... are people joining?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:07:52)</span> <b>blin:</b></span> derek and marian are out/busy<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:08:08)</span> <b>blin:</b></span> one sec let me hop on<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:52:00)</span> <b>blin:</b></span> @efajardo as the data origin, does AAA decide in any way where the data should be cached?<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:53:19)</span> <b>efajardo:</b></span> so AAA is the data origin for the caches<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:53:39)</span> <b>efajardo:</b></span> so once a cache asks AAA for some data it can be send to the cache from anywhere<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:53:50)</span> <b>efajardo:</b></span> I have seen the UCSD cache gathering data from spain or rusia<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:54:21)</span> <b>efajardo:</b></span> CMS AAA fedeartion has no sense of locality<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:55:25)</span> <b>blin:</b></span> so AAA is more like the broker between the cache and where the data actually lives?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:57:17)</span> <b>dweitzel:</b></span> AAA is an origin.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:57:31)</span> <b>dweitzel:</b></span> A federation of origins<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:59:07)</span> <b>blin:</b></span> makes sense. does the connection between cache and the "true" data origin happen through AAA itself? or is it more like a TPC model where AAA tells the cache where to fetch the data that it wants?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:00:55)</span> <b>dweitzel:</b></span> the second.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:01:09)</span> <b>dweitzel:</b></span> redirects to the true origin.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:03:23)</span> <b>blin:</b></span> who's in charge of making sure that the cache is authorized to pull data, AAA?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:05:19)</span> <b>dweitzel:</b></span> I forget how authorization happens in the redirection.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:05:44)</span> <b>dweitzel:</b></span> I suspect it's not a "make sure you are authorized", and more, it will fail when it doesn't have enough access.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:06:14)</span> <b>blin:</b></span> in that case the origins would have authz for caches, or clients in general?<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:07:19)</span> <b>efajardo:</b></span> Well so in CMS most of the authentication<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:07:30)</span> <b>efajardo:</b></span> is based on voms attrs<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:07:43)</span> <b>efajardo:</b></span> so the CMS caches have a x509 proxy with CMS voms<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:08:44)</span> <b>blin:</b></span> ok, fair enough<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:17:05)</span> <b>blin:</b></span> @efajardo the CMS talk you sent me is helpful<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:19:05)</span> <b>blin:</b></span> just to make sure i have it right: you determined which namespaces were being used the most at UCSD + Caltech and set up caches for those namespaces<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:20:06)</span> <b>blin:</b></span> and the namespaces that are used most are determined by the jobs that are sent to your sites<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:20:46)</span> <b>blin:</b></span> but CMS sends jobs to your site /because/ it expects the data to be available in your local storage elements<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:29:40)</span> <b>blin:</b></span> i'm starting to think that throwing together all <tt>storage.xml</tt>'s and getting the namespaces per cache is the right thing to do there<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:31:01)</span> <b>blin:</b></span> because it seems like the namespaces of a cache are driven by site policy<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:41:35)</span> <b>efajardo:</b></span> Well that is a little bit of a chicken and egg problem<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:41:54)</span> <b>efajardo:</b></span> We kinda decided in advance which portion of the namespace we could have cause it was the disk we could afford<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:42:06)</span> <b>efajardo:</b></span> and then modify CMS Frontend to send jobs to UCSD and caltech<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:42:16)</span> <b>efajardo:</b></span> even though we do not advertise in phedex we have thoes datasets<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:43:00)</span> <b>efajardo:</b></span> And then we kinda show for this talk that we did the right choice on choosing that namespace and using the amount of disk we used<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:43:23)</span> <b>efajardo:</b></span> of course for CHEP it is mentioned in a nice tale as we knew what we were doing<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:44:35)</span> <b>efajardo:</b></span> YEs the namespcace of cache are driving by the site/owner of the cache policy<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:47:12)</span> <b>blin:</b></span> yeah, it does seem chicken/egg<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:47:52)</span> <b>blin:</b></span> if the VO is coordinating this, i would think that they should tell each cache which namespaces they're in charge of<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:48:01)</span> <b>blin:</b></span> and sites update their site.xml accordingly<br/>
+</body>
+</html>

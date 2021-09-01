@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri May 10, 2019 : #operations (osg)</title>
+</head>
+<body>
+<h3>Fri May 10, 2019 : #operations (osg)</h3>
+<span style="color: #e23f99"><span style="font-size: small">(10:45:23)</span> <b>marco.mascheroni:</b></span> I am seeing this in many hosted CE (the SchedLog):<br/><pre><br/>05/10/19 10:38:27 Condor GSI authentication failure<br/>GSS Major Status: Authentication Failed<br/>GSS Minor Status Error Chain:<br/>globus_gss_assist: Error during context initialization<br/>OpenSSL Error: s3_clnt.c:1264: in library: SSL routines, function ssl3_get_server_certificate: certificate verify failed<br/>globus_gsi_callback_module: Could not verify credential<br/>globus_gsi_callback_module: Could not verify credential: unable to get issuer certificate<br/></pre><br/>I have updated the CRLs, checked the certificate endate etc<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:45:37)</span> <b>marco.mascheroni:</b></span> (Not sure how to update the CA certificates if necessary)<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:45:45)</span> <b>marco.mascheroni:</b></span> Any idea what to check next?<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:46:15)</span> <b>jlstephen:</b></span> oh i did finish the letsencrypt hostcert renewal yesterday<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:46:27)</span> <b>jlstephen:</b></span> does anything need to be restarted to pick up the new certificates?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:46:46)</span> <b>blin:</b></span> yeah, you probably want to restart the ce service<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:47:00)</span> <b>jlstephen:</b></span> i didn't restart anything<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:47:02)</span> <b>jlstephen:</b></span> ok will do<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:13:37)</span> <b>marco.mascheroni:</b></span> Restart did not help<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:13:52)</span> <b>marco.mascheroni:</b></span> :q<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:17:38)</span> <b>marco.mascheroni:</b></span> Are we missing the Let's encrypt CA certificates?<br/>
+<span style="color: #ea2977"><span style="font-size: small">(11:18:35)</span> <b>jlstephen:</b></span> looks like they're there<br/>
+<span style="color: #ea2977"><span style="font-size: small">(11:18:38)</span> <b>jlstephen:</b></span> <pre>[root@hosted-ce10 ~]# ls /etc/grid-security/certificates/letsencryptauthorityx*<br/>/etc/grid-security/certificates/letsencryptauthorityx3.pem             /etc/grid-security/certificates/letsencryptauthorityx4.pem<br/>/etc/grid-security/certificates/letsencryptauthorityx3.signing_policy  /etc/grid-security/certificates/letsencryptauthorityx4.signing_policy<br/>[root@hosted-ce10 ~]# openssl verify -CApath /etc/grid-security/certificates /etc/grid-security/hostcert.pem <br/>/etc/grid-security/hostcert.pem: OK<br/></pre><br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:18:54)</span> <b>marco.mascheroni:</b></span> uhm<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:25:18)</span> <b>marco.mascheroni:</b></span> In the collector I have<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:25:24)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #43761b"><span style="font-size: small">(11:34:09)</span> <b>blin:</b></span> @marco.mascheroni could you give me the <tt>openssl x509 -in /etc/grid-security/hostcert.pem -noout -text</tt> output?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:34:51)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:35:37)</span> <b>marco.mascheroni:</b></span> it's possible I need to update some packages, some newer hostedces works<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:35:59)</span> <b>blin:</b></span> yeah, i could see CAs/CRLs needing to be updated<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:36:32)</span> <b>marco.mascheroni:</b></span> crls is fetc-crl, how about the cas? It's some yum package?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:36:56)</span> <b>blin:</b></span> osg-ca-certs<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:37:39)</span> <b>marco.mascheroni:</b></span> 1.74 vs 1.78<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:37:54)</span> <b>marco.mascheroni:</b></span> old vs new<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:38:22)</span> <b>blin:</b></span> i don't think that should have much of an effect but it's a good idea to keep osg-ca-certs and vo-client up to date if nothing else<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:43:26)</span> <b>marco.mascheroni:</b></span> yeah, it did not help<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:43:35)</span> <b>marco.mascheroni:</b></span> same error in the sched and same error in the collector<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:47:59)</span> <b>blin:</b></span> what are the permissions on the hostcert/key?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:49:49)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #43761b"><span style="font-size: small">(11:51:09)</span> <b>blin:</b></span> is there a non-full chain cert that you can use?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:51:11)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:51:58)</span> <b>marco.mascheroni:</b></span> there is a cert1.pem<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:54:21)</span> <b>blin:</b></span> does that only contain the host cert?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:54:45)</span> <b>blin:</b></span> (you can just inspect them directly with <tt>less</tt>)<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:56:50)</span> <b>blin:</b></span> but yeah, i would try just using the single host cert instead of the full chain<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:56:59)</span> <b>marco.mascheroni:</b></span> Indeed in the CE that works I set up by hand the link to:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:57:39)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:57:53)</span> <b>marco.mascheroni:</b></span> Now I am trying to use the cert1.pem<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:59:28)</span> <b>blin:</b></span> @matyas ^^ turns out it may be GSI that barfs on fullchain host certs<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:59:39)</span> <b>matyas:</b></span> welp that answers that question :slightly_smiling_face:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(12:05:30)</span> <b>marco.mascheroni:</b></span> It seems the error is gone now. @jlstephen, can you fix the simlying in puppet. I did it bny hand on hosted-ce 10<br/>
+<span style="color: #e23f99"><span style="font-size: small">(12:05:43)</span> <b>marco.mascheroni:</b></span> I am still not getting jobs, but maybe that's something else..<br/>
+<span style="color: #e23f99"><span style="font-size: small">(12:06:11)</span> <b>marco.mascheroni:</b></span> going for dinner, see you later<br/>
+<span style="color: #e23f99"><span style="font-size: small">(12:35:37)</span> <b>marco.mascheroni:</b></span> it works now, I had to clean old pilots because the CE could not authenticate with the factory (maybe the factory still had the old cert ans was not happy I changed it?)<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:55:55)</span> <b>blin:</b></span> yeah it's probably credential caching on the factory end<br/>
+<span style="color: #ea2977"><span style="font-size: small">(13:28:01)</span> <b>jlstephen:</b></span> @marco.mascheroni i updated the certs in puppet and restarted condor-ce on the rest of the hosted-ces<br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:39:33)</span> <b>marco.mascheroni:</b></span> Thanks Judith!<br/>
+</body>
+</html>

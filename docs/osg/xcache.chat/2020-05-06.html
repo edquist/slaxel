@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed May 6, 2020 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Wed May 6, 2020 : #xcache (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(14:55:33)</span> <b>blin:</b></span> @jthiltges <b>@edquist</b> i've been having a discussion with @dweitzel and @didavila about versioned <tt>xrootd-scitokens</tt> shared libs and that xrootd expects the version == its own major version (or an unversioned <tt>.so</tt>). i'd like to just move <tt>xrootd-scitokens</tt> to an unversioned <tt>.so</tt> so that we don't have to have two separate branches of <tt>xrootd-scitokens</tt> with the same codebase. i know we've had some annoyances with plugin builds between feature releases of xrootd, do you see any issues with moving to an unversioned <tt>.so</tt>?<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:56:25)</span> <b>edquist:</b></span> i think the big question is whether the .so versions represent abi changes, right?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:58:31)</span> <b>blin:</b></span> well, they don't for the <tt>xrootd-scitokens</tt> end<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:00:19)</span> <b>blin:</b></span> because xrootd 5 expects <tt>libXrdAccSciTokens-5.so</tt> or <tt>libXrdAccSciTokens.so</tt><br/>
+<span style="color: #16569E"><span style="font-size: small">(15:00:25)</span> <b>edquist:</b></span> i see, well i am not sure too much about what the so versions represent each time<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:00:34)</span> <b>edquist:</b></span> maybe it's fine<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:01:16)</span> <b>blin:</b></span> so if we change <tt>xrootd-scitokens</tt> , it sounds like we can't actually bump the <tt>.so</tt> version<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:03:57)</span> <b>edquist:</b></span> so you are saying you will have to change all the xrootd related stuff together to use unversioned so's ?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:09:12)</span> <b>blin:</b></span> well in this case i'm specifically asking about <tt>xrootd-scitokens</tt><br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:09:14)</span> <b>jthiltges:</b></span> Without diving into it... my hazy guess is that unversioned <tt>.so</tt> files should be fine for xrootd plugins. I assume if you're using <tt>dlopen()</tt>, the version numbers stop mattering?<br/>
+</body>
+</html>

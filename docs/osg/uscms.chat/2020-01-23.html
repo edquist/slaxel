@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jan 23, 2020 : #uscms (osg)</title>
+</head>
+<body>
+<h3>Thu Jan 23, 2020 : #uscms (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(13:48:19)</span> <b>blin:</b></span> &gt;  I had to change walltime, numcpu, and memory requirement from /etc/blahp/slurm_local_submit_attributes.sh.<br/>you should really do this in the job routes:<br/><a href="https://opensciencegrid.org/docs/compute-element/job-router-recipes/#maximum-walltime">https://opensciencegrid.org/docs/compute-element/job-router-recipes/#maximum-walltime</a><br/><a href="https://opensciencegrid.org/docs/compute-element/job-router-recipes/#number-of-cores-to-request">https://opensciencegrid.org/docs/compute-element/job-router-recipes/#number-of-cores-to-request</a><br/><a href="https://opensciencegrid.org/docs/compute-element/job-router-recipes/#maximum-memory">https://opensciencegrid.org/docs/compute-element/job-router-recipes/#maximum-memory</a><br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:53:41)</span> <b>andrew.melo:</b></span> The annoying thing is that the CMS SAM tests don't play nice and send the right params<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:53:50)</span> <b>andrew.melo:</b></span> I also have to override what comes in<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:55:07)</span> <b>blin:</b></span> oh, that's annoying<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:56:37)</span> <b>blin:</b></span> does anyone know who the contacts are at University of Minnesota for the T3 there?<br/>
+<span style="color: #619a4f"><span style="font-size: small">(13:56:52)</span> <b>clundstedt:</b></span> Hang on, I probably do<br/>
+<span style="color: #619a4f"><span style="font-size: small">(13:58:30)</span> <b>clundstedt:</b></span> The last I know Chad Sullivan was the person at UofMinn for their T3.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:11:29)</span> <b>blin:</b></span> hrm, i don't have his contact info. could you shoot it to me via email?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:52:47)</span> <b>bockjoo:</b></span> @blin I have<br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:52:49)</span> <b>bockjoo:</b></span> JOB_ROUTER_ENTRIES = \<br/>   [ \<br/>     GridResource = "batch slurm"; \<br/>     TargetUniverse = 9; \<br/>     name = "Local_Slurm"; \<br/>     MaxIdleJobs = 120; \<br/>   ]<br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:53:19)</span> <b>bockjoo:</b></span> How do I add other attributes?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:54:05)</span> <b>bockjoo:</b></span> Should I just add<br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:54:12)</span> <b>bockjoo:</b></span> set_default_maxMemory = 1000; \<br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:54:24)</span> <b>bockjoo:</b></span> set_default_xcount = 8; \<br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:54:54)</span> <b>bockjoo:</b></span> set_default_maxWallTime = 60; \<br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:55:17)</span> <b>bockjoo:</b></span> and how does it help make SAM jobs run immediately?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:05:03)</span> <b>blin:</b></span> yup, that looks reasonable if you want 8 cores, 1GB RAM, and 1 hr walltime<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:05:37)</span> <b>blin:</b></span> <pre>JOB_ROUTER_ENTRIES = \<br/>   [ \<br/>     GridResource = "batch slurm"; \<br/>     TargetUniverse = 9; \<br/>     name = "Local_Slurm"; \<br/>     MaxIdleJobs = 120; \<br/>     set_default_maxMemory = 1000; \<br/>     set_default_xcount = 8; \<br/>     set_default_maxWallTime = 60; \<br/>   ]</pre><br/><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:07:28)</span> <b>blin:</b></span> i'm not sure why that would make your SAM jobs run immediately but if you're setting those parameters in your <tt>slurm_local_submit_attributes.sh</tt>, it's effectively setting the params in the jobs<br/>
+<span style="color: #7d414c"><span style="font-size: small">(15:10:16)</span> <b>bockjoo:</b></span> In slurm_local_submit_attributes.sh, I have a custom setting with maxmemory=2000, cpu=1, walltime=10min for SAM jobs (lcg user locally):<br/>
+<span style="color: #7d414c"><span style="font-size: small">(15:10:31)</span> <b>bockjoo:</b></span> if [ "x$(/usr/bin/whoami)" == "xlcg" ] ; then<br/>       echo "#SBATCH --mem=2000"<br/>       echo "#SBATCH --cpus-per-task=1"<br/>       echo "#SBATCH --time=00:10:00"<br/>else<br/>       echo "#SBATCH --time=48:00:00"<br/>fi<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:12:34)</span> <b>blin:</b></span> so the SAM jobs get mapped to the <tt>lcg</tt> user?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:14:39)</span> <b>blin:</b></span> if so, i would do that with:<br/><pre>JOB_ROUTER_ENTRIES @=jre<br/>   [<br/>     GridResource = "batch slurm";<br/>     name = "SAM tests";<br/>     MaxIdleJobs = 120;<br/>     Requirements = (Owner == "lcg");<br/>     set_default_maxMemory = 2000;<br/>     set_default_xcount = 1;<br/>     set_default_maxWallTime = 10;<br/>   ]<br/>   [<br/>     GridResource = "batch slurm";<br/>     name = "Local Slurm";<br/>     MaxIdleJobs = 120;<br/>     # 48 hrs max walltime<br/>     set_default_maxWallTime = 2880;<br/>   ]<br/>@jre</pre><br/><br/>
+<span style="color: #7d414c"><span style="font-size: small">(15:16:11)</span> <b>bockjoo:</b></span> Ah, ok, I will try that.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(21:10:52)</span> <b>bockjoo:</b></span> I added the router entry, but it seems there is no change:<br/>
+<span style="color: #7d414c"><span style="font-size: small">(21:11:04)</span> <b>bockjoo:</b></span> [root@cslrm ~]# condor_ce_q | grep lcg<br/>70201.0   lcg             1/23 22:03   0+00:00:00 I  0    0.0 nagrun.sh -v cms -f /cms/Role=lcgadmin -d /queue/grid.probe.metricOutput.EGEE.etf-cms-prod_cern_ch -b <a href="stomp://oldsam.msg.cern.ch:6163/">stomp://oldsam.msg.cern.ch:6163/</a> -c <a href="htcondor://cslrm.rc.ufl.edu">htcondor://cslrm.rc.ufl.edu</a> -t 600 -w 1 -e NONE<br/>70204.0   lcg             1/23 22:05   0+00:00:00 I  0    0.0 nagrun.sh -v cms -f /cms/Role=lcgadmin -d /queue/grid.probe.metricOutput.EGEE.etf-cms-prod_cern_ch -b <a href="stomp://oldsam.msg.cern.ch:6163/">stomp://oldsam.msg.cern.ch:6163/</a> -c <a href="htcondor://cslrm.rc.ufl.edu">htcondor://cslrm.rc.ufl.edu</a> -t 600 -w 1 -e NONE<br/>
+</body>
+</html>

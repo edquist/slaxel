@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Aug 19, 2021 : #flightworthy (chtc)</title>
+</head>
+<body>
+<h3>Thu Aug 19, 2021 : #flightworthy (chtc)</h3>
+<span style="color: #5a4592"><span style="font-size: small">(10:55:39)</span> <b>tannenba:</b></span> IIRC, the starter file transfer used to block both on transfer of input and output.  We wanted the the starter to be responsive because if the slot is preempted, we wanted to go away quickly so a) the slot is free and b) the job can be rescheduled somewhere else.  Previously, when transfer inputs could take 20+ min, it was all just badput since the job will never actually be started.  For transfer output, however, we don't want to be responsive to preemptions.... we want to try and send the job output back right until the moment we are killed to avoid making the entire job run badput.  Thus the decision that it was not very important to do the work to make transfer output happen in a forked child...<br/>
+<span style="color: #d58247"><span style="font-size: small">(12:22:44)</span> <b>gthain:</b></span> Ah.  Thank you.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(12:37:26)</span> <b>blin:</b></span> are we thinking about dropping the old JOB_ROUTER_DEFAULTS + JOB_ROUTER_ENTRIES configs in 9.1?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:07:03)</span> <b>johnkn:</b></span> As in no longer allowing that to be the config?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:07:09)</span> <b>johnkn:</b></span> Don't think so.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(13:53:31)</span> <b>blin:</b></span> so that's a 9.3 thing then?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:56:22)</span> <b>johnkn:</b></span> probably more like a 10.0 thing.  there is no rush to remove the old config support.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:56:52)</span> <b>johnkn:</b></span> We would wait until we are sure that nobody still uses it.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(13:57:19)</span> <b>blin:</b></span> we could start that process with an htcondor-ce 6.x that we ship alongside 9.1<br/>
+<span style="color: #4cc091"><span style="font-size: small">(13:57:48)</span> <b>blin:</b></span> i imagine that JR usage outside of the CE is next to nil<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:57:57)</span> <b>johnkn:</b></span> definitely drop it from the CE first.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:41:26)</span> <b>coatsworth:</b></span> Can anybody take a super simple code review (HTCONDOR-653)? It's just a syntactic change to the DAGMan docs, should only take a minute.<br/>
+</body>
+</html>

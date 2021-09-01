@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jun 16, 2017 : #net-service (osg)</title>
+</head>
+<body>
+<h3>Fri Jun 16, 2017 : #net-service (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(09:37:44)</span> <b>thomlee:</b></span> Hi ... as I said in email I found that Puppet was keeping postgresql-9.4 alive on psds0 (and psds-itb1 incidentally) ... that is no longer the case. Currently it is keeping postgresql-9.6 enabled and running and ensuring postgresql-9.4 is disabled and stopped.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:39:42)</span> <b>smckee:</b></span> Thanks Tom!   Regarding the ongoing email thread on psds0 space and indoes<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:39:44)</span> <b>smckee:</b></span> inodes<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:40:21)</span> <b>smckee:</b></span> Can we attach one of the SSD RAID-1 ar eas to psds0 and migrate data to use it?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:41:14)</span> <b>smckee:</b></span> We could either move /usr/local/pgsql to /usr/local/pgsql-orig and then mount the SSD space at /usr/local/pgsql and then copy from pgsql-orig to pgsql  OR we could do the whole /usr/local in a similar way.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:41:14)</span> <b>thomlee:</b></span> I can do that, I think ... currently they have no filesystems; is ext4 sufficient?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:41:36)</span> <b>smckee:</b></span> Sure, but we may want to increase the default number of inodes.  Currently we have:<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:41:53)</span> <b>smckee:</b></span> [0] 14:10:06 UTC [root@psds0:/etc/rsv]# df -i /usr/local<br/>Filesystem      Inodes   IUsed  IFree IUse% Mounted on<br/>/dev/vdb1      7812608 7666974 145634   99% /usr/local<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:42:06)</span> <b>smckee:</b></span> So about 7.8 million for<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:42:36)</span> <b>smckee:</b></span> 118 GBytes of space<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:42:49)</span> <b>smckee:</b></span> How big are the SSD RAID-1s?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:43:04)</span> <b>thomlee:</b></span> That's around 66,000 inodes/GB<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:43:45)</span> <b>thomlee:</b></span> The SSD RAID-1s are 512 GB<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:43:47)</span> <b>smckee:</b></span> OK, it would be better to have around 80000 then.  The current case has the /usr/local about 77% full<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:44:25)</span> <b>smckee:</b></span> Good.  So if we could get about 40 million inodes that would be good.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:45:18)</span> <b>smckee:</b></span> We should likely migrate all /usr/local in this case.  So we temporarily rename /usr/local to /usr/local-orig, mount the SSD space at /usr/local and then do an rsync or copy to populate the new /usr/local<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:45:21)</span> <b>thomlee:</b></span> ok.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:46:54)</span> <b>smckee:</b></span> I guess mkfs.ext4 has a -i flag to set for bytes-per-inode that you can use<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:47:40)</span> <b>thomlee:</b></span> Exactly what I was just looking at :)<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:48:02)</span> <b>smckee:</b></span> 512G/40 million = 12,800 Bytes / inode?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:48:11)</span> <b>thomlee:</b></span> Default setting appears to be about 16KB/inode.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:48:25)</span> <b>thomlee:</b></span> So something around 12KB/inode?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:48:30)</span> <b>thomlee:</b></span> OK. Off I go ...<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:48:35)</span> <b>smckee:</b></span> Yeah so 12KB/inode is good.  Thanks!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:49:13)</span> <b>thomlee:</b></span> (You can also specify a number of inodes directly with -N but I believe -i is better)<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:55:32)</span> <b>smckee:</b></span> Hi Tom, someone has cleared some space/inodes on psds0<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:55:40)</span> <b>thomlee:</b></span> Oh really?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:55:42)</span> <b>smckee:</b></span> I am checking to see what  is up.   Maybe Edgar ?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:55:56)</span> <b>thomlee:</b></span> Or maybe something automated.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:55:58)</span> <b>smckee:</b></span> 0] 14:55:00 UTC [root@psds0:/etc/rsv]# df -i /usr/local                        Filesystem      Inodes   IUsed  IFree IUse% Mounted on<br/>/dev/vdb1      7812608 7464681 347927   96% /usr/local<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:56:10)</span> <b>smckee:</b></span> Could be but now postgresql-9.6 is running<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:56:41)</span> <b>smckee:</b></span> <a href="https://psetf.grid.iu.edu/etf/check_mk/index.py?start_url=%2Fetf%2Fcheck_mk%2Fview.py%3Fhost%3Dpsds0%26site%3Detf%26view_name%3Dhost">https://psetf.grid.iu.edu/etf/check_mk/index.py?start_url=%2Fetf%2Fcheck_mk%2Fview.py%3Fhost%3Dpsds0%26site%3Detf%26view_name%3Dhost</a><br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:57:04)</span> <b>smckee:</b></span> Most services are green accept for the inodes issue and the rsv probes which I intentionally shut off<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:57:30)</span> <b>smckee:</b></span> Anyway it would be  good to mount the SSD (for now) as /usr/local-new<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:58:01)</span> <b>smckee:</b></span> That way we can rsync and transfer  to use it when we are ready but not try to cut it in right now.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:58:23)</span> <b>smckee:</b></span> maybe mount as /usr/local-ssd (to remind us of the SSDs behind it)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:58:25)</span> <b>thomlee:</b></span> There's a lot of su activity by user postgres logged in /var/log/secure! Is it supposed to be doing that?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:59:04)</span> <b>smckee:</b></span> I login as root and then 'su - postgres'      Is that what you are seeing?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(09:59:20)</span> <b>smckee:</b></span> This is to run pgsql and debug postgres issues<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(10:01:02)</span> <b>smckee:</b></span> So what  seems to be clearing things is that  the simplevisor/message queue is sending data to the CERN bus and cleaning up the directory queue in /usr/local/rsv-perfsonar  (which is what I was originally trying to get to work).   The missing part was getting postgresql-9.6 up<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(10:13:05)</span> <b>smckee:</b></span> Once the SSD is mounted  let me know and I will start  an rsync.   After a  first pass rsync I  may want to shut services down, do a final rsync, then move /usr/local to /usr/local-orig and move /usr/local-ssd to /usr/local.   I guess you may need to do those mount moves.   Then I can restart  the services<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:21:51)</span> <b>thomlee:</b></span> Going to shut down psds0 to add the volume<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(10:22:37)</span> <b>smckee:</b></span> OK<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:37:13)</span> <b>thomlee:</b></span> Booting it into single-user mode so I can make sure I've done this correctly before any services start up.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:42:59)</span> <b>thomlee:</b></span> OK, psds0 is back up and it appears things work. There is now /usr/local-ssd with device /vdc mounted on it ... it is odd to mount a raw device like that, but in this case this "device" is a partition on a physical drive.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(11:04:44)</span> <b>smckee:</b></span> OK, let me start 'rsync -a /usr/local/ /usr/local-ssd'<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:06:15)</span> <b>thomlee:</b></span> OK go right ahead.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(11:06:31)</span> <b>smckee:</b></span> Running now in 'screen' on psds0<br/>
+<span style="color: #e0a729"><span style="font-size: small">(11:13:56)</span> <b>kylegross:</b></span> What should I do with this ticket? <a href="https://ticket.grid.iu.edu/33933">https://ticket.grid.iu.edu/33933</a><br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(11:59:40)</span> <b>smckee:</b></span> Close it (see my update)<br/>
+<span style="color: #e0a729"><span style="font-size: small">(12:00:09)</span> <b>kylegross:</b></span> Great, thanks!<br/>
+<span style="color: #e0a729"><span style="font-size: small">(12:00:14)</span> <b>kylegross:</b></span> You're in Manchester next week?<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:00:55)</span> <b>smckee:</b></span> Yes, leaving to head to the airport in about 30 minutes<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:01:54)</span> <b>smckee:</b></span> Are you going?  Or anyone else from OSG?<br/>
+<span style="color: #e0a729"><span style="font-size: small">(12:02:02)</span> <b>kylegross:</b></span> I'm going.<br/>
+<span style="color: #e0a729"><span style="font-size: small">(12:02:10)</span> <b>kylegross:</b></span> I think Xin from BNL is going<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:02:16)</span> <b>smckee:</b></span> Good.  I will you there!<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:02:22)</span> <b>smckee:</b></span> will see you<br/>
+<span style="color: #e0a729"><span style="font-size: small">(12:02:48)</span> <b>kylegross:</b></span> Yep!  We can again sit at the dinner and judge the wine when they give us the corked bottle like they did in Lisbon.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:02:49)</span> <b>smckee:</b></span> My son is coming with me.<br/>
+<span style="color: #e0a729"><span style="font-size: small">(12:02:52)</span> <b>kylegross:</b></span> ah very cool!<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(12:03:22)</span> <b>smckee:</b></span> Yeah, he is heading to Thailand for a program for 1 month and going with me on my trip before heading on to Thailand<br/>
+<span style="color: #e0a729"><span style="font-size: small">(12:03:51)</span> <b>kylegross:</b></span> nice nice!<br/>
+<span style="color: #e0a729"><span style="font-size: small">(12:04:18)</span> <b>kylegross:</b></span> alrighty... well I'll see you Monday!<br/>
+</body>
+</html>

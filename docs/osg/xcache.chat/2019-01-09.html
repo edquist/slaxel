@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jan 9, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Wed Jan 9, 2019 : #xcache (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(10:44:46)</span> <b>bbockelm:</b></span> @lincoln - for <a href="http://stash.osgconnect.net">stash.osgconnect.net</a>, are you hand-rolling your own Xrootd setup or using an OSG meta-RPM for it?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:45:50)</span> <b>bbockelm:</b></span> (particularly, look for an RPM named <tt>stashcache-origin-server</tt>)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:46:05)</span> <b>bbockelm:</b></span> @dwd same question as above ^^^ but for the FNAL stash origin.<br/>
+<span style="color: #99a949"><span style="font-size: small">(10:48:17)</span> <b>dwd:</b></span> We’re using the dCache xrootd door at FNAL.  I don’t know anything about what software it uses.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:49:44)</span> <b>bbockelm:</b></span> There's a separate host, <tt><a href="http://stashcache.fnal.gov">stashcache.fnal.gov</a></tt>, that is an origin which subscribes to the redirector in order to integrate the dCache xrootd door.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:50:41)</span> <b>bbockelm:</b></span> :slightly_smiling_face: I thought you had a hand in its setup awhile back ... things never got registered in topology, so I don't have a contact handy.<br/>
+<span style="color: #99a949"><span style="font-size: small">(10:55:53)</span> <b>dwd:</b></span> No I didn’t have anything to do with that.  I think it was Robert Illingworth<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:00:18)</span> <b>bbockelm:</b></span> gotcha, thanks.  I'll shoot him an email.<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:09:50)</span> <b>lincoln:</b></span> hm<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:09:52)</span> <b>lincoln:</b></span> I don't remember<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:09:53)</span> <b>lincoln:</b></span> let me look.<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:11:07)</span> <b>lincoln:</b></span> @bbockelm we have the RPM installed, but we have sysconfig pointed to the good ol' <tt>xrootd-clustered.conf</tt><br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:11:17)</span> <b>bbockelm:</b></span> ah, RHEL6?<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:11:20)</span> <b>lincoln:</b></span> sadly<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:11:39)</span> <b>bbockelm:</b></span> Ah, then you definitely won't be bit by any auto-upgrades of the RPM ... which is going RHEL7-only.<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:12:01)</span> <b>lincoln:</b></span> it has a very .. ornate Globus Connect configuration that I am not looking forward to trying to replicate on EL7 :slightly_smiling_face:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:25:33)</span> <b>bbockelm:</b></span> ... for the XRootD host?<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:28:06)</span> <b>lincoln:</b></span> it is doing both<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:30:14)</span> <b>lincoln:</b></span> I suppose I could have the regular GridFTP doors do double-duty with XRootD/Stashcache if it becomes critical to move to EL7 at some point.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:53:54)</span> <b>bbockelm:</b></span> ah, gotcha<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:12:33)</span> <b>lincoln:</b></span> are these docs out of date?<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:12:34)</span> <b>lincoln:</b></span> <a href="https://opensciencegrid.org/StashCache/ops/register/">https://opensciencegrid.org/StashCache/ops/register/</a><br/>
+<span style="color: #e96699"><span style="font-size: small">(14:12:45)</span> <b>lincoln:</b></span> they look out of date to me<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:13:17)</span> <b>lincoln:</b></span> We need to register a new cache for Georgia Tech<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:13:28)</span> <b>lincoln:</b></span> They have the service running but I don't see anything about how to do that<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:13:39)</span> <b>lincoln:</b></span> <a href="https://github.com/opensciencegrid/StashCache/blob/master/caches.json">https://github.com/opensciencegrid/StashCache/blob/master/caches.json</a> should we just add them here? anything else to do? @bbockelm @dweitzel<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:14:43)</span> <b>matyas:</b></span> cache or origin?<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:14:45)</span> <b>lincoln:</b></span> cache<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:15:00)</span> <b>lincoln:</b></span> note this will be for LIGO data, so I don't know if there's anything differnt / extra steps needed<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:15:28)</span> <b>bbockelm:</b></span> do a support ticket, we'll get you taken care of.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:16:24)</span> <b>lincoln:</b></span> rgr<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:16:57)</span> <b>dweitzel:</b></span> <a href="https://opensciencegrid.github.io/docs/data/stashcache/install-cache/">https://opensciencegrid.github.io/docs/data/stashcache/install-cache/</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:17:00)</span> <b>dweitzel:</b></span> Bottom<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:18:34)</span> <b>bbockelm:</b></span> @dweitzel - can you nuke the old instructions that Lincoln found?<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:20:38)</span> <b>lincoln:</b></span> are there any special sauce instructions or extra steps for testing LIGO caches?<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:21:46)</span> <b>lincoln:</b></span> I assume there's something extra since they're authenticated<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:27:12)</span> <b>dweitzel:</b></span> @bbockelm done<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:34:30)</span> <b>bbockelm:</b></span> @lincoln - yeah, until we hit xcache-1.0, there's a lot of special sauce for authenticated caches.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:34:39)</span> <b>bbockelm:</b></span> Just open a ticket and Edgar or Derek can take care of that.<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:34:45)</span> <b>lincoln:</b></span> OK, I will.<br/>
+</body>
+</html>

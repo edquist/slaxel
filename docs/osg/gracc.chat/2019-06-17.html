@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jun 17, 2019 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Mon Jun 17, 2019 : #gracc (osg)</h3>
+<span style="color: #7d414c"><span style="font-size: small">(09:03:09)</span> <b>bockjoo:</b></span> Gratia with slurm mysqldb 5.7.5 or later breaks with this query:<br/>
+<span style="color: #7d414c"><span style="font-size: small">(09:03:20)</span> <b>bockjoo:</b></span> printf "use slurm\nSELECT j.id_job, j.exit_code, j.id_group, j.id_user, j.job_name, j.tres_alloc, j.partition, j.state, MIN(j.time_start) AS time_start, MAX(j.time_end) AS time_end, SUM(j.time_suspended) AS time_suspended, SUM(CASE WHEN j.time_end &lt; j.time_start + j.time_suspended THEN 0 ELSE j.time_end - j.time_start - j.time_suspended END) AS wall_time, a.acct, a.user, MAX(j.mem_req) AS max_rss, ( SELECT SUM(s.user_sec) + SUM(s.user_usec/1000000) FROM ${cluster}_step_table s WHERE s.job_db_inx = j.job_db_inx ) AS cpu_user, ( SELECT SUM(s.sys_sec) + SUM(s.sys_usec/1000000) FROM ${cluster}_step_table s WHERE s.job_db_inx = j.job_db_inx ) AS cpu_sys FROM ${cluster}_job_table as j LEFT JOIN ${cluster}_assoc_table AS a ON j.id_assoc = a.id_assoc WHERE id_job IN ( SELECT id_job FROM ${cluster}_job_table WHERE time_start &gt; 0 AND time_end &gt;= ${timesince_s} ) GROUP BY id_job HAVING MIN(j.time_end) &gt; 0 AND MIN(j.time_start) &gt; 0 ORDER BY j.time_end ; \nquit\n" | mysql -u slurmread -h $host -P $port -p_password_<br/>
+<span style="color: #7d414c"><span style="font-size: small">(09:03:28)</span> <b>bockjoo:</b></span> with this error<br/>
+<span style="color: #7d414c"><span style="font-size: small">(09:03:51)</span> <b>bockjoo:</b></span> ERROR 1055 (42000) at line 2: Expression #2 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'slurm.j.exit_code' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:05:01)</span> <b>dweitzel:</b></span> Hi Bockjoo.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(09:05:23)</span> <b>bockjoo:</b></span> So, I attempted a modified query by adding to GROUP BY id_job<br/>
+<span style="color: #7d414c"><span style="font-size: small">(09:05:41)</span> <b>bockjoo:</b></span> but it still fails with another error:<br/>
+<span style="color: #7d414c"><span style="font-size: small">(09:05:52)</span> <b>bockjoo:</b></span> ERROR 1055 (42000) at line 2: Expression #7 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'slurm.j.partition' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by<br/>
+<span style="color: #7d414c"><span style="font-size: small">(09:05:59)</span> <b>bockjoo:</b></span> Do you have any suggestion?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(09:06:20)</span> <b>bockjoo:</b></span> Hi Derek<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:09:10)</span> <b>dweitzel:</b></span> In the short(ish) term, we would like to use htcondor-ce probe for slurm.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:10:36)</span> <b>dweitzel:</b></span> how would you like to be the guinea pig for using the htcondor-ce probe?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(09:14:29)</span> <b>bockjoo:</b></span> Wouldn't mind<br/>
+<span style="color: #7d414c"><span style="font-size: small">(09:15:25)</span> <b>bockjoo:</b></span> Can you send me an instruction?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:17:29)</span> <b>dweitzel:</b></span> ha, instructions.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:19:52)</span> <b>dweitzel:</b></span> we'll get you something.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(09:37:40)</span> <b>bockjoo:</b></span> printf "use slurm\nSELECT j.id_job, j.exit_code, j.id_group, j.id_user, j.job_name, j.tres_alloc, j.partition, j.state, MIN(j.time_start) AS time_start, MAX(j.time_end) AS time_end, SUM(j.time_suspended) AS time_suspended, SUM(CASE WHEN j.time_end &lt; j.time_start + j.time_suspended THEN 0 ELSE j.time_end - j.time_start - j.time_suspended END) AS wall_time, a.acct, a.user, MAX(j.mem_req) AS max_rss, ( SELECT SUM(s.user_sec) + SUM(s.user_usec/1000000) FROM ${cluster}_step_table s WHERE s.job_db_inx = j.job_db_inx ) AS cpu_user, ( SELECT SUM(s.sys_sec) + SUM(s.sys_usec/1000000) FROM ${cluster}_step_table s WHERE s.job_db_inx = j.job_db_inx ) AS cpu_sys FROM ${cluster}_job_table as j LEFT JOIN ${cluster}_assoc_table AS a ON j.id_assoc = a.id_assoc WHERE id_job IN ( SELECT id_job FROM ${cluster}_job_table WHERE time_start &gt; 0 AND time_end &gt;= ${timesince_s} ) GROUP BY id_job,exit_code,id_group,id_user,job_name,tres_alloc,slurm.j.partition,slurm.j.state,slurm.a.acct,slurm.a.user,slurm.j.job_db_inx HAVING MIN(j.time_end) &gt; 0 AND MIN(j.time_start) &gt; 0 ORDER BY j.time_end ; \nquit\n" | mysql -u slurmread -h $host -P $port -p_password_<br/>
+<span style="color: #7d414c"><span style="font-size: small">(09:37:43)</span> <b>bockjoo:</b></span> works<br/>
+<span style="color: #7d414c"><span style="font-size: small">(09:38:04)</span> <b>bockjoo:</b></span> But I am still willing to experiment the htcondor-ce probe for slurm.<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:59:40)</span> <b>blin:</b></span> <b>@edquist</b> ^^<br/>
+</body>
+</html>

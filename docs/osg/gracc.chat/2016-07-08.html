@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jul 8, 2016 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Fri Jul 8, 2016 : #gracc (osg)</h3>
+<span style="color: #3c8c69"><span style="font-size: small">(12:50:55)</span> <b>kretzke:</b></span> records are now going into monthly indices named <tt><a href="http://gracc.osg.raw0-YYYY.MM">gracc.osg.raw0-YYYY.MM</a></tt> with aliases <tt><a href="http://gracc.osg.query-YYYY.MM">gracc.osg.query-YYYY.MM</a></tt>, which in theory we could point to either raw or summary indices<br/>
+<span style="color: #902d59"><span style="font-size: small">(13:43:10)</span> <b>tanya:</b></span> we should probably force Carl to debug issues with gratiaweb: july 3rd matches data for  oksuzian matches in all places (gracc, gratia database and gratiaweb), july 4th only in gracc and gratia database ; MasterSummaryData is identical to gracc data; so there is no discard of canceled jobs<br/>
+<span style="color: #902d59"><span style="font-size: small">(13:44:01)</span> <b>tanya:</b></span> for 3rd: +------+-------+---------------------+<br/>| Jobs | Hours | ApplicationExitCode |<br/>+------+-------+---------------------+<br/>|   54 |  5692 | 0                   |<br/>|    1 |   112 | 1                   |<br/>|  921 | 83717 | 196608              |<br/>+------+-------+---------------------+<br/>
+<span style="color: #902d59"><span style="font-size: small">(13:44:35)</span> <b>tanya:</b></span> for 4th:<br/>
+<span style="color: #902d59"><span style="font-size: small">(13:44:36)</span> <b>tanya:</b></span> +------+--------+---------------------+<br/>| Jobs | Hours  | ApplicationExitCode |<br/>+------+--------+---------------------+<br/>|   55 |   6864 | 0                   |<br/>| 5124 | 552547 | 196608              |<br/>+------+--------+---------------------+<br/>
+<span style="color: #902d59"><span style="font-size: small">(13:45:24)</span> <b>tanya:</b></span> gratia web shows correct info for 3rd and wrong for 4th (only for canceled jobs)<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:45:49)</span> <b>kretzke:</b></span> I posted the reason above: <br/>this is why those jobs don’t show up in gratiaweb: <tt>R.WallDuration &lt; 1100000000</tt> is part of the WHERE clause. The total wall duration for the failed jobs is 1664210466<br/>
+<span style="color: #902d59"><span style="font-size: small">(13:46:19)</span> <b>tanya:</b></span> oh , i ‘ve missed it<br/>
+<span style="color: #902d59"><span style="font-size: small">(13:46:47)</span> <b>tanya:</b></span> so, it is when wall duration is completely bogus<br/>
+<span style="color: #902d59"><span style="font-size: small">(13:47:18)</span> <b>tanya:</b></span> we need to figure out how to clean up it in gracc<br/>
+<span style="color: #902d59"><span style="font-size: small">(13:47:53)</span> <b>tanya:</b></span> put 0 for wallduration probably; it is some weird condor bug<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:50:04)</span> <b>kretzke:</b></span> is it bogus though? he had a bunch of jobs out there doing nothing (waiting on files to be restored from tape)… this is used cpu time<br/>
+<span style="color: #902d59"><span style="font-size: small">(13:52:01)</span> <b>tanya:</b></span> hm - we have seen before 0 cpu time and incredible wallduration<br/>
+<span style="color: #902d59"><span style="font-size: small">(13:52:21)</span> <b>tanya:</b></span> let me check one job and see<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:54:13)</span> <b>kretzke:</b></span> <a href="https://fifemon.fnal.gov/monitor/dashboard/db/job-cluster-summary?var-cluster=8503120&amp;var-schedd=fifebatch1.fnal.gov&amp;from=1467126414000&amp;to=1467682548096">https://fifemon.fnal.gov/monitor/dashboard/db/job-cluster-summary?var-cluster=8503120&amp;var-schedd=fifebatch1.fnal.gov&amp;from=1467126414000&amp;to=1467682548096</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:55:37)</span> <b>kretzke:</b></span> most jobs ran for several days and did very little<br/>
+<span style="color: #902d59"><span style="font-size: small">(13:57:33)</span> <b>tanya:</b></span> cpu user and system is 0<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:01:05)</span> <b>kretzke:</b></span> does condor report the cpu time for aborted jobs?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:03:12)</span> <b>dweitzel:</b></span> yes<br/>
+<span style="color: #902d59"><span style="font-size: small">(14:04:39)</span> <b>tanya:</b></span> yes, e.g job 8503120.589<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:24:57)</span> <b>kretzke:</b></span> that job looks like it was actually doing something when it got cancelled. some of the jobs actually got input, most didn’t<br/>
+<span style="color: #902d59"><span style="font-size: small">(14:25:25)</span> <b>tanya:</b></span> so, we need to decide how we would like to count them<br/>
+<span style="color: #902d59"><span style="font-size: small">(14:25:36)</span> <b>tanya:</b></span> important information that data are the same<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:26:53)</span> <b>kretzke:</b></span> well, gratiaweb is wrong<br/>
+<span style="color: #902d59"><span style="font-size: small">(14:27:41)</span> <b>tanya:</b></span> yes, i agree; the job is using a slot<br/>
+<span style="color: #902d59"><span style="font-size: small">(14:27:54)</span> <b>tanya:</b></span> so wall duration is relevant<br/>
+<span style="color: #902d59"><span style="font-size: small">(14:28:17)</span> <b>tanya:</b></span> i just worry that when cpu is 0 - it is something weird going on<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:53:24)</span> <b>bbockelm:</b></span> The wall duration filter in Gratia was to avoid displaying data from probes which reported a Unix timestamp as wall duration.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:00:10)</span> <b>kretzke:</b></span> is that still a problem?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:04:13)</span> <b>bbockelm:</b></span> I don’t believe so - I thought we eventually scrubbed all those from the DB.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:05:48)</span> <b>kretzke:</b></span> there’s only two summary records so far this year that hit that. the other was a legitimate-looking GLOW job from 6/3<br/>
+</body>
+</html>

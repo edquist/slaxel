@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jun 2, 2016 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Thu Jun 2, 2016 : #gracc (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(10:24:44)</span> <b>dweitzel:</b></span> @kretzke: looking at the monitoring, I can’t tell if it’s any better with the caching.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:25:26)</span> <b>dweitzel:</b></span> Do you know if elasticsearch ever calls ‘flush’, or any sort of sync?  Ceph caching has this variable: <tt>"rbd_cache_writethrough_until_flush": "true”,</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:25:43)</span> <b>dweitzel:</b></span> so, it doesn’t turn on caching until it knows the application will flush occasionally.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:55:38)</span> <b>bbockelm:</b></span> ElasticSearch should handle durability correctly - calling <tt>fsync</tt> at the appropriate places.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:56:47)</span> <b>bbockelm:</b></span> Looking at the documentation for the code, I’m not sure flipping that switch actually does anything.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:57:05)</span> <b>bbockelm:</b></span> It appears to basically workaround bugs in the old <tt>virtio</tt> driver and not refer to application-level “stuff”.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:57:09)</span> <b>bbockelm:</b></span> (<a href="http://docs.ceph.com/docs/jewel/rbd/rbd-config-ref/">http://docs.ceph.com/docs/jewel/rbd/rbd-config-ref/</a> looking here)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:02:31)</span> <b>dweitzel:</b></span> Eric is convinced that he saw large improvements in the IOPS.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:06:25)</span> <b>dweitzel:</b></span> at least he saw improvements in fio<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:07:17)</span> <b>kretzke:</b></span> IO time for the whole cluster appears to have improved. maybe the restart triggered some clean up of memory cache<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:09:23)</span> <b>dweitzel:</b></span> FWIW, Eric is also investigating changing each disk to use the raid card’s cache.  There is no actual raid now, nor will there be after the change.  But buy implementing a 1 disk raid 0, it uses the Raid card’s cache.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:10:00)</span> <b>kretzke:</b></span> -2 has the lowest IO time, but it may also just be less busy now<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:10:31)</span> <b>dweitzel:</b></span> @kretzke: yeah, but it’s not as significant as I wanted to see :disappointed:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:11:09)</span> <b>dweitzel:</b></span> @bbockelm: we could test with your ELK instance as well.  All you have to do is unmount and un-attach, then re-attach the volume.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:11:15)</span> <b>dweitzel:</b></span> it should pick up the new ceph configuration then.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:14:06)</span> <b>bbockelm:</b></span> @dweitzel: actually, we have gotten permission to expand <tt>hcc-metrics</tt> to start running in production mode and be identical to the OSG hardware.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:14:23)</span> <b>bbockelm:</b></span> That’s what I wanted to chat with you and John about tomorrow.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:14:35)</span> <b>bbockelm:</b></span> Well, John mostly - he actually gets to pick up the work.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:15:16)</span> <b>bbockelm:</b></span> anyhow - if it would be advantageous to just fire up a new VM / block device for <tt>hcc-metrics</tt>, go for it<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:16:02)</span> <b>dweitzel:</b></span> All the IOPS to the ceph cluster!<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:16:25)</span> <b>kretzke:</b></span> somewhat related: I’ve been thinking we should set up a separate ITB “cluster” for gracc/grace<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:16:55)</span> <b>dweitzel:</b></span> it’s a cloud, there’s infinite space, right?  right?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:17:01)</span> <b>dweitzel:</b></span> @kretzke: yeah, that would be fine.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:17:17)</span> <b>dweitzel:</b></span> would ITB be the same size?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:17:25)</span> <b>dweitzel:</b></span> also, have you thought about snapshots anymore?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:19:12)</span> <b>kretzke:</b></span> it probably only needs to be one node<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:21:37)</span> <b>kretzke:</b></span> no haven’t had the chance to dig more. trying to understand how much space is needed for a snapshot, didn’t immediately see that in the docs.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:24:09)</span> <b>kretzke:</b></span> then the question for the whole team is what sort of snapshots/backups do we want? at a minimum I want to save a snapshot prior to cluster maintenance. do we want to save more?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:22:28)</span> <b>dweitzel:</b></span> @kretzke: Our admin pointed out here that by default, elasticsearch performs an fsync after every write.  There is an option to change that to every 5s.  I wonder if that would help: (bottom) <a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/translog.html">https://www.elastic.co/guide/en/elasticsearch/guide/current/translog.html</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:52:47)</span> <b>bbockelm:</b></span> We can definitely try it on GRACC<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:02:20)</span> <b>kretzke:</b></span> are we willing to lose ~500 records in a crash?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:07:54)</span> <b>kretzke:</b></span> I’ve set the fife indices to async<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:21:25)</span> <b>bbockelm:</b></span> I’m 100% OK with losing ~500 records in a crash.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:21:43)</span> <b>bbockelm:</b></span> At least on the raw record side.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:42:09)</span> <b>dweitzel:</b></span> @kretzke: Am I reading the gracc monitoring correctly, is it writing ~1GB an hour to each node?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:07:52)</span> <b>kretzke:</b></span> about 500 MB/hr/node<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(16:35:43)</span> <b>B167BCLN5:</b></span> <br/>
+<span style="color: #A82F2F"><span style="font-size: small">(20:41:43)</span> <b>B167BCLN5:</b></span> <br/>
+</body>
+</html>

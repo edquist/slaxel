@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Oct 9, 2020 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Fri Oct 9, 2020 : #gfactory (osg)</h3>
+<span style="color: #674b1b"><span style="font-size: small">(15:14:44)</span> <b>rynge:</b></span> @jdost321 I'm not getting any glideins from TCNJ - can you take a look to make sure we did not make them fail yesterday?<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:40:20)</span> <b>jdost321:</b></span> something indeed tanked but i think it was looking in bad shape before I even made the change <a href="http://gfactory-2.opensciencegrid.org/factory/monitor/factoryStatus.html?entry=OSG_US_TCNJ-ELSA_gpu&amp;frontend=total&amp;infoGroup=running&amp;elements=StatusRunningCores,ClientCoresTotal,ClientCoresRunning,ClientCoresIdle,&amp;rra=0&amp;window_min=0&amp;window_max=0&amp;timezone=-7">http://gfactory-2.opensciencegrid.org/factory/monitor/factoryStatus.html?entry=OSG_US_TCNJ-ELSA_gpu&amp;frontend=total&amp;infoGroup=running&amp;elements=StatusRunningCores,ClientCoresTotal,ClientCoresRunning,ClientCoresIdle,&amp;rra=0&amp;window_min=0&amp;window_max=0&amp;timezone=-7</a><br/>
+<span style="color: #385a86"><span style="font-size: small">(15:40:27)</span> <b>jdost321:</b></span> i'll check the logs<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:41:15)</span> <b>jdost321:</b></span> sorry, that was the gpu entry, but its about the same picture on the normal one too <a href="http://gfactory-2.opensciencegrid.org/factory/monitor/factoryStatus.html?entry=OSG_US_TCNJ-ELSA&amp;frontend=total&amp;infoGroup=running&amp;elements=StatusRunningCores,ClientCoresTotal,ClientCoresRunning,ClientCoresIdle,&amp;rra=0&amp;window_min=0&amp;window_max=0&amp;timezone=-7">http://gfactory-2.opensciencegrid.org/factory/monitor/factoryStatus.html?entry=OSG_US_TCNJ-ELSA&amp;frontend=total&amp;infoGroup=running&amp;elements=StatusRunningCores,ClientCoresTotal,ClientCoresRunning,ClientCoresIdle,&amp;rra=0&amp;window_min=0&amp;window_max=0&amp;timezone=-7</a><br/>
+<span style="color: #385a86"><span style="font-size: small">(15:41:19)</span> <b>jdost321:</b></span> i didn't even set DISK on the gpu entry<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:41:23)</span> <b>jdost321:</b></span> so i don't think its related<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:47:20)</span> <b>jdost321:</b></span> maybe we still have filled his disks on the wns anyway <tt>Cannot create temp '/local/scratch/glide_XXXXXX'</tt><br/>
+<span style="color: #385a86"><span style="font-size: small">(15:52:02)</span> <b>jdost321:</b></span> i found some successful pilots, those correctly have DISK="4194304" in the condor config (i believe units is kb)<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:54:05)</span> <b>jdost321:</b></span> hmmm this is interesting  though, the one i'm looking at failed for different reasons<br/><pre>globus_gsi_callback_module: Could not verify credential<br/>globus_gsi_callback_module: Could not verify credential<br/>globus_gsi_callback_module: Invalid CRL: The available CRL has expired<br/><br/>10/09/20 16:27:14 (pid:7836) SECMAN: required authentication with collector <a href="http://flock.opensciencegrid.org:9760">flock.opensciencegrid.org:9760</a> failed, so aborting command CCB_REGISTER.<br/>10/09/20 16:27:14 (pid:7836) ERROR: AUTHENTICATE:1003:Failed to authenticate with any method|AUTHENTICATE:1004:Failed to authenticate using GSI|GSI:5004:Failed to authenticate.  Glob<br/>us is reporting error (655360:12)</pre><br/>
+<span style="color: #385a86"><span style="font-size: small">(15:54:24)</span> <b>jdost321:</b></span> @blin looks like update wns isn't working on TCNJ?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:54:25)</span> <b>rynge:</b></span> Fun, all problems at the same time<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:54:49)</span> <b>jdost321:</b></span> well, if we're churning pilots there becuase of this maybe we're filling up his disk for other reasons not the user jobs<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:55:48)</span> <b>blin:</b></span> hrm, that's curious...<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:55:49)</span> <b>jdost321:</b></span> should i check the logging sidecar?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:56:09)</span> <b>blin:</b></span> you could but i don't think it'll tell you much if the CE itself is working ok<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:56:26)</span> <b>blin:</b></span> the WN install only happens on initial deploy so there won't be any updates there<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:56:31)</span> <b>jdost321:</b></span> i just forget what the update wns reports there (if anything)<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:56:36)</span> <b>blin:</b></span> when did you deploy this CE? what tag is it using?<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:57:00)</span> <b>jdost321:</b></span> i think i may have kicked it a few times while fixing the gpu issues, maybe 2 weeks ago? but let me check<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:58:53)</span> <b>jdost321:</b></span> <pre>        Image: opensciencegrid/hosted-ce:fresh<br/>        ImageID: 69dd1de218dbc21a09fb6bdae0abe7c69a3720864cbbf25bd64cfb73a2ce10d8</pre><br/>
+<span style="color: #385a86"><span style="font-size: small">(15:58:56)</span> <b>jdost321:</b></span> Sept 17<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:01:28)</span> <b>blin:</b></span> oof that's well past retirement age in container years! what if you redeploy it? i'm guessing that the CRLs just don't get updated after the initial install<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:02:26)</span> <b>jdost321:</b></span> can't hurt to try..but they should be updating in a cron peroidically, right?<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:04:20)</span> <b>jdost321:</b></span> @blin i'm going with stable this time i don't think that one had any bleeding edge requirements<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:05:01)</span> <b>blin:</b></span> i don't think we're doing that in cron but i could be wrong<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:05:58)</span> <b>jdost321:</b></span> soo it only does fetchcrl 1 time??<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:07:10)</span> <b>blin:</b></span> i'd have to dig but i think the CE fetches CRLs periodically and the WN never fetches CRLs<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:07:20)</span> <b>blin:</b></span> it just gets the CRLs from the initial tarball install<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:09:03)</span> <b>jdost321:</b></span> in the pre SLATE days i am pretty sure the CE kicked off a periodic cron or something that would both pull down the latest CAs and fetch CRL on the remote side.. maybe im' misremembering though<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:13:14)</span> <b>blin:</b></span> sure, i don't think that's something we need to add in the SLATE app, though<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:13:22)</span> <b>rynge:</b></span> For something like this, you might as well rm *.r0 - should have minimal security problems in our setup<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:14:15)</span> <b>jdost321:</b></span> well now that i think we've seen leaving a ton of pilots in batch systems on ce restarts (still no hard proof) i'm afraid to ever kick the CEs until we actually want to pull in changes / updates<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:14:27)</span> <b>jdost321:</b></span> so i think we still want a periodic update<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:15:45)</span> <b>rynge:</b></span> I can't wait for the day we are running tokens everywhere<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:16:34)</span> <b>blin:</b></span> well, if we fix this you're going to need to kick all of the CEs anyway...<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:17:13)</span> <b>jdost321:</b></span> sure, a 1 time only change. to me that's a reasonable change to force kick them all<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:17:44)</span> <b>jdost321:</b></span> otherwise, whats the recommended period for fetchcrrl? every 12h? there's no way we're kicking these every 12h<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:19:51)</span> <b>blin:</b></span> well the goal is to redeploy on every time there's a new container available for the tag you're using<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:20:04)</span> <b>blin:</b></span> so probably weekly, which i think is honestly fine for fetch-crl<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:20:45)</span> <b>jdost321:</b></span> *every time a new container is available and *tested* we still need to come up with that strategy<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:23:20)</span> <b>blin:</b></span> yeah, in the current tagging scheme you'd be using <tt>stable</tt> and only pull in <tt>fresh</tt> for specific instances<br/>
+</body>
+</html>

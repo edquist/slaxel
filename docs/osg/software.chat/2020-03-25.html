@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Mar 25, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Mar 25, 2020 : #software (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(11:39:00)</span> <b>matyas:</b></span> @justas.balcas it looks like you have current log entries in /var/log/gridftp-auth.log<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:39:37)</span> <b>blin:</b></span> also Guenter fixed the GGUS issue, so if you guys could log this all in a ticket that'd be lovely<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:43:22)</span> <b>justas.balcas:</b></span> @matyas but not what I am looking at, like these<br/><pre></pre><br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:43:27)</span> <b>justas.balcas:</b></span> <pre>ATE=20200126112517.663612 HOST=<a href="http://transfer-2.ultralight.org">transfer-2.ultralight.org</a> PROG=globus-gridftp-server NL.EVNT=FTP_INFO START=20200126112324.393833 USER=phedex FILE=/mnt/hadoop/store/data/Run2017E/ZeroBias/AOD/09Aug2019_UL2017-v1/260002/F6868931-6399-8441-B9E4-BB0A6719D679.root BUFFER=235392 BLOCK=1048576 NBYTES=3156492553 VOLUME=/ STREAMS=1 STRIPES=1 DEST=[169.228.130.133] TYPE=RETR CODE=226 TASKID=none retrans=41<br/>DATE=20200126112541.717159 HOST=<a href="http://transfer-2.ultralight.org">transfer-2.ultralight.org</a> PROG=globus-gridftp-server NL.EVNT=FTP_INFO START=20200126112350.638393 USER=phedex FILE=/mnt/hadoop/store/data/Run2017E/ZeroBias/AOD/09Aug2019_UL2017-v1/260002/99583F7E-AC22-A240-9796-BF6B4AA16C22.root BUFFER=235392 BLOCK=1048576 NBYTES=3271336588 VOLUME=/ STREAMS=1 STRIPES=1 DEST=[169.228.130.137] TYPE=RETR CODE=226 TASKID=none retrans=44<br/>DATE=20200126112659.292418 HOST=<a href="http://transfer-2.ultralight.org">transfer-2.ultralight.org</a> PROG=globus-gridftp-server NL.EVNT=FTP_INFO START=20200126112131.455234 USER=phedex FILE=/mnt/hadoop/store/data/Run2018D/JetHT/AOD/12Nov2019_UL2018-v4/110001/E0058975-9520-5546-BDC5-678194985650.root BUFFER=235392 BLOCK=1048576 NBYTES=4054112518 VOLUME=/ STREAMS=1 STRIPES=1 DEST=[131.225.204.153] TYPE=RETR CODE=226 TASKID=none retrans=0</pre><br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:44:18)</span> <b>justas.balcas:</b></span> these are gone since update<br/>
+<span style="color: #d1707d"><span style="font-size: small">(13:29:09)</span> <b>gattebury:</b></span> FWIW I just did a test update to <tt>globus-gridftp-server-13.20-1.osg35.el7.x86_64</tt> as well and also see the same — with our existing config (same as Justas’ except we don’t have TRANSFER in the log_level) seeing the same thing, no longer getting the transfer entries like the above to gridftp.log<br/>
+<span style="color: #d1707d"><span style="font-size: small">(13:29:33)</span> <b>gattebury:</b></span> (just another data point, no time to look into it on our end at this exact moment)<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:33:45)</span> <b>matyas:</b></span> @gattebury do also use gridftp-hdfs?<br/>
+<span style="color: #d1707d"><span style="font-size: small">(13:33:59)</span> <b>gattebury:</b></span> yes<br/>
+<span style="color: #d1707d"><span style="font-size: small">(14:09:29)</span> <b>gattebury:</b></span> Additional info: the previous version we had installed was <tt>globus-gridftp-server-13.9-1.1.osg34.el7</tt>. Looking at the two SRPMS, the former has the <tt>gridftp-conf-logging.patch</tt> applied in the spec file, but that patch doesn’t exist in the 13.20-1.osg35 version. At first glance it _looks_ like that just changes the <tt><a href="http://gridftp.conf.default.in">gridftp.conf.default.in</a></tt> file before things are built.<br/>
+<span style="color: #d1707d"><span style="font-size: small">(14:09:34)</span> <b>gattebury:</b></span> I would assume the actual gridftp.conf files on the system are what get used, but maybe they’re not, or it changes how things are built? ¯\_(ツ)_/¯<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:14:51)</span> <b>matyas:</b></span> osg-gridftp drops a file into /etc/gridftp.d with the logging config<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:15:33)</span> <b>matyas:</b></span> I _think_ it's getting read because writing to /var/log/gridftp-auth.log works, it's just /var/log/gridftp.log that's broken<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:13:44)</span> <b>matyas:</b></span> trying to replicate but I can't get any output into /var/log/gridftp.log even with the old version<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:24:21)</span> <b>matyas:</b></span> you might be hitting this: <a href="https://github.com/gridcf/gct/issues/110">https://github.com/gridcf/gct/issues/110</a><br/>
+<span style="color: #de5f24"><span style="font-size: small">(18:32:38)</span> <b>justas.balcas:</b></span> @matyas what I see it was fixed in master, Can we get a new build from master?<br/>
+<span style="color: #c386df"><span style="font-size: small">(19:14:29)</span> <b>matyas:</b></span> Might be easier to apply the patch; I'll see what I can do tomorrow<br/>
+</body>
+</html>

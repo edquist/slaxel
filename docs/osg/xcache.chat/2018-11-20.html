@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Nov 20, 2018 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Tue Nov 20, 2018 : #xcache (osg)</h3>
+<span style="color: #e06b56"><span style="font-size: small">(11:01:15)</span> <b>jthiltges:</b></span> @matyas Hmm. That looks like a standard InCommon cert, rather than an InCommon IGTF cert. We _could_ adjust the mapfile to map any CN (from a trusted CA). I'm not sure of consequences or preferences. @dweitzel<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:01:54)</span> <b>dweitzel:</b></span> Standard InCommon CA is not distributed by OSG, right?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:02:17)</span> <b>dweitzel:</b></span> so, if we are blocking a non-osg-distributed cert, then that is probably the correct behavior.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:02:36)</span> <b>dweitzel:</b></span> *issued by a non-osg-distributed CA<br/>
+<span style="color: #e06b56"><span style="font-size: small">(11:03:21)</span> <b>jthiltges:</b></span> I believe that's correct. (not distributed)<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:03:34)</span> <b>matyas:</b></span> OK, I'll see if I can get a different host cert<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:04:50)</span> <b>dweitzel:</b></span> @matyas we may even support a letsencrypt cert<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:06:19)</span> <b>matyas:</b></span> OK, because I don't know how to get an InCommon IGTF cert from UW, just a regular InCommon cert<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:14:41)</span> <b>blin:</b></span> that being said, you guys at UNL should be able to request an incommon host cert for those hosts via CNAME validation<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:17:04)</span> <b>matyas:</b></span> ?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:18:09)</span> <b>dweitzel:</b></span> Yup, don't know what you mean @blin<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:19:25)</span> <b>blin:</b></span> i just clarified with mat, i thought you guys were talking about the central collector host certs<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:21:00)</span> <b>dweitzel:</b></span> I think the central collectors use <a href="http://opensciencegrid.org">opensciencegrid.org</a> certs from Wisc that we got a while ago.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:23:48)</span> <b>blin:</b></span> yeah, i'm saying that instead of UW certs, you can use UNL certs and we do cname validation (<a href="https://support.comodo.com/index.php?/Knowledgebase/Article/View/791/0/alternative-methods-of-domain-control-validation-dcv">https://support.comodo.com/index.php?/Knowledgebase/Article/View/791/0/alternative-methods-of-domain-control-validation-dcv</a>)<br/>
+<span style="color: #e06b56"><span style="font-size: small">(11:34:56)</span> <b>jthiltges:</b></span> Err, the current issue is the client cert, rather than collector certs? (Or are there two issues in play?)<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:35:49)</span> <b>blin:</b></span> yeah, you're right john. I was the one that was confused earlier<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:37:29)</span> <b>blin:</b></span> but now that we're on my confused tangent, we should think about replacing the UW collector certs with UNL ones<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:52:04)</span> <b>jthiltges:</b></span> @blin Current certs on collector boxes are good through May 2019. I don't have a strong preference either way. As long as they're working, I'm tempted to leave them, then renew them through UNL.<br/>@matyas I glanced at the config, and LetsEncrypt should be fine, if that saves you some grief. The CAs are part of the osg-ca-certs, and the <tt>"^/CN=([-.A-Za-z0-9/= ]+)$"</tt> mapfile pattern should handle it.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:52:21)</span> <b>blin:</b></span> works for me<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:53:21)</span> <b>bbockelm:</b></span> Hm - you may want to avoid Let's Encrypt for services that are queried by WLCG (AGIS queries the collectors for CE data)<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:53:39)</span> <b>matyas:</b></span> @jthiltges I already requested the InCommon IGTF certs so unless the UW gives me too much grief, I will use those<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:53:49)</span> <b>matyas:</b></span> WLCG doesn't accept LE?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:54:03)</span> <b>blin:</b></span> correct<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:54:39)</span> <b>blin:</b></span> but since we're talking about stashcache caches, we shouldn't have to worry about WLCG queries, right?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:55:32)</span> <b>jthiltges:</b></span> That's my understanding: Try an LE cert for <tt><a href="http://sc-cache.chtc.wisc.edu">sc-cache.chtc.wisc.edu</a></tt> if the IGTF one doesn't go through.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:56:04)</span> <b>bbockelm:</b></span> Correct - the origin itself can do LE, but I thought John was referring to the collector.<br/>
+</body>
+</html>

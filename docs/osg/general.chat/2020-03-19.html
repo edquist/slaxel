@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Mar 19, 2020 : #general (osg)</title>
+</head>
+<body>
+<h3>Thu Mar 19, 2020 : #general (osg)</h3>
+<span style="color: #db3150"><span style="font-size: small">(14:34:54)</span> <b>christinalk:</b></span> I have a user whose jobs (submitted from CHTC, running in OSG via GLOW) failed, with error messages like this:<br/><pre>/scratch/glide_TXLQhX/condor_job_wrapper.sh: line 136: rm: command not found<br/>/cvmfs/oasis.opensciencegrid.org/osg/sw/module-init.sh: line 11: cat: command not found<br/>/cvmfs/oasis.opensciencegrid.org/osg/sw/module-init.sh: line 23: grep: command not found</pre><br/>
+<span style="color: #db3150"><span style="font-size: small">(14:35:09)</span> <b>christinalk:</b></span> Many of these seem to have run at Nebraska? @dweitzel any insight?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:36:20)</span> <b>matyas:</b></span> is their PATH empty?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:36:24)</span> <b>dweitzel:</b></span> wow, can't find grep, sounds like a path error<br/>
+<span style="color: #db3150"><span style="font-size: small">(14:47:05)</span> <b>christinalk:</b></span> note that the errors are coming from the OSG infrastructure scripts, not the user.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:48:04)</span> <b>jthiltges:</b></span> Could you provide details to help identify the job? Maybe we've got a broken worker node at Nebraska?<br/>
+<span style="color: #db3150"><span style="font-size: small">(14:49:28)</span> <b>christinalk:</b></span> should be GLOW VO; local username is <tt>cpprice2</tt>; this table shows # of jobs + associated hostname<br/><pre>    753 <a href="http://c0509.crane.hcc.unl.edu">c0509.crane.hcc.unl.edu</a><br/>    838 <a href="http://c0517.crane.hcc.unl.edu">c0517.crane.hcc.unl.edu</a><br/>    179 <a href="http://c0518.crane.hcc.unl.edu">c0518.crane.hcc.unl.edu</a><br/>    432 <a href="http://c0520.crane.hcc.unl.edu">c0520.crane.hcc.unl.edu</a><br/>    827 <a href="http://c0521.crane.hcc.unl.edu">c0521.crane.hcc.unl.edu</a><br/>    347 <a href="http://c0705.crane.hcc.unl.edu">c0705.crane.hcc.unl.edu</a><br/>    348 <a href="http://c0706.crane.hcc.unl.edu">c0706.crane.hcc.unl.edu</a><br/>    365 <a href="http://c0708.crane.hcc.unl.edu">c0708.crane.hcc.unl.edu</a><br/>    240 <a href="http://c0719.crane.hcc.unl.edu">c0719.crane.hcc.unl.edu</a><br/>    642 <a href="http://c0720.crane.hcc.unl.edu">c0720.crane.hcc.unl.edu</a></pre><br/>
+<blockquote>
+<span style="color: #e06b56"><span style="font-size: small">(14:50:22)</span> <b>jthiltges:</b></span> Thank you. I'll check into it.<br/>
+<span style="color: #db3150"><span style="font-size: small">(14:51:06)</span> <b>christinalk:</b></span> thanks!!<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:16:48)</span> <b>jthiltges:</b></span> @christinalk I'm not finding anything obviously wrong with those nodes. And some are even running glow (icecube) jobs right now. I'd agree with Mat and Derek about the PATH issue. Just not sure how it could get that way.<br/>
+<span style="color: #db3150"><span style="font-size: small">(15:17:46)</span> <b>christinalk:</b></span> hmmm. that’s interesting. I’ll look more closely at the user’s jobs. They’re running successfully in CHTC, so it’s maybe a difference versus the OSG vs CHTC setup.<br/>
+<span style="color: #db3150"><span style="font-size: small">(15:25:21)</span> <b>christinalk:</b></span> which version of Linux do OSG jobs gliding in to Nebraska get?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:26:07)</span> <b>jthiltges:</b></span> Crane is SL 6.10<br/>
+<span style="color: #db3150"><span style="font-size: small">(15:29:38)</span> <b>christinalk:</b></span> AHA. that is the problem then. What attribute would we need to set to get EL7?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:34:28)</span> <b>jthiltges:</b></span> The job wrapper requires EL7? For the job itself, I'd hope singularity would take care of OS version worries. I'm probably confused. :stuck_out_tongue_closed_eyes:<br/>
+<span style="color: #db3150"><span style="font-size: small">(15:38:08)</span> <b>christinalk:</b></span> Yeah, so the issue is: we’re submitting from an EL7 host, where the PATH doesn’t include <tt>/bin</tt>. For these jobs to run, they had to add <tt>getenv = true</tt>, which replicates the path from the submit node inside the job. In this case, that doesn’t work because all the tools in EL6 are in <tt>/bin</tt> and therefore not included in the PATH from the submit node.<br/>
+<span style="color: #db3150"><span style="font-size: small">(15:38:20)</span> <b>christinalk:</b></span> Our jobs all have a default requirement of <tt>OpSysMajorVer == 7</tt><br/>
+<span style="color: #db3150"><span style="font-size: small">(15:39:06)</span> <b>christinalk:</b></span> So there must have been a mismatch between that requirement + whatever mechanism runs the job at Nebraska — do we need to use a different flag to make sure we get the right environment for the payload job?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:44:59)</span> <b>jthiltges:</b></span> Sorry, I've gotta defer to @dweitzel on this one. Too far outside my experience.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:45:33)</span> <b>dweitzel:</b></span> the environment for the payload is a singularity container, right?<br/>
+</blockquote>
+<span style="color: #db3150"><span style="font-size: small">(14:49:55)</span> <b>christinalk:</b></span> there may be other culprits! she had 6000+ jobs fail.<br/>
+<span style="color: #db3150"><span style="font-size: small">(14:50:16)</span> <b>christinalk:</b></span> Unfortunately the job always exits w/ error code 1 (even if it succeeds) so it’ll be hard tracking everyone down.<br/>
+<span style="color: #db3150"><span style="font-size: small">(14:50:58)</span> <b>christinalk:</b></span> looks like she also used BNL, CRUSH, and a teeny tiny amount of UConn<br/>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Feb 11, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue Feb 11, 2020 : #software (osg)</h3>
+<span style="color: #e85d72"><span style="font-size: small">(08:02:57)</span> <b>cnweaver:</b></span> Yes, I think those were the key points.<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:20:26)</span> <b>goughes:</b></span> Anyone had recent experience with the Slurm gratia probe? I'm seeing <tt>/usr/share/gratia/slurm/slurm_meter</tt>  make a connection to mariadb on our slurmdbd server. Then it just hangs for a long time and eventually gets killed. I set up privileges on the slurm accounting database so the user I defined in 20-slurm.ini can run SELECT statements. I verified the privileges work using the same MySQLdb python code from SlurmProbe.py to make a query from our CE. Not sure what my next step should be.<br/>
+<blockquote>
+<span style="color: #385a86"><span style="font-size: small">(2020-02-12 14:13:51)</span> <b>goughes:</b></span> Turns out 20-slurm.ini was configured with the slurmdbd port (6819) instead of the mysql port (3306). :face_palm:<br/>
+</blockquote>
+<span style="color: #43761b"><span style="font-size: small">(12:21:19)</span> <b>blin:</b></span> <b>@edquist</b> ^^<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:21:39)</span> <b>***edquist:</b></span> coughs<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:21:45)</span> <b>***edquist:</b></span> raises hand<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:21:51)</span> <b>goughes:</b></span> :slightly_smiling_face:<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:22:55)</span> <b>edquist:</b></span> any idea if the mariadb server is actually working while it appears to be hung?<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:23:05)</span> <b>edquist:</b></span> (according to, say, top)<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:24:09)</span> <b>goughes:</b></span> I just see it pop up to ~5% cpu occasionally, nothing constant<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:52:03)</span> <b>edquist:</b></span> that is interesting.  You said you can see it making a db connection.  i forget what the mysql command is to see the active queries running - i might check to see if there is actually a query running or if the probe is somehow hanging after making a connection but before actually submitting a query.  you could also check the logs under /var/log/gratia to see if there's anything interesting in there.<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:52:24)</span> <b>edquist:</b></span> when you were able to successfully run the python code to make a query by hand, what user were you running as?<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:52:42)</span> <b>edquist:</b></span> i think the probe runs as root<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:52:50)</span> <b>edquist:</b></span> in case that matters<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:53:22)</span> <b>edquist:</b></span> also feel free to make a support ticket about this<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:53:23)</span> <b>edquist:</b></span> <a href="http://support.opensciencegrid.org">support.opensciencegrid.org</a><br/>
+<span style="color: #385a86"><span style="font-size: small">(13:23:42)</span> <b>goughes:</b></span> I will make a ticket, thanks!<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:39:45)</span> <b>blin:</b></span> @spiperov brian forwarded me an email where you asked about condor security settings in OSG 3.5<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:40:07)</span> <b>blin:</b></span> you should take a look at this section: <a href="https://opensciencegrid.org/docs/release/release_series/#updating-to-htcondor-88x_1">https://opensciencegrid.org/docs/release/release_series/#updating-to-htcondor-88x_1</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(17:40:37)</span> <b>blin:</b></span> also @goughes ^^<br/>
+</body>
+</html>

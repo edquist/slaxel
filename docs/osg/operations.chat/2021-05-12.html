@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed May 12, 2021 : #operations (osg)</title>
+</head>
+<body>
+<h3>Wed May 12, 2021 : #operations (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(10:51:14)</span> <b>blin:</b></span> hrm <b>@edquist</b> @matyas how should folks cancel downtimes? <a href="https://github.com/opensciencegrid/topology/pull/1809">https://github.com/opensciencegrid/topology/pull/1809</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:52:27)</span> <b>matyas:</b></span> by deleting them<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:54:47)</span> <b>blin:</b></span> does that propagate properly down to the downstream consumers?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:56:53)</span> <b>matyas:</b></span> The downtime entries with those IDs will go poof. I don't know if the downstream consumers sync or just append -- you'll have to ask them.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:00:15)</span> <b>blin:</b></span> could you shoot an email to Alexey to double check what CRIC does?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:00:31)</span> <b>blin:</b></span> we only have docs for modifying existing downtimes but nothing about deletion<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:01:14)</span> <b>matyas:</b></span> want me to make them zero-length for now?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:06:42)</span> <b>blin:</b></span> i thought that they were but the topology check wasn't quite right<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:07:06)</span> <b>matyas:</b></span> the check was failing because Doug wasn't registered as a contact for those resources<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:07:29)</span> <b>matyas:</b></span> but also he's _adding_ zero-length downtimes, not modifying the existing ones, which probably wouldn't work<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:08:37)</span> <b>blin:</b></span> looking at the CI failure message, it seems like Topology would be mad even if it was a modification:<br/>&gt;  StartTime does not precede EndTime: 'May 12, 2021 14:00 +0000' -&gt; 'May 12, 2021 14:00 +0000'<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:08:51)</span> <b>matyas:</b></span> ok so make them one-minute<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:10:15)</span> <b>blin:</b></span> before doing that, could you check with Doug to see if that would have any negative effects?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:10:49)</span> <b>blin:</b></span> ultimately, we should probably allow 0-length downtimes as a way to cancel them unless our consumers track deletions<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:13:52)</span> <b>matyas:</b></span> well Alexey's in Europe so by the time he gets back to us it will probably be a moot point<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:14:34)</span> <b>matyas:</b></span> what if I make them 1 minute long for now and if Alexey says it's OK to delete then go back and delete?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:15:52)</span> <b>blin:</b></span> sure as long as you let Doug know that's what we're doing and why<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:16:22)</span> <b>blin:</b></span> probably also worth asking Alexey if zero-ing out the downtime would work for them if deletion doesn't<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:16:58)</span> <b>matyas:</b></span> I'd be surprised if deletion wasn't OK. There's no 'cancelled' flag in the XML so how else would CRIC know if it's been cancelled?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:20:01)</span> <b>blin:</b></span> maybe they just don't pay attention to deletions ¯\_(ツ)_/¯<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:22:53)</span> <b>matyas:</b></span> actually it's just the CI that doesn't like zero-length downtime so I can make it zero-length anyway<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:24:07)</span> <b>blin:</b></span> as long as we fix the tests to accept it<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:38:49)</span> <b>matyas:</b></span> looks like Doug was already trying to modify the existing downtimes (the IDs are the same), he just didn't delete the old entries<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:39:03)</span> <b>matyas:</b></span> I fixed it up and merged it; if it causes issues, we can revert and do something else<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:18:55)</span> <b>paschos:</b></span> <b>@channel</b> we can use a response on 67137… on UConn Storrs. The idea is to add a bunch of VOs to fill unused slots there from the factory<br/>
+</body>
+</html>

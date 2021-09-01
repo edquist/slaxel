@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Aug 26, 2021 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu Aug 26, 2021 : #software (osg)</h3>
+<span style="color: #674b1b"><span style="font-size: small">(10:26:14)</span> <b>rynge:</b></span> Is there a good trick to do version comparisons in classad expressions?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:26:29)</span> <b>rynge:</b></span> <pre>$ condor_status -af SINGULARITY_VERSION | sort | uniq<br/>3.4.0<br/>3.4.2-1.1.el7<br/>3.4.2-1.1.osg34.el7<br/>3.5.2<br/>3.5.2+463-g22a9a22<br/>3.5.3-1.1.osg34.el6<br/>3.5-4.el7<br/>3.6.0-rc.4<br/>3.6.3-1.el7<br/>3.6.3-1.osg34.el7<br/>3.6.4<br/>3.6.4-1.el7<br/>3.7.0-1.el8<br/>3.7.2-1.el7<br/>3.7.2-1.el8<br/>3.7.2-2.el7<br/>3.7.3-1.el7<br/>3.7.4-1.el7<br/>3.7.4-1.el7_9<br/>3.7.4-1.el8<br/>3.8.0<br/>3.8.0-1.el7<br/>3.8.1-1.el7</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:27:09)</span> <b>rynge:</b></span> I would like something like <tt>SINGULARITY_VERSION &gt;= 3.7</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:30:50)</span> <b>matyas:</b></span> try the <tt>versioncmp()</tt> classad function: <a href="https://htcondor.readthedocs.io/en/latest/misc-concepts/classad-mechanism.html">https://htcondor.readthedocs.io/en/latest/misc-concepts/classad-mechanism.html</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:31:21)</span> <b>matyas:</b></span> it's available as far back as 8.8<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:31:59)</span> <b>rynge:</b></span> Great! I'm happy I asked before trying to hack something up!<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(10:33:29)</span> <b>dschultz:</b></span> one thing I didn't know existed was the specialized versions of that: <tt>versionGE(SINGULARITY_VERSION,"3.7")</tt><br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:34:22)</span> <b>rynge:</b></span> :thumbsup:<br/>
+<span style="color: #a72f79"><span style="font-size: small">(11:43:24)</span> <b>andrew.melo:</b></span> Where does blahp live? I think I've got an itch in the SLURM part that is itchy enough for me to scratch<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:44:02)</span> <b>matyas:</b></span> <a href="https://github.com/htcondor/BLAH">https://github.com/htcondor/BLAH</a><br/>
+<span style="color: #a72f79"><span style="font-size: small">(11:44:51)</span> <b>andrew.melo:</b></span> heh, I searched for "blahp" in github<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:45:32)</span> <b>matyas:</b></span> yeah names suck<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:46:12)</span> <b>matyas:</b></span> I think the "p" stands for "protocol" so I guess there's code in there that's not tied to the protocol?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:44:05)</span> <b>blin:</b></span> is it possible to directly run singularity using a local container image available in the local docker instance (i.e. one that shows up via <tt>docker images</tt>?)<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:44:12)</span> <b>blin:</b></span> or do i have to build the sif?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:46:42)</span> <b>matyas:</b></span> try <tt>instance://&lt;the image&gt;</tt><br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(13:08:10)</span> <b>blin:</b></span> nope :disappointed:<br/><pre>FATAL:   osgvo-docker-pilot:latest is not a valid instance name</pre><br/><br/>
+<span style="color: #c386df"><span style="font-size: small">(13:09:13)</span> <b>matyas:</b></span> my bad, "instance://" is a running container<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:11:00)</span> <b>matyas:</b></span> try docker save | singularity run -<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:11:20)</span> <b>matyas:</b></span> (grapsing at straws here if you can't tell :slightly_smiling_face: )<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:13:19)</span> <b>matyas:</b></span> or how about<br/><pre>singularity run &lt;(docker save ...) ...</pre><br/><br/>
+<span style="color: #c386df"><span style="font-size: small">(13:13:24)</span> <b>matyas:</b></span> (bash magic)<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:44:24)</span> <b>blin:</b></span> oh wait. i may just not be passing the image into the container that's running the singularity container...<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:45:09)</span> <b>matyas:</b></span> oh, are you trying to do singularity-in-singularity?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:45:09)</span> <b>blin:</b></span> oh but wait i tried <tt>docker://</tt> locally and it still tries to pull from docker hub first &gt;.&gt;<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:45:17)</span> <b>matyas:</b></span> try <a href="docker://localhost">docker://localhost</a> ?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:45:26)</span> <b>blin:</b></span> singularity-in-singularity-in-docker<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:45:46)</span> <b>matyas:</b></span> :nesting_dolls:<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:46:20)</span> <b>blin:</b></span> argh<br/><pre>blin@blin-latitude:~$ podman images | head -n2<br/>REPOSITORY                                            TAG                  IMAGE ID      CREATED       SIZE<br/>localhost/topology                                    latest               05f76c3c54ee  7 days ago    667 MB<br/>blin@blin-latitude:~$ singularity run <a href="docker://localhost/topology:latest">docker://localhost/topology:latest</a><br/>FATAL:   Unable to handle <a href="docker://localhost/topology:latest">docker://localhost/topology:latest</a> uri: failed to get checksum for <a href="docker://localhost/topology:latest">docker://localhost/topology:latest</a>: error pinging docker registry localhost: Get "<a href="https://localhost/v2/">https://localhost/v2/</a>": dial tcp [::1]:443: connect: connection refused</pre><br/><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:46:30)</span> <b>blin:</b></span> i guess i'll docker save<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:46:50)</span> <b>matyas:</b></span> try the bash magic I showed you<br/>
+</blockquote>
+<span style="color: #a72f79"><span style="font-size: small">(12:52:26)</span> <b>andrew.melo:</b></span> Is there a way to tell fts-transfer-submit to use more verbosity? I have a DNS RR for xrootd-vanderbilt to point to xrootd-redir1-vanderbilt and xrootd-redir2-vanderbilt. However, both of the following fails with <tt>Recoverable error: [112] Result (Neon): Server certificate verification failed: certificate issued for a different hostname after 1 attempts</tt><br/><br/><pre>fts-transfer-submit --overwrite -s <a href="https://fts3-devel.cern.ch:8446">https://fts3-devel.cern.ch:8446</a> <a href="davs://xrootd-vanderbilt.sites.opensciencegrid.org:1094//store/user/meloam/test3">davs://xrootd-vanderbilt.sites.opensciencegrid.org:1094//store/user/meloam/test3</a> <a href="davs://xrootd-vanderbilt.sites.opensciencegrid.org:1094//store/user/meloam/test4">davs://xrootd-vanderbilt.sites.opensciencegrid.org:1094//store/user/meloam/test4</a> --blocking --verbose -K adler32</pre><br/>and<br/><pre>fts-transfer-submit --overwrite -s <a href="https://fts3-devel.cern.ch:8446">https://fts3-devel.cern.ch:8446</a> <a href="davs://xrootd-redir1-vanderbilt.sites.opensciencegrid.org:1094//store/user/meloam/test3">davs://xrootd-redir1-vanderbilt.sites.opensciencegrid.org:1094//store/user/meloam/test3</a> <a href="davs://xrootd-redir1-vanderbilt.sites.opensciencegrid.org:1094//store/user/meloam/test4">davs://xrootd-redir1-vanderbilt.sites.opensciencegrid.org:1094//store/user/meloam/test4</a> --blocking --verbose -K adler32</pre><br/>Whose certificate is bad here? if I do an openssl s_client -connect, I get this<br/><pre>subject=/DC=org/DC=incommon/C=US/ST=Wisconsin/L=Madison/O=University of Wisconsin-Madison/OU=OCIS/CN=<a href="http://xrootd-redir1-vanderbilt.sites.opensciencegrid.org">xrootd-redir1-vanderbilt.sites.opensciencegrid.org</a></pre><br/>... so I'm not sure how the 2nd command is failing<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:54:36)</span> <b>andrew.melo:</b></span> Scratch the previous .. it appears the "regular" FTS server works<br/>
+</body>
+</html>

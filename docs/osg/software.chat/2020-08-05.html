@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Aug 5, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Aug 5, 2020 : #software (osg)</h3>
+<span style="color: #a72f79"><span style="font-size: small">(09:17:46)</span> <b>andrew.melo:</b></span> Is it possible the <tt>blah_disable_wn_proxy_renewal</tt> option isn't wired properly? I'm investigating an issue at Vanderbilt where every single pilot dies at the same time every 8 hours. They jobs are being cancelled by the CE (e.g. SLURM's getting an scancel for the jobs), and as far as I can get debugging the following log in the gridmanager:<br/><pre>08/04/20 17:16:06 [485626] GAHP[485679] &lt;- 'BLAH_JOB_STATUS 4496576 slurm/20200804/22589103'<br/>08/04/20 17:16:06 [485626] GAHP[485679] -&gt; '4496576' '0' 'No Error' '2' '[ ExitCode = 0; JobStatus = 2; WorkerNode = "ng1050"; BatchJobId = "22589103" ]'<br/>08/04/20 17:16:19 [485626] GAHP[485679] &lt;- 'BLAH_JOB_REFRESH_PROXY 4496794 slurm/20200804/22589103 /mnt/ce-spool/ce6.vampire/5336/0/cluster435336.proc0.subproc0/credential_CMSG-v1_0.main_411868'<br/>08/04/20 17:16:28 [485626] GAHP[485679] &lt;- 'BLAH_JOB_CANCEL 4497332 slurm/20200804/22589103'</pre><br/>If I have the various proxy options set to their specific values, shouldn't the JOB_REFRESH_PROXY not happen?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:20:02)</span> <b>andrew.melo:</b></span> <tt>s/specific/recommended/</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:00:51)</span> <b>matyas:</b></span> @blin would know best but he's out this week. Let me dig around....<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:08:22)</span> <b>matyas:</b></span> I got this from one of the HTCondor developers:<br/>&gt; *Jaime Frey*  [11:31 AM]<br/>&gt; The BLAH_JOB_REFRESH_PROXY command will always occur, since the gridmanager is ignorant of the blah_disable_wn_proxy_renewal setting.<br/>&gt; [11:31 AM] It sounds like the blahp is returning an error for that command.<br/>&gt; [11:32 AM] We should confirm that’s happening and see if there’s an error message returned with that error.<br/><br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:29:24)</span> <b>bockjoo:</b></span> Hi I am trying to install globus-gridftp-server but globus-gridftp-server-control is not found: No package globus-gridftp-server-control available. Did I misconfigure my yum repos?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:39:15)</span> <b>matyas:</b></span> globus-gridftp-server-control is in EPEL<br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:44:41)</span> <b>andrew.melo:</b></span> @matyas Any hint of what I'm looking for? IS there a way to crank the debugging up for that component?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:45:40)</span> <b>bbockelm:</b></span> I think you want to look at potential BLAHP issues.  The <tt>BLAH_JOB_REFRESH_PROXY</tt> is supposed to be hooked into a no-op.<br/>
+</body>
+</html>

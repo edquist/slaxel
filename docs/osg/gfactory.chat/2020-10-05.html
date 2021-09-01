@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Oct 5, 2020 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Mon Oct 5, 2020 : #gfactory (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(13:42:37)</span> <b>blin:</b></span> hey @jdost321 @marco.mascheroni while doing the factory/topology audit, my student found what looks like an issue with the Stampede config: <a href="https://github.com/opensciencegrid/osg-gfactory/pull/8">https://github.com/opensciencegrid/osg-gfactory/pull/8</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:36:37)</span> <b>bbockelm:</b></span> Can someone trigger a job to <a href="http://hosted-ce04.opensciencegrid.org">hosted-ce04.opensciencegrid.org</a> ?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:37:06)</span> <b>bbockelm:</b></span> (Need a good way to test out <a href="https://support.opensciencegrid.org/a/tickets/65283">https://support.opensciencegrid.org/a/tickets/65283</a>)<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:03:35)</span> <b>jdost321:</b></span> @bbockelm<br/><pre>ID      OWNER          HELD_SINCE  HOLD_REASON<br/>   1.0   svc-osg01      10/5  14:02 Failed to start GAHP: Agent pid 41297\nssh: Could not resolve hostname <a href="http://hpclogin.gsu.edu:14022">hpclogin.gsu.edu:14022</a>: Name or service not known\nAgent pid 41297 killed\n</pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:04:45)</span> <b>bbockelm:</b></span> perfect, thanks!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:37:18)</span> <b>bbockelm:</b></span> @blin - we haz a bug <a href="https://github.com/slateci/slate-catalog/issues/336">https://github.com/slateci/slate-catalog/issues/336</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:37:46)</span> <b>blin:</b></span> argh ok<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:38:18)</span> <b>blin:</b></span> that's an issue in the container, not the app<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:38:58)</span> <b>bbockelm:</b></span> Nope, it's the app.  <tt>99-instance.conf</tt> comes from a config map.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:39:26)</span> <b>bbockelm:</b></span> :wink: which is annoying because I can't easily override it from the config.<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:41:11)</span> <b>blin:</b></span> oh i see what you're saying, i thought there was an issue with quoting around <tt>BatchMode yes</tt><br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:43:19)</span> <b>bbockelm:</b></span> There's some funkiness with the remote install as well.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:01:02)</span> <b>bbockelm:</b></span> anyhow, that host needs to be reinstalled once <a href="https://github.com/slateci/slate-catalog/issues/336">https://github.com/slateci/slate-catalog/issues/336</a> is taken care of.  Who's the best with go-template-voodoo?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:04:01)</span> <b>blin:</b></span> i think i've got a fix<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:08:24)</span> <b>bbockelm:</b></span> The good news is that, once fixed, the remaining issue looks fairly mundane:<br/><pre>submission command failed (exit code = 1) (stdout:) (stderr:sbatch: error: Batch job submission failed: No partition specified or system default partition-Error from sbatch: -)</pre><br/>That we should know how to handle!<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:15:37)</span> <b>blin:</b></span> the alternative solution to fixing the above in the app is to add  <tt>&lt;HOSTNAME&gt;:&lt;PORT&gt;</tt> to the <tt>remote_gahp</tt><br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:19:58)</span> <b>bbockelm:</b></span> Not sure I'm following that one?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:22:52)</span> <b>blin:</b></span> if folks specify <tt><a href="http://hosted-ce.opensciencegrid.org:1222">hosted-ce.opensciencegrid.org:1222</a></tt>  in the GridResource line, we can update the <tt>remote_gahp</tt> to be able to separate out the hostname/port and construct the SSH command <tt>ssh -p 1222 <a href="mailto:user@hosted-ce.opensciencegrid.org">user@hosted-ce.opensciencegrid.org</a></tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(17:23:08)</span> <b>blin:</b></span> though i'm 95% of the way to a fix in the slate app<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:26:21)</span> <b>bbockelm:</b></span> Gotcha.  Yes, this should also be a condor bugfix in the <tt>remote_gahp</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(17:59:12)</span> <b>blin:</b></span> i regret volunteering for this, helm templating is a giant PITA<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:09:38)</span> <b>blin:</b></span> <tt>{{ regexReplaceAllLiteral ":[0-9]*$" .Values.RemoteCluster.LoginHost "" }}</tt> ended up working but <tt>{{ regexSplit ":" .Values.RemoteCluster.LoginHost 1 | first }}</tt> wouldn't split on the <tt>:</tt> for whatever reason<br/>
+</body>
+</html>

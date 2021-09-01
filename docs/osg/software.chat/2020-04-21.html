@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Apr 21, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue Apr 21, 2020 : #software (osg)</h3>
+<span style="color: #8d4b84"><span style="font-size: small">(15:48:10)</span> <b>kherner:</b></span> This might be the wrong channel but I am having a heck of a time setting up CVMFS in a new EL7 VM with the 3.5 stack. I installed the cvmfs, cvmfs-devel, and cvmfs-config-osg packages, and then when I run a probe command I get errors like this:<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:48:36)</span> <b>blin:</b></span> did you install the <tt>osg-oasis</tt> package?<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(15:48:42)</span> <b>kherner:</b></span> I did<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(15:48:46)</span> <b>kherner:</b></span> # cvmfs_config probe <a href="http://oasis.opensciencegrid.org">oasis.opensciencegrid.org</a><br/>required configuration repository directory does not exist: /cvmfs/config-osg.opensciencegrid.org/etc/cvmfs<br/>Probing /cvmfs/oasis.opensciencegrid.org... Failed!<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(15:49:05)</span> <b>kherner:</b></span> I also ran cvmfs_config setup<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(15:49:26)</span> <b>kherner:</b></span> Also strange is:<br/># cvmfs_config chksetup<br/>Error: libcvmfs_fuse.so not found<br/>Error: libcvmfs_fuse_debug.so not found<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(15:49:40)</span> <b>kherner:</b></span> Though both libs are in the usual place<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(15:50:38)</span> <b>kherner:</b></span> I've got osg-oasis.noarch 0:16-2.osg35.el7<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(15:54:05)</span> <b>kherner:</b></span> It's SL 7.7 FWIW<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:56:53)</span> <b>blin:</b></span> curious. thoughts @dwd ?<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:58:24)</span> <b>dwd:</b></span> Those ought to be in /usr/lib64, are they there?<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(16:01:26)</span> <b>kherner:</b></span> They are<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(16:01:46)</span> <b>kherner:</b></span> OK so the main problem was that I missed you had to manually create /etc/cvmfs/default.local<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(16:02:06)</span> <b>kherner:</b></span> I did that and it seems OK now, though chksetup still reports the missing library error.<br/>
+</body>
+</html>

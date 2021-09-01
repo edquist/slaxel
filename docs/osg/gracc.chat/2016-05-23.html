@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon May 23, 2016 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Mon May 23, 2016 : #gracc (osg)</h3>
+<span style="color: #3c8c69"><span style="font-size: small">(12:17:28)</span> <b>kretzke:</b></span> it is done<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:22:38)</span> <b>dweitzel:</b></span> yay! :tada:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:08:49)</span> <b>bbockelm:</b></span> w00t!  I can confirm my browser is happy with the Let’s Encrypt cert.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:08:59)</span> <b>bbockelm:</b></span> What’s the process for automating renewal?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:11:20)</span> <b>kretzke:</b></span> run ‘certbot[-auto] renew’ twice a day (recommended).<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:12:06)</span> <b>dweitzel:</b></span> is that just in cron?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:12:14)</span> <b>kretzke:</b></span> yep, cron job set up in /etc/cron.d/certbot-renew<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:13:18)</span> <b>dweitzel:</b></span> I, for one, love the Let’s Encrypt.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:14:24)</span> <b>kretzke:</b></span> yep, no excuse not to use https now<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:20:38)</span> <b>bbockelm:</b></span> Oh nifty - yeah, the cert exposed to the browser is like 4 hours old.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:21:50)</span> <b>dweitzel:</b></span> btw, why is certbot run twice a day recommended?  Seems more than necessary.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:25:38)</span> <b>kretzke:</b></span> hm, now I can’t find where I saw that. I it just checks time left on all the certs and only renews ones with less than 30 days (certs expire after 90)<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:31:24)</span> <b>kretzke:</b></span> Note: if you're setting up a cron or systemd job, we recommend running it twice per day (it won't do anything until your certificates are due for renewal or revoked, but running it regularly would give your site a chance of staying online in case a Let's Encrypt-initiated revocation happened for some reason). Please select a random minute within the hour for your renewal tasks. <a href="https://certbot.eff.org/#centosrhel7-nginx">https://certbot.eff.org/#centosrhel7-nginx</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:51:55)</span> <b>bbockelm:</b></span> :disappointed: Unfortunately, it’s not until the latest Fedora that systemd itself can choose a random minute.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:52:37)</span> <b>bbockelm:</b></span> (seems like that should have been the very first thing systemd implemented…)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:52:52)</span> <b>bbockelm:</b></span> anyhow, can we have this for all grid services yet?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:55:28)</span> <b>dweitzel:</b></span> or… even just the <a href="http://opensciencegrid.org">opensciencegrid.org</a> website?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:55:50)</span> <b>dweitzel:</b></span> fwiw, they got rid of the client cert requirement in the new update, but… it’s SHA-1 :disappointed:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:02:30)</span> <b>bbockelm:</b></span> So, how does the cert-renewal work?  Does it just require you to host a certain random string?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:02:57)</span> <b>kretzke:</b></span> I selected the minute by dice roll, so it’s guaranteed to be random :wink:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:03:02)</span> <b>bbockelm:</b></span> because we could _totally_ do that in htcondor-ce.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:04:10)</span> <b>kretzke:</b></span> yep exactly. well, host something, never looked what it is exactly. just give it the webroot path and it puts a file in /.well-know/<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:05:17)</span> <b>kretzke:</b></span> it can also run a standalone server or use your apache (nginx support in beta)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:05:53)</span> <b>bbockelm:</b></span> I guess it’s probably too much to ask them to be IGTF certified then… maybe Jim Basney would be interested though?<br/>
+</body>
+</html>

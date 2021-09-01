@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Sep 25, 2018 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue Sep 25, 2018 : #software (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(10:51:52)</span> <b>matyas:</b></span> I want to set up a testing cache server on a FermiCloud VM, just to see if I can get the software working. What should I use for <tt>pss.origin</tt>? (Also that config knob is confusing because it says "origin" but it points to a redirector, right?)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:52:44)</span> <b>bbockelm:</b></span> <a href="http://redirector.osgstorage.org">redirector.osgstorage.org</a> is fine.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:53:36)</span> <b>bbockelm:</b></span> Caches act as a plain-and-simple client to the data federation, so registration is more about knowing security contacts.  Anyone can run a cache directly against the federation.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:53:51)</span> <b>bbockelm:</b></span> indeed, <tt>pss.origin</tt> is an unfortunate naming clash.<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:54:58)</span> <b>matyas:</b></span> also in the "things that should be fixed" department, the doc says the minimum RAM requirement is 8GB but the default <tt>pfc.ram</tt> is 32g<br/>
+<span style="color: #a72f79"><span style="font-size: small">(10:55:26)</span> <b>andrew.melo:</b></span> <tt>pss.origin</tt> isn't as unfortunate as <tt>cms.*</tt> :slightly_smiling_face:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:00:27)</span> <b>bbockelm:</b></span> for obvious things like that, can we have a running PR?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:01:50)</span> <b>matyas:</b></span> sure<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:02:52)</span> <b>bbockelm:</b></span> <a href="https://github.com/opensciencegrid/docs/pull/442">https://github.com/opensciencegrid/docs/pull/442</a> &lt;~ this one qualifies as a facepalm.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:16:38)</span> <b>bbockelm:</b></span> Mat - note that John Thiltges is working on some PRs for fixing the StashCache packaging.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:18:59)</span> <b>matyas:</b></span> I don't know his GH name; could you let him know about <a href="https://github.com/opensciencegrid/StashCache-Daemon/pull/6">https://github.com/opensciencegrid/StashCache-Daemon/pull/6</a>?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:19:07)</span> <b>bbockelm:</b></span> (So you two may want to coordinate here)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:19:12)</span> <b>bbockelm:</b></span> @jthiltges ^^^<br/>
+<span style="color: #e06b56"><span style="font-size: small">(11:20:53)</span> <b>jthiltges:</b></span> My work-in-progress is here: <a href="https://github.com/jthiltges/StashCache-Daemon/tree/rpm">https://github.com/jthiltges/StashCache-Daemon/tree/rpm</a><br/>Trying to move the various systemd and config files into the packaging (and out of the doc!)<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:22:03)</span> <b>matyas:</b></span> much appreciated!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:22:41)</span> <b>bbockelm:</b></span> Other things to think about is the monitoring, which @efajardo has really struggled with.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:23:03)</span> <b>bbockelm:</b></span> Since we're pretty explicitly RHEL7-centric, we may just want to turn things into a systemd timer / service<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:23:22)</span> <b>bbockelm:</b></span> (as opposed to a weird condor thing we had)<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:24:33)</span> <b>matyas:</b></span> hm. might want to make the EL 7 requirement more prominent in the doc, then<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:26:20)</span> <b>matyas:</b></span> right now it's tucked away in the "as with all OSG software" boilerplate that everyone glosses over<br/>
+<span style="color: #e06b56"><span style="font-size: small">(11:27:28)</span> <b>jthiltges:</b></span> The spec seems to require EL7, so I was assuming EL7-only. <a href="https://github.com/opensciencegrid/StashCache-Daemon/blob/master/spec/stashcache.spec#L60">https://github.com/opensciencegrid/StashCache-Daemon/blob/master/spec/stashcache.spec#L60</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(11:28:04)</span> <b>matyas:</b></span> I wasn't reading the spec file :slightly_smiling_face:<br/>
+<span style="color: #e06b56"><span style="font-size: small">(11:28:32)</span> <b>jthiltges:</b></span> Ah, indeed. I've mostly been working on this from the other end. :slightly_smiling_face:<br/>
+<span style="color: #e06b56"><span style="font-size: small">(11:28:52)</span> <b>jthiltges:</b></span> I was hoping to be lazy, and not worry about a spec that supported both systemd and init.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:29:45)</span> <b>matyas:</b></span> that's perfectly fine, it's the docs that need fixing -- I asked our admin for some nodes while I was experimenting and didn't mention RHEL7 in the requirements<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:34:36)</span> <b>matyas:</b></span> <a href="https://github.com/opensciencegrid/docs/pull/443">https://github.com/opensciencegrid/docs/pull/443</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(12:26:33)</span> <b>marian:</b></span> can somebody remind me url which suppose to be .xml with osg admin contacts?<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:37:00)</span> <b>efajardo:</b></span> @jthiltges the wall I hit with the HTCondor based monitoring is that the scripts is based on <tt>systemctl status</tt> which is not available in containers<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:37:07)</span> <b>efajardo:</b></span> so I do everything via supervisord<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:37:52)</span> <b>efajardo:</b></span> <a href="https://github.com/opensciencegrid/prp-stashcache/blob/master/supervisord.conf">https://github.com/opensciencegrid/prp-stashcache/blob/master/supervisord.conf</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:38:26)</span> <b>efajardo:</b></span> This specifically<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:38:27)</span> <b>efajardo:</b></span> <a href="https://github.com/opensciencegrid/StashCache-Daemon/blob/master/src/xrootd_cache_stats.py">https://github.com/opensciencegrid/StashCache-Daemon/blob/master/src/xrootd_cache_stats.py</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:38:45)</span> <b>efajardo:</b></span> is what I would like to find time to rewrite and make it less based on systemctl<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:39:32)</span> <b>bbockelm:</b></span> I don't think that script is based on systemctl?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:40:00)</span> <b>bbockelm:</b></span> You're thinking of this one maybe: <a href="https://github.com/opensciencegrid/StashCache-Daemon/blob/master/src/stashcache">https://github.com/opensciencegrid/StashCache-Daemon/blob/master/src/stashcache</a> ?<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:43:46)</span> <b>efajardo:</b></span> yea that one<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:43:49)</span> <b>jthiltges:</b></span> @efajardo Thank you for the info!<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:43:54)</span> <b>efajardo:</b></span> right info wrong copy paste<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:44:08)</span> <b>bbockelm:</b></span> Well, let's start ripping things out!  @jthiltges - you want to try some of that?  I could write it up in a ticket.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:44:28)</span> <b>jthiltges:</b></span> Sure<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:44:41)</span> <b>jthiltges:</b></span> And yes, a ticket writeup would be helpful<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:50:22)</span> <b>bbockelm:</b></span> <a href="https://github.com/opensciencegrid/StashCache-Daemon/issues/7">https://github.com/opensciencegrid/StashCache-Daemon/issues/7</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:54:09)</span> <b>bbockelm:</b></span> @jthiltges - is that enough info?  Or do you need more?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:54:26)</span> <b>matyas:</b></span> @marian do you want the XML? we have a human-readable page now<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:54:39)</span> <b>jthiltges:</b></span> That's enough to start... hopefully. Thanks. :slightly_smiling_face:<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:05:21)</span> <b>matyas:</b></span> @marian XML: <a href="https://topology.opensciencegrid.org/miscuser/xml">https://topology.opensciencegrid.org/miscuser/xml</a>  HTML: <a href="https://topology.opensciencegrid.org/contacts">https://topology.opensciencegrid.org/contacts</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(13:13:18)</span> <b>matyas:</b></span> @bbockelm so the authenticated xrootd talks xrootd _over_ https?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:13:43)</span> <b>bbockelm:</b></span> nope.  It will look at the first 4 bytes and decide which protocol you are using to talk to it<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:13:54)</span> <b>marian:</b></span> thanks, @matyas!<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:14:05)</span> <b>matyas:</b></span> but it can talk xrootd over both 1094 and 8443<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:15:30)</span> <b>bbockelm:</b></span> right.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:15:41)</span> <b>matyas:</b></span> that's a little odd<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:16:07)</span> <b>bbockelm:</b></span> it is, indeed.  Technically, it can talk HTTP, HTTPS, or Xrootd over 8443.<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:27:53)</span> <b>matyas:</b></span> is lcmaps required by all stashcache or just authenticated stashcache?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:43:01)</span> <b>jthiltges:</b></span> Just the authenticated part<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:51:51)</span> <b>jthiltges:</b></span> Rearranging the security options to be inside the <tt>if named stashcache-cache-server-auth</tt> seems to work OK:<br/><a href="https://github.com/jthiltges/StashCache-Daemon/blob/rpm/configs/xrootd-stashcache-cache-server.cfg#L34-L45">https://github.com/jthiltges/StashCache-Daemon/blob/rpm/configs/xrootd-stashcache-cache-server.cfg#L34-L45</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(14:53:15)</span> <b>matyas:</b></span> ooh, let me try that... lcmaps was failing to initialize when I was first setting things up<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:05:10)</span> <b>jthiltges:</b></span> I've got some heavy-handed docs updates that cut out the various "Create file X" bits, among other tweaks.<br/><a href="https://github.com/opensciencegrid/docs/compare/master...jthiltges:stashcache">https://github.com/opensciencegrid/docs/compare/master...jthiltges:stashcache</a><br/>(I like your docs changes as well.)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:15:32)</span> <b>bbockelm:</b></span> <a href="https://github.com/opensciencegrid/docs/compare/master...jthiltges:stashcache#diff-a4dfaea12addef90d42c347822a60492R105">https://github.com/opensciencegrid/docs/compare/master...jthiltges:stashcache#diff-a4dfaea12addef90d42c347822a60492R105</a> &lt;~ don't we want to keep fetch-crl in the list?<br/>
+<blockquote>
+<span style="color: #e06b56"><span style="font-size: small">(2018-09-26 10:33:26)</span> <b>jthiltges:</b></span> Good point. I'd forgotten that condor would need fetch-crl. I've pushed a new revision.<br/>There were tables of services in two sections. I've merged them.<br/>
+</blockquote>
+<span style="color: #e06b56"><span style="font-size: small">(15:28:42)</span> <b>jthiltges:</b></span> I leaned toward removing it since fetch-crl only applies to the authenticated service. (right?) There's notes below about enabling fetch-crl.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:29:28)</span> <b>bbockelm:</b></span> well, should be needed by the monitoring pieces ... once those get revived.<br/>
+<span style="color: #965d1b"><span style="font-size: small">(15:59:48)</span> <b>briedel:</b></span> i am running into a bosco issue<br/>
+<span style="color: #965d1b"><span style="font-size: small">(16:00:00)</span> <b>briedel:</b></span> it is to a slurm cluster<br/>
+<span style="color: #965d1b"><span style="font-size: small">(16:00:22)</span> <b>briedel:</b></span> when i submit a <tt>requestcpus = 32</tt> on the condor side<br/>
+<span style="color: #965d1b"><span style="font-size: small">(16:00:37)</span> <b>briedel:</b></span> it translates that to <tt>#SBATCH -N 32</tt><br/>
+<span style="color: #965d1b"><span style="font-size: small">(16:00:47)</span> <b>briedel:</b></span> which is wrong<br/>
+<span style="color: #965d1b"><span style="font-size: small">(16:00:54)</span> <b>briedel:</b></span> cause that means it requests 32 nodes<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:01:58)</span> <b>bbockelm:</b></span> well, that's delightful.  I wonder what happens at UNL?<br/>
+<span style="color: #965d1b"><span style="font-size: small">(16:02:22)</span> <b>briedel:</b></span> i guess you could answer that question :wink:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:11:34)</span> <b>bbockelm:</b></span> Benedikt and I found the answer -- this is fixed in the OSG blahp but missing in the HTCondor one.<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:21:18)</span> <b>lincoln:</b></span> where are the tarballs for the OSG blahp<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:21:58)</span> <b>lincoln:</b></span> i have been using <a href="http://ftp.cs.wisc.edu/condor/bosco">ftp.cs.wisc.edu/condor/bosco</a><br/>
+<span style="color: #e96699"><span style="font-size: small">(16:22:47)</span> <b>lincoln:</b></span> or is OSG building the RPMs directly out of github?<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:23:37)</span> <b>lincoln:</b></span> has there been any effort to upstream the OSG patches with the Condor team?<br/>
+<span style="color: #965d1b"><span style="font-size: small">(16:26:49)</span> <b>briedel:</b></span> @blin?<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(2018-10-15 12:26:51)</span> <b>blin:</b></span> it's an item in our WBS that we hope to get to within the next two months or so<br/>
+</blockquote>
+<span style="color: #9e3997"><span style="font-size: small">(16:34:30)</span> <b>bbockelm:</b></span> Brian Lin went on vacation specifically to avoid that question ;)<br/>
+<span style="color: #965d1b"><span style="font-size: small">(16:35:08)</span> <b>briedel:</b></span> Bosco question?.... run!<br/>
+<span style="color: #965d1b"><span style="font-size: small">(16:35:11)</span> <b>briedel:</b></span> :smile:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:35:20)</span> <b>bbockelm:</b></span> Leaving the country helps<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:46:44)</span> <b>matyas:</b></span> @tim.theisen ^^<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:34:35)</span> <b>matyas:</b></span> @jthiltges your security options change worked!<br/>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri May 19, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Fri May 19, 2017 : #gracc (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(09:34:54)</span> <b>dweitzel:</b></span> @kretzke could you look through collector logs and see if you are seeing rabbitmq disconnections all the time?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:35:05)</span> <b>dweitzel:</b></span> I have a bunch of services that are failing due to disconnections.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:55:26)</span> <b>kretzke:</b></span> yep: <pre>sudo journalctl --since today  CONTAINER_NAME=graccosg_gracc-collector_1 | grep 'AMQP: connection closed'<br/>...<br/>May 19 10:32:21 gratiav2-1.novalocal dockerd[23184]: time="2017-05-19T10:32:21Z" level=warning msg="AMQP: connection closed" can-recover=false code=501 reason="read tcp 172.17.0.5:59572-&gt;129.79.53.43:5671: read: connection reset by peer" server-initiated=false <br/>May 19 11:00:27 gratiav2-1.novalocal dockerd[23184]: time="2017-05-19T11:00:27Z" level=warning msg="AMQP: connection closed" can-recover=false code=501 reason="read tcp 172.17.0.5:49652-&gt;129.79.53.43:5671: read: connection reset by peer" server-initiated=false <br/>May 19 11:15:56 gratiav2-1.novalocal dockerd[23184]: time="2017-05-19T11:15:56Z" level=warning msg="AMQP: connection closed" can-recover=false code=501 reason="read tcp 172.17.0.5:37366-&gt;129.79.53.43:5671: read: connection reset by peer" server-initiated=false <br/>May 19 11:28:41 gratiav2-1.novalocal dockerd[23184]: time="2017-05-19T11:28:41Z" level=warning msg="AMQP: connection closed" can-recover=false code=501 reason="read tcp 172.17.0.5:49122-&gt;129.79.53.43:5671: read: connection reset by peer" server-initiated=false <br/>May 19 12:30:08 gratiav2-1.novalocal dockerd[23184]: time="2017-05-19T12:30:08Z" level=warning msg="AMQP: connection closed" can-recover=false code=501 reason="read tcp 172.17.0.5:53930-&gt;129.79.53.43:5671: read: connection reset by peer" server-initiated=false</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:15:53)</span> <b>dweitzel:</b></span> FYI, here is gracc monitoring in check_mk: <a href="https://hcc-mon.unl.edu/red/check_mk/index.py?start_url=%2Fred%2Fcheck_mk%2Fview.py%3Fview_name%3Dhost%26host%3Dgracc.opensciencegrid.org">https://hcc-mon.unl.edu/red/check_mk/index.py?start_url=%2Fred%2Fcheck_mk%2Fview.py%3Fview_name%3Dhost%26host%3Dgracc.opensciencegrid.org</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:16:02)</span> <b>dweitzel:</b></span> Username: guest, password: guest<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:03:13)</span> <b>bbockelm:</b></span> <b>@edquist</b> - what's the latest on the systemd timers for gracc-apel?  I had a few touchups I was going to suggest, but it's easier as a PR.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:22:45)</span> <b>kretzke:</b></span> well shoot, collector is leaking again :disappointed: <a href="https://gracc.opensciencegrid.org/dashboard/db/gracc-collector-stats?refresh=1m&amp;orgId=1&amp;from=now-6h&amp;to=now">https://gracc.opensciencegrid.org/dashboard/db/gracc-collector-stats?refresh=1m&amp;orgId=1&amp;from=now-6h&amp;to=now</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:35:55)</span> <b>kretzke:</b></span> something happened at 7:30, not clear what. I’ve restarted it before we run out of memory<br/>
+<blockquote>
+<span style="color: #3c8c69"><span style="font-size: small">(13:43:41)</span> <b>kretzke:</b></span> there was a closed amqp connection, but what was different about this one…<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:50:26)</span> <b>bbockelm:</b></span> are these services memory-limited (and auto-restarted?) by systemd or docker?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:51:04)</span> <b>kretzke:</b></span> nope, but they should be<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:22:10)</span> <b>kretzke:</b></span> added memory limits to docker-compose<br/>
+</blockquote>
+<span style="color: #16569E"><span style="font-size: small">(13:50:59)</span> <b>edquist:</b></span> @bbockelm, feel free to suggest away, PR or otherwise.  Or if we have a working example of a daily timer somewhere, that would be great too<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:51:37)</span> <b>bbockelm:</b></span> can you just commit the current one to github?  It's easier to poke things from there.<br/>
+<span style="color: #16569E"><span style="font-size: small">(13:52:10)</span> <b>edquist:</b></span> sure<br/>
+<span style="color: #16569E"><span style="font-size: small">(13:53:31)</span> <b>edquist:</b></span> you mean to the osg org? otherwise my branch at the moment is <a href="https://github.com/edquist/gracc-apel/tree/systemd-timers">https://github.com/edquist/gracc-apel/tree/systemd-timers</a><br/>
+<span style="color: #16569E"><span style="font-size: small">(13:55:40)</span> <b>edquist:</b></span> Ok i've put it in <a href="https://github.com/opensciencegrid/gracc-apel/tree/systemd-timers">https://github.com/opensciencegrid/gracc-apel/tree/systemd-timers</a> for now<br/>
+<span style="color: #16569E"><span style="font-size: small">(13:55:53)</span> <b>edquist:</b></span> too WIP for master  :stuck_out_tongue:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:19:33)</span> <b>bbockelm:</b></span> ok<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:19:48)</span> <b>bbockelm:</b></span> so - reading over the email thread, I don't think there's anything magical about 0800 UTC<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:19:57)</span> <b>bbockelm:</b></span> In fact, I would suggest that we update a few times per day<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:20:08)</span> <b>bbockelm:</b></span> The runtime went from what, 1 hour to 1 minute?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:23:59)</span> <b>bbockelm:</b></span> (also, can we cleanup the repo?  Aren't like half of these scripts unnecessary?)<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:34:35)</span> <b>edquist:</b></span> the runtime is maybe a couple seconds now<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:34:44)</span> <b>edquist:</b></span> if that<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:35:09)</span> <b>edquist:</b></span> yeah we can drop the obsolete scripts if you like<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:38:49)</span> <b>bbockelm:</b></span> :slightly_smiling_face: Send the PR.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:39:00)</span> <b>bbockelm:</b></span> Obsolete scripts still live on in git history, they don't have to be in <tt>HEAD</tt>.<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:42:34)</span> <b>edquist:</b></span> of course...<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:42:52)</span> <b>edquist:</b></span> well anyway, they're out now<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:43:23)</span> <b>bbockelm:</b></span> so, looking at the systemd timers now - I think you only need <tt>gracc-apel-cron.service</tt> and <tt>gracc-apel-cron.timer</tt><br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:44:42)</span> <b>bbockelm:</b></span> hm - what username should this run as?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:00:07)</span> <b>bbockelm:</b></span> <b>@edquist</b> - PR sent for some small touchups.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:32:15)</span> <b>bbockelm:</b></span> <a href="https://hub.docker.com/r/opensciencegrid/gracc-apel/">https://hub.docker.com/r/opensciencegrid/gracc-apel/</a> &lt;- also, I setup a README.md so the DockerHub page didn't look so sparse.  Feel free to add additional links and content.  I also setup a LICENSE file... which I really should make sure is set for all OSG repositories.<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:15:37)</span> <b>marian:</b></span> should I receive notifications about image changes for the gracc-to-apel uploader? if yes, my docker account is zvada if you can add me ... (just asking, I can also live without yet another repo notifications ;))<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:38:29)</span> <b>edquist:</b></span> @marian are you able to set up <tt>gracc-apel.service</tt> and <tt>gracc-apel.timer</tt> on <tt>hcc-grace-itb</tt> ?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:39:17)</span> <b>edquist:</b></span> <a href="https://raw.githubusercontent.com/opensciencegrid/gracc-apel/master/gracc-apel.timer">https://raw.githubusercontent.com/opensciencegrid/gracc-apel/master/gracc-apel.timer</a><br/><a href="https://raw.githubusercontent.com/opensciencegrid/gracc-apel/master/gracc-apel.service">https://raw.githubusercontent.com/opensciencegrid/gracc-apel/master/gracc-apel.service</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(16:41:50)</span> <b>marian:</b></span> yes, I can ... but I'm running out of time today, maybe later tonight or over the weekend when time permits ... is that ok?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:42:02)</span> <b>edquist:</b></span> sure<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:42:10)</span> <b>edquist:</b></span> i mean i think so  :slightly_smiling_face:<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:42:23)</span> <b>edquist:</b></span> i don't know where the logs end up<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:42:38)</span> <b>edquist:</b></span> the output of what gets run by the timer<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:42:38)</span> <b>marian:</b></span> btw, why 1hour for timer?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:42:52)</span> <b>edquist:</b></span> @bbockelm decided that's what he wanted<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:43:10)</span> <b>edquist:</b></span> i think because the script runs in a few seconds now<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:43:18)</span> <b>edquist:</b></span> instead of 15-30 min<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:43:56)</span> <b>marian:</b></span> well, ok ... but send off to apel we were doing once per day alway ... or is that unrelated?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:44:07)</span> <b>edquist:</b></span> used to be yes,<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:44:30)</span> <b>edquist:</b></span> with Brian's change i think this means it'll be hourly now tho<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:44:34)</span> <b>marian:</b></span> hope we don't break their brokers :wink:<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:44:39)</span> <b>edquist:</b></span> heheh<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:45:56)</span> <b>marian:</b></span> not if there is any benefit of that... let's see<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:46:31)</span> <b>marian:</b></span> if=sure<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:57:43)</span> <b>marian:</b></span> I sent email to APEL people if sending stuff every hour is ok with their brokers ...<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:57:45)</span> <b>bbockelm:</b></span> I think sites will enjoy more frequent updates when they are debugging things.  Everyone hates waiting overnight for fixes<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:58:01)</span> <b>bbockelm:</b></span> EGI sites send every job record; it'll be fine<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:58:16)</span> <b>marian:</b></span> yeah, but thing is they just queue records anyway ...<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:59:54)</span> <b>marian:</b></span> so not sure if it make sense our 24 queued unread records are idle until they read and upload to display though, not sure exactly what they are doing, it's just my guess<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:00:02)</span> <b>marian:</b></span> I asked them<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:01:15)</span> <b>marian:</b></span> oh, so you know EGI send every job record ... and also every hour do you know?<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:44:05)</span> <b>marian:</b></span> @marian uploaded a file: <a href="https://opensciencegrid.slack.com/files/marian/F5FU0CRQD/john_s_gordon_response_on_time_interval_sending_apel_records.txt">John's Gordon response on time interval sending apel records</a><br/>
+</body>
+</html>

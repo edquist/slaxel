@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jun 11, 2021 : #flightworthy (chtc)</title>
+</head>
+<body>
+<h3>Fri Jun 11, 2021 : #flightworthy (chtc)</h3>
+<span style="color: #d58247"><span style="font-size: small">(08:01:39)</span> <b>gthain:</b></span> I found one reason the tests fail to shut down quickly.  Not sure what the best fix is.<br/>
+<span style="color: #d58247"><span style="font-size: small">(08:02:03)</span> <b>gthain:</b></span> When the master starts up, if there's a COLLECTOR in DAEMON_LIST, it shuffles it to the beginning of the DAEMON_LIST<br/>
+<span style="color: #d58247"><span style="font-size: small">(08:02:18)</span> <b>gthain:</b></span> which means at shutdown down, the COLLECTOR is the first to get killed.<br/>
+<span style="color: #d58247"><span style="font-size: small">(08:02:54)</span> <b>gthain:</b></span> And the collector tends to exit pretty quickly after a SIGQUIT -- it's got little to clean up<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(08:04:02)</span> <b>tim:</b></span> Most things tear down in the opposite order of startup. Could we process the list in reverse order?<br/>
+<span style="color: #d58247"><span style="font-size: small">(08:04:04)</span> <b>gthain:</b></span> But, if for whatever reason, the master wants to send an update to the collector after it has killed the collector, but before all the other daemons have died, it blocks for almost five minutes in the example I saw<br/>
+<span style="color: #d58247"><span style="font-size: small">(08:04:25)</span> <b>gthain:</b></span> So, possible solutions:<br/>
+<span style="color: #d58247"><span style="font-size: small">(08:04:39)</span> <b>gthain:</b></span> Always kill the collector last (what about shared port?)<br/>
+<span style="color: #d58247"><span style="font-size: small">(08:05:11)</span> <b>gthain:</b></span> Does killing the collector first also cause other daemons to block?<br/>
+<span style="color: #d58247"><span style="font-size: small">(08:06:20)</span> <b>gthain:</b></span> master could detect that it has send the signal to the collector, we could skip all subsequent collector updates<br/>
+<span style="color: #d58247"><span style="font-size: small">(08:09:19)</span> <b>gthain:</b></span> Not block for five minutes<br/>
+<span style="color: #684b6c"><span style="font-size: small">(08:10:26)</span> <b>bbockelman:</b></span> @gthain - have you been eyeballing the SSL test failures?  Only made it as far as the batlab dashboard but it looked like something was dropping a core.<br/>
+<span style="color: #d58247"><span style="font-size: small">(08:10:51)</span> <b>gthain:</b></span> The ssl test is a known failure with a startd core.  On zmiller's plate<br/>
+<span style="color: #d58247"><span style="font-size: small">(08:11:19)</span> <b>gthain:</b></span> also the munge failure which is failing, though we have no test for it<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(08:11:25)</span> <b>tim:</b></span> Not being an expert here. I think kill all the daemons in the list except collector, shared_port, and master. And then kill collector, shared_port, and master. Remember not to send updates to the collector after killing it.<br/>
+<span style="color: #d58247"><span style="font-size: small">(08:15:08)</span> <b>gthain:</b></span> The new 128 core test machine + the shadow memory test revealed a nice little fix that saves 40% of the shadow heap size, so that's a quick win<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:16:39)</span> <b>johnkn:</b></span> I'm not sure it makes sense to leave the collector around just so it can catch updates from the other daemons before it throws that data away, but that might be the easiest way to fix this.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(09:23:19)</span> <b>tim:</b></span> That's what I was thinking. How to fix this with minimal source code change.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:44:35)</span> <b>johnkn:</b></span> So the shadow memory use that Greg fixed is because of dprintf buffering before the config is read in main().<br/>Perhaps we should change things so that D_VERBOSE dprintf's are never buffered ?  that would have fixed this...<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(09:46:04)</span> <b>jfrey:</b></span> Ah. And it’s buffering everything because it doesn’t know the eventual debug level.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:46:09)</span> <b>johnkn:</b></span> right<br/>
+<span style="color: #d58247"><span style="font-size: small">(09:46:48)</span> <b>gthain:</b></span> The real fix is to move the cpu detection code out of a global object called before main<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:46:49)</span> <b>johnkn:</b></span> There are some *really* chatty D_SECURITY | D_VERBOSE , and D_CONFIG | D_VERBOSE dprintfs<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:47:14)</span> <b>johnkn:</b></span> Actually we need cpu detection to happen before config, so that doesn't help here<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(09:47:34)</span> <b>jfrey:</b></span> For setting ARCH?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:48:11)</span> <b>johnkn:</b></span> that's part of it yes,  also DETECTED_CPUS<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(09:48:19)</span> <b>jfrey:</b></span> Ah<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:48:52)</span> <b>johnkn:</b></span> not to mention we need HOSTNAME and FULL_HOSTNAME so we can specialize config filenames on those<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:49:14)</span> <b>johnkn:</b></span> and *that* code needs a lot of infrastructure<br/>
+<span style="color: #4cc091"><span style="font-size: small">(09:57:24)</span> <b>blin:</b></span> @jfrey do you know the correct GGUS support unit to assign to link a ticket to RT?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(09:57:47)</span> <b>jfrey:</b></span> I’ll have to look that up.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(09:58:30)</span> <b>jfrey:</b></span> I found out this week I can’t log into GGUS. I think the cert I was using for it expired.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(09:58:34)</span> <b>jfrey:</b></span> I need to fix that.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(09:58:53)</span> <b>blin:</b></span> i see <tt>HTCondor-CE</tt> in one of our linked tickets but i don't see that in the drop-down and was wondering if there was an HTCondor-specific unit<br/>
+<span style="color: #684b6c"><span style="font-size: small">(11:07:24)</span> <b>bbockelman:</b></span> @jfrey - you can use EGI CheckIn to login via NetID <br/>
+<span style="color: #9b3b45"><span style="font-size: small">(12:30:55)</span> <b>jfrey:</b></span> @blin <tt>HTCondor-CE</tt> is the supporting unit that should trigger forwarding emails to our RT system.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(12:31:30)</span> <b>jfrey:</b></span> I recall someone in the past having trouble seeing the HTCondor-CE unit when filing a ticket, but I can’t find anything about that in my email.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(12:32:12)</span> <b>jfrey:</b></span> When I set this up two years, I worked with Gunter Grein (<a href="mailto:guenter.grein@kit.edu">guenter.grein@kit.edu</a>)<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(12:33:09)</span> <b>jfrey:</b></span> He may be a good place to start to find out why you’re not seeing HTCondor-CE as an option.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(12:37:57)</span> <b>blin:</b></span> gotcha, thanks<br/>
+<span style="color: #2b6836"><span style="font-size: small">(13:23:22)</span> <b>jcpatton:</b></span> Does the dedicated scheduler have a way to merge claimed idle dslots on a (pslotted) machine? (Ack, Greg is out today)<br/>
+<span style="color: #2b6836"><span style="font-size: small">(13:29:14)</span> <b>jcpatton:</b></span> I think what our htcondor-users parallel universe friend might also be running into is I don’t think the dedicated scheduler is smart enough to schedule bigger nodes of a cluster first… i.e., if you have a cluster with a 1 cpu node and a 4 cpu node, and the dedicated scheduler has claims on a 1 cpu slot and a 4 cpu slot, it might schedule that 1 cpu node on the 4 cpu slot and so the job never runs<br/>
+<span style="color: #2b6836"><span style="font-size: small">(13:29:57)</span> <b>jcpatton:</b></span> (which “bigger” is always subjective… sort by memory? cpus? gpus?)<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:56:18)</span> <b>matyas:</b></span> Does DEFRAG_INTERVAL (time between evaluations of the defragmentation policy) also affect how often to stop draining? That is, if I set it to 7200 to only check if a machine needs draining every 2 hours, does that also mean it will only check if draining can be canceled every 2 hours?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:56:51)</span> <b>johnkn:</b></span> I think so.  looking...<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:02:18)</span> <b>matyas:</b></span> still trying to figure out good advice for the two-big-machine cluster<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:02:25)</span> <b>***matyas:</b></span> looks left and right nervously<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:02:36)</span> <b>matyas:</b></span> should I suggest pslot preemption instead?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:03:45)</span> <b>johnkn:</b></span> I almost think he should run 3 startds on each machine.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:04:00)</span> <b>johnkn:</b></span> give them each 1/3 of the total cores<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:05:16)</span> <b>johnkn:</b></span> If defrag could work on a single p-slot then he could just make 3 pslots per machine, but it currently doesn't<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:10:53)</span> <b>matyas:</b></span> that seems like one of those 'experts only' tricks<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:11:53)</span> <b>johnkn:</b></span> IMO 3 p-slots would not be, but 3 startds definitely would be.<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:11:53)</span> <b>matyas:</b></span> actually I don't even know how to do that myself<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:12:39)</span> <b>johnkn:</b></span> <pre>SLOT_TYPE_1_PARTITIONABLE = TRUE<br/>NUM_SLOTS_TYPE_1 = 3<br/>SLOT_TYPE_1 = 1/3</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:13:56)</span> <b>johnkn:</b></span> I'm not sure that last line is even needed, I'd have to check.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(15:14:51)</span> <b>jfrey:</b></span> I don’t believe it is.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(15:15:05)</span> <b>jfrey:</b></span> I left it out when I reconfigured the batlab mac machines, and they were happy.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(15:15:30)</span> <b>jfrey:</b></span> They are static slots, but pslots should behave the same here.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:16:38)</span> <b>johnkn:</b></span> I'm sure it's not needed for static slots,  I'm *pretty* sure it's not needed for p-slots<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:18:08)</span> <b>johnkn:</b></span> But I think when you drain, the command targets a single p-slot, but the startd puts all slots into draining state.<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:22:25)</span> <b>matyas:</b></span> ok this is weird. When I make multiple slots like that, it seems to ignore my setting for MEMORY<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:23:25)</span> <b>matyas:</b></span> never mind, it worked after a condor_restart<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:24:50)</span> <b>johnkn:</b></span> Yeah. you can't change the resource allocation with just a reconfig<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:28:32)</span> <b>matyas:</b></span> ok but so that doesn't actually help because you can only drain the whole machine?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:29:56)</span> <b>johnkn:</b></span> If I remember correctly, yes<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:30:38)</span> <b>johnkn:</b></span> It's worth testing that if you have time.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:31:45)</span> <b>johnkn:</b></span> And I think it's worth treating that as a bug if it turns out I remember correctly<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:36:26)</span> <b>matyas:</b></span> <pre># condor_drain <a href="mailto:slot1@ms-c8-condor-devel.example.net">slot1@ms-c8-condor-devel.example.net</a><br/>Sent request to drain the startd &lt;127.0.0.1:9618?addrs=127.0.0.1-9618&amp;alias=ms-c8-condor-devel.example.net&amp;noUDP&amp;sock=startd_5058_f21d&gt; with <a href="mailto:slot1@ms-c8-condor-devel.example.net">slot1@ms-c8-condor-devel.example.net</a>. This only affects the single startd; any other startds running on the same host will not be drained.<br/><br/># condor_status<br/>Name                                 OpSys      Arch   State     Activity LoadAv Mem   ActvtyTime<br/><br/><a href="mailto:slot1@ms-c8-condor-devel.example.net">slot1@ms-c8-condor-devel.example.net</a> LINUX      X86_64 Drained   Idle      0.000 4096  0+00:00:15<br/><a href="mailto:slot2@ms-c8-condor-devel.example.net">slot2@ms-c8-condor-devel.example.net</a> LINUX      X86_64 Drained   Idle      0.000 4096  0+00:00:16</pre><br/><br/>
+<span style="color: #99a949"><span style="font-size: small">(15:36:43)</span> <b>matyas:</b></span> (condor 9.1.0)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:39:44)</span> <b>johnkn:</b></span> ok.  that's kinda what I expected.. &lt;sigh&gt;<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:54:58)</span> <b>johnkn:</b></span> <pre>SECOND = STARTD<br/>TERTIARY = STARTD<br/>DAEMON_LIST = MASTER STARTD SECOND TERTIARY<br/><br/>SLOT_TYPE_1_PARTITIONABLE = true<br/>NUM_SLOTS_TYPE_1 = 1<br/>SLOT_TYPE_1 = 1/3<br/>SECOND.SLOT_TYPE_1_NAME_PREFIX = dos<br/>TERTIARY.SLOT_TYPE_1_NAME_PREFIX = tres</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:59:36)</span> <b>johnkn:</b></span> So that's 3 startds, but I suspect that they will interfere with each other a bit.<br/>On shutdown they will all try and delete the contents of EXECUTE for instance.<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:11:53)</span> <b>matyas:</b></span> OK, well the guy wants two things:<br/>1. run multicore jobs<br/>2. give interactive jobs priority over batch jobs, letting them preempt batch jobs<br/>what's a good 80% solution (or even 60% solution)?<br/><br/><pre>USE FEATURE : PartitionableSlot(1)<br/>RANK = RequestCPUs + (InteractiveJob =?= True ? 100000 : 0)<br/>USE POLICY : Preempt_If(InteractiveJob =!= True)<br/>NEGOTIATOR_PRE_JOB_RANK = InteractiveJob =?= True ? 1 : 0</pre><br/>&gt; come talk to us if you have starvation issues<br/>(sorry, maybe I should have started with the second question first)<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:21:41)</span> <b>matyas:</b></span> and if he does have starvation issues... set up condor_defrag with some very conservative settings... and if he has "my nodes drain too much" issues, try the 3-startd solution?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:24:55)</span> <b>johnkn:</b></span> And he needs this to work on 8.8?<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:25:06)</span> <b>matyas:</b></span> I'll ask<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:25:16)</span> <b>matyas:</b></span> Why, is the answer better in 9.0?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:25:23)</span> <b>johnkn:</b></span> condor_now to get the interactive jobs going is the better solution here<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:31:40)</span> <b>matyas:</b></span> OK, should I still give him the RANK expression?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:32:00)</span> <b>johnkn:</b></span> Can't hurt. but it probably won't help either.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:32:51)</span> <b>johnkn:</b></span> (assuming interactive jobs are typically larger than batch jobs)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:34:38)</span> <b>johnkn:</b></span> This seems like a good place to use p-slot preemption.  @jfrey want to weigh in here?<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:46:34)</span> <b>matyas:</b></span> (sorry, gotta run an errand; be back in a bit)<br/>
+</body>
+</html>

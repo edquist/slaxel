@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Nov 9, 2018 : #operations (osg)</title>
+</head>
+<body>
+<h3>Fri Nov 9, 2018 : #operations (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(11:43:06)</span> <b>dweitzel:</b></span> @jthiltges good for the itb switchover?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(11:43:17)</span> <b>jthiltges:</b></span> Yup<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:44:58)</span> <b>dweitzel:</b></span> repo-itb -&gt; <a href="http://hcc-osg-software2.unl.edu">hcc-osg-software2.unl.edu</a><br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:18:57)</span> <b>jthiltges:</b></span> The new <a href="http://repo.opensciencegrid.org">repo.opensciencegrid.org</a> was using EL builds of mash and koji RPMs, rather than OSG.<br/>I'm guessing this is what lead to <tt>repodata/*sqlite.xz</tt> files being generated, rather than <tt>sqlite.bz2</tt>.<br/>Should be sorted out within the next hour.<br/>The underlying cause was a missing <tt>yum-plugin-priorities</tt>.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:31:11)</span> <b>jthiltges:</b></span> @matyas ^<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:33:55)</span> <b>matyas:</b></span> dang, I should have spotted that. Thanks @jthiltges!<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:38:48)</span> <b>jthiltges:</b></span> Looks like the newer mash defaults to xz, with a config knob to set otherwise. E.g. <tt>compress_type = bz2</tt><br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:40:09)</span> <b>jthiltges:</b></span> Any idea if the OSG builds of createrepo, mash, koji, etc. are currently needed, or could a bit of work get them replaced with EL versions? Would be a nice bit of debt to pay off. @matyas<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:46:16)</span> <b>matyas:</b></span> createrepo: there's a crashing bug with the newer versions, though that might have only been for el6.<br/>koji: OSG version definitely. we won't be able to pass most of our patches upstream<br/>mash: we can get rid of our version when we drop 32-bit el6 support; @tim.theisen @bbockelm is that something we can do in OSG 3.5?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:03:03)</span> <b>jthiltges:</b></span> Looks like newer versions of mash have reworked their multilib support. Might be able to make things work with config tweaks.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:22:30)</span> <b>matyas:</b></span> <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-2843">https://opensciencegrid.atlassian.net/browse/SOFTWARE-2843</a> &lt;- ticket for upgrading mash; I added a note to investigate if the new version will let us turn our patch changes into config changes<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:29:26)</span> <b>matyas:</b></span> for koji, I'd say that there is a 50/50 chance that the parts that mash uses are not the parts that we patch, so we might be able to get away with using the EPEL version _on repo_<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:30:40)</span> <b>matyas:</b></span> most of the patches have to do with the server parts or auth, and I'm 99% sure that mash does not authenticate to koji<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:51:17)</span> <b>jthiltges:</b></span> Awesome. Thank you.<br/>
+</body>
+</html>

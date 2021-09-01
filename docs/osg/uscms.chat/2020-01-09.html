@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jan 9, 2020 : #uscms (osg)</title>
+</head>
+<body>
+<h3>Thu Jan 9, 2020 : #uscms (osg)</h3>
+<span style="color: #53b759"><span style="font-size: small">(10:26:25)</span> <b>marian:</b></span> ugh, US CMS sites should use this line, I believe you're the only one that doesn't use it:<br/><pre>xrootd.monitor all auth flush 30s window 5s fstat 60 lfn ops xfr 5 dest files io info user <a href="http://xrootd.t2.ucsd.edu:9930">xrootd.t2.ucsd.edu:9930</a> dest fstat info user <a href="http://xrd-mon.osgstorage.org:9930">xrd-mon.osgstorage.org:9930</a></pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(10:27:33)</span> <b>marian:</b></span> that combines traffic going to two collectors ... the second one is forwarding then (with lot of magic) data to monit:<br/><a href="https://monit-kibana.cern.ch/kibana/app/kibana::/discover?_g=()&amp;_a=(columns:!(_source),index:AWnEUpm3NZZoUCd3kmbV,interval:auto,query:(language:lucene,query:(match_all:())),sort:!(metadata.timestamp,desc))">https://monit-kibana.cern.ch/kibana/app/kibana::/discover?_g=()&amp;_a=(columns:!(_source),index:AWnEUpm3NZZoUCd3kmbV,interval:auto,query:(language:lucene,query:(match_all:())),sort:!(metadata.timestamp,desc))</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(10:33:06)</span> <b>marian:</b></span> also, your servers should set <tt>all.sitename CMS_SiteName</tt> ... poking around there are some site servers that don't provide sitename information at all, this makes it harder to properly monitor based on this attribute<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:39:18)</span> <b>blin:</b></span> hi all, i've got a taiwanese site (<tt>T2_TW_NCHC</tt>)  looking to register with the OSG. Is OSG actually the right place for them to "join" CMS?<br/>
+<span style="color: #619a4f"><span style="font-size: small">(14:40:11)</span> <b>clundstedt:</b></span> As a T2?  Surely not.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:43:36)</span> <b>justas.balcas:</b></span> @marian I checked the monit and xrd-cache-1. and numbers are very off…<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:43:48)</span> <b>justas.balcas:</b></span> also somehow xrd-cache-2 numbers are not in monit at all<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:44:19)</span> <b>justas.balcas:</b></span> I would be really happy to see documentation up to date, like how to add new server, new sitename, how to double check that numbers are == what we see locally<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:44:34)</span> <b>justas.balcas:</b></span> and ensure that whole monitoring monitors all correctly and not only partial info<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:46:25)</span> <b>justas.balcas:</b></span> and for that line, it was modified by Edgar to diff one. Not sure why. Looks like this needs to sync up to be usable :slightly_smiling_face:<br/>
+<span style="color: #619a4f"><span style="font-size: small">(14:48:59)</span> <b>clundstedt:</b></span> @blin why would the site want to register with OSG to be CMS?  As long CMS knows about a site (and that one appears in the monitoring, so I think they're good) then they're "In".  Are they looking to switch to OSG middleware?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:50:04)</span> <b>blin:</b></span> it's not clear atm, they're just asking for their contact information to be registered, which they would do to register their site topology<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:51:38)</span> <b>blin:</b></span> so the benefit of them registering with the OSG would be utilizing our middleware, getting their site topology into GOCDB (?) via the OSG, and also having their accounting data (if they choose to upload it to the GRACC) pushed to the WLCG<br/>
+<span style="color: #619a4f"><span style="font-size: small">(14:54:59)</span> <b>clundstedt:</b></span> I now see I'm not the person to ask.  I wouldn't think OSG-&gt;GRACC-&gt;WLCG is the best way to go about being accounted for outside the US.<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:36:54)</span> <b>blin:</b></span> @clundstedt but we do have non-US, CMS sites like <tt>T2_BR_UERJ</tt> registered in the OSG<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:37:05)</span> <b>blin:</b></span> so i'm not really sure where the line is ¯\_(ツ)_/¯<br/>
+<span style="color: #619a4f"><span style="font-size: small">(15:37:22)</span> <b>clundstedt:</b></span> Yes, the Brazil sites and Puerto Rico as well, but they use OSG middleware.<br/>
+<span style="color: #619a4f"><span style="font-size: small">(15:37:50)</span> <b>clundstedt:</b></span> (PR is a T3)<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:38:25)</span> <b>blin:</b></span> so if the taiwanese T2 wanted to use OSG repos, you'd be ok with them registering?<br/>
+<span style="color: #619a4f"><span style="font-size: small">(15:40:11)</span> <b>clundstedt:</b></span> I don't have a strong opinion (and have to authority to go) one way or the other.  If they want to register in OSG, power to them, but I don't think that's needed/expected to be a CMS site.<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:44:12)</span> <b>blin:</b></span> CMS is very confusing :slightly_smiling_face:<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:44:27)</span> <b>blin:</b></span> ok, that all helps. thanks!<br/>
+<span style="color: #619a4f"><span style="font-size: small">(15:44:47)</span> <b>clundstedt:</b></span> I concur with the assessment. We are confusing.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:46:25)</span> <b>andrew.melo:</b></span> Speak for yourself :man-tipping-hand:<br/>
+</body>
+</html>

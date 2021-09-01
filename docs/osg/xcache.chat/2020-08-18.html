@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Aug 18, 2020 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Tue Aug 18, 2020 : #xcache (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(12:34:30)</span> <b>blin:</b></span> @efajardo @dweitzel where are we on validating scitokens + xcache? is it done with the release of 1.5.2?<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:35:23)</span> <b>efajardo:</b></span> Well I have not tried it<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:35:31)</span> <b>efajardo:</b></span> I mean I am runnin an xrootd 5 cache<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:37:17)</span> <b>efajardo:</b></span> but I think we need all caches moved to 5 an then move <tt><a href="http://redirector.osgstorage.org">redirector.osgstorage.org</a></tt>update not @dweitzel?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:48:32)</span> <b>dweitzel:</b></span> Right. Though we can validate xrootd 5 with Scitokens without the full infrastructure upgraded<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:24:02)</span> <b>efajardo:</b></span> ok let me know when oyu have instructions for it<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:25:36)</span> <b>matyas:</b></span> We're seeing some truncated files in the CHTC cache and I want to see if the files are truncated on other caches too. <a href="http://osg.chic.nrp.internet2.edu">osg.chic.nrp.internet2.edu</a> looks to be the biggest reader of /chtc; @efajardo, can you send me the <tt>ls -l</tt> of /chtc/PUBLIC/banes/pongo_ponAbe3/ so I can check the file sizes against our origin?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:31:44)</span> <b>blin:</b></span> can't you try to grab it directly from any of the other caches?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:32:04)</span> <b>matyas:</b></span> the file listing?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:32:57)</span> <b>matyas:</b></span> I don't think there's an <tt>xrdls</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:34:53)</span> <b>blin:</b></span> nah but you could just do a spot check with the specific files that you're seeing that are truncated?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:35:35)</span> <b>matyas:</b></span> these are 20 GB files<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:37:35)</span> <b>dweitzel:</b></span> actually, there is an xrdls, it's <tt>xrdfs &lt;host:port&gt; ls &lt;path&gt;</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:38:12)</span> <b>dweitzel:</b></span> it _may_ work on a cache.<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:42:46)</span> <b>matyas:</b></span> no luck, it just hangs<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:43:05)</span> <b>matyas:</b></span> <tt>xrdfs <a href="http://osg.chic.nrp.internet2.edu:1094">osg.chic.nrp.internet2.edu:1094</a> ls /chtc/PUBLIC/banes/pongo_ponAbe3</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:46:09)</span> <b>dweitzel:</b></span> is that the right port?  It should be "denied" or work, I wouldn't expect a hang unless there's a firewall / port issue.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:46:20)</span> <b>dweitzel:</b></span> try port 8000?<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:47:26)</span> <b>efajardo:</b></span> no 1094<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:47:29)</span> <b>efajardo:</b></span> is the corect<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:47:38)</span> <b>efajardo:</b></span> the new data meta<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:47:43)</span> <b>efajardo:</b></span> just makes this ls horrible<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:47:54)</span> <b>efajardo:</b></span> <br/>
+<span style="color: #a63024"><span style="font-size: small">(16:48:31)</span> <b>efajardo:</b></span> <pre>this file SAMN01920551_recalibrated_after_pass_2_D.bam</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:48:31)</span> <b>dweitzel:</b></span> well that's not super useful.<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:48:37)</span> <b>efajardo:</b></span> looks 681M<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:50:02)</span> <b>efajardo:</b></span> this new thing of separating namespaces data and metadata broke all my caches<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:50:08)</span> <b>efajardo:</b></span> :triumph:<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:50:26)</span> <b>efajardo:</b></span> cause <tt>/xcache</tt> is not kept between pod runs<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:53:04)</span> <b>matyas:</b></span> It's supposed to be 26G<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:53:12)</span> <b>blin:</b></span> what's it matter if <tt>/xcache</tt> isn't kept between pods? aren't you keeping the namespace/meta/data dirs between pods?<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:53:31)</span> <b>efajardo:</b></span> well<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:53:39)</span> <b>efajardo:</b></span> this directive<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:53:40)</span> <b>efajardo:</b></span> <a href="https://github.com/opensciencegrid/docker-xcache/blob/master/xcache/xrootd/50-docker-paths.cfg#L8-L9">https://github.com/opensciencegrid/docker-xcache/blob/master/xcache/xrootd/50-docker-paths.cfg#L8-L9</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(16:53:52)</span> <b>efajardo:</b></span> tells the cache to store the data and the medatada in /xcache<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:54:32)</span> <b>efajardo:</b></span> I am not doing anything with <tt>/xcache</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(16:54:42)</span> <b>efajardo:</b></span> so that is just created at the begingin of every pod<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:55:10)</span> <b>efajardo:</b></span> so all that is kept is a bunch of symlinks to nowhere<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:55:32)</span> <b>dweitzel:</b></span> does symlinks to no where break xrootd?<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:55:37)</span> <b>efajardo:</b></span> yea<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:55:46)</span> <b>efajardo:</b></span> no but it is basiclaly that I start from a clean cache<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:55:48)</span> <b>efajardo:</b></span> between pdo runs<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:56:02)</span> <b>efajardo:</b></span> which we might as weell go stateless at that point<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:56:03)</span> <b>blin:</b></span> i thought you were adding your own meta and data directives, though?<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:56:15)</span> <b>efajardo:</b></span> not to all pods<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:56:24)</span> <b>efajardo:</b></span> the ones where it is a single partition is not needed<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:57:33)</span> <b>blin:</b></span> if you just mount the single partition onto <tt>/xcache</tt> that should work<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:57:37)</span> <b>efajardo:</b></span> I am rolling back to my own images<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:59:56)</span> <b>blin:</b></span> where were you mounting your volume for these containers?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:00:42)</span> <b>blin:</b></span> because i fully expected mounting a single disk to <tt>/xcache/</tt> to work<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:02:11)</span> <b>efajardo:</b></span> yea except that you didnt tell me that<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:04:54)</span> <b>blin:</b></span> it's in the PR description that you approved for these changes =/<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:06:12)</span> <b>blin:</b></span> it's my bad for not getting the doc changes proposed until this week though, sorry<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:06:19)</span> <b>efajardo:</b></span> I thought it was for the origin<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:06:27)</span> <b>efajardo:</b></span> now I need to go surgery on all the caches<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:13:11)</span> <b>efajardo:</b></span> Well it was not that bad only a few caches were running <tt>fresh</tt><br/>
+</body>
+</html>

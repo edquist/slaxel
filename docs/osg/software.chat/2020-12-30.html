@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Dec 30, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Dec 30, 2020 : #software (osg)</h3>
+<span style="color: #99a949"><span style="font-size: small">(14:23:21)</span> <b>dwd:</b></span> @matyas @blin I am having a problem with downloading a file from <a href="http://vdt.cs.wisc.edu">http://vdt.cs.wisc.edu</a>.  It always starts downloading but stops at around the same point, at 158,985 bytes according to wget.  It only happens on my htgettoken tarballs; I can download other, larger tarballs and rpms with no problem.  It doesn’t seem to matter where I copy the file.  I have two different versions of the file, they both get stuck.  URLs are <a href="http://vdt.cs.wisc.edu/upstream/htgettoken/1.0/htgettoken-downloads-1.0.tar.gz">http://vdt.cs.wisc.edu/upstream/htgettoken/1.0/htgettoken-downloads-1.0.tar.gz</a> and <a href="http://vdt.cs.wisc.edu/upstream/htgettoken/1.1/htgettoken-downloads-1.1.tar.gz">http://vdt.cs.wisc.edu/upstream/htgettoken/1.1/htgettoken-downloads-1.1.tar.gz</a><br/>
+<blockquote>
+<span style="color: #e06b56"><span style="font-size: small">(14:28:56)</span> <b>jthiltges:</b></span> Was able to replicate it. Worked fine after switching to https. Maybe an overzealous network security widget in there?<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:31:49)</span> <b>dwd:</b></span> Interesting.  I have also now updated the 1.1 file where I rearranged the order of the files in it and that doesn’t get stuck.  I don’t think I get a choice of what URL type to use; the download using http is built into osg-build<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:42:46)</span> <b>jthiltges:</b></span> Might trace back to a false positive in pyinstaller-4.1.tar.gz<br/><a href="https://www.virustotal.com/gui/file/954ae81de9a4bc096ff02433b3e245b9272fe53f27cac319e71fe7540952bd3d/detection">https://www.virustotal.com/gui/file/954ae81de9a4bc096ff02433b3e245b9272fe53f27cac319e71fe7540952bd3d/detection</a><br/>
+<span style="color: #99a949"><span style="font-size: small">(14:50:49)</span> <b>dwd:</b></span> Possibly, but if I just rearrange the order of the files in the tarball, it passes.<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:54:50)</span> <b>dwd:</b></span> It’s true that when it got stuck, pyinstaller was the first file in the tarball and it is 3.5MB, bigger than where it got stuck<br/>
+</blockquote>
+<span style="color: #99a949"><span style="font-size: small">(14:31:49)</span> <b>dwd:</b></span> Interesting.  I have also now updated the 1.1 file where I rearranged the order of the files in it and that doesn’t get stuck.  I don’t think I get a choice of what URL type to use; the download using http is built into osg-build<br/>
+<blockquote>
+<span style="color: #e06b56"><span style="font-size: small">(14:28:56)</span> <b>jthiltges:</b></span> Was able to replicate it. Worked fine after switching to https. Maybe an overzealous network security widget in there?<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:31:49)</span> <b>dwd:</b></span> Interesting.  I have also now updated the 1.1 file where I rearranged the order of the files in it and that doesn’t get stuck.  I don’t think I get a choice of what URL type to use; the download using http is built into osg-build<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:42:46)</span> <b>jthiltges:</b></span> Might trace back to a false positive in pyinstaller-4.1.tar.gz<br/><a href="https://www.virustotal.com/gui/file/954ae81de9a4bc096ff02433b3e245b9272fe53f27cac319e71fe7540952bd3d/detection">https://www.virustotal.com/gui/file/954ae81de9a4bc096ff02433b3e245b9272fe53f27cac319e71fe7540952bd3d/detection</a><br/>
+<span style="color: #99a949"><span style="font-size: small">(14:50:49)</span> <b>dwd:</b></span> Possibly, but if I just rearrange the order of the files in the tarball, it passes.<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:54:50)</span> <b>dwd:</b></span> It’s true that when it got stuck, pyinstaller was the first file in the tarball and it is 3.5MB, bigger than where it got stuck<br/>
+</blockquote>
+<span style="color: #99a949"><span style="font-size: small">(14:51:18)</span> <b>dwd:</b></span> I made a ticket for changing osg-build to use https instead of http <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-4409">https://opensciencegrid.atlassian.net/browse/SOFTWARE-4409</a><br/>
+</body>
+</html>

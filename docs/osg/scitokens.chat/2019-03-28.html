@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Mar 28, 2019 : #scitokens (osg)</title>
+</head>
+<body>
+<h3>Thu Mar 28, 2019 : #scitokens (osg)</h3>
+<span style="color: #8f4a2b"><span style="font-size: small">(08:42:17)</span> <b>dabrown:</b></span> @bbockelm is there a way to <tt>transfer_input_files</tt> from stash cache in my condor submit file?<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(08:43:25)</span> <b>dabrown:</b></span> I want to do something like <tt>transfer_input_files = stash:/users/dbrown/file.txt</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:17:12)</span> <b>dweitzel:</b></span> Hi @dabrown I think it may just work.  <a href="https://github.com/opensciencegrid/osg-flock/blob/master/node-check/osgvo-additional-htcondor-config">https://github.com/opensciencegrid/osg-flock/blob/master/node-check/osgvo-additional-htcondor-config</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:17:41)</span> <b>dweitzel:</b></span> The url has to be something like: <tt>stash:///users/dbrown/file.txt</tt> I believe.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(11:18:32)</span> <b>dabrown:</b></span> Ah, nice, so as long as I have<br/><pre><br/>FILETRANSFER_PLUGINS "\$(FILETRANSFER_PLUGINS),$PWD/stashcp_plugin"<br/>FILETRANSFER_PLUGINS "C" "-" "+" "N" "N" "-"<br/></pre><br/>I should be good?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:18:52)</span> <b>dweitzel:</b></span> You will need the <tt>stashcp_plugin</tt> file<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:19:03)</span> <b>dweitzel:</b></span> you will need the 30+ lines above that line.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(11:19:36)</span> <b>dabrown:</b></span> Ah, I see<br/><pre><br/>#!/bin/bash<br/>if [ "x\$1" = "x-classad" ]; then<br/>   echo "PluginVersion = \"0.1\""<br/>   echo "PluginType = \"FileTransfer\""<br/>   echo "SupportedMethods = \"stash\""<br/>   exit 0<br/>fi<br/>FULLSRC=\$1<br/>LOC=\$2<br/>SRC=\$(echo \$FULLSRC | cut -d':' -f2-)<br/>. /cvmfs/oasis.opensciencegrid.org/osg/sw/module-init.sh<br/>module load stashcp<br/>stashcp -r -s \$SRC -l \$LOC &gt; /dev/null 2&gt;&amp;1<br/></pre><br/>is <tt>stashcp_plugin</tt><br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(11:19:50)</span> <b>dabrown:</b></span> (modulo the shell escapes)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:20:15)</span> <b>dweitzel:</b></span> yup<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(11:20:17)</span> <b>dabrown:</b></span> nice<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(11:20:18)</span> <b>dabrown:</b></span> thanks<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(11:20:56)</span> <b>dabrown:</b></span> this needs to be on the startds, right, as they are doing the file transfer?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:21:40)</span> <b>dweitzel:</b></span> correct<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:22:11)</span> <b>dweitzel:</b></span> This is very glideinwms specific <pre>FILETRANSFER_PLUGINS "\$(FILETRANSFER_PLUGINS),$PWD/stashcp_plugin"<br/>FILETRANSFER_PLUGINS "C" "-" "+" "N" "N" "-"</pre><br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(11:22:25)</span> <b>dabrown:</b></span> What's the meaning of <tt>"C" "-" "+" "N" "N" "-"</tt>?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:22:38)</span> <b>dweitzel:</b></span> it's GlideinWMS config magic.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(11:22:53)</span> <b>dabrown:</b></span> Ah. I think I can just get this working on the local pool following <a href="http://research.cs.wisc.edu/htcondor/manual/v8.8/SettingUpforSpecialEnvironments.html#x42-3480003.14.2">http://research.cs.wisc.edu/htcondor/manual/v8.8/SettingUpforSpecialEnvironments.html#x42-3480003.14.2</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:23:06)</span> <b>dweitzel:</b></span> yup!<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(11:23:23)</span> <b>dabrown:</b></span> OK, cool. Should have it working today. This will make life a lot easier!<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(11:23:45)</span> <b>dabrown:</b></span> I don't think I'd twigged how powerful the file plugins are.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:23:47)</span> <b>dweitzel:</b></span> sure.  poke me if you have any issues.  I'll be online today.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(11:23:50)</span> <b>dabrown:</b></span> thanks!<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:44:22)</span> <b>jpatton:</b></span> we're improving the file transfer plugin framework so that the plugins do not have to be on the execute machines but are rather sent with the job :slightly_smiling_face:<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(11:46:19)</span> <b>dabrown:</b></span> Cool. BTW, what does <tt>ENABLE_MULTIFILE_TRANSFER_PLUGINS</tt> do? I can't find any reference to it in the manual at <a href="http://research.cs.wisc.edu/htcondor/manual/v8.8/indexname.html">http://research.cs.wisc.edu/htcondor/manual/v8.8/indexname.html</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(11:47:28)</span> <b>jpatton:</b></span> that's going to be the new behavior<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:48:45)</span> <b>jpatton:</b></span> the curl plugin that pulls down http(s) URLs right now processes a file at a time, the new plugin will process multiple files<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(11:49:11)</span> <b>dabrown:</b></span> got it<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(11:49:24)</span> <b>dabrown:</b></span> right now it's set to FALSE on my pool. should i leave it like that?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:49:52)</span> <b>jpatton:</b></span> for now yes<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(12:25:31)</span> <b>dabrown:</b></span> @dweitzel any idea what I'm doing wrong here. Source file appears to be in stash:<br/><pre><br/>[dbrown@login03 ~]$ ls -l /stash/user/dbrown/public/psds/asd_june_2016<br/>total 194<br/>-rw-r----- 1 dbrown users 99000 Mar 28 08:00 AdVirgo.txt<br/>-rw-r----- 1 dbrown users 99000 Mar 28 08:00 aLIGO_design.txt<br/></pre><br/>but when I copy it I get a 404.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(12:26:34)</span> <b>dabrown:</b></span> <br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(12:29:01)</span> <b>dabrown:</b></span> On our local cache I see<br/><pre><br/>190328 13:28:20 64544 ofs_stat: unknown.601766:512@login03.osgconnect.net Unable to locate /user/dbrown/public/psds/asd_june_2016/AdVirgo.txt; no such file or directory<br/>190328 13:28:20 64544 unknown.601766:512@login03.osgconnect.net XrootdResponse: sending err 3011: Unable to locate /user/dbrown/public/psds/asd_june_2016/AdVirgo.txt; no such file or directory<br/>190328 13:28:20 64544 acc_Audit: http grant  *@[::ffff:192.170.227.22] read /user/dbrown/public/psds/asd_june_2016/AdVirgo.txt<br/>190328 13:28:20 61921 XrootdXeq: unknown.601582:341@its-condor-net7 disc 0:05:53 (link read error or closed)<br/></pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:30:49)</span> <b>dweitzel:</b></span> I think the permissions need to have 'read' for everyone.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:31:02)</span> <b>dweitzel:</b></span> so at the least, 644<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:31:09)</span> <b>dweitzel:</b></span> you have 640<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(12:35:14)</span> <b>dabrown:</b></span> Fixed, but it still doesn't work. Here are the permissions:<br/><pre><br/>(pycbc-opengw) [dbrown@login03 ~]$ cd /stash/user<br/>(pycbc-opengw) [dbrown@login03 user]$ ls -ld dbrown<br/>drwx--x--x 1 dbrown users 3 Nov  8 07:37 dbrown<br/>(pycbc-opengw) [dbrown@login03 user]$ ls -ld dbrown/public<br/>drwxr-xr-x 1 dbrown users 3 Mar 28 08:00 dbrown/public<br/>(pycbc-opengw) [dbrown@login03 user]$ ls -ld dbrown/public/psds<br/>drwxr-xr-x 1 dbrown users 1 Mar 28 08:00 dbrown/public/psds<br/>(pycbc-opengw) [dbrown@login03 user]$ ls -ld dbrown/public/psds/asd_june_2016<br/>drwxr-x--x 1 dbrown users 2 Mar 28 08:00 dbrown/public/psds/asd_june_2016<br/>(pycbc-opengw) [dbrown@login03 user]$ ls -ld dbrown/public/psds/asd_june_2016/*<br/>-rw-r--r-- 1 dbrown users 99000 Mar 28 08:00 dbrown/public/psds/asd_june_2016/AdVirgo.txt<br/>-rw-r--r-- 1 dbrown users 99000 Mar 28 08:00 dbrown/public/psds/asd_june_2016/aLIGO_design.txt<br/></pre><br/>So all <tt>x</tt> bit is set all the way down, and all <tt>r</tt> is set on the files.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(12:35:31)</span> <b>dabrown:</b></span> <pre><br/>[dbrown@sugwg-condor inference-ckpt]$ curl -v -L --connect-timeout 30 --speed-limit 1024 -O --fail <a href="http://its-condor-xrootd1.syr.edu:8000/user/dbrown/public/psds/asd_june_2016/AdVirgo.txt">http://its-condor-xrootd1.syr.edu:8000/user/dbrown/public/psds/asd_june_2016/AdVirgo.txt</a><br/>  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current<br/>                                 Dload  Upload   Total   Spent    Left  Speed<br/>  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* About to connect() to <a href="http://its-condor-xrootd1.syr.edu">its-condor-xrootd1.syr.edu</a> port 8000 (#0)<br/>*   Trying 128.230.247.232...<br/>* Connected to <a href="http://its-condor-xrootd1.syr.edu">its-condor-xrootd1.syr.edu</a> (128.230.247.232) port 8000 (#0)<br/>&gt; GET /user/dbrown/public/psds/asd_june_2016/AdVirgo.txt HTTP/1.1<br/>&gt; User-Agent: curl/7.29.0<br/>&gt; Host: <a href="http://its-condor-xrootd1.syr.edu:8000">its-condor-xrootd1.syr.edu:8000</a><br/>&gt; Accept: */*<br/>&gt; <br/>* The requested URL returned error: 404 Not Found<br/>  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0<br/>* Closing connection 0<br/>curl: (22) The requested URL returned error: 404 Not Found<br/></pre><br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(12:36:05)</span> <b>dabrown:</b></span> But it's there:<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(12:36:07)</span> <b>dabrown:</b></span> <pre><br/>(pycbc-opengw) [dbrown@login03 user]$ ls -l /stash/user/dbrown/public/psds/asd_june_2016/AdVirgo.txt<br/>-rw-r--r-- 1 dbrown users 99000 Mar 28 08:00 /stash/user/dbrown/public/psds/asd_june_2016/AdVirgo.txt<br/></pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:36:10)</span> <b>dweitzel:</b></span> huh, that should work.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:36:28)</span> <b>dweitzel:</b></span> older xrootd's, which is probably what is running on the its-condor-xrootd server, served 404's for all errors.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:36:38)</span> <b>dweitzel:</b></span> permission or otherwise.  So don't read too much into the 404 error.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:36:44)</span> <b>dweitzel:</b></span> just means something is wrong.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(12:39:35)</span> <b>dabrown:</b></span> I tried<br/><pre><br/>[dbrown@sugwg-condor inference-ckpt]$ stashcp --debug /user/bbockelm/public/testfile .<br/>2019-03-28T13:39:12+0000 root         INFO     Trying CVMFS...<br/>2019-03-28T13:39:12+0000 root         DEBUG    Checking if the CVMFS file exists: /cvmfs/stash.osgstorage.org/user/bbockelm/public/testfile<br/>2019-03-28T13:39:12+0000 root         DEBUG    Succesfully copied file from CVMFS!<br/></pre><br/>but that's in CVMFS, so not testing XrootD<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:39:54)</span> <b>dweitzel:</b></span> right.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(12:40:12)</span> <b>dabrown:</b></span> This works <tt>stashcp --methods=xrootd --debug /user/bbockelm/public/testfile .</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:40:47)</span> <b>dweitzel:</b></span> ok, so we may be hitting the "negative cache"<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:41:28)</span> <b>dweitzel:</b></span> as in, xrootd keeps track of failed transfers.  And if something requests the same file again, within a timeout, it will send an error back without checking again.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(12:41:35)</span> <b>dabrown:</b></span> Ah<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(12:41:40)</span> <b>dabrown:</b></span> This fails:<br/><tt>stashcp --methods=xrootd --debug /user/dbrown/public/psds/asd_june_2016/AdVirgo.txt .</tt><br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(12:41:46)</span> <b>dabrown:</b></span> How do I flush the anti-cache?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:42:20)</span> <b>dweitzel:</b></span> the anti-cache is in the main redirector.  Without messaging someone to restart it, wait 15 minutes or so...<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(12:42:20)</span> <b>dabrown:</b></span> I have <tt>root@its-condor-xrootd1</tt><br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(12:42:30)</span> <b>dabrown:</b></span> Ah, ok<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(12:43:06)</span> <b>dabrown:</b></span> I think you're right: <tt>stashcp --methods=xrootd --debug /user/dbrown/public/psds/asd_june_2016/aLIGO_design.txt .</tt> works fine<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(12:43:14)</span> <b>dabrown:</b></span> It's just the virgo one that fails.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(12:43:22)</span> <b>dabrown:</b></span> So my bad permissions locked me out<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:43:34)</span> <b>dweitzel:</b></span> ok, good.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:43:51)</span> <b>dweitzel:</b></span> I forget the default anti-cache (I like the name) timeout.  But it's on the order of 15 minutes.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(12:43:59)</span> <b>dabrown:</b></span> got it, thanks.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(13:55:05)</span> <b>dabrown:</b></span> @dweitzel got it working, thanks. Our version of stashcache doesn't know about <tt>-s</tt> and <tt>-l</tt>, and <tt>-r</tt> only works for directories, but changing the line to <tt>stashcp \$SRC \$LOC &gt; /dev/null 2&gt;&amp;1</tt><br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(13:55:10)</span> <b>dabrown:</b></span> works<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(13:55:22)</span> <b>dabrown:</b></span> (I'm using <tt>stashcache-client.noarch 0:5.2.0-1.osg34.el7</tt>)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:56:54)</span> <b>dweitzel:</b></span> interesting...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:56:55)</span> <b>dweitzel:</b></span> ok.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:57:40)</span> <b>dweitzel:</b></span> yeah, <tt>-s</tt> and <tt>-l</tt> are really old options.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:57:52)</span> <b>dweitzel:</b></span> I'll open a pull request to update the OSG version.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(15:59:06)</span> <b>dabrown:</b></span> @rynge what's the right slack channel to ask about stuff like <a href="https://github.com/opensciencegrid/cvmfs-singularity-sync/pull/126/commits/8cb0cbcf81d9ae769c7a1f2bfbdecbe7fcc8be1c">https://github.com/opensciencegrid/cvmfs-singularity-sync/pull/126/commits/8cb0cbcf81d9ae769c7a1f2bfbdecbe7fcc8be1c</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:12:37)</span> <b>rynge:</b></span> #osg-connect - but I have merged it<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:13:40)</span> <b>bbockelm:</b></span> hey, did someone say file transfer plugins?<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(16:20:20)</span> <b>dabrown:</b></span> yeah, they are pretty cool!<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(16:20:25)</span> <b>dabrown:</b></span> @rynge thanks!<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(16:22:24)</span> <b>dabrown:</b></span> @dweitzel did we ever close the loop on federating my xrootd on sugwg-scitokens with the main one?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:22:49)</span> <b>dweitzel:</b></span> Yes, it's federated.  But we never closed the loop on federated "writes"<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(16:22:53)</span> <b>dabrown:</b></span> I think I can bypass this by setting up a condor file transfer plugin that uses my patched stashcp with a different uri<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:23:15)</span> <b>dweitzel:</b></span> You should be able to request data from your own origin.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(16:24:08)</span> <b>dabrown:</b></span> Great. And if I use<br/><pre><br/>#!/bin/bash<br/>if [ "x$1" = "x-classad" ]; then<br/>   echo "PluginVersion = \"0.1\""<br/>   echo "PluginType = \"FileTransfer\""<br/>   echo "SupportedMethods = \"duncan-stash\""<br/>   exit 0<br/>fi<br/>FULLSRC=$1<br/>LOC=$2<br/>SRC=$(echo $FULLSRC | cut -d':' -f2-)<br/>/home/dbrown/bin/stashcp $SRC $LOC &gt; /dev/null 2&gt;&amp;1<br/></pre><br/>I think I can do the writes.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(16:24:16)</span> <b>dabrown:</b></span> with the plugin<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:24:37)</span> <b>dweitzel:</b></span> with a modified stashcp, yes, writes can be done.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(16:24:37)</span> <b>dabrown:</b></span> so I use <tt>stash:///</tt> for read and <tt>duncan-stash:///</tt> for writes<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(16:24:46)</span> <b>dabrown:</b></span> cool.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(16:25:02)</span> <b>dabrown:</b></span> ok, i think i have all the pieces. i'll start putting stuff together tomorrow.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:25:06)</span> <b>dweitzel:</b></span> should.  I forget, is it authenticated reads?<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(16:25:17)</span> <b>dabrown:</b></span> yes<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:25:19)</span> <b>dweitzel:</b></span> or is it public?<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(16:25:25)</span> <b>dabrown:</b></span> authenticated<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:25:45)</span> <b>dweitzel:</b></span> that may make it more difficult.  May have to use duncan-stash for both :slightly_smiling_face:<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(16:26:03)</span> <b>dabrown:</b></span> ok will do<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:26:11)</span> <b>dweitzel:</b></span> authenticated reads are not supported yet in the released stashcp.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:26:31)</span> <b>dweitzel:</b></span> StashCaches have not deployed scitokens support yet.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(16:26:45)</span> <b>dabrown:</b></span> ah, right.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(16:26:53)</span> <b>dabrown:</b></span> ok, I'll use duncan-stash for both<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(16:31:46)</span> <b>dabrown:</b></span> @bbockelm OMG, I love condor file transfer plugins!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:32:17)</span> <b>bbockelm:</b></span> ah - there's some secret sauce here too<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:32:33)</span> <b>bbockelm:</b></span> what version of HTCondor are you running?<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(16:33:13)</span> <b>dabrown:</b></span> <pre><br/>#!/bin/bash<br/>if [ "x$1" = "x-classad" ]; then<br/>   echo "PluginVersion = \"0.1\""<br/>   echo "PluginType = \"FileTransfer\""<br/>   echo "SupportedMethods = \"frame\""<br/>   exit 0<br/>fi<br/>SRC=$1<br/>DST=$2<br/>if [ -f /frames/$SRC ] ; then<br/>  ln -s $SRC $DST<br/>else<br/>  globus-url-copy <a href="gsiftp://some-server/$SRC">gsiftp://some-server/$SRC</a> $DST<br/>fi<br/></pre><br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(16:33:34)</span> <b>dabrown:</b></span> <tt>transfer_input_files = frame:H-RDS_R_L1-726387236-16.gwf</tt><br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(16:33:39)</span> <b>dabrown:</b></span> 8.8.1<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(16:33:49)</span> <b>dabrown:</b></span> lots of possibilities here<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(16:34:02)</span> <b>dabrown:</b></span> Did you figure out whether or not it just works for checkpoint files?<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(16:34:40)</span> <b>dabrown:</b></span> I have condor checkpointing working in PyCBC for inference jobs: <a href="https://github.com/gwastro/pycbc/pull/2596">https://github.com/gwastro/pycbc/pull/2596</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:34:43)</span> <b>bbockelm:</b></span> <a href="https://docs.google.com/document/d/12v2FjSEJIkX0wxnuIBXlpsLOQwpaxxj0TZUxKBWJZ9g/edit">https://docs.google.com/document/d/12v2FjSEJIkX0wxnuIBXlpsLOQwpaxxj0TZUxKBWJZ9g/edit</a> can you view this?<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(16:34:52)</span> <b>dabrown:</b></span> yes<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:35:00)</span> <b>bbockelm:</b></span> that's the new multifile plugin.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(16:35:33)</span> <b>dabrown:</b></span> And I switch to that with <tt>ENABLE_MULTIFILE_TRANSFER_PLUGINS = True</tt>?<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(16:35:38)</span> <b>dabrown:</b></span> Or upgrade to 8.9.0?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:35:54)</span> <b>bbockelm:</b></span> As of 8.9.1, it no longer requires a transfer queue slot.<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(16:35:59)</span> <b>dabrown:</b></span> nice<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:36:28)</span> <b>bbockelm:</b></span> I think the old plugin can also spit out a classad with <tt>TransferError</tt> and actually send the plugin's error message to the hold message<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(16:36:58)</span> <b>dabrown:</b></span> great<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:37:13)</span> <b>bbockelm:</b></span> (bah, but I forget 8.9.1 isn't out yet...)<br/>
+<span style="color: #8f4a2b"><span style="font-size: small">(16:37:39)</span> <b>dabrown:</b></span> ah, nvm. will experiment when it's out. i have enough to keep me busy in 8.8.x, thanks!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:38:31)</span> <b>bbockelm:</b></span> yeah - in 8.9.1, you can also use plugins for stageout and you can have the same plugin use arbitrarily named tokens instead of having to do <tt>duncan-stash</tt>, <tt>duncan2-stash</tt>, etc, etc.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:38:38)</span> <b>bbockelm:</b></span> the <tt>TransferError</tt> stuff _is_ in 8.8.x<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:38:58)</span> <b>bbockelm:</b></span> Do that part earlier rather than later or you'll hate yourself when trying to debug at scale.<br/>
+</body>
+</html>

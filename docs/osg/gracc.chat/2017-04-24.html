@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Apr 24, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Mon Apr 24, 2017 : #gracc (osg)</h3>
+<span style="color: #902d59"><span style="font-size: small">(10:14:35)</span> <b>tanya:</b></span> Hi, what is wrong again with ES?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:18:46)</span> <b>kretzke:</b></span> @dweitzel @marian @bbockelm what experiments are happening with ceph today?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:19:31)</span> <b>dweitzel:</b></span> We are adding another Ceph storage node. It's rebalancing now. <br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:19:57)</span> <b>dweitzel:</b></span> How bad did it affect GRACC this time. <br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:19:59)</span> <b>dweitzel:</b></span> ?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:20:23)</span> <b>kretzke:</b></span> really need to consider stopping elasticsearch rebalancing, or even the cluster, when maintenance like that happens.. master dropped out, so it’s really not happy<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:21:53)</span> <b>marian:</b></span> we also got a ticket: <a href="https://ticket.opensciencegrid.org/33552">https://ticket.opensciencegrid.org/33552</a> ...<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:24:55)</span> <b>marian:</b></span> index rate dropped drastically down shortly before 10<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:07:43)</span> <b>dweitzel:</b></span> I talked to the admins here.  They added new storage.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:08:09)</span> <b>dweitzel:</b></span> something like 30% of the storage is 'rebalancing'.  We are talking how to best do this in the future.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:57:24)</span> <b>dweitzel:</b></span> ok, @kretzke and @marian what state is GRACC in currently?  Is it continously failing?  Or are the services down and need to be restarted?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:57:35)</span> <b>dweitzel:</b></span> I see the rabbitmq queue is rapidly growing.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:01:34)</span> <b>kretzke:</b></span> -5 still hasn’t rejoined the cluster, there’s still high iowait on all nodes (except -5)<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:02:12)</span> <b>kretzke:</b></span> how long for ceph rebuilding to finish?<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:03:43)</span> <b>marian:</b></span> (Marian at GOCOps meeting)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:09:08)</span> <b>dweitzel:</b></span> @kretzke ok, I convinced them to turn down the rebalancing (bascially, instead of adding 12 OSDs at the same time, only add 1)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:09:23)</span> <b>dweitzel:</b></span> I see the monitoring on GRACC shows much better io suddenly.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:09:29)</span> <b>dweitzel:</b></span> lets bring this thing back to life!<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:11:18)</span> <b>kretzke:</b></span> yep, looks like that helped. -5 has rejoined, should start rebalancing shortly<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:13:06)</span> <b>dweitzel:</b></span> ok, good.<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:36:48)</span> <b>marian:</b></span> btw, DNS cut over of gratia-{prod,transfer} to <a href="http://gracc.opensciencegrid.org">gracc.opensciencegrid.org</a> will take place tomorrow around 10ET, according to GOC Ops meeting<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:42:24)</span> <b>marian:</b></span> talking about this one:<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:42:28)</span> <b>marian:</b></span> <a href="https://ticket.opensciencegrid.org/33543">https://ticket.opensciencegrid.org/33543</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:49:50)</span> <b>dweitzel:</b></span> I see GRACC is back to 100% IO time.  But I also see a lot of network traffic.  So I think that's good?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:50:03)</span> <b>dweitzel:</b></span> it's very busy, but at least it's doing something?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:50:07)</span> <b>dweitzel:</b></span> opposed to before?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:24:53)</span> <b>kretzke:</b></span> I’m not sure I’d call 1 MBps “lots” of traffic. It is slowly recovering though, and serving index and search requests<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:09:03)</span> <b>dweitzel:</b></span> Well, seems like gracc recovered.  And our admin learned an important lesson.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:09:46)</span> <b>dweitzel:</b></span> we are also figuring out how we can just "throw money" at this IO problem.  Ideas so far are faster procs for the storage nodes (they are really slow now).  Also, buying more SSD's for the journal.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:14:10)</span> <b>kretzke:</b></span> I wonder if there’s a way you can put a high-perfomance local storage cache in each machine :stuck_out_tongue:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:14:45)</span> <b>dweitzel:</b></span> ah, so it caches the writes to the mounted volumes?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:15:26)</span> <b>dweitzel:</b></span> there's still some things that have been identified.  The XFS partitions are a bit fragmented.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:15:31)</span> <b>dweitzel:</b></span> so we can fix that.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:15:32)</span> <b>kretzke:</b></span> just being facetious<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:15:54)</span> <b>dweitzel:</b></span> yeah, clouds are hard :slightly_smiling_face:<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:18:25)</span> <b>kretzke:</b></span> yeah I bet. google amazon and microsoft can just throw more people at any problems<br/>
+</body>
+</html>

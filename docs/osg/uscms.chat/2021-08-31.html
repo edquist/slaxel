@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Aug 31, 2021 : #uscms (osg)</title>
+</head>
+<body>
+<h3>Tue Aug 31, 2021 : #uscms (osg)</h3>
+<span style="color: #7d414c"><span style="font-size: small">(17:15:40)</span> <b>bockjoo:</b></span> 2001:67c:1148:201::17 does not get resolved at CERN, but it is resolved at Florida.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(17:15:56)</span> <b>bockjoo:</b></span> Does anyone know why?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(17:20:53)</span> <b>justas.balcas:</b></span> dnsmasq &lt;-&gt; DNS issue at Cern?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(17:22:54)</span> <b>justas.balcas:</b></span> or even firewall:<br/><pre>[jbalcas@lxplus730 ~]$ nslookup <a href="http://ultralight.org">ultralight.org</a> 8.8.8.8<br/>;; connection timed out; no servers could be reached</pre><br/>
+<span style="color: #e06b56"><span style="font-size: small">(17:34:28)</span> <b>jthiltges:</b></span> There's three authoritative nameservers servers listed for that IP. But only one of the three (<a href="http://dns4.pic.es">dns4.pic.es</a>) has the PTR record. The other two (<a href="http://ns1.csuc.cat">ns1.csuc.cat</a> and <a href="http://ns2.csuc.cat">ns2.csuc.cat</a>) return SERVFAIL.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(18:35:05)</span> <b>bockjoo:</b></span> Isn't one enough?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(18:45:49)</span> <b>bockjoo:</b></span> dig shows:<br/>
+<span style="color: #7d414c"><span style="font-size: small">(18:46:09)</span> <b>bockjoo:</b></span> ;; AUTHORITY SECTION:<br/><a href="http://pic.es">pic.es</a>.			13196	IN	NS	<a href="http://dns4.pic.es">dns4.pic.es</a>.<br/><a href="http://pic.es">pic.es</a>.			13196	IN	NS	<a href="http://dns2.pic.es">dns2.pic.es</a>.<br/><a href="http://pic.es">pic.es</a>.			13196	IN	NS	<a href="http://nso.nic.es">nso.nic.es</a>.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(19:27:29)</span> <b>jthiltges:</b></span> Caching resolvers might hold onto the bad result for a little while. (And I have no idea how lxplus is doing things.)<br/>It will probably _eventually_ resolve, but often not on the first try, which will likely cause application issues. No idea if it's the root cause here, but worth fixing regardless.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(19:32:12)</span> <b>bockjoo:</b></span> I filed a SNOW ticket. We will see if this is a real issue at CERN or not.<br/>
+</body>
+</html>

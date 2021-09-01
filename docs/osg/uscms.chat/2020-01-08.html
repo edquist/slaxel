@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jan 8, 2020 : #uscms (osg)</title>
+</head>
+<body>
+<h3>Wed Jan 8, 2020 : #uscms (osg)</h3>
+<span style="color: #99a949"><span style="font-size: small">(11:07:57)</span> <b>dwd:</b></span> @justas.balcas I would like to get to the bottom of what causes that.  Can you find the very beginning of one of those failures in /var/log/messages?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:25:11)</span> <b>justas.balcas:</b></span> <br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:25:17)</span> <b>justas.balcas:</b></span> @dwd<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:33:56)</span> <b>dwd:</b></span> @justas.balcas That’s indeed helpful.  Do you have a CERN account, can you submit a ticket to <a href="https://sft.its.cern.ch/jira/browse/CVM">https://sft.its.cern.ch/jira/browse/CVM</a>?   I can see you have version 2.6.0, and I know that changes have since been made to the fuse invalidator, so I do recommend that you upgrade to the latest version 2.7.0 to see if the problem goes away.  I still also would like a ticket however, because as far as I know the problem was not reported before and it’s possible that it still exists in the latest version.  @andrew.melo what version of cvmfs are you using?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(11:34:46)</span> <b>andrew.melo:</b></span> <pre>Name        : cvmfs<br/>Arch        : x86_64<br/>Version     : 2.6.3<br/>Release     : 1.osg34.el7</pre><br/>
+<span style="color: #99a949"><span style="font-size: small">(11:37:22)</span> <b>dwd:</b></span> I believe at least part of the fuse invalidator was turned off for that version (for a different reason) but it has been rewritten for 2.7.0 so I do recommend that you too upgrade to 2.7.0.  We have no proof that you’ve got the same root cause but still,  I recommend 2.7.0.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:37:26)</span> <b>justas.balcas:</b></span> cvmfs is set to latest on our end<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:37:34)</span> <b>justas.balcas:</b></span> so 2.7.0 is not available<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:37:59)</span> <b>dwd:</b></span> I guess it’s only in osg3.5<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:38:28)</span> <b>justas.balcas:</b></span> we are on osg.3.5 :wink:<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:38:35)</span> <b>justas.balcas:</b></span> <br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:38:46)</span> <b>justas.balcas:</b></span> and its 2.7 :))<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:38:51)</span> <b>justas.balcas:</b></span> and failure was 2.6<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:40:00)</span> <b>justas.balcas:</b></span> <br/>
+<span style="color: #99a949"><span style="font-size: small">(11:40:09)</span> <b>dwd:</b></span> Anyway 2.7.0 is also in osg3.4, I was wrong about that.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:40:24)</span> <b>justas.balcas:</b></span> dec 19, mh.. is there anythinng else I need to do after cvmfs upgrade?<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:41:15)</span> <b>dwd:</b></span> You shouldn’t need to.  Can you find any stack traces since Dec 19?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:41:48)</span> <b>justas.balcas:</b></span> I could send you all /var/log/messages*<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:43:34)</span> <b>dwd:</b></span> Ok, from a machine that’s currently got Transport endpoint not connected.  A cvmfs_config bugreport tarball would also be helpful.  I think it only includes the current /var/log/messages though, not older copies.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(11:50:36)</span> <b>andrew.melo:</b></span> Oh wow, DigiCert changed something in their backend and getting a new cert is instant instead of before where it would be "pending" a couple of hours<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:02:34)</span> <b>dweitzel:</b></span> @dweitzel has left the channel<br/>
+<span style="color: #de5f24"><span style="font-size: small">(18:37:58)</span> <b>justas.balcas:</b></span> Hi, Does anyone knows how the xrootd monitoring flows from xrootd servers to cern monit?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(18:38:31)</span> <b>justas.balcas:</b></span> Like this line: <tt>xrootd.monitor all auth flush io 60s ident 5m mbuff 8k rbuff 4k rnums 3 window 10s dest files io info user redir <a href="http://xrootd.t2.ucsd.edu:9930">xrootd.t2.ucsd.edu:9930</a></tt>  and what services are involved, how sitename maps, what is filtered out?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(18:40:16)</span> <b>justas.balcas:</b></span> and for caches we have in addition <tt>dest fstat info user <a href="http://xrd-mon.osgstorage.org:9930">xrd-mon.osgstorage.org:9930</a></tt> is there monitoring somewhere ?<br/>
+</body>
+</html>

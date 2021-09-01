@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jan 23, 2020 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Thu Jan 23, 2020 : #xcache (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(13:22:36)</span> <b>matyas:</b></span> @efajardo you can tell supervisord to forward a process's output to stdout<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:23:39)</span> <b>matyas:</b></span> for example<br/><pre>[program:condor_master]<br/>user = root<br/>command = /usr/sbin/condor_master -f -t<br/>stdout_logfile=/dev/stdout<br/>stderr_logfile=/dev/stderr<br/># don't logrotate these:<br/>stdout_logfile_maxbytes=0<br/>stderr_logfile_maxbytes=0</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(13:26:41)</span> <b>efajardo:</b></span> interesting<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:27:13)</span> <b>efajardo:</b></span> so this might be waht we want to Xrootd but we have to tell Xrootd not to log to its log but to sendit to stdout<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:28:37)</span> <b>matyas:</b></span> you can also write a script that gets started by supervisord and tails the logfile(s) to stdout<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:31:36)</span> <b>blin:</b></span> there's also the cmsd that we have to worry about in the CMS case<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:31:55)</span> <b>blin:</b></span> it'd be interesting to see how they interweave with each other<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:31:56)</span> <b>matyas:</b></span> sure, so have the script tail multiple logfiles<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:32:30)</span> <b>matyas:</b></span> i'm probably going to write a script like this for condor<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:42:12)</span> <b>blin:</b></span> we were talking to greg about making that first class in condor<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:42:24)</span> <b>matyas:</b></span> yeah but that will take a while<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:47:34)</span> <b>andrew.melo:</b></span> condor_master --no-daemonize ?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:48:59)</span> <b>blin:</b></span> the master already has an option to dump its logs to stdout when you start it, iirc<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:49:05)</span> <b>blin:</b></span> the problem is all the other daemon logs<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:50:22)</span> <b>matyas:</b></span> yeah that's what <tt>-t</tt> does<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:50:55)</span> <b>matyas:</b></span> you can pass that to any condor daemon, but since it's the master that starts up the other daemons, it doesn't propagate<br/>
+</body>
+</html>

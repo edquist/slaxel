@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Oct 28, 2019 : #software (osg)</title>
+</head>
+<body>
+<h3>Mon Oct 28, 2019 : #software (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(09:33:30)</span> <b>matyas:</b></span> anybody here know if docker containers get squashed before being uploaded to dockerhub?<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:34:04)</span> <b>matyas:</b></span> if not then pretty much everybody has been building them all wrong :slightly_smiling_face:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:34:56)</span> <b>bbockelm:</b></span> I always assumed they were - starting with the point of inheritance <br/>
+<span style="color: #c386df"><span style="font-size: small">(09:38:18)</span> <b>matyas:</b></span> "docker push" does not seem to have an option for that<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:39:10)</span> <b>matyas:</b></span> so the thing I found out while playing around with condor containers the other day was that because of layering, a <tt>RUN yum clean all</tt> command at the end does nothing<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:39:30)</span> <b>matyas:</b></span> (a separate call that is)<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:40:18)</span> <b>matyas:</b></span> because the contents of the cache have already been added to the previous layer, so the "yum clean" only marks the cache file as being deleted, and does not actually delete the files<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:40:32)</span> <b>dweitzel:</b></span> isn't yum clean all run after the yum commands.  So <tt>yum install ... &amp;&amp; yum clean all</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(09:40:42)</span> <b>matyas:</b></span> yeah if you do it that way, you're fine<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:41:00)</span> <b>matyas:</b></span> but I've seen a lot of containers that don't<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:41:17)</span> <b>matyas:</b></span> also if you have multiple RUN yum ... lines, then you have to clean at the end of each one<br/>
+<span style="color: #de5f24"><span style="font-size: small">(09:44:17)</span> <b>tiradani:</b></span> have you looked at Docker’s “best practices” guide?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(09:44:26)</span> <b>tiradani:</b></span> <a href="https://docs.docker.com/develop/develop-images/dockerfile_best-practices/">https://docs.docker.com/develop/develop-images/dockerfile_best-practices/</a><br/>
+<span style="color: #de5f24"><span style="font-size: small">(09:45:24)</span> <b>tiradani:</b></span> the thing that is easy to forget is that most of the instructions will create a new layer<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:45:25)</span> <b>rynge:</b></span> The containers do not get squashed, but you can do it manually if you want<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:45:50)</span> <b>matyas:</b></span> @tiradani exactly<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:46:07)</span> <b>rynge:</b></span> There is an experimental flag for it in Docker. But I have found it is easier to just export/import the image<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:46:28)</span> <b>matyas:</b></span> I got the yum clean all thing from <a href="https://developers.redhat.com/blog/2016/03/09/more-about-docker-images-size">https://developers.redhat.com/blog/2016/03/09/more-about-docker-images-size</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:47:03)</span> <b>rynge:</b></span> <pre><br/>docker export $CONT_ID | docker import - opensciencegrid/osgvo-xenon:$TAG<br/></pre><br/>
+<span style="color: #de5f24"><span style="font-size: small">(09:47:42)</span> <b>tiradani:</b></span> if you have to build software inside the container, user multistage builds so that the build layers are discarded and you only get the final image.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(09:47:46)</span> <b>tiradani:</b></span> <a href="https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#use-multi-stage-builds">https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#use-multi-stage-builds</a><br/>
+<span style="color: #de5f24"><span style="font-size: small">(09:48:24)</span> <b>tiradani:</b></span> one could also use that method to make the docker file more readable<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:48:33)</span> <b>matyas:</b></span> yeah those are neat<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:51:04)</span> <b>matyas:</b></span> for osg stuff we generally just yum install stuff so that doesn't help, but I could see that being useful for flightworthy<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:52:20)</span> <b>matyas:</b></span> first stage will be to build condor right out of master, and then make a second stage to install the results and then we can upload stuff for people to test<br/>
+</body>
+</html>

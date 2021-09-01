@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Sep 2, 2020 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Wed Sep 2, 2020 : #xcache (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(12:40:50)</span> <b>matyas:</b></span> _Finally_ managed to catch our cache being overloaded and run lsof.<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:41:29)</span> <b>matyas:</b></span> There were almost 1 million open TCP connections<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:41:46)</span> <b>matyas:</b></span> 5220 of them were IPv4, and 988349 were IPv6<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:44:36)</span> <b>matyas:</b></span> 825961 of the IPv6 connections were to fnal<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:14:44)</span> <b>matyas:</b></span> So... is there a way to limit the number of open connections in xrootd? I know Andy said that most of those are idle, but they still take up memory.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:16:48)</span> <b>blin:</b></span> didn't @efajardo having a discussion with Andy about this?<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:17:17)</span> <b>efajardo:</b></span> yea basically there is no way around it<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:17:25)</span> <b>efajardo:</b></span> but<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:17:47)</span> <b>efajardo:</b></span> @matyas can you see if the connections are FROM fnal or TO fnal<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:19:59)</span> <b>matyas:</b></span> <pre>xrootd    13095        xrootd 1683u     IPv6           43747201       0t0        TCP <a href="http://sc-cache.chtc.wisc.edu:irdmi-&gt;fnpc7676.fnal.gov:35222">sc-cache.chtc.wisc.edu:irdmi-&gt;fnpc7676.fnal.gov:35222</a> (ESTABLISHED)</pre><br/>to it looks like?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:21:56)</span> <b>bbockelm:</b></span> Can you attach the LSOF output?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:22:10)</span> <b>matyas:</b></span> <a href="http://pages.cs.wisc.edu/~matyas/sc-cache-lsof-2020-09-02.log.gz">http://pages.cs.wisc.edu/~matyas/sc-cache-lsof-2020-09-02.log.gz</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:22:11)</span> <b>bbockelm:</b></span> Curious if they are established or close_wait.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:23:51)</span> <b>bbockelm:</b></span> You're reading that incorrectly.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:24:10)</span> <b>bbockelm:</b></span> You have invoked <tt>lsof</tt> such that it shows the FDs per thread.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:24:38)</span> <b>bbockelm:</b></span> So, if there are 1,000 file descriptors open for 1,000 xrootd threads, then you end up with 1,000,000 lines of output but still only 1,000 connections.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:25:27)</span> <b>bbockelm:</b></span> For example, one connection appears 1,708 times<br/>
+</body>
+</html>

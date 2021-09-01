@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue May 1, 2018 : #general (osg)</title>
+</head>
+<body>
+<h3>Tue May 1, 2018 : #general (osg)</h3>
+<span style="color: #a2a5dc"><span style="font-size: small">(09:27:08)</span> <b>james.clark:</b></span> hello <b>@channel</b>, i'm finalising some changes to a workflow to use singularity on the OSG but my test job is mysteriously idling indefinitely.   My requirements line has worked previously (<tt>requirements = (HAS_SINGULARITY == TRUE) &amp;&amp; (IS_GLIDEN=?=True) </tt> ) and doesn't seem to cause any problems with a more trivial geolocation script.    Any advice on diagnosing this?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:27:48)</span> <b>rynge:</b></span> Hi James. Where are you submitting from?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:27:59)</span> <b>rynge:</b></span> condor_q -bet [jobid]<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(09:28:02)</span> <b>james.clark:</b></span> This is from <a href="http://ldas-osg.ligo.caltech.edu">ldas-osg.ligo.caltech.edu</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:28:02)</span> <b>rynge:</b></span> That is a good start<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:28:14)</span> <b>rynge:</b></span> -bet is better-analyze<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:28:25)</span> <b>rynge:</b></span> it will tell you why it is not matching<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(09:29:17)</span> <b>james.clark:</b></span> yeah, sorry, should've mentioned that.  Output follows but it was just pointed out that condor_q is only going to give me information about the local schedd, is there a way to correct that?<br/><pre><br/><br/><br/>-- Schedd: <a href="http://ldas-osg.ligo.caltech.edu">ldas-osg.ligo.caltech.edu</a> : &lt;131.215.113.204:9615?...<br/>The Requirements expression for job 3967496.000 is<br/><br/>    ( ( HAS_SINGULARITY == true ) &amp;&amp; ( IS_GLIDEN is true ) ) &amp;&amp; ( TARGET.Arch == "X86_64" ) &amp;&amp; ( TARGET.OpSys == "LINUX" ) &amp;&amp;<br/>    ( TARGET.Disk &gt;= RequestDisk ) &amp;&amp; ( TARGET.Memory &gt;= RequestMemory ) &amp;&amp; ( TARGET.HasFileTransfer )<br/><br/>Job 3967496.000 defines the following attributes:<br/><br/>    RequestDisk = 1<br/>    RequestMemory = 1024<br/><br/>The Requirements expression for job 3967496.000 reduces to these conditions:<br/><br/>         Slots<br/>Step    Matched  Condition<br/>-----  --------  ---------<br/>[0]           0  HAS_SINGULARITY == true<br/>[1]           0  IS_GLIDEN is true<br/><br/>No successful match recorded.<br/>Last failed match: Tue May  1 07:28:15 2018<br/><br/>Reason for last match failure: no match found <br/><br/>3967496.000:  Run analysis summary ignoring user priority.  Of 357 machines,<br/>    321 are rejected by your job's requirements <br/>      0 reject your job because of their own requirements <br/>     36 are exhausted partitionable slots <br/>      0 match and are already running your jobs <br/>      0 match but are serving other users <br/>      0 are available to run your job<br/><br/>WARNING:  Be advised:<br/>   No machines matched the jobs's constraints<br/></pre><br/>
+<span style="color: #e06b56"><span style="font-size: small">(09:29:53)</span> <b>jthiltges:</b></span> Is that a typo? <tt>IS_GLIDEN</tt> vs <tt>IS_GLIDEIN</tt><br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:30:20)</span> <b>rynge:</b></span> Yes<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(09:30:26)</span> <b>james.clark:</b></span> oh my<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:30:32)</span> <b>rynge:</b></span> That would probably expain it<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:30:39)</span> <b>rynge:</b></span> You could also try:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:30:57)</span> <b>rynge:</b></span> condor_q -pool <a href="http://osg-ligo-1.t2.ucsd.edu">osg-ligo-1.t2.ucsd.edu</a> -bet 3967496<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:31:36)</span> <b>rynge:</b></span> I'm not a 100% sure how your pool is setup, but what I found on github, I think that last command is the correct analyze one<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(09:31:45)</span> <b>james.clark:</b></span> yes, it's running now.  that's embarrassing but thank you!<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:32:17)</span> <b>rynge:</b></span> You have no idea how many times I have made typos like that :slightly_smiling_face:<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(09:43:21)</span> <b>james.clark:</b></span> Ok, now for the more interesting questions:  our (LIGO) containers live in <tt>/cvmfs/ligo-containers.opensciencegrid.org</tt>.  Is there a mechanism to ensure we land at sites with that?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:45:00)</span> <b>rynge:</b></span> I can add a test for that<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:45:40)</span> <b>rynge:</b></span> I think you end up copies of OSG VO's glidein scripts<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:45:45)</span> <b>rynge:</b></span> Hang on<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(09:45:54)</span> <b>james.clark:</b></span> great, thanks<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:55:20)</span> <b>rynge:</b></span> I have committed the change, but it will take a while for this to show up in your glidiens<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:55:24)</span> <b>rynge:</b></span> Then you should be able to use:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:55:26)</span> <b>rynge:</b></span> HAS_CVMFS_ligo_containers_opensciencegrid_org == True<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:55:39)</span> <b>rynge:</b></span> Note the change of . and - to _<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(09:58:00)</span> <b>james.clark:</b></span> Great, i'll confirm in a few<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:59:54)</span> <b>efajardo:</b></span> Hi James<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:00:03)</span> <b>efajardo:</b></span> We already have a test with that<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:00:06)</span> <b>efajardo:</b></span> you will only land<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:00:08)</span> <b>efajardo:</b></span> at sites<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:00:11)</span> <b>efajardo:</b></span> that have it<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:00:12)</span> <b>efajardo:</b></span> basically<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:00:40)</span> <b>efajardo:</b></span> <tt>(HAS_SINGULARITY == TRUE)</tt> that means we tested that cvmfs is available<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(10:01:20)</span> <b>james.clark:</b></span> hmm, I'll see if i can repeat the error but i've been seeing:<br/><pre><br/>ERROR  : Image path /cvmfs/ligo-containers.opensciencegrid.org/james-clark/bayeswave:o2_online doesn't exist<br/>ABORT  : Retval = 255<br/></pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:26:43)</span> <b>efajardo:</b></span> hmm interesting<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:26:54)</span> <b>efajardo:</b></span> which sites? I will have to do some testing then<br/>
+<blockquote>
+<span style="color: #a2a5dc"><span style="font-size: small">(15:06:18)</span> <b>james.clark:</b></span> Hi @efajardo, just had a chance to check that failure and it's happening at CCIN2P3 (at least)<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:29:51)</span> <b>efajardo:</b></span> @james.clark dammit. Allright<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:30:01)</span> <b>efajardo:</b></span> let me talk to the admins<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:30:33)</span> <b>efajardo:</b></span> We could do the singularity test with a default singularity image on <tt>/cvfms/ligo</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(15:30:36)</span> <b>efajardo:</b></span> but<br/>
+</blockquote>
+<span style="color: #a2a5dc"><span style="font-size: small">(12:46:00)</span> <b>james.clark:</b></span> Apologies, we have a visitor today and i got dragged away.  I'll need to rerun a bit more carefully to confirm the site etc but there was no DESIRED_Sites in the sub file<br/>
+</body>
+</html>

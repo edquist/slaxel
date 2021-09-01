@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jul 14, 2020 : #xenon (osg)</title>
+</head>
+<body>
+<h3>Tue Jul 14, 2020 : #xenon (osg)</h3>
+<span style="color: #d55aef"><span style="font-size: small">(02:06:15)</span> <b>diego.ramirez:</b></span> This sounds good (name included), thanks :slightly_smiling_face:<br/>
+<span style="color: #d55aef"><span style="font-size: small">(02:07:22)</span> <b>diego.ramirez:</b></span> Did @paschos give you the details on the type of installation that goes in there (i.e., the added G4 features)?<br/>
+<span style="color: #99a949"><span style="font-size: small">(09:45:37)</span> <b>ershockley:</b></span> <b>@channel</b> Should we move this discussion over to the new XENON slack you think? Or keep it here? I’m having a hard time keeping track of everything (maybe cause i’m a slack rookie)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(09:49:03)</span> <b>rynge:</b></span> We can move it, I'm already over there<br/>
+<span style="color: #99a949"><span style="font-size: small">(09:59:51)</span> <b>ershockley:</b></span> Looks like Pascal is not part of that one yet. Just sent invite so once it goes through i guess makes the most sense<br/>
+<span style="color: #99a949"><span style="font-size: small">(10:00:24)</span> <b>ershockley:</b></span> And @rynge thanks a lot for the help. Is it clear what the requirements are for the new container?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:36:15)</span> <b>rynge:</b></span> I have a base requirement. The plan is to set up an image with that and iterate<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:36:28)</span> <b>rynge:</b></span> Should have something with geant4 today<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:37:01)</span> <b>rynge:</b></span> Re geant4, do you need the multi threading?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:37:51)</span> <b>rynge:</b></span> I got Pascal's build flags. @diego.ramirez can I have yours?<br/>
+<span style="color: #d55aef"><span style="font-size: small">(11:13:53)</span> <b>diego.ramirez:</b></span> GEANT4_BUILD_MULTITHREADED<br/>GEANT4_USE_GDML<br/>GEANT4_USE_QT<br/>GEANT4_USE_OPENGL_X11<br/>GEANT4_USE_RAYTRACER_X11<br/>GEANT4_USE_XM<br/>GEANT4_USE_HDF5<br/><br/>These are the build flags I initially discussed with Pascal.<br/>
+<span style="color: #d55aef"><span style="font-size: small">(11:14:15)</span> <b>diego.ramirez:</b></span> From there, he mentioned OPENGL_X11 and RAYTRACER_X11 wouldn't run in the OSG node.<br/>
+<span style="color: #d55aef"><span style="font-size: small">(11:14:41)</span> <b>diego.ramirez:</b></span> So I'd say he considered all but these.<br/>
+<span style="color: #d55aef"><span style="font-size: small">(11:15:27)</span> <b>diego.ramirez:</b></span> @ershockley Did he mention another incompatibility?<br/>
+<span style="color: #d55aef"><span style="font-size: small">(11:15:40)</span> <b>diego.ramirez:</b></span> (Thanks @rynge for the help!)<br/>
+<span style="color: #d55aef"><span style="font-size: small">(11:17:17)</span> <b>diego.ramirez:</b></span> Maybe also QT was not possible? In general, we agreed that it would be good to have an installation with all these flags accessible from cvmfs (low priority), but mostly an installation with whatever is possible from that list on top of our working environment, to be used in OSG (*high priority*).<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:52:22)</span> <b>rynge:</b></span> @diego.ramirez Also, do you have a preferred way of installing prereqs?<br/>
+<span style="color: #d55aef"><span style="font-size: small">(11:55:50)</span> <b>diego.ramirez:</b></span> Not sure I get the comment here (I do miss the expertise :slightly_smiling_face: ) Do you mean <tt>cmake -DGEANT4_INSTALL_DATA=ON -DGEANT4_BUILD_MULTITHREADED=ON...</tt> ?<br/>
+<span style="color: #d55aef"><span style="font-size: small">(11:57:36)</span> <b>diego.ramirez:</b></span> Or you're here referring to the prereqs for the build flags?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:57:53)</span> <b>rynge:</b></span> I meant things like hdf5 - do you use the system one or build a custom one?<br/>
+<span style="color: #d55aef"><span style="font-size: small">(11:58:21)</span> <b>diego.ramirez:</b></span> Ah, in that case I have no preference. I leave to you to decide what's best.<br/>
+<span style="color: #d55aef"><span style="font-size: small">(11:58:32)</span> <b>diego.ramirez:</b></span> @ershockley @l.alth comments here?<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:00:30)</span> <b>ershockley:</b></span> I have not idea, sorry<br/>
+<span style="color: #d1707d"><span style="font-size: small">(12:02:43)</span> <b>l.alth:</b></span> Everything that works and is easy .. never noticed incompatibilities or similar with the prereqs on various systems<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:03:53)</span> <b>rynge:</b></span> <pre>-- Looking for H5_HAVE_THREADSAFE<br/>-- Looking for H5_HAVE_THREADSAFE - not found<br/>CMake Error at cmake/Modules/Geant4OptionalComponents.cmake:368 (message):<br/>  Found an install of HDF5, but it was not built with support for thread<br/>  safety.  Either build Geant4 in single threaded mode, or use/reinstall HDF5<br/>  with thread safety enabled.  See HDF5's install guides, available from<br/>  <a href="https://support.hdfgroup.org/HDF5/release/">https://support.hdfgroup.org/HDF5/release/</a>, for instructions on this.</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:04:04)</span> <b>rynge:</b></span> Got this when trying to build against the conda environment<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:04:20)</span> <b>rynge:</b></span> I'll figure it out<br/>
+<span style="color: #d55aef"><span style="font-size: small">(12:07:45)</span> <b>diego.ramirez:</b></span> OK, thanks. I have time tomorrow to (try to) help, but if the issues persist we can of course consider dropping the multithread flag. In principle it would be good to have it, but as Lutz says: easy and working is most of it.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:15:44)</span> <b>rynge:</b></span> We will follow the same build/publishing as base_environment. Do you have a machine you can <tt>docker build</tt> on?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:20:34)</span> <b>rynge:</b></span> @diego.ramirez One more question: this is for the montecarlo workflows right. Are you ok with a docker and singularity image, or do you really need the /cvmfs install as well?<br/>
+<span style="color: #d55aef"><span style="font-size: small">(14:23:35)</span> <b>diego.ramirez:</b></span> The cvmfs install would work to compile our MC once it's updated. And to maybe run local simulations with the "fancier" flags available.<br/>
+<span style="color: #d55aef"><span style="font-size: small">(14:24:03)</span> <b>diego.ramirez:</b></span> Actually, for the first one, we can also add the environment loading into the deployHQ scripts, right @ershockley? Sorry for my ignorance.<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:39:57)</span> <b>ershockley:</b></span> I would vote for just doing docker/singularity<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:40:11)</span> <b>ershockley:</b></span> And yeah we can do deployHQ<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:23:13)</span> <b>rynge:</b></span> So here is a mockup - I want to hear your feedback before spending more time.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:23:47)</span> <b>rynge:</b></span> Source is at: <a href="https://github.com/XENONnT/montecarlo_environment">https://github.com/XENONnT/montecarlo_environment</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:25:21)</span> <b>rynge:</b></span> When you commit a change there, DeployHQ builds you a new Docker image and Singularity image (<a href="https://hub.docker.com/r/xenonnt/montecarlo">https://hub.docker.com/r/xenonnt/montecarlo</a> and <a href="https://xenon.isi.edu/images/xenonnt-montecarlo%3Adevelopment.simg">https://xenon.isi.edu/images/xenonnt-montecarlo%3Adevelopment.simg</a>)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:25:38)</span> <b>rynge:</b></span> I have not yet synced it to midway, but you can test it directly with:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:25:50)</span> <b>rynge:</b></span> <pre>singularity shell <a href="https://xenon.isi.edu/images/xenonnt-montecarlo%3Adevelopment.simg">https://xenon.isi.edu/images/xenonnt-montecarlo%3Adevelopment.simg</a></pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:26:07)</span> <b>rynge:</b></span> The install is under <tt>/opt/geant4</tt><br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:26:28)</span> <b>rynge:</b></span> So, please give it a test and let me know what you find<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:27:04)</span> <b>rynge:</b></span> If you run into any issues, please share command/data/... so I can test here as well<br/>
+<span style="color: #99a949"><span style="font-size: small">(18:32:33)</span> <b>ershockley:</b></span> Thanks Mats!! @diego.ramirez and/or @l.alth can you test?<br/>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jul 21, 2021 : #operations (osg)</title>
+</head>
+<body>
+<h3>Wed Jul 21, 2021 : #operations (osg)</h3>
+<span style="color: #73769d"><span style="font-size: small">(07:43:20)</span> <b>tim.theisen:</b></span> @jpeterson @jthiltges @blin @matyas <a href="http://repo.opensciencegrid.org">repo.opensciencegrid.org</a> is inaccessible again. I get a <tt>Gateway Timeout</tt><br/>
+<span style="color: #50a0cf"><span style="font-size: small">(08:48:01)</span> <b>timm:</b></span> yes I am seeing the same<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(08:48:29)</span> <b>timm:</b></span> normally wouldn't be an issue since FNAL mirrors it and caches it with squid too but can't install new workers without the certs.<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(08:48:41)</span> <b>timm:</b></span> osg-ca-manage setupCA --location root --url osg<br/>wget failure - Could not fetch file at '<a href="https://repo.opensciencegrid.org/cadist/ca-certs-version-new">https://repo.opensciencegrid.org/cadist/ca-certs-version-new</a>'.<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:50:29)</span> <b>blin:</b></span> agh, apologies. we're working on a fix on the ITB instance and ran into issues there<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:56:36)</span> <b>blin:</b></span> @dweitzel could you add some sort of intermittent outage for repo to the status page?<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(08:59:58)</span> <b>B01GA370NNT:</b></span> <br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:01:56)</span> <b>dweitzel:</b></span> check_mk caught this last night.  Who should get emails about this?<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:02:34)</span> <b>matyas:</b></span> me, @blin, @tim.theisen<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:04:12)</span> <b>dweitzel:</b></span> I don't think Tim has ever logged into <a href="http://monitoring.opensciencegrid.org">monitoring.opensciencegrid.org</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:06:46)</span> <b>dweitzel:</b></span> @blin @matyas is repo still down?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:07:11)</span> <b>dweitzel:</b></span> Do we need to bring back up our clone at Nebraska?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(11:07:33)</span> <b>jthiltges:</b></span> Sadly yes. Hoping for an ETA of ~20 min to have it running.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:48:45)</span> <b>blin:</b></span> @dweitzel we're up!<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:48:57)</span> <b>blin:</b></span> could you throw it into "monitoring"?<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(11:55:51)</span> <b>B01GA370NNT:</b></span> <br/>
+<span style="color: #A82F2F"><span style="font-size: small">(12:03:30)</span> <b>B01GA370NNT:</b></span> Your incident *Repository service unresponsive* has been open for over *3 hours*. (<a href="http://manage.statuspage.io/pages/ws62tz4wcmxv">http://manage.statuspage.io/pages/ws62tz4wcmxv</a>)<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(15:03:56)</span> <b>B01GA370NNT:</b></span> Your incident *Repository service unresponsive* has been open for over *6 hours*. (<a href="http://manage.statuspage.io/pages/ws62tz4wcmxv">http://manage.statuspage.io/pages/ws62tz4wcmxv</a>)<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(15:06:07)</span> <b>B01GA370NNT:</b></span> <br/>
+<span style="color: #43761b"><span style="font-size: small">(15:23:02)</span> <b>blin:</b></span> @matyas how do you want to handle the backlog of topology feature testing? there's the stuff that Cannon wrote, then your PRs, and a bunch of PRs from Carl<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:23:32)</span> <b>edquist:</b></span> just cram it all in and hope for the best, gratia style<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:25:11)</span> <b>matyas:</b></span> which PRs are you talking about? the open ones?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:25:29)</span> <b>blin:</b></span> yup!<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:26:31)</span> <b>matyas:</b></span> <a href="https://github.com/opensciencegrid/topology/pull/1953">https://github.com/opensciencegrid/topology/pull/1953</a> is independent from the webapp; we can probably stick it in topology-utils<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:27:14)</span> <b>matyas:</b></span> you could also download it and run it locally<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:27:30)</span> <b>matyas:</b></span> <a href="https://github.com/opensciencegrid/topology/pull/1951">https://github.com/opensciencegrid/topology/pull/1951</a> is marked as draft<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:42:30)</span> <b>matyas:</b></span> Cannon's changes... I just bumped topology-itb's image to 1.6.0.1 but even after a restart it's picking up the old image. Maybe flux is unhappy.<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:43:18)</span> <b>blin:</b></span> hrm, really? because i'm seeing the RG generator and it looks to be performing swimmingly<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:43:36)</span> <b>matyas:</b></span> that was also in 1.6.0.0<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:43:47)</span> <b>matyas:</b></span> 1.6.0.1 = 1.6.0.0 based on software-base:release instead of fresh<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:45:13)</span> <b>matyas:</b></span> we could also bump production to 1.6.0.0 since it's working just fine, and if my cert fails again, exec in there and run fetch-crl by hand<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:54:54)</span> <b>blin:</b></span> ah ok, i can poke around to see what's making flux mad<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:57:50)</span> <b>blin:</b></span> lol, oops<br/><pre>ts=2021-07-21T20:50:44.155614619Z caller=repocachemanager.go:226 component=warmer canonical_name=<a href="http://index.docker.io/opensciencegrid/topology">index.docker.io/opensciencegrid/topology</a> auth={map[]} err="toomanyrequests: You have reached your pull rate limit. You may increase the limit by authenticating and upgrading: <a href="https://www.docker.com/increase-rate-limit">https://www.docker.com/increase-rate-limit</a>" ref=opensciencegrid/topology:latest</pre><br/>
+<span style="color: #e06b56"><span style="font-size: small">(16:10:15)</span> <b>jthiltges:</b></span> At Nebraska, we're running a registry mirror that seems to take care of the issue on k8s (along with the same problem for singularity users on clusters). Would that be an option?<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:34:46)</span> <b>matyas:</b></span> <b>@here</b> repo's broken again :disappointed:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(20:35:56)</span> <b>dweitzel:</b></span> Setting status<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(20:37:45)</span> <b>B01GA370NNT:</b></span> <br/>
+<span style="color: #c386df"><span style="font-size: small">(20:38:03)</span> <b>matyas:</b></span> thanks<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(23:43:33)</span> <b>B01GA370NNT:</b></span> Your incident *Software Repository Down* has been open for over *3 hours*. (<a href="http://manage.statuspage.io/pages/ws62tz4wcmxv">http://manage.statuspage.io/pages/ws62tz4wcmxv</a>)<br/>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Dec 10, 2020 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Thu Dec 10, 2020 : #gracc (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(10:05:03)</span> <b>bbockelm:</b></span> @dweitzel - @blin carl and I have a question about long-running "pilots" for the pilot probe.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:05:37)</span> <b>bbockelm:</b></span> Currently the records are created when the pilot shuts down.  I think this is potentially problematic at cases like River or Purdue where the containers are in k8s and might last for months.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:06:02)</span> <b>bbockelm:</b></span> My suggestion was, every 24 hours, emit a record and pretend as if the pilot restarted.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:06:21)</span> <b>bbockelm:</b></span> Do you see any potential problems with that?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:20:19)</span> <b>dweitzel:</b></span> Huh, I think that should be fine.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:20:30)</span> <b>dweitzel:</b></span> I presume they will have different "EndTime"s ?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:53:42)</span> <b>blin:</b></span> i think so. <b>@edquist</b>?<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:54:21)</span> <b>edquist:</b></span> i think that's the (DrBrian's) idea<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:55:17)</span> <b>edquist:</b></span> somehow on an interval (eg daily) each job would be treated as restarted somehow<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:55:29)</span> <b>edquist:</b></span> and would get a new end/start time<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:55:48)</span> <b>edquist:</b></span> it's not quite what we originally envisioned since the job names were previously unique<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:56:04)</span> <b>edquist:</b></span> so maybe we could bake the date into the unique job id<br/>
+<span style="color: #16569E"><span style="font-size: small">(10:56:41)</span> <b>edquist:</b></span> but yeah, a new EndTime for each job interval<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:57:49)</span> <b>dweitzel:</b></span> I think that will be fine on the GRACC side.  I mean, lets test, but I feel confident that will work.<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:22:01)</span> <b>edquist:</b></span> ok sounds good then<br/>
+</body>
+</html>

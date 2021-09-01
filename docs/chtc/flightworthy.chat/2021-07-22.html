@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jul 22, 2021 : #flightworthy (chtc)</title>
+</head>
+<body>
+<h3>Thu Jul 22, 2021 : #flightworthy (chtc)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(09:58:33)</span> <b>tlmiller:</b></span> Who can (help me) test a patch for HTCONDOR-589?  This is the "SCITOKENS should check for a mapping before succeeding" work.  I think it's OK, but I'm decidedly new to using SciTokens.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(10:09:30)</span> <b>tim:</b></span> @tlmiller Jason and Zach would have the details. Perhaps you can catch Jason this afternoon.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:10:47)</span> <b>tlmiller:</b></span> Thanks.  I'll give that a try.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(10:23:57)</span> <b>blin:</b></span> anyone should be able to test this by<br/>1. building and starting the CE container: <a href="https://github.com/htcondor/htcondor-ce/blob/V5-branch/tests/containers/README.dev.md#compute-entrypoint">https://github.com/htcondor/htcondor-ce/blob/V5-branch/tests/containers/README.dev.md#compute-entrypoint</a><br/>2. installing Todd's patched version of condor<br/>3. removing the <a href="http://demo.scitokens.org">demo.scitokens.org</a> scitokens mapping out of <tt>/etc/condor-ce/mapfiles.d</tt>  followed by a reconfig<br/>4. trying to run <tt>condor_ce_trace</tt> to see that it tries SCITOKENS auth fails, then tries GSI, which should succeed<br/><pre>_condor_SEC_CLIENT_AUTHENTICATION_METHODS=SCITOKENS,GSI _condor_SCITOKENS_FILE=/tmp/bt_u$(id -u testuser) condor_ce_trace -d <tt>hostname</pre></tt><br/>
+<blockquote>
+<span style="color: #9e3997"><span style="font-size: small">(12:40:58)</span> <b>tlmiller:</b></span> That always tries FS first and always succeeds...?<br/>
+<span style="color: #4cc091"><span style="font-size: small">(12:47:40)</span> <b>blin:</b></span> ah good call. we really should move FS to the back of the authn methods<br/>
+<span style="color: #4cc091"><span style="font-size: small">(12:48:03)</span> <b>blin:</b></span> if you prepend <tt>_condor_SEC_CLIENT_AUTHENTICATION_METHODS=SCITOKENS,GSI</tt> to the condor_ce_trace command, that should get it to to do the thing that we want<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:00:45)</span> <b>tlmiller:</b></span> I hacked up the auth methods lists a lot and it seemed ok.  Let me try that, instead.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:04:06)</span> <b>tlmiller:</b></span> Yeah, that did it.  Looks like it's falling back in this container as desired.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(13:06:44)</span> <b>blin:</b></span> wooo :tada: !!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:35:22)</span> <b>tlmiller:</b></span> ... should run this through the BaTLab, I guess.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:39:58)</span> <b>jcpatton:</b></span> Everything good with testing for HTCONDOR-589? I’m less familiar with scitokens as authn method, I’m more familiar with the credmon’s fetching/generation of scitokens<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:02:21)</span> <b>tlmiller:</b></span> I think so.  I'd still want BrianL (or someone) to do acceptance testing at some point, but I'm confident enough to move the patch forward.<br/>
+</blockquote>
+<span style="color: #9e3997"><span style="font-size: small">(12:16:38)</span> <b>tlmiller:</b></span> I need a reviewer for HTCONDOR-599, the <tt>ExitCode</tt>-after-<tt>OnExitHold</tt> bug.  One-line path.  Any takers?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(12:55:29)</span> <b>jfrey:</b></span> I can take it.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:00:30)</span> <b>tlmiller:</b></span> Thanks.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:47:16)</span> <b>jcpatton:</b></span> Am I the only one still confused by Miron’s idea to scale walltime by MIPS?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:47:52)</span> <b>jcpatton:</b></span> Don’t you have to assume that all jobs are the same?<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:47:55)</span> <b>matyas:</b></span> I would not write a paper using it<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:48:18)</span> <b>tlmiller:</b></span> I think he's just curious to what extent, if any, the percentiles change it you try to pretend that all _machines_ are the same.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:55:26)</span> <b>jcpatton:</b></span> So I guess the conversion he wants is <tt>(CommittedTime / MachineAttr0_MIPS) * 20,000 MIPS</tt> (I forget the exact name of the last machine MIPS attr)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:56:49)</span> <b>tlmiller:</b></span> Right.  Approximate the total number of instructions, multiply by the "canonical" machine speed.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(15:08:43)</span> <b>tim:</b></span> In 9.1.0+, there is a job add CPUInstructions that tells how many instructions were executed. Too bad it is not documented in the manual. <a href="https://opensciencegrid.atlassian.net/browse/HTCONDOR-390">https://opensciencegrid.atlassian.net/browse/HTCONDOR-390</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:09:19)</span> <b>tlmiller:</b></span> If it's not documented, doesn't that mean that ticket's in the wrong state?<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(15:11:00)</span> <b>tim:</b></span> It got marked done when a version history entry was made. Now, we need to make a follow-on ticket to get it into the documentation.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(15:11:19)</span> <b>tim:</b></span> Yes, the workflow was not executed properly.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:11:30)</span> <b>tlmiller:</b></span> Right-o.<br/>
+</body>
+</html>

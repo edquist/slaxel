@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jan 18, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Fri Jan 18, 2019 : #xcache (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(10:17:53)</span> <b>matyas:</b></span> why do we need a proxy renewal script for the cache?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:28:03)</span> <b>blin:</b></span> @efajardo @bbockelm ^^<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:28:19)</span> <b>blin:</b></span> particularly we don't quite understand why a proxy is necessary at all<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:34:21)</span> <b>bbockelm:</b></span> It's for authenticated origins -&gt; the cache has to auth with the origin.<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(11:20:04)</span> <b>blin:</b></span> do we have to worry about this for the ATLAS/CMS cases?<br/>
+</blockquote>
+<span style="color: #c386df"><span style="font-size: small">(10:44:40)</span> <b>matyas:</b></span> can't the cache use its host cert by itself?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:46:24)</span> <b>matyas:</b></span> it's not like gums-client needed to make a proxy to auth to gums-server (or did it?)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:57:19)</span> <b>bbockelm:</b></span> yeah - Xrootd GSI auth doesn't work with EEC.  It _requires_ it to be a proxy<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:58:20)</span> <b>bbockelm:</b></span> the difference is that gums-client talked to gums-server via HTTPS, which is a standardized protocol...<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:58:26)</span> <b>matyas:</b></span> 1. what's an EEC<br/>2. can we put fixing that on the xrootd devs' todo list?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:59:23)</span> <b>bbockelm:</b></span> 1.  EEC -&gt; end-entity-credential.  Non-CA certificate issued by a CA (i.e., user, host, robot, whatever).  Compare against a proxy certificate.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:59:44)</span> <b>bbockelm:</b></span> 2.  Actually, probably a good time to bug them about this as we've been able to get other long-standing GSI complaints fixed lately.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:12:49)</span> <b>matyas:</b></span> separate question: can you show me how to set up the load throttling plugin for the cache?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:13:01)</span> <b>matyas:</b></span> it's hard to do anything on a machine where the load avg is in the triple digits<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:08:33)</span> <b>matyas:</b></span> ffs i've been waiting over 2.5 hours for a simple yum install on sc-cache<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:21:05)</span> <b>lincoln:</b></span> <tt>rpm2cpio foo.rpm | cpio -imd</tt> DO IT LIVE! extracting RPMs directly onto the filesystem is for winners!!<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:35:55)</span> <b>matyas:</b></span> I don't know how to get it onto the machine<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:36:05)</span> <b>matyas:</b></span> the download would probably take forever<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:49:56)</span> <b>lincoln:</b></span> its ok definitely dont do the thing i suggested :slightly_smiling_face:<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:51:19)</span> <b>matyas:</b></span> tbh I'm just trying to install iostat so it would probably be safe<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:52:06)</span> <b>matyas:</b></span> but yeah I need to throttle this<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:57:11)</span> <b>matyas:</b></span> should I use nice or ionice?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:27:49)</span> <b>matyas:</b></span> xrootd on our cache has like a hundred threads in D state. at this point, aren't they just fighting with each other for the disk and trickling the data to the clients?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:35:17)</span> <b>dweitzel:</b></span> Most clients will notice the slow data, and go elsewhere<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:35:23)</span> <b>dweitzel:</b></span> And overload that cache. <br/>
+<span style="color: #c386df"><span style="font-size: small">(16:36:10)</span> <b>matyas:</b></span> so it sounds like there are some config changes I need to make to keep that from happening<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:40:02)</span> <b>matyas:</b></span> hmm. the xrootd manual for xrd.sched says "Constraining the number of threads may yield random failures that are hard to explain."<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:21:10)</span> <b>matyas:</b></span> So Kibana only shows bytes transferred, not files transferred.  How do I know all that transfer isn't being wasted?<br/>That is, how do I know that the jobs weren't just connecting, reading a few KB, then going elsewhere because the transfer was too slow?<br/>
+</body>
+</html>

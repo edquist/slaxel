@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Oct 9, 2015 : #general (osg)</title>
+</head>
+<body>
+<h3>Fri Oct 9, 2015 : #general (osg)</h3>
+<span style="color: #e96699"><span style="font-size: small">(14:51:48)</span> <b>lincoln:</b></span> anyone ever see stuff like this<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:51:50)</span> <b>lincoln:</b></span> slot1_9@uc3-c006.u LINUX      X86_64 Preemptin Killing  -1.000 1007 43+11:59:06<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:51:58)</span> <b>lincoln:</b></span> sometimes partitionable slots get stuck in this state<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:52:08)</span> <b>lincoln:</b></span> load of -1 and 'preempting/killing' forever.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:57:42)</span> <b>dweitzel:</b></span> I presume that slot is in the retirement stage?  Or cgroups is having problems.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:57:50)</span> <b>dweitzel:</b></span> anything interesting on the node’s starter log?<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:57:56)</span> <b>lincoln:</b></span> lets take a looksie<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:02:11)</span> <b>lincoln:</b></span> ah, looks like its cgroup related<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:02:17)</span> <b>lincoln:</b></span> 08/27/15 00:56:02 (pid:32069) Cgroup controller for I/O statistics is not available.<br/>08/27/15 00:56:02 (pid:32069) Cgroup controller for process management is not available.<br/>08/27/15 00:56:02 (pid:32069) Cgroup controller for CPU accounting is not available.<br/>08/27/15 00:56:02 (pid:32069) Cgroup controller for memory accounting is not available.<br/>08/27/15 00:56:02 (pid:32069) Cgroup controller for CPU is not available.<br/>08/27/15 00:56:02 (pid:32069) Unable to set memory limit because cgroup is invalid.<br/>08/27/15 00:56:02 (pid:32069) Unable to set memsw limit because cgroup is invalid.<br/>08/27/15 00:56:02 (pid:32069) Unable to set CPU shares because cgroup is invalid.<br/>08/27/15 00:56:02 (pid:32069) Error while locating memcg controller for starter: 50014 Cgroup not initialized<br/>08/27/15 02:23:22 (pid:32069) condor_write(): Socket closed when trying to write 515 bytes to &lt;192.170.227.199:49585&gt;, fd is 7<br/>08/27/15 02:23:22 (pid:32069) Buf::write(): condor_write() failed<br/>08/27/15 02:23:22 (pid:32069) Lost connection to shadow, waiting 1200 secs for reconnect<br/>08/27/15 02:51:55 (pid:32069) **** condor_starter (condor_STARTER) pid 32069 EXITING WITH STATUS 2<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:02:28)</span> <b>lincoln:</b></span> looks like it picked up a weird kernel at some point. thanks<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:02:53)</span> <b>lincoln:</b></span> well, something like that anyway<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:02:57)</span> <b>lincoln:</b></span> other jobs are running fine<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:03:00)</span> <b>lincoln:</b></span> but that slot got stuck<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:12:15)</span> <b>dweitzel:</b></span> weird.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:13:59)</span> <b>dweitzel:</b></span> ya, I’m not sure what would cause that.  Is the starter still hanging around?  Is the stard not reclaiming the slot?<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:14:36)</span> <b>lincoln:</b></span> i rebooted it, but i will check next time it happens<br/>
+</body>
+</html>

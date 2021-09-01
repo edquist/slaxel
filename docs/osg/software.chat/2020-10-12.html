@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Oct 12, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Mon Oct 12, 2020 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(10:35:10)</span> <b>blin:</b></span> great, thanks @dwd! that should be easy enough to do<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:35:42)</span> <b>blin:</b></span> i should be able to follow up in the jira ticket directly<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:27:35)</span> <b>blin:</b></span> <b>@edquist</b> @matyas could you remind me where we are on being able to add <tt>CILogonId</tt>  attributes to site contacts in Topology?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:28:03)</span> <b>matyas:</b></span> we already can<br/>
+<span style="color: #16569E"><span style="font-size: small">(13:28:24)</span> <b>edquist:</b></span> i thought it was an attribute of the contact from the contacts repo?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:28:34)</span> <b>matyas:</b></span> right<br/>
+<span style="color: #16569E"><span style="font-size: small">(13:29:32)</span> <b>edquist:</b></span> so i assume in topology you reference the contact id from contacts, and the cilogonid comes from the contact info in the contact repo<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:34:22)</span> <b>matyas:</b></span> exactly<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:34:28)</span> <b>blin:</b></span> oh that's not quite what i was interested in<br/>
+<span style="color: #16569E"><span style="font-size: small">(13:34:58)</span> <b>edquist:</b></span> in topology, the contact object has a c.cilogon_id attribute<br/>
+<span style="color: #16569E"><span style="font-size: small">(13:35:07)</span> <b>edquist:</b></span> but it comes from the contacts repo<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:35:09)</span> <b>blin:</b></span> i've got a CILogonID and want to be able to find all of the associated resources<br/>
+<span style="color: #16569E"><span style="font-size: small">(13:35:41)</span> <b>edquist:</b></span> ohh, right.  is there a ticket for this?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:36:23)</span> <b>blin:</b></span> i'd have to do a contact DB lookup -&gt; topology comparison with the way it's set up<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:36:36)</span> <b>blin:</b></span> and when i say "i'd have to", it'd be the central collector<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:36:44)</span> <b>matyas:</b></span> It's exposed in the XML<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:36:54)</span> <b>matyas:</b></span> the CILogonID &lt;-&gt; person mapping is public<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:37:09)</span> <b>blin:</b></span> oh that's good!<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:37:24)</span> <b>blin:</b></span> we'll have to move that data into topology eventually but this'll do for now<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:37:41)</span> <b>matyas:</b></span> what do you mean?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:38:16)</span> <b>blin:</b></span> we won't have the contact DB in the future and we need to retain this contact &lt;-&gt; CILogon mappiing for topology<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:39:25)</span> <b>matyas:</b></span> Guessing you mean that CILogon is going to play the role of the contact DB?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:39:32)</span> <b>blin:</b></span> yup<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:40:10)</span> <b>matyas:</b></span> AFAIK there's nothing in topology that requires the user ID to be a 40-character hash<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:40:43)</span> <b>matyas:</b></span> you can add a person in the contact DB keyed by CILogon ID and use that CILogon ID for the ID in topology and it would work<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:42:03)</span> <b>blin:</b></span> do you know if anyone uses our contact IDs other than us?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:42:43)</span> <b>matyas:</b></span> You mean one of our downstreams? No clue.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:43:47)</span> <b>blin:</b></span> we'll probably have to carry the two different attrs then =/<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:44:46)</span> <b>matyas:</b></span> probably<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:45:50)</span> <b>matyas:</b></span> anyway, if you look in <a href="https://topology.opensciencegrid.org/miscuser/xml">https://topology.opensciencegrid.org/miscuser/xml</a> , every user has a CILogonID attribute<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:47:29)</span> <b>blin:</b></span> great!<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:59:20)</span> <b>edquist:</b></span> &gt;AFAIK there's nothing in topology that requires the user ID to be a 40-character hash<br/><br/>the various resource tests do actually require that though<br/><br/><a href="https://github.com/opensciencegrid/topology/blob/master/src/tests/verify_resources.py#L432">https://github.com/opensciencegrid/topology/blob/master/src/tests/verify_resources.py#L432</a><br/><br/><br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:17:43)</span> <b>bbockelm:</b></span> ^^^ file a bug and let's fix!<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:18:18)</span> <b>edquist:</b></span> it's a feature!<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:18:35)</span> <b>edquist:</b></span> what is the fix?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:18:58)</span> <b>edquist:</b></span> allowing a CILogonID as the contact ID?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:20:55)</span> <b>bbockelm:</b></span> yup.<br/>
+</body>
+</html>

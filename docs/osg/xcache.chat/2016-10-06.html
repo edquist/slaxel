@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Oct 6, 2016 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Thu Oct 6, 2016 : #xcache (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(13:10:05)</span> <b>bbockelm:</b></span> @lincoln - we ( @ivukotic @dweitzel ) are talking about you on the StashCache call.  I would like to get a VM at UChicago so I can move the <tt><a href="http://stash.osgstorage.org">stash.osgstorage.org</a></tt> repo there and query Ceph directly.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:10:50)</span> <b>bbockelm:</b></span> This would immensely reduce the metadata load on the Ceph due to this repo; we could use the extended attribute from Ceph to avoid recursing into unchanged directories.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:11:39)</span> <b>bbockelm:</b></span> I would need a RHEL 7.2 VM, preferably around 4 cores / 8GB RAM (can squeeze it a bit if you are low on resources) and - at least to start - root access and CephFS mounted.<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:12:16)</span> <b>lincoln:</b></span> i always seem to get work assigned when i’m *not* on the call :slightly_smiling_face:<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:12:39)</span> <b>lincoln:</b></span> but yes, i can do that. give me an SSH public key<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:45:48)</span> <b>bbockelm:</b></span> well, that provides some sort of motivation :slightly_smiling_face:<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:46:07)</span> <b>lincoln:</b></span> *scratches head*<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:46:45)</span> <b>bbockelm:</b></span> <pre><br/>ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDMU6d6FnCBGVDFP4qUYjM+7GSmKg+Rcluby61VCOaV3pkDLCydwn80bW8PU5+E4Lnn/Vrx4npwLxmRGsgo3hcgxMnsAXq4B+5KYPyhQspg4DJgatvibacbn/IHlz6K8aU8neU5/Vtl4dWiJVab+cRpuSUZQEbBQd75tMpDBEcdwFaU/qy+7i2d83PgXMt2LQ4gaEn25D5f/1doRKuLZ3gvQbAhdw5uR/60vWY7mqOiZ+CiglaN+aNKgvgZNOyNRnwTLWxtDz4sm7PKdNshywoxPdJTTRyob3d3wZFkNFJ13wzVvHlJPt5Mbt8rAIpkoYc80ziyRfwds+ZSfDLUTeOJ <a href="mailto:bbockelm@pcp256291pcs.unl.edu">bbockelm@pcp256291pcs.unl.edu</a><br/></pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(13:46:51)</span> <b>lincoln:</b></span> ty<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:07:32)</span> <b>lincoln:</b></span> @bbockelm <a href="mailto:bbockelm@stash-cvmfs.osgconnect.net">bbockelm@stash-cvmfs.osgconnect.net</a><br/>
+<span style="color: #e96699"><span style="font-size: small">(14:07:50)</span> <b>lincoln:</b></span> let me know if you have problems<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:07:58)</span> <b>lincoln:</b></span> ah, i need to mount ceph tho<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:09:48)</span> <b>bbockelm:</b></span> no dice on the login as user bbockelm<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:10:02)</span> <b>lincoln:</b></span> hm, ok<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:10:04)</span> <b>lincoln:</b></span> ill take a look in a sec<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:10:10)</span> <b>lincoln:</b></span> need to reboot it anyway<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:12:48)</span> <b>lincoln:</b></span> ah, forgot to unlock the account :slightly_smiling_face: sec<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:13:11)</span> <b>bbockelm:</b></span> :slightly_smiling_face: that works too.  Can I get sudo, at least while I'm bootstrapping things?<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:13:16)</span> <b>lincoln:</b></span> yeah<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:14:03)</span> <b>bbockelm:</b></span> I'll probably setup a throw-away repository while I'm figuring out the xattr stuff, then later on migrate "for real".  "For real" mode requires coordination with the GOC to move over URL the stratum-1 servers pull from.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:14:23)</span> <b>bbockelm:</b></span> I also set this all up as a systemd service.  Death to cron!<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:14:47)</span> <b>lincoln:</b></span> hooray our new systemd overlords<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:17:10)</span> <b>lincoln:</b></span> try again?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:18:30)</span> <b>bbockelm:</b></span> :+1:<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:19:04)</span> <b>lincoln:</b></span> i have ceph mounted as fuse but if that’s insufficient i’ll get the kclient working. ill haev to get mainline or otherwise set up b/c 3.10.x sucks despite what RH says :slightly_smiling_face:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:20:03)</span> <b>bbockelm:</b></span> lemme see if the FUSE client does the xattrs<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:20:18)</span> <b>lincoln:</b></span> should<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:24:18)</span> <b>bbockelm:</b></span> <pre><br/>$  getfattr -d -m ceph.dir.* /stash/user/wpoehlm/public<br/>getfattr: Removing leading '/' from absolute path names<br/># file: stash/user/wpoehlm/public<br/>ceph.dir.entries="78"<br/>ceph.dir.files="0"<br/>ceph.dir.rbytes="938112641267"<br/>ceph.dir.rctime="1475781580.09531479394"<br/>ceph.dir.rentries="249923"<br/>ceph.dir.rfiles="247922"<br/>ceph.dir.rsubdirs="2001"<br/>ceph.dir.subdirs="78"<br/></pre><br/>LGTM.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:24:23)</span> <b>bbockelm:</b></span> Now I have to put this aside and do CHEP stuff<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:37:21)</span> <b>lincoln:</b></span> ok great<br/>
+</body>
+</html>

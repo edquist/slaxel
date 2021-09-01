@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Aug 19, 2020 : #general (osg)</title>
+</head>
+<body>
+<h3>Wed Aug 19, 2020 : #general (osg)</h3>
+<span style="color: #5a4592"><span style="font-size: small">(09:29:09)</span> <b>lmichael:</b></span> @dschultz how many? you said the total is ~5 GB?<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(10:04:23)</span> <b>dschultz:</b></span> so it depends on what we want to do.  if we target specific production workloads, it's ~5GB.  if we want to support all our users, it's probably &gt;100GB<br/>
+<span style="color: #5a4592"><span style="font-size: small">(10:14:02)</span> <b>lmichael:</b></span> Got it. Since you’ve got your own pool, and the OS Pool is ‘bonus’, does it make sense to target certain high-volume workloads for the OS Pool?<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(10:25:37)</span> <b>dschultz:</b></span> it logically makes sense, but is a fun logistic problem in how to target them<br/>
+<span style="color: #5a4592"><span style="font-size: small">(10:36:49)</span> <b>lmichael:</b></span> how do you want to move forward? there are more resources, and significantly more GPUs available if you can remove the dependency on CVMFS by going with HTTP downloads. several files totaling 5GB and individually less than 1GB is very scalable. How else can we help?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:38:50)</span> <b>blin:</b></span> weren't we talking about icecube using the CHTC stash origin at some point? perhaps that'd be helpful<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(10:41:12)</span> <b>dschultz:</b></span> maybe I don't understand stash very well, but doesn't that use cvmfs?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:42:07)</span> <b>blin:</b></span> there are other ways to access files out of stash cache but cvmfs is definitely a convenient interface<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:42:46)</span> <b>blin:</b></span> there's a CLI tool, <tt>stashcp</tt> that could be used (cc @dweitzel)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:43:11)</span> <b>dweitzel:</b></span> indeed, <tt>stashcp</tt> is a useful CLI tool.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(10:51:46)</span> <b>lmichael:</b></span> @blin @dweitzel If David can use <tt>stashcp</tt> without CVMFS (what I think you’re suggesting), does that tackle the 100GB problem better than HTTP? David, does that make a difference for you?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:52:27)</span> <b>blin:</b></span> fwiw, derek brought up the fact that sites that aren't providing CVMFS may also not have the bandwidth to handle the large files required per job<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:58:27)</span> <b>dweitzel:</b></span> stashcp will use the StashCache federation for transfers.  So you get all the bonus of having multiple very fast servers serving the data.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:59:15)</span> <b>dweitzel:</b></span> But, I pointed out to brian, the same sites that do not have CVMFS may also not have the bandwidth to the worker node for 5GB per job.<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(10:59:48)</span> <b>dschultz:</b></span> the bandwidth question is interesting.  we do notice that at some sites already, where we hit their outbound network limit just transferring job data files<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:00:11)</span> <b>dweitzel:</b></span> yeah, stashcp won't get around that problem.<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(11:00:23)</span> <b>dschultz:</b></span> actually installing CVMFS is better for network performance, because of local caching<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:00:47)</span> <b>dweitzel:</b></span> indeed.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(12:02:22)</span> <b>lmichael:</b></span> So, are we deciding that IceCube is better off depending on CVMFS? What’s the resolution and next steps, if otherwise?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:29:24)</span> <b>blin:</b></span> i think that makes sense until we can tease out which sites aren't providing CVMFS because of bandwidth constraints<br/>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jul 14, 2021 : #net-service (osg)</title>
+</head>
+<body>
+<h3>Wed Jul 14, 2021 : #net-service (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(08:49:05)</span> <b>dweitzel:</b></span> @smckee @jthiltges RIP my inbox.  Jeez at all these alerts.  Let me turn them off for now.  I think they are related to Garhan moving the UNL PS host.<br/>
+<span style="color: #84b22f"><span style="font-size: small">(08:50:59)</span> <b>ivukotic:</b></span> @dweitzel you know there is an option to set yourself on vacation?<br/>
+<span style="color: #84b22f"><span style="font-size: small">(08:50:59)</span> <b>ivukotic:</b></span> @dweitzel you know there is an option to set yourself on vacation?<br/>
+<span style="color: #84b22f"><span style="font-size: small">(08:51:00)</span> <b>ivukotic:</b></span> at least there was until one hour ago when I started changing that part of the web site :slightly_smiling_face:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(08:51:32)</span> <b>dweitzel:</b></span> Oh, the alerts are from grafana monitoring of the RabbitMQ queues.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(08:51:48)</span> <b>dweitzel:</b></span> Too little traffic causes an alert.  But then it seems to recover, another alert... and on and on.<br/>
+<span style="color: #d1707d"><span style="font-size: small">(09:36:05)</span> <b>gattebury:</b></span> Not sure the cause, but it looks like the new UNL PS host worked “fine” for a while, and then esmond started complaining about:<br/><br/>&gt; FATAL:  remaining connection slots are reserved for non-replication superuser connections<br/>Guessing something building up and holding potgres connections open? Restarting postgres/pscheduler seems to make everything go again — but obviously not a long term solution.<br/><br/>@dweitzel is this traffic only coming from hcc-ps01? Also, does it seem to have continued again as of … ~20 minutes ago or so?<br/>
+<blockquote>
+<span style="color: #e06b56"><span style="font-size: small">(10:42:57)</span> <b>jthiltges:</b></span> Got postgres monitoring running again on hcc-ps01.<br/>It was kinda hackish, but working. I had to edit the mk_postgres script a bit to stop using UTF8 _things_ in queries along with using a newer version of the script.<br/><br/><pre>ERROR:  Unicode escape values cannot be used for code point values above 007F when the server encoding is not UTF8 at or near "E'[\n\r\u2028"</pre><br/>
+<span style="color: #d1707d"><span style="font-size: small">(12:50:57)</span> <b>gattebury:</b></span> Ahh, excellent — I had nuked the old checkmk checks for it (since they were failing/missing) and made a note to ask you about it today. You beat me to it. Procrastination ftw! :slightly_smiling_face:<br/>
+<span style="color: #d1707d"><span style="font-size: small">(2021-07-15 10:37:23)</span> <b>gattebury:</b></span> Don’t have time to dig into it at the moment, but it looks like the above mentioned issue with the brand new fresh 4.4.0 install started happening again after a period of time.<br/><br/>Seeing <tt>FATAL:  remaining connection slots are reserved for non-replication superuser connections</tt> again in the esmond logs. Tests are failing to be recorded accordingly. Just mentioning now in case someone has desire/time to debug.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(2021-07-15 11:43:15)</span> <b>jthiltges:</b></span> Hmm. We were at 100 connections, with most of them <tt>postgres: pscheduler pscheduler [local] idle</tt>. Looking at the graph, I suspect max_connections was higher before the reinstall. I bumped it to 500.<br/>
+<span style="color: #4ec0d6"><span style="font-size: small">(2021-07-15 12:27:11)</span> <b>smckee:</b></span> Thanks John, the node does lots of testing and I guess needed tweaking.   Is there something "custom" about the postgresql install on this node?<br/>
+<span style="color: #d1707d"><span style="font-size: small">(2021-07-15 12:28:11)</span> <b>gattebury:</b></span> There shouldn’t be — it was quite literally a fresh install from the 4.4.0 netinstall ISO a few days back<br/>
+<span style="color: #d1707d"><span style="font-size: small">(2021-07-15 12:28:47)</span> <b>gattebury:</b></span> beyond adding back the mesh configs, SSH keys, and putting the node info back into the webpage (lat/long/communities/etc) I didn’t modify anything.<br/>
+</blockquote>
+<span style="color: #235e5b"><span style="font-size: small">(09:42:46)</span> <b>dweitzel:</b></span> Looks better as of 9:26<br/>
+</body>
+</html>

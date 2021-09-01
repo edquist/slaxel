@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Apr 3, 2019 : #general (osg)</title>
+</head>
+<body>
+<h3>Wed Apr 3, 2019 : #general (osg)</h3>
+<span style="color: #53b759"><span style="font-size: small">(07:51:23)</span> <b>marian:</b></span> if you point me to those tix I can have a look later tonight or ask other factory operators take a look ...<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:57:43)</span> <b>matyas:</b></span> does anybody know what to do about <a href="https://support.opensciencegrid.org/a/tickets/8517">https://support.opensciencegrid.org/a/tickets/8517</a>? (It's assigned to @blin but he's out this week.) Irena from Notre Dame reported that GLOW jobs were using the wrong network (wrong proxy?) to access StashCache and wants to know if there's anything they can do about that.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:03:05)</span> <b>dweitzel:</b></span> huh, that ticket is confusing.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:03:35)</span> <b>dweitzel:</b></span> I'll ask some questions to hopefully clarify the issues.  Sounds like an operations issue though.  And maybe a GLOW issue.<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:04:01)</span> <b>matyas:</b></span> thanks!<br/>
+<span style="color: #db3150"><span style="font-size: small">(10:04:10)</span> <b>christinalk:</b></span> Yes, I was confused because GLOW users don’t use StashCache<br/>
+<span style="color: #db3150"><span style="font-size: small">(10:04:15)</span> <b>christinalk:</b></span> Squid, I would believe.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:04:30)</span> <b>dweitzel:</b></span> and GLOW isn't HEP.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:04:42)</span> <b>dweitzel:</b></span> and StashCache doesn't use Squid that much.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:04:45)</span> <b>dweitzel:</b></span> very confusing.<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:05:13)</span> <b>matyas:</b></span> does it use squid if it's going through CVMFS?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:08:40)</span> <b>dweitzel:</b></span> yes, but so little it should be nothing on a 10Gb link.<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:08:58)</span> <b>matyas:</b></span> just for browsing the directory, basically?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:09:06)</span> <b>dweitzel:</b></span> yup, metadata like that.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:09:21)</span> <b>dweitzel:</b></span> and checksums, and basic inode metadata.<br/>
+<span style="color: #db3150"><span style="font-size: small">(10:23:13)</span> <b>christinalk:</b></span> I wouldn’t discount some weird job submission that someone is submitting that uses cvmfs or similar. But stashcache is *only* accessible from a OSG VO submit point.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:25:25)</span> <b>dweitzel:</b></span> StashCache is available from every submit point.<br/>
+<span style="color: #db3150"><span style="font-size: small">(10:44:39)</span> <b>christinalk:</b></span> no, i mean that we don’t have a mechanism to put data into a location used by stash cache from CHTC servers (as far as I know)<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:49:58)</span> <b>matyas:</b></span> Brian just told me that @lmichael and Moate have an email thread about this<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:05:40)</span> <b>dweitzel:</b></span> Mat has a origin.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:05:47)</span> <b>matyas:</b></span> it's not in use, though<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:05:57)</span> <b>dweitzel:</b></span> yes, but you have it.  And it's in the federation.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:06:28)</span> <b>dweitzel:</b></span> so StashCache will cache data from it.  And it's available under <tt>/cvmfs/stash.osgstorage.org/chtc/</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(11:06:59)</span> <b>matyas:</b></span> it's not going to cache the data unless someone asks for it though, right?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:07:05)</span> <b>dweitzel:</b></span> right<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:07:18)</span> <b>dweitzel:</b></span> just like all of StashCache<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:08:14)</span> <b>matyas:</b></span> is it causing issues? how?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:17:32)</span> <b>bbockelm:</b></span> Moate and I have a long ongoing email about Squid...<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:18:34)</span> <b>bbockelm:</b></span> Given that we have Squid issues at CHTC due to high load, I would assume someone at ND might just be worried about their Squid load.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:30:36)</span> <b>dweitzel:</b></span> It appears that ND is seeing traffic from Wisconsin squids, which seems unusual.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:37:19)</span> <b>dweitzel:</b></span> @christinalk is there any way that a GLOW user "hard-coded" a squid into their code, then set <tt>WantGlideIn = true</tt> and ended up on the OSG?<br/>
+<span style="color: #5a4592"><span style="font-size: small">(11:37:33)</span> <b>lmichael:</b></span> @marian @dweitzel, re: glideinwms tix, is there at least a practice of replying to the requestor, to let them know (a) we got their request and (b) we need more time?<br/>
+<span style="color: #5a4592"><span style="font-size: small">(11:38:42)</span> <b>lmichael:</b></span> @dweitzel re: GLOW, yes, someone could have a wget or curl command in their job, and also use WantGlidein. Is that what you mean?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:39:28)</span> <b>dweitzel:</b></span> in order to hardcode your proxy in their code, either it would need to be a fancy curl command, or set <tt>http_proxy=&lt;wisc.squid&gt;</tt> in the environment.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:39:54)</span> <b>dweitzel:</b></span> I'm not sure how to catch this.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:40:44)</span> <b>dweitzel:</b></span> well, if you look at the squid logs, maybe you can discern patterns.  Lots of traffic in X directory, which corresponds to X user.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(11:42:10)</span> <b>lmichael:</b></span> @dweitzel, some time ago, @efajardo helped us to make sure that our GLOW jobs running in OSG were using some pre-script to make sure the jobs would use the ‘right’ SQUID. @blin was involved a bit (and Moate). I’ll try to find the thread and send to you.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:43:02)</span> <b>dweitzel:</b></span> yes, that should have done it.  I assume it was in the glidein startup script.  A user could always overwrite that, but yes.<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:50:48)</span> <b>efajardo:</b></span> @dweitzel<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:50:53)</span> <b>efajardo:</b></span> here is the code<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:51:10)</span> <b>efajardo:</b></span> <a href="https://github.com/opensciencegrid/osg-flock/blob/master/node-check/osgvo-node-advertise#L815">https://github.com/opensciencegrid/osg-flock/blob/master/node-check/osgvo-node-advertise#L815</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(11:52:03)</span> <b>efajardo:</b></span> so at each site<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:52:09)</span> <b>efajardo:</b></span> the pilot detects<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:52:13)</span> <b>efajardo:</b></span> what it can<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:52:22)</span> <b>efajardo:</b></span> based on <tt>$OSG_SQUID_LOCATION</tt><br/>
+<span style="color: #5a4592"><span style="font-size: small">(11:52:36)</span> <b>lmichael:</b></span> @dweitzel email thread found and sent<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:54:36)</span> <b>matyas:</b></span> @lmichael yeah we should usually say something to let the requester know we haven't forgotten them<br/>
+<span style="color: #5a4592"><span style="font-size: small">(12:06:08)</span> <b>lmichael:</b></span> @matyas, great. Who should do that for Ops and Security? The each have some old unassigned tix.<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:15:27)</span> <b>matyas:</b></span> I'm not sure. For Software, we have a triage person of the week; Ops and Security should have some sort of system too (and if they don't, they should make one...)<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:16:27)</span> <b>matyas:</b></span> I'm on triage this week so I'll go through and respond/poke people as appropriate<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:11:34)</span> <b>dweitzel:</b></span> @lmichael Operations, or GlideinWMS?  I'm on operations triage.  But my instructions with GlideinWMS is to leave the agent unassigned, and the glideinwms team will do it.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:16:11)</span> <b>dweitzel:</b></span> for <a href="https://support.opensciencegrid.org/a/tickets/8517">https://support.opensciencegrid.org/a/tickets/8517</a> , it's now turned into an instance of a site opening a ticket against a VO, GLOW.  So I will assign to Lauren or Christina?  Which happen to represent the GLOW VO?<br/>
+<span style="color: #5a4592"><span style="font-size: small">(13:49:30)</span> <b>lmichael:</b></span> @dweitzel I’m asking more generally than to you or @matyas, specifically. Who is ‘around’ for glideinwms?<br/>
+<span style="color: #5a4592"><span style="font-size: small">(14:53:01)</span> <b>lmichael:</b></span> @zalak is a full agent in FreshDesk, now! (per AC call) @stanfiem<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:55:54)</span> <b>stanfiem:</b></span> @lmichael thanks!<br/>
+<span style="color: #5a4592"><span style="font-size: small">(15:06:11)</span> <b>lmichael:</b></span> @dweitzel (and maybe others), I’m still super-confused about where the GLOW-squid-ND issue should go, next. Edgar implemented the scripts that (I think Derek confirmed) may be causing the problem. Should Moate loop Edgar in? by sending and email via FreshDesk that we own to Edgar?  thanks for the help!<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(15:20:38)</span> <b>zalak:</b></span> Thanks @lmichael<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(15:21:15)</span> <b>zalak:</b></span> Do I need to create a new FreshDesk account?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:03:01)</span> <b>dweitzel:</b></span> Oh, I don't think Edgar's scripts are causing the issue.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:03:08)</span> <b>dweitzel:</b></span> the scripts look fine.<br/>
+</body>
+</html>

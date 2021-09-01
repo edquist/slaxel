@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Aug 20, 2021 : #icecube-condor (osg)</title>
+</head>
+<body>
+<h3>Fri Aug 20, 2021 : #icecube-condor (osg)</h3>
+<span style="color: #50a0cf"><span style="font-size: small">(09:52:22)</span> <b>dschultz:</b></span> @bbockelm not sure who is working on the docker containers, but one request I'd have is a container like <tt>htcondor/mini</tt> but that allows external access, so I could use it in CI test jobs that use pybindings<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(09:53:33)</span> <b>dschultz:</b></span> I can get <tt>htcondor/mini</tt> to bind to all interfaces, but can't figure out how to talk to the schedd (I think it's something to do with the address, but not sure)<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:23:30)</span> <b>blin:</b></span> i think that may be antithetical to <tt>minicondor</tt> but yeah, you should be able to add some config on top of it<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:23:39)</span> <b>blin:</b></span> @matyas has done the bulk of the container work<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(10:24:13)</span> <b>dschultz:</b></span> yeah, a different image is probably preferred, or at least a set of config options to apply on top of it<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:25:05)</span> <b>blin:</b></span> can you connect to the collector?<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(10:25:30)</span> <b>dschultz:</b></span> yes, that part I can get working<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(10:32:56)</span> <b>dschultz:</b></span> one interesting note: I can query the schedd for jobs, but I can't submit.  it fails in<br/><pre>    with schedd.transaction() as txn:<br/>        sub.queue(txn, 1)</pre><br/>with<br/><pre>args = (&lt;htcondor.htcondor.Schedd object at 0x7ff8f423d2c0&gt;,), kwargs = {}, acquired = True, is_cm = False<br/><br/>    @wraps(func)<br/>    def wrapper(*args, **kwargs):<br/>        acquired = False<br/>        is_cm = False<br/>        try:<br/>            acquired = LOCK.acquire()<br/>    <br/>&gt;           rv = func(*args, **kwargs)<br/>E           htcondor.HTCondorIOError: Failed to connect to schedd.</pre><br/>
+<span style="color: #50a0cf"><span style="font-size: small">(10:49:56)</span> <b>dschultz:</b></span> if it helps, this is what I'm running<br/><pre>podman run --rm -it -p 9618:9618 --env _CONDOR_BIND_ALL_INTERFACES=true htcondor/mini:el7</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:50:38)</span> <b>blin:</b></span> is it a problem with your cred not having enough permissions?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:50:54)</span> <b>blin:</b></span> you could poke around with some pings<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(10:50:56)</span> <b>dschultz:</b></span> I guess it potentially could be, if the error message is just wrong<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:51:19)</span> <b>blin:</b></span> yeah, the failed to connect to schedd is generic enough that i wouldn't be surprised<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(10:51:41)</span> <b>dschultz:</b></span> is there a way to turn off all auth? (this is testing, so I don't care about it)<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:55:33)</span> <b>blin:</b></span> maybe something like<br/><pre>SEC_DEFAULT_AUTHENTICATION_METHODS = CLAIMTOBE<br/>SEC_CLIENT_AUTHENTICATION_METHODS = $(SEC_DEFAULT_AUTHENTICATION_METHODS)</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:55:50)</span> <b>blin:</b></span> there may be per-daemon lists, though. one sec<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:58:07)</span> <b>blin:</b></span> mmk, i don't see any daemon-specific settings so i think that should work<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(11:00:32)</span> <b>dschultz:</b></span> yeah, that got me farther:<br/><pre>E           htcondor.HTCondorIOError: Failed to commit ongoing transaction. SCHEDD:2:Setting owner to "dschultz", which is not a valid user account</pre><br/>
+<span style="color: #50a0cf"><span style="font-size: small">(16:06:44)</span> <b>dschultz:</b></span> not sure if there's a way to map a remote user to a different local user?  or is the answer "use tokens"?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:55:24)</span> <b>blin:</b></span> with CLAIMTOBE you kinda just have to say that's who you are. i imagine that @matyas made an unpriv user in the container that could be used instead<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:56:01)</span> <b>matyas:</b></span> yeah <tt>submittest</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:56:57)</span> <b>blin:</b></span> yeah, i honestly don't remember how you claim to be someone in CLAIMTOBE<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:57:10)</span> <b>blin:</b></span> so you could use FS instead and just run your code as <tt>submittest</tt><br/>
+<span style="color: #50a0cf"><span style="font-size: small">(17:18:45)</span> <b>dschultz:</b></span> would be nice for an easier way to remote submit from the pybindings, instead of having to fake what my local linux user is named<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(17:20:38)</span> <b>dschultz:</b></span> a more production version that would break the same way is if I wanted to submit from my laptop to a cluster, and they had different usernames<br/>
+</body>
+</html>

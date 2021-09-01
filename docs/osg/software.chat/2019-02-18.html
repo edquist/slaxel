@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Feb 18, 2019 : #software (osg)</title>
+</head>
+<body>
+<h3>Mon Feb 18, 2019 : #software (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(09:07:11)</span> <b>bbockelm:</b></span> Hm - should we just start nuking DNs that are obviously invalid: <a href="https://github.com/opensciencegrid/topology/blob/master/virtual-organizations/GLOW.yaml#L39">https://github.com/opensciencegrid/topology/blob/master/virtual-organizations/GLOW.yaml#L39</a> ?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:54:41)</span> <b>blin:</b></span> i think we did that with the contacts themselves aready, VO cleanup is still on our plate<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:12:37)</span> <b>matyas:</b></span> for contacts I specifically did <tt>| grep -v doegrids</tt> when importing from the DB<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:13:11)</span> <b>blin:</b></span> @bbockelm @efajardo @marian @dweitzel technology area meeting delayed 30 min due to the iris hep topical <a href="https://www.google.com/url?q=https%3A%2F%2Findico.cern.ch%2Fevent%2F798499%2F&amp;sa=D&amp;usd=2&amp;usg=AFQjCNHFsCM_NC6PZIeb6qvrji3Wub3kDQ">https://www.google.com/url?q=https%3A%2F%2Findico.cern.ch%2Fevent%2F798499%2F&amp;sa=D&amp;usd=2&amp;usg=AFQjCNHFsCM_NC6PZIeb6qvrji3Wub3kDQ</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(10:23:39)</span> <b>marian:</b></span> ok, thanks for info, @blin!<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:49:41)</span> <b>marian:</b></span> as discussed on the meeting, here is the issue which came out of the support effort last week for xrootd: <a href="https://github.com/xrootd/xrootd/issues/908">https://github.com/xrootd/xrootd/issues/908</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:22:30)</span> <b>bbockelm:</b></span> @marian - there's one combination you may have already tried but isn't listed in the ticket.  I just updated the ticket with a comment if you can take a look.<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:22:49)</span> <b>marian:</b></span> thanks! I'll have a look...<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:23:54)</span> <b>bbockelm:</b></span> In general, I think only the last invocation of <tt>xrootd.fslib</tt> actually determines what is used.  So multiple statements may cause a particular plugin to be loaded in memory -- but what is actually used is 100% determined  by the last <tt>xrootd.fslib</tt> statement.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:24:16)</span> <b>bbockelm:</b></span> E.g., something like this:<br/><pre><br/>xrootd.fslib throttle default<br/>throttle.throttle concurrency 20<br/>multiuser.umask 0002<br/>xrootd.fslib libXrdMultiuser.so default<br/></pre><br/>Is effectively equivalent to:<br/><pre><br/>multiuser.umask 0002<br/>xrootd.fslib libXrdMultiuser.so default<br/></pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(12:39:56)</span> <b>marian:</b></span> yes, that is the case ... but isn't it valid request to allow also <tt>throttle</tt> along <tt>multiuser</tt>?<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:41:40)</span> <b>marian:</b></span> ah, reading other details in the ticket, let's move discussion there, thanks<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:16:11)</span> <b>dweitzel:</b></span> anyone do anything on the repo server today, maybe an hour ago?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:16:37)</span> <b>dweitzel:</b></span> Saw some check_mk alerts go off about HTTP network failure, and CPU usage spiked.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:16:50)</span> <b>dweitzel:</b></span> small blip of only a minute or so...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:16:52)</span> <b>dweitzel:</b></span> but still unusual.<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:16:57)</span> <b>edquist:</b></span> i have not, although i was planning to update it today<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:17:48)</span> <b>dweitzel:</b></span> I thought I remembered you talking about mash scripts today.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:17:52)</span> <b>dweitzel:</b></span> I think you're fine to update it.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:18:09)</span> <b>dweitzel:</b></span> well, it was only a blip, so we can blame the cloud infrastructure.<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:27:16)</span> <b>edquist:</b></span> right i was planning to update the mash scripts (ie, update the osg-repo-scripts package) on the main repo host, though i have not done it yet<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:27:27)</span> <b>edquist:</b></span> (i haven't done anything on repo yet today)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:32:01)</span> <b>dweitzel:</b></span> @matyas got a few minutes to discuss what would be required to run topology on something like Heroku?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:39:40)</span> <b>matyas:</b></span> sure go ahead<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:41:07)</span> <b>matyas:</b></span> we'd need to somehow give it a private ssh key so it could get at the contacts data<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:42:16)</span> <b>matyas:</b></span> uh and we still need to figure out how we'll do user auth so they can look at the contacts data<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:47:12)</span> <b>matyas:</b></span> I think @bbockelm suggested running a separate instance of the webapp that _only_ serves unauth data<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:53:10)</span> <b>matyas:</b></span> we could run that instance on Heroku and continue to have the normal instance running at Nebraska<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:53:26)</span> <b>matyas:</b></span> but that defeats the point of running on Heroku in the first place...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:53:34)</span> <b>dweitzel:</b></span> right, agreed.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:53:54)</span> <b>dweitzel:</b></span> we will have to come up with something for Auth.  And the transition will probably include running 2.<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:53:55)</span> <b>matyas:</b></span> I think we need to come up with a different auth model than X509 certs, one that Heroku supports<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:53:57)</span> <b>dweitzel:</b></span> at least at first.<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:54:18)</span> <b>matyas:</b></span> and get a) our users and b) our consumers to use it<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:54:47)</span> <b>dweitzel:</b></span> do we have any consumers in the OSG that use the auth portion?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:54:51)</span> <b>dweitzel:</b></span> I thought it was just ggus?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:55:57)</span> <b>matyas:</b></span> AGIS<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:56:09)</span> <b>matyas:</b></span> unless they're the same thing? I can never keep these straight<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:57:02)</span> <b>matyas:</b></span> basically these two DNs: <tt>/C=DE/O=GermanGrid/OU=KIT/CN=<a href="http://prod-ars.ggus.eu">prod-ars.ggus.eu</a></tt> and <tt>/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=agisbot/CN=677987/CN=Alexey Anisenkov</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:57:13)</span> <b>dweitzel:</b></span> Other things that will need to be done:  The configuration should come from the Environment, rather than a config file.<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:57:58)</span> <b>blin:</b></span> sitedb may also need the contact info<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:58:18)</span> <b>matyas:</b></span> I think flask is pretty flexible when it comes to config sources so that bit shouldn't be a big deal<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:58:21)</span> <b>matyas:</b></span> what's sitedb?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:58:43)</span> <b>blin:</b></span> CMS' AGIS, basically<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:58:49)</span> <b>blin:</b></span> it's what stephan lammel runs, iirc<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:03:47)</span> <b>dweitzel:</b></span> Topology builds are failing on heroku now (they are still linked to build on each push) because it's trying to compile WSGI, and failing.  Does WSGI need to be in the <tt>requirements.txt</tt>?<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:04:34)</span> <b>matyas:</b></span> pretty sure it already is<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:06:53)</span> <b>dweitzel:</b></span> mod_wsgi is still in the <tt>requirements.txt</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:07:16)</span> <b>dweitzel:</b></span> I built topology last week on heroku by taking it out of the requirements.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:07:27)</span> <b>dweitzel:</b></span> Heroku is fine with python-ldap.<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:07:37)</span> <b>matyas:</b></span> yeah mod_wsgi requires apache to be installed<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:07:43)</span> <b>matyas:</b></span> possibly the apache headers?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:09:07)</span> <b>dweitzel:</b></span> build error is:<br/><pre><br/>           /usr/bin/ld: /app/.heroku/python/lib/libpython3.6m.a(abstract.o): relocation R_X86_64_32S against `_Py_NotImplementedStruct' can not be used when making a shared object; recompile with -fPIC<br/>           /app/.heroku/python/lib/libpython3.6m.a: error adding symbols: Bad value<br/>           collect2: error: ld returned 1 exit status<br/>           error: command 'gcc' failed with exit status 1<br/></pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(17:13:28)</span> <b>matyas:</b></span> that's a new one<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:14:48)</span> <b>matyas:</b></span> actually it seems vaguely familiar -- perhaps a problem with a new version of GCC (Heroku isn't running CentOS, right?)<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:15:17)</span> <b>matyas:</b></span> I gotta go now but the <tt>recompile with -fPIC</tt> rings a bell somewhere<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:16:35)</span> <b>dweitzel:</b></span> yeah, not running CentOS<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:16:51)</span> <b>dweitzel:</b></span> I'm not sure what they are running.  Probably something closer to Alpine or CoreOS<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:37:22)</span> <b>blin:</b></span> &gt; Each server has its own secrets<br/><a href="https://github.com/opensciencegrid/osg-test/commit/63165692984b80b86fc182c8d0d0340910f208c5">https://github.com/opensciencegrid/osg-test/commit/63165692984b80b86fc182c8d0d0340910f208c5</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(17:37:33)</span> <b>blin:</b></span> @efajardo this commit message is poetry and i love it<br/>
+</body>
+</html>

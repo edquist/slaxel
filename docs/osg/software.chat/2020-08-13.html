@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Aug 13, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu Aug 13, 2020 : #software (osg)</h3>
+<span style="color: #7d414c"><span style="font-size: small">(16:26:06)</span> <b>bockjoo:</b></span> ERROR: Failed to connect to queue manager <a href="http://cslrm.rc.ufl.edu">cslrm.rc.ufl.edu</a><br/>SECMAN:2007:Failed to received post-auth ClassAd<br/>
+<span style="color: #7d414c"><span style="font-size: small">(16:26:23)</span> <b>bockjoo:</b></span> at condor_ce_run<br/>
+<span style="color: #7d414c"><span style="font-size: small">(16:27:15)</span> <b>bockjoo:</b></span> I am checking the troubleshooting page, but can not find anything about post-auth ClassAd failure.<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:33:14)</span> <b>blin:</b></span> what's the full command and where are you running it from?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(16:34:30)</span> <b>bockjoo:</b></span> condor_ce_run -lr <a href="http://cslrm.rc.ufl.edu:9619">cslrm.rc.ufl.edu:9619</a> /bin/sh -c "whoami"<br/>
+<span style="color: #7d414c"><span style="font-size: small">(16:35:27)</span> <b>bockjoo:</b></span> I am running it from a different machine where I periodically generated a voms proxy that I use to authenticate to the CE.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(16:35:58)</span> <b>bockjoo:</b></span> The exact command worked and then started failing.<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:38:52)</span> <b>blin:</b></span> i would tail the SchedLog and run the command to see if it's getting to the CE daemons<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:39:51)</span> <b>blin:</b></span> make sure your VO attrs or your DN is mapped<br/>
+<span style="color: #7d414c"><span style="font-size: small">(16:44:34)</span> <b>bockjoo:</b></span> 08/13/20 17:42:35 (D_ALWAYS) DC_AUTHENTICATE: authentication of &lt;128.227.221.4:3838&gt; did not result in a valid mapped user name, which is required for this command (1112 QMGMT_WRITE_CMD), so aborting.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(16:44:48)</span> <b>bockjoo:</b></span> 128.227.221.4 is the machine where I executed the command.<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:46:25)</span> <b>blin:</b></span> i can think of a few things:<br/>1. mapped user doesn't exist<br/>2. your credentials aren't mapping<br/>3. something else in your lcmaps config is broken<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:46:41)</span> <b>blin:</b></span> journalctl should have some info about what lcmaps is doing<br/>
+<span style="color: #7d414c"><span style="font-size: small">(16:47:01)</span> <b>bockjoo:</b></span> 3.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(16:47:05)</span> <b>bockjoo:</b></span> Thanks!<br/>
+</body>
+</html>

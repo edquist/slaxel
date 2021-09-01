@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jan 27, 2020 : #uscms (osg)</title>
+</head>
+<body>
+<h3>Mon Jan 27, 2020 : #uscms (osg)</h3>
+<span style="color: #7d414c"><span style="font-size: small">(09:28:48)</span> <b>bockjoo:</b></span> scontrol show job takes 9 seconds. I think that's too much if every single job is running the command.<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:30:24)</span> <b>blin:</b></span> we cache results so it doesn't necessarily do it for every job<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:30:42)</span> <b>blin:</b></span> do you see <tt>JobStatus</tt> for the lcg jobs?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(09:42:08)</span> <b>bockjoo:</b></span> I have this<br/>
+<span style="color: #7d414c"><span style="font-size: small">(09:42:08)</span> <b>bockjoo:</b></span> JobId=46386633 JobName=bl_3ac15913bbb4<br/>   UserId=lcg(9054) GroupId=cmsdata(5001) MCS_label=N/A<br/>   Priority=55707 Nice=0 Account=cmsdata QOS=cmsdata<br/>   JobState=RUNNING Reason=None Dependency=(null)<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:43:38)</span> <b>blin:</b></span> thanks. that looks fine to me so it could be an issue with our cache not updating<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:44:26)</span> <b>blin:</b></span> on the CE there should be a cache in <tt>/var/tmp/slurm_cache_lcg/</tt>. could you grep for that jobid?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(09:46:10)</span> <b>bockjoo:</b></span> [root@osg ~]# grep  46386633  /var/tmp/slurm_cache_lcg/blahp_results_cache<br/>46386633        "(dp0<br/>S'""46386633""'<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:47:21)</span> <b>andrew.melo:</b></span> What's the modification time on that<br/>
+<span style="color: #7d414c"><span style="font-size: small">(12:09:11)</span> <b>bockjoo:</b></span> Sorry, I was out of internet reach.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(12:09:24)</span> <b>bockjoo:</b></span> Do you mean /var/tmp/slurm_cache_lcg/blahp_results_cache?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:16:30)</span> <b>blin:</b></span> yup, that's the right file<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:32:26)</span> <b>blin:</b></span> if you could add <tt>-A 5 -B 5</tt>  that should give us enough context<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:07:01)</span> <b>bockjoo:</b></span> That job id is gone. I will look for another one.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:09:33)</span> <b>bockjoo:</b></span> I have this<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:09:34)</span> <b>bockjoo:</b></span> [root@osg ~]# condor_ce_q | grep lcg<br/>143276.0   lcg             1/27 13:28   0+00:00:00 I  0    0.0 nagrun.sh -v cms -f /cms/Role=lcgadmin -d /queue/grid.probe.metricOutput.EGEE.etf-cms-prod_cern_ch -b <a href="stomp://oldsam.msg.cern.ch:6163/">stomp://oldsam.msg.cern.ch:6163/</a> -c <a href="htcondor://osg.rc.ufl.edu">htcondor://osg.rc.ufl.edu</a> -t 600 -w 1 -e NONE<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:09:50)</span> <b>bockjoo:</b></span> but scontrol show job does not show anything<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:10:15)</span> <b>blin:</b></span> isn't there another option or a tool for showing jobs that have left the queue for slurm?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:11:18)</span> <b>blin:</b></span> <tt>sacct -j &lt;jobid&gt;</tt>, i believe<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:11:46)</span> <b>blin:</b></span> <tt>-M &lt;partition&gt;</tt>  may be necessary<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:14:06)</span> <b>bockjoo:</b></span> There is. But I am not sure where this is going.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:14:39)</span> <b>blin:</b></span> well i'm curious how long all of these commands are taking and if for some reason the output of these commands aren't what we expect<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:15:07)</span> <b>blin:</b></span> and in that case, the blahp may not pick up the state change and pass it back to the CE<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:15:21)</span> <b>bockjoo:</b></span> OK. I will research more and get back to this again.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:17:15)</span> <b>blin:</b></span> also the output of <tt>condor_ce_config_val_dump -dump GRIDMANAGER_*</tt> would be helpful to see if your CE has changed the default <tt>GRIDMANAGER_JOB_PROBE_INTERVAL</tt>  or <tt>GRIDMANAGER_JOB_PROBE_RATE</tt>  (defaults are 1 min and 5/s)<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:34:11)</span> <b>bockjoo:</b></span> -bash: condor_ce_config_val_dump: command not found<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:36:34)</span> <b>blin:</b></span> oops, <tt>condor_ce_config_val -dump GRIDMANAGER_*</tt><br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:08:10)</span> <b>bockjoo:</b></span> Nothing returns for INTERVAL or RATE:<br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:08:11)</span> <b>bockjoo:</b></span> [root@osg ~]# condor_ce_config_val -dump GRIDMANAGER_* | grep GRIDMANAGER_JOB_PROBE_INTERVAL<br/>[root@osg ~]# condor_ce_config_val -dump GRIDMANAGER_* | grep GRIDMANAGER_JOB_PROBE_RATE<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:09:44)</span> <b>blin:</b></span> ok so they should be set to the defaults. how many jobs do you have in the slurm queue from this CE at any given time?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:10:27)</span> <b>bockjoo:</b></span> Total for all users: 767 jobs; 0 completed, 0 removed, 472 idle, 290 running, 5 held, 0 suspended<br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:10:51)</span> <b>bockjoo:</b></span> That's the tail -2 of the condor_ce_q<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:12:17)</span> <b>blin:</b></span> hrm ok, that's really not much<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:15:01)</span> <b>blin:</b></span> let me talk this over with derek as i think he wrote the original job status caching code<br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:22:22)</span> <b>bockjoo:</b></span> OK. Thanks!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:32:30)</span> <b>dweitzel:</b></span> @bockjoo can we turn on blahp debugging on the CE.  All you need to do is touch <tt>/var/tmp/slurm_cache_lcg/slurm_status.debug</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:33:05)</span> <b>dweitzel:</b></span> Then, let it run for ~1 hour, and send us the resulting log in <tt>/var/tmp/slurm_cache_lcg/slurm_status.log</tt> .<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:33:22)</span> <b>dweitzel:</b></span> you can send the log to me and @blin<br/>
+<span style="color: #7d414c"><span style="font-size: small">(15:54:33)</span> <b>bockjoo:</b></span> Thanks Derek! I will do that.<br/>
+</body>
+</html>

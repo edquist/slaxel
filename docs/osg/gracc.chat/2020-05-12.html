@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue May 12, 2020 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Tue May 12, 2020 : #gracc (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(16:20:56)</span> <b>blin:</b></span> hey accounting experts, what's supposed to create the certinfo files again? A brand new site is seeing this in the gratia logs:<br/><pre>19:08:46 UTC Gratia: ERROR: unable to find valid certinfo file for job 238<br/>19:08:46 UTC Gratia: Info: suppressing record with GlobalJobId slurm:<a href="http://slurm-login.isg.siue.edu/3306/slurm_acct_db/slurm.238">slurm-login.isg.siue.edu/3306/slurm_acct_db/slurm.238</a> due to missing DN<br/>19:08:46 UTC Gratia: OK: No unsuppressed usage records in this packet: not sending</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:32:19)</span> <b>blin:</b></span> (<b>@edquist</b> @dweitzel ^^)<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:34:11)</span> <b>edquist:</b></span> is it condor?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:34:22)</span> <b>edquist:</b></span> :)<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:34:44)</span> <b>edquist:</b></span> looks like you have the SuppressNoDNRecords option set<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:34:46)</span> <b>edquist:</b></span> and no DN<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:37:55)</span> <b>blin:</b></span> it's slurm according to the globaljobid<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:38:26)</span> <b>blin:</b></span> and i think there is /some/ local usage but not very much atm so they do want SuppressNoDNRecords enabled<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:38:56)</span> <b>blin:</b></span> however, none of the OSG pilots are being accounted for so that seems like there's an issue there<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:41:27)</span> <b>dweitzel:</b></span> Htcondor-ce creates the files. <br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:41:39)</span> <b>dweitzel:</b></span> It uses the per job history directory. <br/>
+<span style="color: #43761b"><span style="font-size: small">(17:43:49)</span> <b>blin:</b></span> ah, that's right, thanks<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:58:52)</span> <b>blin:</b></span> @dweitzel since you've done a bunch of this surgery recently is it just a matter of mapping the user of the job to the appropriate VO?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:59:47)</span> <b>blin:</b></span> also <b>@edquist</b> since i'm bound to forget how all of this works please document this somewhere<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:01:38)</span> <b>dweitzel:</b></span> There’s a couple ways to do this. If all jobs will be the same VO, then there is a VOOverride. If different users are different VOs, or you want to filter only certain users. The there is a user VO map. <br/>
+<span style="color: #43761b"><span style="font-size: small">(18:03:07)</span> <b>blin:</b></span> great, they're only accepting the OSG VO now so that's easy<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:09:11)</span> <b>dweitzel:</b></span> Feel free to attach me to whatever ticket or email. I can help out<br/>
+</body>
+</html>

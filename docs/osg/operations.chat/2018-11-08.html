@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Nov 8, 2018 : #operations (osg)</title>
+</head>
+<body>
+<h3>Thu Nov 8, 2018 : #operations (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(10:08:28)</span> <b>matyas:</b></span> @jthiltges @dweitzel can one of you put in an http -&gt; https redirect on <a href="http://repo.gridcf.org">repo.gridcf.org</a>?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:09:27)</span> <b>matyas:</b></span> also when is the changeover for <a href="http://repo.gridcf.org">repo.gridcf.org</a> happening and what will the new ssh key be?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:13:05)</span> <b>dweitzel:</b></span> I thought the repo.* machine will keep the same SSH key?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:13:12)</span> <b>dweitzel:</b></span> We put it in our puppet.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:14:52)</span> <b>jthiltges:</b></span> <a href="http://repo.gridcf.org">repo.gridcf.org</a> looks like a cloudflare thing. I assume the redirect has to happen in that config?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:15:34)</span> <b>blin:</b></span> yeah, it's a cloudflare cname to <a href="http://repo.opensciencegrid.org">repo.opensciencegrid.org</a><br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:15:43)</span> <b>jthiltges:</b></span> @matyas Just so I can confirm, what hostname are you SSHing to for <a href="http://repo.gridcf.org">repo.gridcf.org</a>?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:16:02)</span> <b>matyas:</b></span> hcc-osg-software2<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:16:46)</span> <b>blin:</b></span> shouldn't you be ssh'ing to <a href="http://repo.opensciencegrid.org">repo.opensciencegrid.org</a> because we do the repo host hokey-pokey?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:17:12)</span> <b>matyas:</b></span> that's what it is<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:17:31)</span> <b>blin:</b></span> yeah but sometimes it's hcc-osg-software, right?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:18:10)</span> <b>matyas:</b></span> I had an alias for it in my .ssh/config<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:18:15)</span> <b>matyas:</b></span> let me try without...<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:18:34)</span> <b>blin:</b></span> anyway, since <a href="http://repo.gridcf.org">repo.gridcf.org</a> is a CNAME for <a href="http://repo.opensciencegrid.org">repo.opensciencegrid.org</a> i think any http -&gt; https changes have to occur for <a href="http://repo.gridcf.org">repo.gridcf.org</a> as well as <a href="http://repo.opensciencegrid.org">repo.opensciencegrid.org</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:18:53)</span> <b>matyas:</b></span> right, that's what I asked for<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:19:05)</span> <b>matyas:</b></span> they use a different vhost though, right?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:19:05)</span> <b>blin:</b></span> and we should make sure that things like the osg-ca-scripts can handle https<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:19:14)</span> <b>blin:</b></span> ah<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:20:12)</span> <b>matyas:</b></span> osg-ca-scripts already uses https<br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:20:37)</span> <b>jthiltges:</b></span> This info helps, thank you Mat and Brian.<br/>And yes, there's a single SSH RSA host key shared by <a href="http://repo.opensciencegrid.org">repo.opensciencegrid.org</a> and <a href="http://repo-itb.opensciencegrid.org">repo-itb.opensciencegrid.org</a>, which should persist across this and future server swaps.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:22:17)</span> <b>blin:</b></span> so if it's a separate vhost, does that mean we can force https just for the <a href="http://gridcf.org">gridcf.org</a> domain and leave it the same for the <a href="http://osg.org">osg.org</a> domain?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:23:24)</span> <b>matyas:</b></span> I think so but I'm not an apache expert<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:23:56)</span> <b>dweitzel:</b></span> Since it's proxied through cloudflare, I think there's a cloudflare option to do this.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(10:23:59)</span> <b>jthiltges:</b></span> Err, this is all CloudFlare level stuff, right?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:24:05)</span> <b>dweitzel:</b></span> and that might be the appropriate place to do this.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:24:46)</span> <b>blin:</b></span> oh, cool<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:25:25)</span> <b>blin:</b></span> we just have to harass @bbockelm to finish transferring over the cloudflare ownership to me<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:45:04)</span> <b>bbockelm:</b></span> If only you were in the same room as @bbockelm!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:01:23)</span> <b>dweitzel:</b></span> production <a href="http://repo.opensciencegrid.org">repo.opensciencegrid.org</a> is now on a new host.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:01:31)</span> <b>dweitzel:</b></span> test away, and let us know if there are any issues.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:07:32)</span> <b>matyas:</b></span> I can't reach <a href="http://repo.gridcf.org">repo.gridcf.org</a> via SSH. I feel like I've asked that question before -- is that a cloudflare thing?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:08:47)</span> <b>dweitzel:</b></span> yup, cloudflare.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:08:53)</span> <b>dweitzel:</b></span> DNS points to the cloudflare host.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:08:59)</span> <b>matyas:</b></span> if I want to put a stable hostname in a script for uploading gridcf packages to, should I just use <a href="http://repo.opensciencegrid.org">repo.opensciencegrid.org</a>?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:09:47)</span> <b>blin:</b></span> or <a href="http://repo.gridcf.org">repo.gridcf.org</a>?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:10:06)</span> <b>matyas:</b></span> @blin I can't contact that via SSH, that's the problem<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:10:18)</span> <b>dweitzel:</b></span> yeah, <a href="http://repo.opensciencegrid.org">repo.opensciencegrid.org</a> would be safe<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:10:47)</span> <b>dweitzel:</b></span> Someone needs to look at the <a href="http://gridcf.org">gridcf.org</a> config, make sure it's pointing to <a href="http://repo.opensciencegrid.org">repo.opensciencegrid.org</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(11:11:21)</span> <b>blin:</b></span> when brian sent me screenshots yesterday it was<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:12:29)</span> <b>dweitzel:</b></span> ok, sounds good then.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:15:11)</span> <b>blin:</b></span> looks like it's a cloudflare feature to prevent ssh<br/><a href="https://serverfault.com/questions/709738/access-my-server-through-ssh-with-the-domain-with-cloudflare#709750">https://serverfault.com/questions/709738/access-my-server-through-ssh-with-the-domain-with-cloudflare#709750</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:17:01)</span> <b>dweitzel:</b></span> well, not so much a feature.  Just that the DNS points to cloudflare servers, which don't allow SSH.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(17:13:29)</span> <b>jthiltges:</b></span> Ugh. I'd thought CloudFlare was pointing at the new hcc-osg-repo VM for the various services it was fronting (idmanager, oim, ticket, twiki, voms, bosco, display).<br/>Apparently not. Seems to be using hcc-osg-software2. @dweitzel<br/>Things were unavailable for a bit, now back. 16:39-17:07 CST (probably less visible than that with CloudFlare caching).<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:14:24)</span> <b>dweitzel:</b></span> Ugh. Ok. I can move it tomorrow?  Is it something we need to coordinate?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(17:14:33)</span> <b>jthiltges:</b></span> (I'd been working on getting renewed certificates, which were on a different filesystem path. Puppet happily applied changes to both servers, and the new certs weren't on the hcc-osg-software2 machine.)<br/>
+<span style="color: #e06b56"><span style="font-size: small">(17:14:46)</span> <b>jthiltges:</b></span> Tomorrow should be fine, I'd say.<br/>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jan 10, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Tue Jan 10, 2017 : #gracc (osg)</h3>
+<span style="color: #902d59"><span style="font-size: small">(11:27:00)</span> <b>tanya:</b></span> we have a probe (or probes that reports NULL as CPUUser/System Duration and these records are not summarized in gratia but GRACC assumes it is 0 and happily summarized it. the probe we are looking at is pbs:<a href="http://ligo-ce1.pace.gatech.edu">ligo-ce1.pace.gatech.edu</a> (ResourceType: Batch)<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:29:42)</span> <b>tanya:</b></span> what do you want to do about it?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:31:47)</span> <b>kretzke:</b></span> current GRACC behavior seems correct to me<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:32:04)</span> <b>tanya:</b></span> i think that the probe is bogus:<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:32:05)</span> <b>tanya:</b></span> +--------------------+-----------------+-------------------+<br/>| hours              | CPUUSerDuration | CPUSystemDuration |<br/>+--------------------+-----------------+-------------------+<br/>| 113571950.76638868 |            NULL |              NULL |<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:32:23)</span> <b>tanya:</b></span> this is summary for December of 2016<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:34:01)</span> <b>tanya:</b></span> ok, i will open  a ticket with GOC but if we want to have what gratia have we need to discard records where CPUDuration is not defined<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:35:33)</span> <b>kretzke:</b></span> did a job run and use resources?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:37:46)</span> <b>kretzke:</b></span> some of the records from that probe are bogus, and have <tt>&lt;StartTime &gt;1970-01-01T00:00:00Z&lt;/StartTime&gt;</tt><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:37:59)</span> <b>kretzke:</b></span> I thought @kherner opened a GOC ticket<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:43:32)</span> <b>tanya:</b></span> oh, yeah it is the same probe; it looks start time was fixed on 12/16 but CPU is still 0<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:43:42)</span> <b>tanya:</b></span> no 0 but Null<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:43:59)</span> <b>tanya:</b></span> (not listed in xml record received by gratia)<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:44:18)</span> <b>kretzke:</b></span> got some bad records 12/23<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(11:52:48)</span> <b>kherner:</b></span> Ah, so does a Null value break the parsing?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:53:55)</span> <b>kretzke:</b></span> no. it’s not null, it’s just not in the record. which is fine. the real issue is the epoch <tt>StartTime</tt><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:56:08)</span> <b>kretzke:</b></span> it would be nice if the <tt>CpuDuration</tt>s were included, but I don’t see why we should throw out a record when they’re missing<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:57:10)</span> <b>tanya:</b></span> that is the question for Brian - why it was not set 0 and happily summarized in gratia<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:57:30)</span> <b>kretzke:</b></span> actually, the *real* issue is the PBS probe reporting epoch starttime and calculating <tt>WallDuration</tt> from it<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:57:46)</span> <b>tanya:</b></span> yes - this should be a ticket<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:58:04)</span> <b>tanya:</b></span> @sbhat has promised to open it<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:06:17)</span> <b>sbhat:</b></span> Yep - typing it up now <br/>
+<span style="color: #aba727"><span style="font-size: small">(12:38:22)</span> <b>sbhat:</b></span> ticket open<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:38:22)</span> <b>sbhat:</b></span> <a href="https://ticket.grid.iu.edu/32317">https://ticket.grid.iu.edu/32317</a><br/>
+<span style="color: #aba727"><span style="font-size: small">(12:38:34)</span> <b>sbhat:</b></span> please feel free to add yourself to the CC or add any comments if you feel it's necessary<br/>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Apr 17, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Mon Apr 17, 2017 : #gracc (osg)</h3>
+<span style="color: #3c8c69"><span style="font-size: small">(15:40:43)</span> <b>kretzke:</b></span> anyone up for diplomatically telling Frank his query killed the head node? speaking of that, turns out Grafana was using the “system” Elasticsearch node (:9200) instead of the “user” node (:9201). I’ve fixed that<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:44:27)</span> <b>dweitzel:</b></span> can you tell what he was doing?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:45:46)</span> <b>kretzke:</b></span> I’m responding. he requested the last 10 years with one minute intervals. We need to scrub every interval &lt; 1d… although there is no 1m option, so I suspect he manually typed that in going for one month (1M)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:46:36)</span> <b>dweitzel:</b></span> yeah, now the gracc page is just stalled.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:46:43)</span> <b>dweitzel:</b></span> spinning "loading" symbols.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:49:43)</span> <b>kretzke:</b></span> maybe we should just burn the “summary” pages, they do so many queries and create so many buckets…<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:54:34)</span> <b>kretzke:</b></span> restarting the query node too, I may have hosed it<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:57:21)</span> <b>kretzke:</b></span> well, trying to<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:29:28)</span> <b>dweitzel:</b></span> status update?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:30:30)</span> <b>kretzke:</b></span> had to manually kill it. everything’s back up<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:52:57)</span> <b>dweitzel:</b></span> So, all of the gratiaweb queries always filtered out the "Unknown" VO's.  Had, by default, an exclude-VO: "Unknown|unknown|other"<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:53:06)</span> <b>dweitzel:</b></span> is that something we should do as well?<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(16:54:52)</span> <b>kherner:</b></span> @dweitzel I would think so<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:57:35)</span> <b>dweitzel:</b></span> @kretzke is there an easy way to add that to the "data source", or some meta level so it doesn't have to be done for each and every graph?<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(16:58:08)</span> <b>kherner:</b></span> That way a gracc query will do the same thing as the Gratia default<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:58:46)</span> <b>kretzke:</b></span> ad-hoc filter, e.g. <a href="https://gracc.opensciencegrid.org/dashboard/db/site-summary?orgId=1&amp;var-interval=%24__auto_interval&amp;var-site=SU%20OrangeGrid&amp;var-type=Payload&amp;var-Filter=VOName%7C!%3D%7CUnknown&amp;from=1489874310802&amp;to=1492466310802">https://gracc.opensciencegrid.org/dashboard/db/site-summary?orgId=1&amp;var-interval=%24__auto_interval&amp;var-site=SU%20OrangeGrid&amp;var-type=Payload&amp;var-Filter=VOName%7C!%3D%7CUnknown&amp;from=1489874310802&amp;to=1492466310802</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:07:37)</span> <b>kretzke:</b></span> hm, but filtering out “missing” values is not so easy<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:08:03)</span> <b>dweitzel:</b></span> Oh, values with N/A ?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:11:16)</span> <b>kretzke:</b></span> I mean the bucket for docs missing the field<br/>
+</body>
+</html>

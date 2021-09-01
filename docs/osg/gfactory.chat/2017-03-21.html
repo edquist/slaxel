@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Mar 21, 2017 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Tue Mar 21, 2017 : #gfactory (osg)</h3>
+<span style="color: #5b89d5"><span style="font-size: small">(10:33:53)</span> <b>sthapa:</b></span> @klarson1  when I saw it, the expired proxy was on the compute node in the payload.  The glidein logs would have the expired proxy message<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:58:27)</span> <b>rynge:</b></span> Caltech_cit2 - issue with squid: Failed to load file 'description.h3gdJU.cfg' from '<a href="http://gfactory-1.t2.ucsd.edu/factory/stage">http://gfactory-1.t2.ucsd.edu/factory/stage</a>' using proxy '10.3.11.62:3128'.<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:13:28)</span> <b>marian:</b></span> @rynge: any particular Frontend has this issue? I don't seem to find any sign of problem for fecmsglobal for instance (@Caltech_cit2 entry)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:13:47)</span> <b>rynge:</b></span> osg-flock<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:14:38)</span> <b>rynge:</b></span> Last failure was yesterday - so maybe it was a just a temporary problem<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:14:46)</span> <b>marian:</b></span> nevermind, was on wrong factory (ITB one), loging to SDSC one<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:14:50)</span> <b>marian:</b></span> and will check<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:15:24)</span> <b>rynge:</b></span> Seems like I'm getting some glideins from there<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:15:43)</span> <b>rynge:</b></span> So don't spend time on it<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:15:50)</span> <b>rynge:</b></span> I will let you know if I see it later today<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:16:12)</span> <b>marian:</b></span> I parsed through quickly and I see prolbme also for CMS FE:<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:16:13)</span> <b>marian:</b></span> Mon Mar 20 18:11:46 PDT 2017 Failed to load file 'description.h3gdJU.cfg' from '<a href="http://gfactory-1.t2.ucsd.edu/factory/stage">http://gfactory-1.t2.ucsd.edu/factory/stage</a>' using proxy '10.3.11.62:3128'.<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:16:29)</span> <b>marian:</b></span> could be it's failing only on particular WNs ...<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:16:49)</span> <b>marian:</b></span> I'll check on that and file ticket to the site if needed<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:19:14)</span> <b>rynge:</b></span> That is about the same problem I saw the failures:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:19:16)</span> <b>rynge:</b></span> Starting glidein_startup.sh at Mon Mar 20 18:45:31 PDT 2017<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:19:36)</span> <b>rynge:</b></span> Running on compute-20-39.tier2<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:24:43)</span> <b>marian:</b></span> also, those are from yesterday ... let's see maybe things got fixed meantime since you said some glideins are back and getting jobs too?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:26:24)</span> <b>rynge:</b></span> That is my guess<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:28:26)</span> <b>marian:</b></span> @mkandes, is the CERN productino factory <a href="http://vocms0805.cern.ch">vocms0805.cern.ch</a>?<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:31:02)</span> <b>marian:</b></span> nevermind, figured it out<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:06:50)</span> <b>marian:</b></span> anyone understand this setting in the factory?             &lt;restrictions require_glidein_glexec_use="False" require_voms_proxy="False"/&gt;<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:07:12)</span> <b>marian:</b></span> trying to debug this ticket: <a href="https://ggus.eu/index.php?mode=ticket_info&amp;ticket_id=126902">https://ggus.eu/index.php?mode=ticket_info&amp;ticket_id=126902</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(14:08:07)</span> <b>marian:</b></span> seems like RALPP with Nordugrid CE has require_voms_proxy="True" while other entries with NorduGrid CEs are using require_voms_proxy"False"<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:09:01)</span> <b>marian:</b></span> people complain it creates troubles for running specific production jobs at RALPP as it sets GLIDEIN_REQUIRE_VOMS = True within a job<br/>
+<span style="color: #bd9336"><span style="font-size: small">(14:28:53)</span> <b>mkandes:</b></span> Documentation says require_voms_proxy = true is only needed if flexed is in use. <a href="http://www.uscms.org/SoftwareComputing/Grid/WMS/glideinWMS/doc.v2_6_1/factory/configuration.html">http://www.uscms.org/SoftwareComputing/Grid/WMS/glideinWMS/doc.v2_6_1/factory/configuration.html</a><br/>
+<span style="color: #bd9336"><span style="font-size: small">(14:29:08)</span> <b>mkandes:</b></span> *glexec<br/>
+<span style="color: #bd9336"><span style="font-size: small">(14:29:31)</span> <b>mkandes:</b></span> So I'm not sure why it's not required for other nordugrid sites.<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:32:50)</span> <b>marian:</b></span> isn't it enough GLEXEC_BIN is set to use glexec? ... well, it seems like most of Nordugrid entries use require_voms_proxy="False", only RALPP set it to True ... and only at RALPP are issues with some prod jobs due that<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:33:05)</span> <b>marian:</b></span> maybe Jeff know more about history here?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(14:34:26)</span> <b>mkandes:</b></span> Maybe. If all other sites set it false, I would try that to see if it helps the local issue.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:45:34)</span> <b>rynge:</b></span> Is 8.4.8 the latest version of the condor tarball?<br/>
+<span style="color: #965d1b"><span style="font-size: small">(15:06:22)</span> <b>briedel:</b></span> hi factory-ops, could someone test if submissions to the CCIN2P3 CE work now?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:11:44)</span> <b>rynge:</b></span> @mkandes this is re the auth email thread last week<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:12:01)</span> <b>rynge:</b></span> It is the 21st, so supposedly the site enabled us<br/>
+<span style="color: #385a86"><span style="font-size: small">(17:51:33)</span> <b>jdost321:</b></span> @marian if you're sitll around see my comment on GFACTOPS-1060 it looks like condor never came back up clean on test-frontend-1 after the network issue last night at UCSD<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:51:55)</span> <b>marian:</b></span> yeah<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:52:06)</span> <b>marian:</b></span> I'm struggling with FE indeed<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:52:09)</span> <b>marian:</b></span> doing more tests<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:52:15)</span> <b>marian:</b></span> good you jumped in<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:52:55)</span> <b>marian:</b></span> would you do clean restart of things that we can see how jobs start to flow from the schedd?<br/>
+<span style="color: #53b759"><span style="font-size: small">(17:53:07)</span> <b>marian:</b></span> I guess we don't need to remove nor resubmit<br/>
+<span style="color: #385a86"><span style="font-size: small">(17:53:29)</span> <b>jdost321:</b></span> no, i'm saying i just did that, a full restart<br/>
+<span style="color: #385a86"><span style="font-size: small">(17:53:41)</span> <b>jdost321:</b></span> it should be fine now, give it some time and it should request new pilots<br/>
+<span style="color: #385a86"><span style="font-size: small">(17:57:26)</span> <b>jdost321:</b></span> this was the tip off:<br/>
+<span style="color: #385a86"><span style="font-size: small">(17:57:45)</span> <b>jdost321:</b></span> /var/log/gwms-frontend/group_cms/cms.err.log<br/>
+<span style="color: #385a86"><span style="font-size: small">(17:58:04)</span> <b>jdost321:</b></span> [2017-03-21 15:41:21,040] ERROR: glideinFrontendLib:1057: Runtime Error. Failed to talk to schedd <a href="http://test-frontend-1.t2.ucsd.edu">test-frontend-1.t2.ucsd.edu</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(18:00:14)</span> <b>marian:</b></span> heh, I was checking frontend log, but didn't go to subfolder group_cms<br/>
+<span style="color: #385a86"><span style="font-size: small">(18:01:47)</span> <b>jdost321:</b></span> there are a lot of harmless misleading lines in there as well<br/>
+<span style="color: #385a86"><span style="font-size: small">(18:02:01)</span> <b>jdost321:</b></span> for example the fe is trying to talk to a lot of old test factories it no longer has access to<br/>
+<span style="color: #385a86"><span style="font-size: small">(18:02:57)</span> <b>jdost321:</b></span> i see fresh pilots now in the itb factory on the vanderbilt entries<br/>
+<span style="color: #53b759"><span style="font-size: small">(18:03:03)</span> <b>marian:</b></span> alright, heading home soon and I'll see how things go<br/>
+<span style="color: #53b759"><span style="font-size: small">(18:03:05)</span> <b>marian:</b></span> great<br/>
+<span style="color: #385a86"><span style="font-size: small">(18:03:15)</span> <b>jdost321:</b></span> all idle so far<br/>
+<span style="color: #53b759"><span style="font-size: small">(18:03:32)</span> <b>marian:</b></span> but some movement there, good<br/>
+</body>
+</html>

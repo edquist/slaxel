@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jul 22, 2021 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Thu Jul 22, 2021 : #xcache (osg)</h3>
+<span style="color: #e06b56"><span style="font-size: small">(09:31:24)</span> <b>jthiltges:</b></span> This is the best I'd yet stumbled across: <a href="https://github.com/xrootd/xrootd/blob/master/src/XrdXrootd/XrdXrootdStats.cc#L47-L74">https://github.com/xrootd/xrootd/blob/master/src/XrdXrootd/XrdXrootdStats.cc#L47-L74</a><br/>(Better references would be appreciated!)<br/>
+<span style="color: #de5f24"><span style="font-size: small">(12:03:20)</span> <b>justas.balcas:</b></span> Looks like something, thanks.  Better doc would be great (is it incremental, or for last 1min/1hr/since restart, etc)<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:23:43)</span> <b>matyas:</b></span> @dweitzel we've already put xrootd 5.3.0 in the upcoming-release repos and we'll add a warning to the release notes.<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:23:52)</span> <b>matyas:</b></span> How do you turn off asyncio?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:24:20)</span> <b>matyas:</b></span> We want to add instructions for that in the release notes.<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:24:39)</span> <b>matyas:</b></span> (We'll remind people to turn it back on when we release a fixed xrootd)<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:26:08)</span> <b>blin:</b></span> can we get Andy to tell us?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:31:59)</span> <b>blin:</b></span> sent an email<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:58:52)</span> <b>dweitzel:</b></span> What are we talking about?  Is asyncio broken?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:59:10)</span> <b>dweitzel:</b></span> Is it suddenly on by default?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:59:16)</span> <b>dweitzel:</b></span> What changed?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:02:35)</span> <b>matyas:</b></span> I thought it _was_ on by default?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:02:48)</span> <b>matyas:</b></span> I'm talking about the bug Andy mentioned with 5.3.0 on the call<br/>
+<span style="color: #7d414c"><span style="font-size: small">(16:13:43)</span> <b>bockjoo:</b></span> xrootd.async off<br/>
+<span style="color: #7d414c"><span style="font-size: small">(16:15:16)</span> <b>bockjoo:</b></span> is what I have in my xrootd config file.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(16:15:37)</span> <b>bockjoo:</b></span> I had to add it explicitly to work around a problem.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:17:09)</span> <b>dweitzel:</b></span> Shoot. I didn’t catch that. Let me email Andy?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:17:43)</span> <b>matyas:</b></span> Brian already did<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:17:54)</span> <b>matyas:</b></span> it was fixed yb <a href="https://github.com/xrootd/xrootd/commit/6a3da29f3c3f3e86df15e567f550187e5aab4ed6">https://github.com/xrootd/xrootd/commit/6a3da29f3c3f3e86df15e567f550187e5aab4ed6</a> apparently but that didn't make it into 5.3.0<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:19:11)</span> <b>dweitzel:</b></span> Ah, ok.  Now I'm following.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:19:47)</span> <b>dweitzel:</b></span> Bockjoo is correct on the async off.  I think a lot of people have it turned off for one reason or another.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:20:05)</span> <b>dweitzel:</b></span> I don't think HDFS can handle asyncio, it can't handle out of order writes.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:20:37)</span> <b>dweitzel:</b></span> <a href="https://github.com/opensciencegrid/xrootd-hdfs/blob/master/src/XrdHdfs.cc#L730">https://github.com/opensciencegrid/xrootd-hdfs/blob/master/src/XrdHdfs.cc#L730</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:21:01)</span> <b>dweitzel:</b></span> Nope, HDFS cannot handle out of order writes.<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:21:18)</span> <b>matyas:</b></span> I think that's a separate issue than the bug in 5.3.0<br/>
+</body>
+</html>

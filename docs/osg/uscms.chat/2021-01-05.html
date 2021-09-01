@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jan 5, 2021 : #uscms (osg)</title>
+</head>
+<body>
+<h3>Tue Jan 5, 2021 : #uscms (osg)</h3>
+<span style="color: #a72f79"><span style="font-size: small">(14:50:06)</span> <b>andrew.melo:</b></span> It looks like we failed SAM tests for a couple hours because of some sort of lcmaps error hitting the xrootd service:<br/><pre>VOMS failure (10): AC not present in credentials.</pre><br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:50:12)</span> <b>andrew.melo:</b></span> Has anyone else seen something similar<br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:50:46)</span> <b>andrew.melo:</b></span> <pre>lcmaps[32032]   LOG_DEBUG: 2021-01-05.09:33:57Z: lcmaps_x509_to_voms_fqans(): VOMS data structure initialized<br/>lcmaps[32032]     LOG_ERR: 2021-01-05.09:33:57Z: lcmaps_x509_to_voms_fqans(): Warning: Wrong VOMS data format making it an invalid VOMS extension: AC not present in credentials.. LCMAPS will ignore the VOMS extensions in the mapping sequence.<br/>lcmaps[32032]   LOG_DEBUG: 2021-01-05.09:33:57Z: lcmaps_x509_to_voms_fqans(): Failure, VOMS destroy</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:38:13)</span> <b>blin:</b></span> @andrew.melo are these connections with WLCG VOMS creds?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:38:28)</span> <b>andrew.melo:</b></span> Presumably so, they're the testing jobs sent from WLCG<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:40:28)</span> <b>andrew.melo:</b></span> in frustration I bounced the service and now it's not doing that???<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:42:29)</span> <b>blin:</b></span> because of course<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:43:48)</span> <b>blin:</b></span> but fwiw, wlcg proxies are signed using VOMS 3 iirc so you'd need to install some packages from epel instead of osg repos<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:43:54)</span> <b>blin:</b></span> let me try to dig up which packages exactly<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:48:18)</span> <b>blin:</b></span> oh hrm, nvm, that was for folks that wanted to generated WLCG VOMS proxies: they needed to install <tt>voms-clients-java</tt> from EPEL<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:08:32)</span> <b>andrew.melo:</b></span> closest thing I could find to the C not present in credentials error is some openssl shenanigans, so maybe that's an isue<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:08:50)</span> <b>andrew.melo:</b></span> someone with a different openssl than ours<br/>
+</body>
+</html>

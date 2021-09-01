@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Nov 21, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Tue Nov 21, 2017 : #gracc (osg)</h3>
+<span style="color: #3c8c69"><span style="font-size: small">(09:51:00)</span> <b>kretzke:</b></span> gracc collector has been unhappy since midnight CT. It’s taking a couple minutes to process each record bundle, so requests are piling up. Not clear what’s causing this suddenly.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:53:15)</span> <b>kretzke:</b></span> logstash-cvmfs-sync-logs appears to be in a crash loop<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:54:04)</span> <b>dweitzel:</b></span> I know the rabbitmq isn't happy.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:56:37)</span> <b>dweitzel:</b></span> logstash-cvmfs-sync-logs docker image has been up for days.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:18:35)</span> <b>kretzke:</b></span> what’s going on with rabbitmq?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:19:17)</span> <b>dweitzel:</b></span> Lots of CPU time, and Amazon is throttling us (as far as we can tell)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:19:39)</span> <b>dweitzel:</b></span> we're making changes to the perfsonar probe so it doesn't do so much.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:19:49)</span> <b>dweitzel:</b></span> could that be the issue on the collector?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:20:43)</span> <b>kretzke:</b></span> ah, yeah, that could explain it. It waits until the records have been sent and acknowledged by the broker before closing the connection<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:21:21)</span> <b>dweitzel:</b></span> the message rates don't look crazy.  Just a lot of opening / closing of channels.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:38:38)</span> <b>kretzke:</b></span> unrelated, logstash-glidein is dumping everything to stdout since it still has the default pipeline config along with the custom config<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:40:33)</span> <b>dweitzel:</b></span> Ah, I'll change that.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:40:35)</span> <b>dweitzel:</b></span> good catch.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:41:06)</span> <b>bbockelm:</b></span> @kretzke - the culprit is the perfSonar uploader process, which apparently creates a channel and a queue per message<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:41:11)</span> <b>bbockelm:</b></span> *doh!*<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:43:00)</span> <b>bbockelm:</b></span> I sent in a PR to actually reuse the same channel for all the messages, which will solve the load issues.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:43:19)</span> <b>kretzke:</b></span> ah. channels are supposed to be lightweight, but that may be extreme :slightly_smiling_face:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:43:25)</span> <b>bbockelm:</b></span> Yeeeeeah<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:43:43)</span> <b>bbockelm:</b></span> And also it created a queue per message, but then sent the message to the exchange.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:44:09)</span> <b>bbockelm:</b></span> so, it's a curious stress test<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:44:15)</span> <b>bbockelm:</b></span> not a particularly useful one.  But at least curious.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:44:30)</span> <b>kretzke:</b></span> heh<br/>
+</body>
+</html>

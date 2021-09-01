@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri May 28, 2021 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Fri May 28, 2021 : #gracc (osg)</h3>
+<span style="color: #16569E"><span style="font-size: small">(09:03:24)</span> <b>edquist:</b></span> @miwalls, thanks for the config &amp; logs, i'm taking a look<br/>
+<span style="color: #a63024"><span style="font-size: small">(09:49:29)</span> <b>miwalls:</b></span> Okay thanks! I feel like it might be related to the VO thing? At least it seems the config dumps failed VO mapping to quarantine.<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:31:26)</span> <b>edquist:</b></span> Hi @miwalls, sorry for the delayed response.  I am curious to see the exact log messages that say why the records are getting quarantined... Do you have a snippit from the log file that says it's quarantining a record?  Or else you can attach a gzip of the log file (eg from  2021-05-27) in the support ticket.<br/><br/>&gt; I feel like it might be related to the VO thing? At least it seems the config dumps failed VO mapping to quarantine.<br/>Right, the <tt>QuarantineUnknownVORecords="1"</tt> setting instructs gratia to send records to quarantine if it can't find VO information for it.  I think normally gratia derives VO information from certinfo files that gratia creates from htcondor-ce history data.  I see from what you posted above the error message was complaining that gratia could not find the corresponding certinfo file for the job.  I am afraid something may be going wrong in the certinfo file creation.<br/><br/>Another thing to search for in the logs is for a "Traceback", which might clue us in if something is broken there.  Again if you want to attach a gzip of the log we can take a closer look.<br/><br/>But as for this warning:<br/><br/><tt>WARNING: No mapfile specified; not using VO mapping</tt><br/><br/>Gratia is just warning that the <tt>UserVOMapFile</tt> (currently set to <tt>"/var/lib/osg/user-vo-map"</tt>, which is also the default) does not exist.  That file can be used to map usernames to VO, but we don't use that anymore; so I think this part can be ignored.<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:35:49)</span> <b>miwalls:</b></span> There really isn't much going on in /var/log/gratia/2021-05-28.log. It doesn't have any 'Traceback or quarantine information'.<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:36:19)</span> <b>edquist:</b></span> can you take a peek at 2021-05-27.log also?<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:36:38)</span> <b>edquist:</b></span> thanks<br/><br/>
+<span style="color: #a63024"><span style="font-size: small">(14:39:26)</span> <b>miwalls:</b></span> Nice finally found something! Any idea where it might be timing out to?<br/>23:29:26 CDT Gratia: Failed to send xml to web service due to an error of type "&lt;class 'TimeoutError'&gt;": [Errno 110] Connection timed out<br/>23:29:26 CDT Gratia: Traceback (most recent call last):<br/>  File "/usr/lib/python3.6/site-packages/gratia/common/connect_utils.py", line 316, in sendUsageXML<br/>    if not connect():  # Failed to connect<br/>  File "/usr/lib/python3.6/site-packages/gratia/common/connect_utils.py", line 133, in connect<br/>    connection.connect()<br/>  File "/usr/lib64/python3.6/http/client.py", line 946, in connect<br/>    (self.host,self.port), self.timeout, self.source_address)<br/>  File "/usr/lib64/python3.6/socket.py", line 724, in create_connection<br/>    raise err<br/>  File "/usr/lib64/python3.6/socket.py", line 713, in create_connection<br/>    sock.connect(sa)<br/>TimeoutError: [Errno 110] Connection timed out<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:40:14)</span> <b>edquist:</b></span> ooo<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:40:17)</span> <b>edquist:</b></span> interesting<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:42:43)</span> <b>miwalls:</b></span> My assumption this right?<br/>[root@cc-condor slurm]# telnet <a href="http://gratia-osg-prod.opensciencegrid.org">gratia-osg-prod.opensciencegrid.org</a> 80<br/>Trying 129.93.175.6...<br/>Connected to <a href="http://gratia-osg-prod.opensciencegrid.org">gratia-osg-prod.opensciencegrid.org</a>.<br/>Escape character is '^]'.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:43:40)</span> <b>blin:</b></span> There were UNL network issues yesterday<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:45:18)</span> <b>edquist:</b></span> right the <a href="http://gratia-osg-prod.opensciencegrid.org:80">gratia-osg-prod.opensciencegrid.org:80</a> mentioned in a few settings in your ProbeConfig should be the attempted connection that was timing out<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:45:59)</span> <b>miwalls:</b></span> Okay yeah looks like it was in the morning then evening yesterday.<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:47:48)</span> <b>edquist:</b></span> i see, so probably that was just a fun distraction<br/>
+<span style="color: #16569E"><span style="font-size: small">(14:48:06)</span> <b>edquist:</b></span> (got me excited)<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:48:22)</span> <b>miwalls:</b></span> Me too :smile:<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:01:45)</span> <b>blin:</b></span> So <b>@edquist</b> do we suspect that there's an issue with certinfo generation or reading?<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:06:05)</span> <b>edquist:</b></span> due to the recent discovery of the other bug in the certinfo code it would not have surprised me to find something else here also ... but if the only Tracebacks were for timeouts (which we have explained with the known network outages), then yes i suppose it could be something else like a permissions thing for reading.  Is gratia running as non-root here also?<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:07:41)</span> <b>miwalls:</b></span> I think the "cron" is root.<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:08:19)</span> <b>miwalls:</b></span> Looks like it 0,15,30,45 * * * * root /usr/share/gratia/common/cron_check  /etc/gratia/slurm/ProbeConfig &amp;&amp; /usr/share/gratia/slurm/slurm_meter -s 900 -c<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:11:22)</span> <b>blin:</b></span> I was thinking something along the lines of unexpected formatting in the file itself. Where are certinfo files supposed to be written to?<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:12:51)</span> <b>edquist:</b></span> i think the DataFolder<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:13:05)</span> <b>edquist:</b></span> which in this case is..........<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:14:06)</span> <b>edquist:</b></span> <tt>/var/lib/gratia/data/</tt><br/>
+<span style="color: #16569E"><span style="font-size: small">(15:14:18)</span> <b>edquist:</b></span> (the default i think)<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:16:58)</span> <b>blin:</b></span> And certinfos are created from CE history ads, right? Is that config pointing to the right dir? Is the CE configured to write to it?<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:21:24)</span> <b>edquist:</b></span> it is supposed to match the <tt>PER_JOB_HISTORY_DIR</tt> setting<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:21:58)</span> <b>edquist:</b></span> is <tt>condor_ce_config_val PER_JOB_HISTORY_DIR</tt> the right command to check that?<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:22:38)</span> <b>edquist:</b></span> yeah i believe they are created from CE history ads in the form of history files<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:35:27)</span> <b>miwalls:</b></span> [root@cc-condor gratia]# condor_ce_config_val PER_JOB_HISTORY_DIR<br/>/var/lib/gratia/condorce_data<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:35:45)</span> <b>miwalls:</b></span> DataFolder="/var/lib/gratia/data/"<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:37:18)</span> <b>miwalls:</b></span> Permissions look good<br/>[root@cc-condor gratia]# ls -lah /var/lib/gratia/<br/>total 4.0K<br/>drwxr-xr-x   8 root root  104 May 25 12:13 .<br/>drwxr-xr-x. 39 root root 4.0K May 28 08:28 ..<br/>drwxrwxrwt   2 root root    6 May 28 13:45 condorce_data<br/>drwxrwxrwt   3 root root   24 May 25 12:13 data<br/>drwxr-xr-x   2 root root    6 May 25 12:13 logs<br/>drwxr-xr-x   2 root root    6 May 25 12:13 osg-pilot-container<br/>drwxr-xr-x   4 root root   29 May 25 12:13 pbs-lsf<br/>drwxr-xr-x   3 root root   43 May 25 12:13 tmp<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:37:53)</span> <b>edquist:</b></span> oh interesting<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:38:26)</span> <b>edquist:</b></span> thanks @miwalls i was just going to ask you to check the PER_JOB_HISTORY_DIR setting<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:38:45)</span> <b>edquist:</b></span> i think this might be a problem with DataFolder not matching<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:39:26)</span> <b>edquist:</b></span> do you see a bunch of <tt>history.*.*</tt> files under condorce_data ?<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:39:53)</span> <b>miwalls:</b></span> No files at all<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:44:54)</span> <b>blin:</b></span> I thought the match had to be between CondorCEHistoryFolder and the CE's history dir<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:46:45)</span> <b>blin:</b></span> Mitchell, could you check if there are errors in the SchedLog with writing to the CE dir? I think they often show up in the logs on CE service restart<br/>
+<span style="color: #16569E"><span style="font-size: small">(15:53:56)</span> <b>edquist:</b></span> i know we were confused about this point before ... the check in gratia is for DataFolder though<br/><br/><a href="https://github.com/opensciencegrid/gratia-probe/blob/master/condor/condor_meter#L860-L864">https://github.com/opensciencegrid/gratia-probe/blob/master/condor/condor_meter#L860-L864</a><br/>
+<span style="color: #16569E"><span style="font-size: small">(15:54:53)</span> <b>edquist:</b></span> although maybe i am mixing this up with the htcondor-ce probe case .. hmm<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(16:01:22)</span> <b>blin:</b></span> Yeah, does the slurm probe use that code for certinfo generation?<br/>
+</blockquote>
+<span style="color: #a63024"><span style="font-size: small">(15:54:55)</span> <b>miwalls:</b></span> I do not see any errors for that condorce_data directory.<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:56:45)</span> <b>blin:</b></span> Do you see any errors for <tt>PER_JOB_HISTORY_DIR</tt>?<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:59:05)</span> <b>miwalls:</b></span> Don't see that anywhere in /var/log/condor-ce<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:02:41)</span> <b>blin:</b></span> Hrm, if you remove some CE jobs, you should see history files show up in the <tt>condorce_data</tt> dir<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:04:35)</span> <b>miwalls:</b></span> Yes there  two history files after removing two<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:07:57)</span> <b>blin:</b></span> Ok so <b>@edquist</b> I think missing certinfo files are a gratia problem. My question is whether generation is happening or if the files are malformed<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:20:16)</span> <b>edquist:</b></span> right, so<br/><a href="https://github.com/opensciencegrid/gratia-probe/blob/master/common/gratia/common/condor_ce.py#L219-L225">https://github.com/opensciencegrid/gratia-probe/blob/master/common/gratia/common/condor_ce.py#L219-L225</a><br/>
+<span style="color: #16569E"><span style="font-size: small">(16:22:47)</span> <b>edquist:</b></span> did you bump up DebugLevel and LogLevel from its previous settings?<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:23:35)</span> <b>edquist:</b></span> if you can set them both to <tt>"4"</tt>, then we should see messages for successful and unsuccessful attempts to create certinfo files<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:25:00)</span> <b>miwalls:</b></span> doing it now<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:25:34)</span> <b>edquist:</b></span> i would grep for <tt>Successfully wrote certinfo file</tt> and <tt>Unable.*write out certinfo file</tt><br/>
+<span style="color: #16569E"><span style="font-size: small">(16:26:24)</span> <b>edquist:</b></span> (looks like that first DebugPrint is misphrased)<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:27:13)</span> <b>edquist:</b></span> thanks and sorry for all the crazy runaround here<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:28:19)</span> <b>miwalls:</b></span> Nothing was return for that.<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:29:29)</span> <b>miwalls:</b></span> Only mention of certinfo is 'ERROR: unable to find valid certinfo file for job 3403'<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:29:52)</span> <b>miwalls:</b></span> Specifically it seems stuck on that job it prints that every 5ish minutes<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:30:41)</span> <b>edquist:</b></span> i see<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:30:42)</span> <b>edquist:</b></span> ok<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:31:52)</span> <b>edquist:</b></span> ah so you are not seeing 'unable to find valid certinfo file for job NNNN" for lots of jobs<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:35:06)</span> <b>miwalls:</b></span> That is the only one I see printed for that.<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:35:13)</span> <b>miwalls:</b></span> IN the past there were alot.<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:36:50)</span> <b>edquist:</b></span> ah<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:37:00)</span> <b>edquist:</b></span> so maybe more will show up as new jobs complete<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:38:30)</span> <b>edquist:</b></span> anyway with <tt>DebugLevel="4"</tt> and <tt>LogLevel="4"</tt> we should see any attempts by gratia to create certinfo files<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:40:22)</span> <b>edquist:</b></span> but<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:41:26)</span> <b>edquist:</b></span> right, as i read it, gratia will only create those certinfo files for the <tt>history.*.*</tt> files under CondorCEHistoryFolder<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:42:15)</span> <b>edquist:</b></span> which i think you have set to <tt>/var/lib/gratia/condorce_data</tt><br/>
+<span style="color: #16569E"><span style="font-size: small">(16:42:48)</span> <b>edquist:</b></span> which i think matches the <tt>PER_JOB_HISTORY_DIR</tt> setting<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:43:32)</span> <b>edquist:</b></span> actually now i am curious if htcondor-ce logs its creation of <tt>history.*.*</tt> files there<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:43:45)</span> <b>edquist:</b></span> (maybe @blin knows the answer there)<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:47:37)</span> <b>blin:</b></span> Maybe at a high debug level but but normally<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:48:23)</span> <b>edquist:</b></span> ok<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:48:30)</span> <b>miwalls:</b></span> I really haven't noticed much a change in logs for gratia after setting those both to 4<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:48:51)</span> <b>edquist:</b></span> that's ok -<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:49:07)</span> <b>edquist:</b></span> i guess in particular i wanted to make sure it was set to &gt;= 3<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:49:23)</span> <b>edquist:</b></span> in case we were missing a "Successfully wrote certinfo file ..."<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:49:25)</span> <b>edquist:</b></span> message<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:49:45)</span> <b>edquist:</b></span> at this point i am curious whether the history files are showing up<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:50:16)</span> <b>miwalls:</b></span> I saw two show up in /var/lib/gratia/condorce_data/ after I removed two condor jobs.<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:50:23)</span> <b>edquist:</b></span> ah<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:50:24)</span> <b>edquist:</b></span> ok<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:50:26)</span> <b>edquist:</b></span> great<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:51:02)</span> <b>edquist:</b></span> so history files are getting created<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:52:32)</span> <b>edquist:</b></span> if they are getting deleted also, i think that is a sign that gratia is deleting them, which only happens after creating the certinfo files<br/>
+<span style="color: #16569E"><span style="font-size: small">(16:52:45)</span> <b>edquist:</b></span> (to answer @blin's question)<br/>
+<span style="color: #16569E"><span style="font-size: small">(17:01:47)</span> <b>edquist:</b></span> anyway i think i am ready to call it for today.  @matyas please see the above channel history here for context if you join the fun on tueday.  The current goal is to answer blin's  question<br/><br/>&gt;I think missing certinfo files are a gratia problem. My question is whether generation is happening or if the files are malformed<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:13:30)</span> <b>miwalls:</b></span> Sounds good thanks Carl and Brian<br/>
+</body>
+</html>

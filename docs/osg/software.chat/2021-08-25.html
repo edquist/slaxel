@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Aug 25, 2021 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Aug 25, 2021 : #software (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(11:34:07)</span> <b>dweitzel:</b></span> @blin Who's the best person to ask about the HTCondor central collector config?<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(11:35:50)</span> <b>jpatton:</b></span> @moate… though anyone at CHTC can config_val<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:36:23)</span> <b>jpatton:</b></span> OH… I read this wrong… nevermind<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:36:27)</span> <b>dweitzel:</b></span> Are we talking about the same service?  This central collector is on tiger.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:36:34)</span> <b>dweitzel:</b></span> or transitioning to tiger<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:36:44)</span> <b>jpatton:</b></span> nope :slightly_smiling_face: my bad, carry on<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:36:52)</span> <b>dweitzel:</b></span> k, no worries.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:37:28)</span> <b>blin:</b></span> me or @jthiltges probably<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:50:17)</span> <b>dweitzel:</b></span> :slightly_smiling_face: john was asking a question.  And now I'm curious.<br/>
+</blockquote>
+<span style="color: #235e5b"><span style="font-size: small">(11:50:55)</span> <b>dweitzel:</b></span> John asked me a question about the central collector.  Does it do permissions based on the DNS?  IE, the cert DN needs to match the incoming message?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:51:01)</span> <b>dweitzel:</b></span> I thought there was something like that.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:53:46)</span> <b>blin:</b></span> for CEs, this is the main bit <a href="https://github.com/htcondor/htcondor-ce/blob/V5-branch/config/01-ce-collector-requirements.conf#L17-L31">https://github.com/htcondor/htcondor-ce/blob/V5-branch/config/01-ce-collector-requirements.conf#L17-L31</a><br/>
+<blockquote>
+<span style="color: #e06b56"><span style="font-size: small">(2021-08-27 09:33:57)</span> <b>jthiltges:</b></span> On the central collector side, seems I needed to swap the AUTHENTICATION_METHODS order from <tt>GSL, SSL</tt> to <tt>SSL, GSI</tt>.<br/><br/>Now my "PERMISSION DENIED" errors have gone away, though I'm not yet seeing the host registered.<br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-08-27 09:35:02)</span> <b>blin:</b></span> i thought we were in a steady state on this ordering :confused:<br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-08-27 09:35:48)</span> <b>blin:</b></span> IIRC, we needed to put GSI first because of the way condor does authz fallback<br/>
+<span style="color: #e06b56"><span style="font-size: small">(2021-08-27 09:36:08)</span> <b>jthiltges:</b></span> At the moment, looks like production is running htcondor-ce-collector 4.4.1, and the ordering was swapped in 4.5+<br/><a href="https://github.com/htcondor/htcondor-ce/commit/545ef5f8b2">https://github.com/htcondor/htcondor-ce/commit/545ef5f8b2</a><br/>
+<span style="color: #e06b56"><span style="font-size: small">(2021-08-27 09:43:42)</span> <b>jthiltges:</b></span> Dumb question time...<br/>If I'm understanding, we want the client to try GSI auth first (since condor probably won't find the SSL keys).<br/>But we want the central collector to try SSL first, otherwise SSL clients will fail to authenticate?<br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-08-27 09:50:10)</span> <b>blin:</b></span> well, in the authN handshake, the server order wins so it needs to be <tt>GSI, SSL</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-08-27 09:51:40)</span> <b>blin:</b></span> because most CEs will likely not have the right config to present its <tt>SSL</tt> creds<br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-08-27 09:52:08)</span> <b>blin:</b></span> with SSL first, we had a lot of CEs disappear from the collector IIRC<br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-08-27 09:52:41)</span> <b>blin:</b></span> so i'm a little confused that swapping back to <tt>SSL, GSI</tt> fixed it for you. Regardless, the right move is to probably update to HTCondor-CE 4.5 (or even 5.x in upcoming!)<br/>
+<span style="color: #e06b56"><span style="font-size: small">(2021-08-27 10:00:23)</span> <b>jthiltges:</b></span> The test CE is running htcondor-ce-5.1.1-1.1.osg35up.el7.noarch and condor-9.0.5-1.1.osg35up.el7.x86_64.<br/><br/>Client shows this<br/><pre>08/26/21 11:24:12 (D_ALWAYS) SECMAN: FAILED: Received "DENIED" from server for user gsi@unmapped using method GSI.<br/>08/26/21 11:24:12 (D_SECURITY) SECMAN: unable to create security session to &lt;128.104.103.155:9619&gt; via TCP, failing.<br/>08/26/21 11:24:12 (D_ALWAYS) ERROR: SECMAN:2004:Failed to create security session to &lt;128.104.103.155:9619&gt; with TCP.|SECMAN:2010:Received "DENIED" from server for user gsi@unmapped using method GSI.</pre><br/>Central collector side:<br/><pre>08/26/21 16:24:12 (fd:15) (pid:21408) (D_ALWAYS) PERMISSION DENIED to gsi@unmapped from host 128.104.103.219 for command 60010 (UPDATE_SCHEDD_AD), access level ADVERTISE_SCHEDD: reason: ADVERTISE_SCHEDD authorization policy contains no matching ALLOW entry for this request; identifiers used for this host: 128.104.103.219,128-104-103-219.csi-cephfsplugin-metrics.rook-ceph.svc.cluster.local, hostname size = 1, original ip address = 128.104.103.219</pre><br/>And note that the central collector isn't seeing the real client IP, for k8s reasons.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(2021-08-27 10:08:50)</span> <b>jthiltges:</b></span> I'm happy to keep poking at this. But so far, even setting <tt>ALL_DEBUG = D_ALL</tt> hasn't been very illuminating. :disappointed:<br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-08-27 10:14:32)</span> <b>blin:</b></span> hrmmm. i think from the CE side you could do some more targeted poking<br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-08-27 10:14:40)</span> <b>blin:</b></span> try<br/><pre>_condor_TOOL_DEBUG="D_CAT D_ALWAYS:2 D_SECURITY:2" condor_ce_ping -debug -pool <a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a> -verbose ADVERTISE_SCHEDD</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-08-27 11:20:41)</span> <b>blin:</b></span> @jthiltges ^^ does that give you anything interresting?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(2021-08-27 11:22:10)</span> <b>jthiltges:</b></span> Working on it. Trying to sort out my own ignorance, and decide if my test CE itself is broken. :slightly_smiling_face:<br/><br/>From what I can tell, seems I need to use <tt>-addr</tt> rather than <tt>-pool</tt> to actually make a network connection.<br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-08-27 11:25:00)</span> <b>blin:</b></span> :thinking_face:<br/>
+<span style="color: #e06b56"><span style="font-size: small">(2021-08-27 12:26:03)</span> <b>jthiltges:</b></span> Argh. I was off-track on blaming GSI,SSL order madness. (Been trying too many combinations.)<br/><br/>The debug command above was really helpful. Seems on the collector, I needed to comment out the gridmap line from <tt>mapfiles.d/50-gsi-callout.conf</tt><br/><pre>GSI /(.*)/ GSS_ASSIST_GRIDMAP</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-08-27 12:27:10)</span> <b>blin:</b></span> oh, that got installed on the collector ???<br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-08-27 12:27:50)</span> <b>blin:</b></span> ah crap ok, i see it<br/>
+<span style="color: #e06b56"><span style="font-size: small">(2021-08-27 12:29:02)</span> <b>jthiltges:</b></span> (Yeah, ce-collector seems to pull in ce-client)<br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-08-27 12:37:43)</span> <b>blin:</b></span> hrm i forget what the client is needed for on the collector<br/>
+<span style="color: #e06b56"><span style="font-size: small">(2021-08-27 13:45:44)</span> <b>jthiltges:</b></span> I'm guessing you'd want it for the condor_ce_* CLI tools?<br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-08-27 13:46:19)</span> <b>blin:</b></span> i'm not entirely sure that the mapfiles are necesary for just the client tools though<br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-08-27 13:46:27)</span> <b>blin:</b></span> let me poke around<br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-08-27 13:46:41)</span> <b>blin:</b></span> does that mean that you updated the collector to htcondor-ce 5?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(2021-08-27 13:48:22)</span> <b>jthiltges:</b></span> This is for the collector on tiger. Was working on testing things out.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(2021-08-27 13:53:57)</span> <b>jthiltges:</b></span> And yes on htcondor-ce 5... apparently. :stuck_out_tongue_closed_eyes:<br/>I'd used <tt>opensciencegrid/software-base:3.5-el7-release</tt>, which seems to have osg-upcoming enabled. (Maybe counterintuitive with the word "release" in the tag name, but oh well.)<br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-08-27 13:55:21)</span> <b>blin:</b></span> yeah, we kinda flatten the upcoming + release pipelines into one for the containers<br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-08-27 13:55:42)</span> <b>blin:</b></span> the thinking being that people using the containers are going to want to be on the leading edge anyway<br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-08-27 13:56:19)</span> <b>blin:</b></span> and containers allow us to abstract away a lot of the config so it's potentially less disruptive than updating RPMs from release -&gt; upcoming<br/>
+<span style="color: #e06b56"><span style="font-size: small">(2021-08-27 13:57:07)</span> <b>jthiltges:</b></span> Gotcha. (So. many. tags. Whee!)<br/>
+<span style="color: #e06b56"><span style="font-size: small">(2021-08-27 13:57:14)</span> <b>jthiltges:</b></span> My plan is to leave the UNL central collector VMs alone, and when tiger seems fine, move DNS.<br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-08-27 13:57:22)</span> <b>blin:</b></span> woooo!<br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-08-27 13:57:45)</span> <b>blin:</b></span> and yeah, a non-zero % of the choice to flatten the two pipelines was because we were sitting on so many tags already<br/>
+<span style="color: #e06b56"><span style="font-size: small">(2021-08-27 15:44:53)</span> <b>jthiltges:</b></span> After sorting out the UDP port shenanigans with k8s, finally have a CE showing up in the central collector on tiger. Thanks so much for your help.<br/>(And now time for me to stop looking at it, before I realize it's broken, and it bothers me over the weekend.)<br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-08-27 15:46:05)</span> <b>blin:</b></span> any time! good sleuthing :slightly_smiling_face:<br/>
+</blockquote>
+<span style="color: #43761b"><span style="font-size: small">(11:54:49)</span> <b>blin:</b></span> and CEs can use condor GSI/SSL authN, which we map to the CN<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:55:15)</span> <b>blin:</b></span> so effectively, the FQDN that the CEs ask to be contacted on must match the CN of their cert<br/>
+</body>
+</html>

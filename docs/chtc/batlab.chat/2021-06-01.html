@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jun 1, 2021 : #batlab (chtc)</title>
+</head>
+<body>
+<h3>Tue Jun 1, 2021 : #batlab (chtc)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(10:55:01)</span> <b>johnkn:</b></span> Anyone know why the workspace build I submitted this morning is now showing interrupted and the batlab submit node is now showing no condor_binaries?<br/><pre>[johnkn@batlabsubmit0001 ~]$ condor_q<br/>-bash: /usr/bin/condor_q: No such file or directory</pre><br/>
+<span style="color: #385a86"><span style="font-size: small">(11:15:54)</span> <b>kcramer:</b></span> That is a bit odd, I'm showing:<br/><pre>[kcramer@batlabsubmit0001 ~]$ which condor_q<br/>/usr/bin/condor_q</pre><br/>
+<span style="color: #385a86"><span style="font-size: small">(11:16:40)</span> <b>kcramer:</b></span> Getting a response from condor_q, unless something has changed in the last 20 minutes<br/>
+<span style="color: #385a86"><span style="font-size: small">(11:17:39)</span> <b>kcramer:</b></span> Of note, puppet is running. There might have been a change or update that @wiscmoate is working on?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:19:38)</span> <b>wiscmoate:</b></span> @johnkn on Friday @tlmiller, @tim and I had a meeting in which we agreed to upgrade HTCondor on batlabsubmit0001 to 9.1.0.  I just did that half an hour ago.  I had some troubles with package dependencies and versionlocks, so it took longer than expected.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:20:03)</span> <b>wiscmoate:</b></span> Long enough to leave a window where HTCondor wasn't installed at all.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:20:37)</span> <b>wiscmoate:</b></span> Long enough I guess to interrupt jobs.  Sorry about that.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:22:06)</span> <b>wiscmoate:</b></span> I presume it was the nmi build that was interrupted and not actually the HTcondor job?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:22:50)</span> <b>wiscmoate:</b></span> My fuzzy memory tells me that BaTLab is more sensitive to schedd interruptions than most workflows<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:59:19)</span> <b>johnkn:</b></span> the nmi build yes.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(14:00:12)</span> <b>tim:</b></span> I would guess that the streaming I/O may cause the jobs to fail fast when the schedd (and shadows) disappear.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(14:00:28)</span> <b>tim:</b></span> Thank you for the upgrade.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:44:53)</span> <b>johnkn:</b></span> The win10 box is really struggling.    I have a workspace build where remote_pre, which should take less than 2 minutes, took 33 minutes.<br/>and the "externals" step, which on windows is just downloading and unpacking a tarball, took 20 minutes<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:46:08)</span> <b>johnkn:</b></span> The win8 box is also visibly slower than the win7 box.  taking 50% to 100% longer for io tasks<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(15:02:01)</span> <b>tim:</b></span> Yes, I see. Either we need new hardware or we should try out the developer VM from Microsoft on a Hypervisor.<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:15:40)</span> <b>gthain:</b></span> Is that with only one build running?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:16:11)</span> <b>johnkn:</b></span> I don't think so, there were per-commit builds also running<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:16:32)</span> <b>johnkn:</b></span> but the load on the win7 box should be equivalent.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:17:52)</span> <b>johnkn:</b></span> I think the real difference here is that the win10 disks, or at least the execute disk is quite degraded<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:37:51)</span> <b>johnkn:</b></span> OK.  had a look at the win10 box.  It has two 4 TB platters - a system drive and a c:\condor\execute drive.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:42:33)</span> <b>johnkn:</b></span> The system drive is busy, showing spiky usage at about 50% duty cycle. the execute drive is completely saturated, and appears to be showing a 100Kb/sec aggregate transfer rate. and is showing an averate access time that jumps around a lot, but it often 1000's of milliseconds.   I saw 8000 once<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:44:10)</span> <b>johnkn:</b></span> plenty of cpu and memory headroom.  never saw more than 25% usage of either of those<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:52:12)</span> <b>johnkn:</b></span> Well, that's a problem...  It looks like write caching is disabled for one of the two platters,  I'm guessing it's the execute disk...<br/>
+<span style="color: #d58247"><span style="font-size: small">(15:52:42)</span> <b>gthain:</b></span> It's on physical hardware, not a vm?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:03:27)</span> <b>johnkn:</b></span> correct<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:04:13)</span> <b>johnkn:</b></span> I think so anyway.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:04:42)</span> <b>johnkn:</b></span> I'm not sure how to make sure of that from the windows desktop.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:07:18)</span> <b>johnkn:</b></span> but device manager isn't showing anything that looks like a virtual driver to me.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(16:08:46)</span> <b>tim:</b></span> It's real hardware<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:14:01)</span> <b>johnkn:</b></span> I'm shutting down condor on that node to see if I can't get the disk caching enabled.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(16:22:35)</span> <b>tim:</b></span> Also, the Win8 box went from having a handful of test failures to 40 or more failures and this is not due to a commit. So, something changed with the node? The week of May 17th, things looked good on the Win8 box. Thing started getting worse the week of the 24th and then on the 27th things took a turn for the worse.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:23:23)</span> <b>johnkn:</b></span> Yeah, it was doing about as well as the win7 box, and suddenly... not.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:42:18)</span> <b>johnkn:</b></span> I cannot enable write caching on the second drive,  It's a scsi disk, maybe there's some hardware setting?<br/>So I switched c:\condor\execute on the Win10 box so it uses the same platter as the system drive.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(17:17:44)</span> <b>tim:</b></span> @johnkn Did the configuration change on the Win10 box. We previously limited it to 3 jobs. It is currently running 6.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:44:49)</span> <b>johnkn:</b></span> I did change the config, but only to add myself as a local admin.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:45:25)</span> <b>johnkn:</b></span> other changes must have come from somewhere else.  (I did restart, so config changes on disk may have gotten picked up?)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:46:28)</span> <b>johnkn:</b></span> Looks like the Win10 box still only has 3 4 core slots, and only 2 slots that will run tests. so no change<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:46:58)</span> <b>johnkn:</b></span> It can't actually be running 3 jobs, probably 3 jobs are trying to reconnect<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(18:39:16)</span> <b>tim:</b></span> Yes, I think that the dashboard did not reflect reality for a while.<br/>
+</body>
+</html>

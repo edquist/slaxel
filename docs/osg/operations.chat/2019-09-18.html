@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Sep 18, 2019 : #operations (osg)</title>
+</head>
+<body>
+<h3>Wed Sep 18, 2019 : #operations (osg)</h3>
+<span style="color: #e23f99"><span style="font-size: small">(08:55:16)</span> <b>marco.mascheroni:</b></span> @lincoln can you double check if <a href="http://uct2-stratum-r.mwt2.org">uct2-stratum-r.mwt2.org</a> has an updated cvmfs? I have an update that finished on the 16th of september but these looks older than the ones in cvmfs:<br/><pre><br/>login4(1009)$ ls /cvmfs/cms.cern.ch/ -altr | grep slc | tail<br/>drwxrwxr-x   9 usatlas G-815132   4096 17 apr 11.27 slc7_amd64_gcc530<br/>drwxrwxr-x   9 usatlas G-815132   4096 18 apr 03.44 slc6_amd64_gcc530<br/>drwxrwxr-x   9 usatlas G-815132   4096  7 ago 09.53 slc6_amd64_gcc481<br/>drwxrwxr-x   8 usatlas G-815132   4096 26 ago 18.39 slc7_amd64_gcc630<br/>drwxrwxr-x   8 usatlas G-815132   4096 26 ago 18.58 slc6_amd64_gcc630<br/>drwxrwxr-x   8 usatlas G-815132   4096 26 ago 19.10 slc6_amd64_gcc700<br/>drwxrwxr-x   8 usatlas G-815132   4096  4 set 18.29 slc7_amd64_gcc820<br/>drwxrwxr-x   8 usatlas G-815132   4096  5 set 03.30 slc7_amd64_gcc900<br/>drwxrwxr-x   8 usatlas G-815132   4096  5 set 03.38 slc7_amd64_gcc700<br/>drwxrwxr-x   8 usatlas G-815132   4096  5 set 17.29 slc7_aarch64_gcc700<br/></pre><br/>For reference here is the same ls on lxplus:<br/>[mmascher@lxplus708 ~]$ ls -altr /cvmfs/cms.cern.ch/ | grep slc | tail<br/><pre><br/>drwxr-xr-x.   9 cvmfs cvmfs   4096 18 apr 10.44 slc6_amd64_gcc530<br/>drwxr-xr-x.   8 cvmfs cvmfs   4096  6 set 00.29 slc7_aarch64_gcc700<br/>drwxr-xr-x.   9 cvmfs cvmfs   4096 11 set 10.33 slc6_amd64_gcc481<br/>drwxr-xr-x.   8 cvmfs cvmfs   4096 11 set 11.13 slc6_amd64_gcc630<br/>drwxr-xr-x.   8 cvmfs cvmfs   4096 11 set 11.18 slc7_amd64_gcc630<br/>drwxr-xr-x.   8 cvmfs cvmfs   4096 11 set 13.01 slc7_amd64_gcc700<br/>drwxr-xr-x.   8 cvmfs cvmfs   4096 11 set 13.10 slc6_amd64_gcc700<br/>drwxr-xr-x.   8 cvmfs cvmfs   4096 16 set 19.44 slc7_amd64_gcc900<br/>drwxr-xr-x.   8 cvmfs cvmfs   4096 16 set 23.40 slc7_amd64_gcc820<br/>drwxr-xr-x.   8 cvmfs cvmfs   4096 17 set 23.20 slc7_aarch64_gcc820<br/></pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(09:01:54)</span> <b>lincoln:</b></span> ill check<br/>
+<span style="color: #7d414c"><span style="font-size: small">(09:07:56)</span> <b>bockjoo:</b></span> uid/gid is 174/174 for cvmfs/cvmfs. you can map them through /etc/cvmfs/uid.map and /etc/cvmfs/gid.map<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:01:14)</span> <b>matyas:</b></span> @jdost321 @lincoln @marco.mascheroni how are things going with the hosted-ce dry run? Do you need software help?<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:04:12)</span> <b>jdost321:</b></span> @matyas we've beein in meetings all morning, going to get to it in a few min<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:04:25)</span> <b>jdost321:</b></span> we'll definitely ping you if we need help<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:27:23)</span> <b>jdost321:</b></span> @matyas we can't find the new hosted ce / condor.. is it in upcoming-testing or do we need to explicitly upgrade osg-release to 3.5?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:27:58)</span> <b>matyas:</b></span> coulda sworn we put it in 3.4 as well but yeah you should use 3.5<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:29:29)</span> <b>jdost321:</b></span> what are the full package names?<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:29:39)</span> <b>jdost321:</b></span> maybe we searched the wrong thing<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:29:50)</span> <b>matyas:</b></span> osg-ce-bosco<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:30:19)</span> <b>matyas:</b></span> it should bring in hosted-ce-tools; if not, install that as well<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:30:37)</span> <b>jdost321:</b></span> and sorry what version number are we looking for?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:31:11)</span> <b>matyas:</b></span> osg-ce-bosco-3.5-2.osg35.el7.x86_64.rpm<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:34:18)</span> <b>matyas:</b></span> and hosted-ce-tools-0.4-1.osg35.el7.noarch.rpm<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:45:35)</span> <b>jdost321:</b></span> we made it overcomplicated by trying to upgrade from an existing 3.4 CE rather than starting from scratch, updating osg-release to 3.5 gives us the right rpms, thanks<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:53:18)</span> <b>jdost321:</b></span> so far i think your directions are pretty clear, what's your availability like this afternoon if we have more questions?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:58:09)</span> <b>matyas:</b></span> I'm here until 5:15 central<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:00:36)</span> <b>jdost321:</b></span> thanks!<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:09:34)</span> <b>matyas:</b></span> @jdost321 how are things going?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(17:22:12)</span> <b>marco.mascheroni:</b></span> so far so good, but we have not finished though yet<br/>
+<span style="color: #e96699"><span style="font-size: small">(17:22:42)</span> <b>lincoln:</b></span> if anything is needed from our side, feel free to ping me<br/>
+<span style="color: #e23f99"><span style="font-size: small">(17:25:28)</span> <b>marco.mascheroni:</b></span> one question @matyas who is running the script to update the worker node client on the head node?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(17:25:33)</span> <b>marco.mascheroni:</b></span> Do I need to enable a cron?<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:26:34)</span> <b>matyas:</b></span> if you've set up the /etc/endpoints.ini file, then do <tt>systemctl enable --now update-all-remote-wn-clients.timer</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(17:26:57)</span> <b>matyas:</b></span> it's pretty much a cron. runs every 12 hours IIRC<br/>
+<span style="color: #e23f99"><span style="font-size: small">(17:27:10)</span> <b>marco.mascheroni:</b></span> ok thx<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:27:14)</span> <b>matyas:</b></span> yep.<br/>
+<span style="color: #e23f99"><span style="font-size: small">(17:27:25)</span> <b>marco.mascheroni:</b></span> Is it possible to do it for multiple users<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:27:27)</span> <b>matyas:</b></span> run <tt>update-all-remote-wn-clients</tt> by hand (as root) to try it out first<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:27:29)</span> <b>matyas:</b></span> yeah<br/>
+<span style="color: #e23f99"><span style="font-size: small">(17:27:31)</span> <b>marco.mascheroni:</b></span> <pre><br/>[Endpoint VDT-ITB-MADISON-CE2-MATYAS]<br/>;;; local_user (required) is which user on this host to run the updater for this endpoint<br/>local_user = osg4<br/></pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(17:27:42)</span> <b>matyas:</b></span> you define multiple [Endpoint XXX] sections<br/>
+<span style="color: #e23f99"><span style="font-size: small">(17:27:46)</span> <b>marco.mascheroni:</b></span> ok<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:28:08)</span> <b>matyas:</b></span> I need to go but I'll be back in about 2 hours<br/>
+<span style="color: #e23f99"><span style="font-size: small">(17:28:18)</span> <b>marco.mascheroni:</b></span> ok<br/>
+<span style="color: #e23f99"><span style="font-size: small">(20:06:15)</span> <b>marco.mascheroni:</b></span> @matyas the dryrun looked good, no bad surprises. Question, [Endpoint XXX], can XXX be whatever, what is it used for<br/>
+<span style="color: #c386df"><span style="font-size: small">(20:06:40)</span> <b>matyas:</b></span> it can be whatever, it's only used as the name of the log file<br/>
+<span style="color: #e23f99"><span style="font-size: small">(20:06:51)</span> <b>marco.mascheroni:</b></span> ok<br/>
+</body>
+</html>

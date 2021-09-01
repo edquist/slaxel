@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jun 29, 2021 : #operations (chtc)</title>
+</head>
+<body>
+<h3>Tue Jun 29, 2021 : #operations (chtc)</h3>
+<span style="color: #e23f99"><span style="font-size: small">(09:34:55)</span> <b>baydemir:</b></span> This log snippet is repeating itself every ~5 seconds in htpheno-cm's <tt>CollectorLog</tt>. This seems excessive, especially considering that there are several other startd's exhibiting the same behavior.<br/>
+<span style="color: #e23f99"><span style="font-size: small">(09:35:43)</span> <b>baydemir:</b></span> Any ideas what's going on here? I think @jcpatton are both unclear on this.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:35:58)</span> <b>johnkn:</b></span> What is the COLLECTOR_DEBUG log level?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:36:29)</span> <b>johnkn:</b></span> this looks like D_SECURITY:2 which is insanely chatty.<br/>
+<span style="color: #e23f99"><span style="font-size: small">(09:37:52)</span> <b>baydemir:</b></span> Looks like… <tt>ALL_DEBUG = D_CAT D_ALWAYS:2 D_SECURITY:2</tt>.<br/>
+<span style="color: #ea2977"><span style="font-size: small">(09:38:10)</span> <b>zmiller:</b></span> Yeah, if it's printing the sent/received ClassAds that's D_SECURITY:2<br/>
+<span style="color: #e23f99"><span style="font-size: small">(09:38:31)</span> <b>baydemir:</b></span> If it's just chatty logging, we can turn that down.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:38:40)</span> <b>johnkn:</b></span> Should turn off D_SECURITY:2 (unless someone is actively debugging security stuff)<br/>
+<span style="color: #ea2977"><span style="font-size: small">(09:39:47)</span> <b>zmiller:</b></span> D_SECURITY (with no :2) isn't too bad.  I also find D_COMMAND useful and it's not too verbose.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:40:36)</span> <b>johnkn:</b></span> best to use D_SECURITY:1 D_COMMAND:1, rather than leave them unqualifed.<br/>
+<span style="color: #d58247"><span style="font-size: small">(09:40:57)</span> <b>gthain:</b></span> The only time I'd want D_COMMAND off is for a heavily loaded collector<br/>
+<span style="color: #99a949"><span style="font-size: small">(09:41:19)</span> <b>matyas:</b></span> the classad seems to be printed because of D_SECURITY not D_SECURITY:2<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:41:33)</span> <b>johnkn:</b></span> if so, that's a bug.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:41:59)</span> <b>johnkn:</b></span> from the logging it does look that way<br/>
+<span style="color: #ea2977"><span style="font-size: small">(09:42:22)</span> <b>zmiller:</b></span> It's misleading, that dprintf is wrapped in an "if D_FULLDEBUG" I think.  That should be updated.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:42:39)</span> <b>johnkn:</b></span> ah.  minor bug then.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:44:09)</span> <b>johnkn:</b></span> I find D_COMMAND mostly redundant for the collector, it seems to log nearly all commands anway.<br/>
+<span style="color: #ea2977"><span style="font-size: small">(09:44:33)</span> <b>zmiller:</b></span> <pre>                if (IsDebugVerbose(D_SECURITY)) {<br/>                        dprintf (D_SECURITY, "DC_AUTHENTICATE: received following ClassAd:\n");<br/>                        dPrintAd (D_SECURITY, m_auth_info);<br/>                }                       <br/> </pre><br/>
+<blockquote>
+<span style="color: #ea2977"><span style="font-size: small">(09:48:10)</span> <b>zmiller:</b></span> @johnkn making a thread to not fill the operations channel.<br/><br/>How crazy would the changes be to get a :3 for security?  It is a rare occasion where I/admins really need everything.<br/><br/>Not really important, just curious.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:49:24)</span> <b>johnkn:</b></span> Probably  a day or two.  right now there are two sets of flags, one for :1 and a separate set for :2.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:50:38)</span> <b>johnkn:</b></span> turning that into a 2 bit field, or bit-twiddling that into an integer in all the right places would be a bit fiddly, but I think the actual code is all isolated to condor_utils.<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:00:19)</span> <b>zmiller:</b></span> D_DAEMONCORE would also benefit from a :3 option.  Almost nobody needs to see the commands and timers registered whenever one of either is updated.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:03:41)</span> <b>johnkn:</b></span> agree<br/>
+</blockquote>
+<span style="color: #235e5b"><span style="font-size: small">(09:46:31)</span> <b>johnkn:</b></span> that's probably a common pattern.<br/>
+<span style="color: #e23f99"><span style="font-size: small">(09:56:05)</span> <b>baydemir:</b></span> Backing up a step: Do startds normally communicate with the collector like this, every 5 seconds? Because I have one startd that's showing up in the <tt>CollectorLog</tt> with basically the same messages as the snippet above, except that it's not showing up <tt>condor_status</tt>.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:57:19)</span> <b>johnkn:</b></span> No, not every 5 seconds over a long period of time.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:57:34)</span> <b>johnkn:</b></span> especially if the ads are not showing up in the collector.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:59:00)</span> <b>johnkn:</b></span> startds will often send multiple commands over a short period of time, but the communication should be bursty,  and be periodic at a rate of ~10 min<br/>
+<span style="color: #2b6836"><span style="font-size: small">(11:12:15)</span> <b>jcpatton:</b></span> I wonder if there could be some firewall (/ipv6) issue with it, but not sure where to start with that<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:13:06)</span> <b>johnkn:</b></span> first step is to look at the logs on the startd and see what it thinks is happening.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(11:13:38)</span> <b>jcpatton:</b></span> We have no access to this startd :slightly_smiling_face: so that’ll be some fun emails<br/>
+<span style="color: #2b6836"><span style="font-size: small">(11:14:04)</span> <b>jcpatton:</b></span> Who would know best about how Globus is set up on our transfer server(s)? We have a user that wants to access a group directory via Globus <a href="https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=103606">https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=103606</a><br/>
+<blockquote>
+<span style="color: #4bbe2e"><span style="font-size: small">(11:15:18)</span> <b>tjslauson:</b></span> @eturatsinze<br/>
+</blockquote>
+<span style="color: #2b6836"><span style="font-size: small">(11:29:52)</span> <b>jcpatton:</b></span> One more question :slightly_smiling_face: any idea if es1000 can come back soon? Understood if you’re trying to find a better home for it.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:33:22)</span> <b>wiscmoate:</b></span> @jcpatton yes, I hit the power button to bring it up on Sunday -<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:33:31)</span> <b>wiscmoate:</b></span> didn't follow up to see if it had actually come up<br/>
+<span style="color: #2b6836"><span style="font-size: small">(11:33:34)</span> <b>jcpatton:</b></span> ah<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:33:59)</span> <b>wiscmoate:</b></span> I'll pay it a visit in about 30 mins<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:34:25)</span> <b>baydemir:</b></span> Are htpheno-cm and htpheno-submit managed by puppet, or something else? They are both on Condor 8.9.12, which looking at the release notes, sounds like a not-good version to be on.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:35:54)</span> <b>wiscmoate:</b></span> @baydemir Both are managed via puppet -<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:37:55)</span> <b>wiscmoate:</b></span> Not sure what's up with htpeno-cm, puppet is configured to install HTCondor 9.1.0-0.541048.el7<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:38:13)</span> <b>wiscmoate:</b></span> Possibly puppet runs are failing, I'll run one manually<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(11:39:44)</span> <b>tjslauson:</b></span> puppet is not managing condor on htpheno-cm<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(11:40:06)</span> <b>tjslauson:</b></span> there are no roles attached that would do that, and the nodefile also has nothing that would do that<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(11:40:27)</span> <b>tjslauson:</b></span> condor was installed manually on 2019-11-07, and it's been updated since through <tt>yum update</tt><br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:41:32)</span> <b>baydemir:</b></span> Is the same true for htpheno-submit?<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(11:42:20)</span> <b>tjslauson:</b></span> in contrast, htpheno-submit has a role attached that does enable puppet's condor management<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:44:15)</span> <b>baydemir:</b></span> But htpheno-submit is also on 8.9.12, which doesn't seem right if its being managed by puppet?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:44:50)</span> <b>wiscmoate:</b></span> It's on @jpeterson’s test environment, which is forked from an older master branch commit -<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:45:36)</span> <b>wiscmoate:</b></span> Thus it's stuck in the past at the moment<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:45:55)</span> <b>baydemir:</b></span> Ah! Okay.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:46:18)</span> <b>jpeterson:</b></span> that can be pushed to master, there aren’t any changes on my testing for it.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:46:28)</span> <b>wiscmoate:</b></span> :thumbsup:<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:46:47)</span> <b>wiscmoate:</b></span> I'll run master branch on it<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:46:55)</span> <b>jpeterson:</b></span> I haven’t gotten to all of them apparently<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(12:09:45)</span> <b>tim:</b></span> Ugh. Nobody should be running 8.9.12. It was withdrawn due to serious issues.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(12:25:39)</span> <b>wiscmoate:</b></span> @baydemir I misspoke, htpheno-cm's HTCondor installation is not puppeted -<br/>
+<span style="color: #3c989f"><span style="font-size: small">(12:26:23)</span> <b>wiscmoate:</b></span> HTCondor is manually installed:<br/><pre>[moate@htpheno-cm ~]$ sudo yum history info 42<br/>Loaded plugins: fastestmirror, priorities, versionlock<br/>Transaction ID : 42<br/>Begin time     : Thu Nov  7 14:52:13 2019<br/>Begin rpmdb    : 475:de1adf05c7e882267f7b7c4838344ab5880ad54c<br/>End time       :            14:52:16 2019 (3 seconds)<br/>End rpmdb      : 482:f103aabb67ffb2790be5ee250789f98cd822f3dc<br/>User           : jcpatton &lt;jcpatton&gt;<br/>Return-Code    : Success<br/>Command Line   : install condor python-condor</pre><br/>
+<span style="color: #3c989f"><span style="font-size: small">(12:27:34)</span> <b>wiscmoate:</b></span> Last updated (by yum-cron):<br/><pre>[moate@htpheno-cm ~]$ sudo yum history info 129<br/>Loaded plugins: fastestmirror, priorities, versionlock<br/>Transaction ID : 129<br/>Begin time     : Sat Feb 20 04:09:51 2021<br/>Begin rpmdb    : 604:02599be9f33116901c0a1178f25d6ea57eccc1c6<br/>End time       :            04:09:54 2021 (3 seconds)<br/>End rpmdb      : 604:6fc9fa0799240eea55a7cfc853b95c9efb5998ec<br/>User           : root &lt;root&gt;<br/>Return-Code    : Success</pre><br/>
+<span style="color: #3c989f"><span style="font-size: small">(12:29:06)</span> <b>wiscmoate:</b></span> @baydemir so a conversation needs to be had about how HTCondor should be managed on <a href="http://htpheno-cm.chtc.wisc.edu">htpheno-cm.chtc.wisc.edu</a><br/>
+<span style="color: #3c989f"><span style="font-size: small">(12:31:39)</span> <b>wiscmoate:</b></span> RT ticket for htpheno-cm is:<br/><pre>      ticket #98937: VM for external collab central manager<br/>     <a href="https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=98937">https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=98937</a></pre><br/>
+<span style="color: #3c989f"><span style="font-size: small">(12:33:13)</span> <b>wiscmoate:</b></span> Opening message:<br/><pre>Following up on my previous request, can we get a basic VM (to run a central manager on, and maybe a schedd temporarily as well)? I don't think it should be puppetized, at least not until we get the config figured out.<br/><br/>Suggested name:<br/>htpheno-cm(0000).<a href="http://chtc.wisc.edu">chtc.wisc.edu</a>&lt;<a href="http://chtc.wisc.edu">http://chtc.wisc.edu</a>&gt;<br/><br/>It would be wonderful if it could also be attached to Nathan Miller's storage in WID, but that can come later.<br/><br/>Jason</pre><br/>
+<span style="color: #e23f99"><span style="font-size: small">(12:33:39)</span> <b>baydemir:</b></span> Hrm. I was about to say, I'd like to hear @jcpatton's thoughts on this.<br/>
+<span style="color: #e23f99"><span style="font-size: small">(12:33:44)</span> <b>baydemir:</b></span> (I don't think I have access to RT.)<br/>
+<span style="color: #3c989f"><span style="font-size: small">(12:34:05)</span> <b>wiscmoate:</b></span> We can fix that pretty easily if you want<br/>
+<span style="color: #e23f99"><span style="font-size: small">(12:34:52)</span> <b>baydemir:</b></span> Might as well, if the ticket is a good place to have the conversation. :man-shrugging:<br/>
+<blockquote>
+<span style="color: #3c989f"><span style="font-size: small">(12:35:52)</span> <b>wiscmoate:</b></span> @baydemir name "baydemir"?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(12:36:08)</span> <b>baydemir:</b></span> Yes, please.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(12:37:16)</span> <b>wiscmoate:</b></span> email <tt><a href="mailto:baydemir@continuousassurance.org">baydemir@continuousassurance.org</a></tt>?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(12:37:38)</span> <b>baydemir:</b></span> <a href="mailto:baydemir@morgridge.org">baydemir@morgridge.org</a><br/>
+</blockquote>
+<span style="color: #2b6836"><span style="font-size: small">(12:37:26)</span> <b>jcpatton:</b></span> General question... Can a puppet-controlled node's entire condor config be described by a single file (e.g. in <tt>node/</tt>) or is there always some base CHTC config that comes first<br/>
+<span style="color: #3c989f"><span style="font-size: small">(12:47:54)</span> <b>wiscmoate:</b></span> @jcpatton I'll be somewhat pedantic and say that Puppet doesn't necessarily control HTCondor configuration in CHTC;  What it does do by default is wipe out the RPM's <tt>/etc/condor</tt> and git-clone the <a href="https://git.chtc.wisc.edu/?p=chtc_htcondor_config.git;a=summary">chtc_htcondor_config</a> repository into <tt>/etc/condor</tt><br/>
+<span style="color: #3c989f"><span style="font-size: small">(12:49:02)</span> <b>wiscmoate:</b></span> &gt;  Can a puppet-controlled node's entire condor config be described by a single file (e.g. in <tt>node/</tt>)<br/>I don't think I'm answering the question you're intending here, but, we could make puppet do that by writing some ~code~ yaml, but it doesn't currently do that<br/>
+<span style="color: #3c989f"><span style="font-size: small">(12:49:47)</span> <b>wiscmoate:</b></span> We could have puppet install the HTCondor RPMs but leave <tt>/etc/condor</tt> alone<br/>
+<span style="color: #3c989f"><span style="font-size: small">(12:50:12)</span> <b>wiscmoate:</b></span> Or we could have puppet directly control specific files in <tt>/etc/condor</tt><br/>
+<span style="color: #2b6836"><span style="font-size: small">(12:56:37)</span> <b>jcpatton:</b></span> Aha, I remembered that config was its own repo, but I forgot that you could decouple the config from having the binaries controlled by puppet. We should at least do the latter, and also consider having the current set of config enforced by puppet. Having the config in the regular config repo instead would be nice, but again I'm not sure how many hoops there are to jump through to avoid or undo some default CHTC config that we don't want.<br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:03:42)</span> <b>baydemir:</b></span> The one thing I'd add is that the binaries + config shouldn't ever break backwards compatibility, because we don't have direct control over the startds, and it'd be more rounds of email than anyone wants to get the collaborators to upgrade or make config changes on their end.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(13:04:40)</span> <b>jcpatton:</b></span> That does make going to 9.0+ a little bit of a scary leap...<br/>
+<span style="color: #2b6836"><span style="font-size: small">(13:05:01)</span> <b>jcpatton:</b></span> But at least we're already using tokens<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(16:47:56)</span> <b>tjslauson:</b></span> @jcpatton es1000 is back up!  It gave me a RAID scare for a few minutes (that's what was keeping it down) but it seems to be doing well now.<br/>
+<blockquote>
+<span style="color: #2b6836"><span style="font-size: small">(16:49:39)</span> <b>jcpatton:</b></span> Thank you!!! And sorry for the scare, RAID errors are no fun<br/>
+</blockquote>
+</body>
+</html>

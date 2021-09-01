@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Aug 2, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Wed Aug 2, 2017 : #gracc (osg)</h3>
+<span style="color: #16569E"><span style="font-size: small">(09:54:03)</span> <b>edquist:</b></span> Thanks @kretzke, yeah a different normalization factor would be a simple explanation, but it looked like 13.48 was being used across the board for SPRACE... So that doesn't seem to be it...  Does anybody know where/how the cms dashboard data gets its data?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:42:24)</span> <b>dweitzel:</b></span> Hi, I want to make sure we are all on the same page, @marian and @kretzke.  BrianB volunteered GRACC's ES to host glidein logs from the factories.  We are going to use filebeats <a href="https://www.elastic.co/products/beats/filebeat">https://www.elastic.co/products/beats/filebeat</a> on the factories to send the logs, and a new instance of logstash (probably in a docker instance) to receive and store the logs in ES.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:42:39)</span> <b>dweitzel:</b></span> I am configuring everything.  I will work with @marian to make sure everything gets puppetized.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:45:37)</span> <b>kretzke:</b></span> that will make @tanya’s day :slightly_smiling_face:<br/>
+<span style="color: #902d59"><span style="font-size: small">(12:46:33)</span> <b>tanya:</b></span> great!<br/>
+<span style="color: #902d59"><span style="font-size: small">(12:46:54)</span> <b>tanya:</b></span> let us know when we could see the data<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:51:16)</span> <b>kretzke:</b></span> @dweitzel any idea on the data rate?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:51:31)</span> <b>dweitzel:</b></span> nope, not at all.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:51:41)</span> <b>dweitzel:</b></span> Could you help me setup the ES side?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:51:46)</span> <b>dweitzel:</b></span> like the index.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:53:45)</span> <b>kretzke:</b></span> sure. Logstash will create a default mapping, which is a good place to start, so you just need to tell it the index pattern and it will create the indices as needed.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:54:31)</span> <b>dweitzel:</b></span> ok, I'm following this page: <a href="https://www.elastic.co/guide/en/beats/libbeat/5.5/logstash-installation.html#logstash-setup">https://www.elastic.co/guide/en/beats/libbeat/5.5/logstash-installation.html#logstash-setup</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:54:57)</span> <b>kretzke:</b></span> btw, looks like some index cleanup will be needed soon, disks are filling up <pre>gratiav2-2 | SUCCESS | rc=0 &gt;&gt;<br/>Filesystem      Size  Used Avail Use% Mounted on<br/>/dev/vdb1       2.0T  1.5T  510G  75% /data<br/>/dev/vdc1       3.0T  2.5T  483G  84% /data2<br/><br/>gratiav2-4 | SUCCESS | rc=0 &gt;&gt;<br/>Filesystem      Size  Used Avail Use% Mounted on<br/>/dev/vdb1       2.0T  1.6T  452G  78% /data<br/>/dev/vdc1       3.0T  2.5T  512G  83% /data2<br/><br/>gratiav2-3 | SUCCESS | rc=0 &gt;&gt;<br/>Filesystem      Size  Used Avail Use% Mounted on<br/>/dev/vdb1       2.0T  1.5T  559G  73% /data<br/>/dev/vdc1       3.0T  2.4T  554G  82% /data2<br/><br/>gratiav2-5 | SUCCESS | rc=0 &gt;&gt;<br/>Filesystem      Size  Used Avail Use% Mounted on<br/>/dev/vdb1       2.0T  1.7T  266G  87% /data<br/>/dev/vdc1       2.0T  1.8T  216G  90% /data2<br/></pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:55:31)</span> <b>dweitzel:</b></span> boo.  Ok.  What does "cleanup" actually imply?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:55:31)</span> <b>kretzke:</b></span> FIFE is using 3TB, so a lot of that cleanup is on us<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:56:06)</span> <b>kretzke:</b></span> deleting the indices. there’s a lot of old indices that have been closed, but they still use disk space<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:56:22)</span> <b>dweitzel:</b></span> ah, ok.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:56:23)</span> <b>kretzke:</b></span> there may be some old GRACC indices out there too<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:56:54)</span> <b>dweitzel:</b></span> Does FIFE do that?  Are old indices in FIFE not valuable after some amount of time?  Unlike GRACC, where the data is always valuable?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:58:19)</span> <b>kretzke:</b></span> value certainly decreases with time (probably don’t care about log details from a year ago)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:16:49)</span> <b>dweitzel:</b></span> @kretzke if the data goes through, where will I see the data?  Kibana?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:17:04)</span> <b>dweitzel:</b></span> Will the new index automatically show up, or do I need to do an index pattern?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:25:34)</span> <b>kretzke:</b></span> you’ll need to add the index pattern to kibana<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:45:38)</span> <b>dweitzel:</b></span> @kretzke I don't think I have a kibana login on that node.  Could you add the index pattern: filebeat-*<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:45:43)</span> <b>dweitzel:</b></span> (I may rename it)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:11:58)</span> <b>dweitzel:</b></span> thanks @kretzke figured out.  Not sure how useful the data is, it's a bit... all over the place.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:13:34)</span> <b>kretzke:</b></span> I was just complaining about how terrible the condor logs are…<br/>
+</body>
+</html>

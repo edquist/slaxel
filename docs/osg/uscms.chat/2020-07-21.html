@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jul 21, 2020 : #uscms (osg)</title>
+</head>
+<body>
+<h3>Tue Jul 21, 2020 : #uscms (osg)</h3>
+<span style="color: #a72f79"><span style="font-size: small">(11:53:43)</span> <b>andrew.melo:</b></span> Hmm, with cvmfs 2.7.2, I'm occasionally getting the following stacktrace:<br/><pre>Jul 15 22:40:09 ng1010 cvmfs2: (<a href="http://cms.cern.ch">cms.cern.ch</a>) switched to catalog revision 96016<br/>Jul 15 23:40:10 ng1010 cvmfs2: (<a href="http://cms.cern.ch">cms.cern.ch</a>) switched to catalog revision 96018<br/>Jul 16 06:22:58 ng1010 cvmfs2: (<a href="http://cms.cern.ch">cms.cern.ch</a>) stack trace generation failed<br/>Jul 16 06:23:01 ng1010 cvmfs2: (<a href="http://cms.cern.ch">cms.cern.ch</a>) Signal 6, errno 12<br/>Jul 16 06:23:03 ng1010 cvmfs2: (<a href="http://cms.cern.ch">cms.cern.ch</a>) watchdog disappeared, aborting<br/>Jul 16 06:23:03 ng1010 cvmfs2: (<a href="http://cms.cern.ch">cms.cern.ch</a>) Backtrace (18 symbols):#012/lib64/libcvmfs_fuse.so(+0x9c3d3) [0x7fd39d4463d3]#012/lib64/libpthread.so.0(+0xf5d0) [0x7fd39fafb5d0]#012/lib64/libc.so.6(gsignal+0x37) [0x7fd39ef36207]#012/lib64/libc.so.6(abort+0x148) [0x7fd39ef378f8]#012/lib64/libc.so.6(+0x2f026) [0x7fd39ef2f026]#012/lib64/libc.so.6(+0x2f0d2) [0x7fd39ef2f0d2]#012/lib64/libcvmfs_fuse.so(+0x82bc6) [0x7fd39d42cbc6]#012/lib64/libcvmfs_fuse.so(+0x8443d) [0x7fd39d42e43d]#012/lib64/libcvmfs_fuse.so(+0x845dc) [0x7fd39d42e5dc]#012/lib64/libcvmfs_fuse.so(+0xd8bd2) [0x7fd39d482bd2]#012/lib64/libcvmfs_fuse.so(+0xd8c98) [0x7fd39d482c98]#012/lib64/libcvmfs_fuse.so(+0xd02d9) [0x7fd39d47a2d9]#012/usr/bin/cvmfs2() [0x40874a]#012/lib64/libfuse.so.2(+0x16fe4) [0x7fd39fd1efe4]#012/lib64/libfuse.so.2(+0x16b6b) [0x7fd39fd1eb6b]#012/lib64/libfuse.so.2(+0x13401) [0x7fd39fd1b401]#012/lib64/libpthread.so.0(+0x7dd5) [0x7fd39faf3dd5]#012/lib64/libc.so.6(clone+0x6d) [0x7fd39effdead]<br/>Jul 16 06:23:04 ng1010 cvmfs2: (<a href="http://cms.cern.ch">cms.cern.ch</a>) address of g_cvmfs_exports: 0x7fd39d8deb50</pre><br/>
+<span style="color: #df3dc0"><span style="font-size: small">(12:48:31)</span> <b>burt:</b></span> IIRC errno 12 is ENOMEM - how’s the memory of the system look?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:33:35)</span> <b>andrew.melo:</b></span> It's fine now, but that's not very helpful ...<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:36:10)</span> <b>andrew.melo:</b></span> In principle, we've got cgroups set up to protect the overall machine from dirty users<br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:53:26)</span> <b>andrew.melo:</b></span> ACtually, scratch that. Dmesg doesn't show an OOM<br/>
+</body>
+</html>

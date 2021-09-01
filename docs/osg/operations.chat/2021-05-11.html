@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue May 11, 2021 : #operations (osg)</title>
+</head>
+<body>
+<h3>Tue May 11, 2021 : #operations (osg)</h3>
+<span style="color: #e96699"><span style="font-size: small">(10:09:33)</span> <b>lincoln:</b></span> could someone give me a heads up once a new squid container is ready to deploy?<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:09:39)</span> <b>lincoln:</b></span> I would like to restart all of the ATLAS squids<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:09:46)</span> <b>lincoln:</b></span> even if its a testing branch<br/>
+<span style="color: #73769d"><span style="font-size: small">(10:16:34)</span> <b>tim.theisen:</b></span> Check your email at 9:00AM CDT Brian Lin sent<br/><pre>I've kicked off new container image rebuilds so 4.15-1.1 is now available in the opensciencegrid/frontier-squid:testing image.</pre><br/>
+<span style="color: #73769d"><span style="font-size: small">(10:16:57)</span> <b>tim.theisen:</b></span> @lincoln :point_up:<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:39:16)</span> <b>lincoln:</b></span> thanks<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:39:29)</span> <b>lincoln:</b></span> restarted all of the ATLAS squids w/ the testing image :thumbsup:<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:40:33)</span> <b>blin:</b></span> let us know how it goes!<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:42:00)</span> <b>lincoln:</b></span> they're all running, so I'll let you know if I just blew up all of the T2s :wink:<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:42:52)</span> <b>blin:</b></span> DevOps :tm: !<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:43:42)</span> <b>blin:</b></span> you can still break all your services...but faster<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:27:01)</span> <b>lincoln:</b></span> @blin just following up here, everything seems ok with the testing image<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:27:09)</span> <b>blin:</b></span> awesome, thanks!<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:29:24)</span> <b>jthiltges:</b></span> I'm trying to get the svn-to-github mirror at opensciencegrid/Software-Redhat running again (and migrated to tiger k8s). But I'm running into trouble with the git history.<br/>A new git-svn checkout gets new hashes. And I've yet to discover the magic words to merge the existing repo.<br/><br/>The lazy option is to <tt>git push --force</tt>. Rewriting history would hopefully be a rare event: only if the Ceph PV is lost. Any thoughts on how disruptive this would be @matyas and @blin?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:30:47)</span> <b>matyas:</b></span> are you doing it by hand? I think in the past we used to use <a href="https://github.com/alloy/git-svn-mirror">https://github.com/alloy/git-svn-mirror</a><br/>
+<blockquote>
+<span style="color: #e06b56"><span style="font-size: small">(12:32:36)</span> <b>jthiltges:</b></span> I'm using the same tool, yup. It creates an new repo, and <tt>git push</tt> ends in sadness on my test repo:<br/><pre> ! [rejected]            svn/trunk -&gt; trunk (non-fast-forward)<br/>error: failed to push some refs to 'git@github.com:jthiltges/osg-svn-test.git'<br/>hint: Updates were rejected because a pushed branch tip is behind its remote<br/>hint: counterpart. Check out this branch and integrate the remote changes<br/>hint: (e.g. 'git pull ...') before pushing again.<br/>hint: See the 'Note about fast-forwards' in 'git push --help' for details.</pre><br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:33:43)</span> <b>jthiltges:</b></span> I _can_ pull the existing repo clone from the old VM. But we'd have the same problem if the Ceph volume disappears.<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:34:25)</span> <b>matyas:</b></span> and it's not just a conflict with the current repo, it's always different if you run it twice?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:36:31)</span> <b>jthiltges:</b></span> That's a very good question. I'll give it a try.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:16:40)</span> <b>jthiltges:</b></span> It seems to consistently generate the same history. It just doesn't match the old repo. So not entirely bad!<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:17:06)</span> <b>matyas:</b></span> ok, that's good<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:17:48)</span> <b>matyas:</b></span> I think it should be OK to do a force push this time<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:18:41)</span> <b>matyas:</b></span> it's not used frequently enough to be a problem<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:19:04)</span> <b>jthiltges:</b></span> Great. I still need to get the container onto docker hub, and sort out the k8s. (And then get things properly into OSG workspaces for github and docker.) But at least there's a clear path forward. Thanks!<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:19:26)</span> <b>matyas:</b></span> sure! Thanks for working on this<br/>
+</blockquote>
+<span style="color: #c386df"><span style="font-size: small">(13:04:01)</span> <b>matyas:</b></span> @jthiltges separate issue: <a href="http://repo.gridcf.org">repo.gridcf.org</a> appears to be down<br/>
+<blockquote>
+<span style="color: #e06b56"><span style="font-size: small">(13:15:18)</span> <b>jthiltges:</b></span> Doh. I'm suspecting that's a Cloudflare thing. CF is probably pointed at <a href="http://repo.opensciencegrid.org">repo.opensciencegrid.org</a>, rather than <a href="http://hcc-osg-repo.unl.edu">hcc-osg-repo.unl.edu</a>. Can you swap that @dweitzel ? Or should I make a ticket?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:18:28)</span> <b>dweitzel:</b></span> Make a ticket, but I'll confirm.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:19:12)</span> <b>dweitzel:</b></span> I do not have access to the <a href="http://gridcf.org">gridcf.org</a> domain.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:19:25)</span> <b>dweitzel:</b></span> @matyas any idea who manages that?  @blin?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:21:37)</span> <b>blin:</b></span> i should have access. Mat may as well<br/>
+<span style="color: #e06b56"><span style="font-size: small">(13:22:48)</span> <b>jthiltges:</b></span> Ticket email sent.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:23:03)</span> <b>matyas:</b></span> yep looks like I have access too<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:38:46)</span> <b>matyas:</b></span> fixed<br/>
+</blockquote>
+<span style="color: #c386df"><span style="font-size: small">(13:04:14)</span> <b>matyas:</b></span> (or at least broken -- returns 404's)<br/>
+</body>
+</html>

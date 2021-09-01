@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jun 23, 2021 : #flightworthy (chtc)</title>
+</head>
+<body>
+<h3>Wed Jun 23, 2021 : #flightworthy (chtc)</h3>
+<span style="color: #4cc091"><span style="font-size: small">(09:27:43)</span> <b>blin:</b></span> hey there's a ticket on <tt>htcondor-users</tt> with the subject<br/>&gt; HTCondor-CE: after 2 minutes Staging of job files failed<br/>but it's not specifically a CE issue, it's just some weirdness with remote stage in<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:04:06)</span> <b>jcpatton:</b></span> Can anyone help me understand why we get a Shadow Exception in the log _and then_ job on hold when jobs go over the 72 hour limit? Some excerpts from our startd config:<br/><pre>JobRuntimeGuarantee        = 72 * $(HOUR)<br/>JobRuntimeLimit            = 72 * $(HOUR)<br/>### This appears to be overwritten in owned_by_chtc.conf:<br/>TIME_EXCEEDED              = TotalJobRunTime &gt;  ( 72 * $(HOUR) )<br/>### owned_by_chtc.conf version:<br/>TIME_EXCEEDED = TotalJobRuntime &gt; ((72 * $(HOUR) + (264 * $(HOUR) * (Target.LongJob =?= true))))<br/>PREEMPT                    = (MY.TIME_EXCEEDED)<br/><br/>WANT_HOLD        = ((MY.TIME_EXCEEDED) &amp;&amp; Target.Is_Resumable =!= true)<br/>WANT_HOLD_REASON = "Job failed to complete in 72 hrs"<br/><br/>JobRuntimeGuarantee = ifThenElse((ifThenElse(isUndefined(TARGET.WantGlidein), false, TARGET.WantGlidein) || ifThenElse(isUndefined(TARGET.InteractiveJob), false, TARGET.InteractiveJob) || ifThenElse(isUndefined(TARGET.IsBuildJob), false, TARGET.IsBuildJob)), 4 * $(HOUR), ifThenElse(ifThenElse(isUndefined(TARGET.LongJob), false, TARGET.LongJob), 336 * $(HOUR), ($(JobRuntimeGuarantee))))<br/><br/>MaxJobRetirementTime = (3600 * (72 - 68 * (IfThenElse(IsUndefined(WantGlidein), false, WantGlidein) || IfThenElse(IsUndefined(InteractiveJob), false, InteractiveJob) || IfThenElse(IsUndefined(IsBuildJob), false, IsBuildJob))))<br/><br/>JobRuntimeLimit = ifThenElse(ifThenElse(isUndefined(TARGET.LongJob), false, TARGET.LongJob), 336 * $(HOUR), ($(JobRuntimeLimit)))</pre><br/>Why isn’t the job evicted then put on hold? What should we expect to happen if a job has <tt>Is_Resumable == true</tt>?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:10:27)</span> <b>jcpatton:</b></span> (I can paste the “nice” versions of the <tt>JobRuntime</tt> expressions if it helps)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:15:20)</span> <b>johnkn:</b></span> Periodic expression evaluation on the Execute node happens in the startd,   but the shadow is talking to the Starter, not the startd.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:19:51)</span> <b>johnkn:</b></span> the communication channel between shadow and starter is rich.  but the communication channel between starter and startd is restricted.  There's a complicated 3 way conversation happening here.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:23:10)</span> <b>johnkn:</b></span> I'm not sure what your actual question is.  you appear to be saying that the job is evicted and then held at first, and then later that it isn't.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:23:56)</span> <b>jcpatton:</b></span> What can a user do if they want to get the contents of their sandbox transferred back if their job hits the 72-hour limit?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:24:23)</span> <b>johnkn:</b></span> and it does not get transferred if the job ends up on hold?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:25:34)</span> <b>jcpatton:</b></span> I don’t know… before I get to that point, I’m concerned about the shadow exception implying that the job is going away on the execute machine before it goes on hold and has a chance to transfer files<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:27:51)</span> <b>johnkn:</b></span> Yeah.  that's the three way conversation.  The Shadow gets told (via the rich channel) that the job is being kicked.  but the Startd waits for the Starter to exit before it does it's state transition.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:28:45)</span> <b>johnkn:</b></span> File transfer has to happen before the starter exits,  the Startd doesn't have a way to do that because it doesn't talk to the shadow.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:36:17)</span> <b>jcpatton:</b></span> set the channel description: (the group formerly known as)<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(11:52:59)</span> <b>jfrey:</b></span> All of the glexec support in the startd and starter is dead now, yes?<br/>
+<blockquote>
+<span style="color: #bb86b7"><span style="font-size: small">(13:06:22)</span> <b>tim:</b></span> @jfrey Yes, glexec support is dead.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(13:07:47)</span> <b>tim:</b></span> At some point I was going to remove it.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(13:23:51)</span> <b>jfrey:</b></span> I’ll be ripping some glexec-related code in the shadow as a side effect of the GSI removal.<br/>
+</blockquote>
+<span style="color: #674b1b"><span style="font-size: small">(12:29:49)</span> <b>coatsworth:</b></span> FYI I think I figured out why <tt>test_python_bindings_collector</tt> is failing. The collector sometimes advertises its own ad and other times it doesn't. This is based on a timer. My test (and other flaky python tests) were expecting to see the exact same number of collector ads every time.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:30:31)</span> <b>coatsworth:</b></span> I'm going to run a few workspace builds, if these all work correctly I'll push the change directly to master to clean up our main board. I'll continue all other Ornithology tests on my branch.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:32:40)</span> <b>tlmiller:</b></span> ... I would ask why the ad is present, or not, based on a timer, but I'm pretty sure the answer would only be depressing.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:32:57)</span> <b>johnkn:</b></span> IMO, we should consider it a bug that the collector ad isn't in the collector before it ever responds to any queries<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:34:20)</span> <b>johnkn:</b></span> IIRC,  the collector ad used to not be in the collector at all, it was only sent to the view collector (on a timer),<br/>that was changed when we wanted to have statistics in the collector ad<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:39:00)</span> <b>johnkn:</b></span> @coatsworth fyi.  there is a load test going, so random test failures are likely.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:00:50)</span> <b>coatsworth:</b></span> Thanks for the heads up, if these fail under load it should be obvious.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:01:19)</span> <b>coatsworth:</b></span> I also kind of thought the collector ad timer should be considered a bug, but @gthain feels otherwise.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:07:03)</span> <b>johnkn:</b></span> IMO things that make it hard to test Condor can be treated as bugs even if they don't really impact users.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:07:25)</span> <b>tlmiller:</b></span> Concur.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:09:29)</span> <b>johnkn:</b></span> I say make a ticket, can be lower priority but we should really fix this<br/>
+<span style="color: #d58247"><span style="font-size: small">(13:13:59)</span> <b>gthain:</b></span> Remember the master ad may have a similar issue<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:24:51)</span> <b>johnkn:</b></span> yes, but the fix for that is quite different.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:27:52)</span> <b>johnkn:</b></span> Question about mount_under_scratch.  Can that be used to have a rootly directory show up in the user sandbox (i.e. so a docker job can see it)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:28:35)</span> <b>johnkn:</b></span> or is it just the other way around.   a sandbox dir appears to be outside the sandbox?<br/>
+<span style="color: #d58247"><span style="font-size: small">(14:02:45)</span> <b>gthain:</b></span> Mount_under_scratch  effectively replaces some existing directory (outside the sandbox) with a link to a directory under the sandbox directory<br/>
+<span style="color: #d58247"><span style="font-size: small">(14:03:34)</span> <b>gthain:</b></span> e.g. so that /tmp isn't really shared across jobs, but is redirected to a private copy<br/>
+<span style="color: #4cc091"><span style="font-size: small">(15:33:10)</span> <b>blin:</b></span> who <b>@here</b> doesn't have access to the OSG Slack?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(15:53:59)</span> <b>jfrey:</b></span> I don’t think I’ve tried to access the OSG Slack.<br/>
+<blockquote>
+<span style="color: #4cc091"><span style="font-size: small">(16:21:51)</span> <b>blin:</b></span> invite sent<br/>
+</blockquote>
+<span style="color: #9b3b45"><span style="font-size: small">(16:53:08)</span> <b>jfrey:</b></span> As part of removing GSI code from HTCondor, I’d like to get rid of the shadow forking a child process whenever it needs to read the proxy file. Now that GSI is no longer used for proxy-related tasks, removing the forking code in the shadow increases its RSS size from 5040kB to 5304kB (about a 5% increase). Note that this is only when a proxy is present. Is that an acceptable tradeoff for code simplification?<br/>
+<span style="color: #4cc091"><span style="font-size: small">(17:12:48)</span> <b>blin:</b></span> hey @tim when do you think we'll get a new blahp version? the RC fixes a lot of issues for OSG and it'd be great if we could have those fixes in the tarball<br/>
+<blockquote>
+<span style="color: #bb86b7"><span style="font-size: small">(2021-06-24 09:48:46)</span> <b>tim:</b></span> @blin OSP pool update in next release have gotten in the way of getting the rc into the tarball. It'e next on my list after OSP update and today's release.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(2021-06-24 09:53:14)</span> <b>blin:</b></span> gotcha. should we create a ticket to automate the blahp RC -&gt; tarball pipeline? it'd be cool if you could just tag the RC and it'd just result in the RPMs/tarballs in the appropriate places<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(2021-06-24 10:17:18)</span> <b>tim:</b></span> Yup, I am working on it. However, I have deadlines that do allow time to do that work and I end up doing things more manually. I am making progress.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(2021-06-24 11:04:07)</span> <b>blin:</b></span> is there a ticket for it?<br/>
+</blockquote>
+<span style="color: #d58247"><span style="font-size: small">(17:17:42)</span> <b>gthain:</b></span> @jfrey if it doesn't trigger the <tt>shadow_mem_test</tt>, I'm good with the increase<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:18:43)</span> <b>gthain:</b></span> and given the dprintf fixes that help the shadow, I think we're still net negative shadow memory size in 9.1<br/>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Mar 24, 2021 : #operations (osg)</title>
+</head>
+<body>
+<h3>Wed Mar 24, 2021 : #operations (osg)</h3>
+<span style="color: #a63024"><span style="font-size: small">(11:56:05)</span> <b>paschos:</b></span> <b>@here</b> the new GaTech site (with CE: <a href="http://osg-sched2.pace.gatech.edu">osg-sched2.pace.gatech.edu</a>)  has gpus that should be accessible for osg jobs - but only at a fixed % of the total. Is there a config or a sauce that can be applied to ensure that?<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:00:33)</span> <b>lincoln:</b></span> fyi-<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:00:36)</span> <b>lincoln:</b></span> HostedCE04 is getting shut off<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:01:09)</span> <b>lincoln:</b></span> This appears to be GSU<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:02:45)</span> <b>lincoln:</b></span> as a reminder I will turn all of the non-K8S HostedCEs off by 3/31<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:03:02)</span> <b>jpeterson:</b></span> guessing Georgia State != Georgia Tech<br/>
+<blockquote>
+<span style="color: #a63024"><span style="font-size: small">(12:08:24)</span> <b>paschos:</b></span> yes<br/>
+</blockquote>
+<span style="color: #e96699"><span style="font-size: small">(12:03:07)</span> <b>lincoln:</b></span> right, they are different<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:04:54)</span> <b>jpeterson:</b></span> @paschos what scheduler are they using?  that is to muy understanding handled on the scheduler/partition side, or by restricting the number of pilots from the factory.<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:07:39)</span> <b>paschos:</b></span> condor<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:08:05)</span> <b>paschos:</b></span> so — it’s up to them configure the ratio<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:08:08)</span> <b>paschos:</b></span> ?<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:09:03)</span> <b>paschos:</b></span> first i wanted to make sure that factory also sends them gpu jobs---<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:09:14)</span> <b>paschos:</b></span> @marian same with ligo<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:10:10)</span> <b>paschos:</b></span> if there any relevant docs on how a site can configure this can you post them ?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:11:15)</span> <b>jpeterson:</b></span> I haven’t dealt with the non-hosted ce configs; or with condor as the endpoint scheduler yet, normally got to John for Slurm configs to do this.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:11:58)</span> <b>jpeterson:</b></span> if it is our factory feeding the jobs then we should be able to set it to a max number of pilots that matches the % desired<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:12:00)</span> <b>paschos:</b></span> its a host-hosted CE<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:12:50)</span> <b>blin:</b></span> i think the best thing to do would be to handle this on the condor scheduler end instead of in the CE/factory<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:13:50)</span> <b>paschos:</b></span> i agree--- but my understanding is that the factory should. be at least be aware that this is also gpu resource… wrong?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:14:29)</span> <b>blin:</b></span> Yup, you're right<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:16:52)</span> <b>paschos:</b></span> ok--- so the recommendation that I am hearing is that they need add something in condor to run gpu jobs at a particular % from those coming in through the CE… is htere a doc that outlines the steps forr this?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:16:56)</span> <b>blin:</b></span> for the condor cluster side, they probably want to set up accounting groups and enable GPU support on the workers <a href="https://htcondor.readthedocs.io/en/latest/admin-manual/policy-configuration.html#configuring-gpus">https://htcondor.readthedocs.io/en/latest/admin-manual/policy-configuration.html#configuring-gpus</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:17:30)</span> <b>blin:</b></span> accounting group doc <a href="https://htcondor.readthedocs.io/en/latest/admin-manual/user-priorities-negotiation.html#group-accounting">https://htcondor.readthedocs.io/en/latest/admin-manual/user-priorities-negotiation.html#group-accounting</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:17:32)</span> <b>paschos:</b></span> gpu support is alrready enabled<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:17:33)</span> <b>paschos:</b></span> <pre>use feature : gpus<br/>START = (TARGET.WantGPU == True) &amp;&amp; ( $(START) )<br/>HasGPU = True<br/>STARTD_ATTRS = $(STARTD_ATTRS),HasGPU<br/>GLIDEIN_ResourceName = "Georgia_Tech_PACE_CE_2"<br/>STARTD_ATTRS = $(STARTD_ATTRS),GLIDEIN_ResourceName</pre><br/><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:17:44)</span> <b>paschos:</b></span> on their worker gpu nodes<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:18:49)</span> <b>blin:</b></span> mmk, so it's sorting out the accounting groups. i can ask if there's a setup guide but all i know of off hand is the manual<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:20:54)</span> <b>blin:</b></span> there are a bunch of how to recipes but i don't see anything for this particular use case <a href="https://htcondor-wiki.cs.wisc.edu/index.cgi/wiki?p=HowToAdminRecipes">https://htcondor-wiki.cs.wisc.edu/index.cgi/wiki?p=HowToAdminRecipes</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:24:03)</span> <b>paschos:</b></span> right --- that’s why i was thinking that maybe CE/Factory can handle this? Quoting Jeff from above: “if it is our factory feeding the jobs then we should be able to set it to a max number of pilots that matches the % desired”<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:27:18)</span> <b>blin:</b></span> i think it makes sense for the factory to request the appropriate amount of GPUs per pilot but how many GPUs the OSG gets from their cluster should be part of their local scheduler policy<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:31:29)</span> <b>jpeterson:</b></span> agreed, just because the factory could, doesn’t mean it should.  if it is handled at the local scheduler they can make adjustements as desired<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:32:52)</span> <b>paschos:</b></span> ok — thats. fine … then its all about the sauce that makes it work on their end<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:44:34)</span> <b>moate:</b></span> I'm looking for glidein advice - I've got two Freshdesk tickets <a href="https://support.opensciencegrid.org/a/tickets/66747">66747</a> and <a href="https://support.opensciencegrid.org/a/tickets/66653">66653</a> that have to do with troubleshooting IceCube GPU glidein issues.  My normal method for troubleshooting something like this would be to learn how to run nearly identical jobs and gauge success/failure, then troubleshoot from there.  That is bound to take a lot of time and effort which I don't have.  Does anybody have a better method?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:44:37)</span> <b>jpeterson:</b></span> from what I can see the factory is not configured to send them GPU jobs. that resource type is not listed. @paschos  so that info will have to be added to the entry<br/>
+<blockquote>
+<span style="color: #a63024"><span style="font-size: small">(2021-03-26 12:26:03)</span> <b>paschos:</b></span> @marian<br/>
+</blockquote>
+<span style="color: #a63024"><span style="font-size: small">(12:46:52)</span> <b>paschos:</b></span> ok-- should i open a ticket for it?<br/>
+<blockquote>
+<span style="color: #53b759"><span style="font-size: small">(15:06:47)</span> <b>marian:</b></span> yes, FD assigned to the gWMS Factory group, please<br/>
+</blockquote>
+<span style="color: #3c8c69"><span style="font-size: small">(12:48:39)</span> <b>jpeterson:</b></span> probably a good start<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:49:35)</span> <b>bbockelm:</b></span> @moate - for 66653, you can target the job exactly to the SDSC endpoint IceCube is referencing and see if <tt>/etc/OpenCL/vendors</tt> is present.  The likely case is that it's not being mounted in the script here: <a href="https://github.com/opensciencegrid/tiger-osg-config/blob/master/manifests/base/vo-frontend-glow/frontend.xml#L250">https://github.com/opensciencegrid/tiger-osg-config/blob/master/manifests/base/vo-frontend-glow/frontend.xml#L250</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:50:12)</span> <b>bbockelm:</b></span> I believe the implementation of that script is here: <a href="https://github.com/opensciencegrid/osg-flock/blob/master/job-wrappers/default_singularity_wrapper.sh">https://github.com/opensciencegrid/osg-flock/blob/master/job-wrappers/default_singularity_wrapper.sh</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:51:01)</span> <b>bbockelm:</b></span> Scanning through the bash, I'd guess the lines that are supposed to add OpenCL support are here: <a href="https://github.com/opensciencegrid/osg-flock/blob/master/job-wrappers/default_singularity_wrapper.sh#L305-L307">https://github.com/opensciencegrid/osg-flock/blob/master/job-wrappers/default_singularity_wrapper.sh#L305-L307</a><br/>
+<span style="color: #aba727"><span style="font-size: small">(12:51:16)</span> <b>moate:</b></span> @bbockelm endpoint = CE, yes?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:52:23)</span> <b>bbockelm:</b></span> Yup.  You can steer an individual job to a given site by setting <tt>DESIRED_Sites</tt> appropriately in your job submit file.<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:52:57)</span> <b>moate:</b></span> Oh, neat.  Fodder for a wiki article.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:53:49)</span> <b>bbockelm:</b></span> Hm. It seems that CHTC doesn't have any user-facing docs I can easily find on how to manage OSG submissions<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:54:48)</span> <b>bbockelm:</b></span> <a href="https://chtc.cs.wisc.edu/scaling-htc.shtml">https://chtc.cs.wisc.edu/scaling-htc.shtml</a> Seems this is the closest page but targeting jobs beyond an on/off switch ends in "get in touch with us".<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:55:18)</span> <b>moate:</b></span> Generally RCF strategy is to abstract that stuff away<br/>
+<span style="color: #aba727"><span style="font-size: small">(12:55:34)</span> <b>moate:</b></span> Through job transforms, etc<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:57:23)</span> <b>bbockelm:</b></span> Anyhow - considering how completely overhauled all the frontend stuff is, the question of "is it still a problem?" is quite valid.  Might have been fixed.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:58:53)</span> <b>bbockelm:</b></span> For #66747 -- that ticket appears to have been during the era where the collector was repeatedly crashing.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:00:18)</span> <b>bbockelm:</b></span> <a href="https://vo-frontend-glow.chtc.wisc.edu/vofrontend/monitor/frontendStatus.html?group=glowGPU&amp;factory=Glow_US_Syracuse2_condor_gpu@gfactory_instance@OSG@gfactory-2.opensciencegrid.org&amp;infoGroup=Running&amp;elements=MatchJobRunningHere,MatchGlideinRunning,MatchGlideinIdle,MatchGlideinFailed,MatchCoreIdle,MatchCoreRunning,&amp;rra=0&amp;window_min=0&amp;window_max=0&amp;timezone=-5">https://vo-frontend-glow.chtc.wisc.edu/vofrontend/monitor/frontendStatus.html?group=glowGPU&amp;[…]eRunning,&amp;rra=0&amp;window_min=0&amp;window_max=0&amp;timezone=-5</a> here's the current status of the Syracuse endpoint.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:03:30)</span> <b>blin:</b></span> Syracuse may have even turned off GPU support on us because we were requesting them and leaving them idle<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:04:20)</span> <b>blin:</b></span> i remember seeing that when @dweitzel was troubleshooting F@H jobs<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:04:21)</span> <b>bbockelm:</b></span> We<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:04:31)</span> <b>bbockelm:</b></span> re definitely still getting GPU slots, supposedly.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:05:11)</span> <b>blin:</b></span> ah ok, maybe they just did that for OSG jobs then or Derek fixed everything :slightly_smiling_face:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:10:07)</span> <b>dweitzel:</b></span> Mats and I disabled F@H jobs from running at Syracuse.  And stopped them from requesting idle GPU pilots there.<br/>
+<span style="color: #aba727"><span style="font-size: small">(13:24:50)</span> <b>moate:</b></span> Thanks for the advices, it's enough to get me started<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:14:05)</span> <b>bbockelm:</b></span> @moate - whatever was wrong with Syracuse looks much better<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:14:29)</span> <b>bbockelm:</b></span> <br/>
+<span style="color: #aba727"><span style="font-size: small">(14:16:27)</span> <b>moate:</b></span> I think the slots are getting matched and claimed, but the resources aren't actually being utilized<br/>
+<span style="color: #aba727"><span style="font-size: small">(14:16:45)</span> <b>moate:</b></span> At least, that's my understanding of ticket 66747<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:19:14)</span> <b>bbockelm:</b></span> <tt>condor_status -const 'TotalGPUs &amp;&amp; DynamicSlot' -af:h Name SlotType TotalGPUs GPUs TotalJobRuntime</tt> &lt;~ this looks reasonable.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:19:43)</span> <b>bbockelm:</b></span> That is, there's a reasonable distribution of IceCube jobs<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:20:50)</span> <b>bbockelm:</b></span> Looking at one that's been running for a few minutes, I see it churning CPU.<br/>
+</body>
+</html>

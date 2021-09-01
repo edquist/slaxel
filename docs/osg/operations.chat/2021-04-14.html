@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Apr 14, 2021 : #operations (osg)</title>
+</head>
+<body>
+<h3>Wed Apr 14, 2021 : #operations (osg)</h3>
+<span style="color: #9d8eee"><span style="font-size: small">(09:51:34)</span> <b>cat:</b></span> @tlmiller’s question came a bit late yesterday — can someone help him?<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(09:52:14)</span> <b>cat:</b></span> I see in #general that @blin mentioned the factory configuration repository &lt;<a href="https://github.com/opensciencegrid/osg-gfactory">https://github.com/opensciencegrid/osg-gfactory</a>&gt;<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(09:53:56)</span> <b>cat:</b></span> But I’m not at all sure that’s a useful place to look in this case.<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:55:46)</span> <b>blin:</b></span> @tlmiller i assume you mean the config of the pilot startd's?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:04:51)</span> <b>blin:</b></span> @rynge would be the authority but i believe the startd configs are put together from condor itself, glideinwms itself, factory entry config and frontend xml config<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(10:06:22)</span> <b>cat:</b></span> Oh, well that narrows it down. :wink:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:29:10)</span> <b>rynge:</b></span> Heh<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:29:19)</span> <b>rynge:</b></span> What are we looking for<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:29:32)</span> <b>bbockelm:</b></span> I guess I just do a condor_config_val against a running pilot.  But, as Brian Lin notes, the configuration is dynamically constructed.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:30:56)</span> <b>tlmiller:</b></span> The configuration of the pilot's startds, yes.  I believe I've gotten the information I need through other means, though I'd still like to know for future reference.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:44:31)</span> <b>bbockelm:</b></span> The "easy route" would be <tt>condor_config_val</tt> against a running pilot.  The second easiest route is get access from Mats for the glidein logs and start picking those apart.  The really hard route is to debug / understand the construction of the config from all the various sources.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:54:15)</span> <b>rynge:</b></span> <tt>condor_config_val</tt> will probably only work on non-Singularity instances<br/>
+<span style="color: #5a4592"><span style="font-size: small">(11:47:48)</span> <b>lmichael:</b></span> Ping @jdost321 and @blin on <a href="https://support.opensciencegrid.org/a/tickets/67038">https://support.opensciencegrid.org/a/tickets/67038</a>, which hasn’t had an OSG reply in two days. Jeff can reply to them and own to me?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:55:35)</span> <b>blin:</b></span> sorry, i meant to reply to your note but got distracted<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:56:00)</span> <b>blin:</b></span> i also bumped the urgency on the ticket<br/>
+<span style="color: #5a4592"><span style="font-size: small">(12:16:50)</span> <b>lmichael:</b></span> @blin you want to join an initial meeting, or might @jdost321 and I proceed given that they seem really close?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:17:53)</span> <b>blin:</b></span> yeah that sounds good. i'm also out the next two days so I wouldn't want my schedule to hold anything up<br/>
+<span style="color: #5a4592"><span style="font-size: small">(12:23:14)</span> <b>lmichael:</b></span> I’ll jump in and let Sedgie decide when they’d like to meet (now or later), but I think @jdost321 can proceed with answering their immediate questions, too.<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:52:21)</span> <b>tlmiller:</b></span> @bbockelm I tried running <tt>condor_config_val</tt> against a running pilot.  That doesn't work -- if you try to run it from inside the job, the glide-in doesn't include the binary, and if you try to run it remotely, osgconnect hasn't turned on CCB for non-root users, so it can't connect.<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:53:24)</span> <b>tlmiller:</b></span> What I ended up doing was (one job at a time) poking around in the filesystem until I (a) found that there was also no <tt>condor_gpu_utilization</tt> and (b) found a config file that looked sane-ish.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:09:44)</span> <b>bbockelm:</b></span> ah, indeed, I suppose I user my superpowers to do that.<br/>
+<span style="color: #385a86"><span style="font-size: small">(13:10:10)</span> <b>jdost321:</b></span> @lmichael @blin I just replied to the LSU ticket, thanks for instigating the consultation, I guess we're waiting to see how Sedgie replies about his availability?<br/>
+</body>
+</html>

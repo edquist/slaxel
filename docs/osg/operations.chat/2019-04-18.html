@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Apr 18, 2019 : #operations (osg)</title>
+</head>
+<body>
+<h3>Thu Apr 18, 2019 : #operations (osg)</h3>
+<span style="color: #e23f99"><span style="font-size: small">(05:14:13)</span> <b>marco.mascheroni:</b></span> @jlstephen @lincoln Can't ssh to many of the hosted CEs, os something going on with the infrastructure?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(05:17:02)</span> <b>marco.mascheroni:</b></span> Also, I need two new VM for <a href="http://cedar.computecanada.ca">cedar.computecanada.ca</a> and <a href="http://qb8.loni.org">qb8.loni.org</a><br/>
+<span style="color: #ea2977"><span style="font-size: small">(08:32:50)</span> <b>jlstephen:</b></span> @marco.mascheroni hypervisor issues. can you try again?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(09:13:42)</span> <b>marco.mascheroni:</b></span> it works Judith, thanks! Let me know about the two new VMs<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:28:02)</span> <b>jlstephen:</b></span> <a href="http://hosted-ce28.grid.uchicago.edu">hosted-ce28.grid.uchicago.edu</a> and <a href="http://hosted-ce29.grid.uchicago.edu">hosted-ce29.grid.uchicago.edu</a><br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:28:15)</span> <b>jlstephen:</b></span> let me know if you can't log in to either one of them<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:25:55)</span> <b>matyas:</b></span> <b>@edquist</b>, is there a way to test updates to your webhook, e.g. on topology-itb?<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:26:01)</span> <b>edquist:</b></span> yes<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:26:06)</span> <b>edquist:</b></span> what are you thinking?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:26:30)</span> <b>matyas:</b></span> every once in a while I have to update the versions of the Python dependencies<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:26:42)</span> <b>matyas:</b></span> which should happen on both the main webapp and the webhook<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:26:55)</span> <b>matyas:</b></span> and there should be a way to make sure the webhook to still works<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:39:34)</span> <b>edquist:</b></span> i see<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:39:49)</span> <b>edquist:</b></span> yeah there is a webhook dir somewhere on itb<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:40:38)</span> <b>edquist:</b></span> /opt/topology-itb-webhook i think<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:40:47)</span> <b>matyas:</b></span> yeah that's where it is<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:40:54)</span> <b>edquist:</b></span> anyway, if you update that and restart apache<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:41:07)</span> <b>edquist:</b></span> you can make a PR against the <tt>itb</tt> branch<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:41:44)</span> <b>edquist:</b></span> the instance on topology-itb handles the <tt>itb</tt> branch PRs, and the prod topology instance handles PRs against <tt>master</tt><br/>
+<span style="color: #16569E"><span style="font-size: small">(11:42:13)</span> <b>edquist:</b></span> living on the edge with new python versions<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:42:35)</span> <b>edquist:</b></span> unstable, fresh, raw, swift<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:43:05)</span> <b>edquist:</b></span> <tt>dicey</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(11:43:57)</span> <b>blin:</b></span> i think mat's asking for tests to run that would validate the webhook with new python deps<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:55:20)</span> <b>edquist:</b></span> so,<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:55:23)</span> <b>edquist:</b></span> currently,<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:55:41)</span> <b>edquist:</b></span> /opt/topology-itb-webhook/venv is a symlink to ../topology-itb/venv<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:56:03)</span> <b>edquist:</b></span> so if you are updating that one, it should update for the webhook also<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:56:09)</span> <b>edquist:</b></span> restart apache of course<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:56:26)</span> <b>edquist:</b></span> then, as i said, the way to test it is to make a PR against the <tt>itb</tt> branch<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:56:41)</span> <b>edquist:</b></span> and get some popcorn<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:56:45)</span> <b>edquist:</b></span> for the show<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:57:03)</span> <b>edquist:</b></span> there are not exactly unit tests<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:57:18)</span> <b>blin:</b></span> we should have those :stuck_out_tongue:<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:58:07)</span> <b>edquist:</b></span> you understand of course that the main work of the webhook is interacting with github<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:59:27)</span> <b>edquist:</b></span> the part you can test without github is whether certain commits are eligible for autocommit into other commits<br/>
+<span style="color: #16569E"><span style="font-size: small">(11:59:50)</span> <b>edquist:</b></span> but in any case the integration test is to run the whole thing<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:00:40)</span> <b>blin:</b></span> yeah, i think the autocommit stuff would be useful to have unit tests for<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:01:08)</span> <b>edquist:</b></span> perhaps we can stand up our own github server for unit testing<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:01:12)</span> <b>blin:</b></span> and i wish i knew more about mocking because that would allow us to write unit tests for the github integration bits<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:01:21)</span> <b>edquist:</b></span> :stuck_out_tongue:<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:01:41)</span> <b>edquist:</b></span> what is mocking?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:03:45)</span> <b>blin:</b></span> <a href="https://docs.python.org/3/library/unittest.mock-examples.html#">https://docs.python.org/3/library/unittest.mock-examples.html#</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:04:10)</span> <b>blin:</b></span> i've probably had a tab opened to that page + 5 other articles on mock open for over a year now<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:25:39)</span> <b>edquist:</b></span> your poor laptop never gets rebooted<br/>
+<span style="color: #16569E"><span style="font-size: small">(12:26:23)</span> <b>edquist:</b></span> anyway, i have not looked into mock<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:05:34)</span> <b>blin:</b></span> firefox can retain tab history between reboots, tho<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:05:01)</span> <b>marian:</b></span> fwiw, mock is cool! I know @jthiltges is also big fan of it ...<br/>
+<span style="color: #e06b56"><span style="font-size: small">(16:15:07)</span> <b>jthiltges:</b></span> Ah, I think this is different. A python feature, rather than the rpm build tool. =/<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:31:06)</span> <b>marian:</b></span> ah, haven't fully recognized the context of discussion<br/>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jan 8, 2018 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Mon Jan 8, 2018 : #xcache (osg)</h3>
+<span style="color: #674b1b"><span style="font-size: small">(16:06:43)</span> <b>rynge:</b></span> I don't have that many hosts to test this from, but I think there is something wrong with the IPv6 connections to <a href="http://redirector.osgstorage.org">redirector.osgstorage.org</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:06:59)</span> <b>rynge:</b></span> $ telnet 2001:18e8:2:6::242 1094<br/>Trying 2001:18e8:2:6::242...<br/>telnet: connect to address 2001:18e8:2:6::242: Network is unreachable<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:12:14)</span> <b>dweitzel:</b></span> @kylegross who from the GOC manages IPv6 DNS?  Sounds like <a href="http://redirectory.osgstorage.org">redirectory.osgstorage.org</a> has an IPv6 address, but the xrootd service isn't listening on the port.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:13:02)</span> <b>dweitzel:</b></span> @marian can you provide the configuration to the GOC so that the redirector can listen on the IPv6 Interface (if the <a href="http://redirectory.osgstorage.org">redirectory.osgstorage.org</a> is using the ipv6 interface)<br/>
+<span style="color: #e0a729"><span style="font-size: small">(16:13:16)</span> <b>kylegross:</b></span> Tom Lee (<a href="mailto:thomlee@iu.edu">thomlee@iu.edu</a>) manages it.<br/>
+<span style="color: #e0a729"><span style="font-size: small">(16:13:34)</span> <b>kylegross:</b></span> probably could email him and he'd see it in the morning<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:14:43)</span> <b>dweitzel:</b></span> ok, I'll send the email.<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:16:09)</span> <b>marian:</b></span> @dweitzel: for XRootD it should just work if hosting machine supports v6 address ... in this case it does ... is there anything what expect to work v6 related and it doesn't?<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:17:02)</span> <b>marian:</b></span> ah, may be ports blocked on IPv6 address, gotcha<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:18:35)</span> <b>marian:</b></span> yeah, let's email Thomas ... but I remember we were requesting hole there some time ago and things worked ... maybe something unintentionally has changed on the firewall level or so, hard to say<br/>
+<span style="color: #e96699"><span style="font-size: small">(16:18:36)</span> <b>lincoln:</b></span> tom lee is also in slack fwiw<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:18:56)</span> <b>marian:</b></span> perhaps osg-net-service slack channel would be good to ping for discussion?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:20:36)</span> <b>dweitzel:</b></span> @marian are we monitoring the redirectors with check_mk?<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:20:50)</span> <b>marian:</b></span> yeah, we do<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:21:04)</span> <b>marian:</b></span> not sure if our tests refer to IPv6 addresses, though<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:22:32)</span> <b>marian:</b></span> probably something to expand on the test specifically ...<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:23:57)</span> <b>dweitzel:</b></span> @rynge <tt>telnet 2001:18e8:2:6::242 1094</tt> actually works for me.<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:27:42)</span> <b>marian:</b></span> btw, since it's redirector we need also 1213 open world-wide, too ... I see there is doc to refer to as well: <a href="https://opensciencegrid.github.io/StashCache/ops/redirector/">https://opensciencegrid.github.io/StashCache/ops/redirector/</a> ... need a bit of clean up, but mostly formatting<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:44:28)</span> <b>rynge:</b></span> I was wondering if it is maybe the host I was testing from which had poor IPv6 setup<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:45:03)</span> <b>rynge:</b></span> rynge@xd-login:~$ ping6 <a href="http://google.com">google.com</a><br/>connect: Network is unreachable<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:45:05)</span> <b>rynge:</b></span> So yeah<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:56:38)</span> <b>rynge:</b></span> I'm having a hard time to decide if the hosts are misconfigured, or if xrootd elects to use IPv6 even though it shouldn't<br/>
+</body>
+</html>

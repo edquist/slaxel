@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Apr 3, 2017 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Mon Apr 3, 2017 : #gfactory (osg)</h3>
+<span style="color: #674b1b"><span style="font-size: small">(09:38:48)</span> <b>rynge:</b></span> @efajardo We are not getting any comet glideins. Anything wrong or is the allocation all used up?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(11:28:01)</span> <b>mkandes:</b></span> @rynge: Glideins look like they are pending at Comet. And at least on XUP, OSG allocations are not exhausted. But that accounting is usually wrong ....<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:29:15)</span> <b>rynge:</b></span> Ok - well we will keep requesting until we hear otherwise.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(11:43:08)</span> <b>mkandes:</b></span> @jdost321 @marian @amjad: It looks like there is something amiss with the factory web monitoring at CERN. <a href="http://vocms0805.cern.ch/factory/monitor/factoryStatus.html">http://vocms0805.cern.ch/factory/monitor/factoryStatus.html</a><br/>
+<span style="color: #bd9336"><span style="font-size: small">(11:44:07)</span> <b>mkandes:</b></span> I checked system. Everything looks like it is up and running, Just not sure why factoryStatus page not updating ....<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:45:00)</span> <b>marian:</b></span> I may have a look later today unless Jeff or Amjad have some do it meantime<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:11:25)</span> <b>amjad:</b></span> @mkandes , I noticed that during afternoon too, everything working fine and web services too, I guess this is the second time is happening<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:12:12)</span> <b>amjad:</b></span> gwms-factory, httpd services working fine<br/>
+<span style="color: #bd9336"><span style="font-size: small">(13:13:43)</span> <b>mkandes:</b></span> Yeah, I don't think I've seen this behavior before. Usually when I see no updates on web monitoring it's because factory has been down for some reason. In this case, everything looks normal ... a little strange.<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:29:51)</span> <b>marian:</b></span> is this normal from factory log on vocms805?<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:29:52)</span> <b>marian:</b></span> [2017-04-03 20:28:46,883] DEBUG: glideFactoryMonitorAggregator:753: aggregate_data, missing total data from file rrd_Status_Attributes.xml<br/>[2017-04-03 20:28:47,851] DEBUG: glideFactoryMonitorAggregator:753: aggregate_data, missing total data from file rrd_Log_Completed.xml<br/>[2017-04-03 20:28:48,760] DEBUG: glideFactoryMonitorAggregator:753: aggregate_data, missing total data from file rrd_Log_Completed_Stats.xml<br/>[2017-04-03 20:28:50,172] DEBUG: glideFactoryMonitorAggregator:753: aggregate_data, missing total data from file rrd_Log_Completed_WasteTime.xml<br/>[2017-04-03 20:28:51,585] DEBUG: glideFactoryMonitorAggregator:753: aggregate_data, missing total data from file rrd_Log_Counts.xml<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:30:59)</span> <b>marian:</b></span> maybe some issue with data updates ... not sure if it's safe flush data and let factory recreate again, though<br/>
+<span style="color: #bd9336"><span style="font-size: small">(13:31:44)</span> <b>mkandes:</b></span> Hmmm. What's the disk space looking like on CERN factory? I wonder if we're running up against limits again?<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:31:51)</span> <b>marian:</b></span> that I checked<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:31:53)</span> <b>marian:</b></span> it's OK<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:31:57)</span> <b>marian:</b></span> plenty of space<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:34:35)</span> <b>marian:</b></span> <tt>service gwms-factory upgrade</tt> would hurt?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(13:34:53)</span> <b>mkandes:</b></span> No, it should not.<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:35:07)</span> <b>marian:</b></span> I stop service there for quick, to upgrade and then start<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:35:21)</span> <b>marian:</b></span> or do you want to do it Amjad?<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:36:25)</span> <b>marian:</b></span> in ideal case <tt>service gwms-factory upgrade</tt> should do some trick with rrd files if anything is broken there<br/>
+<span style="color: #bd9336"><span style="font-size: small">(13:36:31)</span> <b>mkandes:</b></span> You can go ahead and give it a try. I also tried stopping and restarting all the services earlier. But I did not do an upgrade.<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:38:20)</span> <b>marian:</b></span> ok doing now<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:38:55)</span> <b>amjad:</b></span> @marian , I always noticed Those log files<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:39:32)</span> <b>marian:</b></span> could be it's there always<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:39:58)</span> <b>amjad:</b></span> I already notified CERN IT about the attached SSD volume to the factory<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:40:20)</span> <b>marian:</b></span> do you have any evidence something wrong with disk there?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:40:54)</span> <b>amjad:</b></span> about the current monitoring situation I do not think disk has anything to do with it<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:41:09)</span> <b>amjad:</b></span> but this factory has disk errors<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:41:25)</span> <b>amjad:</b></span> I restarted HTTPD service but not gwms-factory one<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:41:38)</span> <b>amjad:</b></span> please go ahead if you have any ideas<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:41:49)</span> <b>marian:</b></span> ok I did<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:28:27)</span> <b>marian:</b></span> @amjad, @mkandes ... seems like some plots drawing is getting back? <a href="http://vocms0805.cern.ch/factory/monitor/factoryStatus.html">http://vocms0805.cern.ch/factory/monitor/factoryStatus.html</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(14:28:55)</span> <b>marian:</b></span> I haven't touched anything at CERN factory besides restart we talked about<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:30:36)</span> <b>amjad:</b></span> it's around 18:15<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:30:43)</span> <b>amjad:</b></span> back*<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:30:46)</span> <b>marian:</b></span> looks like there was gap since March 31: <a href="http://vocms0805.cern.ch/factory/monitor/factoryStatus.html?entry=total&amp;frontend=total&amp;infoGroup=running&amp;elements=StatusRunning,ClientGlideRunning,ClientGlideIdle,&amp;rra=2&amp;window_min=1490632208181.6145&amp;window_max=1491228000000&amp;timezone=-5">http://vocms0805.cern.ch/factory/monitor/factoryStatus.html?entry=total&amp;frontend=total&amp;infoGroup=running&amp;elements=StatusRunning,ClientGlideRunning,ClientGlideIdle,&amp;rra=2&amp;window_min=1490632208181.6145&amp;window_max=1491228000000&amp;timezone=-5</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(14:41:05)</span> <b>marian:</b></span> so restart of things did bring monitoring back obviously ... question then is how functional was this factory from March 31 if at all... thought, you both said nothing strange with the gwms processes ... not sure if we need to investigate at this stage further or just let things as they are and watch more carefully in next days... I'd say latter would be ok and we can get back to discuss it on Wed meeting ... @amjad if you notice something funky during your day time tomorrow at CERN factory let us know and I'll try to follow on my shift on Tuesday from CST zone<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:51:54)</span> <b>amjad:</b></span> Sure<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:28:37)</span> <b>blin:</b></span> hey guys, is edgar out today?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:38:03)</span> <b>mkandes:</b></span> I would assume so. I only saw him online briefly earlier today.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:39:54)</span> <b>rynge:</b></span> Was he carrying a surf board?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:51:53)</span> <b>blin:</b></span> hey, who's on factory ops tomorrow?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:52:39)</span> <b>mkandes:</b></span> Marian is on Tuesday.<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:57:16)</span> <b>blin:</b></span> thanks<br/>
+<span style="color: #385a86"><span style="font-size: small">(18:11:01)</span> <b>jdost321:</b></span> any reason you want to wait for us to remove the glow pilots until tomorrow? i can do it now<br/>
+</body>
+</html>

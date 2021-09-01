@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Sep 3, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu Sep 3, 2020 : #software (osg)</h3>
+<span style="color: #73769d"><span style="font-size: small">(07:21:15)</span> <b>tim.theisen:</b></span> Internal links are broken in the technology area documentation. For example, the link at the top of <a href="https://opensciencegrid.org/technology/release/cut-sw-release/">https://opensciencegrid.org/technology/release/cut-sw-release/</a> is suppose to link to the data release document and it fails. The internal links work in our main documentation area. What is wrong with building the technology pages?<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:49:45)</span> <b>blin:</b></span> my guess is that it's because technology is using a newer version of mkdocs<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:49:55)</span> <b>blin:</b></span> do you have a link to the .md line with the problematic link?<br/>
+<span style="color: #73769d"><span style="font-size: small">(09:00:47)</span> <b>tim.theisen:</b></span> <a href="https://github.com/opensciencegrid/technology/blame/master/docs/release/cut-sw-release.md#L2">https://github.com/opensciencegrid/technology/blame/master/docs/release/cut-sw-release.md#L2</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(09:29:52)</span> <b>blin:</b></span> @tim.theisen hrm, it works for me locally so I'll have to poke around Travis to see what's different. Is this something holding up the release?<br/>
+<span style="color: #73769d"><span style="font-size: small">(09:30:16)</span> <b>tim.theisen:</b></span> Nope, just noticed it today on our web site.<br/>
+<span style="color: #73769d"><span style="font-size: small">(09:31:36)</span> <b>tim.theisen:</b></span> Since it is the technology site, I am not too worried. That is why I checked out the docs site to see if the problem was there. (It wasn't)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:17:40)</span> <b>rynge:</b></span> <pre>DAEMON_LIST = MASTER, SCHEDD<br/><br/>COLLECTOR_HOST = <a href="http://flock.opensciencegrid.org:9618">flock.opensciencegrid.org:9618</a><br/>COLLECTOR_PORT =<br/>SHARED_PORT_PORT = 31314<br/>COLLECTOR_USES_SHARED_PORT = true<br/>SCHEDD.USE_SHARED_PORT = true<br/>MASTER.COLLECTOR_HOST = $(IP_ADDRESS):$(SHARED_PORT_PORT) $(COLLECTOR_HOST)</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:17:51)</span> <b>rynge:</b></span> This is from a k8s schedd in slate<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:18:06)</span> <b>rynge:</b></span> What I don't understand is the <tt>MASTER.COLLECTOR_HOST</tt><br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:18:43)</span> <b>rynge:</b></span> If there is no local collector, why have both a local and the flock one?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:19:16)</span> <b>rynge:</b></span> In the logs I see:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:19:21)</span> <b>rynge:</b></span> <pre>09/03/20 13:33:13 (pid:102) Warning: Collector information was not found in the configuration file. ClassAds will not be sent to the collector and this daemon will not join a larger Condor pool.</pre><br/><br/>
+<span style="color: #73769d"><span style="font-size: small">(10:20:04)</span> <b>tim.theisen:</b></span> This is a workaround for SHARED_PORT_PORT not being honored (a bug that will be fixed in the next release)<br/>
+<span style="color: #e85d72"><span style="font-size: small">(10:21:00)</span> <b>cnweaver:</b></span> See <a href="https://www-auth.cs.wisc.edu/lists/htcondor-users/2020-June/msg00084.shtml">https://www-auth.cs.wisc.edu/lists/htcondor-users/2020-June/msg00084.shtml</a> for where Todd recommended how to set up the work-around.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:21:29)</span> <b>rynge:</b></span> Interesting<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:21:53)</span> <b>rynge:</b></span> Well we are still not getting it to register<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:23:22)</span> <b>rynge:</b></span> @tim.theisen Do you know if it is in 8.9.7?<br/>
+<span style="color: #73769d"><span style="font-size: small">(10:24:19)</span> <b>tim.theisen:</b></span> The bug fix is going into 8.8.10 and 8.9.8.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:24:30)</span> <b>rynge:</b></span> Ok<br/>
+<span style="color: #73769d"><span style="font-size: small">(10:25:40)</span> <b>tim.theisen:</b></span> Whoops 8.8.10 and 8.9.8 have already been released.<br/>
+<span style="color: #73769d"><span style="font-size: small">(10:25:53)</span> <b>tim.theisen:</b></span> HTCondor 8.9.8 will be released into OSG upcoming today.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:26:46)</span> <b>rynge:</b></span> Nice!<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:36:40)</span> <b>tim.theisen:</b></span> @blin @efajardo: Do we have any container recently tagged as stable?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:36:49)</span> <b>blin:</b></span> nope<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:36:55)</span> <b>tim.theisen:</b></span> Thanks.<br/>
+<span style="color: #73769d"><span style="font-size: small">(16:49:31)</span> <b>tim.theisen:</b></span> Can you take a peek at the release announcement before you go? I thought it would be done sooner, but someone distracted me with a Bosco issue.<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:53:56)</span> <b>matyas:</b></span> lol<br/>
+</body>
+</html>

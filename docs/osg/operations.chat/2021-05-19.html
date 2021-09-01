@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed May 19, 2021 : #operations (osg)</title>
+</head>
+<body>
+<h3>Wed May 19, 2021 : #operations (osg)</h3>
+<span style="color: #3c8c69"><span style="font-size: small">(09:15:25)</span> <b>jpeterson:</b></span> no dice<br/><pre># SLURM directives:<br/>#SBATCH -o /dev/null<br/>#SBATCH -e /dev/null<br/>#SBATCH -t 4320<br/>#SBATCH --mem=464269<br/>#SBATCH -n 52<br/>#SBATCH --ntasks-per-node 52</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(09:26:19)</span> <b>blin:</b></span> have i mentioned that i hate software?<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(09:29:55)</span> <b>cat:</b></span> As one should.<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:31:16)</span> <b>blin:</b></span> hold on, i couldn't look at the CE itself because I wasn't on the VPN and hopping on the VPN kills webex lol<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:35:41)</span> <b>blin:</b></span> @jpeterson agh the patch failed so new images didn't get built. one sec, i'll have a fixed image in a jiffy<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:38:59)</span> <b>bbockelm:</b></span> (that reminds me - how did the LSUHSC CE deploy go?  One thing we can do is have flux manage the precise tag each CE is using)<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:50:38)</span> <b>blin:</b></span> fwiw, that's something that I discussed with the SLATE team<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:51:53)</span> <b>blin:</b></span> in the chart, it sounds like they have the ability to allow wild cards in the images, i.e. it'll pull down <tt>release-&lt;timestamp&gt;</tt><br/>
+<span style="color: #e96699"><span style="font-size: small">(10:00:57)</span> <b>lincoln:</b></span> I think we're happy to let people set release tags just not full container image URLs<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:39:06)</span> <b>blin:</b></span> @jpeterson new <tt>release</tt> tag should have this change<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:56:46)</span> <b>rynge:</b></span> @blin Were you able to update the PATH for AMNH-HEL?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:57:32)</span> <b>blin:</b></span> we actually reverted the change because of some issues we encountered<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:57:43)</span> <b>blin:</b></span> they have since been fixed, though, and I think we can re-apply the fix @jpeterson<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:58:27)</span> <b>rynge:</b></span> Sajesh opened another ticket about it: <a href="https://support.opensciencegrid.org/a/tickets/67306">https://support.opensciencegrid.org/a/tickets/67306</a><br/>
+<span style="color: #aba727"><span style="font-size: small">(11:12:44)</span> <b>moate:</b></span> @bbockelm @jdost321 @dweitzel Tim Slauson and I will be absent from standup;  we're running an interview<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:20:26)</span> <b>dweitzel:</b></span> have fun!<br/>
+<span style="color: #385a86"><span style="font-size: small">(11:28:17)</span> <b>jdost321:</b></span> @rynge I asked Sajesh to on Brian B's suggestion, as the non-GPU resource seems resolved, so we want a fresh ticket to tackle the GPU matching isssue<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:30:27)</span> <b>rynge:</b></span> I bet the GPU resources are idle because we don't have Singularity on there<br/>
+<span style="color: #385a86"><span style="font-size: small">(11:30:29)</span> <b>jdost321:</b></span> hmm nevermind i see now 67306 is not gpu related<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:30:33)</span> <b>rynge:</b></span> But I have to check<br/>
+<span style="color: #385a86"><span style="font-size: small">(11:31:06)</span> <b>jdost321:</b></span> but the last he mentioned on the HEL ticket is its working again but not for GPU queues<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:31:42)</span> <b>rynge:</b></span> Right, but I suspect the GPU jobs all require Singularity<br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:31:46)</span> <b>rynge:</b></span> Looking now<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:32:28)</span> <b>blin:</b></span> for Singularity, the CE needs to be redeployed with <a href="https://github.com/opensciencegrid/hosted-ce-config/pull/29/files#diff-565f4a3ce10a764c0bf55db9786afca1d98cd1166471db7d7f8db0e40a2c18e0R117-R121">https://github.com/opensciencegrid/hosted-ce-config/pull/29/files#diff-565f4a3ce10a764c0bf55db9786afca1d98cd1166471db7d7f8db0e40a2c18e0R117-R121</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(11:38:12)</span> <b>rynge:</b></span> As far as I can tell, currently we only have GPU jobs from F@H and IceCube, which both require Singularity<br/>
+<span style="color: #385a86"><span style="font-size: small">(12:06:57)</span> <b>jdost321:</b></span> @blin this CE was redeployed as recently as 2 days ago and @jpeterson merged the pr before that so it should be in<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:09:02)</span> <b>blin:</b></span> IIRC, Jeff reverted the change<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:09:32)</span> <b>blin:</b></span> yeah, it's not there any more<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:10:04)</span> <b>blin:</b></span> we had run into held jobs due to the old osg-ca-certs on the factory and reverted the config in case that was the culprit<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:13:14)</span> <b>jpeterson:</b></span> <tt>CONDORCE_PILOT_JOB_ENV = "PATH=/usr/local/sbin/:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/software/Singularity/singularity-3.5.3/bin/singularity"</tt>   this line back in?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:14:17)</span> <b>jpeterson:</b></span> ah read back a bit further…<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:16:47)</span> <b>jpeterson:</b></span> redeploying with the env, and scitokens<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:45:26)</span> <b>matyas:</b></span> @jdost321 I assigned a ticket from Sajesh to you since he mentioned you by name: <a href="https://support.opensciencegrid.org/a/tickets/67306">https://support.opensciencegrid.org/a/tickets/67306</a><br/>let me know if that should have been someone else (or a different group)<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:11:06)</span> <b>jpeterson:</b></span> @blin @jdost321 also looks like the AMNH redeploy didn’t fix the matching for GPU jobs. so there is a second ticket from Sajesh <a href="https://support.opensciencegrid.org/a/tickets/67307">https://support.opensciencegrid.org/a/tickets/67307</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:11:49)</span> <b>jpeterson:</b></span> @matyas there is also a ticket about issues submitting downtime updates, would that go to you/topology? <a href="https://support.opensciencegrid.org/a/tickets/67308">https://support.opensciencegrid.org/a/tickets/67308</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(16:14:39)</span> <b>matyas:</b></span> yep, that would go to topology. @blin fixed his PR so I think he's good<br/>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Mar 24, 2020 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Tue Mar 24, 2020 : #xcache (osg)</h3>
+<span style="color: #a63024"><span style="font-size: small">(11:39:00)</span> <b>efajardo:</b></span> Hi <b>@here</b> I was looking at the stshcache  configs<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:39:04)</span> <b>efajardo:</b></span> <a href="https://github.com/opensciencegrid/xcache/blob/master/configs/stash-cache/xrootd/xrootd-stash-cache.cfg#L27">https://github.com/opensciencegrid/xcache/blob/master/configs/stash-cache/xrootd/xrootd-stash-cache.cfg#L27</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(11:39:16)</span> <b>efajardo:</b></span> why did we set port 1094? for xrotod as opposed to 8000<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:39:32)</span> <b>efajardo:</b></span> It makes more sense to reuse port 8000 so sites do not have to open two ports<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:40:23)</span> <b>blin:</b></span> i agree, i don't recall what the initial decision was but I just carried that decision over when i reorganized the config<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:40:29)</span> <b>efajardo:</b></span> Xrootd can receive both xrootd and http requests in the same socket<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:40:31)</span> <b>blin:</b></span> @matyas i think you and @bbockelm made the decision?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:40:59)</span> <b>matyas:</b></span> isn't 1094 the typical xrootd port?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:41:23)</span> <b>matyas:</b></span> IIRC you can't (yet) specify the port in stashcp<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:41:33)</span> <b>matyas:</b></span> so when it uses xrdcp it always uses 1094<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:41:51)</span> <b>dweitzel:</b></span> we own stashcp, we can change it's behavior.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:42:21)</span> <b>matyas:</b></span> yeah, sure<br/>
+<span style="color: #9e3997"><span style="font-size: small">(21:32:57)</span> <b>bbockelm:</b></span> <tt>1094</tt> is standard (perhaps even IANA registered?) xrootd port:<br/><pre>$ grep 1094 /etc/services<br/>rootd           1094/udp    # ROOTD<br/>rootd           1094/tcp    # ROOTD</pre><br/>(and that's on a Mac!)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(21:33:34)</span> <b>bbockelm:</b></span> Now, why did we separate out HTTP onto port 8000?  I think that's lost to history.  If I did it again now, I'd definitely put both on 1094.<br/>
+</body>
+</html>

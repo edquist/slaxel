@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jun 4, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu Jun 4, 2020 : #software (osg)</h3>
+<span style="color: #674b1b"><span style="font-size: small">(17:19:10)</span> <b>rynge:</b></span> @blin @matyas OSGConnect login node was upgraded by Puppet from 8.9.6 to 8.9.7, and we are now getting:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:19:14)</span> <b>rynge:</b></span> <pre>$ condor_submit workload.submit <br/>Submitting job(s)<br/>ERROR: store_cred of Kerberose credential failed - Operation failed because of a configuration error</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:19:35)</span> <b>rynge:</b></span> We wanted to revert back to 8.9.6, but those packages are already gone<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:20:48)</span> <b>bbockelm:</b></span> @jpatton @dweitzel ^^^<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:21:11)</span> <b>matyas:</b></span> can you update scitokens-credmon from osg-testing? <tt>yum update --enablerepo=osg-testing \*scitokens-credmon\*</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:21:15)</span> <b>dweitzel:</b></span> ah, there was multiple steps needed.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:21:51)</span> <b>dweitzel:</b></span> Jason put together instructions: <a href="https://docs.google.com/document/d/1fqgJnoztPwZuwVZhNq3-ofeNeOm_FAem03jFxWXlsuM/edit">https://docs.google.com/document/d/1fqgJnoztPwZuwVZhNq3-ofeNeOm_FAem03jFxWXlsuM/edit</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:22:13)</span> <b>dweitzel:</b></span> There's a tldr near the end.<br/>
+<span style="color: #ea2977"><span style="font-size: small">(17:22:30)</span> <b>jlstephen:</b></span> ok @rynge i've updated scitokens-credmon as well<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:25:05)</span> <b>dweitzel:</b></span> at least it's not friday afternoon!<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:25:24)</span> <b>rynge:</b></span> Still failing on l04<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:25:35)</span> <b>mrcruz:</b></span> What happened Friday?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:27:17)</span> <b>mrcruz:</b></span> Yikes, maybe I’m in the wrong room.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:28:24)</span> <b>rynge:</b></span> @jlstephen Did you see the doc Derek posted?<br/>
+<span style="color: #ea2977"><span style="font-size: small">(17:28:37)</span> <b>jlstephen:</b></span> looking now<br/>
+<span style="color: #ea2977"><span style="font-size: small">(17:44:18)</span> <b>jlstephen:</b></span> from the instructions<br/>
+<span style="color: #ea2977"><span style="font-size: small">(17:44:19)</span> <b>jlstephen:</b></span> <pre>[root@login04 config.d]# systemctl reload httpd.service<br/>Job for httpd.service invalid.</pre><br/>
+<span style="color: #ea2977"><span style="font-size: small">(17:44:30)</span> <b>jlstephen:</b></span> is apache supposed to be running on login04/login05?<br/>
+<span style="color: #ea2977"><span style="font-size: small">(17:44:33)</span> <b>jlstephen:</b></span> it isn't currently<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:45:10)</span> <b>bbockelm:</b></span> That's not needed for job submit.<br/>
+<span style="color: #ea2977"><span style="font-size: small">(17:45:22)</span> <b>jlstephen:</b></span> ok<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:45:38)</span> <b>bbockelm:</b></span> The likely problem is between the credd and condor_submit.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:50:05)</span> <b>bbockelm:</b></span> hm - looks like I'm not assigned to any submit host right now so I can't login and look around.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:55:15)</span> <b>rynge:</b></span> @bbockelm I added you, but we will probably downgrade<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:56:01)</span> <b>bbockelm:</b></span> <pre>06/04/20 17:55:40 ERROR: got STORE_CRED but SEC_CREDENTIAL_DIRECTORY_KRB not defined!</pre><br/>From the CreddLog.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:56:28)</span> <b>bbockelm:</b></span> Looks like you don't have the correct Google doc from @dweitzel<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:58:51)</span> <b>rynge:</b></span> Defining that made submit work<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:58:58)</span> <b>rynge:</b></span> Not sure yet if scitokens work<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:00:08)</span> <b>bbockelm:</b></span> Quite possibly - though you want <tt>/var/lib/condor/credentials</tt>  and <tt>/var/lib/condor/krb_credentials</tt>  to be an alias.  The symlink at <tt>/var/lib/condor/credentials</tt> points to the oauth directory.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:00:37)</span> <b>bbockelm:</b></span> (you just started with a fresh directory meaning you're the only one with credentials right now...)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:01:00)</span> <b>rynge:</b></span> <pre>SEC_CREDENTIAL_DIRECTORY_OAUTH = /var/lib/condor/oauth_credentials<br/>SEC_CREDENTIAL_DIRECTORY_KRB = $(SEC_CREDENTIAL_DIRECTORY_OAUTH)</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:01:01)</span> <b>rynge:</b></span> Ok?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:01:30)</span> <b>bbockelm:</b></span> Nah - you want them pointing at different directories but you want the contents of <tt>condor/credentials</tt> to be moved to <tt>condor/krb_credentials</tt><br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:02:17)</span> <b>bbockelm:</b></span> You could do a <tt>cp -r /var/lib/condor/credentials/ /var/lib/condor/krb_credentials</tt> for example to move the credentials forward.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:02:59)</span> <b>bbockelm:</b></span> Right now I see just two users have submitted since you created the directory:<br/><pre>$ ls -lh /var/lib/condor/krb_credentials<br/>total 8.0K<br/>-rw------- 1 root root 29 Jun  4 18:02 osgmon.cred<br/>-rw------- 1 root root 29 Jun  4 18:01 rynge.cred</pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:03:12)</span> <b>bbockelm:</b></span> Gotta run and take care of kids - good luck!<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:31:14)</span> <b>rynge:</b></span> We downgraded, and will look at this later<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:32:34)</span> <b>bbockelm:</b></span> :+1:good idea<br/>
+</body>
+</html>

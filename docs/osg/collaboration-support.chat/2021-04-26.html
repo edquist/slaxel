@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Apr 26, 2021 : #collaboration-support (osg)</title>
+</head>
+<body>
+<h3>Mon Apr 26, 2021 : #collaboration-support (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(16:12:11)</span> <b>ruben.lara:</b></span> While trying to start an interactive job, I get these messages:<br/><pre>[rlara3@osg-login2 ~]$ condor_submit -interactive<br/>Submitting job(s).<br/>1 job(s) submitted to cluster 245290.<br/>Waiting for job to start...<br/>Connection to <a href="http://condor-job.atl1-1-02-014-5-l.pace.gatech.edu">condor-job.atl1-1-02-014-5-l.pace.gatech.edu</a> closed by remote host.<br/>Connection to <a href="http://condor-job.atl1-1-02-014-5-l.pace.gatech.edu">condor-job.atl1-1-02-014-5-l.pace.gatech.edu</a> closed.</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(16:14:29)</span> <b>ruben.lara:</b></span> Analyzing the job:<br/><pre># condor_q -better-analyze 245290<br/><br/><br/>-- Schedd: <a href="http://osg-login2.pace.gatech.edu">osg-login2.pace.gatech.edu</a> : &lt;128.61.254.78:6044?...<br/>The Requirements expression for job 245290.000 is<br/><br/>    (TARGET.Arch == "X86_64") &amp;&amp; (TARGET.OpSys == "LINUX") &amp;&amp; (TARGET.Disk &gt;= RequestDisk) &amp;&amp; (TARGET.Memory &gt;= RequestMemory) &amp;&amp;<br/>    ((TARGET.FileSystemDomain == MY.FileSystemDomain) || (TARGET.HasFileTransfer))<br/><br/>Job 245290.000 defines the following attributes:<br/><br/>    FileSystemDomain = "<a href="http://osg-login2.pace.gatech.edu">osg-login2.pace.gatech.edu</a>"<br/>    RequestDisk = 1<br/>    RequestMemory = 512<br/><br/>The Requirements expression for job 245290.000 reduces to these conditions:<br/><br/>         Slots<br/>Step    Matched  Condition<br/>-----  --------  ---------<br/>[0]         118  TARGET.Arch == "X86_64"<br/>[1]         118  TARGET.OpSys == "LINUX"<br/>[3]         118  TARGET.Disk &gt;= RequestDisk<br/>[5]         118  TARGET.Memory &gt;= RequestMemory<br/>[7]         118  TARGET.FileSystemDomain == MY.FileSystemDomain<br/><br/><br/>245290.000:  Job is running.<br/><br/>Last successful match: Mon Apr 26 17:07:09 2021<br/><br/><br/>245290.000:  Run analysis summary ignoring user priority.  Of 21 machines,<br/>      0 are rejected by your job's requirements<br/>      0 reject your job because of their own requirements<br/>      0 match and are already running your jobs<br/>      0 match but are serving other users<br/>     21 are able to run your job</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(16:14:51)</span> <b>ruben.lara:</b></span> Any pointers where I can look for possible issues?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:14:57)</span> <b>rynge:</b></span> The <tt>-interactive</tt> flag is probably not going to work on most of OSG<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:14:58)</span> <b>rynge:</b></span> Can you try without that flag?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:15:11)</span> <b>ruben.lara:</b></span> Batch jobs run without issues.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:15:42)</span> <b>rynge:</b></span> Ok, so the interactive / ssh_to_job features are not working well with glideins<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:16:04)</span> <b>ruben.lara:</b></span> Should that work with local resources?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:16:59)</span> <b>rynge:</b></span> Probably, but I think somebody from the condor team would have to provide specifics<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:18:15)</span> <b>ruben.lara:</b></span> Thanks!<br/>
+</body>
+</html>

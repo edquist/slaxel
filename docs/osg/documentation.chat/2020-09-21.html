@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Sep 21, 2020 : #documentation (osg)</title>
+</head>
+<body>
+<h3>Mon Sep 21, 2020 : #documentation (osg)</h3>
+<span style="color: #9d8eee"><span style="font-size: small">(09:40:54)</span> <b>cat:</b></span> So why is <tt>../../documentation/style-guide.md</tt> busted?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:42:49)</span> <b>blin:</b></span> because that gets turned into <tt>/documentation/style-guide.md</tt> in the HTML<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:43:07)</span> <b>blin:</b></span> and the <tt>.md</tt> files aren't served up in the static site output<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(09:43:30)</span> <b>cat:</b></span> But according to Mat’s principle, always use <tt>.md</tt>…<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:43:57)</span> <b>matyas:</b></span> unless you've got a relative link going _past_ the root of the documentation tree<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:46:54)</span> <b>matyas:</b></span> (which results in odd behavior in the old version of mkdocs as well)<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:47:48)</span> <b>matyas:</b></span> In the (unmerged) update I'm writing for the style guide, I wrote that document-relative link with the .md extension, e.g. (<tt>../software/development-process.md</tt>) work in all versions of mkdocs<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(09:50:19)</span> <b>cat:</b></span> Oh I see, so in your examples, <tt>../documentation</tt> is the root of the current site?<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:50:41)</span> <b>matyas:</b></span> no<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:50:58)</span> <b>blin:</b></span> errr, no? <tt>..</tt> is the root<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:51:11)</span> <b>blin:</b></span> <tt>documentation</tt> is a directory in the docs root<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:52:05)</span> <b>matyas:</b></span> I should have been explicit -- the "current file", relative to the root of the site (i.e. <a href="http://osg.org/tech-itb">osg.org/tech-itb</a>) is <tt>/documentation/writing-documentation/</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(09:52:06)</span> <b>blin:</b></span> <pre>blin@blin-latitude:~/web/technology/docs (master)$ ls -l<br/>total 48<br/>drwxrwxr-x. 2 blin blin  4096 Jul  9  2019 css<br/>drwxrwxr-x. 2 blin blin  4096 Sep  3 09:11 documentation<br/>drwxrwxr-x. 2 blin blin  4096 Mar 26 14:30 files<br/>drwxrwxr-x. 3 blin blin  4096 Aug 13 11:09 img<br/>-rw-rw-r--. 1 blin blin  1792 Apr  6 09:06 index.md<br/>drwxrwxr-x. 3 blin blin 12288 Aug 24 09:48 meetings<br/>drwxrwxr-x. 2 blin blin  4096 Sep  3 09:11 policy<br/>drwxrwxr-x. 2 blin blin  4096 Jan 25  2019 projects<br/>drwxrwxr-x. 2 blin blin  4096 Sep 14 10:03 release<br/>drwxrwxr-x. 2 blin blin  4096 Sep  3 09:11 software</pre><br/><br/>
+<span style="color: #c386df"><span style="font-size: small">(09:59:35)</span> <b>matyas:</b></span> Guessing here, but I think the intention is to make it easy to link to images &amp; stuff that are page-specific. So you'd have a structure like<br/><pre>/docs/style-guide.md<br/>/docs/style-guide/happyface.png<br/>/docs/writing-docs.md</pre><br/>if you're writing <tt>style-guide.md</tt> , then if you refer to <tt>happyface.png</tt>, it resolves to <tt>/docs/style-guide/happyface.png</tt>, but if you refer to <tt>writing-docs.md</tt>, it resolves to <tt>/docs/writing-docs/</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(09:59:55)</span> <b>matyas:</b></span> and it needs the <tt>.md</tt> to know that it's referring to another doc instead of some other asset<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:01:05)</span> <b>matyas:</b></span> What's happening behind-the scenes is <tt>/docs/sytle-guide.md</tt> does _not_ become <tt>/docs/style-guide.html</tt>. It becomes <tt>/docs/style-guide/index.html</tt>.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:02:01)</span> <b>blin:</b></span> that's assuming that <tt>/</tt> is the root of your <tt>docs</tt> dir in your repo, rightt?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:02:19)</span> <b>matyas:</b></span> yes<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:03:37)</span> <b>matyas:</b></span> or rather, <tt><a href="https://opensciencegrid.org/technology-itb">https://opensciencegrid.org/technology-itb</a></tt> in the finished product<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(11:02:18)</span> <b>cat:</b></span> Sorry, I meant that <tt>..</tt> was the root — of the visible pages, of course.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:03:17)</span> <b>matyas:</b></span> OK, yep.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:04:27)</span> <b>blin:</b></span> i'm not sure it's particularly relevant, tbh. you could have a heavily nested dir structure. you don't always have to go back to the root docs dir<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:05:37)</span> <b>matyas:</b></span> yeah I think in the new version there's no way to refer to the root docs dir unambiguously, regardless of the path of the current file :disappointed:<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:15:31)</span> <b>matyas:</b></span> else, if we're willing to use a plugin from Some Random Dude's GitHub Repo (<a href="https://github.com/sander76/mkdocs-abs-rel-plugin">https://github.com/sander76/mkdocs-abs-rel-plugin</a>), we can keep the links we have.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:21:38)</span> <b>matyas:</b></span> hahaha, I figured that would be your response. Yeah that's pretty much how I feel too.<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(11:24:48)</span> <b>cat:</b></span> I mean, TBH, there are pros and cons to site relative links. So I don’t really care what links are supposed to look like, but I don’t want to have to change them all, across multiple sites, every so often.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:29:11)</span> <b>blin:</b></span> they've come out with a pretty strong statement on only supporting doc-relative links so i don't think we'll have to make changes again anytime soon<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:29:45)</span> <b>blin:</b></span> and updating links only has to occur when updating to a newer version of mkdocs, which can be done on a fairly long time schedule<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:30:14)</span> <b>blin:</b></span> and i think software would be able to handle that task for anyone using our mkdocs setup<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:32:58)</span> <b>matyas:</b></span> We'll just have to be careful about reorganizing doc pages<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(11:33:14)</span> <b>cat:</b></span> Wait, “software” or “[the] Software [team]“?<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(11:33:40)</span> <b>cat:</b></span> Because I have multiple sites to manage, and if you are volunteering Software team effort to update them all, cool!<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:34:27)</span> <b>blin:</b></span> both? i'm curious as to which sites would need updating<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:35:09)</span> <b>blin:</b></span> i'm guessing that older school sites don't need updates<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:36:19)</span> <b>blin:</b></span> and tbh i'm afraid that the theme you're using for the school pages isn't well-maintained for the update but i haven't looked at that in quite some time<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(11:37:59)</span> <b>cat:</b></span> But we can leave the old School sites on whatever version they are using forever?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:40:12)</span> <b>blin:</b></span> if we don't change them at all, yeah. the static site's already been generated<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:40:45)</span> <b>blin:</b></span> if we want to make changes, then we have to worry about how long the older versions of MkDocs are going to be available<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(11:42:08)</span> <b>cat:</b></span> Well, for starters, the management website has around 120 lines containing things that seem like links…<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(11:42:32)</span> <b>cat:</b></span> Many will go outside the site, of course, but all should be checked.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:42:38)</span> <b>blin:</b></span> management's tiny. i'm not too worrieid<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(11:42:43)</span> <b>cat:</b></span> Most will go outside, I suppose.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:42:43)</span> <b>blin:</b></span> and yeah, very few internal links<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(11:42:56)</span> <b>cat:</b></span> So you’re doing that one?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:43:44)</span> <b>blin:</b></span> yeah, sure. we can make the changes but first i want to verify our process on the technology site<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(11:43:55)</span> <b>cat:</b></span> “TWiki is awful, because we keep having to update it and change our sites; we should dump it.”<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:44:19)</span> <b>blin:</b></span> that was just one of the very many reasons...<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:45:02)</span> <b>blin:</b></span> and i think these updates are a lot simpler: you can do it one site at a time and honestly don't take all that much effort<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(11:45:52)</span> <b>cat:</b></span> Eh, then you still haven’t been around long enough: These technology decisions are *all* fads and largely are based on the personal whims of whoever makes the decisions.<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(11:46:24)</span> <b>cat:</b></span> But maybe it takes a few more years to see it that way!<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(11:46:49)</span> <b>cat:</b></span> Anyway, I accept your offer to update the management site, although I would like to see/review the changes in the PR.<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(11:47:03)</span> <b>cat:</b></span> If anything, to make sure that I understand how to do things going forward!<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:47:46)</span> <b>blin:</b></span> the fact that we don't have to deal with students during an OSG school DoSing their materials is enough of a technical justification, imo<br/>
+<span style="color: #9d8eee"><span style="font-size: small">(11:47:54)</span> <b>cat:</b></span> Also, it would be helpful to know what themes are actually well supported in the MkDocs ecosystem. I thought one big selling point was “look, lots of themes to choose from!“, but in practice it seems to be “material or die”.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:50:10)</span> <b>blin:</b></span> i think readthedocs is officially supported by the mkdocs team<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:50:25)</span> <b>blin:</b></span> material is just one of the more actively developed ones that i've seen<br/>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Apr 22, 2019 : #software (osg)</title>
+</head>
+<body>
+<h3>Mon Apr 22, 2019 : #software (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(10:42:42)</span> <b>dweitzel:</b></span> @blin reading through the software notes.  The blahp refreshing proxies, I thought we turned those off?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:43:03)</span> <b>dweitzel:</b></span> We turned off all proxy "handling" in the blahp code, I thought.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:43:37)</span> <b>blin:</b></span> yeah, which may have been the wrong thing to do<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:43:47)</span> <b>blin:</b></span> (but turning it back on doesn't appear to help either)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:43:56)</span> <b>dweitzel:</b></span> yeah, it was always not great.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:44:24)</span> <b>dweitzel:</b></span> This is why we require a shared filesystem for non-HTCondor clusters.  So the CE handles the proxy, and all the jobs access the proxy from the share filesystem.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:45:25)</span> <b>bbockelm:</b></span> The blahp proxy renewal code was very, very CREAM specific IIRC.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:46:01)</span> <b>blin:</b></span> the problem appears to be that the blahp, upon initial submission, copies the proxy over to the blahp's working dir<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:46:16)</span> <b>blin:</b></span> (i.e. from spool to the user's home dir)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:46:41)</span> <b>bbockelm:</b></span> I thought it copied over to $HOME, not the real user's home?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:47:08)</span> <b>blin:</b></span> and uses the copied proxy so it doesn't get any updates to the proxy<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:47:31)</span> <b>blin:</b></span> in my testing on pbs, i'm seeing the working dirs in the user's home dir<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:47:59)</span> <b>bbockelm:</b></span> Interesting.  I believe the blahp solution for proxy refreshing required something like a runtime agent on the worker node to take care of things?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:48:35)</span> <b>blin:</b></span> yeah, i think that's right<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:48:59)</span> <b>blin:</b></span> maybe we should be modifying the blahp so that it sets $HOME to the appropriate spool dir?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:49:28)</span> <b>bbockelm:</b></span> or maybe just neuter the code path for proxy management outside spool?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:49:36)</span> <b>bbockelm:</b></span> this would work if the blahp did nothing, right?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:50:03)</span> <b>blin:</b></span> i think it'd need to be told where to find the original proxy in spool, though<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:50:33)</span> <b>blin:</b></span> yeah<br/><pre><br/>export X509_USER_PROXY=$new_home/bl_43f7cf74d09e.proxy<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:50:45)</span> <b>blin:</b></span> that gets added to the PBS submission script<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:51:02)</span> <b>bbockelm:</b></span> right - instead point that at the original proxy filename, which the HTCondor CE should know.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:51:10)</span> <b>blin:</b></span> yup<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:58:37)</span> <b>dweitzel:</b></span> Might be able to "neuter" the code here: <a href="https://github.com/opensciencegrid/BLAH/blob/v1_18_bosco/src/scripts/blah_common_submit_functions.sh#L681">https://github.com/opensciencegrid/BLAH/blob/v1_18_bosco/src/scripts/blah_common_submit_functions.sh#L681</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:59:02)</span> <b>dweitzel:</b></span> If the blahp doesn't "reset" the environment variable, then it will use the previous value?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:01:19)</span> <b>dweitzel:</b></span> if there is a previous value, I'm not sure about that.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:01:27)</span> <b>blin:</b></span> @dweitzel @efajardo meeting?<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:01:40)</span> <b>efajardo:</b></span> I am<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:01:48)</span> <b>efajardo:</b></span> I always forget the million clicks to get into the meeting<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:01:50)</span> <b>dweitzel:</b></span> joining<br/>
+</body>
+</html>

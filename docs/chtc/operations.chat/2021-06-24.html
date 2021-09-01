@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jun 24, 2021 : #operations (chtc)</title>
+</head>
+<body>
+<h3>Thu Jun 24, 2021 : #operations (chtc)</h3>
+<span style="color: #e7392d"><span style="font-size: small">(08:29:35)</span> <b>ckoch5:</b></span> @jcpatton I’m getting this error again in our GPU Kibana dashboard<br/><pre>Could not locate that index-pattern (id: chtc-by-record-time), [click here to re-create it](#/management/kibana/index_pattern)</pre><br/>
+<span style="color: #e7392d"><span style="font-size: small">(08:29:40)</span> <b>ckoch5:</b></span> :white_frowning_face:<br/>
+<span style="color: #2b6836"><span style="font-size: small">(08:31:51)</span> <b>jcpatton:</b></span> it’d be great if that <tt>click here</tt> was actually a link<br/>
+<span style="color: #2b6836"><span style="font-size: small">(08:41:05)</span> <b>jcpatton:</b></span> it’s going to take me a bit to figure this out, I know what happened, though<br/>
+<span style="color: #2b6836"><span style="font-size: small">(08:41:28)</span> <b>jcpatton:</b></span> the index pattern needed to be changed to deal with a conflict in how indicies are named<br/>
+<span style="color: #e7392d"><span style="font-size: small">(08:47:03)</span> <b>ckoch5:</b></span> cool<br/>
+<blockquote>
+<span style="color: #2b6836"><span style="font-size: small">(09:08:36)</span> <b>jcpatton:</b></span> Do you happen to know what the name of the individual visualizations in the dashboard are? We have a lot of similarly named viz items :grimacing:<br/>
+<span style="color: #e7392d"><span style="font-size: small">(09:09:12)</span> <b>ckoch5:</b></span> I know. :upside_down_face:<br/>
+<span style="color: #2b6836"><span style="font-size: small">(09:10:07)</span> <b>jcpatton:</b></span> oh I think I might be able to figure them out<br/>
+<span style="color: #2b6836"><span style="font-size: small">(09:11:18)</span> <b>jcpatton:</b></span> <tt>Jobs Requested GPUs</tt> <tt>Jobs Provisioned GPUs</tt> <tt>Jobs Requested and Provisioned GPUs</tt>?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(09:12:13)</span> <b>ckoch5:</b></span> It depends which dashboard…<br/>
+<span style="color: #2b6836"><span style="font-size: small">(09:14:52)</span> <b>jcpatton:</b></span> I fixed the first graph in the CHTC GPU Dashboard<br/>
+<span style="color: #e7392d"><span style="font-size: small">(09:16:19)</span> <b>ckoch5:</b></span> It works!<br/>
+<span style="color: #e7392d"><span style="font-size: small">(09:16:26)</span> <b>ckoch5:</b></span> the one I’m interested in is “GPU Lab Usage”<br/>
+<span style="color: #2b6836"><span style="font-size: small">(09:16:43)</span> <b>jcpatton:</b></span> ok, I might try to fix all the viz but I’ll start with those<br/>
+<span style="color: #e7392d"><span style="font-size: small">(09:17:10)</span> <b>ckoch5:</b></span> thanks. :slightly_smiling_face:<br/>
+<span style="color: #2b6836"><span style="font-size: small">(09:21:05)</span> <b>jcpatton:</b></span> ok, should be fixed<br/>
+<span style="color: #2b6836"><span style="font-size: small">(09:23:55)</span> <b>jcpatton:</b></span> Kibana really doesn’t make it easy to change the index pattern on… pretty much any object that uses an index pattern. It does let you edit the raw JSON of any object (with the warning that you better know what you’re doing), which appears the only way to change the index pattern… sigh<br/>
+<span style="color: #e7392d"><span style="font-size: small">(09:44:02)</span> <b>ckoch5:</b></span> ah, so you changed the names of the index and that broke all of our viz?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:02:47)</span> <b>jcpatton:</b></span> Kibana doesn’t let you edit existing index patterns, so I had to delete and recreate them so they didn’t conflict<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:04:22)</span> <b>jcpatton:</b></span> I forgot that you can’t just quick fix visualizations to point to a new index pattern, which is really annoying<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:05:11)</span> <b>jcpatton:</b></span> tl;dr I broke them and forgot to fix them<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:54:32)</span> <b>ckoch5:</b></span> can you also update the query “GPU Lab Jobs Start and End”<br/>
+<span style="color: #2b6836"><span style="font-size: small">(12:12:26)</span> <b>jcpatton:</b></span> done<br/>
+<span style="color: #e7392d"><span style="font-size: small">(12:13:38)</span> <b>ckoch5:</b></span> thank you. :grin:<br/>
+<span style="color: #2b6836"><span style="font-size: small">(12:14:54)</span> <b>jcpatton:</b></span> if you feel like taking a stab at doing any updates yourself, under Management -&gt; Saved Objects, find the object you want to update, click the “…” menu on the right, go to Inspect, scroll down to <tt>references</tt> and set the <tt>id</tt> line for all of the <tt>"type": "index-pattern"</tt> references to <tt>"id": "7d960a50-caf7-11eb-bc8f-1957a102cd79"</tt><br/>
+</blockquote>
+<span style="color: #4cc091"><span style="font-size: small">(12:01:54)</span> <b>blin:</b></span> what's the max runtime for jobs in the pool?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(12:11:58)</span> <b>ckoch5:</b></span> 72 hours default; 2 weeks with the longjob attribute<br/>
+<span style="color: #e7392d"><span style="font-size: small">(12:12:12)</span> <b>ckoch5:</b></span> GPU Lab nodes have different policy<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(13:59:12)</span> <b>lmichael:</b></span> @wiscmoate @gthain It appears that our GLOW pool may not be doing as well as it could to catch memory overuse. I just reviewed log files of a user for whom the User Log noted memory usage much higher than request, but didn’t put the jobs on hold.<br/><a href="https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=103538">https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=103538</a><br/>Are we not policing memory overuse, there, like we do in the CHTC pool. We ought to be!<br/>
+<span style="color: #d58247"><span style="font-size: small">(14:01:54)</span> <b>gthain:</b></span> What's "GLOW" in this context?  OSG?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:20:17)</span> <b>wiscmoate:</b></span> Looking at the context in the ticket, it looks like yes, it's the glidein pool<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:20:44)</span> <b>wiscmoate:</b></span> Do glideins use cgroups to contain memory usage?<br/>
+<span style="color: #d58247"><span style="font-size: small">(14:21:05)</span> <b>gthain:</b></span> They don't have root, so they can't (at least right now in condor)<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:21:31)</span> <b>wiscmoate:</b></span> Roger;  need to apply some special policy then<br/>
+<blockquote>
+<span style="color: #9f69e7"><span style="font-size: small">(2021-06-25 12:37:06)</span> <b>lmichael:</b></span> @gthain @wiscmoate it looks like HTCondor still reports a much lower value for Memory Usage in the user log than the image value and job error (OOM killer) indicate.<br/>We definitely need some policy. Next steps?<br/><br/>But is there something ELSE going on with HTCondor’s detection/math around image size vs. Memory usage?<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(2021-06-25 12:38:23)</span> <b>lmichael:</b></span> See recent in <a href="https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=103538">https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=103538</a><br/>
+</blockquote>
+<span style="color: #e7392d"><span style="font-size: small">(14:21:33)</span> <b>ckoch5:</b></span> we have non cgroup policy for holding disk jobs<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:21:40)</span> <b>wiscmoate:</b></span> Aye<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:21:41)</span> <b>ckoch5:</b></span> could we use that for memory in the osg pilots<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:21:45)</span> <b>wiscmoate:</b></span> Think so<br/>
+<span style="color: #d58247"><span style="font-size: small">(14:22:22)</span> <b>gthain:</b></span> I would hope this is not just a problem for us, but generally in OSG<br/>
+<span style="color: #d58247"><span style="font-size: small">(14:22:45)</span> <b>gthain:</b></span> Would like any fix we do to be generally useful for all OSG users<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:43:06)</span> <b>ckoch5:</b></span> ^^ would like to implement something like this in OSG Connect<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:43:16)</span> <b>ckoch5:</b></span> I don’t think we do any disk/memory enforcement and we should<br/>
+</body>
+</html>

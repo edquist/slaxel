@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Nov 15, 2018 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Thu Nov 15, 2018 : #gracc (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(10:39:30)</span> <b>blin:</b></span> could someone tell me why the number of records appear to show up in this kibana graph but there aren't any actual records that show up below it? <a href="https://gracc.opensciencegrid.org/kibana/app/kibana#/discover?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-30d,mode:quick,to:now))&amp;_a=(columns:!(_source),filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:gracc.osg.summary,key:ResourceType,negate:!f,type:phrase,value:Batch),query:(match:(ResourceType:(query:Batch,type:phrase))))),index:gracc.osg.summary,interval:auto,query:(query_string:(analyze_wildcard:!t,lowercase_expanded_terms:!f,query:hosted-ce21.grid.uchicago.edu)),sort:!(EndTime,desc),uiState:(vis:(legendOpen:!t)))">https://gracc.opensciencegrid.org/kibana/app/kibana#/discover?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-30d,mode:quick,to:now))&amp;_a=(columns:!(_source),filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:gracc.osg.summary,key:ResourceType,negate:!f,type:phrase,value:Batch),query:(match:(ResourceType:(query:Batch,type:phrase))))),index:gracc.osg.summary,interval:auto,query:(query_string:(analyze_wildcard:!t,lowercase_expanded_terms:!f,query:hosted-ce21.grid.uchicago.edu)),sort:!(EndTime,desc),uiState:(vis:(legendOpen:!t)))</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:46:48)</span> <b>dweitzel:</b></span> well, kibana is throwing JS errors.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:47:16)</span> <b>blin:</b></span> in general or for this specific query?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:49:24)</span> <b>dweitzel:</b></span> specific query.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:52:30)</span> <b>blin:</b></span> huh, weird<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:53:24)</span> <b>dweitzel:</b></span> it's probably because of this:<br/><pre><br/>"CpuEfficiency": [<br/>      "Infinity"<br/>    ],<br/></pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:53:34)</span> <b>dweitzel:</b></span> though, I have no idea what is calculating that.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:54:34)</span> <b>blin:</b></span> rofl<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:54:45)</span> <b>dweitzel:</b></span> <pre>(doc['CpuDuration_user']+doc['CpuDuration_system'])/(doc['WallDuration']*doc['Processors'])</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:55:02)</span> <b>dweitzel:</b></span> processors = 0 in the records.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:55:08)</span> <b>dweitzel:</b></span> there's the underlying issue.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:55:31)</span> <b>blin:</b></span> and that's gotta be a gratia probe thing, huh<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:55:36)</span> <b>blin:</b></span> ok, thanks<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:58:32)</span> <b>dweitzel:</b></span> yeah, or the # of proc isn't being propagated up the stack.  So the HTCondor-CE doesn't see it how many procs it used at the slurm cluster, so does it just not set that variable?<br/>
+</body>
+</html>

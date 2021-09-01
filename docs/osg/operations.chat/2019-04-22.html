@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Apr 22, 2019 : #operations (osg)</title>
+</head>
+<body>
+<h3>Mon Apr 22, 2019 : #operations (osg)</h3>
+<span style="color: #e23f99"><span style="font-size: small">(09:30:01)</span> <b>marco.mascheroni:</b></span> @jlstephen @lincoln Did you set up the DNS reverse record for the new CEs? In particular for ce26:<br/><br/><pre><br/>[0726] gfactory@gfactory-1 ~$ host 128.135.158.209<br/>Host 209.158.135.128.in-addr.arpa. not found: 3(NXDOMAIN)<br/></pre><br/>
+<span style="color: #ea2977"><span style="font-size: small">(09:33:17)</span> <b>jlstephen:</b></span> i thought i did, but i will check<br/>
+<span style="color: #e23f99"><span style="font-size: small">(09:39:05)</span> <b>marco.mascheroni:</b></span> thx<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:48:15)</span> <b>dweitzel:</b></span> @marco.mascheroni are the hosted-ce's under any sort of puppet or configuration management?<br/>
+<span style="color: #ea2977"><span style="font-size: small">(09:56:12)</span> <b>jlstephen:</b></span> @marco.mascheroni i added the missing records<br/>
+<span style="color: #ea2977"><span style="font-size: small">(09:56:28)</span> <b>jlstephen:</b></span> hosted-ce24, hosted-ce25, hosted-ce26, and hosted-ce27<br/>
+<span style="color: #e23f99"><span style="font-size: small">(09:59:41)</span> <b>marco.mascheroni:</b></span> thx Judith! @dweitzel yes they are, Juduth and Lincoln manage the puppet conf<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:00:57)</span> <b>jlstephen:</b></span> afaik the ce-specific configuration (condor, hostcerts, etc.) isn't in puppet, though<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:01:04)</span> <b>blin:</b></span> well, /parts/ are puppeted, right?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:01:06)</span> <b>blin:</b></span> yeah ^^<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:03:19)</span> <b>dweitzel:</b></span> Can you coordinate with @jthiltges on installing check_mk client.  I think it's just a matter of installing the RPM from EPEL, dropping a file in xinitd, and opening a port.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:04:38)</span> <b>blin:</b></span> what tests did we decide to run again?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:05:06)</span> <b>dweitzel:</b></span> We will start with the basic ones.  Host alive, memory, cpu, ... all the regular stuff.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:05:31)</span> <b>dweitzel:</b></span> John is working on the right condor_q commands to get what we want.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:05:51)</span> <b>dweitzel:</b></span> watching for held jobs, making sure jobs are idle + running...<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:05:59)</span> <b>blin:</b></span> remote <tt>condor_status -any</tt> checks may be useful, too<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:06:18)</span> <b>blin:</b></span> to check that all the necessary daemons are running<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:06:31)</span> <b>dweitzel:</b></span> yes, that would work.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:06:58)</span> <b>dweitzel:</b></span> check_mk client also allows us to test for specific processes running.  Make sure a process, and only 1, named <tt>condor_schedd</tt> is running, for example.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:07:26)</span> <b>dweitzel:</b></span> <tt>condor_status</tt> is more holistic though, make sure it's up, running, and reporting.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:39:32)</span> <b>bbockelm:</b></span> @dweitzel - fwiw, since the schedd momentarily forks when responding to <tt>condor_q</tt>, you might want to tweak the logic to allow for 1-2 processes.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:40:00)</span> <b>dweitzel:</b></span> yeah, maybe <tt>condor_schedd</tt> was a bad example.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:23:36)</span> <b>rynge:</b></span> @dweitzel Simple, but has been useful for us monitoring the schedds: <a href="https://github.com/rynge/htcondor-icinga">https://github.com/rynge/htcondor-icinga</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:39:40)</span> <b>blin:</b></span> hey @manglano, regarding this ticket: <a href="https://support.opensciencegrid.org/a/tickets/8638">https://support.opensciencegrid.org/a/tickets/8638</a>, i assigned this to the security team for a reason<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:39:57)</span> <b>blin:</b></span> when doing triage, you should only have to worry about tickets with the group = operations<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:41:56)</span> <b>blin:</b></span> and tickets in the "all unassigned tickets" filter<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(16:05:21)</span> <b>manglano:</b></span> hey @blin, sorry about that; it was how I understood the Ticket Triage document<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:07:22)</span> <b>blin:</b></span> ah i see<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:07:48)</span> <b>blin:</b></span> @jdost321 i think the ticket triage doc needs to be modified<br/>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jan 24, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Thu Jan 24, 2019 : #xcache (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(11:01:10)</span> <b>bbockelm:</b></span> @isfiligoi @efajardo @blin - for the FlatIron origin @ SDSC -- can someone do a writeup of the current plan?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:03:45)</span> <b>blin:</b></span> @efajardo @isfiligoi I'm going to throw that into your court since you guys know the details of the project and we discussed the OSG software container vision yesterday<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:03:56)</span> <b>blin:</b></span> a shared google doc would be lovely<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:17:52)</span> <b>isfiligoi:</b></span> As for the plan… I am still in the exploratory phase… Sorry, just joined and still ramping up<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:21:22)</span> <b>bbockelm:</b></span> Sure.  Do you have notes written down?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:21:33)</span> <b>bbockelm:</b></span> I understand the objective is doing an origin, right?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:21:51)</span> <b>bbockelm:</b></span> Sorry, an authenticated origin containerized inside k8s?<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:22:12)</span> <b>isfiligoi:</b></span> There are 2 parts:<br/>1) Create a generic Docker/k8 setup for the origin<br/>2) Create a Flatiron instance at UCSd<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:22:50)</span> <b>isfiligoi:</b></span> The setup should support both public and auth access, not sure (yet) what Flatiron will end up using<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:23:24)</span> <b>bbockelm:</b></span> Roger.  So, any work not done starting with xcache-1.0 (<a href="https://koji.chtc.wisc.edu/koji/buildinfo?buildID=12388">https://koji.chtc.wisc.edu/koji/buildinfo?buildID=12388</a>) is going to be thrown away.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:23:48)</span> <b>bbockelm:</b></span> (so we should make sure we start there)<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:24:23)</span> <b>matyas:</b></span> what do you mean thrown away?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:25:13)</span> <b>bbockelm:</b></span> Anything starting on the current Xrootd release (4.8.0), pre-overhaul, is not going to be particularly useful once the overhaul is released.<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:26:11)</span> <b>isfiligoi:</b></span> I have short term goals, so using proven technology is more important than avoiding re-writes later on<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:26:30)</span> <b>isfiligoi:</b></span> BTW: How do I connecto to koji?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:26:30)</span> <b>bbockelm:</b></span> The overhaul is only waiting on the final Xrootd tag and is deployed.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:26:43)</span> <b>bbockelm:</b></span> :slightly_smiling_face: Hit cancel.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:27:13)</span> <b>matyas:</b></span> @isfiligoi: send me the DN of your grid cert and I'll make you an account<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:27:51)</span> <b>isfiligoi:</b></span> OK&lt; so I do need a cert… don’t have one yet<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:28:03)</span> <b>isfiligoi:</b></span> Can you remind me where do I get one?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:28:18)</span> <b>blin:</b></span> this should suffice: <a href="https://opensciencegrid.org/docs/security/user-certs/#getting-a-certificate-from-cilogon">https://opensciencegrid.org/docs/security/user-certs/#getting-a-certificate-from-cilogon</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:34:51)</span> <b>bbockelm:</b></span> @blin - for stuff like this, I think it should go into a "startup" script that includes the certificate ownership correction (as necessary) <a href="https://github.com/brianhlin/prp-stashcache/blob/wip/xcache/stash-cache/supervisord.d/stash-cache.conf#L14">https://github.com/brianhlin/prp-stashcache/blob/wip/xcache/stash-cache/supervisord.d/stash-cache.conf#L14</a><br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(11:58:20)</span> <b>blin:</b></span> hey, i'm confused what you meant by "stuff like this"<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:00:43)</span> <b>blin:</b></span> i was throwing the cert ownership fixup script into the base xcache image<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:30:34)</span> <b>bbockelm:</b></span> Looked like you had something that needed to execute around the time of Xrootd<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:31:03)</span> <b>bbockelm:</b></span> Looked like it raced in parallel - we should just force the ordering if necessary <br/>
+<span style="color: #43761b"><span style="font-size: small">(16:31:38)</span> <b>blin:</b></span> yeah, agreed, it's on my todo list<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:31:51)</span> <b>bbockelm:</b></span> Ah - I linked the wrong place. I meant to show that for the fix_certs.sh in the base package<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:32:48)</span> <b>blin:</b></span> yeah it starts to get a little unwieldy because you've got ordering requirements across images<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:33:12)</span> <b>blin:</b></span> fix_certs.sh -&gt; proxy renewal/authfile -&gt; xrootd<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:33:37)</span> <b>bbockelm:</b></span> Yeah - and the Authfile piece too<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:33:47)</span> <b>bbockelm:</b></span> But that can fail as necessary <br/>
+<span style="color: #43761b"><span style="font-size: small">(16:35:51)</span> <b>blin:</b></span> how about proxy renewal?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:42:47)</span> <b>bbockelm:</b></span> No - can’t do anything without a proxy.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:43:13)</span> <b>bbockelm:</b></span> (The origin doesn’t need a proxy, of course)<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:43:59)</span> <b>blin:</b></span> ok so really each cache implementation should have a startup script and the base xcache shouldn't do much other than start cron<br/>
+</blockquote>
+<span style="color: #43761b"><span style="font-size: small">(11:35:39)</span> <b>blin:</b></span> for stuff like what, exactly?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:35:39)</span> <b>bbockelm:</b></span> (@isfiligoi - fwiw, you don't need to actually see the Koji instance right now, but you can just inherit from <a href="https://github.com/brianhlin/prp-stashcache/blob/wip/xcache/xcache/Dockerfile)">https://github.com/brianhlin/prp-stashcache/blob/wip/xcache/xcache/Dockerfile)</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(11:39:15)</span> <b>efajardo:</b></span> @isfiligoi you can alsao get it from <tt>yum --enablerepo=osg-development</tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(11:59:34)</span> <b>isfiligoi:</b></span> Do I read right that xcache installs both the stashcach-server and stashcash-origin rpms as dependencies?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:00:13)</span> <b>blin:</b></span> no, it should be the other way around stash-cache and stash-origin require xcache<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:00:47)</span> <b>isfiligoi:</b></span> ok… will read better :slightly_smiling_face:<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:41:55)</span> <b>isfiligoi:</b></span> Is there any documentation on how to install stashcach origin using the new method?<br/>How much should I expect it to differe from<br/><a href="https://github.com/opensciencegrid/docs/blob/master/docs/data/stashcache/install-origin.md">https://github.com/opensciencegrid/docs/blob/master/docs/data/stashcache/install-origin.md</a><br/>?<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:48:35)</span> <b>efajardo:</b></span> @matyas :top:<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:53:05)</span> <b>matyas:</b></span> gonna be working on that today<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:19:47)</span> <b>bbockelm:</b></span> Hi - just getting back to my laptop for a second (sorry, visitors here all day long).  Did anyone invite Igor to the StashCache meeting?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:21:46)</span> <b>dweitzel:</b></span> Nope.  But I can add him to the mailing list.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:22:20)</span> <b>dweitzel:</b></span> Congrats Igor, you're subscribed!<br/>
+<span style="color: #965d1b"><span style="font-size: small">(14:51:26)</span> <b>briedel:</b></span> <pre>/cvmfs/stash.osgstorage.org/home/saxani/stash/GolemResources/FastMC/ares_platinum_macho_split_0.75_6.8_th34_0.000/0_0.010593_0.000000_0.086827_0.000000_0.000000_0.000000/STERILE.meows</pre> is this file available in stashcache?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:53:13)</span> <b>dweitzel:</b></span> it looks like that directory is in <tt>/home</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:55:59)</span> <b>dweitzel:</b></span> Also, it's not in the <tt>public</tt> directory.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:56:28)</span> <b>dweitzel:</b></span> so nope, that file isn't on StashCache, and won't be.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:03:03)</span> <b>bbockelm:</b></span> @isfiligoi - the origin doc is <a href="https://opensciencegrid.org/docs/data/stashcache/install-origin/">https://opensciencegrid.org/docs/data/stashcache/install-origin/</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:03:15)</span> <b>bbockelm:</b></span> (just a rendered version of what's in GH)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:09:21)</span> <b>bbockelm:</b></span> if you use the new RPM, all the files you config (or override) are in <tt>/etc/xrootd/config.d/1*.cfg</tt> or <tt>/etc/xrootd/config.d/9*.cfg</tt><br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:10:29)</span> <b>bbockelm:</b></span> you also don't need to do the <tt>fetch-crl</tt> piece if you are using systemd (which you aren't - but if you are basing off Brian Lin's Dockerfile, it's already there)<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:14:43)</span> <b>blin:</b></span> (you'll need to volume mount <tt>/etc/grid-security/xrd/xrd{cert,key}.pem</tt>)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:29:32)</span> <b>bbockelm:</b></span> @blin @matyas - how’s doc day going?  Maybe Igor can be the first installer?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:30:22)</span> <b>blin:</b></span> mat's at a talk but i think he's started with tackling the topology registration updates<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:32:57)</span> <b>bbockelm:</b></span> Sounds good!  Depending on when we get to ORD, I might try a swing at the core doc. Just leave a note where things are at the end of the day.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(21:01:26)</span> <b>bbockelm:</b></span> Ok, this was my attempt at the origin doc: <a href="https://github.com/opensciencegrid/docs/pull/491">https://github.com/opensciencegrid/docs/pull/491</a><br/>
+</body>
+</html>

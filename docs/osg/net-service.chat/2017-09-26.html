@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Sep 26, 2017 : #net-service (osg)</title>
+</head>
+<body>
+<h3>Tue Sep 26, 2017 : #net-service (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(14:48:16)</span> <b>thomlee:</b></span> hello<br/>
+<span style="color: #5b89d5"><span style="font-size: small">(14:48:19)</span> <b>mvkrenz:</b></span> Marian. I asked Tom to join us here<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:49:40)</span> <b>marian:</b></span> Hi Tom<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:49:49)</span> <b>thomlee:</b></span> Hi Marian<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:50:31)</span> <b>marian:</b></span> I think we have an issue with <a href="http://event-itb.grid.iu.edu">event-itb.grid.iu.edu</a> ... its IPv6 doesnt' respond to messaging queues<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:50:50)</span> <b>marian:</b></span> 5671 suppose to be open on both IPv4 and IP6<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:51:41)</span> <b>marian:</b></span> we don't seem to recognize any issue on the production event host because it doesn't have IPv6 interface attached<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:52:30)</span> <b>marian:</b></span> also, my client is only IPv4 so it strange why it reroutes things to IPv6 if I query event-itb ... at least that's what strace suggest where to look<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:53:40)</span> <b>thomlee:</b></span> I see event-itb has a beam process listening on IPv4 on ports 15671 and 25672, and on IPv6 on ports 5671, 5672, 61613, and 61614<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:53:48)</span> <b>marian:</b></span> @marian uploaded a file: <a href="https://opensciencegrid.slack.com/files/U08N712CA/F78M1TD97/-.txt">Untitled</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(14:54:24)</span> <b>marian:</b></span> yeah, my issue is "network is unreachable"<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:54:36)</span> <b>thomlee:</b></span> well, it is not listening on port 5671 for IPv4<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:55:02)</span> <b>thomlee:</b></span> according to netstat<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:55:17)</span> <b>thomlee:</b></span> which seems to contradict what I see in that image<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:56:13)</span> <b>marian:</b></span> btw, silly quetion: is colon OK in the v6 address of event-itb?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:56:45)</span> <b>thomlee:</b></span> depends on the telnet command<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:56:55)</span> <b>marian:</b></span> yeah I don't really now more details what it should be doing on the server side but that's how we communicate with RabitMQ ... in the url we use that port<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:57:10)</span> <b>thomlee:</b></span> sometimes I see IPv6 addresses in square brackets, but that is usually in a URL<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:57:49)</span> <b>thomlee:</b></span> as in https://[2001:18e8:2:6::10e]:443, as an example<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:57:54)</span> <b>marian:</b></span> ah, moment, my client is not v6 at all so pointless to telnet from there<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:58:21)</span> <b>marian:</b></span> but strace shows me it's redirected there for some reason<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:58:41)</span> <b>marian:</b></span> connect(5, {sa_family=AF_INET6, sin6_port=htons(5671), inet_pton(AF_INET6, "2001:18e8:2:6::10e", &amp;sin6_addr), sin6_flowinfo=0, sin6_scope_id=0}, 28) = -1 ENETUNREACH (Network is unreachable)<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:58:50)</span> <b>marian:</b></span> no clue why<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:59:34)</span> <b>marian:</b></span> only that's why I pointed out 5671 for v6 address on event-itb<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:02:01)</span> <b>thomlee:</b></span> well typically when there are both IPv4 and IPv6 addresses, most DNS resolvers choose the IPv6 address, since that's what we're meant to be moving towards<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:02:12)</span> <b>thomlee:</b></span> if you don't specify that you really want IPv4<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:02:47)</span> <b>thomlee:</b></span> so "telnet -4 <a href="http://event-itb.grid.iu.edu">event-itb.grid.iu.edu</a> 5671" would, I hope, request an IPv4 address when it resolves the hostname<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:06:03)</span> <b>marian:</b></span> but that strace is from my application actually<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:07:30)</span> <b>thomlee:</b></span> how does the application do its DNS lookup?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:07:36)</span> <b>thomlee:</b></span> Does it specify IPv4?<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:10:19)</span> <b>marian:</b></span> I don't know much details there, but it tries IPv4 address of event-itb on connect but then event-itb responds with v6 address ... here portion of strace:<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:10:20)</span> <b>marian:</b></span> connect(5, {sa_family=AF_INET, sin_port=htons(5671), sin_addr=inet_addr("129.79.53.45")}, 16) = 0<br/>getsockname(5, {sa_family=AF_INET, sin_port=htons(38927), sin_addr=inet_addr("192.168.1.9")}, [16]) = 0<br/>close(5)                                = 0<br/>socket(PF_INET6, SOCK_DGRAM, IPPROTO_IP) = 5<br/>connect(5, {sa_family=AF_INET6, sin6_port=htons(5671), inet_pton(AF_INET6, "2001:18e8:2:6::10e", &amp;sin6_addr), sin6_flowinfo=0, sin6_scope_id=0}, 28) = -1 ENETUNREACH (Network is unreachable)<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:14:18)</span> <b>marian:</b></span> if I give you full strace would it help?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:15:21)</span> <b>thomlee:</b></span> Strange that it gets and IPv4 and then just switches over to ipvo6<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:15:23)</span> <b>thomlee:</b></span> v6 ...<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:22:52)</span> <b>thomlee:</b></span> it might help? The worst it can do is tell us nothing more<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:24:33)</span> <b>marian:</b></span> ok, generating<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:26:41)</span> <b>marian:</b></span> <a href="http://t2.unl.edu/store/zvada/debugging/graccarchiver.strace">http://t2.unl.edu/store/zvada/debugging/graccarchiver.strace</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(15:27:20)</span> <b>marian:</b></span> yeah, that is strange to me, it gets IPv4 and switches to IPv6<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:39:07)</span> <b>thomlee:</b></span> My time has just been preempted; Scott wants me to look at oasis-login, which needs to be resolved today<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:03:24)</span> <b>thomlee:</b></span> One problem after another<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:03:43)</span> <b>thomlee:</b></span> Yes, it looks as if it requests the IPv4 address, gets it, and then goes ahead and uses the IPv6 address anyway.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:03:55)</span> <b>thomlee:</b></span> It doesn't even seem to look up the IPv6 address. Very odd.<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:32:01)</span> <b>marian:</b></span> yeah, this not urgent issue so I can wait but eventually it needs to be solved ... when can I ping you continue discussion? or should I file GOC ticket for this?<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:33:39)</span> <b>marian:</b></span> it's also ITB instance ... but if <a href="http://event.grid.iu.edu">event.grid.iu.edu</a> gets IPv6 address I can imagine this would be problem for the production instance ... so good we hit it on ITB now<br/>
+</body>
+</html>

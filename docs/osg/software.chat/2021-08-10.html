@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Aug 10, 2021 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue Aug 10, 2021 : #software (osg)</h3>
+<span style="color: #de5f24"><span style="font-size: small">(09:10:50)</span> <b>justas.balcas:</b></span> Hi, for ‘OSG-SEC-2021-07-27’ - just want to clarify. Message says:<br/><pre>Update any HTCondor-CEs, HTCondor access points, and HTCondor central managers to a fixed version of the software [3] (8.8.14, 9.0.3 or 9.1.1) as soon as reasonably possible.</pre><br/>So  8.8.15-1.2.osg35.el7 - is not an option? Likewise of 9.0.4-1.osg35up.el7 ? Or any higher version than &gt;8.814<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:14:08)</span> <b>matyas:</b></span> we had to do another security release after that message was written; you should update to 8.8.15/9.0.4/9.1.2 instead<br/>
+<span style="color: #de5f24"><span style="font-size: small">(09:15:52)</span> <b>justas.balcas:</b></span> Thanks<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:29:27)</span> <b>matyas:</b></span> @justas.balcas, you had a problem with Singularity spending a long time converting .SIF files to sandboxes recently, right?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:29:35)</span> <b>matyas:</b></span> How did you solve that?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(10:33:39)</span> <b>justas.balcas:</b></span> we had mistake in singularity.conf. On some nodes we still need to use <tt>allow setuid = yes</tt>  - that solved an issue<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:37:19)</span> <b>blin:</b></span> FYI github's having issues: <a href="https://www.githubstatus.com/incidents/rmfrw9dfbtbp">https://www.githubstatus.com/incidents/rmfrw9dfbtbp</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:37:37)</span> <b>blin:</b></span> set the channel topic: All things related to the OSG Software Stack: <a href="https://opensciencegrid.org/docs/">https://opensciencegrid.org/docs/</a><br/>
+<span style="color: #619a4f"><span style="font-size: small">(11:48:05)</span> <b>clundstedt:</b></span> My Google-fu is weak today, what's the condor mapping/ token generation magic to enable daemons to authenticate via IDTokens in a Condor cluster?  I did a naive thing of generating a token for my scheduler with an identity like <a href="mailto:red-gw3@daemon.unl.edu">red-gw3@daemon.unl.edu</a> and I can talk to my collector (condor_status and condor_q) work.  Jobs submit but I get:<br/>"ERROR: SECMAN:2010:Received "DENIED" from server for user <a href="mailto:red-gw3@deamon.unl.edu">red-gw3@deamon.unl.edu</a> using method IDTOKENS." my /bin/hostname job matches machines but doesn't run.<br/>
+<span style="color: #619a4f"><span style="font-size: small">(11:48:17)</span> <b>clundstedt:</b></span> (copied over from #operations)<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:49:04)</span> <b>blin:</b></span> so <tt>condor_submit</tt> works without an issue but jobs are getting held with that error?<br/>
+<span style="color: #619a4f"><span style="font-size: small">(11:49:23)</span> <b>clundstedt:</b></span> Not held, just idle.<br/>
+<span style="color: #619a4f"><span style="font-size: small">(11:49:52)</span> <b>clundstedt:</b></span> I just threw a condor_run for a first attempt (and qeditted a needed classad)<br/>
+<span style="color: #619a4f"><span style="font-size: small">(11:50:20)</span> <b>clundstedt:</b></span> That's the only error that's showing up in the Schedd log<br/>
+<span style="color: #619a4f"><span style="font-size: small">(11:51:30)</span> <b>clundstedt:</b></span> 08/10/21 11:15:55 PERMISSION DENIED to <a href="mailto:red-gw3@deamon.unl.edu">red-gw3@deamon.unl.edu</a> from host 129.93.183.26 for command 1 (UPDATE_SCHEDD_AD), access level ADVERTISE_SCHEDD: reason: ADVERTISE_SCHEDD authorization policy contains no matching ALLOW entry for this request; identifiers used for this host: 129.93.183.26,<a href="http://red-kube-c7128.unl.edu">red-kube-c7128.unl.edu</a>, hostname size = 1, original ip address = 129.93.183.26<br/>
+<span style="color: #619a4f"><span style="font-size: small">(11:51:36)</span> <b>clundstedt:</b></span> This is what shows up in the Collectorlog<br/>
+<span style="color: #619a4f"><span style="font-size: small">(11:52:09)</span> <b>clundstedt:</b></span> That smells like a token mapping issue.<br/>
+<span style="color: #619a4f"><span style="font-size: small">(11:52:34)</span> <b>clundstedt:</b></span> (and red-gw3 is a container running in a k8s cluster)<br/>
+<span style="color: #619a4f"><span style="font-size: small">(11:52:50)</span> <b>clundstedt:</b></span> (so that IP is somewhat misleading)<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:53:33)</span> <b>blin:</b></span> i think you can run <tt>condor_token_list</tt> to see the details of the tokens that you have on both the collector/schedd side<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:53:37)</span> <b>blin:</b></span> maybe there's a hint in the scopes?<br/>
+<span style="color: #619a4f"><span style="font-size: small">(11:53:47)</span> <b>clundstedt:</b></span> We've been doing GSI on the inside of our cluster and I need to move to tokens for the daemons (I think) to get my k8s stuff happy.<br/>
+<span style="color: #619a4f"><span style="font-size: small">(11:55:17)</span> <b>clundstedt:</b></span> Hmmm, I created the tokens on the schedd using the POOL to sign, I'm not sure what condor_token_list on the collector would tell me, should there be some gw3 token there?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:56:04)</span> <b>blin:</b></span> i forget if the collector would have a list of all the tokens it accepts or not (tokens are new to me too :slightly_smiling_face: )<br/>
+<span style="color: #619a4f"><span style="font-size: small">(11:56:29)</span> <b>clundstedt:</b></span> the only tokens I see on the collector are some I've generated in the past tying to learn<br/>
+<span style="color: #619a4f"><span style="font-size: small">(11:57:00)</span> <b>clundstedt:</b></span> The Schedd and Collector do have the same POOL password file<br/>
+<span style="color: #619a4f"><span style="font-size: small">(11:57:27)</span> <b>clundstedt:</b></span> I wonder if I need an additional -authz on the scheduler's token<br/>
+<span style="color: #619a4f"><span style="font-size: small">(11:58:08)</span> <b>clundstedt:</b></span> I didn't add any authz arguments when I generated the schedd's token<br/>
+<span style="color: #619a4f"><span style="font-size: small">(11:58:42)</span> <b>clundstedt:</b></span> (Kinda relying on @daemon.unl.edu to take care of it, but all references to that are in GSI lines in the mapfile.  I'll bet I need to figure out the correct authz argument)<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:59:49)</span> <b>matyas:</b></span> if you omit -authz then it means no auth restrictions<br/>
+<span style="color: #619a4f"><span style="font-size: small">(11:59:57)</span> <b>clundstedt:</b></span> oh<br/>
+<span style="color: #619a4f"><span style="font-size: small">(12:00:00)</span> <b>clundstedt:</b></span> huh<br/>
+<span style="color: #619a4f"><span style="font-size: small">(12:00:14)</span> <b>clundstedt:</b></span> That's good to know<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:00:18)</span> <b>blin:</b></span> IIRC IDTOKEN scopes will be additive to the permissions that the mapped user already has?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:00:28)</span> <b>matyas:</b></span> subtractive<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:00:36)</span> <b>matyas:</b></span> er. ANDed<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:00:47)</span> <b>matyas:</b></span> (i.e. intersection)<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:01:03)</span> <b>blin:</b></span> hrm, i thought that's what scitokens did<br/>
+<span style="color: #619a4f"><span style="font-size: small">(12:01:10)</span> <b>clundstedt:</b></span> Ok, so I'm back to being clueless.<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:01:58)</span> <b>matyas:</b></span> if the user's in ALLOW_READ and ALLOW_WRITE in the condor config, and if you made the token with -authz WRITE -authz OWNER, then you can use the token for WRITE (only)<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:02:21)</span> <b>matyas:</b></span> if the user's in ALLOW_READ and ALLOW_WRITE in the condor config, and if you made the token with no -authz, then you can use the token for READ and WRITE<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:02:40)</span> <b>matyas:</b></span> also, in tokens, -authz WRITE does *not* imply -authz READ<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:03:41)</span> <b>matyas:</b></span> (unlike condor config, where ALLOW_WRITE does also give ALLOW_READ)<br/>
+<span style="color: #619a4f"><span style="font-size: small">(12:07:38)</span> <b>clundstedt:</b></span> Perhaps I needed to do a condor_token_fetch for the schedd?  That seems to have removed my schedd errors.  (I'm really just getting my feet wet with idtokens here, sorry)<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:09:56)</span> <b>matyas:</b></span> (no worries, idtokens are kinda confusing for me too)<br/>
+<span style="color: #619a4f"><span style="font-size: small">(12:11:01)</span> <b>clundstedt:</b></span> They seems simple, which worries me a bit as I'm sure I'll open us up to some nasty exploit.  ("YOU DID WHAT?")<br/>I'll keep poking.<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:11:54)</span> <b>matyas:</b></span> TBH I don't think it's a big deal that you omit <tt>-authz</tt> -- it's no worse than previous auth methods like SSL or GSI<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:12:46)</span> <b>matyas:</b></span> -authz restrictions are useful for when you want to delegate credentials to untrusted apps<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:42:54)</span> <b>bbockelm:</b></span> :point_up: The <tt>-authz</tt> is a restriction to what the identity can do.  It's very different than the SciTokens model where the default token can do nothing and then scopes _add._<br/>
+</body>
+</html>

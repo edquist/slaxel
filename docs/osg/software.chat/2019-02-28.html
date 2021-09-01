@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Feb 28, 2019 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu Feb 28, 2019 : #software (osg)</h3>
+<span style="color: #df3dc0"><span style="font-size: small">(08:36:43)</span> <b>zalak:</b></span> I got the following error while running <tt>osg-promote osg-ca-certs igtf-ca-certs</tt><br/><br/>Koji error: Couldn't do ssl_login: [Errno -2] Name or service not known<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:26:41)</span> <b>matyas:</b></span> what's in your <tt>~/.osg-koji</tt> directory?<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(09:36:41)</span> <b>zalak:</b></span> client.crt  config  osg-ca-bundle.crt<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:38:02)</span> <b>matyas:</b></span> is client.crt a symlink to a grid proxy?<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(09:39:39)</span> <b>zalak:</b></span> lrwxrwxrwx. 1 root root    14 Feb 27 20:01 client.crt -&gt; /tmp/x509up_u0<br/>-rw-r--r--. 1 root root   698 Feb 27 20:01 config<br/>-rw-r--r--. 1 root root 11518 Feb 27 20:01 osg-ca-bundle.crt<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(09:39:46)</span> <b>zalak:</b></span> Seems like it is.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:40:24)</span> <b>bbockelm:</b></span> <tt>[Errno -2] Name or service not known</tt> -&gt;  Smells like a DNS error message.  Is the config is pointing at an old DNS name or something?<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(09:41:39)</span> <b>zalak:</b></span> Let me check.<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(09:46:44)</span> <b>zalak:</b></span> Oh I think I know the reason.<br/><br/>So, we were running a docker image (on a SL 7 vm) yesterday to create Koji builds. I suspended the VM after we created the builds. This morning I resumed the VM to promote the builds. Is that the reason?<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(09:48:52)</span> <b>zalak:</b></span> [root@0b6f557c70b1 trunk]# cat ~/.osg-koji/config<br/>[koji]<br/>;configuration for koji cli tool<br/>;url of XMLRPC server<br/>server = <a href="http://koji.chtc.wisc.edu/kojihub">http://koji.chtc.wisc.edu/kojihub</a><br/>;url of web interface<br/>weburl = <a href="http://koji.chtc.wisc.edu/koji">http://koji.chtc.wisc.edu/koji</a><br/>;url for koji file access<br/>topurl = <a href="http://koji.chtc.wisc.edu">http://koji.chtc.wisc.edu</a><br/><br/>; use_old_ssl uses koji.compatrequests instead of requests<br/>; This allows our passphrase caching patches to work.<br/>; Set use_old_ssl=True unless using a grid proxy.<br/>use_old_ssl = True<br/><br/>;configuration for SSL authentication<br/>;client certificate<br/>cert = ~/.osg-koji/client.crt<br/>;certificate of the CA that issued the client certificate<br/>ca = ~/.osg-koji/osg-ca-bundle.crt<br/>;certificate of the CA that issued the HTTP server certificate<br/>serverca = ~/.osg-koji/osg-ca-bundle.crt<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(09:49:16)</span> <b>zalak:</b></span> *Output of config file:*<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:03:42)</span> <b>matyas:</b></span> can you run "ping <a href="http://koji.chtc.wisc.edu">koji.chtc.wisc.edu</a>" in the container?<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(10:05:02)</span> <b>zalak:</b></span> It says <tt>ping: <a href="http://koji.chtc.wisc.edu">koji.chtc.wisc.edu</a>: Name or service not known</tt><br/>
+<span style="color: #df3dc0"><span style="font-size: small">(10:07:51)</span> <b>zalak:</b></span> Seems like I'm having a connection issue.<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(10:08:15)</span> <b>zalak:</b></span> Because, I'm not able to download anything.<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(10:52:39)</span> <b>zalak:</b></span> Question regarding promoting builds.<br/><br/>Is it possible to promote builds from a different system or a different VM if I checkout the svn repo or <tt>svn update</tt> in that system?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:56:44)</span> <b>matyas:</b></span> yes<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:56:50)</span> <b>matyas:</b></span> you don't need to check out the SVN repo<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:56:55)</span> <b>matyas:</b></span> promoting all depends on koji tags<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:57:10)</span> <b>matyas:</b></span> e.g. do <tt>osg-koji list-tagged osg-3.4-el6-development osg-ca-certs</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(12:58:05)</span> <b>matyas:</b></span> if you version you want is in development, you can promote it to testing (the default)<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(13:01:20)</span> <b>zalak:</b></span> I can see the latest version:<br/><br/><tt>osg-ca-certs-1.79-1.osg34.el6             osg-3.4-el6-development  Zalak Shah A255156</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(13:05:43)</span> <b>matyas:</b></span> then once you have permission to promote, you can run <tt>osg-promote osg-ca-certs</tt><br/>
+<span style="color: #df3dc0"><span style="font-size: small">(13:13:07)</span> <b>zalak:</b></span> Thank you.<br/>
+</body>
+</html>

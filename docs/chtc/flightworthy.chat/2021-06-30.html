@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jun 30, 2021 : #flightworthy (chtc)</title>
+</head>
+<body>
+<h3>Wed Jun 30, 2021 : #flightworthy (chtc)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(02:37:49)</span> <b>johnkn:</b></span> Because <tt>-af</tt> treats all the arguments after it until the next <tt>-</tt> as a list of things to query, while <tt>-format</tt> only consumes the next two arguments<br/>
+<span style="color: #235e5b"><span style="font-size: small">(02:41:14)</span> <b>johnkn:</b></span> try this<br/><pre>condor_q 768.0 -af:r Requirements</pre><br/>or this<br/><pre>condor_q -af:r Requirements - 768.0</pre><br/>
+<span style="color: #99a949"><span style="font-size: small">(08:49:21)</span> <b>matyas:</b></span> yep that works<br/>
+<span style="color: #99a949"><span style="font-size: small">(08:50:43)</span> <b>matyas:</b></span> thanks!<br/>
+<span style="color: #99a949"><span style="font-size: small">(09:36:24)</span> <b>matyas:</b></span> for the blahp, how can I get the exact command line that slurm_submit.sh was run with?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(09:42:19)</span> <b>jfrey:</b></span> No. You’d have to modify slurm_submit.sh to save its arguments.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(09:42:45)</span> <b>jfrey:</b></span> That’s something we should improve upon.<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:43:34)</span> <b>edquist:</b></span> alternatively the caller could be verbose about it?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(09:43:51)</span> <b>jfrey:</b></span> That’s the blahp C program.<br/>
+<span style="color: #16569E"><span style="font-size: small">(09:43:55)</span> <b>edquist:</b></span> ah<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(09:44:21)</span> <b>jfrey:</b></span> <a href="http://get.htcondor.org">get.htcondor.org</a> is currently broken for tarball installations.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(09:44:58)</span> <b>tim:</b></span> What seems to be the problem?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(09:45:00)</span> <b>jfrey:</b></span> It tries to download URLs like this: <a href="https://research.cs.wisc.edu/htcondor/tarball/current/current/condor-x86_64_CentOS7-stripped.tar.gz">https://research.cs.wisc.edu/htcondor/tarball/current/current/condor-x86_64_CentOS7-stripped.tar.gz</a><br/>
+<span style="color: #9b3b45"><span style="font-size: small">(09:45:22)</span> <b>jfrey:</b></span> But our website has URLs like this: <a href="https://research.cs.wisc.edu/htcondor/tarball/current/current/condor-current-x86_64_CentOS7-stripped.tar.gz">https://research.cs.wisc.edu/htcondor/tarball/current/current/condor-current-x86_64_CentOS7-stripped.tar.gz</a><br/>
+<span style="color: #9b3b45"><span style="font-size: small">(09:45:35)</span> <b>jfrey:</b></span> Note the extra <tt>-current</tt> in the filename<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(09:48:56)</span> <b>tim:</b></span> I look at the directory and the file seems to be there. <a href="https://research.cs.wisc.edu/htcondor/tarball/current/current/">https://research.cs.wisc.edu/htcondor/tarball/current/current/</a><br/>
+<span style="color: #9b3b45"><span style="font-size: small">(09:49:19)</span> <b>jfrey:</b></span> Look at the filenames in that directory<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(09:49:57)</span> <b>tim:</b></span> Nevermind. I see that the gethtcondor script does not put the current into the file name. I can easily fix the web site.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(09:56:04)</span> <b>tim:</b></span> I dropped symlinks in place.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(09:59:06)</span> <b>jfrey:</b></span> Ok. It works now.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(09:59:49)</span> <b>jfrey:</b></span> So this is a change from 9.0 and before.<br/>
+<blockquote>
+<span style="color: #bb86b7"><span style="font-size: small">(11:09:29)</span> <b>tim:</b></span> @jfrey It is new with 9.0 and 9.1. I also fixed the 9.0 symlinks at the same time.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(11:11:08)</span> <b>jfrey:</b></span> Ah, right. I misread the <tt>ls -l</tt> output.<br/>
+</blockquote>
+<span style="color: #4cc091"><span style="font-size: small">(10:10:46)</span> <b>blin:</b></span> hey Jaime, i think there may be an issue with the GGUS/RT sync<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(10:11:14)</span> <b>jfrey:</b></span> What are you seeing?<br/>
+<span style="color: #4cc091"><span style="font-size: small">(10:11:50)</span> <b>blin:</b></span> the underlying GGUS ticket here had a comment added this morning but it hasn't shown up in RT <a href="https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=103427">https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=103427</a><br/>
+<span style="color: #4cc091"><span style="font-size: small">(10:12:07)</span> <b>blin:</b></span> (GGUS ticket: <a href="https://ggus.eu/index.php?mode=ticket_info&amp;ticket_id=147386">https://ggus.eu/index.php?mode=ticket_info&amp;ticket_id=147386</a>)<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(10:14:52)</span> <b>jfrey:</b></span> HTCONDOR-CE is not currently the responsible unit. I suspect that’s the reason.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(10:22:34)</span> <b>blin:</b></span> ah ok that makes sense. though that's a little rough<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(10:25:08)</span> <b>jfrey:</b></span> Yeah. And if the ticket is assigned back to us, RT won’t get the intervening updates from GGUS.<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:46:06)</span> <b>matyas:</b></span> can I get an unevaluated classad attribute as a string? I want to do<br/><tt>condor_q -const 'regexp("SDSC-Expanse", Requirements)'</tt><br/>without evaluating Requirements<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:48:18)</span> <b>tlmiller:</b></span> <tt>unparse</tt>?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:48:47)</span> <b>tlmiller:</b></span> <tt>unparse()</tt>.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:49:00)</span> <b>johnkn:</b></span> or <tt>unresolved()</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:49:12)</span> <b>johnkn:</b></span> if the schedd is 9.0 or later<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:49:15)</span> <b>tlmiller:</b></span> Depending on what you're trying to do, of course.<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:49:18)</span> <b>matyas:</b></span> unparse() works, thanks<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:50:43)</span> <b>matyas:</b></span> I should stop looking at the classad spec for functions<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:53:10)</span> <b>tlmiller:</b></span> That one was in the manual...<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:53:16)</span> <b>matyas:</b></span> exactly<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:53:29)</span> <b>tlmiller:</b></span> Oh, but not in the spec?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:53:35)</span> <b>tlmiller:</b></span> Yeah, that's at best confusing.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:54:47)</span> <b>johnkn:</b></span> The classad spec is the non-condor classad interface<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:55:14)</span> <b>johnkn:</b></span> (which we should nuke from orbit and stop pretending classads is an external.)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:55:28)</span> <b>tlmiller:</b></span> (concur)<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:55:43)</span> <b>matyas:</b></span> (agreed)<br/>
+<span style="color: #d58247"><span style="font-size: small">(11:55:58)</span> <b>gthain:</b></span> The 20 year old "new" classad paper is not the spec<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:56:24)</span> <b>matyas:</b></span> I read the man classads page first and when I didn't find it there I figured I'd get a full function list in the "complete language specification" link instead of the "for use in HTCondor" link<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:13:16)</span> <b>tlmiller:</b></span> Yay!  Somebody actually read a manpage I wrote.  Boo!  It was maybe actually harmful.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:13:42)</span> <b>tlmiller:</b></span> Let me know if, in light this experience, you have a suggestion for improving the wording.<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:14:42)</span> <b>matyas:</b></span> Pretty sure I reviewed that manpage :wink:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:14:57)</span> <b>tlmiller:</b></span> Boo!  The only person to read the manpage I wrote had to. :(<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:42:07)</span> <b>matyas:</b></span> "For use in HTCondor, including a complete list of functions, see ..." ?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:51:39)</span> <b>tlmiller:</b></span> I like it.  Done.<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:53:50)</span> <b>matyas:</b></span> I've got a separate manual issue where I go to a page like <a href="https://htcondor.readthedocs.io/en/latest/users-manual/file-transfer.html">https://htcondor.readthedocs.io/en/latest/users-manual/file-transfer.html</a>, and I try to go back to 8.8 to see if it was different there, and I get a 404<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:54:50)</span> <b>matyas:</b></span> this also happens to the classads man page <a href="https://htcondor.readthedocs.io/en/latest/man-pages/classads.html">https://htcondor.readthedocs.io/en/latest/man-pages/classads.html</a><br/>
+<span style="color: #99a949"><span style="font-size: small">(12:55:59)</span> <b>matyas:</b></span> can we add some redirects or something?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:57:42)</span> <b>tlmiller:</b></span> That's a MarkC issue, sadly.<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:58:02)</span> <b>matyas:</b></span> oh this also affects the Getting HTCondor page<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:58:07)</span> <b>tlmiller:</b></span> Also, not sure where to redirect.<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:58:53)</span> <b>matyas:</b></span> it might help if we added the table of contents bar to the 404 page<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:59:07)</span> <b>tlmiller:</b></span> Well, I guess for the first link there's a section we could redirect to (instead of its own page)?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:59:19)</span> <b>tlmiller:</b></span> I don't know that we control the 404 page at all; another MarkC question.<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:00:04)</span> <b>matyas:</b></span> OK, I'll email him since he's out today<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:00:42)</span> <b>tlmiller:</b></span> The getting htcondor page _definitely_ didn't exist in 8.8 :)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:00:52)</span> <b>tlmiller:</b></span> OK, sounds good.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:38:33)</span> <b>tlmiller:</b></span> I just retargeted a bunch of BACKLOG tickets from 9.0.0 to 9.0.x.  Since they're still in BACKLOG after the release, I imagine no one actually cares.  If you do, you may want to set the version to 9.0.3 so the ticket's for the next release.<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:36:43)</span> <b>matyas:</b></span> I just saw in the <a href="https://htcondor.readthedocs.io/en/latest/admin-manual/configuration-macros.html">manual</a> that you could append a daemon to the DC_DAEMON_LIST by doing<br/><pre>DC_DAEMON_LIST = +NEW_DAEMON</pre><br/>(apparently introduced in 7.2.1). Is the + syntax specific to DC_DAEMON_LIST (and if so wtf) or is it a general (undocumented) "append item to list" config syntax feature?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:42:35)</span> <b>jfrey:</b></span> It appears to be specific to DC_DAEMON_LIST. And if you use it twice, the first daemon will not be added.<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:44:14)</span> <b>matyas:</b></span> wtf<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:45:52)</span> <b>jfrey:</b></span> DC_DAEMON_LIST is undefined by default, which means use the baked-in list of daemons.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:46:24)</span> <b>jfrey:</b></span> If you set <tt>DC_DAEMON_LIST = NEW_DAEMON</tt>, that means no other daemons are considered daemon-core.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:47:11)</span> <b>jfrey:</b></span> Setting <tt>DC_DAEMON_LIST = $(DC_DAEMON_LIST) NEW_DAEMON</tt>  evaluates to <tt>DC_DAEMON_LIST=NEW_DAEMON</tt>, leading to the same problem.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:47:58)</span> <b>jfrey:</b></span> I am not defending this behavior, just explaining it.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:48:24)</span> <b>jfrey:</b></span> The + syntax means add the given daemon to the baked-in default list.<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:48:47)</span> <b>matyas:</b></span> Can you do <tt>DC_DAEMON_LIST = $(DAEMON_LIST) NEW_DAEMON</tt> ?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:50:02)</span> <b>jfrey:</b></span> That may cause trouble if SHARED_PORT isn’t in DAEMON_LIST<br/>
+<span style="color: #5a4592"><span style="font-size: small">(16:50:02)</span> <b>tannenba:</b></span> @johnkn Very soon we will configure OSPool startds to have <tt>use policy:hold_if_memory_exceeded</tt> in their config...  TJ, could you please verify this metaknob works as expected (ideally on Linux)?   I can deal with making the PR to the OSG config, but I'd like quick confirmation this knob works as expected before enabling it on lots of nodes...  Thanks.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:51:22)</span> <b>jfrey:</b></span> And I’d presume you would do this:<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:51:25)</span> <b>jfrey:</b></span> <pre>DAEMON_LIST = $(DAEMON_LIST) NEW_DAEMON<br/>DC_DAEMON_LIST = $(DAEMON_LIST)</pre><br/><br/>
+<span style="color: #99a949"><span style="font-size: small">(16:52:26)</span> <b>matyas:</b></span> Can't we make AUTO_INCLUDE_SHARED_PORT_IN_DAEMON_LIST also include it in DC_DAEMON_LIST? (Presumably SHARED_PORT is a DC daemon?)<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:52:28)</span> <b>jfrey:</b></span> We should change that code so that DC_DAEMON_LIST only adds to the internal default list.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:52:56)</span> <b>johnkn:</b></span> @tannenba I can give it a test.  the way it interacts with cgroups memory limits make it a bit iffy, but I'm pretty sure it works if cgroups doesn't kick in first.<br/>
+<blockquote>
+<span style="color: #5a4592"><span style="font-size: small">(16:54:55)</span> <b>tannenba:</b></span> @johnkn Thanks,  Since this is for glideins, please test it with a non-root startd (i.e. a personal condor)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:55:25)</span> <b>johnkn:</b></span> sure, that's easier.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:56:02)</span> <b>johnkn:</b></span> should I just write a test for that and add it to the test suite?<br/>
+<span style="color: #5a4592"><span style="font-size: small">(16:57:11)</span> <b>tannenba:</b></span> That would be fantastic if it does not significantly delay getting an answer of 'it appears to work'<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:57:39)</span> <b>johnkn:</b></span> ok.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:00:01)</span> <b>tlmiller:</b></span> If it helps, the infrastructure for causing and checking excessive memory usage is already present in, IIRC, <tt>cmd_drain_policies</tt>.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(17:00:15)</span> <b>tannenba:</b></span> Nice!  Thanks ToddM!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:00:19)</span> <b>tlmiller:</b></span> I don't recall if it uses that specific metaknob, which may postdate the test.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:01:01)</span> <b>tlmiller:</b></span> (Actually, IIRC, that test even checks to make sure that the memory-exceeded policy it's using works when the startd _isn't_ draining.)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:01:38)</span> <b>johnkn:</b></span> yeah.  sure looks at first blush like we have a test for this already..<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:02:07)</span> <b>johnkn:</b></span> in fact maybe 2.  test_drain_policies.py also<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:02:33)</span> <b>tlmiller:</b></span> ... I should check if there's a good reason both of those still exist.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:04:16)</span> <b>tlmiller:</b></span> ... there does not appear to be (other than the problem with Ornithology not running on some platforms).<br/>
+</blockquote>
+<span style="color: #235e5b"><span style="font-size: small">(16:53:18)</span> <b>johnkn:</b></span> We should undocument DC_DAEMON_LIST.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:54:27)</span> <b>johnkn:</b></span> I can't think if any reason for it to be visible to outsiders at this point.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:55:02)</span> <b>johnkn:</b></span> because you no longer need (or want) to set it if you are cloning a condor daemon.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(16:59:09)</span> <b>tannenba:</b></span> Folks : I am creating a list of HTCSS components/elements.  Can anyone think of anything beyond the following:  1) HTCondor (access point, execution point, central manager), 2) HTCondor-CE, 3) GAHPs for many different schedulers, 4) BOSCO, 5) BLAHP, 6) ClassAd Library, 7) HTMap, 8. HTCondor REST service, 9) DAGMan, 10) Python Bindings, 11) JupyterHub spawner to HTCondor, 12) Chirp<br/>
+<span style="color: #5a4592"><span style="font-size: small">(17:03:10)</span> <b>tannenba:</b></span> Adding to my list above - ... HTCondor Annex Toolkit ?  Elastic Search injector?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:04:38)</span> <b>tlmiller:</b></span> Is the grid manager consider part of the access point, then?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:05:46)</span> <b>tlmiller:</b></span> Not sure it deserves the name "toolkit", really, but there's some infrastructure in the cloud for <tt>condor_annex</tt> that might not fit under (1).<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:06:06)</span> <b>tlmiller:</b></span> 15) The test suite / ornithology<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:06:54)</span> <b>tlmiller:</b></span> 16) We probably can't really claim that Metronome is independent software any more.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:07:25)</span> <b>tlmiller:</b></span> 17) Have we finally killed "the Perl bindings"?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:08:00)</span> <b>tlmiller:</b></span> 18) Do the bazillion different credmons count?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:08:19)</span> <b>tlmiller:</b></span> 6) Could we finally stop pretending that the ClassAd library is independent?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:09:14)</span> <b>tlmiller:</b></span> 19) Is <tt>htchirp</tt> covered by 12?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:10:36)</span> <b>tlmiller:</b></span> 20) A giant stack of "supported" (whatever that means) or at least "official" Docker images of various types.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:10:54)</span> <b>tlmiller:</b></span> 21) A much smaller stack of "supported" (whatever that means) or at least "official" VM images and other cloud paraphenalia of various types.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:12:38)</span> <b>tlmiller:</b></span> 22) The pandad still exists, although maybe it shouldn't.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:14:41)</span> <b>johnkn:</b></span> libcondorapi? (hopefully not...)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:15:40)</span> <b>tlmiller:</b></span> 23) documentation isn't technically software, but depending on what you're using the list for may need to be listed as its own thing.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(17:20:17)</span> <b>tannenba:</b></span> Thanks ToddM, the above is helpful!<br/>
+<span style="color: #5a4592"><span style="font-size: small">(17:25:50)</span> <b>tannenba:</b></span> Oh, and we shan't forget the HTCondor Google Marketplace entry (sigh)....<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:32:24)</span> <b>johnkn:</b></span> the cmd_drain_policies test is definitely a test for the HOLD_IF_MEMORY_EXCEEDED metaknob in a personal condor, but  we don't run it anymore<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:32:49)</span> <b>johnkn:</b></span> it appears to have been replaced by test_drain_policies, which is an ornithology rewrite of that test<br/>
+<span style="color: #2b6836"><span style="font-size: small">(20:45:14)</span> <b>jcpatton:</b></span> FWIW, I called the Elasticsearch ad storer "(condor_)adstash" (playing off "logstash" in the ELK stack)<br/>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jun 5, 2019 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Jun 5, 2019 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(12:32:45)</span> <b>blin:</b></span> @matyas <b>@edquist</b> i'm trying to build a docker container that has all the same default build packages installed as the koji builds<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:32:51)</span> <b>blin:</b></span> thoughts on a good way to do that?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:33:14)</span> <b>matyas:</b></span> what do you mean 'default build packages'?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:34:52)</span> <b>blin:</b></span> whatever we get from the build repos<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:35:15)</span> <b>matyas:</b></span> so the stuff you don't have to put into BuildRequires when you do builds?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:35:42)</span> <b>blin:</b></span> yeah<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:36:05)</span> <b>blin:</b></span> <tt>DEBUG package_manager.py:122:  ['/usr/bin/yum', '--installroot', '/var/lib/mock/osg-3.4-el6-build-52540-65240/root/', 'groupinstall', 'build']</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:36:32)</span> <b>blin:</b></span> so can I just do a <tt>yum groupinstall build</tt>? Do i have to install/enable specific repos?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:37:02)</span> <b>matyas:</b></span> i don't believe that group definition exists outside of the koji environment. hold on<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:40:00)</span> <b>matyas:</b></span> epel-rpm,macros, tar, sed, findutils, gcc, redhat-rpm-config, make, shadow-utils, coreutils, buildsys-macros, which, gcc-c++, unzip, gawk, cpio, bash, info, grep, rpm-build, patch, util-linux-ng, diffutils, gzip, redhat-release, bzip2<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:40:23)</span> <b>matyas:</b></span> and buildsys-macros I believe is only in the osg-development repo<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:42:16)</span> <b>blin:</b></span> hrm ok<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:42:26)</span> <b>blin:</b></span> do we lock down versions or just get whatever the latest is from epel?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:42:32)</span> <b>matyas:</b></span> latest<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:43:16)</span> <b>blin:</b></span> unrelated, you know what's a fun thing i'm finding out? we don't test the OSG singularity in the nightlies<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:43:25)</span> <b>blin:</b></span> for whatever reason, it's being installed from epel<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:46:30)</span> <b>matyas:</b></span> is that for regular or upcoming?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:47:23)</span> <b>blin:</b></span> ohhh, nevermind<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:47:35)</span> <b>blin:</b></span> this is for the 3.3 -&gt; 3.4 tests<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:47:49)</span> <b>blin:</b></span> and since we didn't have singularity in 3.3, it first grabs it from epel<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:48:31)</span> <b>blin:</b></span> and the failures we're seeing now with singularity-runtime are because singularity 3 provides singularity-runtime<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:48:42)</span> <b>blin:</b></span> and <tt>rpm --verify singularity-runtime</tt> fails<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:48:58)</span> <b>matyas:</b></span> then we shouldn't have 3.3-&gt;3.4 tests in osg34-singularity.yaml<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:48:59)</span> <b>blin:</b></span> ...i feel like the verify test isn't very useful<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:49:13)</span> <b>matyas:</b></span> agreed<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:49:41)</span> <b>blin:</b></span> we only do it right after installation, what could verify possibly catch there?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:49:50)</span> <b>matyas:</b></span> well, if rpm itself is broken...<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:50:18)</span> <b>matyas:</b></span> so yeah. useless<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:50:52)</span> <b>blin:</b></span> the failures will fix themselves when we release 3.4.31<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:54:25)</span> <b>matyas:</b></span> even so, it's noise<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:54:33)</span> <b>matyas:</b></span> if you make a PR to remove the verify test, I will approve it<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:55:08)</span> <b>blin:</b></span> we're on the cusp of 3.4.31, i don't really want the mental load of having to remove it for a couple of days and remembering to turn it back on<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:19:51)</span> <b>efajardo:</b></span> Hi<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:19:58)</span> <b>efajardo:</b></span> <b>@here</b><br/>
+<span style="color: #a63024"><span style="font-size: small">(14:20:01)</span> <b>efajardo:</b></span> folks<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:20:08)</span> <b>matyas:</b></span> sup<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:20:17)</span> <b>efajardo:</b></span> I am getting this error when getting a VOMS extenrsion for gluex<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:20:30)</span> <b>efajardo:</b></span> <pre>Creating temporary proxy to /tmp/tmp_x509up_u0_18747 ............................++++++<br/>...............................................++++++<br/><br/>No policy language specified, Gsi impersonation proxy assumed. Done<br/>Contacting  <a href="http://gluex.phys.uconn.edu:15014">gluex.phys.uconn.edu:15014</a> [/DC=org/DC=incommon/C=US/ST=CT/L=Storrs/O=University of Connecticut/OU=Academic IT/CN=<a href="http://gluex.phys.uconn.edu">gluex.phys.uconn.edu</a>] "Gluex" Failed<br/><br/>Error: Error during SSL handshake:<br/><br/>None of the contacted servers for Gluex were capable<br/>of returning a valid AC for the user.</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(14:20:34)</span> <b>efajardo:</b></span> ANy idea what is wrong?<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:20:38)</span> <b>efajardo:</b></span> It was working fine beforee<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:22:28)</span> <b>matyas:</b></span> is their voms server down maybe?<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:23:13)</span> <b>efajardo:</b></span> Actually that might be the case<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:23:13)</span> <b>efajardo:</b></span> <tt><a href="https://gluex.phys.uconn.edu:8443/voms/Gluex/">https://gluex.phys.uconn.edu:8443/voms/Gluex/</a></tt><br/>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jul 22, 2019 : #operations (osg)</title>
+</head>
+<body>
+<h3>Mon Jul 22, 2019 : #operations (osg)</h3>
+<span style="color: #e23f99"><span style="font-size: small">(09:31:28)</span> <b>marco.mascheroni:</b></span> @lincoln @jlstephen the factory cannot connect to <a href="http://hosted-ce07.grid.uchicago.edu">hosted-ce07.grid.uchicago.edu</a> on port 9619. The machine is listening though. Can you check it? It's been like this since a while<br/>
+<span style="color: #e23f99"><span style="font-size: small">(09:32:56)</span> <b>marco.mascheroni:</b></span> Also, can't ssh to <a href="http://hosted-ce26.grid.uchicago.edu">hosted-ce26.grid.uchicago.edu</a><br/>
+<span style="color: #e23f99"><span style="font-size: small">(09:33:05)</span> <b>marco.mascheroni:</b></span> Seems the machine is down<br/>
+<span style="color: #ea2977"><span style="font-size: small">(09:34:34)</span> <b>jlstephen:</b></span> openstack security group re ce07, should be fixed now<br/>
+<span style="color: #e23f99"><span style="font-size: small">(09:35:04)</span> <b>marco.mascheroni:</b></span> ok thx<br/>
+<span style="color: #ea2977"><span style="font-size: small">(09:36:15)</span> <b>jlstephen:</b></span> will check re ce26; david is in the process of moving all of the hosted-ces to our new openstack infrastructure<br/>
+<span style="color: #e23f99"><span style="font-size: small">(09:38:28)</span> <b>marco.mascheroni:</b></span> sounds good<br/>
+<span style="color: #ea2977"><span style="font-size: small">(09:50:20)</span> <b>jlstephen:</b></span> @marco.mascheroni so it looks like the disk for c26 accidentally was nuked while migrating<br/>
+<span style="color: #ea2977"><span style="font-size: small">(09:50:35)</span> <b>jlstephen:</b></span> we're setting up a new vm now, but how do you want to handle the reconfiguration?<br/>
+<span style="color: #ea2977"><span style="font-size: small">(09:51:00)</span> <b>jlstephen:</b></span> just the usual us provisioning the vm and then handing it over to you for condor configuration?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(09:57:32)</span> <b>marco.mascheroni:</b></span> yes, any alternative? I guess you do not have a back up of nthe disk, I actually just need this file <tt>/etc/osg/config.d/99-local.ini</tt>, and possibly the ssh key <tt>/etc/osg/bosco.key</tt> so I do not have to bother the site admins.<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:02:59)</span> <b>jlstephen:</b></span> i can doublecheck the old hypervisors, but it sounds like the disk already was deleted off the old storage<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:03:59)</span> <b>marco.mascheroni:</b></span> ouch :disappointed:<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:04:10)</span> <b>jlstephen:</b></span> yeah... sorry about that<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:04:30)</span> <b>marco.mascheroni:</b></span> yeah it happens<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:06:18)</span> <b>jlstephen:</b></span> i'm still checking to see if the volume hasn't *actually* been deleted, though<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:06:47)</span> <b>marco.mascheroni:</b></span> finger crossed!<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:15:05)</span> <b>jlstephen:</b></span> sigh looks like it really did get deleted off disk<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:15:13)</span> <b>jlstephen:</b></span> so david is working on spinning up a new vm<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:15:26)</span> <b>jlstephen:</b></span> i'll let you know when it's up for you to reconfigure<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:21:13)</span> <b>marco.mascheroni:</b></span> sound good<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:24:08)</span> <b>matyas:</b></span> do CEs report what version of the OSG worker node client they have?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:36:42)</span> <b>marco.mascheroni:</b></span> not sure..<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:38:53)</span> <b>marco.mascheroni:</b></span> @lincoln @jlstephen I am getting an error about stratum-R and the rsynch at TACC. (CMS resumed sent new wfs):<br/><br/><pre><br/>login4(1070)$ tail Stratum-R/stunnel/var/log/stunnel.log<br/>2019.07.22 10:24:33 LOG4[ui]: Rebuild your stunnel against OpenSSL version 1.0.2 or higher<br/>2019.07.22 10:24:33 LOG4[ui]: Use "checkHost" or "checkIP" to restrict trusted certificates<br/>2019.07.22 10:24:33 LOG5[ui]: Configuration successful<br/>2019.07.22 10:25:56 LOG5[0]: Service [rsync] accepted connection from 127.0.0.1:48678<br/>2019.07.22 10:25:56 LOG5[0]: s_connect: connected 192.170.227.96:273<br/>2019.07.22 10:25:56 LOG5[0]: Service [rsync] connected remote server from 129.114.63.44:44850<br/>2019.07.22 10:25:56 LOG4[0]: CERT: Pre-verification error: certificate has expired<br/>2019.07.22 10:25:56 LOG4[0]: Rejected by CERT at depth=0: DC=org, DC=opensciencegrid, O=Open Science Grid, OU=Services, CN=<a href="http://uct2-stratum-r.mwt2.org">uct2-stratum-r.mwt2.org</a><br/>2019.07.22 10:25:56 LOG3[0]: SSL_connect: 14090086: error:14090086:SSL routines:ssl3_get_server_certificate:certificate verify failed<br/>2019.07.22 10:25:56 LOG5[0]: Connection reset: 0 byte(s) sent to SSL, 0 byte(s) sent to socket<br/></pre><br/><br/>I do not have access to <a href="http://uct2-stratum-r.mwt2.org">uct2-stratum-r.mwt2.org</a> anymore (I used to be able to log in as root using my ssh key)<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:39:49)</span> <b>matyas:</b></span> expired cert?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:40:01)</span> <b>matyas:</b></span> looks like it was given out by the OSG CA<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:40:11)</span> <b>marco.mascheroni:</b></span> looks so<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:41:23)</span> <b>lincoln:</b></span> will take a look<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:42:05)</span> <b>marco.mascheroni:</b></span> Who is maintaining <a href="http://uct2-stratum-r.mwt2.org">uct2-stratum-r.mwt2.org</a> nowdays? I remember at HOW I spoke to Marc Weinberg who was working on the stratum-<br/>R stuff as well<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:42:39)</span> <b>lincoln:</b></span> Judith and I. We have a medium-term plan to rebuild it but right now I'll take a look at that cert issue<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:42:50)</span> <b>marco.mascheroni:</b></span> thanks<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:06:58)</span> <b>lincoln:</b></span> @marco.mascheroni requesting a new cert now<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:07:10)</span> <b>lincoln:</b></span> hopefully turn around will be quick<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:26:06)</span> <b>matyas:</b></span> it would be nice if we could match based on the wn-client version. we put stashcp in osg-wn-client in december, which lets people use stashcp even if the execute node doesn't have cvmfs/modules<br/>
+<span style="color: #ea2977"><span style="font-size: small">(14:04:42)</span> <b>jlstephen:</b></span> @marco.mascheroni the new hosted-ce26 is up and has your key on it<br/>
+</body>
+</html>

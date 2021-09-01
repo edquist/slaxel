@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jul 15, 2021 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu Jul 15, 2021 : #software (osg)</h3>
+<span style="color: #de5f24"><span style="font-size: small">(18:45:38)</span> <b>justas.balcas:</b></span> Hi, any singularity experts here? Starting from 3.8.x release - i see it now wants to convert SIF file to temporary sandbox, which very slowdowns startup/shutdown. Do you know if there is a way to turn this off and use it old way?<br/><pre>[jbalcas@gpu-ibanks-1 ~]$ singularity shell -B /data -B /imdata -B /storage -B /cvmfs --nv /storage/af/group/gpu/software/singularity/ibanks/edge.simg<br/>INFO:    Converting SIF file to temporary sandbox...<br/>^C^C^C<br/>Singularity&gt;<br/>Singularity&gt;<br/>Singularity&gt;<br/>Singularity&gt;<br/>Singularity&gt; exit<br/>exit<br/>INFO:    Cleaning up image...<br/>[jbalcas@gpu-ibanks-1 ~]$</pre><br/>
+<blockquote>
+<span style="color: #e06b56"><span style="font-size: small">(22:08:50)</span> <b>jthiltges:</b></span> Doing a quick test like this, I'm not seeing a temporary sandbox issue:<br/><pre>$ singularity --version<br/>singularity version 3.8.0-1.el8<br/>$ singularity pull <a href="shub://GodloveD/lolcow">shub://GodloveD/lolcow</a><br/>$ singularity shell lolcow_latest.sif<br/>Singularity&gt;</pre><br/>Are you running singularity in privileged mode? It may be helpful to compare the output from <tt>singularity --debug shell ...</tt> between the old and new versions.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(2021-07-16 09:34:00)</span> <b>justas.balcas:</b></span> Thanks for the hint! yes, this is the setuid flag change<br/>
+</blockquote>
+</body>
+</html>

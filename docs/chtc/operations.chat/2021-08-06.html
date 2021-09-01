@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Aug 6, 2021 : #operations (chtc)</title>
+</head>
+<body>
+<h3>Fri Aug 6, 2021 : #operations (chtc)</h3>
+<span style="color: #4bbe2e"><span style="font-size: small">(09:55:37)</span> <b>tjslauson:</b></span> @wiscmoate and anyone who's wondering why chtc-reports was quiet last night: <a href="http://monitor.chtc.wisc.edu">monitor.chtc.wisc.edu</a> was down overnight.  I think something brushed its backside yesterday evening - it seemed to boot up fine this morning when I wiggled its power cable.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:07:32)</span> <b>jcpatton:</b></span> would it be good to run the scripts now and get a 1.5-day report?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:16:47)</span> <b>jcpatton:</b></span> someone beat me to it :slightly_smiling_face:<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(10:17:04)</span> <b>lmichael:</b></span> @wiscmoate can you run the same memory over-request script and show me who is the worst?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(10:51:20)</span> <b>wiscmoate:</b></span> @lmichael yes, but it's present on all submit nodes at <tt>/usr/local/bin/memory_use.py</tt><br/>
+<span style="color: #3c989f"><span style="font-size: small">(10:51:41)</span> <b>wiscmoate:</b></span> Top 3:<br/><pre>Owner             : <a href="mailto:mfrayer@chtc.wisc.edu">mfrayer@chtc.wisc.edu</a><br/>Total Unused  (MB):               4999648<br/>Avg Requested (MB):                   800<br/>Avg Used      (MB):                   177<br/>Highest Used  (MB):                   843<br/>Busy Jobs in Pool :                  8034<br/><br/>Owner             : <a href="mailto:osg_osg@hep.wisc.edu">osg_osg@hep.wisc.edu</a><br/>Total Unused  (MB):              4394986<br/>Avg Requested (MB):                 6111<br/>Avg Used      (MB):                 1111<br/>Highest Used  (MB):                 9642<br/>Busy Jobs in Pool :                  879<br/><br/>Owner             : <a href="mailto:yshen84@chtc.wisc.edu">yshen84@chtc.wisc.edu</a><br/>Total Unused  (MB):               2524793<br/>Avg Requested (MB):                 61440<br/>Avg Used      (MB):                 16354<br/>Highest Used  (MB):                 27503<br/>Busy Jobs in Pool :                    56</pre><br/>
+<span style="color: #3c989f"><span style="font-size: small">(10:52:08)</span> <b>wiscmoate:</b></span> Interestingly, that second one is glideins coming into CHTC<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(10:59:24)</span> <b>lmichael:</b></span> So, represents (likely) lost of different users…<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(11:00:09)</span> <b>lmichael:</b></span> mfrayer is showing up partially because she’s running a high-mem job that doesn’t use all the TBs of memory during the whole duration of the job.<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(11:40:54)</span> <b>lmichael:</b></span> Unfortunately, mfrayer’s jobs reasonably vary between 5 and 900MB, and she just has a LOT of them. I’m not sure she could do better, but her per-job request is probably not contributing a lot to unused cores?<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(11:41:32)</span> <b>lmichael:</b></span> I otherwise contacted yshen84.<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(11:42:10)</span> <b>lmichael:</b></span> @wiscmoate any way we can get more details for the OSG jobs, per actual user within the payloads?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:44:33)</span> <b>wiscmoate:</b></span> @lmichael I'm very ignorant of OSG monitoring tools, @blin @matyas or @bbockelman might know of something that already exists to do what you're asking (gratia, etc)<br/>
+<blockquote>
+<span style="color: #9f69e7"><span style="font-size: small">(11:45:23)</span> <b>lmichael:</b></span> Let’s take it into this thread.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:46:47)</span> <b>wiscmoate:</b></span> It's probably possible to to write a script to query the various gliden entities and classads to find out about jobs running on pilots in our pool, but that road is fraught with peril - HTCondor security negotiation and firewalls and NAT, oh my<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:48:39)</span> <b>wiscmoate:</b></span> We can dig into the pilot sandboxes to grab the classads of the job running inside, but that's a project<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:49:31)</span> <b>wiscmoate:</b></span> One sample is easy, I just SSH in and get it done<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:49:38)</span> <b>wiscmoate:</b></span> An aggregation of what's going on is less easy<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:50:32)</span> <b>wiscmoate:</b></span> Like, I could tell you about one glidein job that's currently running in CHTC.  I couldn't easily tell you about all glidein jobs running in CHTC.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(12:01:36)</span> <b>blin:</b></span> What sort of info see you looking for @lmichael? There may be some historical info in the GRACC for completed jobs<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(12:05:15)</span> <b>lmichael:</b></span> Trying to figure out which user within <a href="mailto:osg_osg@hep.wisc.edu">osg_osg@hep.wisc.edu</a> is the biggest culprit for over-requesting memory on a per-job basis. Moate has a script (see a bit farther up in the #operationschannel), but it doesn’t get us the payload usernames.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(12:15:35)</span> <b>blin:</b></span> oh, hrm. that's tough because we probably capture memory use but not over-use<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(12:25:01)</span> <b>lmichael:</b></span> Moate’s script does the over-use calculation - by comparing RequestMemory with MemoryUsage<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(12:25:53)</span> <b>lmichael:</b></span> but I imagine the calculation would differ for glideins? Maybe our glideins (pilots) are requesting what they request (is that static?) and the payload jobs just don’t need that much right now?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(12:30:27)</span> <b>wiscmoate:</b></span> @lmichael I believe frontend configuration determines the requestmemory and requestcpus of pilots<br/>
+<span style="color: #3c989f"><span style="font-size: small">(12:30:56)</span> <b>wiscmoate:</b></span> *If* I'm correct, then it would be up to the admins who run the various frontends<br/>
+<span style="color: #3c989f"><span style="font-size: small">(12:32:09)</span> <b>wiscmoate:</b></span> In this case the OSG frontend<br/>
+<span style="color: #3c989f"><span style="font-size: small">(12:34:11)</span> <b>wiscmoate:</b></span> Short story, I think what you're saying here is mostly accurate -&gt;<br/>&gt; Maybe our glideins (pilots) are requesting what they request (is that static?) and the payload jobs just don’t need that much right now?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(12:35:06)</span> <b>wiscmoate:</b></span> A clever frontend admin could make multiple frontend groups that request jobs for pilots requesting various amounts of memory<br/>
+<span style="color: #3c989f"><span style="font-size: small">(12:36:28)</span> <b>wiscmoate:</b></span> For example, there could be a 2GiB memory group, a 4GiB memory group, a 8 GiB memory group, etc - but that gets complicated.  How many CPUs do you ask for in each group?  Disk? GPUs?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(12:36:56)</span> <b>wiscmoate:</b></span> suddenly you have thousands of frontend groups<br/>
+<span style="color: #3c989f"><span style="font-size: small">(12:37:07)</span> <b>wiscmoate:</b></span> And have to take care that they don't intersect<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:43:20)</span> <b>matyas:</b></span> how much pilots request is typically declared at the factory level<br/>
+<span style="color: #99a949"><span style="font-size: small">(12:44:07)</span> <b>matyas:</b></span> and I think the current philosophy is "send big pilots, use pslots"<br/>
+<span style="color: #4cc091"><span style="font-size: small">(13:08:20)</span> <b>blin:</b></span> ok so i got around to looking, we don't record the memory request or consumption in the GRACC<br/>
+<span style="color: #4cc091"><span style="font-size: small">(13:09:55)</span> <b>blin:</b></span> @lmichael what time frame are you looking for right now? for a short term solution, we could query the schedds for history data where MemoryUsage &gt; RequestMemory<br/>
+<span style="color: #4cc091"><span style="font-size: small">(13:10:18)</span> <b>blin:</b></span> getting this data systematically would require some GRACC work and maybe some Gratia work<br/>
+</blockquote>
+<span style="color: #9f69e7"><span style="font-size: small">(11:46:48)</span> <b>lmichael:</b></span> Something else: Do we understand/care why at least one OSG School learners sees the following after <tt>condor_submit -i</tt> from <tt><a href="http://learn.chtc.wisc.edu">learn.chtc.wisc.edu</a></tt>?<br/><pre>/usr/bin/xauth:  file /var/lib/condor/execute/slot1/dir_28276/.Xauthority does not exist</pre><br/>Is there something general going on that would affect others, or is this maybe because they used <tt>ssh</tt> with X11 when they first connected to <tt>learn</tt>?<br/>
+<blockquote>
+<span style="color: #4bbe2e"><span style="font-size: small">(11:56:20)</span> <b>tjslauson:</b></span> probably the latter? <tt>zfang77</tt> has a DISPLAY variable set for one of their login sessions to learn<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(11:57:01)</span> <b>tjslauson:</b></span> and their condor_ssh_to_job to build3000 is in that session<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(12:00:40)</span> <b>lmichael:</b></span> Thanks! That’s what I expected, and will tell them/others<br/>
+</blockquote>
+</body>
+</html>

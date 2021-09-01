@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jan 24, 2020 : #uscms (osg)</title>
+</head>
+<body>
+<h3>Fri Jan 24, 2020 : #uscms (osg)</h3>
+<span style="color: #a72f79"><span style="font-size: small">(05:07:30)</span> <b>andrew.melo:</b></span> If SLURM is running the jobs immediately, I don't think it's an issue with the job requirements, it appears (?) that it's condor/blahp that's complaning?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(08:53:43)</span> <b>bockjoo:</b></span> I guess so. How are you doing it at Vandy?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(08:54:47)</span> <b>bockjoo:</b></span> There are a lot of idle jobs (cmspilot). I am wondering they somehow block the condor/blahp scheduling even though the router is added.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:09:39)</span> <b>andrew.melo:</b></span> I don't do anything special, the SAM jobs come in, hit the queue, run and leave<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:54:28)</span> <b>blin:</b></span> @bockjoo do they ever go from idle -&gt; running? how quickly do the jobs run?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(09:57:26)</span> <b>bockjoo:</b></span> condor_ce_q for lcg jobs show "I" for longer than 15minutes. But slurm shows once jobs are subbmitted, they run almost immediately.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:00:03)</span> <b>bockjoo:</b></span> [root@cslrm ~]# date<br/>Fri Jan 24 10:59:43 EST 2020<br/>[root@cslrm ~]# condor_ce_q | grep lcg<br/>77637.0   lcg             1/24 10:33   0+00:00:00 I  0    0.0 nagrun.sh -v cms -f /cms/Role=lcgadmin -d /queue/grid.probe.metricOutput.EGEE.etf-cms-prod_cern_ch -b <a href="stomp://oldsam.msg.cern.ch:6163/">stomp://oldsam.msg.cern.ch:6163/</a> -c <a href="htcondor://cslrm.rc.ufl.edu">htcondor://cslrm.rc.ufl.edu</a> -t 600 -w 1 -e NONE<br/>77638.0   lcg             1/24 10:36   0+00:00:00 I  0    0.0 nagrun.sh -v cms -f /cms/Role=lcgadmin -d /queue/grid.probe.metricOutput.EGEE.etf-cms-prod_cern_ch -b <a href="stomp://oldsam.msg.cern.ch:6163/">stomp://oldsam.msg.cern.ch:6163/</a> -c <a href="htcondor://cslrm.rc.ufl.edu">htcondor://cslrm.rc.ufl.edu</a> -t 600 -w 1 -e NONE<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:00:10)</span> <b>blin:</b></span> how long do they run for?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:03:01)</span> <b>blin:</b></span> what is the slurm status? we look for <tt>JobStatus=</tt> from <tt>scontrol show job</tt><br/>
+<span style="color: #7d414c"><span style="font-size: small">(21:56:40)</span> <b>bockjoo:</b></span> They are running 3 -4 minutes.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(21:57:09)</span> <b>bockjoo:</b></span> i will check  scontrol command.<br/>
+</body>
+</html>

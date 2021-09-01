@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jul 22, 2021 : #operations (chtc)</title>
+</head>
+<body>
+<h3>Thu Jul 22, 2021 : #operations (chtc)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(09:42:43)</span> <b>johnkn:</b></span> @wiscmoate no specific failure for 128 core nodes, just that the STARTD uses internal data structures and mechanisms not really designed to scale to large numbers of slots.  So having 128 slots is getting to the point where performance will begin to suffer.  Think about STARTD_SLOT_ATTRS for instance, that is n-squared on the number of slots.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(09:50:24)</span> <b>wiscmoate:</b></span> Right right<br/>
+<span style="color: #3c989f"><span style="font-size: small">(10:57:47)</span> <b>wiscmoate:</b></span> @johnkn any idea what maximum dynamic slot count per partitionable slot should be? 80? 100?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:00:32)</span> <b>johnkn:</b></span> We don't have enough experience with high slot counts yet to know.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:02:43)</span> <b>johnkn:</b></span> There is a new mechanism that can be used instead of STARTD_SLOT_ATTRS write cross-slot policies.<br/>this has been for a while, but I've never had a chance to go over it with you.   when you and I failed to<br/>implement GPU backfill a while ago, it went in as part of that bugfix.<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:04:36)</span> <b>matyas:</b></span> curious: is it possible to configure things such that a dslot always has at least 2 cpus?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:05:04)</span> <b>johnkn:</b></span> yes.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:05:22)</span> <b>johnkn:</b></span> you can write a config policy to round up job requests for CPUs, Memory, etc<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:05:37)</span> <b>matyas:</b></span> that might be a workaround, then<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:05:59)</span> <b>johnkn:</b></span> We do this to set minimum 8 core slots for our batlab build and test machine.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:09:13)</span> <b>wiscmoate:</b></span> The bad news is that throughput suffers<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:09:49)</span> <b>wiscmoate:</b></span> If somebody asks for one core and their work truly can only use one core, then you have one core potentially idle<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:11:06)</span> <b>wiscmoate:</b></span> How would <tt>condor_userprio</tt> account for an hour on a 2-core dynamic slot where the job only asked for 1 core?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:11:17)</span> <b>wiscmoate:</b></span> Would it be one core hour or two core hours?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:11:54)</span> <b>johnkn:</b></span> It would be 2 core hours<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:12:17)</span> <b>wiscmoate:</b></span> Then the accuracy of our reports would suffer<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:12:37)</span> <b>matyas:</b></span> I guess put RequestCPUs &gt;= 2 in the START expression?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:13:43)</span> <b>wiscmoate:</b></span> These 128-core hosts are only going to be accepting WantGlidein, WantFlocking and is_resumable jobs for the immediate future;  I think most of those are <tt>RequestCpus = 1</tt><br/>
+<span style="color: #99a949"><span style="font-size: small">(11:14:09)</span> <b>matyas:</b></span> make 2 startds with 64 cores each<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:14:10)</span> <b>wiscmoate:</b></span> @lmichael @bbockelman see conversation :arrow_up:<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:14:22)</span> <b>wiscmoate:</b></span> That's the approach I'm taking right now<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:15:13)</span> <b>johnkn:</b></span> Lets just go with a single 128 core p-slot and keep an eye out for issues.  we don't know for sure that 128 is the place where we fall over, it might be 256 or 512 cores.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:15:40)</span> <b>wiscmoate:</b></span> OK<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:15:44)</span> <b>johnkn:</b></span> We just know that the trajectory is unsustainable for the design of the STARTD and we have work to do.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:18:34)</span> <b>johnkn:</b></span> And stay away from STARTD_SLOT_ATTRS. come find me if you think you have a need.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:18:49)</span> <b>wiscmoate:</b></span> right-o<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:19:35)</span> <b>johnkn:</b></span> Also maybe submit a ticket about slot user config.  it's starting to consume your whole config file. :slightly_smiling_face:<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:19:57)</span> <b>wiscmoate:</b></span> It's like you're reading my mind<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:20:50)</span> <b>wiscmoate:</b></span> Would that be a Jira ticket or a condorwiki ticket?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:21:32)</span> <b>johnkn:</b></span> jira ticket to the htcondor project<br/>
+<span style="color: #684b6c"><span style="font-size: small">(14:26:14)</span> <b>bbockelman:</b></span> @wiscmoate - if 128 cores in a single partitionable slot becomes problematic, let's fallback to two partitionable slots of 64 cores each.<br/>
+<span style="color: #684b6c"><span style="font-size: small">(14:26:31)</span> <b>bbockelman:</b></span> ALSO: Calico on Tiger now owns IPv6!  :tada:<br/>
+<span style="color: #684b6c"><span style="font-size: small">(14:28:40)</span> <b>bbockelman:</b></span> Moate, my plan is to ask JeffP to flip the switch and enable IPv6 on Kubernetes next Thursday.<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:28:43)</span> <b>matyas:</b></span> Is it number of slots total or number of dslots per pslot?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:28:54)</span> <b>wiscmoate:</b></span> Cool!<br/>
+<span style="color: #3c989f"><span style="font-size: small">(14:31:41)</span> <b>wiscmoate:</b></span> @bbockelman @jcpatton @lmichael @ckoch5 I'm overhauling HTCondor configuration and minimizing the number of times <tt>MaxJobRetirementTime</tt> is assigned a unique expression for several reasons (most important among them is reducing complexity).  There's a lot of potential for me to fat-finger configuration here.  If jobs run longer than usual or are evicted earlier than expected let me know.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(14:35:41)</span> <b>ckoch5:</b></span> I am both excited for this project and it makes me nervous. :sweat_smile:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:01:39)</span> <b>johnkn:</b></span> @matyas Inefficiencies in the STARTD is mostly slots total, the only one I can think of related to d-slots per slot is related to consumption policies<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:04:07)</span> <b>johnkn:</b></span> (there is a claim id in the p-slot for every possible d-slot)<br/>
+<span style="color: #684b6c"><span style="font-size: small">(15:04:52)</span> <b>bbockelman:</b></span> @lmichael - I forget where the thread is about Globus but my interpretation of the ticket says direct downloads are no longer a function of the CLI but can be done directly through the HTTPS API.<br/>
+<blockquote>
+<span style="color: #9f69e7"><span style="font-size: small">(15:16:06)</span> <b>lmichael:</b></span> see #general for a full recap (I hadn’t gotten any replies except for a short pondering by @blin where I also posted in OSG’s #general).<br/>
+</blockquote>
+<span style="color: #99a949"><span style="font-size: small">(15:06:38)</span> <b>matyas:</b></span> @johnkn right which is why Brian's two 64-core pslots idea wouldn't work<br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:47:28)</span> <b>wiscmoate:</b></span> New cores in the CHTC pool, yay! -&gt;<br/>
+<span style="color: #684b6c"><span style="font-size: small">(15:56:34)</span> <b>bbockelman:</b></span> :tada:<br/>
+<span style="color: #684b6c"><span style="font-size: small">(15:57:00)</span> <b>bbockelman:</b></span> @wiscmoate - for the new Calico version, here's the new feature -- integration into <tt>kubectl</tt>:<br/><pre>$ kubectl get globalnetworkpolicies<br/>NAME                        CREATED AT<br/>allow-icinga2               2021-07-10T18:30:35Z<br/>allow-kubelet-from-master   2021-07-12T18:31:49Z<br/>allow-local-ssh             2021-07-10T18:44:41Z<br/>allow-logstash              2021-07-10T18:26:02Z<br/>allow-outgoing-https        2021-07-22T19:05:26Z<br/>allow-puppet-git            2021-07-10T18:30:35Z<br/>allow-test                  2021-07-10T18:02:56Z<br/>deny-remote-ssh             2021-07-10T18:44:41Z</pre><br/>You can now use <tt>kubectl</tt> to set your network policies!<br/>
+<span style="color: #3c989f"><span style="font-size: small">(15:57:30)</span> <b>wiscmoate:</b></span> Interesting<br/>
+</body>
+</html>

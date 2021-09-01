@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Aug 24, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Mon Aug 24, 2020 : #software (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(11:11:15)</span> <b>dweitzel:</b></span> worked ¯\_(ツ)_/¯<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:35:47)</span> <b>matyas:</b></span> :+1::skin-tone-2:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:07:41)</span> <b>bbockelm:</b></span> Typically each XRootD module filters on keys it knows about.  So if, something like this:<br/><pre>xrd.tls /etc/grid-security/xrd/xrdcert.pem /etc/grid-security/xrd/xrdkey.pem<br/>xrd.tlsca noverify</pre><br/>is likely to be ignored in 4.x (although I have questions about the <tt>noverify</tt>...).<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:08:01)</span> <b>bbockelm:</b></span> However, if you pass an option to a line that already exists, the various modules are hit-and-miss on whether it's a warning or an error.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:08:46)</span> <b>bbockelm:</b></span> I still claim that you can develop a unique fingerprint for each XRootD developer based on the configuration syntax and its response to different things being present or missing.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:19:33)</span> <b>dweitzel:</b></span> If I am reading the xrootd config correctly, then the <tt>noverify</tt> just means to not verify the client certificates.  In our usage, we don't want any client certificates.  Just tokens, over the TLS secured connection.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:21:40)</span> <b>bbockelm:</b></span> Those sound like two different things, right?  <tt>noverify</tt> sounds like "accept any user cert but still utilize its contents for authorization decisions".<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:25:17)</span> <b>dweitzel:</b></span> I'll verify with Andy to make sure that I understand the configuration correctly.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:30:11)</span> <b>dweitzel:</b></span> from Andy:<br/>&gt; Indeed, if you tell the server "noverify" then the server doesn't care what kind of cert the client has. The client need only to be able to have enough of a cert to negotiate a TLS session. That does not at all affect the client's ability or requirement to verify the server's certificate (which is required by default). So, for the purpose you outlined, tlsca noverify is the option you want.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:30:19)</span> <b>dweitzel:</b></span> I think the noverify is what we want.<br/>
+<span style="color: #d1707d"><span style="font-size: small">(17:16:26)</span> <b>gattebury:</b></span> Was trying to update/sync some EL7 hosts just now and have run across this on multiple installs:<br/><br/><tt>file /usr/lib64/libXrdSecgsiVOMS-4.so from install of vomsxrd-1:0.6.0-3.osg35.el7.x86_64 conflicts with file from package xrootd-libs-1:4.12.3-1.osg35.el7.x86_64</tt><br/><br/>These are both straight out of the osg35 release repo (I think). Removing the <tt>vomsxrd</tt> package happily lets me get around this, and I’m _assuming_ it isn’t needed as the majority of our functioning xrootd servers seem to not have the package installed at all.<br/><br/>Still, trying to install <tt>vomsxrd</tt> out of the release repo will fail with the above, and both packages definitely have that same file. Just an FYI in case this isn’t intentional and vomsxrd is really supposed to go away or be unusable.<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:18:18)</span> <b>blin:</b></span> errr, i didn't think this was supposed to happen really until xrootd 5?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:18:34)</span> <b>blin:</b></span> @abh?<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:18:37)</span> <b>matyas:</b></span> looks like it happened in 4.12.0<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:18:56)</span> <b>matyas:</b></span> maybe? <a href="https://github.com/xrootd/xrootd/blob/master/packaging/rhel/xrootd.spec.in#L914-L915">https://github.com/xrootd/xrootd/blob/master/packaging/rhel/xrootd.spec.in#L914-L915</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(17:19:15)</span> <b>blin:</b></span> argh, well we should probably update the packaging with an obsoletes/provides pair<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:20:20)</span> <b>matyas:</b></span> there already appears to be one: <a href="https://github.com/xrootd/xrootd/blob/master/packaging/rhel/xrootd.spec.in#L398-L399">https://github.com/xrootd/xrootd/blob/master/packaging/rhel/xrootd.spec.in#L398-L399</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(17:21:29)</span> <b>blin:</b></span> hrm, i think for 4.12.3 we carried our own spec file. maybe we missed that update?<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:25:49)</span> <b>matyas:</b></span> nope, we dropped our spec file when we hit 4.12.0<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:28:07)</span> <b>matyas:</b></span> ~oh I bet I know what's going on~ no i don't nevermind<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:29:49)</span> <b>matyas:</b></span> I'm confused. /usr/lib64/libXrdSecgsiVOMS-4.so is supposed to be in xrootd-voms, not xrootd-libs.<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:33:14)</span> <b>matyas:</b></span> yeah I see it<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:33:36)</span> <b>matyas:</b></span> 4.12.3 has a glob in <tt>%files libs</tt> that matches libXrdSecgsiVOMS-4.so.<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:34:03)</span> <b>matyas:</b></span> 4.12.4rc1 fixes it<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:35:22)</span> <b>matyas:</b></span> @gattebury vomsxrd is replaced by xrootd-voms, so you should have that installed.<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:38:55)</span> <b>matyas:</b></span> Your servers work without it at the moment probably because the plugin was accidentally included in xrootd-libs, but the next version is going to fix that, so you might encounter upgrade errors if you don't have xrootd-voms installed.<br/>
+<span style="color: #d1707d"><span style="font-size: small">(18:02:18)</span> <b>gattebury:</b></span> :thumbsup: thanks — that clears up the oddness of seeing it in xrootd-libs<br/>
+</body>
+</html>

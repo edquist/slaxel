@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Feb 25, 2021 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Thu Feb 25, 2021 : #gfactory (osg)</h3>
+<span style="color: #674b1b"><span style="font-size: small">(09:58:52)</span> <b>rynge:</b></span> @marco.mascheroni What was the issue with OSG flock and 8.8.12?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:17:36)</span> <b>marco.mascheroni:</b></span> @rynge, turned out it has nothing to do with the OSG Flock frontend. I need to follow up with @marcom. I tested this with both 8.8.10 and 8.8.12:<br/><br/><pre>Universe = grid<br/>transfer_Input_files = url_dirs.desc<br/>encrypt_Input_files = tok.tgz,url_dirs.desc<br/>x509userproxy = $ENV(X509_USER_PROXY)<br/>Grid_Resource = condor <a href="http://its-condor-ce2.syr.edu">its-condor-ce2.syr.edu</a> <a href="http://its-condor-ce2.syr.edu:9619">its-condor-ce2.syr.edu:9619</a><br/>Executable = sleep.sh<br/>nordugrid_rsl = (queue=cms)(runtimeenvironment=ENV/GLITE)<br/>copy_to_spool = True<br/>Transfer_Executable = True<br/>transfer_Output_files =<br/>WhenToTransferOutput  = ON_EXIT<br/>stream_output = False<br/>stream_error  = False<br/>Notification = Never<br/>+Owner = undefined<br/>Log = log<br/>Output = out<br/>Error = err<br/>Queue 1</pre><br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:17:53)</span> <b>marco.mascheroni:</b></span> Where url_dirs.desc is an empty file<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:18:32)</span> <b>marco.mascheroni:</b></span> It works with 8.8.10, it does not work with 8.8.12. Deleting <tt>transfer_Input_files</tt> and <tt>encrypt_Input_files</tt> works on both versions<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:18:35)</span> <b>marco.mascheroni:</b></span> Also @blin<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:25:27)</span> <b>rynge:</b></span> Ok, thanks<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:48:36)</span> <b>efajardo:</b></span> @efajardo has left the channel<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:59:22)</span> <b>marco.mascheroni:</b></span> Actually, I just noticed the job started. I need to check more.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:00:58)</span> <b>jpeterson:</b></span> not sure if this is here or operations, but I’m looking into an issue with <tt>COVID19_US_AMNH-HEL</tt>  as it is running pilots but doesn’t seem to be matching.  in the <tt>/var/log/gwms-factory/client/user_feosgflock/glidein_gfactory_instance/entry_COVID19_US_AMNH-HEL</tt>logs I see the following when grepping for <tt>VO</tt><br/><pre>GLIDECLIENT_OSG_VO OSG<br/>GLIDEIN_Supported_VOs COVID19 </pre><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:01:26)</span> <b>jpeterson:</b></span> this looks like it is getting OSG jobs instead of COVID19 jobs. yes?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:37:15)</span> <b>rynge:</b></span> The covid19 jobs are running under the OSG VO<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:37:52)</span> <b>rynge:</b></span> This is probably related to AMNH Singularity issue<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:38:18)</span> <b>rynge:</b></span> We have a fix in git (untested so far)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:38:45)</span> <b>rynge:</b></span> <a href="https://support.opensciencegrid.org/a/tickets/66700">https://support.opensciencegrid.org/a/tickets/66700</a> - Singularity in non-standard locations<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:39:54)</span> <b>jpeterson:</b></span> <a href="https://support.opensciencegrid.org/a/tickets/66836">https://support.opensciencegrid.org/a/tickets/66836</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:07:39)</span> <b>rynge:</b></span> 95% sure that is the same issue<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:07:49)</span> <b>rynge:</b></span> We could try to patch the prod factory<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:08:07)</span> <b>rynge:</b></span> But it starting to feel like we have done a lot of those hotfixes recently<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:14:40)</span> <b>rynge:</b></span> <a href="https://cdcvs.fnal.gov/redmine/issues/25510">https://cdcvs.fnal.gov/redmine/issues/25510</a><br/>
+</body>
+</html>

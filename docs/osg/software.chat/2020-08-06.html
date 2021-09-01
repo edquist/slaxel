@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Aug 6, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu Aug 6, 2020 : #software (osg)</h3>
+<span style="color: #7d414c"><span style="font-size: small">(16:38:28)</span> <b>bockjoo:</b></span> Something's strange with xrootd-4.12.3-2. xrootd-server did not create /var/run/xrootd.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(16:43:45)</span> <b>bockjoo:</b></span> xrdcp -d 1 -f <a href="root://cmsio6.rc.ufl.edu//store/mc/test.root">root://cmsio6.rc.ufl.edu//store/mc/test.root</a> /dev/null fails too.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(16:44:02)</span> <b>bockjoo:</b></span> server log shows: 200806 17:42:22 14569 ofs_open: coldhead.21032:<a href="mailto:31@oo.ihepa.ufl.edu">31@oo.ihepa.ufl.edu</a> Unable to open /store/mc/test.root; permission denied<br/>
+<span style="color: #7d414c"><span style="font-size: small">(16:44:33)</span> <b>bockjoo:</b></span> [root@cmsio6 ~]# grep all.export  /etc/xrootd/xrootd-clustered.cfg<br/>all.export /store nostage<br/>
+<span style="color: #7d414c"><span style="font-size: small">(16:45:16)</span> <b>bockjoo:</b></span> (base) [coldhead@oo ~]$ xrdcp -d 1 -f <a href="root://cmsio4.rc.ufl.edu//store/mc/test.root">root://cmsio4.rc.ufl.edu//store/mc/test.root</a> /dev/null<br/>[16MB/2.456GB][  0%][&gt;                                                 ][16MB/s]<br/>
+<span style="color: #7d414c"><span style="font-size: small">(16:45:41)</span> <b>bockjoo:</b></span> cmsio4 which is 4.12.3-1 works fine. The configuration is identical.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(16:46:01)</span> <b>bockjoo:</b></span> I have no idea what's going on.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(16:47:12)</span> <b>jthiltges:</b></span> Switched from an OSG package to an EPEL package?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:48:23)</span> <b>matyas:</b></span> OSG hasn't shipped 4.12.3-2 yet<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:49:14)</span> <b>matyas:</b></span> Do you have yum priorities installed? (RPM name <tt>yum-plugin-priorities</tt>)<br/>
+<span style="color: #7d414c"><span style="font-size: small">(16:54:42)</span> <b>bockjoo:</b></span> I see. No, I don't have it: rpm -qa | grep yum-plugin-priorities<br/>
+<span style="color: #e06b56"><span style="font-size: small">(16:56:22)</span> <b>jthiltges:</b></span> After the priorities plugin is installed, doing a <tt>yum distro-sync</tt> should get things back into line.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(16:59:32)</span> <b>bockjoo:</b></span> Thanks @matyas @jthiltges!<br/>
+<span style="color: #7d414c"><span style="font-size: small">(17:00:33)</span> <b>bockjoo:</b></span> @jthiltges Should I remove xrootd afer yum distro-sync and reinstall it?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(17:01:51)</span> <b>jthiltges:</b></span> distro-sync should list xrootd as one of the packages to be downgraded. (Please look closely over the list of changes to avoid surprises!)<br/>
+<span style="color: #e06b56"><span style="font-size: small">(17:04:10)</span> <b>jthiltges:</b></span> There might be other packages which were updated from OSG to EPEL. That step should catch them all.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(17:07:43)</span> <b>bockjoo:</b></span> My research computing installed epel for globus-gridftp-server-control.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(17:07:56)</span> <b>bockjoo:</b></span> And I am seeing this at yum list | grep xrootd:<br/>
+<span style="color: #7d414c"><span style="font-size: small">(17:08:05)</span> <b>bockjoo:</b></span> cms-xrootd.noarch                  1.2-9.osg35.el7 @UFRC_OSG_OSG_3_5_contrib_for_RHEL_CentOS-7_x86_64<br/>xrootd.x86_64                      1:4.12.3-2.el7  @epel<br/>xrootd-client.x86_64               1:4.12.3-2.el7  @epel<br/>
+<span style="color: #7d414c"><span style="font-size: small">(17:08:06)</span> <b>bockjoo:</b></span> ...<br/>
+<span style="color: #7d414c"><span style="font-size: small">(17:08:08)</span> <b>bockjoo:</b></span> ...<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:08:44)</span> <b>matyas:</b></span> right, you need both EPEL and OSG, but for packages that are in both, you'll need the OSG version<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:09:07)</span> <b>matyas:</b></span> that's what priorities are used for<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:11:23)</span> <b>rynge:</b></span> @rynge has left the channel<br/>
+<span style="color: #7d414c"><span style="font-size: small">(17:34:02)</span> <b>bockjoo:</b></span> @matyas It was my bad. I had to install osg-release:<br/>yum install yum-plugin-priorities<br/>yum distro-sync<br/>yum install osg-release<br/>This procedure aligned the repo and yum install xrootd picks up xrootd from the osg repo. Thanks!<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:34:23)</span> <b>matyas:</b></span> :+1::skin-tone-2:<br/>
+<span style="color: #7d414c"><span style="font-size: small">(17:34:28)</span> <b>bockjoo:</b></span> Well I had to first remove xrootd.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(18:24:26)</span> <b>bockjoo:</b></span> @matyas My research computing is asking why xrootd is both in EPEL and OSG. He complains:<br/>
+<span style="color: #7d414c"><span style="font-size: small">(18:24:31)</span> <b>bockjoo:</b></span> "If you have any input at all, I'd advise that you suggest to OSG to stop making their packages available in EPEL and OSG repos.  Just pick one and be done with it.  Managing this kind of thing is just annoying from my (personal) perspective."<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:25:11)</span> <b>matyas:</b></span> In this case, the xrootd developers are making their packages available in EPEL, and OSG is adding patches on top of the packages in EPEL.<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:26:00)</span> <b>matyas:</b></span> One day in the far future we may be able to upstream all of our OSG patches, in which case we can stop shipping xrootd in OSG, but that hasn't been accomplished yet.<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:26:19)</span> <b>matyas:</b></span> I get that it's annoying; we don't really have a choice.<br/>
+</body>
+</html>

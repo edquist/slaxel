@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Nov 8, 2018 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu Nov 8, 2018 : #software (osg)</h3>
+<span style="color: #99a949"><span style="font-size: small">(15:05:02)</span> <b>dwd:</b></span> <b>@channel</b> Who in OSG software can help with debugging an xrootd server problem? e xrootd server configured as a stashcache restarts itself during stress-testing of reads from /cvmfs/ligo.osgstorage.org by a single cvmfs client.  <a href="https://github.com/lscsoft/osg-lvc/issues/4">https://github.com/lscsoft/osg-lvc/issues/4</a><br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:05:17)</span> <b>andrew.melo:</b></span> please don't use @ channel :disappointed:<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:05:31)</span> <b>dwd:</b></span> Oh what to use instead?<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:05:36)</span> <b>marian:</b></span> yeah, <b>@here</b><br/>
+<span style="color: #99a949"><span style="font-size: small">(15:05:41)</span> <b>dwd:</b></span> Ok, sorry<br/>
+<span style="color: #965d1b"><span style="font-size: small">(15:05:45)</span> <b>briedel:</b></span> @dweitzel<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:05:49)</span> <b>marian:</b></span> we have also #osg-stashcache channel<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:06:01)</span> <b>marian:</b></span> what version they have?<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:06:18)</span> <b>marian:</b></span> I believe @jthiltges tackled some issues recently...<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:06:26)</span> <b>jthiltges:</b></span> It segfaults? This has been an issue: <a href="https://github.com/xrootd/xrootd/issues/666">https://github.com/xrootd/xrootd/issues/666</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:06:31)</span> <b>dweitzel:</b></span> There are known bugs it all released versions of XRootD<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:07:12)</span> <b>dwd:</b></span> xrootd-server-4.8.5-1.osg34.el7.x86_64<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:07:27)</span> <b>jthiltges:</b></span> @dweitzel Which build is Syracuse now using? The latest HCC one from Brian?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:07:34)</span> <b>dweitzel:</b></span> The bug John pointed out it’s not released yet<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:07:47)</span> <b>dweitzel:</b></span> Yet the latest HCC one<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:08:00)</span> <b>dwd:</b></span> This one is Edgar’s test machine <a href="http://xcache-11.t2.ucsd.edu">xcache-11.t2.ucsd.edu</a><br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:08:08)</span> <b>jthiltges:</b></span> Thanks.<br/><a href="https://koji.chtc.wisc.edu/koji/buildinfo?buildID=12250">https://koji.chtc.wisc.edu/koji/buildinfo?buildID=12250</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(15:09:38)</span> <b>marian:</b></span> I think I have access there, do you want me upgrade there?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:09:41)</span> <b>jthiltges:</b></span> If you're seeing a backtrace that points toward <tt>XrdCl</tt>, that build will hopefully take care of it.<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:09:54)</span> <b>marian:</b></span> yep, I have root to <a href="http://xcache-11.t2.ucsd.edu">xcache-11.t2.ucsd.edu</a><br/>
+<span style="color: #99a949"><span style="font-size: small">(15:10:25)</span> <b>dwd:</b></span> There’s no backtrace in xrootd.log.  It just silently restarts itself.  Do backtraces go somewhere else?<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:11:45)</span> <b>dwd:</b></span> Once you login to the xcache-11 you need to use “docker exec -it 37a3aa4c7bae /bin/bash” to attach to the xrootd container<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:11:47)</span> <b>jthiltges:</b></span> At Nebraska, we set <tt>DAEMON_COREFILE_LIMIT="unlimited"</tt> in the xrootd environment, and corefiles should end up in the cwd of the xrootd process. Possibly <tt> /var/spool/xrootd/&lt;instance&gt;</tt><br/>
+<span style="color: #99a949"><span style="font-size: small">(15:13:55)</span> <b>dwd:</b></span> There aren’t any core files there, but I don’t know if that variable is set.  Where to look for it?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:14:36)</span> <b>bbockelm:</b></span> 4.8.5 is not stable under load for xcache.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:15:28)</span> <b>bbockelm:</b></span> I’d strongly advise an upgrade first.<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:15:52)</span> <b>marian:</b></span> this is where to set things, @dwd: <a href="http://opensciencegrid.org/StashCache/ops/troubleshoot/">http://opensciencegrid.org/StashCache/ops/troubleshoot/</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(15:16:11)</span> <b>marian:</b></span> (old doc but helps)<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:17:01)</span> <b>dwd:</b></span> The only reason why I was using Edgar’s server was because he gave me access there.  Maybe I should have been testing on <a href="http://xrootd-local.unl.edu">xrootd-local.unl.edu</a>.  But maybe somebody else should be doing the testing instead of me anyway, I just did it because I wasn’t sure if it was a cvmfs client issue and it’s an urgent problem for LIGO<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:21:08)</span> <b>bbockelm:</b></span> Is Edgar around today?<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:21:22)</span> <b>dwd:</b></span> I got a message that he’s on vacation until next Wednesday<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:23:14)</span> <b>dwd:</b></span> @marian can you do the upgrade in his docker container?<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:23:52)</span> <b>marian:</b></span> oh, I haven't touched his containerized setup ... can take a look, though<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:24:26)</span> <b>marian:</b></span> oh jeez, <tt>docker ps</tt> looks scary on that host!<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:25:22)</span> <b>marian:</b></span> <pre><br/>[1324] root@xcache-11 ~# docker ps | wc -l<br/>36<br/></pre><br/>sure there is no another way around? stop the thing for a reason?<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:26:27)</span> <b>marian:</b></span> oh, ok, I located one container running prp-stashcache<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:26:46)</span> <b>dwd:</b></span> Can’t you just connect to the running container and do the upgrade inside of it?<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:27:43)</span> <b>dwd:</b></span> docker exec -it 37a3aa4c7bae /bin/bash<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:27:58)</span> <b>marian:</b></span> yeah<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:28:00)</span> <b>marian:</b></span> I'm inside<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:32:50)</span> <b>marian:</b></span> quite some <tt>Requires:</tt> issues... trying to fight against it...<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:33:44)</span> <b>dwd:</b></span> Yeah it would be nice if koji made a yum repo for you out of all the rpms in the single build<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:37:41)</span> <b>marian:</b></span> I upgrading into 4.8.6-exprimental brings more hassle:<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:37:45)</span> <b>marian:</b></span> <pre><br/>error: Failed dependencies:<br/>	libjson-c.so.2()(64bit) is needed by xrootd-server-libs-1:4.8.6-0.experimental.552240.9b957cae.hcc.el7.x86_64<br/>	libmacaroons.so.0()(64bit) is needed by xrootd-server-libs-1:4.8.6-0.experimental.552240.9b957cae.hcc.el7.x86_64<br/></pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(15:38:54)</span> <b>marian:</b></span> is this the only cache which runs problematic release and causes issues to LIGO?<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:42:34)</span> <b>dwd:</b></span> libmacaroons is in epel<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:43:25)</span> <b>marian:</b></span> I'd kill container if it causes troubles and perhaps try to create another docker image with latest experimental build ... also this seems using Edgar's image, not the one from opensciencegrid ...<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:43:26)</span> <b>dwd:</b></span> yum provides /usr/lib64/libjson-c.so.2 says it is in json-c in base<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:43:57)</span> <b>marian:</b></span> is it worth to conflict his setup if he is coming back tomorrow?<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:44:15)</span> <b>dwd:</b></span> His message said he’s coming back Wednesday<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:44:41)</span> <b>marian:</b></span> ah, next Wed<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:44:50)</span> <b>blin:</b></span> and it's actually next Thursday, iirc<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:45:03)</span> <b>blin:</b></span> yup, next Thurs<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:45:17)</span> <b>marian:</b></span> ok, so decide ... but I don't think I can spend rest of the day on this today ... I can look tomorrow, though<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:45:40)</span> <b>dwd:</b></span> If you do yum install instead of rpm -U won’t it just pull in the needed rpms?<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:46:11)</span> <b>marian:</b></span> yum install against URL?<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:46:21)</span> <b>marian:</b></span> I think that was first I tried ...<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:46:29)</span> <b>marian:</b></span> then downloaded rpms<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:46:41)</span> <b>marian:</b></span> and did <tt>rpm -ivh...</tt> with no luck<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:47:08)</span> <b>marian:</b></span> also, I'm not sure how come we put into production something a day before of week of vacation :wink:<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:48:38)</span> <b>blin:</b></span> <tt>yum install xrootd --enablerepo=hcc-testing</tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(15:49:18)</span> <b>marian:</b></span> just looking at it<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:49:23)</span> <b>marian:</b></span> need to create repo file<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:50:14)</span> <b>dwd:</b></span> Edgar told me this was a test machine, not production<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:51:28)</span> <b>marian:</b></span> looks promising with .repo file<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:51:31)</span> <b>marian:</b></span> though:<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:51:35)</span> <b>marian:</b></span> <pre><br/><br/>Transaction check error:<br/>  installing package xrootd-client-libs-1:4.8.6-0.experimental.552240.9b957cae.hcc.el7.x86_64 needs 12KB on the /etc/xrootd filesystem<br/>  installing package xrootd-server-1:4.8.6-0.experimental.552240.9b957cae.hcc.el7.x86_64 needs 20KB on the /etc/xrootd filesystem<br/><br/>Error Summary<br/>-------------<br/>Disk Requirements:<br/>  At least 1MB more space needed on the /etc/xrootd filesystem.<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:52:05)</span> <b>blin:</b></span> ugh<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:52:39)</span> <b>dwd:</b></span> /etc/xrootd has 78G available<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:52:54)</span> <b>blin:</b></span> but is that all available to the container?<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:53:26)</span> <b>dwd:</b></span> That’s what df says inside the container.  How else could you tell?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:53:36)</span> <b>blin:</b></span> oh, then idk<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:53:49)</span> <b>marian:</b></span> ¯\_(ツ)_/¯<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:54:04)</span> <b>marian:</b></span> yeah <tt>/</tt> says 78G free<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:54:19)</span> <b>marian:</b></span> no special /etc/xrootd mount point<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:58:20)</span> <b>blin:</b></span> @dweitzel ^^ any ideas?<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:59:30)</span> <b>dwd:</b></span> Yes there is a special /etc/xrootd mount point<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:00:09)</span> <b>marian:</b></span> I see it now!<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:01:18)</span> <b>marian:</b></span> and it's read-only<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:01:51)</span> <b>dweitzel:</b></span> It’s probably managed by kubernetes. Good luck. Have to worry about volumes and ports and ips <br/>
+<span style="color: #53b759"><span style="font-size: small">(16:02:55)</span> <b>marian:</b></span> if I yum remove?<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:03:00)</span> <b>marian:</b></span> worth of try?<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:03:16)</span> <b>marian:</b></span> that removes other dependencies, though ...<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:03:34)</span> <b>marian:</b></span> yum remove xrootd* I mean<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:04:02)</span> <b>dweitzel:</b></span> That won’t fix the read only directory <br/>
+<span style="color: #53b759"><span style="font-size: small">(16:04:08)</span> <b>marian:</b></span> true<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:05:09)</span> <b>dwd:</b></span> So is there a test stashcache instance at UNL we could use for this debugging instead?<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:05:47)</span> <b>marian:</b></span> I don't think so ... unless @jthiltges @dweitzel know<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:06:12)</span> <b>marian:</b></span> but what we're testing, xrootd or whole containerized stashcache?<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:06:44)</span> <b>marian:</b></span> if containerized I don't think we have adequate testing env<br/>
+<span style="color: #e06b56"><span style="font-size: small">(16:06:54)</span> <b>jthiltges:</b></span> There's no test instance to my knowledge. <tt><a href="http://hcc-stash.unl.edu">hcc-stash.unl.edu</a></tt> is the only one.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(16:07:24)</span> <b>jthiltges:</b></span> If you can make it crash, we'll happily look at corefiles. :slightly_smiling_face:<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:07:30)</span> <b>marian:</b></span> there we can update xrootd but nothing else ... which probably is not what Dave is looking for<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:09:53)</span> <b>dwd:</b></span> Ok can you make it so I can log in there as root to look at the log?  Perhaps through hcc-cvmfs if that’s easiest<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:11:10)</span> <b>marian:</b></span> just to clarify ... xrootd logs on hcc-stash?<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:11:47)</span> <b>dwd:</b></span> Yes, xrootd.log.  Wait, we need one that is authorized for https, is hcc-stash set up for that?<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:11:53)</span> <b>dwd:</b></span> For ligo<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:12:01)</span> <b>marian:</b></span> yes, it should be<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:12:50)</span> <b>dwd:</b></span> It’s not configured for <a href="http://ligo.osgstorage.org">ligo.osgstorage.org</a> for production, xrootd-local is instead<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:13:37)</span> <b>marian:</b></span> but we run there v4.8.5 ... same as Edgar in the container<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:14:20)</span> <b>marian:</b></span> we could add you to the puppet profile as you have duo access at UNL ... let me ask our admins, (@gattebury, what you think? :))<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:14:45)</span> <b>marian:</b></span> adding Dave to hiera of hcc-stash should do it, right?<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:15:19)</span> <b>marian:</b></span> ah, missed your line about ligo...<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:15:42)</span> <b>marian:</b></span> ugh ... xrootd-local is not very experimental platform, though<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:18:18)</span> <b>dwd:</b></span> There is a hcc-stash port 8443 but it doesn’t work with ligo.  I’d be more nervous about crashing xrootd-local, although this is the same kind of stressing that happens in production and that Tom Downes is doing.  It does apparently recover itself at least.<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:21:09)</span> <b>marian:</b></span> xrootd-local serves downstream everything for CMS AAA, too<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:22:27)</span> <b>dwd:</b></span> Could somebody set up hcc-stash to be able to serve authorized ligo?  @dweitzel?<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:32:12)</span> <b>dwd:</b></span> @bbockelm @dweitzel is it a good idea to set up hcc-stash for <a href="http://ligo.osgstorage.org">ligo.osgstorage.org</a> testing?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(19:14:49)</span> <b>dweitzel:</b></span> I see no reason why hcc-stash can’t be a production ligo cache. It may be already, not sure. But, how “testing” is testing?  I’ve got no problem hitting it with as much traffic as possible. I’m hesitant to turn it off for hours, or changing the configuration such that it fails request. <br/>
+<span style="color: #235e5b"><span style="font-size: small">(19:15:00)</span> <b>dweitzel:</b></span> Load tests, I’m fine with. <br/>
+<span style="color: #235e5b"><span style="font-size: small">(19:16:06)</span> <b>dweitzel:</b></span> I don’t think it’s currently a ligo cache only because it’s sitting right next to the origin, which is at Nebraska. The need isn’t quite there just for a cache. <br/>
+</body>
+</html>

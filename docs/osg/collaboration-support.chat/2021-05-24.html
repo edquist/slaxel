@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon May 24, 2021 : #collaboration-support (osg)</title>
+</head>
+<body>
+<h3>Mon May 24, 2021 : #collaboration-support (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(07:42:49)</span> <b>ruben.lara:</b></span> Good news (I guess): seems to be that the issues we had on Friday were related to the general OSG outage. As of right now, we are getting and running jobs without issues. The final configuration of the CE has these settings:<br/><pre>BoscoOverrides:<br/>  Enabled: false<br/>  GitEndpoint: <a href="https://github.com/slateci/bosco-override-template">https://github.com/slateci/bosco-override-template</a><br/>  # If GitEndpoint requires authentication, create a SLATE secret with<br/>  # 'git.key' containing the private SSH key that can access<br/>  # it. Specify the name of the secret in GitKeySecret:<br/>  GitKeySecret: null<br/>  # rlara3 - 20210521 - Added under request from Brian Lin<br/>  TarballURL: <a href="https://research.cs.wisc.edu/htcondor/tarball/9.0/9.0.1/daily/condor-9.0.1-20210502-x86_64_CentOS7-stripped.tar.gz">https://research.cs.wisc.edu/htcondor/tarball/9.0/9.0.1/daily/condor-9.0.1-20210502-x86_64_CentOS7-stripped.tar.gz</a></pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(07:43:11)</span> <b>ruben.lara:</b></span> <pre>ContainerTags:<br/>  HostedCE: release</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(08:01:18)</span> <b>ruben.lara:</b></span> @paschos: next item, test if the Bosco updates are working as expected.<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:55:25)</span> <b>paschos:</b></span> <b>@here</b> i don’t think that gatech is running any gpu payloads in OSG_US_GATech_osg-sched2_gpu … they are all cpu jobs therre<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:08:46)</span> <b>paschos:</b></span> @rynge can you take a look for the osg frontend if you have a moment<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:09:26)</span> <b>rynge:</b></span> Trying to catch up - what am I looking for?<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:11:51)</span> <b>paschos:</b></span> well --- that CE is supposedly accepting gpu pilots but we have no gpu jobs running on those nodes. Benedikt also earlier mentioned that the no gpu icecubes jobs matching…<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:12:50)</span> <b>paschos:</b></span> we’re missing something… that CE was redeployed last week so it can differrentiate between the gpu/cpu jobs --- but the observed effec on the cluster is the same…<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:13:30)</span> <b>paschos:</b></span> ttheer is OSG_US_GATech_osg-sched2 and OSG_US_GATech_osg-sched2_gpu that will submit cpu vs gpu pilots to the cluster<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:16:10)</span> <b>rynge:</b></span> Hmm, looks like we don't see the GPUs<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:16:15)</span> <b>rynge:</b></span> Let me dig in some logs<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:16:49)</span> <b>paschos:</b></span> some classad they’ll need to advertize<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:19:32)</span> <b>paschos:</b></span> this is the entry in startd for their nodes:<br/><pre>use feature : gpus<br/>HasGPU = True<br/>#START = (TARGET.WantGPU == True) &amp;&amp; ( $(START) )<br/># Add to give priority to GPU jobs, but allow other jobs to run<br/>RANK = (TARGET.WantGPU * 1000)<br/>STARTD_ATTRS = $(STARTD_ATTRS),HasGPU<br/>GLIDEIN_ResourceName = "Georgia_Tech_PACE_CE_2"<br/>STARTD_ATTRS = $(STARTD_ATTRS),GLIDEIN_ResourceName</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:38:31)</span> <b>rynge:</b></span> I'm seeing some odd errors in the HTCondor logs:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:38:35)</span> <b>rynge:</b></span> <pre>05/24/21 14:09:46 (pid:231803) CONFIGURATION PROBLEM: Failed to insert ClassAd attribute STARTD_JOB_ATTRS = "x509userproxysubject,x509UserProxyFQAN,x509UserProxyVOName,x509UserProxyEmail,x509UserProxyExpiration,ProjectName" GPUsUsage GPUsMemoryUsage GPUsUsage GPUsMemoryUsage.  The most common reason for this is that you forgot to quote a string value in the list of attributes being added to the STARTD ad.<br/>05/24/21 14:09:46 (pid:231803) CONFIGURATION PROBLEM: Failed to insert ClassAd attribute GLIDEIN_Resource_Slots = GPUs,1,type=main.  The most common reason for this is that you forgot to quote a string value in the list of attributes being added to the STARTD ad.</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:39:56)</span> <b>rynge:</b></span> Same one with other GPU entries<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:41:56)</span> <b>paschos:</b></span> ok --- so we ar missing attributes in startd? Is there something we can clone from another gpu site?<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:43:07)</span> <b>paschos:</b></span> or (long shot) is there osg documentation on what needs to be in startd for gpus?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:47:24)</span> <b>rynge:</b></span> I have a fix I want you to try. You can either kill all glideins in your system for the gpus<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:47:42)</span> <b>rynge:</b></span> Or wait, until things cycle automatically<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:47:45)</span> <b>rynge:</b></span> But that will take time<br/>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jan 22, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Tue Jan 22, 2019 : #xcache (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(09:18:20)</span> <b>matyas:</b></span> That's unfortunate. So how can I tell if the cache is being useful or just wasting its time?<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:18:35)</span> <b>matyas:</b></span> Also, where is 'elsewhere'? The origin?<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:23:32)</span> <b>matyas:</b></span> Or it asks the redirector?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:09:23)</span> <b>dweitzel:</b></span> It depends on the client.  From the usage, I think it's mostly CVMFS.  CVMFS will go to another cache, ordered by the GeoIP results, closest first.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:17:39)</span> <b>blin:</b></span> is there a default uid/gid for the xrootd user?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:29:52)</span> <b>dweitzel:</b></span> looks like the RPM just gets the next available: <a href="https://github.com/xrootd/xrootd/blob/master/packaging/rhel/xrootd.spec.in#L593-L596">https://github.com/xrootd/xrootd/blob/master/packaging/rhel/xrootd.spec.in#L593-L596</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:56:25)</span> <b>blin:</b></span> thanks, follow-up question: does <tt>set foo=$BAR</tt> really work with env variables in xrootd config?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:56:58)</span> <b>blin:</b></span> @ivukotic seems to be using it here: <a href="https://github.com/slateci/XCache/blob/master/xcache.cfg#L1-L6">https://github.com/slateci/XCache/blob/master/xcache.cfg#L1-L6</a><br/>
+<span style="color: #84b22f"><span style="font-size: small">(14:57:33)</span> <b>ivukotic:</b></span> yes it does work<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:26:31)</span> <b>efajardo:</b></span> yea<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:26:47)</span> <b>efajardo:</b></span> but it fails horribly<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:26:54)</span> <b>efajardo:</b></span> if the env var is not set<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:36:22)</span> <b>blin:</b></span> and presumably you can't do things like <tt>oss.localroot $BAR</tt>?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:37:24)</span> <b>blin:</b></span> @efajardo fails horribly meaning in a confusing way or just that the service won't start?<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:37:51)</span> <b>efajardo:</b></span> The service won’t start and the log message is not very helpful<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:38:04)</span> <b>efajardo:</b></span> I prefer to write good defaults and if the env variable is dfined<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:38:13)</span> <b>efajardo:</b></span> then set it to the value of the env variable<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:38:19)</span> <b>efajardo:</b></span> much safer<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:38:26)</span> <b>efajardo:</b></span> specially if it is osmethign everyone will use<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:40:27)</span> <b>blin:</b></span> makes sense for cases with sensible defaults<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:41:04)</span> <b>blin:</b></span> but for those without sensible defaults, we can probably add some error messages in the images to check for these env vars or something<br/>
+</body>
+</html>

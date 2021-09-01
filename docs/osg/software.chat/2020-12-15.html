@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Dec 15, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue Dec 15, 2020 : #software (osg)</h3>
+<span style="color: #73769d"><span style="font-size: small">(09:01:58)</span> <b>tim.theisen:</b></span> @blin Are there updated instructions on how to locally view documentation? Since we switched to GHA, the virtualenv with the ci directory no longer seems to work.<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:02:46)</span> <b>blin:</b></span> i think i have a ticket for that. do you have docker installed?<br/>
+<span style="color: #73769d"><span style="font-size: small">(09:03:13)</span> <b>tim.theisen:</b></span> Yes.<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:07:18)</span> <b>blin:</b></span> from the root of the repo, try <tt>docker run --rm -p 8000:8000 -v ${PWD}:/docs squidfunk/mkdocs-material:6.1.4</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(09:07:35)</span> <b>blin:</b></span> should be viewable at <tt>localhost:8000</tt><br/>
+<span style="color: #73769d"><span style="font-size: small">(09:09:51)</span> <b>tim.theisen:</b></span> Yup, works well.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:10:19)</span> <b>dweitzel:</b></span> I want a cool username like <tt>squidfunk</tt> too!<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:40:13)</span> <b>efajardo:</b></span> <b>@here</b> we notice one cannot install <tt>osg-flock</tt> in a CEnto8 host<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:40:15)</span> <b>efajardo:</b></span> <pre>[root@test-008 ~]# yum install osg-flock --enablerepo=osg-development<br/>OSG Software for Enterprise Linux 8 - Development - x86_64                                                                                                                                         10 kB/s | 3.0 kB     00:00    <br/>OSG Software for Enterprise Linux 8 - Development - x86_64                                                                                                                                        378 kB/s | 186 kB     00:00    <br/>Error: <br/> Problem: package osg-flock-1.2-2.osg35.el8.noarch requires gratia-probe-glideinwms, but none of the providers can be installed<br/>  - package gratia-probe-glideinwms-1.22.0-1.osg35.el8.x86_64 requires gratia-probe-common &gt;= 1.22.0-1.osg35.el8, but none of the providers can be installed<br/>  - conflicting requests<br/>  - nothing provides pyOpenSSL needed by gratia-probe-common-1.22.0-1.osg35.el8.x86_64<br/>(try to add '--skip-broken' to skip uninstallable packages or '--nobest' to use not only best candidate packages)</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(17:40:21)</span> <b>efajardo:</b></span> is this by design?<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:43:13)</span> <b>matyas:</b></span> is this centos 8.2 or 8.3?<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:43:45)</span> <b>matyas:</b></span> if it's 8.2, try enabling the <tt>PowerTools</tt> repo; if it's 8.3, try enabling the <tt>powertools</tt> repo<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:44:10)</span> <b>matyas:</b></span> (yah they changed it; super annoying)<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:44:56)</span> <b>efajardo:</b></span> ahh let me try<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:47:51)</span> <b>efajardo:</b></span> No dice<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:47:53)</span> <b>efajardo:</b></span> <pre> yum install osg-flock --enablerepo=osg-development --enablerepo=PowerTools<br/>CentOS-8 - PowerTools                                                                                                                                                                             2.0 MB/s | 2.0 MB     00:00    <br/>Last metadata expiration check: 0:00:01 ago on Tue 15 Dec 2020 03:47:40 PM PST.<br/>Error: <br/> Problem: package osg-flock-1.2-2.osg35.el8.noarch requires gratia-probe-glideinwms, but none of the providers can be installed<br/>  - package gratia-probe-glideinwms-1.22.0-1.osg35.el8.x86_64 requires gratia-probe-common &gt;= 1.22.0-1.osg35.el8, but none of the providers can be installed<br/>  - conflicting requests<br/>  - nothing provides pyOpenSSL needed by gratia-probe-common-1.22.0-1.osg35.el8.x86_64<br/>(try to add '--skip-broken' to skip uninstallable packages or '--nobest' to use not only best candidate packages)</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(17:58:48)</span> <b>matyas:</b></span> <a href="https://github.com/opensciencegrid/gratia-probe/blob/master/rpm/gratia-probe.spec#L366">https://github.com/opensciencegrid/gratia-probe/blob/master/rpm/gratia-probe.spec#L366</a>. centos 8 provides 'python3-pyOpenSSL', not 'pyOpenSSL'; we'll have to fix that in the spec file<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:59:01)</span> <b>matyas:</b></span> I will make a ticket<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:59:15)</span> <b>efajardo:</b></span> ok thanks<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:59:29)</span> <b>efajardo:</b></span> let me know when you have JIRA TICkcet for it Mat<br/>
+<span style="color: #c386df"><span style="font-size: small">(18:03:44)</span> <b>matyas:</b></span> <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-4398">https://opensciencegrid.atlassian.net/browse/SOFTWARE-4398</a>; added you as a watcher<br/>
+<span style="color: #a63024"><span style="font-size: small">(18:09:06)</span> <b>efajardo:</b></span> thank you<br/>
+</body>
+</html>

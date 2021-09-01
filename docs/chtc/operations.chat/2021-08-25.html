@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Aug 25, 2021 : #operations (chtc)</title>
+</head>
+<body>
+<h3>Wed Aug 25, 2021 : #operations (chtc)</h3>
+<span style="color: #9f69e7"><span style="font-size: small">(10:16:45)</span> <b>lmichael:</b></span> @wiscmoate or @tjslauson can you look into why user <tt>sislam9</tt> account didn’t make it to <a href="http://learn.chtc.wisc.edu">learn.chtc.wisc.edu</a> from the web app (looks like they exist on submit1).<br/>
+<blockquote>
+<span style="color: #4bbe2e"><span style="font-size: small">(10:46:47)</span> <b>tjslauson:</b></span> puppet was disabled on <tt>learn</tt> during the second week of the OSG school - @wiscmoate probably knows why<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(10:47:33)</span> <b>tjslauson:</b></span> I think the bits and pieces I picked up were something to do with a last-minute request for altered home dir permissions for serving out per-user web content?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(10:56:15)</span> <b>wiscmoate:</b></span> Yes -<br/>
+<span style="color: #3c989f"><span style="font-size: small">(10:58:01)</span> <b>wiscmoate:</b></span> And this -&gt; <a href="https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=103909">https://crt.cs.wisc.edu/rt/Ticket/Display.html?id=103909</a><br/>
+<span style="color: #9f69e7"><span style="font-size: small">(11:01:34)</span> <b>lmichael:</b></span> Can you push the account now?<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(11:05:07)</span> <b>lmichael:</b></span> really, run puppet manually/once?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:19:10)</span> <b>wiscmoate:</b></span> Yes<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(12:29:24)</span> <b>lmichael:</b></span> Thanks!<br/>
+<span style="color: #3c989f"><span style="font-size: small">(13:36:01)</span> <b>wiscmoate:</b></span> @lmichael puppet run finished on learn<br/>
+</blockquote>
+<span style="color: #4bbe2e"><span style="font-size: small">(12:51:16)</span> <b>tjslauson:</b></span> @lmichael @jcpatton <tt>hguo84</tt> 's using a bunch of CPU and memory on submit2 - this expected?<br/>
+<blockquote>
+<span style="color: #4bbe2e"><span style="font-size: small">(12:53:15)</span> <b>tjslauson:</b></span> either way, I'll be killing their processes in a moment - the memory is concerning<br/>
+<span style="color: #2b6836"><span style="font-size: small">(12:53:29)</span> <b>jcpatton:</b></span> Not that I'm aware of<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(12:59:15)</span> <b>tjslauson:</b></span> kk.  I've killed all of <tt>hguo84</tt>'s processes and manually locked their <tt>submit2</tt> Linux account.  @lmichael let me know if you want to lock them properly via the userapp pending communication, so I can undo my manual lock.<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(13:00:46)</span> <b>lmichael:</b></span> Thanks! I’l get in touch with them ASAP.<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(13:01:20)</span> <b>tjslauson:</b></span> kk<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(13:01:33)</span> <b>tjslauson:</b></span> I've disabled their netid in the userapp and will undo my lock in the meantime<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(14:53:13)</span> <b>lmichael:</b></span> @tjslauson any details on what kind of tasks were running? Python? something else?<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(14:53:24)</span> <b>lmichael:</b></span> number of cores and amount of RAM?<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(14:58:12)</span> <b>tjslauson:</b></span> earlier this morning, the single process (with 8 threads) was using 8 cores.  I didn't notice excessive memory usage this morning.  When I checked again early afternoon, there were 3 of these processes intermittently using all of submit2's cores and using ~60% of system memory (about 50 to 60GB used from these processes).<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(14:58:20)</span> <b>tjslauson:</b></span> the command invocation was <tt>./tomoJointBS tomoJoint.inp</tt><br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(14:58:31)</span> <b>tjslauson:</b></span> and it ran from this directory: <tt>/home/hguo84/SSIP/MOD1-3-fromCVMH_Output_Files_absdt_s600-600-200_balance0.8_vthres1.5-7.8-0.6-4.6_wtcd2.34_10iters_FD-finc4</tt><br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(15:01:34)</span> <b>tjslauson:</b></span> without doing anything destructive, I can say that <tt>tomoJointBS</tt> is a binary executable that is linked to OpenMP and FORTRAN libraries<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(15:01:49)</span> <b>tjslauson:</b></span> so it's probably a compiled FORTRAN program<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(15:03:35)</span> <b>lmichael:</b></span> perfect. thanks!<br/>
+</blockquote>
+</body>
+</html>

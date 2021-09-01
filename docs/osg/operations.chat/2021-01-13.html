@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jan 13, 2021 : #operations (osg)</title>
+</head>
+<body>
+<h3>Wed Jan 13, 2021 : #operations (osg)</h3>
+<span style="color: #3c8c69"><span style="font-size: small">(10:20:09)</span> <b>jpeterson:</b></span> Hosted CE slurm temp directory config question.<br/><br/>I have a new CE that I’m getting errors about the temp dir not having enough space.   Site admin says the temp dir doesn’t exist outside of the job, and if the job doesn’t explicitly ask for it the default is 100M, which I’m guessing is a problem when our check script looks for 3G and finds 0G.   Is this in a bosco override that I should be looking?  something like <tt>--tmp=&lt;size[units]&gt;</tt>  in <tt>bosco_override/glite/bin/slurm_submit.sh</tt>  ?  I see some <tt>--mem=</tt>  in the <tt>$SBATCH</tt>  echos<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:40:13)</span> <b>blin:</b></span> yeah, you should echo the necessary sbatch directive so 3G is probably the right thing to request<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:40:35)</span> <b>blin:</b></span> you should do that in <tt>slurm_local_submit_attrs.sh</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:41:46)</span> <b>blin:</b></span> modifying the <tt>*_submit/status/cancel.sh</tt> scripts should really only be done if we identify a bug in them, or in the very rare case that specifying it in the <tt>*local_submit_attributes.sh</tt> would not work<br/>
+<span style="color: #5a4592"><span style="font-size: small">(11:00:49)</span> <b>lmichael:</b></span> ticket handed to Ops: AMNH Singularity update <a href="https://support.opensciencegrid.org/a/tickets/66573">https://support.opensciencegrid.org/a/tickets/66573</a><br/>
+</body>
+</html>

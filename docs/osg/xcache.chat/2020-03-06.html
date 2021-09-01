@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Mar 6, 2020 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Fri Mar 6, 2020 : #xcache (osg)</h3>
+<span style="color: #8d4b84"><span style="font-size: small">(10:41:47)</span> <b>kherner:</b></span> @efajardo Are things looking better in the last 12 hours?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:28:30)</span> <b>matyas:</b></span> the CHTC cache has been a lot more stable since then<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:14:35)</span> <b>matyas:</b></span> So what can I, as a cache admin, do in order to keep my cache stable the next time something like this happens?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:15:49)</span> <b>matyas:</b></span> Is there some sort of xrootd config knob I can set to do some throttling?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:27:13)</span> <b>dweitzel:</b></span> There certainly is throttling.  I'm not familiar with the configuration though.<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:47:00)</span> <b>efajardo:</b></span> Well I think you can set anumber of max connections or osmething like that<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:47:08)</span> <b>efajardo:</b></span> but the other cahces were stable<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:47:09)</span> <b>efajardo:</b></span> so<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:51:20)</span> <b>matyas:</b></span> is there a graph for how many connections the server was receiving?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:52:11)</span> <b>matyas:</b></span> were we getting more connections than others? were we slow in satisfying them?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:53:02)</span> <b>matyas:</b></span> I'm guessing that if the cache is trying to send a file to 6920 places at the same time, it's gonna go slowly for everyone<br/>
+<span style="color: #e06b56"><span style="font-size: small">(12:55:28)</span> <b>jthiltges:</b></span> From the stats, I'm thinking "reqs" is a counter since the last service restart, rather than active connections. The 5.8GB of buffer data seems like the issue. But I'm not sure how best to address that.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:02:38)</span> <b>matyas:</b></span> well, is number of active connections correlated with load average? our ganglia shows a peak of 1.12k for the one minute load average yesterday<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:04:36)</span> <b>bbockelm:</b></span> &gt;  Is there some sort of xrootd config knob I can set to do some throttling?<br/>Probably best to setup the throttling plugin?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:07:35)</span> <b>matyas:</b></span> Sure. What's it called and where do I get it?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:12:05)</span> <b>matyas:</b></span> <a href="https://twiki.cern.ch/twiki/bin/view/Main/XrootdThrottling">https://twiki.cern.ch/twiki/bin/view/Main/XrootdThrottling</a> ?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:12:48)</span> <b>matyas:</b></span> er <a href="https://twiki.cern.ch/twiki/bin/view/Main/XrootdThrottlingExperimental">https://twiki.cern.ch/twiki/bin/view/Main/XrootdThrottlingExperimental</a> ?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:16:48)</span> <b>matyas:</b></span> would that even help? I think it's the number of connections that killed me, not the 'number of IO operations in-progress', right?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:17:31)</span> <b>matyas:</b></span> Ganglia graphs, in case they help<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:22:04)</span> <b>efajardo:</b></span> What killed oyu is the number of http open connections<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:22:22)</span> <b>efajardo:</b></span> I checked CMS caches and even under heavy laod the memory was never a problem<br/>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jul 23, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Tue Jul 23, 2019 : #xcache (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(11:55:43)</span> <b>blin:</b></span> hey @efajardo what do you guys do for cms xcache monitoring? i don't see any <tt>xrd.report</tt> config<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:56:26)</span> <b>efajardo:</b></span> what?<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:56:37)</span> <b>efajardo:</b></span> we report to two places<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:57:01)</span> <b>efajardo:</b></span> ahh sorry<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:57:07)</span> <b>efajardo:</b></span> I thouhgt you meant monitoring<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:57:24)</span> <b>efajardo:</b></span> No we do not use <tt>xrd.report</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(11:58:08)</span> <b>efajardo:</b></span> I think that is the old Xrootd monitor before monitor<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:58:52)</span> <b>efajardo:</b></span> It is under the “3       Esoteric xrd Configuration Directives”<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:58:57)</span> <b>blin:</b></span> what do you mean "before monitor"?<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:58:59)</span> <b>efajardo:</b></span> <a href="http://xrootd.org/doc/dev48/xrd_config.htm#_Toc496911317">http://xrootd.org/doc/dev48/xrd_config.htm#_Toc496911317</a><br/>
+<span style="color: #a63024"><span style="font-size: small">(11:59:19)</span> <b>efajardo:</b></span> we use <tt>xrootd.monitor</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(11:59:21)</span> <b>efajardo:</b></span> for all monitoring<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:59:27)</span> <b>efajardo:</b></span> and we report to two places<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:59:29)</span> <b>efajardo:</b></span> <pre>xrootd.monitor all auth flush 30s window 5s fstat 60 lfn ops xfr 5 dest files io info user <a href="http://xrootd.t2.ucsd.edu:9930">xrootd.t2.ucsd.edu:9930</a> dest fstat info user <a href="http://xrd-mon.osgstorage.org:9930">xrd-mon.osgstorage.org:9930</a></pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(11:59:35)</span> <b>efajardo:</b></span> UCSD own collector and OSG General  Rabbit MQ one<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:59:41)</span> <b>efajardo:</b></span> that then flush backs to CERN<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:00:24)</span> <b>blin:</b></span> hrm, i don't think that made it into the CMS XCache PR<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:07:34)</span> <b>marian:</b></span> well. not for caches, but for normal data servers in the AAA, CMS uses this line:<br/><pre><br/>xrd.report <a href="http://xrootd.t2.ucsd.edu:9931">xrootd.t2.ucsd.edu:9931</a> every 30s all sync<br/></pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(12:09:53)</span> <b>marian:</b></span> it's the summary monitoring but that information doesn't go anywhere further, just stays stored at UCSD ... it's been used by MONAlisa only which is shutdown ... I had a discussion on this with Matevz last week (prior to that with Derek) and we'll be trying to use the concept of summaries, probably. But that is some new development coming. So to confirm for now, no, don't use <tt>xrd.report</tt> and use only <tt>xrootd.monitor</tt> directive Edgar mentioned.<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:10:34)</span> <b>blin:</b></span> stashcache uses <tt>xrd.report</tt>. presumably we want that still<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:10:55)</span> <b>marian:</b></span> how you use xrd.report?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:12:38)</span> <b>blin:</b></span> dunno, @dweitzel may know. this is the config that we ship <tt>xrd.report <a href="http://xrd-report.osgstorage.org:9931">xrd-report.osgstorage.org:9931</a></tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(12:16:46)</span> <b>marian:</b></span> ah, then yes, wasn't aware of that ... that is only for caches, though ... gotcha<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:17:19)</span> <b>marian:</b></span> sure Derek knows more about it<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:44:22)</span> <b>dweitzel:</b></span> xrd.report is summary monitoring.  The OSG does not (currently) collect summary monitoring.  <a href="http://xrd-report.osgstorage.org">xrd-report.osgstorage.org</a> points to <a href="http://uct2-collectd.mwt2.org">uct2-collectd.mwt2.org</a>, where an old summary monitor used to exist.  It's been a while since I've checked on it, so it's probably dead.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:44:40)</span> <b>dweitzel:</b></span> xrd.report and xrd.monitor report different things, and most places should have both defined.<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:47:35)</span> <b>blin:</b></span> i've created a doc enumerating the differences between the XCache implementations: <a href="https://docs.google.com/document/d/1Cxuzy6onOgcjTalkpkT5sBqO2yQqt6ko3zGEk3whMVI/edit?usp=sharing">https://docs.google.com/document/d/1Cxuzy6onOgcjTalkpkT5sBqO2yQqt6ko3zGEk3whMVI/edit?usp=sharing</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(14:31:24)</span> <b>marian:</b></span> I added piece of paragraph under StashCache monitoring, just as Derek summarized.<br/>
+</body>
+</html>

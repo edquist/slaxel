@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Nov 17, 2016 : #general (osg)</title>
+</head>
+<body>
+<h3>Thu Nov 17, 2016 : #general (osg)</h3>
+<span style="color: #de5f24"><span style="font-size: small">(10:15:15)</span> <b>tiradani:</b></span> Does anyone know how to get the reason a jobrouter failed to route a job?  We have an intermittent problem on our CEs where the jobs are being held due to "CE job in status 1 put on hold by SYSTEM_PERIODIC_HOLD due to non-existent route or entry in JOB_ROUTER_ENTRIES."<br/>
+<span style="color: #de5f24"><span style="font-size: small">(10:15:32)</span> <b>tiradani:</b></span> as near as I can tell this is only being triggered because the job hasn't been routed in 30 minutes<br/>
+<span style="color: #de5f24"><span style="font-size: small">(10:16:13)</span> <b>tiradani:</b></span> condor_ce_job_router_info shows that the job matches the one and only route on the CE.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(10:16:43)</span> <b>tiradani:</b></span> I suspect that the job router is trying to route but failing for some unknown reason.  However, none of the logs show anything useful.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:20:19)</span> <b>dweitzel:</b></span> do you have any max idle, or max commands on the route?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(10:48:25)</span> <b>tiradani:</b></span> MaxJobs = 10000; <br/>        MaxIdleJobs = 2000;<br/>
+<span style="color: #de5f24"><span style="font-size: small">(10:48:47)</span> <b>tiradani:</b></span> so if the idle count goes over 2000, those jobs won't be routed?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:58:42)</span> <b>dweitzel:</b></span> right<br/>
+<span style="color: #de5f24"><span style="font-size: small">(11:03:10)</span> <b>tiradani:</b></span> thanks, I will watch for that condition.  In any case I think I should bump up the MaxIdleJobs<br/>
+</body>
+</html>

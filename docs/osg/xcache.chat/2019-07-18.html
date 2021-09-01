@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jul 18, 2019 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Thu Jul 18, 2019 : #xcache (osg)</h3>
+<span style="color: #a63024"><span style="font-size: small">(10:57:10)</span> <b>efajardo:</b></span> yes<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:57:21)</span> <b>efajardo:</b></span> it does exist @bbockelm you gave it to the folk in NCAS<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:57:26)</span> <b>efajardo:</b></span> to check if a file was cached<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:57:38)</span> <b>efajardo:</b></span> I just do not remember the name is like <tt>xrdstat</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(10:57:41)</span> <b>efajardo:</b></span> or something like that<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:57:50)</span> <b>efajardo:</b></span> I however have anothe rproblem<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:57:56)</span> <b>efajardo:</b></span> I found this on the caches today<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:58:06)</span> <b>efajardo:</b></span> <pre>190718 15:52:22 807 ?:131@osg-ligo-1.t2.ucsd.edu XrdPoll: FD 131 attached to poller 0; num=1<br/>Failed to validate credentials.<br/>Globus error: globus_credential: Error verifying credential: Failed to verify credential<br/>globus_gsi_callback_module: Could not verify credential<br/>globus_gsi_callback_module: Could not verify credential<br/>globus_gsi_callback_module: Invalid CRL: The available CRL has expired<br/><br/></pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(10:58:22)</span> <b>efajardo:</b></span> however I see that crond is running<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:58:27)</span> <b>efajardo:</b></span> <pre>[root@stashcache etc]# ps aux | grep cron<br/>root        550  0.0  0.0  22692  1548 ?        S    Jul09   0:01 /usr/sbin/crond -n<br/>root       3602  0.0  0.0  12520   988 pts/0    S+   15:56   0:00 grep --color=auto cro</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(10:58:47)</span> <b>efajardo:</b></span> and the cron jobs are installed for fecth-crl<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:58:49)</span> <b>efajardo:</b></span> <pre>[root@stashcache etc]# cd /etc/cron.d<br/>[root@stashcache cron.d]# ls<br/>0hourly  fetch-crl  fetch-crl.cron  stash-cache-auth.cron  stash-cache-renew-proxy.cron  xcache-reporter.cron</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(10:59:02)</span> <b>efajardo:</b></span> @blin you create this iamge<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:59:10)</span> <b>efajardo:</b></span> any idea on what could be going wrong?<br/>
+<span style="color: #53b759"><span style="font-size: small">(11:08:29)</span> <b>isfiligoi:</b></span> Are you using the costumized fetch-crl.cron?<br/>The one from rpm requires activation from systemd, which does not run in the container<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:09:13)</span> <b>efajardo:</b></span> I think this is the one I see installed<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:09:15)</span> <b>efajardo:</b></span> <pre>cat fetch-crl.cron <br/># Cron job running by default every 6 hours, at 45 minutes past the hour<br/># with  +/- 3 minutes sleep to work inside a docker container<br/><br/>45 */6 * * * root /usr/sbin/fetch-crl -q -r 360 -p 20 -T 10<br/><br/></pre><br/>
+<span style="color: #53b759"><span style="font-size: small">(11:11:36)</span> <b>isfiligoi:</b></span> yep, that looks ok<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:40:16)</span> <b>blin:</b></span> @efajardo anything in the cron log?<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:46:57)</span> <b>efajardo:</b></span> @blin where is that<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:47:28)</span> <b>blin:</b></span> <tt>/var/log/cron</tt>?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:47:34)</span> <b>blin:</b></span> somewhere in there<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:47:36)</span> <b>efajardo:</b></span> that does nt exist<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:48:09)</span> <b>blin:</b></span> how about the supervisor logs?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:48:16)</span> <b>blin:</b></span> do you see cron referenced in there?<br/>
+<span style="color: #a63024"><span style="font-size: small">(11:51:14)</span> <b>efajardo:</b></span> <pre>[root@dtn2-daejeon supervisor]# grep -i cron /var/log/supervisord.log -A 4 -B 4<br/>2019-07-05 19:01:10,091 CRIT Server 'unix_http_server' running without any HTTP authentication checking<br/>2019-07-05 19:01:10,091 INFO supervisord started with pid 1<br/>2019-07-05 19:01:11,093 INFO spawned: 'stash-cache-authfile-update' with pid 557<br/>2019-07-05 19:01:11,094 INFO spawned: 'stash-cache' with pid 558<br/>2019-07-05 19:01:11,095 INFO spawned: 'crond' with pid 559<br/>2019-07-05 19:01:11,096 INFO spawned: 'stash-cache-auth' with pid 560<br/>2019-07-05 19:01:11,223 INFO exited: stash-cache-auth (exit status 1; not expected)<br/>2019-07-05 19:01:12,224 INFO success: stash-cache-authfile-update entered RUNNING state, process has stayed up for &gt; than 1 seconds (startsecs)<br/>2019-07-05 19:01:12,224 INFO success: stash-cache entered RUNNING state, process has stayed up for &gt; than 1 seconds (startsecs)<br/>2019-07-05 19:01:12,224 INFO success: crond entered RUNNING state, process has stayed up for &gt; than 1 seconds (startsecs)<br/>2019-07-05 19:01:12,225 INFO spawned: 'stash-cache-auth' with pid 612<br/>2019-07-05 19:01:12,282 INFO exited: stash-cache-auth (exit status 1; not expected)<br/>2019-07-05 19:01:14,286 INFO spawned: 'stash-cache-auth' with pid 640<br/>2019-07-05 19:01:14,575 INFO exited: stash-cache-authfile-update (exit status 0; expected</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(11:58:07)</span> <b>blin:</b></span> cron's running but there aren't any log files? that's kinda weird<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:58:32)</span> <b>blin:</b></span> can you run the fetch-crl command from the cron file manually?<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:06:31)</span> <b>efajardo:</b></span> I did<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:06:39)</span> <b>efajardo:</b></span> <pre>sendmail: RCPT TO:&lt;postmaster@dtn2-daejeon.kreonet.net&gt; (550 5.1.1 Relay denied)<br/>sendmail: RCPT TO:&lt;postmaster@dtn2-daejeon.kreonet.net&gt; (550 5.1.1 Relay denied)<br/>sendmail: RCPT TO:&lt;postmaster@dtn2-daejeon.kreonet.net&gt; (550 5.1.1 Relay denied)<br/>sendmail: RCPT TO:&lt;postmaster@dtn2-daejeon.kreonet.net&gt; (550 5.1.1 Relay denied)<br/>sendmail: RCPT TO:&lt;postmaster@dtn2-daejeon.kreonet.net&gt; (550 5.1.1 Relay denied)<br/>sendmail: RCPT TO:&lt;postmaster@dtn2-daejeon.kreonet.net&gt; (550 5.1.1 Relay denied)<br/>sendmail: RCPT TO:&lt;postmaster@dtn2-daejeon.kreonet.net&gt; (550 5.1.1 Relay denied)</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(12:06:51)</span> <b>efajardo:</b></span> this is what I found on <tt>crond-stderr---supervisor-mPB51E.log</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:28:12)</span> <b>blin:</b></span> interesting<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:04:17)</span> <b>marian:</b></span> stashcache meeting anybody? currently it's me, Mat, Matevz, we start now...<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:04:22)</span> <b>marian:</b></span> ok, Edgar is also here...<br/>
+</body>
+</html>

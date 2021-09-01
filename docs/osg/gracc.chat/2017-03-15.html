@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Mar 15, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Wed Mar 15, 2017 : #gracc (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(07:24:27)</span> <b>dweitzel:</b></span> @kretzke GRACC grafana was down last night.  I restarted grafana itself, what other services need to be restarted?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(08:48:30)</span> <b>kretzke:</b></span> @dweitzel prometheus<br/>
+<span style="color: #235e5b"><span style="font-size: small">(08:49:29)</span> <b>dweitzel:</b></span> Ah. How do you start that?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(08:49:50)</span> <b>dweitzel:</b></span> Grafana is an init service. Easy enough. <br/>
+<span style="color: #3c8c69"><span style="font-size: small">(08:50:17)</span> <b>kretzke:</b></span> same <tt>sudo systemctl start prometheus</tt><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(08:50:40)</span> <b>kretzke:</b></span> (I just did it)<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:00:53)</span> <b>kretzke:</b></span> I’ve changed both services to <tt>Restart=always</tt>, seems SIGPIPE is considered a “clean” exit signal (hence why systemd hasn’t been restarting them, they were “on-failure”)… still need to figure out why journald keeps restarting<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:15:40)</span> <b>dweitzel:</b></span> It seems to be happening at around the same time in the middle of the night. That should help us figure things out. <br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:16:44)</span> <b>kretzke:</b></span> yeah, ~10:00 UTC. Last nights first crash was 09:17 <tt>Mar 15 09:17:44 gratiav2-1.novalocal systemd[1]: systemd-journald.service watchdog timeout (limit 3min)!</tt><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:17:18)</span> <b>kretzke:</b></span> high io wait leading up to it <a href="https://gracc.opensciencegrid.org/dashboard/db/grace-system-nodes?var-interval=10s&amp;var-host=gratiav2-1&amp;from=1489568214374&amp;to=1489570056325">https://gracc.opensciencegrid.org/dashboard/db/grace-system-nodes?var-interval=10s&amp;var-host=gratiav2-1&amp;from=1489568214374&amp;to=1489570056325</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:18:32)</span> <b>kretzke:</b></span> journald timed out again at 09:36 and 10:22<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:19:57)</span> <b>kretzke:</b></span> seems to have affected all nodes except -2<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:35:48)</span> <b>dweitzel:</b></span> @jthiltges and other Anvil admins are looking into why IO is locking up at 3am.<br/>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jun 23, 2021 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Jun 23, 2021 : #software (osg)</h3>
+<span style="color: #a72f79"><span style="font-size: small">(09:54:20)</span> <b>hahnx117:</b></span> No other schedd's other than the CE, this is a very small POC. Idea is 1 CE that jobs would submit to, 3 WNs.<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:56:03)</span> <b>blin:</b></span> can you run <tt>condor_q</tt> from the CE itself?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:56:19)</span> <b>blin:</b></span> also, have you guys considered an OSG Hosted CE? <a href="https://opensciencegrid.org/docs/compute-element/hosted-ce/">https://opensciencegrid.org/docs/compute-element/hosted-ce/</a><br/>
+<span style="color: #a72f79"><span style="font-size: small">(10:07:45)</span> <b>hahnx117:</b></span> I get the following error, which I've been working on tracing down:<br/><pre># condor_q<br/>Error: <br/><br/>Extra Info: You probably saw this error because the condor_schedd is not <br/>running on the machine you are trying to query. If the condor_schedd is not <br/>running, the Condor system will not be able to find an address and port to <br/>connect to and satisfy this request. Please make sure the Condor daemons are <br/>running and try again.<br/> <br/>Extra Info: If the condor_schedd is running on the machine you are trying to <br/>query and you still see the error, the most likely cause is that you have <br/>setup a personal Condor, you have not defined SCHEDD_NAME in your <br/>condor_config file, and something is wrong with your SCHEDD_ADDRESS_FILE <br/>setting. You must define either or both of those settings in your config <br/>file, or you must use the -name option to condor_q. Please see the Condor <br/>manual for details on SCHEDD_NAME and SCHEDD_ADDRESS_FILE. </pre><br/>
+<span style="color: #a72f79"><span style="font-size: small">(10:12:14)</span> <b>hahnx117:</b></span> <pre># condor_status -schedd<br/>Error: can't find collector</pre><br/>
+<span style="color: #a72f79"><span style="font-size: small">(10:15:05)</span> <b>hahnx117:</b></span> looking in <tt>/var/log/condor-ce/CollectorLog</tt> I see both<br/><pre>06/23/21 10:11:37 SharedPortEndpoint: waiting for connections to named socket collector<br/>06/23/21 10:11:37 DaemonCore: non-shared command socket at &lt;160.94.22.186:23075?alias=cse-osg-hn-poc-01.cse.umn.edu&gt;<br/>06/23/21 10:11:37 Daemoncore: Listening at &lt;0.0.0.0:23075&gt; on TCP (ReliSock) and UDP (SafeSock).<br/>06/23/21 10:11:37 SharedPortEndpoint: failed to open /var/lock/condor-ce/shared_port_ad: No such file or directory<br/>06/23/21 10:11:37 SharedPortEndpoint: did not successfully find SharedPortServer address. Will retry in 60s.<br/>06/23/21 10:11:37 DaemonCore: private command socket at &lt;160.94.22.186:0?alias=cse-osg-hn-poc-01.cse.umn.edu&amp;sock=collector&gt;</pre><br/>and<br/><pre>06/23/21 10:11:37 ERROR "Unable to determine my own address, aborting rather than hang.  You may need to make sure the shared port daemon is running first." at line 1819 in file /builddir/build/BUILD/condor-9.0.0/src/condor_collector.V6/collector.cpp</pre><br/>
+<blockquote>
+<span style="color: #a72f79"><span style="font-size: small">(10:19:40)</span> <b>hahnx117:</b></span> I should probably bring this to a thread to not dominate the main space<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:22:08)</span> <b>blin:</b></span> two questions<br/>1. are both the <tt>condor-ce</tt> and <tt>condor</tt> services running?<br/>2. do you see <tt>condor_shared_port</tt> in <tt>systemctl status condor-ce</tt>?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(10:23:24)</span> <b>hahnx117:</b></span> The <tt>condor</tt> service is running and without error, but the <tt>condor-ce</tt>  service is running with a failure<br/>
+<span style="color: #a72f79"><span style="font-size: small">(10:23:37)</span> <b>hahnx117:</b></span> and I do _not_ see <tt>condor_shared_port</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:24:06)</span> <b>blin:</b></span> what's the CE failure?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(10:25:42)</span> <b>hahnx117:</b></span> I can't quite tell looking at the <tt>systemctl</tt> output, let me see if I can see anything in the StarLog<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:26:03)</span> <b>blin:</b></span> i've got a few minutes until my next meeting, would you want to have a screen share session?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(10:26:15)</span> <b>hahnx117:</b></span> that works, sure thing<br/>
+<span style="color: #a72f79"><span style="font-size: small">(10:26:52)</span> <b>hahnx117:</b></span> now I have to figure out how to do that...<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:27:02)</span> <b>blin:</b></span> one sec, i'll DM you zoom coordinates<br/>
+<span style="color: #a72f79"><span style="font-size: small">(10:27:15)</span> <b>hahnx117:</b></span> thank you!<br/>
+<span style="color: #619a4f"><span style="font-size: small">(2021-06-24 08:48:54)</span> <b>sull0153148:</b></span> I requested a hosted CE yesterday. Have not heard back so far.<br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-06-24 09:00:18)</span> <b>blin:</b></span> hi @sull0153148 I saw that come across my inbox. As I understand it from @hahnx117, your cluster isn't quite running jobs yet so a Hosted CE may be a bit premature at this point<br/>
+<span style="color: #619a4f"><span style="font-size: small">(2021-06-24 09:05:08)</span> <b>sull0153148:</b></span> I was wondering about that. Please advise us on how to get to that state for a test cluster.<br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-06-24 09:06:51)</span> <b>blin:</b></span> were you one of the folks CC'ed on the email that I sent to David? There's a quickstart guide for setting up an HTCondor pool that I passed along that I believe he was going to read through yesterday<br/>
+<span style="color: #a72f79"><span style="font-size: small">(2021-06-24 09:14:36)</span> <b>hahnx117:</b></span> yep! I had to build a few VMs and I plan on running through that today/tomorrow<br/>
+<span style="color: #a72f79"><span style="font-size: small">(2021-06-24 09:15:56)</span> <b>hahnx117:</b></span> I just want to double check: I was going to build a central manager, a submit host, then some execute hosts. Does a hosted CE take the place of any of those? From reading through both sets of docs I don't _think_ so, but I thought I'd check<br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-06-24 09:16:33)</span> <b>blin:</b></span> nope, you'll need to set up the CM/submit/execute regardless<br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-06-24 09:16:57)</span> <b>blin:</b></span> an OSG Hosted CE just saves you from installing HTCondor-CE on one of your submit hosts<br/>
+<span style="color: #a72f79"><span style="font-size: small">(2021-06-24 09:18:36)</span> <b>hahnx117:</b></span> excellent, thanks again for all the help!<br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-06-24 09:33:15)</span> <b>blin:</b></span> any time!<br/>
+</blockquote>
+<span style="color: #73769d"><span style="font-size: small">(13:30:44)</span> <b>tim.theisen:</b></span> @dmason How is the HTCondor 9.0.1 testing going?<br/>
+<span style="color: #bc3663"><span style="font-size: small">(13:35:01)</span> <b>dmason:</b></span> So far no problems that I know of -- I'll check with Farrukh<br/>
+<span style="color: #bc3663"><span style="font-size: small">(13:46:46)</span> <b>dmason:</b></span> @fkhan says "No major issues thus far. We had to set some ALLOW_* and DENY_* knobs explicitly (they were default before)<br/>Also, worth mentioning that we're not doing tokens yet. Getting our infrastructure as is to 9.0.1 with GSI first"<br/>
+<span style="color: #73769d"><span style="font-size: small">(13:47:18)</span> <b>tim.theisen:</b></span> OK. Sounds good.<br/>
+<span style="color: #73769d"><span style="font-size: small">(13:47:36)</span> <b>tim.theisen:</b></span> @blin: HTCondor-CE 5.1.1 still looking good?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:48:02)</span> <b>blin:</b></span> oops, i forgot to ask @xizhouf to update to htcondor-ce-5.1.1<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(13:51:32)</span> <b>blin:</b></span> @xizhouf would you be able to <tt>yum update htcondor-ce --enablerepo=osg-upcoming-testing</tt> on your CE?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(18:32:47)</span> <b>xizhouf:</b></span> Done.<br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-06-24 08:08:00)</span> <b>blin:</b></span> thanks!<br/>
+<span style="color: #43761b"><span style="font-size: small">(2021-06-24 08:08:09)</span> <b>blin:</b></span> how does it look this morning?<br/>
+</blockquote>
+<span style="color: #43761b"><span style="font-size: small">(13:48:25)</span> <b>blin:</b></span> i am in the process of testing some stuff on the tiger hosted CEs, though<br/>
+<span style="color: #73769d"><span style="font-size: small">(13:49:49)</span> <b>tim.theisen:</b></span> @matyas Yesterday, I built condor for devops-itb and the VMU tests still got the old stuff. What's the best way to ensure I got what I just built in OSG VMU tests from the devops-itb repo?<br/>
+<span style="color: #73769d"><span style="font-size: small">(13:51:02)</span> <b>tim.theisen:</b></span> @blin Cool, just let me know the results when you have them.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:54:10)</span> <b>matyas:</b></span> You need to wait until it shows up on <a href="http://repo.opensciencegrid.org">repo.opensciencegrid.org</a> (<a href="https://repo.opensciencegrid.org/osg/devops/el7/itb/x86_64/">https://repo.opensciencegrid.org/osg/devops/el7/itb/x86_64/</a>).<br/>We should probably make a devops-minefield repo that will pull directly from Koji.<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(14:01:52)</span> <b>blin:</b></span> @matyas could you make yourself a Jira ticket for this?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:02:19)</span> <b>matyas:</b></span> yep, on it. This is usually a Carl thing though<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:02:35)</span> <b>blin:</b></span> sure, assign it to him<br/>
+</blockquote>
+<span style="color: #73769d"><span style="font-size: small">(14:00:51)</span> <b>tim.theisen:</b></span> Thank you<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:07:09)</span> <b>matyas:</b></span> <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-4681">https://opensciencegrid.atlassian.net/browse/SOFTWARE-4681</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(15:16:33)</span> <b>blin:</b></span> @tim.theisen i just deployed 5.1.1 and 9.0.1 on a Hosted CE and ran a test job successfully:<br/><pre># rpm -q htcondor-ce condor<br/>htcondor-ce-5.1.1-1.1.osg35up.el7.noarch<br/>condor-9.0.1-1.1.osg35up.el7.x86_64</pre><br/><br/>
+</body>
+</html>

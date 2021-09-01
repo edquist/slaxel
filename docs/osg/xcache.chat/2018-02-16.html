@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Feb 16, 2018 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Fri Feb 16, 2018 : #xcache (osg)</h3>
+<span style="color: #674b1b"><span style="font-size: small">(13:42:09)</span> <b>rynge:</b></span> I see a lot of es warnings when doing stashcp<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:42:11)</span> <b>rynge:</b></span> 2018-02-16 13:52:34,210    INFO:  /cvmfs/oasis.opensciencegrid.org/osg/modules/stashcp/4.3.1/bin/stashcp '/user/irisqing/public/kinc-1517420344/00/00/random_1_kinc-log-no.txt' '/srv/pegasus.ggUwzl7DD'<br/>2018-02-16 15:09:12,718    INFO:  2018-02-16T15:09:12+0000 root         WARNING  Error posting to ES: HTTP Error 503: Service Unavailable<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:47:38)</span> <b>dweitzel:</b></span> thanks Mats.  Let me check with the admins of that machine.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:48:44)</span> <b>rynge:</b></span> Ok, second issue: I'm seeing some low utilization on some of the workflows using stashcache<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:49:01)</span> <b>rynge:</b></span> For example, slow access at UCSD<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:49:25)</span> <b>rynge:</b></span> Do you measure performance at the sites somehow?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:50:07)</span> <b>rynge:</b></span> Stats: Total 4 transfers, 2.9 GB transferred in 10622 seconds. Rate: 284.4 KB/s (2.2 Mb/s)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:50:18)</span> <b>rynge:</b></span> That is for 4 files which should cache excellent<br/>
+<span style="color: #84b22f"><span style="font-size: small">(13:50:20)</span> <b>ivukotic:</b></span> restarted now.<br/>
+<span style="color: #84b22f"><span style="font-size: small">(13:51:18)</span> <b>ivukotic:</b></span> shouldn't monitoring give you performance info?<br/>
+<span style="color: #84b22f"><span style="font-size: small">(13:51:32)</span> <b>ivukotic:</b></span> do you still see errors?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:51:53)</span> <b>rynge:</b></span> It will take a while for new jobs to come back, so I will not not about the es fix for a while<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:12:15)</span> <b>rynge:</b></span> I wonder if it is just a slow or misconfigured /cvmfs at UCSD<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:12:40)</span> <b>rynge:</b></span> Seems like the files are accessed from /cvmfs/stash.osgstorage.org/<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:13:03)</span> <b>rynge:</b></span> Any ideas on how to test this? curl's against the local squid?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:24:14)</span> <b>dweitzel:</b></span> Well... not really.  CVMFS contacts the UCSD stashcache to download data.  Only the namespace information goes through Squid.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:26:15)</span> <b>rynge:</b></span> Huh, so even if stashcp choose /cvmfs/ it goes through xrootd?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:27:22)</span> <b>dweitzel:</b></span> all data goes through xrootd servers.  Namespace is in CVMFS though.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:27:32)</span> <b>rynge:</b></span> Interesting<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:27:56)</span> <b>rynge:</b></span> Ok, so any ideas on performance? Or should I just complain about it in general terms?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:30:33)</span> <b>dweitzel:</b></span> Complain to UCSD.  It could be a million things, like always.  NAT's (if they run NAT there).  StashCache server there (do they have ganglia on it?)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:32:07)</span> <b>rynge:</b></span> Ok, thanks<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:36:03)</span> <b>dweitzel:</b></span> FWIW, HCC's stashcache server is being beaten up too: <a href="http://hcc-ganglia.unl.edu/?c=red-infrastructure&amp;h=hcc-stash.unl.edu&amp;m=load_report&amp;r=hour&amp;s=by%20name&amp;hc=4&amp;mc=2">http://hcc-ganglia.unl.edu/?c=red-infrastructure&amp;h=hcc-stash.unl.edu&amp;m=load_report&amp;r=hour&amp;s=by%20name&amp;hc=4&amp;mc=2</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(15:24:56)</span> <b>marian:</b></span> @rynge looks to me there could be something funky going on at UCSD, here some stats about their StashCache:<br/><a href="http://condorflux.t2.ucsd.edu:3000/dashboard/db/telegraf?var-host=xrd-cache-1.t2.ucsd.edu&amp;from=now%2Fw&amp;to=now%2Fw">http://condorflux.t2.ucsd.edu:3000/dashboard/db/telegraf?var-host=xrd-cache-1.t2.ucsd.edu&amp;from=now%2Fw&amp;to=now%2Fw</a><br/>or<br/><a href="http://condorflux.t2.ucsd.edu:3000/dashboard/db/dynamic-cpu-mem-disk-telegraf?var-server=xrd-cache-1.t2.ucsd.edu&amp;var-path=%2F&amp;from=now%2Fw&amp;to=now%2Fw">http://condorflux.t2.ucsd.edu:3000/dashboard/db/dynamic-cpu-mem-disk-telegraf?var-server=xrd-cache-1.t2.ucsd.edu&amp;var-path=%2F&amp;from=now%2Fw&amp;to=now%2Fw</a><br/>
+</body>
+</html>

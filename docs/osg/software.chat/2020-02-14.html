@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Feb 14, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Fri Feb 14, 2020 : #software (osg)</h3>
+<span style="color: #e85d72"><span style="font-size: small">(14:50:30)</span> <b>cnweaver:</b></span> I have a new, dumb condor question: I have a pool where the central manager is on an unusual port, so I have set <tt>COLLECTOR_PORT = 31942</tt> in the config for my schedd. This broadly works fine, except that non-privileged users on the submit node can't run <tt>condor_q</tt>. The immediate cause seems to be a difference between <tt>/var/lib/condor/spool/.schedd_address.super</tt>, which has a correct port for talking to the schedd, and <tt>/var/lib/condor/spool/.schedd_address</tt>, which just has a zero. I'm not sure how this is related to changing <tt>COLLECTOR_PORT</tt>, since it's an entirely different port, but if I replace the contents of <tt>.schedd_address</tt> with those of <tt>.schedd_address.super</tt> tools which need to talk to the schedd start working for the non-privilaged users. I assume there must be some more correct way to do this, however.<br/>
+<span style="color: #e85d72"><span style="font-size: small">(17:09:31)</span> <b>cnweaver:</b></span> While I'm at it, another issue:<br/><pre>02/14/20 22:09:25 ScheddAd Error: Neither 'MyAddress' nor 'ScheddIpAddr' found in ad<br/>02/14/20 22:09:25 Could not make hashkey --- ignoring ad<br/>02/14/20 22:09:25 Received malformed ad from command (1). Ignoring.</pre><br/>My collector seems dissatisfied with the quality of the ads my schedd is sending it. Is there any way I can see these ads, and more importantly is there something I should be doing to ensure that <tt>ATTR_MY_ADDRESS</tt> or <tt>ATTR_SCHEDD_IP_ADDR</tt> gets set in them? I'm not sure exactly which code would be responsible for this, as many places set <tt>ATTR_SCHEDD_IP_ADDR</tt>, but they generaly don't seem to be conditional, since this attribute is apparently rather fundamental.<br/>
+</body>
+</html>

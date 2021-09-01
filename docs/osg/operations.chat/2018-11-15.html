@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Nov 15, 2018 : #operations (osg)</title>
+</head>
+<body>
+<h3>Thu Nov 15, 2018 : #operations (osg)</h3>
+<span style="color: #e23f99"><span style="font-size: small">(08:34:05)</span> <b>marco.mascheroni:</b></span> Hi @jlstephen turned out I do not have access to ssh <a href="http://hosted-ce21.grid.uchicago.edu">hosted-ce21.grid.uchicago.edu</a> anymore. Can you add my key please? I used to access with "ssh <a href="mailto:cloud-user@hosted-ce21.grid.uchicago.edu">cloud-user@hosted-ce21.grid.uchicago.edu</a>"<br/>
+<span style="color: #e23f99"><span style="font-size: small">(08:34:32)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #ea2977"><span style="font-size: small">(09:59:01)</span> <b>jlstephen:</b></span> @marco.mascheroni can you try again?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(09:59:30)</span> <b>marco.mascheroni:</b></span> it works, thanks<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:25:29)</span> <b>marco.mascheroni:</b></span> @blin looks like we already ahve condor 8.6.13<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:25:29)</span> <b>marco.mascheroni:</b></span> [cloud-user@hosted-ce21 ~]$ sudo yum list installed | grep condor<br/>Repository sl-security is listed more than once in the configuration<br/>condor.x86_64                       8.6.13-1.osg34.el7             @osg<br/>condor-bosco.x86_64                 8.6.13-1.osg34.el7             @osg<br/>condor-classads.x86_64              8.6.13-1.osg34.el7             @osg<br/>condor-procd.x86_64                 8.6.13-1.osg34.el7             @osg<br/>condor-python.x86_64                8.6.13-1.osg34.el7             @osg<br/>gratia-probe-htcondor-ce.x86_64     1.20.7-1.osg34.el7             @osg<br/>htcondor-ce.noarch                  3.1.4-1.osg34.el7              @osg<br/>htcondor-ce-bosco.noarch            3.1.4-1.osg34.el7              @osg<br/>htcondor-ce-client.noarch           3.1.4-1.osg34.el7              @osg<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:27:25)</span> <b>blin:</b></span> hrm, is the gratia-probe service enabled?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:28:53)</span> <b>blin:</b></span> and what are the contents of <tt>/etc/gratia/condor/ProbeConfig</tt>?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:47:20)</span> <b>marco.mascheroni:</b></span> [cloud-user@hosted-ce21 ~]$ systemctl list-unit-files | grep gratia<br/>[cloud-user@hosted-ce21 ~]$ systemctl list-unit-files | grep probe<br/>[cloud-user@hosted-ce21 ~]$ ls -altr /etc/gratia/condor/ProbeConfig<br/>ls: cannot access /etc/gratia/condor/ProbeConfig: No such file or directory<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:48:08)</span> <b>marco.mascheroni:</b></span> there is a /etc/gratia/htcondor-ce/ProbeConfig file<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:48:08)</span> <b>blin:</b></span> rofl what the fuck<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:48:20)</span> <b>blin:</b></span> oh ok, yeah let's take a look at that<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:59:34)</span> <b>blin:</b></span> @dweitzel do you know which user bosco runs as on the CE?<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:59:47)</span> <b>blin:</b></span> we think we need to update the known_hosts file for that user on one of the hosted CEs<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:05:59)</span> <b>dweitzel:</b></span> It runs as whatever user the jobs owner. <br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:06:35)</span> <b>dweitzel:</b></span> Grid manager starts it<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:15:55)</span> <b>blin:</b></span> makes sense, thanks<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:16:15)</span> <b>blin:</b></span> @marco.mascheroni that should be the <tt>feligo</tt> user in this case<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:16:42)</span> <b>blin:</b></span> errr, maybe not since what you showed me was from the factory perspective<br/>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri May 28, 2021 : #flightworthy (chtc)</title>
+</head>
+<body>
+<h3>Fri May 28, 2021 : #flightworthy (chtc)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(10:57:32)</span> <b>tlmiller:</b></span> Anyone want to volunteer for a doc review?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:57:59)</span> <b>tlmiller:</b></span> (Two updates to the _get_htcondor_ manual.)<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(11:14:59)</span> <b>jfrey:</b></span> I can do it.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:20:31)</span> <b>tlmiller:</b></span> Thanks.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:11:08)</span> <b>johnkn:</b></span> Any other volunteers for a doc review?  HTCONDOR-389 update condor_history man page so it matches -help output.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:11:33)</span> <b>tlmiller:</b></span> Well, I just asked for a review, so I guess I'll take this one.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:11:51)</span> <b>johnkn:</b></span> thanks<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:12:10)</span> <b>tlmiller:</b></span> No problem.  I should get to it this afternoon.<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:28:17)</span> <b>matyas:</b></span> Hi TJ, re. <a href="https://opensciencegrid.atlassian.net/browse/HTCONDOR-498">https://opensciencegrid.atlassian.net/browse/HTCONDOR-498</a> -- I gave the user the workaround of putting his STARTD_CRON output into several variables and using strcat:<br/><pre>LONG_ATTRIB1="first 4000 chars"<br/>LONG_ATTRIB2="next 4000 chars"<br/>LONG_ATTRIB3="next next 4000 chars"<br/>LONG_ATTRIB=strcat(LONG_ATTRIB1,LONG_ATTRIB2,LONG_ATTRIB3)</pre><br/>should that work?<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:29:43)</span> <b>matyas:</b></span> actually<br/><pre>LONG_ATTRIB=strcat(LONG_ATTRIB1?:"",LONG_ATTRIB2?:"",LONG_ATTRIB3?:"")</pre><br/>to handle UNDEFINEDs<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:16:15)</span> <b>johnkn:</b></span> Yes, that would work.  the fractional parts would be published also, which is kinda crappy.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:16:34)</span> <b>johnkn:</b></span> not sure why you need tohandle undefineds since you control the whole classad<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:18:53)</span> <b>johnkn:</b></span> I have to wonder how even an 80 core machine needs more than 8k for a single stringlist.  they might want to rethink their schema<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:20:23)</span> <b>johnkn:</b></span> and you might remind them that they need to provide commas in the correct places, so perhaps <tt>join(",",ATTRB1,ATTRB2,ATTRB3)</tt> might be a better choice<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:46:22)</span> <b>matyas:</b></span> It looks like he has a script that generates a file with a that contains info about each job on the machine, so:<br/><pre>RequestCpus = "['1', '1', '1', ...<br/>RequestMemory = "['2000', '2000', '2000', ...<br/>MaxWallTimeMins = "['1250', '2000', '2750', ...<br/>CRAB_AsyncDest = "['T2_BE_IIHE', 'T2_CH_CERN', 'T2_CH_CERN', ...</pre><br/>and his STARTD_CRON cats that file.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:49:27)</span> <b>tlmiller:</b></span> I can think of less-clumsy ways to represent the data, but how hard would it be to split on commas and only print a hundred per line (with a trailing <tt>\</tt>)?<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:49:50)</span> <b>matyas:</b></span> The STARTD_CRON output parser doesn't handle <tt>\</tt><br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:50:11)</span> <b>tlmiller:</b></span> ... it's not just passing it along the ClassAd parser (which I thought did)?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:51:18)</span> <b>tlmiller:</b></span> (Weird.)<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:52:15)</span> <b>matyas:</b></span> It passes it one line at a time (or 8k, whichever comes first)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:52:38)</span> <b>tlmiller:</b></span> *sigh*<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:54:29)</span> <b>tlmiller:</b></span> (It also makes me sad that the attributes are strings, given that they're the string form of ClassAd lists, but...)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:55:57)</span> <b>tlmiller:</b></span> you also might be able to do<br/><pre>RequestCPUs = "['1', '1',..."<br/>RequestCPUS = strcat(RequestCPUs, "'1', '1', ...")<br/>RequestCPUS = strcat(RequestCPUs, "..., '1', '1']")</pre><br/>which might be easier to program.<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:04:18)</span> <b>matyas:</b></span> He says it's showing up weird in the logs, like<br/><pre>05/25/21 10:57:53 Can't insert 'LOCALCHECK_JobOverRunTime = "['False', 'False', 'False', 'FalCMS_CONDOR_SCAN = 1621965362' into 'LOCALCHECK' ClassAd</pre><br/>note the <tt>CMS_CONDOR_SCAN = ...</tt> shoved into the middle of the ad.<br/>I will ask him how frequently his classad file generator runs -- maybe he's overwriting the file while it's being read?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(15:31:09)</span> <b>jfrey:</b></span> The old ClassAd format requires one attribute/value pair per line, and the reader code doesn’t support <tt>\</tt> for line continuation.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(15:32:20)</span> <b>jfrey:</b></span> The new ClassAd syntax (not used here) allows arbitrary whitespace between and amid attribute/value pairs. It uses semicolons for separators, ala C.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:59:35)</span> <b>johnkn:</b></span> So Json lists converted to strings?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:00:25)</span> <b>johnkn:</b></span> wow,  either classad lists or string lists would be more compact here.<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:01:38)</span> <b>matyas:</b></span> Those look more like classad lists in strings<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:01:57)</span> <b>matyas:</b></span> ... or python<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:02:15)</span> <b>johnkn:</b></span> could be python.  the single quoted items are not classad<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:02:45)</span> <b>matyas:</b></span> nor json<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:02:51)</span> <b>johnkn:</b></span> the junk in the middle of his lines has to be his fault somehow.   startd cron is reading from a pipe<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:05:05)</span> <b>johnkn:</b></span> I'm going to push a fix that ups the line length to 64k or stdin and 1k for stderr (both 8x the current limit)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:08:59)</span> <b>johnkn:</b></span> bloating *every* slot ad with all that unnecessary syntax is still a bad idea.  but actual classad lists would be even worse in terms of memory and parsing cost<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:12:15)</span> <b>matyas:</b></span> yeah probably although the really long lines are the ones with file paths in them<br/><pre>DESIRED_CMSDataset = "['/DoubleMuon/Run2017F-09Aug2019_UL2017-v1/MINIAOD', '/DoubleEG/Run2016B-21Feb2020_ver2_UL2016_HIPM-v1/MINIAOD', '/ParkingBPH2/Run2018D-05May2019promptD-v1/MINIAOD', ...</pre><br/><br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:13:11)</span> <b>johnkn:</b></span> hmm.  ok those look sorta reasonable.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:35:11)</span> <b>johnkn:</b></span> There might actually be a win putting those dataset names into separate (shorter named) attributes and then having a classad list that references those<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:35:52)</span> <b>johnkn:</b></span> it would depend on how often the datasets were shared between slots<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:37:51)</span> <b>matyas:</b></span> isn't that dataset per-startd?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:38:27)</span> <b>johnkn:</b></span> does not look like  a path on the startd to me.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:38:52)</span> <b>johnkn:</b></span> I'm guessing this is part of a URL? or maybe a shared file system?<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:40:20)</span> <b>matyas:</b></span> probably a shared file system<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:40:41)</span> <b>matyas:</b></span> oh sorry, I misread what you meant by 'dataset'<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:41:34)</span> <b>matyas:</b></span> there's some more variables I didn't paste, some of which look very unique<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:42:51)</span> <b>johnkn:</b></span> a fixed attribute name (like a hash) for the attributes that hold the dataset names  presumably be "stable" over the long term, and thus give good classad cache in both the startd and the collector.<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:43:04)</span> <b>matyas:</b></span> I mean this really should have been one hash per slot instead of parallel arrays<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:43:57)</span> <b>matyas:</b></span> but that's harder to do<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:44:36)</span> <b>johnkn:</b></span> Yeah.  something that changes whenever *any* slot changes will give the worst cache performance<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:44:47)</span> <b>johnkn:</b></span> but definitely more work.<br/>
+</body>
+</html>

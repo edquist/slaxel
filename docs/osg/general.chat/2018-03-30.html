@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Mar 30, 2018 : #general (osg)</title>
+</head>
+<body>
+<h3>Fri Mar 30, 2018 : #general (osg)</h3>
+<span style="color: #a72f79"><span style="font-size: small">(13:43:52)</span> <b>andrew.melo:</b></span> :wave::skin-tone-2: hi, I'm Andrew Melo, from Vanderbilt<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:44:48)</span> <b>blin:</b></span> yay that worked<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:44:54)</span> <b>blin:</b></span> join us in #osg-software<br/>
+<span style="color: #c386df"><span style="font-size: small">(19:24:47)</span> <b>matyas:</b></span> @rynge, I'm trying to test a Singularity bug on EL6 and having some trouble. On a Fermicloud VM, I get the following error:<br/><pre><br/>$ singularity shell   /cvmfs/singularity.opensciencegrid.org/opensciencegrid/osgvo:el6<br/>ERROR  : Base home directory does not exist within the container: /cloud<br/>ABORT  : Retval = 255<br/></pre><br/>Fermicloud puts their users' home directories under <tt>/cloud/login/$USER</tt> but I don't see that anywhere in <tt>/etc</tt> except <tt>/etc/mtab</tt>; <tt>useradd</tt> creates the home directory under <tt>/home</tt>, and changing <tt>$HOME</tt> has no effect. There are no problems with this command on EL7. Do you know what might be going on?<br/>
+<span style="color: #c386df"><span style="font-size: small">(19:27:03)</span> <b>matyas:</b></span> also @bbockelm I was able to reproduce the original problem on EL7 amd verify that the PR #1424 patch fixes it<br/>
+<span style="color: #c386df"><span style="font-size: small">(19:28:26)</span> <b>matyas:</b></span> although I didn't see anything in the logs with the patched version, it just silently refused to create the offending directory<br/>
+<span style="color: #674b1b"><span style="font-size: small">(20:43:54)</span> <b>rynge:</b></span> Singularity's overlayfs support is picky with kernel versions and so on. Disable automatic mounting of $HOME with --containall<br/>
+<span style="color: #674b1b"><span style="font-size: small">(20:44:09)</span> <b>rynge:</b></span> singularity shell --containall /cvmfs/singularity.opensciencegrid.org/opensciencegrid/osgvo:el6<br/>
+</body>
+</html>

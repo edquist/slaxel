@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu May 10, 2018 : #general (osg)</title>
+</head>
+<body>
+<h3>Thu May 10, 2018 : #general (osg)</h3>
+<span style="color: #a2a5dc"><span style="font-size: small">(10:31:42)</span> <b>james.clark:</b></span> hello <b>@channel</b>, couple of questions:  should I be surprised that the OSG pool visible from <tt><a href="http://ldas-osg.ligo.caltech.edu">ldas-osg.ligo.caltech.edu</a></tt> is *tiny* or am i badly misunderstanding the output of condor_status ?   If i run <tt>condor_status  -pool <a href="http://osg-ligo-1.t2.ucsd.edu">osg-ligo-1.t2.ucsd.edu</a></tt>, i see a grand total of 32 machines.   That drops down to 25 once i demand LIGO data and then really starts to drop off down to just 4 machines if i want singularity (3 of which are busy and 1 which doesn't have much memory).   I was getting several 1000's of cores for an analysis I ran last summer, where now it seems like i'd be lucky to get 32 for the same thing.   I'm wondering if there's anything we can do on the LIGO side to improve that, again assuming condor_status is telling me what i think it is<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:33:06)</span> <b>rynge:</b></span> @efajardo will have to look at your frontend to make sure it requests correctly<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:34:04)</span> <b>rynge:</b></span> Overall, I think you will see less cycles now compared to last summer, but it should still be in the 100s-1000s range (my guess)<br/>
+<span style="color: #99a949"><span style="font-size: small">(10:35:23)</span> <b>dwd:</b></span> Doesn’t the pool grow as demand increases?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:35:43)</span> <b>rynge:</b></span> Edgar will have to look<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(10:38:27)</span> <b>james.clark:</b></span> i tried submitting 100 jobs but it didn't grow..<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:42:53)</span> <b>rynge:</b></span> Keep the jobs in there - having pressure makes it easier to look at the frontend<br/>
+<span style="color: #dd8527"><span style="font-size: small">(10:43:01)</span> <b>marcom:</b></span> Who (which script) is setting to true HAS_SINGULARITY? By default GlideinWMS singularity features are disabled not to interfere w/ current VO scripts (DISABLE_GWMS, <a href="http://glideinwms.fnal.gov/doc.prd/frontend/configuration.html#attr_singularity">http://glideinwms.fnal.gov/doc.prd/frontend/configuration.html#attr_singularity</a> )<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:43:36)</span> <b>rynge:</b></span> Is that question for me?<br/>
+<span style="color: #dd8527"><span style="font-size: small">(10:46:17)</span> <b>marcom:</b></span> you or James, I don’t know which scripts his glideins are using<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:47:33)</span> <b>rynge:</b></span> I _think_ they use the OSG ones, but let's wait for Edgar on that as well - I don't want to start a guessing game on what could be wrong<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(10:50:03)</span> <b>james.clark:</b></span> i've been setting HAS_SINGULARITY as a requirement (either Edgar's advice or possibly documentation i found, i'm afraid i forget).   I can try without again but i think i was landing at sites without singularity<br/>
+<span style="color: #a72f79"><span style="font-size: small">(11:29:16)</span> <b>andrew.melo:</b></span> Could someone knowledgable about this whole CA kerfluffle message me? I've got a conversation going with DigiCert/Symantec about being able to use our existing SSL subscription to also provide IGTF certs and want to make sure I don't say anything weird.<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:04:32)</span> <b>efajardo:</b></span> @james.clark can you submit again but yes the pools grow with demand<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(12:05:33)</span> <b>james.clark:</b></span> sure thing.  with / without HAS_SINGULARITY ?<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:12:13)</span> <b>efajardo:</b></span> should work fine either way<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:12:33)</span> <b>efajardo:</b></span> If a site has singularity you will always run inside singularity<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:12:40)</span> <b>efajardo:</b></span> if your job needs singularity<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:12:48)</span> <b>efajardo:</b></span> then with <tt>HAS_SINGULARITY</tt> in your requirments<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:13:01)</span> <b>efajardo:</b></span> I want to see if there is a problem with the pool<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:13:07)</span> <b>efajardo:</b></span> I see it working fine<br/>
+<span style="color: #a63024"><span style="font-size: small">(12:13:13)</span> <b>efajardo:</b></span> but of course ramp up takes time<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(12:19:10)</span> <b>james.clark:</b></span> ok - i submitted 2 batches of 100 jobs; one with HAS_ and one without<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(20:28:14)</span> <b>james.clark:</b></span> not strictly OSG but in case anyone has a quick answer:  how do we configure our local condor pool to resolve the following error with condor-singularity jobs? <tt>ERROR  : Failed creating home directory in container /var/singularity/mnt/final/home/jclark: Operation not supported</tt><br/>
+</body>
+</html>

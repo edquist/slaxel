@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Mar 25, 2019 : #software (osg)</title>
+</head>
+<body>
+<h3>Mon Mar 25, 2019 : #software (osg)</h3>
+<span style="color: #a72f79"><span style="font-size: small">(01:01:58)</span> <b>andrew.melo:</b></span> I don't know where to report it, so I'll try here. I just figured how to get priorities to work right with spacewalk so you don't have to kludge (the regular yum repo priority doesn't work). You can instead inject the priorities from <tt>/etc/yum/pluginconf.d</tt><br/><pre><br/>[root@se21 pluginconf.d]# cat rhnplugin.conf <br/>[main]<br/>enabled = 1<br/>gpgcheck = 1<br/>timeout = 120<br/><br/>[centos_7_osg_34_dev]<br/>priority = 98<br/></pre><br/>(where <tt>centos_7_osg_34_dev</tt> is the spcewalk ID) I've fought this ... forever and now found a good solution<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(2019-03-26 12:12:21)</span> <b>blin:</b></span> what do you mean by injecting the prios from <tt>/etc/yum/pluginconf.d</tt>?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(2019-03-26 15:36:39)</span> <b>andrew.melo:</b></span> W/spacewalk, you don't have any repos in /etc/yum.repos.d, so you lose the priority information in any .repo file. E.G. yum-plugin-priority doesn't know what the OSG repo has a higher prio. You can instead inject them in /etc/yum/pluginconf.d/rhnplugin.conf, so that it will respect priorities the way that OSG needs<br/>
+<span style="color: #43761b"><span style="font-size: small">(2019-03-27 16:54:27)</span> <b>blin:</b></span> <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-3648">https://opensciencegrid.atlassian.net/browse/SOFTWARE-3648</a><br/>
+<span style="color: #a72f79"><span style="font-size: small">(2019-03-27 17:03:10)</span> <b>andrew.melo:</b></span> Actually, the necessary lines are just the bottom 2 (the top 5 are already there)<br/>
+<span style="color: #43761b"><span style="font-size: small">(2019-03-27 17:03:34)</span> <b>blin:</b></span> good to know,t hanks<br/>
+</blockquote>
+<span style="color: #a72f79"><span style="font-size: small">(01:10:42)</span> <b>andrew.melo:</b></span> test<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:46:32)</span> <b>blin:</b></span> afaik, @andrew.melo you guys are the only ones using spacewalk in the OSG :slightly_smiling_face:<br/>
+<span style="color: #a72f79"><span style="font-size: small">(09:47:18)</span> <b>andrew.melo:</b></span> Surprising to me :)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:43:04)</span> <b>bbockelm:</b></span> note: xrootd-4.9.1-rc1 was just cut 30 seconds ago.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:43:24)</span> <b>bbockelm:</b></span> go-go-gadget software team?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:08:39)</span> <b>matyas:</b></span> i got it<br/>
+<span style="color: #9e3997"><span style="font-size: small">(11:13:40)</span> <b>bbockelm:</b></span> thanks!  I think @jthiltges was interested in testing it.<br/>
+</body>
+</html>

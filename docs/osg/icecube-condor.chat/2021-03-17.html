@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Mar 17, 2021 : #icecube-condor (osg)</title>
+</head>
+<body>
+<h3>Wed Mar 17, 2021 : #icecube-condor (osg)</h3>
+<span style="color: #50a0cf"><span style="font-size: small">(12:22:37)</span> <b>dschultz:</b></span> @bbockelm question about the new glidein-cm3000 and singularity.  we have a user that is setting the env in the condor submit file, and it not appearing in the job environment.  Is that not supported with condor+singularity, or an error somewhere in the glidein system?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:50:37)</span> <b>bbockelm:</b></span> Oof.  That's a good question.  There was work to get environments functioning correctly last year -- but I don't know where it is for the frontend.  It shouldn't have changed from the old <a href="http://glidein.chtc.wisc.edu">glidein.chtc.wisc.edu</a> though.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:51:07)</span> <b>bbockelm:</b></span> @gthain has been working with LIGO to get HTCondor to invoke Singularity directly; that definitely handles env vars right.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:51:34)</span> <b>bbockelm:</b></span> Other known issues... I believe Singularity 3.7.x introduced some new <tt>LD_LIBRARY_PATH</tt> handling.  Is that the env var that is getting dropped?<br/>
+<span style="color: #e0a729"><span style="font-size: small">(13:24:17)</span> <b>gthain:</b></span> Moate is currently working on switching the GLOW VO to use the new condor-starts-singularity, which definitely handles environment variables properly<br/>
+<span style="color: #e0a729"><span style="font-size: small">(13:25:12)</span> <b>gthain:</b></span> Singularity 3.7 deals with with <tt>LD_LIBRARY_PATH</tt> differently, I believe that only a problem on some sites, as glidein startds set <tt>STARTER_INHERITS_ENVIRONMENT = true</tt>, which worries me<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(13:43:30)</span> <b>dschultz:</b></span> it's the <tt>PYTHONPATH</tt> that shows the first problem.  though of course that's merely the first import that fails<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(13:50:05)</span> <b>dschultz:</b></span> note that there are also warnings in the user error like this:<br/><pre>WARNING  glidein_config not defined () in singularity_lib.sh. Some functions like advertise and error_gen will be limited.</pre><br/>I don't think that's related to anything the user is doing, so maybe an issue with glidein configuration?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:19:31)</span> <b>bbockelm:</b></span> That's one which Mats was chasing down earlier for the OSG VO.<br/>
+</body>
+</html>

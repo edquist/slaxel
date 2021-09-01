@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jun 11, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu Jun 11, 2020 : #software (osg)</h3>
+<span style="color: #73769d"><span style="font-size: small">(14:26:46)</span> <b>tim.theisen:</b></span> Who updates the Docker Images for opensciencegrid? I am looking over the release and xcache and xrootd-standalone probably need to be updated with the latest voms package.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:27:22)</span> <b>blin:</b></span> the software team does<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:27:37)</span> <b>blin:</b></span> afaik xrootd-standalone never got promoted to stable so we can let that one slip<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:28:24)</span> <b>blin:</b></span> and fwiw we don't have to tie the containers to the release, though it is nice i suppose<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:29:19)</span> <b>blin:</b></span> we can kick off new builds but unless @efajardo or @didavila have time to test the new builds today, we won't be able to promote them to stable<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:30:14)</span> <b>tim.theisen:</b></span> Just following the comments in the VOMS ticket about containers that would need an update.<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:30:43)</span> <b>tim.theisen:</b></span> There's a spot to announce new containers. So, I'll just announce the frontier-squid and hosted-ce containers.<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:30:53)</span> <b>matyas:</b></span> On a side note, is there a list or easy way to find out which containers would be touched by a package update?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:31:14)</span> <b>matyas:</b></span> or do you just kinda have to know?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:33:26)</span> <b>blin:</b></span> i've been trying to add them to the ticket description<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:34:21)</span> <b>blin:</b></span> we should probably develop a tool that's analogous to koji-blame for determining package versions in our containers<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:44:30)</span> <b>bbockelm:</b></span> Why not auto-rebuild?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:45:08)</span> <b>bbockelm:</b></span> isn't there a dataflow here?  If container A inherits from container B and the fresh tag of container B is newer, then rebuild container A.<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:48:05)</span> <b>matyas:</b></span> That's not the issue I'm thinking of:<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:48:35)</span> <b>matyas:</b></span> if container A installs rpm B and we update rpm B, how do we know to rebuild container A?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:49:07)</span> <b>matyas:</b></span> and build/test/release container A<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:49:17)</span> <b>bbockelm:</b></span> Gotcha, I understand now.  Not a ton of good options without introspecting the container.<br/>
+<span style="color: #dd8527"><span style="font-size: small">(18:26:03)</span> <b>marcom:</b></span> The image /cvmfs/singularity.opensciencegrid.org/fermilab/fnal-wn-sl6\:latest seems not to be updated. I updated the dockerfile that triggered a build in docker hub, but the singularity image did not change<br/>
+<span style="color: #dd8527"><span style="font-size: small">(18:26:25)</span> <b>marcom:</b></span> I did the same for /cvmfs/singularity.opensciencegrid.org/fermilab/fnal-wn-sl7\:latest and it worked<br/>
+<span style="color: #dd8527"><span style="font-size: small">(18:26:50)</span> <b>marcom:</b></span> Anything I should do/check?<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:31:07)</span> <b>blin:</b></span> hey marco, we've got that ticket open in the helpdesk for it<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:32:12)</span> <b>blin:</b></span> we're looking into it, there's been a lot of back and forth<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:35:49)</span> <b>blin:</b></span> but it's not anything that you're doing. something's broken on our end<br/>
+<span style="color: #dd8527"><span style="font-size: small">(18:37:58)</span> <b>marcom:</b></span> Thanks, I did not know. Let me know how it goes or if there is anything I can do. I do print a timestamp when building the image, so I know that the last image picked up was on "Tue Mar 24 00:26:04 UTC 2020", the following one on June 1 was ignored.<br/>
+</body>
+</html>

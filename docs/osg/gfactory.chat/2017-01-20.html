@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jan 20, 2017 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Fri Jan 20, 2017 : #gfactory (osg)</h3>
+<span style="color: #53b759"><span style="font-size: small">(14:44:39)</span> <b>marian:</b></span> hey @mkandes ... just heads up I won't have time do more Ops this afternoon and Jeff is at CERN ... letting you know that you can keep an eye on things just in case ... I will watch stuff, too, but won't follow unless really critical<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:37:02)</span> <b>klarson1:</b></span> is anyone doing ops have a few min to look at the goc itb factory for me?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:48:13)</span> <b>klarson1:</b></span> never mind :slightly_smiling_face:<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:12:47)</span> <b>marian:</b></span> what's up Krista? anything specific?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:15:07)</span> <b>mkandes:</b></span> Sorry, just got back from lunch.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:15:25)</span> <b>klarson1:</b></span> ajit is trying to test stampede from the cern itb factory<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:15:45)</span> <b>klarson1:</b></span> looks like the frontend is making req but i see nothing in the gt itb factory monitoring<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:16:02)</span> <b>klarson1:</b></span> i thought i had a config issue on my side but it's not that<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:16:16)</span> <b>klarson1:</b></span> wondering if you see any obvious errs?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:16:47)</span> <b>mkandes:</b></span> I can have a look. This is at GOC-ITB or CERN-ITB? P.S. I doubt CERN-ITB is setup properly.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:17:04)</span> <b>klarson1:</b></span> i was ignoring the cern itb factory.  looked non functioning :slightly_smiling_face:<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:17:27)</span> <b>mkandes:</b></span> Okay, give me a second.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:17:32)</span> <b>klarson1:</b></span> thanks<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:19:40)</span> <b>mkandes:</b></span> Which frontend are you submitting from?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:19:51)</span> <b>klarson1:</b></span> cern itb, vocms0802<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:21:49)</span> <b>mkandes:</b></span> I don't think even registers with GOC-ITB factory.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:22:40)</span> <b>klarson1:</b></span> well that is a problem :slightly_smiling_face:<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:24:19)</span> <b>mkandes:</b></span> If you can get me the DN and security_name, I can register it.<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:28:02)</span> <b>marian:</b></span> thanks Marty for helping Krista and Edgar!<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:28:24)</span> <b>mkandes:</b></span> No problem.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:33:12)</span> <b>klarson1:</b></span> give me one sec<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:34:49)</span> <b>klarson1:</b></span> i can never remember, is it this line?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:34:50)</span> <b>klarson1:</b></span> &lt;collector DN="/DC=org/DC=opensciencegrid/O=Open Science Grid/OU=Services/CN=glidein-itb.grid.iu.edu" factory_identity="<a href="mailto:gfactory@glidein-itb.grid.iu.edu">gfactory@glidein-itb.grid.iu.edu</a>" my_identity="<a href="mailto:fecmsglobalitb@glidein-itb.grid.iu.edu">fecmsglobalitb@glidein-itb.grid.iu.edu</a>" node="glidein-itb.grid.iu.edu"/&gt;<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:35:25)</span> <b>klarson1:</b></span> here is the DN and the security name:<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:35:27)</span> <b>klarson1:</b></span> &lt;security classad_proxy="/var/lib/gwms-frontend/.globus/x509_service_proxy.proxy" proxy_DN="/DC=ch/DC=cern/OU=computers/CN=frontend04/vocms080.cern.ch" security_name="CMSG-ITB_gWMSFrontend-v1_0" sym_key="aes_256_cbc"&gt;<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:37:59)</span> <b>mkandes:</b></span> I thought you said it was vocms0802, no?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:38:47)</span> <b>klarson1:</b></span> hmm, i was looking at the git repo of our configs and not the machine itself.  sigh, let me check<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:41:23)</span> <b>klarson1:</b></span> that is right, they are using this "machine" for all pilot and frontend service certs across global pool and itb<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:42:52)</span> <b>klarson1:</b></span> does this cern itb frontend still need to be registered or is this DN/security name already there?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:45:21)</span> <b>mkandes:</b></span> Yes, this frontend is already registered then. However, there is no sign of any glidein requests from it at Stampede.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:45:33)</span> <b>mkandes:</b></span> When did the requests start?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:46:12)</span> <b>klarson1:</b></span> i know of a recent issue but no idea what other work goes thru goc itb<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:46:56)</span> <b>klarson1:</b></span> i see this in the frontend log:<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:46:58)</span> <b>klarson1:</b></span> [2017-01-20 23:46:00,844] INFO:    15(   15    15    15    15)     0(    0    10) |     0     0     0     0 |     0     0     0 |     1     2 | Up   Ligo_US_Stampede_gt5@gfactory_instance@ITBGOC@glidein-itb.grid.iu.edu<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:47:35)</span> <b>klarson1:</b></span> that has been going on for a while<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:48:22)</span> <b>klarson1:</b></span> mabye this is the prob,<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:48:24)</span> <b>klarson1:</b></span> [2017-01-20 23:41:59,765] DEBUG: glideinFrontendLib:570: Running glidein ids at (u'<a href="http://glidein-itb.grid.iu.edu">glidein-itb.grid.iu.edu</a>', 'Ligo_US_Stampede_gt5@gfactory_instance@ITBGOC', u'<a href="mailto:fecmsglobalitb@glidein-itb.grid.iu.edu">fecmsglobalitb@glidein-itb.grid.iu.edu</a>') (total glideins: 0, total jobs 0, cluster matches: 0):<br/>[2017-01-20 23:41:59,777] DEBUG: glideinFrontendLib:348: There were 1 exceptions in countMatch subprocess. Most recent traceback: ['Traceback (most recent call last):\n', '  File "/usr/lib/python2.6/site-packages/glideinwms/frontend/glideinFrontendLib.py", line 318, in countMatch\n    if eval(match_obj):\n', '  File "&lt;string&gt;", line 1, in &lt;module&gt;\n', '  File "/usr/lib/python2.6/site-packages/glideinwms/frontend/glideinFrontendLib.py", line 1221, in getGlideinCpusNum\n    glidein_cpus = int(cpus)\n', "ValueError: invalid literal for int() with base 10: 'node'\n"]<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:48:41)</span> <b>klarson1:</b></span> i dunno if the err is related to the line above or not<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:49:15)</span> <b>klarson1:</b></span> oh there is this<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:49:16)</span> <b>klarson1:</b></span> [2017-01-20 23:47:59,754] WARNING: No security credentials match for factory pool <a href="http://glidein-itb.grid.iu.edu">glidein-itb.grid.iu.edu</a>, not advertising request; if this is not intentional, check for typos frontend's credential trust_domain and type, vs factory's pool trust_domain and auth_method<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:50:55)</span> <b>klarson1:</b></span> is this that proj id patch edgar was talking about?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:51:37)</span> <b>klarson1:</b></span> oh wait, does the type here need to be grid_proxy+project_id?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:51:42)</span> <b>klarson1:</b></span> &lt;credential absfname="/var/lib/gwms-frontend/.globus/x509_cmspilot04_cms_pilot.proxy" project_id="TG-PHY160019" security_class="cmspilot" trust_domain="grid" type="grid_proxy"/&gt;<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:51:45)</span> <b>mkandes:</b></span> Yes.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:51:50)</span> <b>klarson1:</b></span> the trust domain is right<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:52:41)</span> <b>mkandes:</b></span> One second. Let me double check something.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:57:59)</span> <b>mkandes:</b></span> Also while I'm double checking format for project_id here, can you double check what you have for GOC-ITB DN in the frontend?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:58:24)</span> <b>klarson1:</b></span> i think that is ok:<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:58:25)</span> <b>klarson1:</b></span> &lt;collector DN="/DC=org/DC=opensciencegrid/O=Open Science Grid/OU=Services/CN=glidein-itb.grid.iu.edu" factory_identity="<a href="mailto:gfactory@glidein-itb.grid.iu.edu">gfactory@glidein-itb.grid.iu.edu</a>" my_identity="<a href="mailto:fecmsglobalitb@glidein-itb.grid.iu.edu">fecmsglobalitb@glidein-itb.grid.iu.edu</a>" node="glidein-itb.grid.iu.edu"/&gt;<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:59:29)</span> <b>klarson1:</b></span> i'm looking at the auth type on the factory entry (per the monitoring) and it doesn't match the frontend.  so i'm pretty sure that is an issue.  but i coudlnt' remember what edgar's patch was for if it affected this as well<br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:04:26)</span> <b>mkandes:</b></span> what is it on the frontend?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(17:06:53)</span> <b>klarson1:</b></span> the auth typ was grid_proxy only.  i've changed it to grid_proxy+project_id and watching the logs for the errs<br/>
+<span style="color: #e7392d"><span style="font-size: small">(17:07:35)</span> <b>klarson1:</b></span> there are a lot of bad schedds in this FE so a lot of noise :grimacing:<br/>
+<span style="color: #e7392d"><span style="font-size: small">(17:09:04)</span> <b>klarson1:</b></span> i think the auth type message is gone but i still have this<br/>
+<span style="color: #e7392d"><span style="font-size: small">(17:09:05)</span> <b>klarson1:</b></span> [2017-01-21 00:06:38,244] DEBUG: glideinFrontendLib:348: There were 1 exceptions in countMatch subprocess. Most recent traceback: ['Traceback (most recent call last):\n', '  File "/usr/lib/python2.6/site-packages/glideinwms/frontend/glideinFrontendLib.py", line 318, in countMatch\n    if eval(match_obj):\n', '  File "&lt;string&gt;", line 1, in &lt;module&gt;\n', '  File "/usr/lib/python2.6/site-packages/glideinwms/frontend/glideinFrontendLib.py", line 1221, in getGlideinCpusNum\n    glidein_cpus = int(cpus)\n', "ValueError: invalid literal for int() with base 10: 'node'\n"]<br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:09:25)</span> <b>mkandes:</b></span> <a href="https://indico.fnal.gov/getFile.py/access?contribId=33&amp;sessionId=7&amp;resId=0&amp;materialId=slides&amp;confId=10571">https://indico.fnal.gov/getFile.py/access?contribId=33&amp;sessionId=7&amp;resId=0&amp;materialId=slides&amp;confId=10571</a><br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:09:46)</span> <b>mkandes:</b></span> Edgar says these are the instructions for frontend.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(17:12:45)</span> <b>klarson1:</b></span> hmm.  there is a bosco credential in here as well so im not sure i can change the group configuration as is. may need a whole new group.  it's after 5 here, i am going to pass this along to the cern operators and maybe they can pick it up monday.  this was really helpful, thanks!<br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:13:18)</span> <b>mkandes:</b></span> No problem. Let's have a look at it again next week.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(17:13:27)</span> <b>klarson1:</b></span> great.  have a good weekend!<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:15:30)</span> <b>efajardo:</b></span> I am sorry @mkandes I was busy with our students<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:15:34)</span> <b>efajardo:</b></span> What you need?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:17:27)</span> <b>mkandes:</b></span> CMS was having trouble trying to get into Stampede from CERN ITB frontend. But I think we concluded they may not have it setup properly to add +project_id. I don't even see their requests at GOC_ITB factory. So we'll probably have to help them next week.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(17:18:37)</span> <b>klarson1:</b></span> i was poking around on the fe to see if i could help.  i can't do anymore so we'll have to pick it up next week.  i don't want to make a major change on a fri and leave for the weekend either :slightly_smiling_face:<br/>
+<span style="color: #bd9336"><span style="font-size: small">(17:29:08)</span> <b>mkandes:</b></span> Understandable<br/>
+<span style="color: #a63024"><span style="font-size: small">(18:16:13)</span> <b>efajardo:</b></span> @mkandes can you change the ITB COmet entry<br/>
+<span style="color: #a63024"><span style="font-size: small">(18:16:19)</span> <b>efajardo:</b></span> I see this on my frontend log:<br/>
+<span style="color: #a63024"><span style="font-size: small">(18:16:25)</span> <b>efajardo:</b></span> <pre>[2017-01-20 16:14:54,609] DEBUG: glideinFrontendLib:347: There were 1 exceptions in countMatch subprocess. Most recent traceback: ['Traceback (most recent call last):\n', '  File "/usr/lib/python2.6/site-packages/glideinwms/frontend/glideinFrontendLib.py", line 317, in countMatch\n    if eval(match_obj):\n', '  File "&lt;string&gt;", line 1, in &lt;module&gt;\n', '  File "/usr/lib/python2.6/site-packages/glideinwms/frontend/glideinFrontendLib.py", line 1206, in getGlideinCpusNum\n    glidein_cpus = int(cpus)\n', "ValueError: invalid literal for int() with base 10: 'node'\n"] </pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(18:16:42)</span> <b>efajardo:</b></span> it looks like it does not like the glidein_cpus being something else than auto<br/>
+<span style="color: #a63024"><span style="font-size: small">(18:17:17)</span> <b>efajardo:</b></span> I can try updating the frontend from 3.2.15 to 3.2.16<br/>
+<span style="color: #bd9336"><span style="font-size: small">(18:18:50)</span> <b>mkandes:</b></span> Ah, yes. I was playing around with this the other day. Let me revert back.<br/>
+<span style="color: #a63024"><span style="font-size: small">(18:24:54)</span> <b>efajardo:</b></span> cool<br/>
+<span style="color: #a63024"><span style="font-size: small">(18:24:59)</span> <b>efajardo:</b></span> it looks like it does not like it<br/>
+<span style="color: #a63024"><span style="font-size: small">(18:25:01)</span> <b>efajardo:</b></span> the fornted<br/>
+<span style="color: #bd9336"><span style="font-size: small">(18:26:05)</span> <b>mkandes:</b></span> Okay, it should be good now.<br/>
+<span style="color: #a63024"><span style="font-size: small">(18:30:18)</span> <b>efajardo:</b></span> Hmm actually I still see same error<br/>
+<span style="color: #a63024"><span style="font-size: small">(18:30:21)</span> <b>efajardo:</b></span> <pre>[2017-01-20 16:29:41,910] DEBUG: glideinFrontendLib:348: There were 1 exceptions in countMatch subprocess. Most recent traceback: ['Traceback (most recent call last):\n', '  File "/usr/lib/python2.6/site-packages/glideinwms/frontend/glideinFrontendLib.py", line 318, in countMatch\n    if eval(match_obj):\n', '  File "&lt;string&gt;", line 1, in &lt;module&gt;\n', '  File "/usr/lib/python2.6/site-packages/glideinwms/frontend/glideinFrontendLib.py", line 1221, in getGlideinCpusNum\n    glidein_cpus = int(cpus)\n', "ValueError: invalid literal for int() with base 10: 'node'\n"] </pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(18:30:48)</span> <b>efajardo:</b></span> Can you revert it to what it was since we plan to use COmet for real during the wknd?<br/>
+<span style="color: #a63024"><span style="font-size: small">(18:32:11)</span> <b>efajardo:</b></span> Opps now I see another error<br/>
+<span style="color: #a63024"><span style="font-size: small">(18:32:14)</span> <b>efajardo:</b></span> <pre>[2017-01-20 16:31:39,561] WARNING: glideinFrontendInterface:972: No security credentials match for factory pool <a href="http://glidein-itb.grid.iu.edu">glidein-itb.grid.iu.edu</a>, not advertising request; if this is not intentional, check for typos frontend's credential trust_domain and type, vs factory's pool trust_domain and auth_method</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(18:32:33)</span> <b>efajardo:</b></span> but that is just a warning<br/>
+<span style="color: #a63024"><span style="font-size: small">(18:32:36)</span> <b>efajardo:</b></span> so it should be good<br/>
+<span style="color: #a63024"><span style="font-size: small">(18:32:51)</span> <b>efajardo:</b></span> well it looks bad actually<br/>
+<span style="color: #a63024"><span style="font-size: small">(18:35:38)</span> <b>efajardo:</b></span> @mkandes did you change something on the itb?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(18:42:58)</span> <b>mkandes:</b></span> These are same problems Krista saw. Hmmm.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(18:43:12)</span> <b>mkandes:</b></span> Give me a second. I'll investigate.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(18:46:07)</span> <b>mkandes:</b></span> P.S. Could this have something to do with our patch the other day?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(18:51:59)</span> <b>mkandes:</b></span> What frontend are you submitting from?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(18:54:54)</span> <b>mkandes:</b></span> @efajardo: What frontend?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(18:55:06)</span> <b>mkandes:</b></span> uclhc?<br/>
+<span style="color: #a63024"><span style="font-size: small">(18:57:02)</span> <b>efajardo:</b></span> I fixed it<br/>
+<span style="color: #a63024"><span style="font-size: small">(18:57:06)</span> <b>efajardo:</b></span> 3.2.16 is broken<br/>
+<span style="color: #a63024"><span style="font-size: small">(18:57:12)</span> <b>efajardo:</b></span> I downgraded the forntedn to 3.2.15<br/>
+<span style="color: #bd9336"><span style="font-size: small">(18:57:20)</span> <b>mkandes:</b></span> What was it?<br/>
+<span style="color: #a63024"><span style="font-size: small">(18:59:06)</span> <b>efajardo:</b></span> it was complaning about the security<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:01:29)</span> <b>efajardo:</b></span> I saw this error in the frontned side<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:01:31)</span> <b>efajardo:</b></span> <tt>[2017-01-20 16:31:39,561] WARNING: glideinFrontendInterface:972: No security credentials match for factory pool <a href="http://glidein-itb.grid.iu.edu">glidein-itb.grid.iu.edu</a>, not advertising request; if this is not intentional, check for typos frontend's credential trust_domain and type, vs factory's pool trust_domain and auth_method</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(19:01:43)</span> <b>efajardo:</b></span> And this one<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:01:46)</span> <b>efajardo:</b></span> <pre>[2017-01-20 23:41:31,959] DEBUG: glideFactoryEntry:1006: Checking security credentials for client CMSG-ITB_gWMSFrontend-v1_0.opportunistic_conservative <br/>[2017-01-20 23:49:05,309] DEBUG: glideFactoryEntry:1006: Checking security credentials for client uclhc-fe-1-t2-ucsd-edu_OSG_gWMSFrontend.comet <br/>[2017-01-20 23:49:05,334] DEBUG: glideFactoryEntry:1006: Checking security credentials for client uclhc-fe-1-t2-ucsd-edu_OSG_gWMSFrontend.itb <br/>[2017-01-20 23:49:05,340] WARNING: glideFactoryEntry:1172: Client 'uclhc-fe-1-t2-ucsd-edu_OSG_gWMSFrontend.itb' did not specify a Project Id in the request, this is required by entry OSG_T2_US_UCSD_gw6_Comet_mcore</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(19:01:48)</span> <b>efajardo:</b></span> in the factory side<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:02:03)</span> <b>efajardo:</b></span> I will have to talk to the gwms folks about stop breaking things<br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:03:14)</span> <b>mkandes:</b></span> It was working the other day though, no?<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:04:33)</span> <b>efajardo:</b></span> yea but I just now tried to update the frontend to 3.2.16<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:04:35)</span> <b>efajardo:</b></span> and it brooke<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:04:46)</span> <b>efajardo:</b></span> then when I downgrade it to 3.2.15 started working again<br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:05:29)</span> <b>mkandes:</b></span> Ah, you upgraded today. I see.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:06:06)</span> <b>mkandes:</b></span> @klarson1 : Can you also check if that's what the CERN-ITB frontend is running?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:11:34)</span> <b>mkandes:</b></span> @efajardo: So who or what is expected to run this weekend?<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:12:05)</span> <b>efajardo:</b></span> Well one of Franks postdocs plans to run some jobs through the wknd<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:12:07)</span> <b>efajardo:</b></span> using Comet<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:12:16)</span> <b>efajardo:</b></span> Can you check on the itb<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:12:33)</span> <b>efajardo:</b></span> that the frontend <a href="http://glidein-frontend-2.ucsd.edu">glidein-frontend-2.ucsd.edu</a> is registred there please?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:14:53)</span> <b>mkandes:</b></span> It is not registered.<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:16:32)</span> <b>efajardo:</b></span> can you register<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:16:34)</span> <b>efajardo:</b></span> it please?<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:16:49)</span> <b>efajardo:</b></span> I see its registered in GOC, can you just copy paste?<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:16:54)</span> <b>efajardo:</b></span> the configs to the ITB?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:19:35)</span> <b>mkandes:</b></span> Sure.<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:20:09)</span> <b>efajardo:</b></span> thank you<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:20:11)</span> <b>efajardo:</b></span> I appreciate<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:20:17)</span> <b>efajardo:</b></span> I got this request from FRank last minute<br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:23:31)</span> <b>mkandes:</b></span> I assume you meant ... <a href="http://glidein-frontend.t2.ucsd.edu">glidein-frontend.t2.ucsd.edu</a><br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:25:01)</span> <b>mkandes:</b></span> What is it's DN? Looks like old digicert<br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:26:11)</span> <b>mkandes:</b></span> @efajardo: ?<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:26:29)</span> <b>efajardo:</b></span> hmm let me check<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:27:14)</span> <b>efajardo:</b></span> its funny it looks like it uses this one<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:27:17)</span> <b>efajardo:</b></span> <tt>/DC=ch/DC=cern/OU=computers/CN=frontend01/vocms080.cern.ch</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(19:27:29)</span> <b>efajardo:</b></span> I got no idea why<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:29:14)</span> <b>efajardo:</b></span> Or if its easier you can just put the comet entry in the GOC factory<br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:29:52)</span> <b>mkandes:</b></span> I'll just register it on GOC-ITB.<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:31:27)</span> <b>efajardo:</b></span> ok<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:31:29)</span> <b>efajardo:</b></span> ty<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:31:33)</span> <b>efajardo:</b></span> I appreciate it<br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:36:02)</span> <b>mkandes:</b></span> Okay, give it a look now.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:36:24)</span> <b>mkandes:</b></span> Ah, shit. Wait, I think I forgot something.<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:36:50)</span> <b>efajardo:</b></span> hmm<br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:37:22)</span> <b>mkandes:</b></span> Okay, maybe not.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:38:58)</span> <b>mkandes:</b></span> Did you submit some jobs through that frontend?<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:39:21)</span> <b>efajardo:</b></span> yes<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:39:28)</span> <b>efajardo:</b></span> I think it looks good now<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:42:32)</span> <b>efajardo:</b></span> I see this error<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:42:34)</span> <b>efajardo:</b></span> <pre>[2017-01-21 01:39:54,524] DEBUG: glideFactoryEntry:1006: Checking security credentials for client UCSD-CMS-Frontend.comet <br/>[2017-01-21 01:39:54,530] WARNING: glideFactoryEntry:1153: No username mapping for security class frontend of credential for UCSD-CMS-Frontend.comet (secid: UCSDCMS), skipping request.</pre><br/>
+<span style="color: #a63024"><span style="font-size: small">(19:42:36)</span> <b>efajardo:</b></span> in the factory<br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:48:52)</span> <b>mkandes:</b></span> Is that the name of the frontend? UCSD-CMS-Frontend.comet<br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:49:29)</span> <b>mkandes:</b></span> frontend_name at top of frontend.xml?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:51:16)</span> <b>mkandes:</b></span> or is its security_class = frontend?<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:52:08)</span> <b>efajardo:</b></span> ahh<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:52:16)</span> <b>efajardo:</b></span> I see I think I had to change the security class<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:53:05)</span> <b>efajardo:</b></span> <tt>frontend_name="UCSD-CMS-Frontend"</tt><br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:53:22)</span> <b>mkandes:</b></span> and security_class?<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:56:17)</span> <b>efajardo:</b></span> Ok it looks like it is working<br/>
+<span style="color: #a63024"><span style="font-size: small">(19:56:20)</span> <b>efajardo:</b></span> I see glideins submitted<br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:56:42)</span> <b>mkandes:</b></span> ah okay.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(19:57:02)</span> <b>mkandes:</b></span> So just impatience. :wink:<br/>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Aug 22, 2017 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue Aug 22, 2017 : #software (osg)</h3>
+<span style="color: #b14cbc"><span style="font-size: small">(17:19:34)</span> <b>tmartin:</b></span> Anyone seen this error for xrootd?<br/>170822 15:17:46 16827 tmartin.2584819:30@uaf-8 XrootdProtocol: more auth requested; sz=2066<br/>Failed to create verification context.<br/>Globus error occurred (error unprintable)<br/>Globus chain verification failure.<br/>ERROR in AuthzKey: Key verification failed.<br/>170822 15:17:46 16827 secgsi_Authenticate: ERROR: unable to get the key associated to this user<br/>170822 15:17:46 16827 XrootdXeq: User authentication failed;<br/>170822 15:17:46 16827 tmartin.2584819:30@uaf-8 XrootdResponse: sending err 3010:<br/>170822 15:17:46 16827 XrootdXeq: tmartin.2584819:30@uaf-8 disc 0:00:00<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:36:35)</span> <b>bbockelm:</b></span> hm<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:36:54)</span> <b>bbockelm:</b></span> basically, Globus couldn't verify the client's proxy certificate was valid.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:37:16)</span> <b>bbockelm:</b></span> what version of <tt>xrootd-lcmaps</tt>?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:38:24)</span> <b>bbockelm:</b></span> Particularly, this error occurred in the initialization of Globus -- before it even gets to the client proxy<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:38:35)</span> <b>bbockelm:</b></span> So it's either an internal bug or some environment misconfigured.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:38:48)</span> <b>bbockelm:</b></span> Hence, version would be interesting to know.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:41:26)</span> <b>bbockelm:</b></span> @tmartin ^^^<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(18:49:57)</span> <b>tmartin:</b></span> Sorry, I got sidetracked with another problem<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(18:50:17)</span> <b>tmartin:</b></span> xrootd-lcmaps-1.3.3-3.osg33.el7.x86_64<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:50:26)</span> <b>bbockelm:</b></span> no problem!  Timing worked out (just got back from a coffee break at the conference)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:51:07)</span> <b>bbockelm:</b></span> So, does the same host work for GridFTP?  I.e., does it have a functioning Globus, CA, CRL, etc setup?<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(18:51:18)</span> <b>tmartin:</b></span> Yes, it works fine for gridftp<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(18:51:49)</span> <b>tmartin:</b></span> Now I have a specific hostcert for this service since it uses the alternative names for the gridftp<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:51:52)</span> <b>bbockelm:</b></span> just to make sure we aren't chasing down bugs that are already fixed, can you do "yum update --enablerepo=osg-testing xrootd-lcmaps" to get 1.3.4?<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(18:52:32)</span> <b>tmartin:</b></span> Ya so...<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(18:52:39)</span> <b>tmartin:</b></span> works<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:53:05)</span> <b>bbockelm:</b></span> ah - 1.3.4 works completely?<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(18:53:09)</span> <b>tmartin:</b></span> Yup<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(18:53:12)</span> <b>tmartin:</b></span> let me confirm sec<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(18:54:17)</span> <b>tmartin:</b></span> Yup, update lcmaps,  then restart the cmsd and xrootd services and voila<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(18:54:24)</span> <b>tmartin:</b></span> did it on another host<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:54:50)</span> <b>bbockelm:</b></span> ok, so we're probably chasing something that got fixed.<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(18:55:04)</span> <b>tmartin:</b></span> Must be an interaction with RHEL7 or something then?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:55:46)</span> <b>bbockelm:</b></span> <a href="https://github.com/opensciencegrid/xrootd-lcmaps/commit/141823b47f2e8e8015481f3f9b3de39d97ba8cd5">https://github.com/opensciencegrid/xrootd-lcmaps/commit/141823b47f2e8e8015481f3f9b3de39d97ba8cd5</a> possibly this bugfix<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:55:53)</span> <b>bbockelm:</b></span> does the host enable HTTP?<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(18:55:59)</span> <b>tmartin:</b></span> I saw that, but the configuration change did nothing<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(18:57:18)</span> <b>tmartin:</b></span> Matevz and I were trying a variety of things related to that<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(18:57:25)</span> <b>tmartin:</b></span> assuming it was this bug<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:58:58)</span> <b>bbockelm:</b></span> Gotcha.  Well, it seems that it's better now :slightly_smiling_face:<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(18:59:41)</span> <b>tmartin:</b></span> Hehe thanks :slightly_smiling_face:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:15:29)</span> <b>bbockelm:</b></span> @tmartin - while you're here, what version of xrootd-hdfs are you running?<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(19:15:50)</span> <b>tmartin:</b></span> [1703] root@gftp-6 ~# rpm -qa|grep xrootd-hdfs<br/>xrootd-hdfs-1.8.8-1.osg33.el7.x86_64<br/>[1715] root@gftp-6 ~#<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:17:20)</span> <b>bbockelm:</b></span> Ok.  So, I have something nifty to show you.  Can you set up this CVMFS config file on a test node:<br/><pre><br/>$ cat /etc/cvmfs/config.d/cms.osgstorage.org.local <br/>CVMFS_SERVER_URL="<a href="http://hcc-cvmfs-repo.unl.edu:8000/cvmfs/@fqrn@">http://hcc-cvmfs-repo.unl.edu:8000/cvmfs/@fqrn@</a>"<br/>CVMFS_EXTERNAL_URL="<a href="https://xrootd-local.unl.edu:1094">https://xrootd-local.unl.edu:1094</a>"<br/></pre><br/>
+<span style="color: #b14cbc"><span style="font-size: small">(19:34:58)</span> <b>tmartin:</b></span> done<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(19:35:08)</span> <b>tmartin:</b></span> sorry I was debugging a gpu node :slightly_smiling_face:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:35:22)</span> <b>bbockelm:</b></span> ok - so, if you do a <tt>voms-proxy-init --voms cms</tt>, can you do <tt>ls /cvmfs/cms.osgstorage.org/store</tt> ?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:35:39)</span> <b>bbockelm:</b></span> (alternately: run the command as root.  You should be able to list the directory but not access files)<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(19:36:29)</span> <b>tmartin:</b></span> [1736] tmartin@test-012 ~$ ls /cvmfs/cms.osgstorage.org/store<br/>ls: cannot access /cvmfs/cms.osgstorage.org/store: No such file or directory<br/>[1736] tmartin@test-012 ~$<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:36:55)</span> <b>bbockelm:</b></span> ah - what is CVMFS complaining about in <tt>/var/log/messages</tt>?<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(19:37:18)</span> <b>tmartin:</b></span> getting it updated first<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:38:26)</span> <b>bbockelm:</b></span> (it should work with the latest <tt>osg-oasis</tt> RPM)<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(19:39:17)</span> <b>tmartin:</b></span> osg-oasis-7-9.osg33.el7.noarch<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(19:39:21)</span> <b>tmartin:</b></span> is what I have<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:39:42)</span> <b>bbockelm:</b></span> that should work if the cvmfs-related packages are the latest.<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(19:39:43)</span> <b>tmartin:</b></span> Aug 22 17:39:36 test-012 cvmfs2: (<a href="http://cms.osgstorage.org">cms.osgstorage.org</a>) whitelist verification failed (6): invalid whitelist signature<br/>Aug 22 17:39:36 test-012 cvmfs2: (<a href="http://cms.osgstorage.org">cms.osgstorage.org</a>) failed to fetch file catalog at <a href="http://cms.osgstorage.org:/">cms.osgstorage.org:/</a> (hash: 0000000000000000000000000000000000000000, error 9 [host returned HTTP error])<br/>Aug 22 17:39:36 test-012 cvmfs2: (<a href="http://cms.osgstorage.org">cms.osgstorage.org</a>) Failed to initialize root file catalog (16 - file catalog failure)<br/>\]\<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:40:02)</span> <b>bbockelm:</b></span> Hmmm - this is the problem<br/><pre><br/>Aug 22 17:39:36 test-012 cvmfs2: (<a href="http://cms.osgstorage.org">cms.osgstorage.org</a>) whitelist verification failed (6): invalid whitelist signature<br/></pre><br/>
+<span style="color: #b14cbc"><span style="font-size: small">(19:40:21)</span> <b>tmartin:</b></span> I can see the cms repo<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:40:59)</span> <b>bbockelm:</b></span> which CMS repo?  <tt><a href="http://cms.cern.ch">cms.cern.ch</a></tt>?<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(19:41:10)</span> <b>tmartin:</b></span> Ya, I just read it to check cvmfs<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(19:41:34)</span> <b>tmartin:</b></span> Does CVMFS just read anything from config.d or does it not need a .conf?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:41:50)</span> <b>bbockelm:</b></span> Ok, try this public key:<br/><pre><br/>$ cat /etc/cvmfs/keys/cms.osgstorage.org/cms.osgstorage.org.pub <br/>-----BEGIN PUBLIC KEY-----<br/>MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtZSB8dyDedI1YYekqMVW<br/>MOQJzsQrPFgkuqy1UumTXmMriVZdgA/0IY07DY/fOqdBOia+Ipmj03jWq+MZph0S<br/>XZ5VXnvrzGsf0zLqczPhnvaMYln1MYg88bISkl0WADVZ8dhxmoT0lQIfpL/rQegq<br/>r2uxb1BqSHJFNVGvEl1apwkWNxYfGDN0zEhKLx2tudrwsB/nn/W8HuK29gk7A+lc<br/>kZ8Irn0hnUGiD3jaICE7HdICvBhZyMBH9ZT+cETj7RDBp2BUDim4Cy79T2OOmHu/<br/>W3sP21GfbAAZuzC2fWWkvs5wOPIrk44Lgx1E2DHVxsjYhAYWoYy5oEALfHU+Fo2h<br/>BQIDAQAB<br/>-----END PUBLIC KEY-----<br/></pre><br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:42:12)</span> <b>bbockelm:</b></span> and see if that gets the whitelist issue to go away.<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(19:44:08)</span> <b>tmartin:</b></span> [1743] root@test-012 /etc/cvmfs/keys/cms.osgstorage.org# ls /cvmfs/cms.osgstorage.org/store<br/>ls: cannot access /cvmfs/cms.osgstorage.org/store: No such file or directory<br/>[1744] root@test-012 /etc/cvmfs/keys/cms.osgstorage.org#<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:44:39)</span> <b>bbockelm:</b></span> ah - what's the latest in <tt>/var/log/messages</tt> though?<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(19:44:59)</span> <b>tmartin:</b></span> it does not give one actually<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:45:24)</span> <b>bbockelm:</b></span> oh, so autofs is caching the negative response.  Bounce that service quick and it should allow you to at least retest the error.<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(19:45:35)</span> <b>tmartin:</b></span> Ya, that is what I did<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(19:45:53)</span> <b>tmartin:</b></span> I am getting other errors when trying other cvmfs file systems oddly enough<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(19:46:59)</span> <b>tmartin:</b></span> might be something wonky with this host<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:47:35)</span> <b>bbockelm:</b></span> anyhow - so maybe the punchline doesn't work, but the point is that we're beginning to publish all the CMS files at T2_US_Nebraska into CVMFS.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:47:54)</span> <b>bbockelm:</b></span> And we'd like to go to the next level and get all of T2_US_UCSD published as well<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(19:48:02)</span> <b>tmartin:</b></span> Ok got it<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(19:48:15)</span> <b>tmartin:</b></span> that host was a) RHEL7, b) maybe had some odd stuff.<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(19:48:18)</span> <b>tmartin:</b></span> I used a worker node<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(19:48:23)</span> <b>tmartin:</b></span> [1747] root@sdsc-3 /etc/cvmfs/config.d# ls /cvmfs/cms.osgstorage.org/store<br/>data  mc  relval  user<br/>[1747] root@sdsc-3 /etc/cvmfs/config.d#<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(19:48:40)</span> <b>tmartin:</b></span> So test no, prod yes :slightly_smiling_face:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:48:44)</span> <b>bbockelm:</b></span> that requires (a) GridFTP/Xrootd hosts to be based on RHEL7, (b) xrootd-hdfs-1.9.2 (should be in the hcc-testing or osg-testing repo), and (c) the gridftp-hdfs out of the hcc repo.<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(19:48:45)</span> <b>tmartin:</b></span> That is interesting<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:49:20)</span> <b>bbockelm:</b></span> the latest-greatest-everything allows us to index the site in a scalable manner.<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(19:49:26)</span> <b>tmartin:</b></span> Does that not put a bit of pressure in the cvmfs cache area?<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(19:49:37)</span> <b>tmartin:</b></span> as far as size?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:49:43)</span> <b>bbockelm:</b></span> nope - we use a separate CVMFS cache area for *.<a href="http://osgstorage.org">osgstorage.org</a> and set the cache size to be 1GB<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:49:50)</span> <b>bbockelm:</b></span> so, effectively, it's not a cache but rather a buffer.<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(19:50:06)</span> <b>tmartin:</b></span> Interesting.<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(19:50:41)</span> <b>tmartin:</b></span> You guys run like 12 gftp servers right? at 10Gbps each?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:51:00)</span> <b>bbockelm:</b></span> (separately, we have some work to use HDFS as a cache ... that's still a few weeks away from testing at other sites)<br/>
+<span style="color: #b14cbc"><span style="font-size: small">(19:52:30)</span> <b>tmartin:</b></span> Well once I get my xrootd on the gridftp servers I will be in a better position to control interesting things like that here.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:54:09)</span> <b>bbockelm:</b></span> Gotcha.  The more important one is the GridFTP server, as those create the checksums.  I only need one Xrootd server upgraded (Xrootd is used to scan the directories)<br/>
+</body>
+</html>

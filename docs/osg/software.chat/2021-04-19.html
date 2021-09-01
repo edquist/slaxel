@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Apr 19, 2021 : #software (osg)</title>
+</head>
+<body>
+<h3>Mon Apr 19, 2021 : #software (osg)</h3>
+<span style="color: #a72f79"><span style="font-size: small">(10:05:45)</span> <b>andrew.melo:</b></span> Running some test jobs and getting the follwoing back:<br/><pre>WARNING: underlay of /usr/bin/nvidia-smi required more than 50 (722) bind mounts</pre><br/>Is this something tha tneeds to be fixed at the site, or is OK to ignore?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:07:07)</span> <b>blin:</b></span> hrm, is that message from a pilot running in a singularity container?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(10:09:21)</span> <b>andrew.melo:</b></span> Correct. Submitting a condor job via CMS connect that just runs "hostname ; date ; nvidia-smi"<br/>
+<span style="color: #a72f79"><span style="font-size: small">(10:11:38)</span> <b>andrew.melo:</b></span> It's not @ every site, so there must be a different config somewhere<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:15:33)</span> <b>blin:</b></span> yeah i suspect that it's a site thing. @dwd knows more (everything?) about underlays<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:25:28)</span> <b>bbockelm:</b></span> My theory: Looks like the <tt>nvidia-smi</tt> binary from the host was attempted to be bind-mount into the container and, most likely, required every binary in /usr/bin to be bind-mounted to avoid using overlayfs.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(10:27:10)</span> <b>andrew.melo:</b></span> fwiw, this is that executable condor runs:<br/><pre>#!/bin/bash<br/><br/>hostname<br/>date<br/>ip a<br/>nvidia-smi</pre><br/>
+<span style="color: #99a949"><span style="font-size: small">(11:14:06)</span> <b>dwd:</b></span> This is just a warning and to be expected when there’s no file at /usr/bin/nvidia-smi.  The underlay feature works by creating a new scratch directory including the new bind mount point and then it separately bind mounts in everything from the container image.  You can work around it by including an empty file or any file at /usr/bin/nvidia-smi, or by ignoring the warning.  It’s not clear if it affects performance or not, but it seemed kind of excessive for the kernel to have to keep track of so many bind mount points so I put the warning into the original singularity-2 implementation, and the reimplementation of underlay in singularity-3 carried that forward.<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:15:52)</span> <b>dwd:</b></span> @andrew.melo is that explanation clear?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(11:16:46)</span> <b>andrew.melo:</b></span> That makes sense to me, thanks!<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:53:25)</span> <b>rynge:</b></span> <pre>--OSG-3.6--<br/>3.6.210325 cvmfs-2.8.0-1.osg36.el7.x86_64<br/>3.6.210325 cvmfs-config-osg-2.5-1.osg36.el7.noarch<br/>3.6.210325 cvmfs-x509-helper-2.1-2.1.osg36.el7.x86_64<br/>3.6.210325 frontier-squid-4.13-1.1.osg36.el7.x86_64<br/>3.6.210325 gratia-probe-common-2.0.0-2.osg36.el7.noarch<br/>3.6.210325 gratia-probe-condor-2.0.0-2.osg36.el7.noarch<br/>3.6.210325 gratia-probe-htcondor-ce-2.0.0-2.osg36.el7.noarch<br/>3.6.210325 osg-ca-certs-1.94-1.osg36.el7.noarch<br/>3.6.210325 osg-ce-3.6-2.osg36.el7.x86_64<br/>3.6.210325 osg-ce-condor-3.6-2.osg36.el7.x86_64<br/>3.6.210325 osg-configure-4.0.0-1.osg36.el7.noarch<br/>3.6.210325 osg-configure-ce-4.0.0-1.osg36.el7.noarch<br/>3.6.210325 osg-configure-cluster-4.0.0-1.osg36.el7.noarch<br/>3.6.210325 osg-configure-condor-4.0.0-1.osg36.el7.noarch<br/>3.6.210325 osg-configure-gateway-4.0.0-1.osg36.el7.noarch<br/>3.6.210325 osg-configure-gratia-4.0.0-1.osg36.el7.noarch<br/>3.6.210325 osg-configure-infoservices-4.0.0-1.osg36.el7.noarch<br/>3.6.210325 osg-configure-siteinfo-4.0.0-1.osg36.el7.noarch<br/>3.6.210325 osg-configure-squid-4.0.0-1.osg36.el7.noarch<br/>3.6.210325 osg-oasis-17-1.osg36.el7.noarch<br/>3.6.210325 osg-release-3.6-3.osg36.el7.noarch<br/>3.6.210325 osg-scitokens-mapfile-1-1.osg36.el7.x86_64<br/>3.6.210325 osg-system-profiler-1.6.0-1.osg36.el7.noarch<br/>3.6.210325 voms-2.0.14-1.6.osg36.el7.x86_64<br/>3.6.210325 voms-clients-cpp-2.0.14-1.6.osg36.el7.x86_64<br/>3.5.32  lcas-lcmaps-gt4-interface-0.3.1-1.3.osg35.el7.x86_64<br/>3.5.32  lcmaps-1.6.6-1.12.osg35.el7.x86_64<br/>3.5.32  lcmaps-db-templates-1.6.6-1.12.osg35.el7.x86_64<br/>3.5.32  lcmaps-plugins-basic-1.7.0-2.osg35.el7.x86_64<br/>3.5.32  lcmaps-plugins-verify-proxy-1.5.11-1.1.osg35.el7.x86_64<br/>3.5.32  lcmaps-plugins-voms-1.7.1-1.6.osg35.el7.x86_64<br/>3.5.32  vo-client-110-1.osg35.el7.noarch<br/>3.5.32  vo-client-lcmaps-voms-110-1.osg35.el7.noarch</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:53:40)</span> <b>rynge:</b></span> Interesting to see some 3.5 packages in there<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:53:44)</span> <b>rynge:</b></span> This is from an upgrade<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:54:54)</span> <b>rynge:</b></span> If you try to remove then, <tt>osg-ce</tt> and <tt>osg-ce-condor</tt> would also be removed<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:23:01)</span> <b>blin:</b></span> hrm that's curious. we do have an <tt>osg-obsoletes</tt> ticket that <b>@edquist</b> was working on that we backburnered<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:23:15)</span> <b>blin:</b></span> <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-4316">https://opensciencegrid.atlassian.net/browse/SOFTWARE-4316</a><br/>
+<span style="color: #16569E"><span style="font-size: small">(18:23:41)</span> <b>edquist:</b></span> that package is deadly<br/>
+<span style="color: #16569E"><span style="font-size: small">(18:25:09)</span> <b>edquist:</b></span> so<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:25:10)</span> <b>blin:</b></span> yeah, iirc, we were leaning towards shipping a script that handled it instead<br/>
+<span style="color: #16569E"><span style="font-size: small">(18:25:11)</span> <b>edquist:</b></span> 3.6.210325<br/>
+<span style="color: #16569E"><span style="font-size: small">(18:25:34)</span> <b>edquist:</b></span> yeah it seemed like there was not really a clean way to handle it in the packaging alone, sadly<br/>
+<span style="color: #16569E"><span style="font-size: small">(18:25:49)</span> <b>edquist:</b></span> that osg release number doesn't look healthy<br/>
+<span style="color: #16569E"><span style="font-size: small">(18:26:20)</span> <b>edquist:</b></span> oh,<br/>
+<span style="color: #16569E"><span style="font-size: small">(18:26:28)</span> <b>edquist:</b></span> or i guess it's the new date scheme<br/>
+<span style="color: #16569E"><span style="font-size: small">(18:26:29)</span> <b>edquist:</b></span> nm<br/>
+<span style="color: #16569E"><span style="font-size: small">(18:26:57)</span> <b>edquist:</b></span> but yeah that is interesting about vo-client<br/>
+<span style="color: #16569E"><span style="font-size: small">(18:27:07)</span> <b>edquist:</b></span> and the rest<br/>
+<span style="color: #16569E"><span style="font-size: small">(18:27:55)</span> <b>edquist:</b></span> i am curious what <tt>osg-ce</tt> and <tt>osg-ce-condor</tt> depend on from the 3.5 list<br/>
+<span style="color: #16569E"><span style="font-size: small">(18:28:08)</span> <b>edquist:</b></span> that do not have e.6 equivalents<br/>
+<span style="color: #43761b"><span style="font-size: small">(18:30:23)</span> <b>blin:</b></span> is Yum having issues with the vo-client and the vo-client-lcmaps deps?<br/>
+</body>
+</html>

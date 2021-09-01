@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Aug 31, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Mon Aug 31, 2020 : #software (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(10:26:47)</span> <b>stanfiem:</b></span> I'm getting an error trying to send an announcement via osg-notify, any ideas what might be up?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:27:01)</span> <b>stanfiem:</b></span> <pre>Traceback (most recent call last):<br/>  File "/usr/bin/osg-notify", line 242, in &lt;module&gt;<br/>    main()<br/>  File "/usr/bin/osg-notify", line 171, in main<br/>    results = topology_utils.get_vo_contacts(args)<br/>  File "/usr/lib/python2.7/site-packages/topology_utils.py", line 247, in get_vo_contacts<br/>    root = get_contacts(args, 'vo', 'VO')<br/>  File "/usr/lib/python2.7/site-packages/topology_utils.py", line 222, in get_contacts<br/>    response = session.get(url)<br/>  File "/usr/lib/python2.7/site-packages/requests/sessions.py", line 498, in get<br/>    return self.request('GET', url, **kwargs)<br/>  File "/usr/lib/python2.7/site-packages/requests/sessions.py", line 486, in request<br/>    resp = self.send(prep, **send_kwargs)<br/>  File "/usr/lib/python2.7/site-packages/requests/sessions.py", line 598, in send<br/>    r = adapter.send(request, **kwargs)<br/>  File "/usr/lib/python2.7/site-packages/requests/adapters.py", line 370, in send<br/>    timeout=timeout<br/>  File "/usr/lib/python2.7/site-packages/urllib3/connectionpool.py", line 544, in urlopen<br/>    body=body, headers=headers)<br/>  File "/usr/lib/python2.7/site-packages/urllib3/connectionpool.py", line 344, in _make_request<br/>    self._raise_timeout(err=e, url=url, timeout_value=conn.timeout)<br/>  File "/usr/lib/python2.7/site-packages/urllib3/connectionpool.py", line 314, in _raise_timeout<br/>    if 'timed out' in str(err) or 'did not complete (read)' in str(err):  # Python 2.6<br/>TypeError: __str__ returned non-string (type Error)</pre><br/><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:27:33)</span> <b>blin:</b></span> is this on osg-sw-submit?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:27:39)</span> <b>stanfiem:</b></span> yes<br/>
+<span style="color: #73769d"><span style="font-size: small">(10:29:01)</span> <b>tim.theisen:</b></span> That is what you get when you type the wrong password for your cert.<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:29:11)</span> <b>matyas:</b></span> you get a timeout??<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:29:32)</span> <b>stanfiem:</b></span> I got a different error when I typed the wrong password (because it took me three times to remember it)<br/>
+<span style="color: #73769d"><span style="font-size: small">(10:29:41)</span> <b>tim.theisen:</b></span> nevermind. I read the stack trace wrong.<br/>
+<span style="color: #73769d"><span style="font-size: small">(10:30:54)</span> <b>tim.theisen:</b></span> I just tried a dry-run of a release announcement on osg-sw-submit and it worked for me.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:31:29)</span> <b>blin:</b></span> what's the DN of your proxy?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:33:49)</span> <b>stanfiem:</b></span> <pre>/DC=org/DC=cilogon/C=US/O=Indiana University/CN=Mike Stanfield A6445216</pre><br/><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:35:13)</span> <b>blin:</b></span> how about the full command you're running?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:35:46)</span> <b>stanfiem:</b></span> <pre> osg-notify --cert .keys/usercert-key.pem --key .keys/usercert-key.pem --sign --sign-id 7FD42669 --from security --type test --message announcements/OSG-SEC-2020-08-31_Vulnerabilities_in_frontier-squid.txt --subject "OSG-SEC-2020-08-31 Vulnerabilities in frontier-squid" --recipients "<a href="mailto:stanfiem@iu.edu">stanfiem@iu.edu</a>" --oim-recipients resources --oim-recipients vos --oim-contact-type security --dry-run</pre><br/><br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:36:40)</span> <b>bbockelm:</b></span> Looks like an issue chatting with topology - is it possible topology is trying to query something internally and failing?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:41:14)</span> <b>blin:</b></span> there's certainly a lot of topology repo update failures on the host<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:43:50)</span> <b>matyas:</b></span> that's normal<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:44:05)</span> <b>matyas:</b></span> we're lazy and rely on git for locking<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:44:37)</span> <b>matyas:</b></span> I just checked... repo is up to date<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:46:52)</span> <b>blin:</b></span> i don't see much else of interest in the logs<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:48:31)</span> <b>blin:</b></span> @stanfiem could you run a <tt>date; ...</tt>  with your command?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:48:56)</span> <b>bbockelm:</b></span> another possibility is that topology doesn't like Mike's cert.  Did someone else try a CILogon cert?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:48:58)</span> <b>blin:</b></span> also, can you see the contact info in your browser here? <a href="https://topology.opensciencegrid.org/vosummary/xml">https://topology.opensciencegrid.org/vosummary/xml</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:49:24)</span> <b>blin:</b></span> yeah, from the logs, mat, tim, and I used cilogon certs :slightly_smiling_face:<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:49:56)</span> <b>blin:</b></span> though maybe Mike's got an openid-issued cert?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:51:24)</span> <b>stanfiem:</b></span> and my certificate is expired :slightly_smiling_face: user error wins again<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:51:34)</span> <b>stanfiem:</b></span> i love x509<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:53:28)</span> <b>blin:</b></span> to be fair, <tt>osg-notify</tt> should be more helpful in catching that sort of thing<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:16:38)</span> <b>andrew.melo:</b></span> BrianL -- first pass looks like adding those home directories to the CE didn't fix it....<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:18:19)</span> <b>blin:</b></span> :anguished:<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:18:22)</span> <b>andrew.melo:</b></span> Wait<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:18:29)</span> <b>andrew.melo:</b></span> Scratch that, let me loop back to you<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:32:04)</span> <b>eric.appelt:</b></span> This was my late-night mistake, I made the home directories in /root rather than /home :sweat_smile:<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:37:48)</span> <b>andrew.melo:</b></span> Lol, I was gonna just let the reason hang, but if you wanna out yourself.... :slightly_smiling_face:<br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:16:47)</span> <b>andrew.melo:</b></span> Oddball question, but I figure I'd ask here first, I'm implementing an XRootD OSS (filesystem) plugin -- is there anything on the server side that specifies is the sync or async versions of read() are preferred?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:31:39)</span> <b>rynge:</b></span> @bbockelm In 8.9.7, should it be enough for a schedd to auth to the CM with idtokens and then be able to negotiate? I think you told us that there should be an automatic session token in that case<br/>
+</body>
+</html>

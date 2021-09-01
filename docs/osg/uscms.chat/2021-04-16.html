@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Apr 16, 2021 : #uscms (osg)</title>
+</head>
+<body>
+<h3>Fri Apr 16, 2021 : #uscms (osg)</h3>
+<span style="color: #de5f24"><span style="font-size: small">(14:58:20)</span> <b>justas.balcas:</b></span> @dmason Can you help me (us - meaning caltech) with one issue? Speed up this fix? <a href="https://ggus.eu/?mode=ticket_info&amp;ticket_id=151348">https://ggus.eu/?mode=ticket_info&amp;ticket_id=151348</a> ?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:06:49)</span> <b>andrew.melo:</b></span> Errr, I can't access ggus?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:11:04)</span> <b>justas.balcas:</b></span> In short: FNAL FTS3 is outdated and it fails to transfer from INFN Tape to Caltech (or any other Tier2 using FTS3@FNAL)<br/>
+<span style="color: #bc3663"><span style="font-size: small">(15:11:07)</span> <b>dmason:</b></span> yeah down for me too<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:11:56)</span> <b>justas.balcas:</b></span> <pre>update#8<br/>Chih-Hao Huang 	2021-04-16 	12:09 	<br/>Public Diary:<br/>This requires an upgrade of FTS3 to newer version.<br/>The upgrade is planned and we are waiting for the preparation of a new server.<br/>Stay tuned.                                        <br/>update#9<br/>Justas Balcas 	2021-04-16 	19:53 	<br/>Public Diary:<br/>Hi, Do we have ETA for this fix?        </pre><br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:12:04)</span> <b>justas.balcas:</b></span> <a href="https://fermi.servicenowservices.com/nav_to.do?uri=incident.do?sysparm_query=number=b3b93a341b636c90bdf586eae54bcba2">https://fermi.servicenowservices.com/nav_to.do?uri=incident.do?sysparm_query=number=b3b93a341b636c90bdf586eae54bcba2</a><br/>
+<span style="color: #bc3663"><span style="font-size: small">(15:13:00)</span> <b>dmason:</b></span> I will tell you the earliest possible is going to be next week.  Definitely not coming today<br/>
+<span style="color: #bc3663"><span style="font-size: small">(15:13:50)</span> <b>dmason:</b></span> I'll go poke at FTS monitoring -- ggus is gone as far as I can tell<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:21:01)</span> <b>justas.balcas:</b></span> Ok, pinging Nick in this case, to cancel all transfers and resync siteconf and go back to cern fts3.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:21:03)</span> <b>justas.balcas:</b></span> thanks<br/>
+<span style="color: #bc3663"><span style="font-size: small">(15:26:20)</span> <b>dmason:</b></span> I see -- this is because you've needed to move to davs in production?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:27:21)</span> <b>justas.balcas:</b></span> no, it is not dav related. ggus is back. more detailed explanation is here: <a href="https://ggus.eu/index.php?mode=ticket_info&amp;ticket_id=149215#update#12">https://ggus.eu/index.php?mode=ticket_info&amp;ticket_id=149215#update#12</a><br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:28:26)</span> <b>justas.balcas:</b></span> But yea, we were switching back and forth for davs. One day from fnal to cern, after few days back to fnal, and now back to cern :D<br/>
+<span style="color: #bc3663"><span style="font-size: small">(15:31:43)</span> <b>dmason:</b></span> I see -- the fix is sandwiched between FTS releases -- we're getting 3.10 in there.  Yes the expedient thing is switch, then come back once we've tested the new release<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:32:10)</span> <b>andrew.melo:</b></span> I'm looking at a log and I don't see the long pause mentioned in the ggus ticket . ex - <a href="https://cmsftssrv2.fnal.gov:8449/var/log/fts3/transfers/2021-04-16/storm-fe-cms.cr.cnaf.infn.it__transfer.ultralight.org/2021-04-16-1845__storm-fe-cms.cr.cnaf.infn.it__transfer.ultralight.org__7021853__03e72678-9a58-11eb-9f94-a0369f23cf8e">https://cmsftssrv2.fnal.gov:8449/var/log/fts3/transfers/2021-04-16/storm-fe-cms.cr.cnaf.i[…]light.org__7021853__03e72678-9a58-11eb-9f94-a0369f23cf8e</a><br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:32:21)</span> <b>andrew.melo:</b></span> whole thing happens in 16 minutes<br/>
+<span style="color: #bc3663"><span style="font-size: small">(15:33:12)</span> <b>dmason:</b></span> It'll be interesting to see if the server switch helps.  I agree thats a good empirical check<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:35:22)</span> <b>andrew.melo:</b></span> I'd also assume that since the interaction is between the endpoints and the gfal tools, the bug/issue would be at that layer and not at the FTS layer, who just orchetrates running a gajillion gfal copies, but I must be missing a part of the equation<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:36:02)</span> <b>justas.balcas:</b></span> I will let you know :wink: but seeing all other transfers from infn tape to other sites succeed using cernfts3 - I think it will work<br/>
+<span style="color: #bc3663"><span style="font-size: small">(15:39:10)</span> <b>dmason:</b></span> There's also configuration differences we've seen, but yes will be good to have the datapoint<br/>
+<span style="color: #de5f24"><span style="font-size: small">(15:43:31)</span> <b>justas.balcas:</b></span> the switch is most complicated part. rucio takes 12h to sync siteconf change. Also seems rucio is not deleting pending transfers even all rules are cancelled, so need also transfer team to do fts-transfer-cancel… (I liked in Phedex world to have power other this :slightly_smiling_face:)<br/>
+<span style="color: #de5f24"><span style="font-size: small">(16:40:31)</span> <b>justas.balcas:</b></span> It works with CERN FTS3<br/>
+<span style="color: #bc3663"><span style="font-size: small">(16:46:51)</span> <b>dmason:</b></span> OK good -- once we have the second server back we'll have 3.10 available at FNAL to test against too<br/>
+<span style="color: #de5f24"><span style="font-size: small">(18:07:16)</span> <b>justas.balcas:</b></span> I see most US Sites failing xrootd SAM tests failing. Something wrong with both fnal redirectors?<br/><a href="https://monit-grafana.cern.ch/d/serviceAvailability/overview-service-availability?orgId=11&amp;from=1618611300000&amp;to=1618613459999">https://monit-grafana.cern.ch/d/serviceAvailability/overview-service-availability?orgId=11&amp;from=1618611300000&amp;to=1618613459999</a><br/>
+<span style="color: #bc3663"><span style="font-size: small">(18:11:35)</span> <b>dmason:</b></span> looking more like a SAM test problem -- cert expired?<br/>
+<span style="color: #bc3663"><span style="font-size: small">(18:11:45)</span> <b>dmason:</b></span> wonder if there's problems at CERN now<br/>
+<span style="color: #bc3663"><span style="font-size: small">(18:19:07)</span> <b>dmason:</b></span> no -- there's some unhappiness in here.  Lets see whats up.<br/>
+<span style="color: #bc3663"><span style="font-size: small">(18:43:10)</span> <b>dmason:</b></span> Looking better here<br/>
+<span style="color: #dd8527"><span style="font-size: small">(19:02:57)</span> <b>mtadel:</b></span> have you guys figure it out?<br/>fnal redirector used to redirect to raw IP numbers of site redirectors, not hostnames, and then authentication failed as the redirector's cert didn't match<br/>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue May 14, 2019 : #operations (osg)</title>
+</head>
+<body>
+<h3>Tue May 14, 2019 : #operations (osg)</h3>
+<span style="color: #e23f99"><span style="font-size: small">(08:42:51)</span> <b>marco.mascheroni:</b></span> @blin yes, I will register it<br/>
+<span style="color: #e23f99"><span style="font-size: small">(08:44:47)</span> <b>marco.mascheroni:</b></span> @jthiltges  hosted-ce09 is actually retired, it has long gone (since last august, before I took over the hosted CE management). I will fix my spreadsheet<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:33:41)</span> <b>bbockelm:</b></span> @marco.mascheroni, all - do we have any existence proofs of using GPUs for a hosted CE?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:01:04)</span> <b>marco.mascheroni:</b></span> @bbockelm I don't, do you think it's much difference? Naively I'd think you just need to set the right attributes in the CE, or in the submission host (if it's not supported)<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:22:31)</span> <b>marian:</b></span> <b>@here</b>: Purdue has a resource they claim is just a test resource and don't get any production jobs ... The resource is, however, registered in the topology under the name <tt>Purdue-Hadoop-HT-PBS-CE</tt> ... we don't need it then in the osg accouring reports either ... how to best achieve it won't being counted and still have this resource in topology? would attribute in .yaml <tt>Disable: true</tt> do it or <tt>Active: false</tt>? Not sure what is difference between Disable and Active, can somebody tell?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:23:42)</span> <b>dweitzel:</b></span> ... stop the gratia probe?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:23:58)</span> <b>dweitzel:</b></span> also, what do we care if it's a production job.  We count test jobs in the OSG all the time.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:24:19)</span> <b>dweitzel:</b></span> why do they not want it in GRACC?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:26:32)</span> <b>blin:</b></span> @marian <a href="https://github.com/opensciencegrid/topology/tree/master/src#useful-definitions">https://github.com/opensciencegrid/topology/tree/master/src#useful-definitions</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(13:27:00)</span> <b>marian:</b></span> well I meant at all ... I just want to avoid reminders for that resouce from gracc about the probes ... OK, can tell just stop the probe ...<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:27:28)</span> <b>marian:</b></span> for the decomissioning probe completely? what's suggested way? set it inactive, remove completely from topology or?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:27:47)</span> <b>dweitzel:</b></span> turn off the WLCG bit in topology.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:28:02)</span> <b>dweitzel:</b></span> I think that reminder from GRACC is just for WLCG enabled resources.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:28:39)</span> <b>blin:</b></span> set it to inactive<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:29:41)</span> <b>dweitzel:</b></span> They have the WLCG interop turned on for it: <a href="https://github.com/opensciencegrid/topology/blob/master/topology/Purdue%20University/Purdue%20CMS/Purdue-Hadoop.yaml#L84">https://github.com/opensciencegrid/topology/blob/master/topology/Purdue%20University/Purdue%20CMS/Purdue-Hadoop.yaml#L84</a><br/>
+<span style="color: #53b759"><span style="font-size: small">(13:41:28)</span> <b>marian:</b></span> sorry stepped away from computer for a moment<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:43:06)</span> <b>marian:</b></span> by turn off WLCG bit you mean remove whole section <tt>WLCGInformation:</tt> in the topology for given resource, @dweitzel?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:43:49)</span> <b>dweitzel:</b></span> I'm not sure about removing the section.  It may fail some of the tests.  I would just set InteropAccounting to false<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:44:06)</span> <b>marian:</b></span> ah, gotcha<br/>
+<span style="color: #53b759"><span style="font-size: small">(13:46:47)</span> <b>marian:</b></span> and for the resource which shouldn't be anymore in topology? reading gihub link @blin sent, is <tt>Disable: true</tt> good enough to consider resource decommissioned?<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(13:47:13)</span> <b>manglano:</b></span> Hi, there are many Freshdesk tickets pertaining to a "Publication Survey"; most are unanswered, it seems?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:47:52)</span> <b>blin:</b></span> @marian please set <tt>Active: False</tt>. we try to avoid setting disable<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:48:19)</span> <b>blin:</b></span> @manglano got a link?<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(13:57:30)</span> <b>manglano:</b></span> It looks like they've all been assigned to Mats <a href="https://support.opensciencegrid.org/a/tickets/8761">https://support.opensciencegrid.org/a/tickets/8761</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:58:45)</span> <b>blin:</b></span> ah ok, if they're assigned, don't worry about it<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(13:58:49)</span> <b>manglano:</b></span> ok<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:09:21)</span> <b>matyas:</b></span> @marian: there is a "Production: False" you can set in topology<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:12:07)</span> <b>matyas:</b></span> ...I'm not sure how the different consumers interpret it though. What ends up in the XML is <tt>&lt;GridType&gt;OSG Integration Test Bed Resource&lt;/GridType&gt;</tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(15:58:24)</span> <b>marian:</b></span> thanks, @blin and @matyas for suggestions<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:59:54)</span> <b>marian:</b></span> maybe this would imply to think of the meaning of the &gt;three different options and converge to something more clear that site contacts also know what to edit in topology when they are a) testing resource or b) retiring it ...<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:00:19)</span> <b>matyas:</b></span> yeah<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:00:37)</span> <b>matyas:</b></span> our choices were kind of constrained by what our downstreams wanted in the XML<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:00:43)</span> <b>marian:</b></span> sure, undrestood<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:00:45)</span> <b>blin:</b></span> yeah, we've got a lot of disable fields that we inherited that we should clean up<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:01:05)</span> <b>marian:</b></span> we can bring it up on the Ops meeting on Monday and make it @jdost321 problem :wink:<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:01:14)</span> <b>blin:</b></span> but in the template + most of the documentation we tell people to set the <tt>Active</tt> field one way or another<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:01:55)</span> <b>marian:</b></span> yeah, there is also WLCGInformation thingy etc...<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:04:40)</span> <b>blin:</b></span> idk about that, tbh<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:05:01)</span> <b>marian:</b></span> @matyas: as I see it, <tt>Production: False</tt> will affect complete list of resources listed in the topology file ... not per resource<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:05:33)</span> <b>marian:</b></span> so we may need some more attention to all disable options and cases probably and decide how to simplify<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:08:21)</span> <b>matyas:</b></span> @blin oh hey we finally found out the purpose of a ResourceGroup :stuck_out_tongue:<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:08:42)</span> <b>blin:</b></span> rofl<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:08:57)</span> <b>matyas:</b></span> yeah I guess you're supposed to put all the production resources in one yaml file and all the itb resources in another yaml file<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:29:43)</span> <b>marian:</b></span> ha! :slightly_smiling_face:<br/>
+</body>
+</html>

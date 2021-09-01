@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Sep 26, 2018 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Sep 26, 2018 : #software (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(02:33:20)</span> <b>bbockelm:</b></span> When it gets back to working hours again (hope you guys all mute your notifications appropriately!), I don't understand the supervisord.conf here: <a href="https://github.com/efajardo/prp-stashcache/blob/master/supervisord.conf#L30">https://github.com/efajardo/prp-stashcache/blob/master/supervisord.conf#L30</a>  does that mean refresh proxy is only re-run 4 times?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(05:54:26)</span> <b>bbockelm:</b></span> ah - there's a separate service that runs cron, which in turn kicks off these jobs.<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:52:12)</span> <b>matyas:</b></span> is there some way I can get a list of what's available on stashcache? is there a <tt>stashls</tt> or something?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:55:25)</span> <b>dweitzel:</b></span> kinda, but not really...  Hence the cvmfs repo where you can 'ls'<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:55:48)</span> <b>dweitzel:</b></span> if you have the OSG CVMFS installed, just <tt>ls /cvmfs/stash.osgstorage.org/</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(10:04:28)</span> <b>matyas:</b></span> does that mean any file on stashcache is also accessible via cvmfs?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:07:28)</span> <b>dweitzel:</b></span> cvmfs uses stashcache for the actual data.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:09:33)</span> <b>dweitzel:</b></span> "Stash" is just 1 origin of many in the StashCache federation.  So no, not every file is available through CVMFS.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:09:36)</span> <b>dweitzel:</b></span> but many are.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:09:43)</span> <b>dweitzel:</b></span> Most*<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:36:21)</span> <b>matyas:</b></span> I can't seem to mount <tt>/cvmfs/stash.osgstorage.org</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(17:37:11)</span> <b>matyas:</b></span> <pre><br/>(download) escaped<br/>  <a href="http://cvmfs-s1fnal.opensciencegrid.org:8000/cvmfs/stash.osgstorage.org/data/00/00000000000000000000000000000000000000C">http://cvmfs-s1fnal.opensciencegrid.org:8000/cvmfs/stash.osgstorage.org/data/00/00000000000000000000000000000000000000C</a><br/>  to<br/>  <a href="http://cvmfs-s1fnal.opensciencegrid.org:8000/cvmfs/stash.osgstorage.org/data/00/00000000000000000000000000000000000000C">http://cvmfs-s1fnal.opensciencegrid.org:8000/cvmfs/stash.osgstorage.org/data/00/00000000000000000000000000000000000000C</a><br/>(download) Verify downloaded url /data/00/00000000000000000000000000000000000000C,<br/>  proxy <a href="http://squid1.fnal.gov:3128">http://squid1.fnal.gov:3128</a> (curl error 7)<br/>(download) download failed (error 6 - proxy connection problem)<br/>                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^<br/>(cache) failed to fetch file catalog at <a href="http://stash.osgstorage.org:/">stash.osgstorage.org:/</a><br/>  (hash: 0000000000000000000000000000000000000000, error 6 [proxy connection problem])<br/></pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(17:47:55)</span> <b>matyas:</b></span> also, do you run an authenticated cache server in addition to, or instead of a non-authenticated cache server?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(19:06:44)</span> <b>dweitzel:</b></span> in addition.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(19:07:35)</span> <b>dweitzel:</b></span> Proxy connection problem.  Maybe fnal squid isn't allowing you to download?<br/>
+<span style="color: #c386df"><span style="font-size: small">(19:18:41)</span> <b>matyas:</b></span> should I just set up my own squid or something?<br/>
+<span style="color: #c386df"><span style="font-size: small">(19:26:07)</span> <b>matyas:</b></span> ok, tried it with my own proxy; now I see 403 forbidden errors in the logs<br/>
+<span style="color: #c386df"><span style="font-size: small">(19:26:58)</span> <b>matyas:</b></span> <pre><br/><a href="http://cvmfs-s1fnal.opensciencegrid.org:8000/cvmfs/stash.osgstorage.org/data/00/00000000000000000000000000000000000000C">http://cvmfs-s1fnal.opensciencegrid.org:8000/cvmfs/stash.osgstorage.org/data/00/00000000000000000000000000000000000000C</a>    [09-26-2018 19:25:21 CDT]<br/>(download) http status error code: HTTP/1.1 403 Forbidden<br/>    [09-26-2018 19:25:21 CDT]<br/>(download) Verify downloaded url /data/00/00000000000000000000000000000000000000C, proxy <a href="http://131.225.154.192:3128">http://131.225.154.192:3128</a> (curl error 23)    [09-26-2018 19:25:21 CDT]<br/>(download) download failed (error 8 - proxy returned HTTP error)    [09-26-2018 19:25:21 CDT]<br/></pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(19:38:59)</span> <b>dweitzel:</b></span> you could always set proxy to DIRECT<br/>
+<span style="color: #235e5b"><span style="font-size: small">(19:39:08)</span> <b>dweitzel:</b></span> so... no proxy<br/>
+</body>
+</html>

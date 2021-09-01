@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Dec 20, 2018 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Thu Dec 20, 2018 : #xcache (osg)</h3>
+<span style="color: #8d4b84"><span style="font-size: small">(08:44:03)</span> <b>kherner:</b></span> Actually that's almost certainly me<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(08:45:10)</span> <b>kherner:</b></span> Probably files with fake transient object candidates to overlay on DES images<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:01:05)</span> <b>bbockelm:</b></span> @ivukotic - what's the TCP keepalive setting for your hosts?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:01:51)</span> <b>bbockelm:</b></span> Is it something that times out after, say, 7 minutes?<br/>
+<span style="color: #84b22f"><span style="font-size: small">(14:02:04)</span> <b>ivukotic:</b></span> checking now<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:02:22)</span> <b>bbockelm:</b></span> anyhow, you definitely need to get the client to the next debug level.  I think it's a clear sign of "read recovery" kicking in.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:02:33)</span> <b>bbockelm:</b></span> Note that after 7 minutes the client *reconnects* before the server even notices it disconnects.<br/>
+<span style="color: #84b22f"><span style="font-size: small">(14:04:26)</span> <b>ivukotic:</b></span> It happens rather frequently<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:04:43)</span> <b>bbockelm:</b></span> that's great news!  That means a random "pstack" would reveal the problem.<br/>
+<span style="color: #84b22f"><span style="font-size: small">(14:04:43)</span> <b>ivukotic:</b></span> I can't change client logging as these are production jobs<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:05:09)</span> <b>bbockelm:</b></span> I'm thinking something is holding on to a lock and the lock isn't releasing until the client disconnects<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:05:27)</span> <b>bbockelm:</b></span> We'd be able to take a better guess from the OFS read-level traces.<br/>
+<span style="color: #84b22f"><span style="font-size: small">(14:05:30)</span> <b>ivukotic:</b></span> cat /proc/sys/net/ipv4/tcp_keepalive_time<br/>7200<br/>
+<span style="color: #84b22f"><span style="font-size: small">(14:05:41)</span> <b>ivukotic:</b></span> so 2h<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:06:49)</span> <b>bbockelm:</b></span> Try:<br/><pre><br/>ofs.trace open close delay redirect read<br/></pre><br/>
+</body>
+</html>

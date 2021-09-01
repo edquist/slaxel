@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jun 3, 2021 : #operations (chtc)</title>
+</head>
+<body>
+<h3>Thu Jun 3, 2021 : #operations (chtc)</h3>
+<span style="color: #bb86b7"><span style="font-size: small">(09:14:25)</span> <b>tim:</b></span> I am copying a few files from <a href="http://dumbo.chtc.wisc.edu">dumbo.chtc.wisc.edu</a> to <a href="http://moria.cs.wisc.edu">moria.cs.wisc.edu</a> and the transfer rate averages 160KB/s. Any idea why so slow?<br/>
+<blockquote>
+<span style="color: #3c989f"><span style="font-size: small">(10:09:52)</span> <b>wiscmoate:</b></span> @tim the only thing I can think of is that some of the CS 3370a network links to CS have been shown to have pretty poor performance;  we're hoping that gets addressed when we eventually upgrade the networks in both rooms.  You could try transfers between dumbo and various other servers in different datacenters to get more data points.<br/>
+</blockquote>
+<span style="color: #9f69e7"><span style="font-size: small">(09:30:07)</span> <b>lmichael:</b></span> @tjslauson @wiscmoate any updates yet on the HPC Cluster issues? The email to users (and what I can read here) was pretty vague, but let us know what the RCFs can send out.<br/>(And thank you for handling things without me. I saw it all a bit too late to help yesterday.)<br/>
+<blockquote>
+<span style="color: #4bbe2e"><span style="font-size: small">(10:27:39)</span> <b>tjslauson:</b></span> @lmichael no update, I chose not to open Pandora's box last night because of how late it was getting when I was ready to start running bigger commands.  The storage cluster, though not healthy, has at least been in a mostly-stable state since the weekend and showed no signs of deteriorating further.  This morning it's in the same state as yesterday (good!).  I'll be running the commands that have a chance of affecting jobs today.<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(10:27:59)</span> <b>tjslauson:</b></span> I thought that yesterday @jcpatton did a great job conveying the information we had at the time.  @lmichael if there's anything specific you're looking for to put in a next communication, please lmk and I can see what we know and what we don't.<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(10:57:49)</span> <b>lmichael:</b></span> I’m fine with the level of detail and lack of specificity yesterday! I’m mostly trying to figure out what a more detailed update (that we promised in the first email) should entail.<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(10:59:58)</span> <b>lmichael:</b></span> So, it sounds like we could send something like<br/><pre>We are still doing some tests and verifications, but we believe the HPC Cluster filesystem is mostly stable at this time, even if a bit slower than usual. As we work to regain normal performance, we'll provide an update only if we believe users will experience job failures and/or should avoid running more work or external transfers. As always, if you experience issues - including anything to do with data access on the cluster - please send an email to <a href="mailto:chtc@cs.wisc.edu">chtc@cs.wisc.edu</a>.</pre><br/>
+<span style="color: #9f69e7"><span style="font-size: small">(11:03:26)</span> <b>lmichael:</b></span> good @tjslauson?<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(12:31:47)</span> <b>tjslauson:</b></span> nope - see the update I just wrote<br/>
+</blockquote>
+<span style="color: #4bbe2e"><span style="font-size: small">(12:31:25)</span> <b>tjslauson:</b></span> new update on the HPC front: the HPC cluster is now hanging for all user-like operations I've tried (logging in, running commands) due to issues with the <tt>/home</tt> filesystem.  There's reason to think that the FS might be fixing itself atm (and that the answer here is patience), but regardless I'll be heading on-site to continue looking at it this afternoon.<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(12:32:51)</span> <b>tjslauson:</b></span> jobs are still showing as running, but I'd bet they're frozen on I/O.  I've temporarily disabled scheduling any new jobs until things look better.<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(13:35:26)</span> <b>tjslauson:</b></span> @lmichael @ckoch5 @jcpatton as of a couple minutes ago the FS is reporting it's healthy, and the commands that were hanging before (including Josh's commands on hpclogin2 from ticket 103423) are all working.  I'm going to give it at least an hour before I call it healthy.<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(13:38:04)</span> <b>tjslauson:</b></span> I took snapshots of which jobs were in what states before and after, and I'm not seeing much difference.  That's not to say there weren't any job issues, but I'm not seeing job issues with that method.<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(14:09:10)</span> <b>lmichael:</b></span> @tjslauson You mean that jobs that might have been blocked on I/O have likely resumed now? Would you expect that any would have failed and left the queue, needing to be resubmitted?<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(14:11:34)</span> <b>lmichael:</b></span> (just trying to figure out what our update to users should be when you think it’s stable enough)<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(14:42:58)</span> <b>tjslauson:</b></span> @lmichael with this, I was meaning that it looked on the surface like all jobs continued running after the pause in I/O ended.<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(14:45:02)</span> <b>tjslauson:</b></span> I checked in on all of this afternoon's jobs using <tt>sacct</tt>, and I'm not seeing any jobs that exited with any state other than <tt>COMPLETED</tt> (normal exit) or <tt>CANCELLED</tt> (when someone uses <tt>scancel</tt> on a job).<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(14:46:23)</span> <b>tjslauson:</b></span> Slurm by default will try to requeue jobs if it detects some abnormal failure caused by the compute node itself (users can opt instead to never requeue by adding a flag to their jobs)<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(14:46:40)</span> <b>tjslauson:</b></span> in short, I haven't noticed any job issues yet beyond the I/O pause, which would have delayed any jobs waiting on I/O for 1.5 to 2 hours.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(14:47:41)</span> <b>jcpatton:</b></span> hopefully they had some leeway in their walltime requests :slightly_smiling_face:<br/>
+<span style="color: #4bbe2e"><span style="font-size: small">(14:54:34)</span> <b>tjslauson:</b></span> @lmichael I've lifted the temporary pause on HPC job scheduling.  Everything's looked stable for the past hour-plus :)<br/>
+</body>
+</html>

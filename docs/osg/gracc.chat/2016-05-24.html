@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue May 24, 2016 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Tue May 24, 2016 : #gracc (osg)</h3>
+<span style="color: #3c8c69"><span style="font-size: small">(09:38:10)</span> <b>kretzke:</b></span> @dweitzel: what constitutes a “day” for the status reports, and what field are you filtering on? having trouble correlating those with <a href="https://gracc.opensciencegrid.org/dashboard/db/osg-jobusagerecord?panelId=2&amp;fullscreen&amp;from=1463495873515&amp;to=1464100673515&amp;var-interval=1d">https://gracc.opensciencegrid.org/dashboard/db/osg-jobusagerecord?panelId=2&amp;fullscreen&amp;from=1463495873515&amp;to=1464100673515&amp;var-interval=1d</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:42:06)</span> <b>dweitzel:</b></span> I’m using <tt>now-1d</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:42:33)</span> <b>dweitzel:</b></span> then the search is (using python bindings): <br/><pre><br/>s = Search(using=client, index='gracc-osg-*') \<br/>        .filter('range', **{'@timestamp': {'from': from_date, 'to': to_date}}) \<br/>        .params(search_type="count”)<br/></pre><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(09:44:00)</span> <b>kretzke:</b></span> hm, so that should actually be all resource types?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:44:37)</span> <b>dweitzel:</b></span> yes, just looking at record counts.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:06:50)</span> <b>kretzke:</b></span> over that same period for yesterday I’m seeing a bit over a million records (vs 245K). <a href="https://gracc.opensciencegrid.org/dashboard/db/grace-records?from=1463986800000&amp;to=1464073200000">https://gracc.opensciencegrid.org/dashboard/db/grace-records?from=1463986800000&amp;to=1464073200000</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:07:44)</span> <b>dweitzel:</b></span> will the indexes for all of those be gracc-osg-* ?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:08:10)</span> <b>kretzke:</b></span> ah, but we’re using EndTime, so it’s possible a bunch of records came in between 02:00 and now. that seems high, but maybe<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:09:10)</span> <b>kretzke:</b></span> yeah, poor naming on my part, gracc-osg-* will also include gracc-osg-transfer-* and gracc-osg-itb-*<br/>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Dec 7, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Mon Dec 7, 2020 : #software (osg)</h3>
+<span style="color: #674b1b"><span style="font-size: small">(12:56:43)</span> <b>rynge:</b></span> <pre>osg         2794  0.0  0.0 169428 10140 ?        S    Dec05   0:08 /usr/libexec/condor/curl_plugin -infile /tmp/osgvo-pilot-12494/lib/condor/execute/dir_2763/.<a href="http://curl_plugin.in">curl_plugin.in</a> -outfile /tmp/osgvo-pilot-12494/lib/condor/execute/dir_2763/.curl_plugin.out</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:56:54)</span> <b>rynge:</b></span> Does the curl_plugin has any timeouts set?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:09:17)</span> <b>rynge:</b></span> I have a bunch of those hanging<br/>
+<span style="color: #73769d"><span style="font-size: small">(14:09:39)</span> <b>tim.theisen:</b></span> From the source:<br/><pre>// After 30 seconds, check if we're making forward progress (&gt; 1 byte/s)</pre><br/>
+<span style="color: #73769d"><span style="font-size: small">(14:10:25)</span> <b>tim.theisen:</b></span> That's for version 8.9.7 and later.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:14:08)</span> <b>dweitzel:</b></span> ouch, 1 byte/s limit?  CVMFS enforces a 1KB/s limit.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:46:03)</span> <b>rynge:</b></span> The jobs I saw had connections opened for ~2 days, and had 0 bytes downloaded (at least according to the target file)<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:51:22)</span> <b>lincoln:</b></span> @rynge where did you see this error?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:51:43)</span> <b>dweitzel:</b></span> @tim.theisen where are you seeing that in the source?  I don't see any speed limit in the curl plugin code here: <a href="https://github.com/htcondor/htcondor/blob/0c7e87f652dc453ffc745b4267e50b17043a8450/src/condor_filetransfer_plugins/curl_plugin.cpp">https://github.com/htcondor/htcondor/blob/0c7e87f652dc453ffc745b4267e50b17043a8450/src/condor_filetransfer_plugins/curl_plugin.cpp</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:54:57)</span> <b>dweitzel:</b></span> It should have a curl call to <a href="https://curl.se/libcurl/c/CURLOPT_LOW_SPEED_LIMIT.html">https://curl.se/libcurl/c/CURLOPT_LOW_SPEED_LIMIT.html</a><br/>
+<span style="color: #73769d"><span style="font-size: small">(14:57:23)</span> <b>tim.theisen:</b></span> <a href="https://github.com/htcondor/htcondor/blob/f7eee115874a90704a5f97e07f5aa019dddf2ecb/src/condor_filetransfer_plugins/multifile_curl_plugin.cpp#L36">https://github.com/htcondor/htcondor/blob/f7eee115874a90704a5f97e07f5aa019dddf2ecb/src/condor_filetransfer_plugins/multifile_curl_plugin.cpp#L36</a><br/>
+<span style="color: #73769d"><span style="font-size: small">(15:00:30)</span> <b>tim.theisen:</b></span> That;s the old curl plugin. The multi-file curl plugin is used by default now.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:01:35)</span> <b>rynge:</b></span> @lincoln It was on a JetStream VM/Docker instance, connecting to <a href="http://stash.osgconnect.net">stash.osgconnect.net</a>  - I guess we don't have timeouts on the server either... :slightly_smiling_face:<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:01:46)</span> <b>lincoln:</b></span> :thinking_face:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:04:43)</span> <b>rynge:</b></span> It seems like the jobs are running fine now<br/>
+</body>
+</html>

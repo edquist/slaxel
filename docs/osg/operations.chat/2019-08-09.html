@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Aug 9, 2019 : #operations (osg)</title>
+</head>
+<body>
+<h3>Fri Aug 9, 2019 : #operations (osg)</h3>
+<span style="color: #e23f99"><span style="font-size: small">(03:27:07)</span> <b>marco.mascheroni:</b></span> @lincoln @jlstephen, there are a few hostedCEs with expiring/expired hostcerts:<br/><pre><br/><a href="http://hosted-ce04.grid.uchicago.edu">hosted-ce04.grid.uchicago.edu</a> notAfter=Aug 11 14:11:54 2019 GMT<br/><a href="http://hosted-ce07.grid.uchicago.edu">hosted-ce07.grid.uchicago.edu</a> notAfter=Aug  7 18:39:00 2019 GMT<br/><a href="http://hosted-ce08.grid.uchicago.edu">hosted-ce08.grid.uchicago.edu</a> notAfter=Aug  7 18:53:15 2019 GMT<br/></pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(08:27:41)</span> <b>lincoln:</b></span> will take care of it<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:33:52)</span> <b>lincoln:</b></span> looks like there is a firewall or security group that is blocking these from auto-renewing<br/>
+<span style="color: #e23f99"><span style="font-size: small">(12:07:07)</span> <b>marco.mascheroni:</b></span> Ok, let me know when I should check them again<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:25:25)</span> <b>matyas:</b></span> @paschos topology registration for stashcaches is used for generating their "authfiles"... getting an authfile for the cache from topology will let you verify that registration is correct. so try this:<br/><pre><br/>$ curl '<a href="https://topology.opensciencegrid.org/stashcache/authfile?cache_fqdn=stashcache.grid.uchicago.edu">https://topology.opensciencegrid.org/stashcache/authfile?cache_fqdn=stashcache.grid.uchicago.edu</a>' | less<br/></pre><br/>if you get a bunch of xrootd acls (stuff like <tt>g /hcc /hcc/focusday rl</tt> and <tt>u 47146b14.0 /user/ligo rl</tt>) then your registration is fine. if you get an error message, it's not<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:27:12)</span> <b>matyas:</b></span> that's for the authenticated stashcache; for the unauthenticated stashcache, it's <pre><br/>$ curl '<a href="https://topology.opensciencegrid.org/stashcache/authfile-public?cache_fqdn=stashcache.grid.uchicago.edu">https://topology.opensciencegrid.org/stashcache/authfile-public?cache_fqdn=stashcache.grid.uchicago.edu</a>' | less<br/></pre><br/>("/stashcache/authfile-public" instead of "/stashcache/authfile")<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:44:54)</span> <b>paschos:</b></span> great --- thank you<br/>
+</body>
+</html>

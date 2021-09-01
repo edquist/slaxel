@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Mar 1, 2021 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Mon Mar 1, 2021 : #gfactory (osg)</h3>
+<span style="color: #50a0cf"><span style="font-size: small">(11:15:11)</span> <b>timm:</b></span> <a href="http://hosted-ce10.opensciencegrid.org">hosted-ce10.opensciencegrid.org</a> not happy either as of this morning<br/>
+<span style="color: #674b1b"><span style="font-size: small">(13:51:21)</span> <b>rynge:</b></span> @marcom Do you have a target date for 3.7.3?<br/>
+<span style="color: #dd8527"><span style="font-size: small">(14:14:09)</span> <b>marcom:</b></span> 2 weeks<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:17:03)</span> <b>rynge:</b></span> Ok, thanks!<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:17:44)</span> <b>rynge:</b></span> @jdost321 and team - could we get a hot patch for <a href="https://cdcvs.fnal.gov/redmine/issues/25510">https://cdcvs.fnal.gov/redmine/issues/25510</a> ? Just the last comment on that one is applicable<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:18:48)</span> <b>jdost321:</b></span> I'm assuming the other hot patches we've already applied have made it into 3_7 branch?<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:33:57)</span> <b>jdost321:</b></span> looks like our last patching was Feb 3 which is quite old.. i'll give it a shot<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:38:07)</span> <b>jdost321:</b></span> @rynge factory is patched<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:40:35)</span> <b>rynge:</b></span> Thank you!<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:41:05)</span> <b>rynge:</b></span> Can you also check on the rsync log script to xd-login?<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:47:46)</span> <b>jdost321:</b></span> sometimes the fatcory deletes a log before its written back, condor aleways writes back as 600 permission for some reason. that causes rync to fail on those logs and sometimes it completely bails<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:47:58)</span> <b>jdost321:</b></span> i just did a manual chmod back, let's see if it completes this time<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:48:39)</span> <b>rynge:</b></span> Thanks<br/>
+<span style="color: #385a86"><span style="font-size: small">(14:49:17)</span> <b>jdost321:</b></span> ok you should have the latest now<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:17:12)</span> <b>jdost321:</b></span> @marcom @rynge any reason this patch could have broken our monitoring?? <a href="http://gfactory-2.opensciencegrid.org/factory/monitor/factoryStatus.html">http://gfactory-2.opensciencegrid.org/factory/monitor/factoryStatus.html</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:17:47)</span> <b>rynge:</b></span> No idea<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:19:02)</span> <b>jdost321:</b></span> i will try reverting to the prev singularity lib in 20 if i don't find anything else that may be unrelated<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:38:05)</span> <b>jdost321:</b></span> no FEs are talking to the factory currently<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:39:45)</span> <b>jdost321:</b></span> @rynge see any weird errors in your FE logs?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:40:31)</span> <b>rynge:</b></span> Ouch, let me check<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:42:22)</span> <b>jdost321:</b></span> going to rever singularity stript and restart.. don't see anything else obv here<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:43:15)</span> <b>rynge:</b></span> <pre>ExeError: Unexpected Error running '/usr/sbin/condor_advertise -pool <a href="http://gfactory-2.opensciencegrid.org">gfactory-2.opensciencegrid.org</a> -tcp -multiple UPDATE_MASTER_AD /tmp/gfi_ad_batch_564631124_6067_gfactory-2.opensciencegrid.org'. Details: Command '/usr/sbin/condor_advertise -pool <a href="http://gfactory-2.opensciencegrid.org">gfactory-2.opensciencegrid.org</a> -tcp -multiple UPDATE_MASTER_AD /tmp/gfi_ad_batch_564631124_6067_gfactory-2.opensciencegrid.org' returned non-zero exit status 1: failed to send classad to &lt;169.228.38.43:9618?alias=gfactory-2.opensciencegrid.org&gt;</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:43:21)</span> <b>rynge:</b></span> But that could just be the restart<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:47:15)</span> <b>jdost321:</b></span> restarting condor again just in case for good measure..<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:47:28)</span> <b>rynge:</b></span> Ok, I'm still looking<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:48:07)</span> <b>jdost321:</b></span> it was kind of scary how different the singularity lib is when i diffed the 3_7 one from the one we have.. but i don't understand how thats even related to advertising entries in the factory / fes requesting<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:51:40)</span> <b>rynge:</b></span> <pre>[2021-03-01 15:50:55,229] INFO: Advertising 0 glideresource classads to the user pool<br/>[2021-03-01 15:50:55,233] INFO: There are 0 classads to advertise<br/>[2021-03-01 15:50:55,240] INFO: Done advertising</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:51:43)</span> <b>rynge:</b></span> That is a little bit odd<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:52:14)</span> <b>jdost321:</b></span> ok i think we're back<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:52:30)</span> <b>jdost321:</b></span> Mats sorry, i think we need to try moving to testing this singularity on itb factory first<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:52:32)</span> <b>rynge:</b></span> All the entries are marked <tt>Down</tt>  on my side<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:52:38)</span> <b>jdost321:</b></span> it should recover in about 5 min<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:52:41)</span> <b>rynge:</b></span> It is on ITB<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:53:10)</span> <b>jdost321:</b></span> i'm starting to get ads back<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:53:16)</span> <b>jdost321:</b></span> hmm and no issues on itb?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:54:55)</span> <b>rynge:</b></span> Not that I have seen<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:55:11)</span> <b>rynge:</b></span> Anyways, entries are looking good here as well<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:55:33)</span> <b>jdost321:</b></span> i'm getting weary of testing patches like this.. i think its time to try a full release of 3_7_3 or whatever the next will be, ensure it works in itb, then upgrade prod<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:55:35)</span> <b>rynge:</b></span> <pre>[2021-03-01 15:55:15,802] INFO: Advertising global and singular requests for factory <a href="http://gfactory-2.opensciencegrid.org">gfactory-2.opensciencegrid.org</a><br/>[2021-03-01 15:55:15,944] INFO: Advertising 84 glideresource classads to the user pool<br/>[2021-03-01 15:55:15,949] INFO: There are 84 classads to advertise<br/>[2021-03-01 15:55:17,592] INFO: Done advertising</pre><br/>`<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:56:47)</span> <b>rynge:</b></span> I can tell the site that they will have to wait<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:56:56)</span> <b>rynge:</b></span> But we need to test this on ITB<br/>
+<span style="color: #385a86"><span style="font-size: small">(15:58:51)</span> <b>jdost321:</b></span> i thought you said its already on itb?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:00:27)</span> <b>rynge:</b></span> It is - but what I want to understand is why it didn't work in  production<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:00:38)</span> <b>rynge:</b></span> So maybe they are not patched to the same level?<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:01:25)</span> <b>jdost321:</b></span> right, i'm worried there have been manual patches on both, and they have deviated<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:02:40)</span> <b>jdost321:</b></span> thats why rather than patching a single file i'm hoping to test a full release update, even if its from a release candidate<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:02:57)</span> <b>rynge:</b></span> I agree<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:03:16)</span> <b>jdost321:</b></span> sorry mats, assumed it would be a harmless patch and we could have this for you in prod<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:03:30)</span> <b>jdost321:</b></span> still not even convinced its the patch itself that caused it.. i'm at a loss<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:04:20)</span> <b>rynge:</b></span> They way I'm seeing this from the frontend pov, is that with the switchover to the the gwms singularity libs, we are now more dependent on the gwms release cycle, and factory versions/patches<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:04:57)</span> <b>rynge:</b></span> I'm trying to not be difficult here... :slightly_smiling_face:<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:05:19)</span> <b>jdost321:</b></span> yeah i am thinking singularity script updates should be decoupled from software releases, you need quicker turnaround<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:05:35)</span> <b>jdost321:</b></span> when they were your own scripts they were considered data, not code, independent of releases<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:06:46)</span> <b>rynge:</b></span> Right, ownership changed<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:07:08)</span> <b>rynge:</b></span> Hopefully this is just a little bit of initial issues and it will settle down<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:07:11)</span> <b>jdost321:</b></span> i don't see why they can't still be owned by gwms, but not be dependent on the ful lgwms releases?<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:07:47)</span> <b>jdost321:</b></span> just not sure what that deployment model would look like..<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:08:55)</span> <b>rynge:</b></span> The nice part of centralized management is that the improvements we make will go out to everybody<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:13:27)</span> <b>jdost321:</b></span> just double checked,  singularity_lib.sh indeed was the one from that patch on itb and it works there<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:13:53)</span> <b>jdost321:</b></span> one deviation is prod has a patched  singularity_wrapper.sh form feb 3<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:14:43)</span> <b>jdost321:</b></span> ah, we arn't running the same 3.7.2<br/>
+<span style="color: #385a86"><span style="font-size: small">(16:15:16)</span> <b>jdost321:</b></span> itb: glideinwms-factory-3.7.2-1.osgup.el7.noarch prod: glideinwms-factory-3.7.2-0.2.rc2.osgup.el7.noarch<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(18:17:59)</span> <b>timm:</b></span> in the 3.9 version they split the httpd stuff including the scripts into a separate rpm<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(18:18:17)</span> <b>timm:</b></span> which presumably can be updated independently of the others<br/>
+</body>
+</html>

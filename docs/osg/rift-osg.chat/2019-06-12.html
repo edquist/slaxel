@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jun 12, 2019 : #rift-osg (osg)</title>
+</head>
+<body>
+<h3>Wed Jun 12, 2019 : #rift-osg (osg)</h3>
+<span style="color: #53b759"><span style="font-size: small">(04:00:04)</span> <b>isfiligoi:</b></span> BTW: The fact that you only see half of the cores used is sorta OK… just a monitoring artifact.<br/>The glideins advertise 1x GPU + 2x CPU, so using only one CPU x glidein is actually OK<br/>
+<span style="color: #53b759"><span style="font-size: small">(04:06:00)</span> <b>isfiligoi:</b></span> The real question is why you guys run out of jobs with 6 hours, or so.<br/>The jobs do seem to finish really quickly.<br/>I do hope it is not due to failures!<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(08:23:31)</span> <b>james.clark:</b></span> Actually, yes, i realised that the workflow could be better optimised - the architecture is basically still designed to distribute jobs as if they're the hours-long CPU processes.  GPUs have brought that down to minutes, so my guess is the workflow itself is rather inefficient<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(10:19:32)</span> <b>james.clark:</b></span> Ok <b>@channel</b> there are indeed some very new errors in fact.  We're seeing:<br/><pre><br/>/cvmfs/oasis.opensciencegrid.org/osg/sw/module-init.sh: line 11: cat: command not found<br/>/cvmfs/oasis.opensciencegrid.org/osg/sw/module-init.sh: line 23: cat: command not found<br/>/cvmfs/oasis.opensciencegrid.org/osg/sw/module-init.sh: line 23: grep: command not found<br/>/cvmfs/oasis.opensciencegrid.org/osg/sw/module-init.sh: line 33: sed: command not found<br/>/cvmfs/oasis.opensciencegrid.org/osg/sw/module-init.sh: line 36: sed: command not found<br/>/cvmfs/oasis.opensciencegrid.org/osg/sw/module-init.sh: line 39: sed: command not found<br/>Switched to a new branch 'temp-RIT-Tides-port_master-GPUIntegration'<br/>/tmp/glide_fbeyqC/execute/dir_65587/condor_exec.exe: line 15: ls: command not found<br/>/tmp/glide_fbeyqC/execute/dir_65587/condor_exec.exe: line 16: cat: command not found<br/></pre><br/>I don't think anything fundamental has changed in the submission file<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:21:58)</span> <b>isfiligoi:</b></span> this does not make sense! :slightly_smiling_face:<br/>Pretty sure we have cat in every container<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:22:45)</span> <b>isfiligoi:</b></span> do you have the node name?<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:23:16)</span> <b>efajardo:</b></span> I do not think we have changed anything nn the pilot side<br/>
+<span style="color: #a63024"><span style="font-size: small">(10:23:32)</span> <b>efajardo:</b></span> but I will see what this module loading is causing<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(10:26:10)</span> <b>james.clark:</b></span> there is a <tt>getenv=True</tt> in the submission file that I don't like the look of.  I'm trying again with that removed but the filesystem at caltech is currently experiencing terrible performance so things are pretty slow<br/>
+<span style="color: #53b759"><span style="font-size: small">(10:30:28)</span> <b>isfiligoi:</b></span> Good starting point for sure<br/>
+<span style="color: #a2a5dc"><span style="font-size: small">(10:58:47)</span> <b>james.clark:</b></span> ok, false alarm.  it's the careless <tt>getenv</tt>, sorry<br/>
+</body>
+</html>

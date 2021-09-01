@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jun 20, 2018 : #security (osg)</title>
+</head>
+<body>
+<h3>Wed Jun 20, 2018 : #security (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(10:03:54)</span> <b>blin:</b></span> hey <b>@here</b>, two things:<br/>1) we need a call made by security here: <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-3270">https://opensciencegrid.atlassian.net/browse/SOFTWARE-3270</a><br/>2) we had a question come across the software mailing list about providing the CA bundle in a <tt>.deb</tt>. I know we used to do this, @zalak does your process still generate the debs?<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(10:05:37)</span> <b>zalak:</b></span> RE: 2) Yes, it does.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:06:28)</span> <b>blin:</b></span> where does it place them?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:06:40)</span> <b>blin:</b></span> the person says they used to be placed here: <a href="http://software.grid.iu.edu/apt/dists/stable/main/binary-amd64/osg-ca-certs-1.56NEW-0.deb">http://software.grid.iu.edu/apt/dists/stable/main/binary-amd64/osg-ca-certs-1.56NEW-0.deb</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:06:58)</span> <b>blin:</b></span> obviously the <a href="http://grid.iu.edu">grid.iu.edu</a> won't work and should be <a href="http://repo.osg.org">repo.osg.org</a><br/>
+<span style="color: #df3dc0"><span style="font-size: small">(10:13:57)</span> <b>zalak:</b></span> Checking...<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(10:22:56)</span> <b>zalak:</b></span> [root@localhost myshellscript]# locate osg-ca-certs-1.72NEW-0.deb<br/>/certs/trunk/cadist/CA-Certificates-Base/1.72NEW/osg-ca-certs-1.72NEW-0.deb<br/>/certs/trunk/cadist/release/osg-ca-certs-1.72NEW-0.deb<br/>/home/zalak/myshellscript/certs/trunk/cadist/release/osg-ca-certs-1.72NEW-0.deb<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:24:29)</span> <b>blin:</b></span> so where can i find that on <a href="http://repo.osg.org">repo.osg.org</a>?<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(10:35:19)</span> <b>zalak:</b></span> It's not there in <a href="http://repo.opensciencegrid.org">repo.opensciencegrid.org</a> but it's here: <a href="https://vdt.cs.wisc.edu/svn/certs/trunk/cadist/release/">https://vdt.cs.wisc.edu/svn/certs/trunk/cadist/release/</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:38:03)</span> <b>blin:</b></span> is there an igtf-ca-certs deb?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:39:38)</span> <b>blin:</b></span> at some point we should also talk about why we're adding every version of each package to SVN<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(10:41:25)</span> <b>zalak:</b></span> this one: osg-ca-certs-1.72IGTFNEW-0.deb?<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(10:41:44)</span> <b>zalak:</b></span> Okay.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:44:06)</span> <b>blin:</b></span> oh, i get it<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:44:09)</span> <b>blin:</b></span> that naming scheme is confusing<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(10:44:55)</span> <b>zalak:</b></span> Ha ha yes.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:01:41)</span> <b>blin:</b></span> anyways, we need to get those debs up on repo<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:05:21)</span> <b>blin:</b></span> you have access to repo, right?<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(11:09:00)</span> <b>zalak:</b></span> I think other team copies data from SVN to repo.<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:13:30)</span> <b>blin:</b></span> the release team?<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(11:14:42)</span> <b>zalak:</b></span> Yes<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(11:16:51)</span> <b>zalak:</b></span> I only commit files in SVN.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:25:10)</span> <b>bbockelm:</b></span> Can we please drop the "NEW" moniker?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:25:21)</span> <b>bbockelm:</b></span> After all, the "OLD" only applies to RHEL5 and before.<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(15:28:14)</span> <b>zalak:</b></span> But we refer all the OSG packages as 1.XXNEW and IGTF packages as 1.XXIGTFNEW.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:28:39)</span> <b>bbockelm:</b></span> yeah, that was relevant 5+ years ago but doesn't seem so relevant now.<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(15:29:19)</span> <b>zalak:</b></span> Ok, so what I'm supposed to use for OSG? just OSG?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:30:24)</span> <b>blin:</b></span> why don't we call them <tt>osg-ca-certs-&lt;VERSION&gt;</tt> vs <tt>igtf-ca-certs-&lt;VERSION&gt;</tt>?<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(15:32:44)</span> <b>zalak:</b></span> Good question. And I do not have a answer. I need to check. Because there are other dependent script that also needs to be updated in order to match the new name.<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:34:27)</span> <b>blin:</b></span> i wonder if we need to update <tt>osg-ca-scripts</tt><br/>
+</body>
+</html>

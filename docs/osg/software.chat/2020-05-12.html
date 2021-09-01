@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue May 12, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Tue May 12, 2020 : #software (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(11:12:59)</span> <b>dweitzel:</b></span> I assume no, but does OSG 3.4 support GT5?<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:18:57)</span> <b>matyas:</b></span> you assume correctly<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:19:11)</span> <b>matyas:</b></span> although it's not like we patch gt5 support out of condor<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:19:46)</span> <b>matyas:</b></span> and you can install the actual gram rpms from epel<br/>
+<span style="color: #a72f79"><span style="font-size: small">(11:21:32)</span> <b>andrew.melo:</b></span> GRAM. Now that's a name I've not heard in a long time....<br/>
+<span style="color: #e85d72"><span style="font-size: small">(13:47:53)</span> <b>cnweaver:</b></span> Stashcache question: Can someone remind me whether the preferred configuration is xroot and http both on port 1094, or xroot on 1094 and http on 8000?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:49:08)</span> <b>blin:</b></span> the latter atm<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:49:19)</span> <b>blin:</b></span> that's what we ship by default<br/>
+<span style="color: #e85d72"><span style="font-size: small">(13:49:47)</span> <b>cnweaver:</b></span> Yes, that is what I discovered when updating to the latest docker image, and it was a bit of a surprise.<br/>
+<span style="color: #e85d72"><span style="font-size: small">(13:49:58)</span> <b>cnweaver:</b></span> However, if it's expected I'll go update docs.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:00:45)</span> <b>blin:</b></span> updating to the latest docker image from what? the ports have been like that for quite some time now<br/>
+<span style="color: #e85d72"><span style="font-size: small">(14:01:09)</span> <b>cnweaver:</b></span> The SLATE catalog was still on a build of the image from a number of months ago.<br/>
+<span style="color: #e85d72"><span style="font-size: small">(14:01:32)</span> <b>cnweaver:</b></span> However, I might have only tested xrdcp before, while today I had the presence of mind to test both protocols.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:14:06)</span> <b>andrew.melo:</b></span> @blin I think I've stumbled onto ... something on condor-ce. Basically, DigiCert is now issuing certs with:<br/><pre>[root@ce5 grid-security]# openssl x509 -in hostcert.pem -noout -subject<br/>subject= /DC=com/DC=DigiCert-Grid/C=US/ST=TN/L=Nashville/O=Vanderbilt University/CN=<a href="http://ce5.accre.vanderbilt.edu">ce5.accre.vanderbilt.edu</a></pre><br/>but condor_mapfile from condor-ce wants<br/><pre>GSI "^\/DC\=DigiCert-Grid\/DC\=com\/O=Open Science Grid\/OU\=Services\/CN\=(host\/)?([A-Za-z0-9.\-]*)$" \<a href="mailto:2@daemon.opensciencegrid.org">2@daemon.opensciencegrid.org</a></pre><br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:14:39)</span> <b>andrew.melo:</b></span> am I correctly reading that the subject above won't authenticate and would be the cause of<br/><pre>==&gt; /var/log/condor-ce/MasterLog &lt;==<br/>05/12/20 15:36:39 SECMAN: FAILED: Received "DENIED" from server for user gsi@unmapped using method GSI.<br/>05/12/20 15:36:39 ERROR: SECMAN:2010:Received "DENIED" from server for user gsi@unmapped using method GSI.<br/>05/12/20 15:36:39 Failed to start non-blocking update to &lt;129.59.197.77:9619&gt;.</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:14:52)</span> <b>blin:</b></span> what version of htcondor-ce?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:15:10)</span> <b>andrew.melo:</b></span> <pre>[root@vm-cms-ce5 condor-ce]# yum info htcondor-ce<br/>Loaded plugins: fastestmirror, priorities, rhnplugin<br/>This system is receiving updates from RHN Classic or Red Hat Satellite.<br/>Loading mirror speeds from cached hostfile<br/>Installed Packages<br/>Name        : htcondor-ce<br/>Arch        : noarch<br/>Version     : 3.2.2<br/>Release     : 1.osg34.el7<br/>Size        : 64 k<br/>Repo        : installed<br/>From repo   : centos_7_osg_34_prod<br/>Summary     : A framework to run HTCondor as a CE<br/>URL         : <a href="http://github.com/opensciencegrid/htcondor-ce">http://github.com/opensciencegrid/htcondor-ce</a><br/>License     : Apache 2.0<br/>Description : A framework to run HTCondor as a CE</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:15:39)</span> <b>blin:</b></span> ah, from crusty ol 3.4<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:15:42)</span> <b>andrew.melo:</b></span> (which I now see is old because I'm on the wrong spacewalk channel, but "Version   : 3.4.0<br/>Release   : 1.osg34.el7"  is the same)<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:16:24)</span> <b>blin:</b></span> yeah but updating won't help since we haven't changed the mapfile in the HTCondor-CE 3 series<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:17:44)</span> <b>andrew.melo:</b></span> Do you think that's the right diagnosis?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:17:57)</span> <b>blin:</b></span> ya, definitely<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:18:02)</span> <b>blin:</b></span> add this line to the mapfile:<br/><pre>GSI "^/DC=DigiCert-Grid/C=US/ST=TN/L=Nashville/O=Vanderbilt University/CN=(host/)?([A-Za-z0-9.-]*)$" <a href="mailto:2@daemon.opensciencegrid.org">2@daemon.opensciencegrid.org</a></pre><br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:18:46)</span> <b>andrew.melo:</b></span> I need to add some toothpicks<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:22:26)</span> <b>andrew.melo:</b></span> Are these perl regular expressions?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:23:44)</span> <b>blin:</b></span> yup, though in my experience the backslashes haven't been necessary<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:24:05)</span> <b>blin:</b></span> certainly not for the <tt>=</tt><br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:24:36)</span> <b>andrew.melo:</b></span> <tt>GSI "^\/DC=com\/DC=DigiCert-Grid\/C=US\/ST=TN\/L=Nashville\/O=Vanderbilt University\/CN\=(host\/)?([A-Za-z0-9.\-]*)$" \<a href="mailto:2@daemon.opensciencegrid.org">2@daemon.opensciencegrid.org</a></tt> is what I ended up with<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:24:53)</span> <b>andrew.melo:</b></span> So, er, should I open a ticket somewhere?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:25:30)</span> <b>blin:</b></span> nope, because OSG 3.4 is in critical bug/security fix only mode<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:26:01)</span> <b>blin:</b></span> plus, the <tt>condor_mapfile</tt> is config(noreplace) in the packaging so if you do update your version of condor-ce, your changes are safe<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:27:04)</span> <b>blin:</b></span> so until you upgrade to OSG 3.5 with HTCondor-CE 4, you can carry this in your local config<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:27:30)</span> <b>blin:</b></span> (in HTCondor-CE 4, the mapfile changes quite a bit with the benefit of not having to care about the DN formats)<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:29:12)</span> <b>andrew.melo:</b></span> Sweet, thanks. I can add that line to config management. Globally will other hosts that connect to my CE be confused by the weird DN?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:30:50)</span> <b>blin:</b></span> no, because they should only care that the cert authenticates properly up the CA chain<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:31:40)</span> <b>blin:</b></span> basically all the <tt>@daemon.opensciencegrid.org</tt> lines were for CE daemons on the same host treating each other with the proper authZ level<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:31:51)</span> <b>blin:</b></span> external hosts shouldn't care<br/>
+<span style="color: #a72f79"><span style="font-size: small">(16:42:50)</span> <b>andrew.melo:</b></span> gotcha thanks<br/>
+</body>
+</html>

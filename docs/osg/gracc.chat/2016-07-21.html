@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jul 21, 2016 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Thu Jul 21, 2016 : #gracc (osg)</h3>
+<span style="color: #df3dc0"><span style="font-size: small">(12:11:33)</span> <b>boj:</b></span> yup, that's my readytalk<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(12:11:43)</span> <b>boj:</b></span> sorry, didn't realize I wasn't logged into slack this morning<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:39:25)</span> <b>kretzke:</b></span> @dweitzel: what sort of ceph monitoring do you have? we keep getting intermittent periods of 5-20 minutes where a disk is practically unusable, e.g. -4 right now:<br/>avg-cpu:  %user   %nice %system %iowait  %steal   %idle<br/>           0.00    0.00    0.00   50.00    0.00   50.00<br/><br/>Device:         rrqm/s   wrqm/s     r/s     w/s    rkB/s    wkB/s avgrq-sz avgqu-sz   await r_await w_await  svctm  %util<br/>vda               0.00     0.00    0.00    0.00     0.00     0.00     0.00     0.00    0.00    0.00    0.00   0.00   0.00<br/>vdb               0.00     0.00    0.00    0.00     0.00     0.00     0.00     0.00    0.00    0.00    0.00   0.00   0.00<br/>vdc               0.00     0.00    0.00    0.00     0.00     0.00     0.00     7.01    0.00    0.00    0.00   0.00 100.10<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(12:40:33)</span> <b>kretzke:</b></span> if it’s not clear, that’s 100% util with no activity<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:15:30)</span> <b>dweitzel:</b></span> we have some montioring, but probably not enough to detect something like this.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:15:39)</span> <b>dweitzel:</b></span> I’ll talk to the admins.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:34:32)</span> <b>dweitzel:</b></span> I certainly see a dip, in performance, that has since recovered.  We're not sure what would cause it.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:42:24)</span> <b>kretzke:</b></span> ok. if you look over the disk i/o time graphs (<a href="https://gracc.opensciencegrid.org/dashboard/db/grace-system-monitoring-disk">https://gracc.opensciencegrid.org/dashboard/db/grace-system-monitoring-disk</a>) you’ll see these spikes every few hours, generally only impacting one disk in the cluster, with correlated flush &amp; bulk queues for that node in elasticsearch. not sure if searches get backed up too, since it can get the data from a shard on another node maybe it’s ok.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:44:33)</span> <b>dweitzel:</b></span> what am I looking for in these graphs?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:44:40)</span> <b>dweitzel:</b></span> to see the periodic disruption?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:46:15)</span> <b>kretzke:</b></span> yeah, periods where io time hits 100%. mainly I’m just noting what metrics I’m looking at<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:00:33)</span> <b>dweitzel:</b></span> I'm gonna be a few minutes late. But I'll be there. <br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:01:41)</span> <b>kretzke:</b></span> joe and I are wrapping up another meeting<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(14:03:20)</span> <b>boj:</b></span> ok<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(14:03:25)</span> <b>boj:</b></span> I started the readytalk<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:23:55)</span> <b>dweitzel:</b></span> our backend ganglia graph monitoring:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:23:59)</span> <b>dweitzel:</b></span> @dweitzel uploaded a file: <a href="https://opensciencegrid.slack.com/files/dweitzel/F1U143UGJ/pasted_image_at_2016_07_21_02_23_pm.png">Pasted image at 2016-07-21, 2:23 PM</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:24:17)</span> <b>dweitzel:</b></span> Transferring at 4Gbps<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:25:47)</span> <b>dweitzel:</b></span> @dweitzel uploaded a file: <a href="https://opensciencegrid.slack.com/files/dweitzel/F1U0N99PA/pasted_image_at_2016_07_21_02_25_pm.png">Pasted image at 2016-07-21, 2:25 PM</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:36:30)</span> <b>dweitzel:</b></span> I’m happy to see that the infrastructure scales up to what elasticsearch needs, which is apparently &gt;4Gbps.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:00:14)</span> <b>dweitzel:</b></span> project owner changed to @kretzke congrats!<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(16:29:26)</span> <b>boj:</b></span> :clap::skin-tone-5:<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:51:46)</span> <b>kretzke:</b></span> so something I forgot to bring up in the meeting: with the node crashes and disk hangs I have a growing concern that a ceph-backed cloud may be a poor choice for an elasticsearch cluster. the graphs above kinda reinforce that, 4Gbps isn’t terrible, but not great for four nodes<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:53:34)</span> <b>dweitzel:</b></span> We have a network outage here at UNL.  The gracc servers may or may not be available.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:53:54)</span> <b>dweitzel:</b></span> Likely culprit, backhoe<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:59:16)</span> <b>kretzke:</b></span> d’oh!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:08:49)</span> <b>dweitzel:</b></span> @kretzke: ok, so how bad is it if the network dowtime might last a while?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:09:15)</span> <b>kretzke:</b></span> looks like it’s back<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:12:06)</span> <b>dweitzel:</b></span> you’re right, as far as we can tell, it’s back.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:12:22)</span> <b>dweitzel:</b></span> we’ll be monitoring it for a bit.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:12:42)</span> <b>dweitzel:</b></span> backlog in amqp?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:14:45)</span> <b>kretzke:</b></span> not bad, only got to a couple thousand. ingest rate is actually pretty low now, no backfills<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:16:17)</span> <b>dweitzel:</b></span> oh, if only every network outage was that short.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:19:53)</span> <b>kretzke:</b></span> indeed. to answer your question, if it were a longer outage, say hours or days, well a bunch of stuff would be broken in fifemon, but it is just monitoring after all<br/>
+</body>
+</html>

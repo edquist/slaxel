@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jun 16, 2017 : #general (osg)</title>
+</head>
+<body>
+<h3>Fri Jun 16, 2017 : #general (osg)</h3>
+<span style="color: #e96699"><span style="font-size: small">(07:08:25)</span> <b>ian_cancercomputer:</b></span> Mainly what i'm wondering is if it's standard practice, when only supporting a couple of VOs, to just create those user accounts and leave all customizations in /etc/grid-security alone.  With edg-mkgridmap I explicitly commented out every line in edg-mkgridmap.conf that wasn't one of the VOs I support; It lookx like I could do a similar thing with the ban-voms-mapfile but if it's considered safe and unnecessary not to ban VOs if there's no matching linux user, then that would be a lot easier for me.<br/>
+<span style="color: #e96699"><span style="font-size: small">(07:10:00)</span> <b>ian_cancercomputer:</b></span> The other thing I'm wondering is if /etc/grid-security needs to be sync'ed to all my WN's still; this was necessary with edg-mkgridmap for glexec if I recall correctly, but since glexec also seems to be going away I don't know if this is still necessary for the pilot glideins to do their thing?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:48:36)</span> <b>blin:</b></span> @ian_cancercomputer 1) yea, just create unix accounts for the VOs you support and add specific DNs to the grid-mapfile. There won't be any mapping if the local account doesn't exist.<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:49:42)</span> <b>blin:</b></span> 2) No, you don't need to sync anything. Are you guys still running glexec? Do you have a specific reason? Because if you don't have one, you really shouldn't<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:50:22)</span> <b>blin:</b></span> you won't need <tt>lcmaps-plugins-voms</tt> on the WNs, there shouldn't be a need to auth there<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:51:34)</span> <b>ian_cancercomputer:</b></span> Thanks @blin , re glexec - it was needed to get the glideins working last summer when first setting up; if OSG/Splinter isn't using it then it's not needed.<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:52:02)</span> <b>blin:</b></span> ahhh ok<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:52:45)</span> <b>blin:</b></span> i'm only vaguely familiar with how subprojects work within the OSG VO so you may still need to retain a grid-mapfile, run glexec, and thus leave your WNs on osg 3.3<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:53:28)</span> <b>dweitzel:</b></span> OSG VO does not require glexec.<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:53:46)</span> <b>blin:</b></span> i'd ask about it in #osg-support. If the projects are differentiated by VOMS attributes, you shouldn't need glexec<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:54:04)</span> <b>dweitzel:</b></span> There are no Certificates in the OSG VO.<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:54:09)</span> <b>blin:</b></span> the lcmaps voms plugin can handle vo mapping<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:54:12)</span> <b>dweitzel:</b></span> so glexec wouldn't even work.<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:54:57)</span> <b>blin:</b></span> @dweitzel do you know how splinter jobs are separated out from normal osg jobs?<br/>
+<span style="color: #e96699"><span style="font-size: small">(12:55:17)</span> <b>ian_cancercomputer:</b></span> Thanks @dweitzel -- i guess i can confirm this by migrating a WN or two and checking for failures, if none then all is well and i'll do the rest..<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:55:28)</span> <b>dweitzel:</b></span> @rynge would know, but I assume just a different submitter.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:55:36)</span> <b>dweitzel:</b></span> They flock to the OSG frontend.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:59:34)</span> <b>rynge:</b></span> @blin Just a frontend start expression<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:59:42)</span> <b>rynge:</b></span> That is the best we have so far<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:00:19)</span> <b>rynge:</b></span> <a href="https://github.com/opensciencegrid/osg-flock/blob/master/osg-flock.grid.iu.edu/frontend.xml#L22">https://github.com/opensciencegrid/osg-flock/blob/master/osg-flock.grid.iu.edu/frontend.xml#L22</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:00:33)</span> <b>blin:</b></span> so does CC /only/ run splinter-project jobs or do other osg jobs run there as well?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:00:48)</span> <b>rynge:</b></span> Only splinter so far<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:00:56)</span> <b>rynge:</b></span> If there are other projects we can enable them<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:01:07)</span> <b>rynge:</b></span> Problem is identifying projects at that level<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:01:18)</span> <b>blin:</b></span> ah ok, makes sense<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:01:39)</span> <b>blin:</b></span> i wasn't sure if ian would have had to differentiate between splinter/osg jobs<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:01:49)</span> <b>blin:</b></span> thanks for the clarification<br/>
+</body>
+</html>

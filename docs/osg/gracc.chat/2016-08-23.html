@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Aug 23, 2016 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Tue Aug 23, 2016 : #gracc (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(14:18:59)</span> <b>dweitzel:</b></span> Hi @kretzke, command line summarizer is done (and was very simple, because of the architecture of it all).<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:19:27)</span> <b>dweitzel:</b></span> If you give me the go ahead, I’ll yum update the gracc-summary package, and start summarizing.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:19:40)</span> <b>dweitzel:</b></span> I’ll start with this month, just to make sure it all works, then this year...<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:29:53)</span> <b>kretzke:</b></span> sure<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(14:37:54)</span> <b>B167BCLN5:</b></span> <br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:20:36)</span> <b>dweitzel:</b></span> ok, month looks good: <a href="https://gracc.opensciencegrid.org/dashboard/db/raw-vs-summary?from=now%2FM&amp;to=now%2FM">https://gracc.opensciencegrid.org/dashboard/db/raw-vs-summary?from=now%2FM&amp;to=now%2FM</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:20:39)</span> <b>dweitzel:</b></span> moving on to the year.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:28:55)</span> <b>dweitzel:</b></span> summarize all the things!<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:29:34)</span> <b>dweitzel:</b></span> I’m probably going slower and more cautiously than I have to.  But whatever.  I’m just doing 7 days at a time, then the next 7 days… so there’s some overhead.  Could probably do more, but this is fast enough.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:31:35)</span> <b>kretzke:</b></span> nodes seem to be handling it well. load spiked when you started the year, but has gone down <a href="https://gracc.opensciencegrid.org/dashboard/db/grace-system-monitoring?from=now-1h&amp;to=now">https://gracc.opensciencegrid.org/dashboard/db/grace-system-monitoring?from=now-1h&amp;to=now</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:33:15)</span> <b>dweitzel:</b></span> yeah, I need to turn down the debugging level on the graccreq agent.  It’s sitting at 100% on the head node.  Probably doesn’t need to be.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:33:34)</span> <b>dweitzel:</b></span> Probably just spitting out logging data, a ton of it.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:34:50)</span> <b>kretzke:</b></span> summaries are being indexed at a couple kHz <a href="http://event-itb.grid.iu.edu:15672/#/queues/gratia/grace.osg.summary">http://event-itb.grid.iu.edu:15672/#/queues/gratia/grace.osg.summary</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:35:51)</span> <b>dweitzel:</b></span> is that good?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:36:25)</span> <b>kretzke:</b></span> I think so.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:37:10)</span> <b>dweitzel:</b></span> it’s about done summarizing the year.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:37:23)</span> <b>kretzke:</b></span> mainly interested in queue depth, there was a big spike 20 minutes ago but generally everything is keeping up<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:38:57)</span> <b>kretzke:</b></span> wow, that’s great. so re-summarizing will be a pretty quick operation<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:39:19)</span> <b>dweitzel:</b></span> yeah, not too bad at all.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:39:27)</span> <b>dweitzel:</b></span> done.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:39:57)</span> <b>dweitzel:</b></span> &lt;20 minutes to re-summarize 3/4 of a year.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:39:58)</span> <b>dweitzel:</b></span> not bad.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:42:05)</span> <b>kretzke:</b></span> I could see that being a nightly operation, to update corrections and such<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:43:06)</span> <b>dweitzel:</b></span> for sure.  Originally it was part of the plan for the summarizer to resummarize the year every once in a while.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:43:19)</span> <b>dweitzel:</b></span> That would be very easy to add.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:43:39)</span> <b>dweitzel:</b></span> my next goal is to convert the periodic summarizer to systemd timers.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:44:04)</span> <b>dweitzel:</b></span> then I could just add an arguments like “year”, or “sevenday” to different timers.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:45:48)</span> <b>kretzke:</b></span> sounds good. at some point the agent will have to march through indices, opening and closing them as it goes<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:46:17)</span> <b>dweitzel:</b></span> can you not query a closed index?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:46:39)</span> <b>kretzke:</b></span> you cannot<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:47:35)</span> <b>kretzke:</b></span> closing an index keeps the data on disk but otherwise removes it from elasticsearch<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:48:18)</span> <b>dweitzel:</b></span> I’m sure we talked about it before, but what’s the advantage of closing indices?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:49:29)</span> <b>kretzke:</b></span> reduce overhead - heap, file descriptors, cluster update time<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:50:17)</span> <b>dweitzel:</b></span> ah, ok.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:50:34)</span> <b>dweitzel:</b></span> I’m going to time and resummarize last year.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:08:39)</span> <b>dweitzel:</b></span> I think I summarized last year.  But I can’t find the summarized records...<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:09:59)</span> <b>kretzke:</b></span> oh right, I need to add the index to the alias<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:10:15)</span> <b>dweitzel:</b></span> ah, you only have 2016 in the alias?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:10:38)</span> <b>dweitzel:</b></span> 20min to summarize 2015<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:11:13)</span> <b>kretzke:</b></span> nice! ok it’s in<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:12:04)</span> <b>dweitzel:</b></span> ok.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:12:10)</span> <b>kretzke:</b></span> very cool <a href="https://gracc.opensciencegrid.org/dashboard/db/gracc-summary-payload-summary?from=1420070400000&amp;to=now">https://gracc.opensciencegrid.org/dashboard/db/gracc-summary-payload-summary?from=1420070400000&amp;to=now</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:12:12)</span> <b>dweitzel:</b></span> the data looks odd because of the gaps.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:12:29)</span> <b>dweitzel:</b></span> but the raw and summary match up, as far as I can tell.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:12:51)</span> <b>dweitzel:</b></span> lots faster, huh.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:15:12)</span> <b>kretzke:</b></span> the gaps are intersting, especially since there’s records there. probably need to be re-indexed <a href="https://gracc.opensciencegrid.org/dashboard/db/raw-vs-summary?from=1444637872982&amp;to=1445363526503">https://gracc.opensciencegrid.org/dashboard/db/raw-vs-summary?from=1444637872982&amp;to=1445363526503</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:17:24)</span> <b>dweitzel:</b></span> there’s no corehours<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:17:28)</span> <b>dweitzel:</b></span> but wall duration is there.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:19:35)</span> <b>kretzke:</b></span> yeah, core hours was added during a re-indexing<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:21:05)</span> <b>kretzke:</b></span> expected another reindexing as we got more into this anyways. Tanya pointed out yesterday that <tt>Njobs</tt> is a string<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:22:18)</span> <b>dweitzel:</b></span> where is Njobs ?  In the raw?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:22:23)</span> <b>kretzke:</b></span> yeah<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:22:36)</span> <b>dweitzel:</b></span> Should I also summarize then on Njobs (which is a string, which seems crazy)<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:24:28)</span> <b>kretzke:</b></span> well, after Njobs is remapped we’ll want it summed (probably instead of <tt>Count</tt>)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:25:06)</span> <b>dweitzel:</b></span> ok, that would be super easy, and resummarize wouldn’t create duplicates.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:25:09)</span> <b>kretzke:</b></span> or keep <tt>Count</tt>, could be useful to know how many records are in the summary<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:25:58)</span> <b>kretzke:</b></span> but that won’t happen immediately<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:26:33)</span> <b>dweitzel:</b></span> ok, we’ll just have to coordinate.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:27:38)</span> <b>kretzke:</b></span> yep<br/>
+</body>
+</html>

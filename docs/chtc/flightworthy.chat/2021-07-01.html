@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jul 1, 2021 : #flightworthy (chtc)</title>
+</head>
+<body>
+<h3>Thu Jul 1, 2021 : #flightworthy (chtc)</h3>
+<span style="color: #99a949"><span style="font-size: small">(15:06:58)</span> <b>matyas:</b></span> @gthain we'll get those commandments after 40 years<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:24:25)</span> <b>gthain:</b></span> We now have output from the failing defrag test.<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:25:17)</span> <b>gthain:</b></span> Immediate problem is that the defrag daemon picks a victim job to drain, issues drain command, but the job thinks the starter was killed, and goes into a loop, trying to reconnect, instead of treating it like an eviction<br/>
+<blockquote>
+<span style="color: #9e3997"><span style="font-size: small">(17:08:57)</span> <b>tlmiller:</b></span> "the job" goes into a loop?<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:09:46)</span> <b>gthain:</b></span> The starter gets killed by the drain before it has spawned the job proper<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:10:30)</span> <b>tlmiller:</b></span> So which daemon keeps trying to reconnect, the startd?<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:10:32)</span> <b>gthain:</b></span> The starter exits<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:10:46)</span> <b>gthain:</b></span> The shadow is confused, as the connection to the starter has gone away<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:10:55)</span> <b>gthain:</b></span> So the shadow goes into reconnect mode<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:11:06)</span> <b>gthain:</b></span> It fails to reconnect to the starter<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:11:12)</span> <b>gthain:</b></span> but does this repeatedly<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:11:19)</span> <b>tlmiller:</b></span> And it will never succeed because the starter is gone.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:11:20)</span> <b>tlmiller:</b></span> OK.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:11:36)</span> <b>tlmiller:</b></span> Sounds like a bug in the shadow?<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:11:45)</span> <b>gthain:</b></span> I think the shadow exits<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:12:01)</span> <b>gthain:</b></span> but somehow the schedd retries with the same claimid<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:12:16)</span> <b>tlmiller:</b></span> Or maybe the starter [also] needs to something before dying in this case?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:12:38)</span> <b>tlmiller:</b></span> ... wasn't there a report on condor-users just recently from a user concerned by the schedd reusing claims it should know were dead?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:13:23)</span> <b>tlmiller:</b></span> Wait, even if the schedd retries with the same claim ID, why would the shadow try to reconnnect?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:13:41)</span> <b>tlmiller:</b></span> How would it have any knowledge of a previous starter?<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:14:04)</span> <b>gthain:</b></span> Bugs all around<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:14:07)</span> <b>tlmiller:</b></span> Is there some confusion with when the schedd is in recovery mode?<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:14:20)</span> <b>gthain:</b></span> Apparently<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:14:24)</span> <b>tlmiller:</b></span> Well, that's the question.   It's great if the test found a bug.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:14:42)</span> <b>tlmiller:</b></span> (I mean, I can't think of any other reason for a newly-born shadow to try to reconnect.)<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:14:49)</span> <b>gthain:</b></span> I'm going to try to reproduce this by adding a sleep to the starter before it spawns the job<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:14:51)</span> <b>tlmiller:</b></span> How much of this were you able to find in the logs?<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:14:55)</span> <b>gthain:</b></span> and draining the startd right then<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:14:59)</span> <b>gthain:</b></span> This is all from the logs<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:15:17)</span> <b>tlmiller:</b></span> Ah. OK.  Should we disable the test while you're working on the fix, then?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:15:30)</span> <b>tlmiller:</b></span> Also, that sounds like it has a good chance of repro'ing.<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:15:42)</span> <b>gthain:</b></span> Yes -- this is one of the known flakey tests:  "defrag"<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:16:21)</span> <b>tlmiller:</b></span> I'm away from my second factor right now -- is defrag in the intermittent report?<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:16:54)</span> <b>gthain:</b></span> It is now<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:17:06)</span> <b>gthain:</b></span> (just one failure, the most recent run)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:17:29)</span> <b>tlmiller:</b></span> (OK.  So the report is more-or-less working.)<br/>
+</blockquote>
+<span style="color: #d58247"><span style="font-size: small">(16:26:15)</span> <b>gthain:</b></span> <pre>14:14:07 Monitor (Mon7844) Beginning eventlog monitor<br/>14:14:07 Job submitted<br/>14:14:27   (Mon7844) Saw Job 2.0 Disconnected<br/>14:14:35   (Mon7844) Saw Job 2.0 Reconnect Fail<br/>14:15:07   (Mon7844) Saw Job 2.0 Disconnected<br/>14:15:15   (Mon7844) Saw Job 2.0 Reconnect Fail<br/>14:15:27   (Mon7844) Saw Job 2.0 Disconnected<br/>14:15:35   (Mon7844) Saw Job 2.0 Reconnect Fail<br/>14:15:47   (Mon7844) Saw Job 2.0 Disconnected<br/>14:15:55   (Mon7844) Saw Job 2.0 Reconnect Fail<br/>14:16:07   (Mon7844) Saw Job 2.0 Disconnected<br/>14:16:15   (Mon7844) Saw Job 2.0 Reconnect Fail<br/>14:16:27   (Mon7844) Saw Job 2.0 Disconnected<br/>14:16:35   (Mon7844) Saw Job 2.0 Reconnect Fail<br/>14:16:47   (Mon7844) Saw Job 2.0 Disconnected<br/>14:16:55   (Mon7844) Saw Job 2.0 Reconnect Fail<br/>14:17:07   (Mon7844) Saw Job 2.0 Disconnected<br/>14:17:15   (Mon7844) Saw Job 2.0 Reconnect Fail<br/>14:17:28   (Mon7844) Saw Job 2.0 Disconnected<br/>14:17:36   (Mon7844) Saw Job 2.0 Reconnect Fail</pre><br/>
+<span style="color: #d58247"><span style="font-size: small">(16:28:19)</span> <b>gthain:</b></span> Startd gets the drain request, then hits a network problem:<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:28:21)</span> <b>gthain:</b></span> <pre>07/01/21 14:14:25.031 (D_ALWAYS) Initiating graceful draining.<br/>07/01/21 14:14:25.031 (D_ALWAYS) slot1_1: Changing activity: Busy -&gt; Retiring<br/>07/01/21 14:14:25.032 (D_ALWAYS) slot1_1: State change: claim retirement ended/expired<br/>07/01/21 14:14:25.032 (D_ALWAYS) slot1_1: Changing state and activity: Claimed/Retiring -&gt; Preempting/Vacating<br/>07/01/21 14:14:25.034 (D_ALWAYS) slot1: State change: entering Drained state<br/>07/01/21 14:14:25.034 (D_ALWAYS) slot1: Changing state and activity: Unclaimed/Idle -&gt; Drained/Retiring<br/>07/01/21 14:14:25.605 (D_ALWAYS) condor_read(): Socket closed abnormally when trying to read 5 bytes from &lt;127.0.0.1:63367&gt;, errno=10054 </pre><br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:31:46)</span> <b>ckoch5:</b></span> does dagman run post scripts as the user or htcondor?<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:33:06)</span> <b>gthain:</b></span> user<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:33:35)</span> <b>ckoch5:</b></span> thanks<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:34:02)</span> <b>gthain:</b></span> Everything dagman does, it does as the user -- it never has rootly power<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:50:16)</span> <b>matyas:</b></span> I have a submit transform question. I have an attribute "Desired_Allocations" that is a list of the allocations the user wants to run on.<br/>There is an attribute, "User_Allocated_Resources" that, if True, _only_ runs on these allocations and _not_ the Open Pool.<br/>If the user doesn't supply Desired_Allocations, I want them to only run on the Open Pool.<br/>If the user supplies Desired_Allocations and "OpenPool" is _not_ in the list, then don't run on the Open Pool (i.e. add "User_Allocated_Resources == True" to the Requirements).<br/>If the user supplies Desired_Allocations and "OpenPool" _is_ in the list, then also run on the Open Pool (i.e. don't add that requirement).<br/><br/>I tried this but it seems to do nothing:<br/><pre>JOB_TRANSFORM_NAMES = allocations<br/>JOB_TRANSFORM_allocations @=jt<br/>Name = "allocations";<br/>Requirements = (!isUndefined(Desired_Allocations) &amp;&amp; !stringListMember(Desired_Allocations, "OpenPool"));<br/><br/>SET Requirements = MY.Requirements &amp;&amp; (User_Allocated_Resources == True);<br/>@jt</pre><br/>what did I do wrong?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(16:59:13)</span> <b>jfrey:</b></span> You have the arguments to <tt>stringListMember()</tt> reversed. The member should be first and the list should be second.<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:59:35)</span> <b>matyas:</b></span> augh<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:01:56)</span> <b>matyas:</b></span> still doesn't work though<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:02:16)</span> <b>matyas:</b></span> <pre>Requirements = (!isUndefined(Desired_Allocations) &amp;&amp; !stringListMember("OpenPool", Desired_Allocations));</pre><br/><br/>
+<span style="color: #99a949"><span style="font-size: small">(17:06:23)</span> <b>matyas:</b></span> Hmm. I tried it with <tt>Requirements = "True";</tt> and it still doesn't work so it might be the SET statement<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:07:12)</span> <b>matyas:</b></span> oh hang on<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(17:08:12)</span> <b>jfrey:</b></span> Remove those quotes<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:08:32)</span> <b>matyas:</b></span> er, right<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:10:29)</span> <b>matyas:</b></span> still nope<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:21:34)</span> <b>matyas:</b></span> OK I am really WTF-ing here.<br/><pre>JOB_TRANSFORM_NAMES = allocations<br/>JOB_TRANSFORM_allocations @=jt<br/>Name = "allocations";<br/>Requirements = True;<br/>SET Requirements True;<br/>@jt</pre><br/><pre>[vagrant@ms-c7-condor ~]$ condor_submit test.sub<br/>Submitting job(s).<br/>1 job(s) submitted to cluster 25.<br/>[vagrant@ms-c7-condor ~]$ condor_q 25.0 -af:r Requirements<br/>(TARGET.Arch == "X86_64") &amp;&amp; (TARGET.OpSys == "LINUX") &amp;&amp; (TARGET.Disk &gt;= RequestDisk) &amp;&amp; (TARGET.Memory &gt;= RequestMemory) &amp;&amp; ((TARGET.FileSystemDomain == MY.FileSystemDomain) || (TARGET.HasFileTransfer))</pre><br/><br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:23:24)</span> <b>tlmiller:</b></span> Insert usual questions about reconfig vs restart here?<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:23:36)</span> <b>matyas:</b></span> did a restart<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:23:50)</span> <b>matyas:</b></span> well I did a condor_restart, not a systemctl restart condor<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:24:10)</span> <b>tlmiller:</b></span> Should be fine if there wasn't anything else in the queue, right?<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:24:56)</span> <b>matyas:</b></span> what should?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:25:33)</span> <b>tlmiller:</b></span> condor_restart can arbitrarily delay actually restartding the schedd if there's jobs in the qeueu, right?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:25:43)</span> <b>tlmiller:</b></span> [I can haz typing![<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:27:17)</span> <b>matyas:</b></span> OK, I did <tt>condor_rm -all; systemctl stop condor; systemctl start condor</tt><br/>
+<span style="color: #99a949"><span style="font-size: small">(17:27:20)</span> <b>matyas:</b></span> still no luck<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:28:53)</span> <b>tlmiller:</b></span> (ponder...)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:29:27)</span> <b>tlmiller:</b></span> I assume there's nothing of interest in the schedd log?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:31:50)</span> <b>tlmiller:</b></span> ... what happens if you replace the space betwen <tt>SET</tt> and <tt>Requirements</tt> with an <tt>_</tt>?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:32:55)</span> <b>tlmiller:</b></span> ... or an <tt>=</tt> between <tt>Requirements</tt> and <tt>True</tt>?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:34:39)</span> <b>tlmiller:</b></span> Boy, the documentation for this is rather incomplete, isn't it?<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:34:46)</span> <b>matyas:</b></span> <pre>SET Requirements="True";</pre><br/>?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:35:00)</span> <b>tlmiller:</b></span> Probably<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:35:09)</span> <b>matyas:</b></span> I crash the schedd on submission<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:35:10)</span> <b>tlmiller:</b></span> <pre>SET Requirements = True</pre><br/><br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:35:18)</span> <b>tlmiller:</b></span> ...<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:35:26)</span> <b>tlmiller:</b></span> well, that's a good problem to find, I guess.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:35:59)</span> <b>tlmiller:</b></span> (The examples I'm looking at from the manual don't include the semicolons.)<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:36:36)</span> <b>matyas:</b></span> maybe I'm mixing old syntax with new syntax<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:37:09)</span> <b>tlmiller:</b></span> I was just going to say I'm at least partly not sure which is which because I couldn't tell from your fragment which syntax you were trying to use.<br/>
+<span style="color: #4cc091"><span style="font-size: small">(17:37:50)</span> <b>blin:</b></span> yeah, no semicolons in the transform syntax<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:41:04)</span> <b>matyas:</b></span> yawp the semicolons were exactly it<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:41:36)</span> <b>tlmiller:</b></span> I wonder what the parse was doing with them?<br/>
+<span style="color: #99a949"><span style="font-size: small">(17:57:34)</span> <b>matyas:</b></span> except now it's matching too much:<br/><pre>JOB_TRANSFORM_NAMES = allocations<br/>JOB_TRANSFORM_allocations @=jt<br/>Name = "allocations"<br/>Requirements = (!isUndefined(Desired_Allocations) &amp;&amp; !stringListMember("OpenPool", Desired_Allocations))<br/><br/>SET Requirements $(MY.Requirements) &amp;&amp; (User_Allocated_Resources == True)<br/>@jt</pre><br/><br/>
+<span style="color: #99a949"><span style="font-size: small">(17:58:31)</span> <b>matyas:</b></span> I have 3 jobs, one with no Desired_Allocations, one with <tt>Desired_Allocations="Stampede"</tt> and one with <tt>Desired_Allocations="Stampede,OpenPool"</tt>. Only the second one should get the extra requirements clause but they all do<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:02:09)</span> <b>tlmiller:</b></span> I hope you don't need to put parentheses around the <tt>!</tt> clauses...<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:03:04)</span> <b>tlmiller:</b></span> ... you may also need more <tt>MY</tt>, but I don't actually know that's supposed to work. :)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:03:47)</span> <b>tlmiller:</b></span> <tt>(!isUndefined(MY.Desired_Allocations)) &amp;&amp; (!stringListMember("OpenPool", MY.Desire_Allocations))</tt>?<br/>
+<span style="color: #99a949"><span style="font-size: small">(18:04:57)</span> <b>matyas:</b></span> no luck<br/>
+<span style="color: #99a949"><span style="font-size: small">(18:05:33)</span> <b>matyas:</b></span> (also btw you mistyped the second Desired_Allocations)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:05:43)</span> <b>tlmiller:</b></span> (Sorry.)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:05:51)</span> <b>tlmiller:</b></span> What happens if you just do the first clause?<br/>
+<span style="color: #99a949"><span style="font-size: small">(18:06:44)</span> <b>matyas:</b></span> same result<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:07:07)</span> <b>tlmiller:</b></span> And <tt>False</tt>?<br/>
+<span style="color: #99a949"><span style="font-size: small">(18:08:01)</span> <b>matyas:</b></span> what<br/>the<br/>fuck<br/>
+<span style="color: #99a949"><span style="font-size: small">(18:08:23)</span> <b>matyas:</b></span> same result<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:08:27)</span> <b>tlmiller:</b></span> I assume that _also..._ yeah.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:08:37)</span> <b>tlmiller:</b></span> So ...<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:08:43)</span> <b>tlmiller:</b></span> is requirements spelled wrong?<br/>
+<span style="color: #99a949"><span style="font-size: small">(18:09:09)</span> <b>matyas:</b></span> _I_ didn't spell it wrong :stuck_out_tongue:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:09:13)</span> <b>tlmiller:</b></span> Oh.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:09:26)</span> <b>tlmiller:</b></span> Try all the left-hand side attribute names in all-lowercase.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:09:38)</span> <b>tlmiller:</b></span> These aren't actually ClassAds, right?<br/>
+<span style="color: #99a949"><span style="font-size: small">(18:09:58)</span> <b>matyas:</b></span> nope<br/>
+<span style="color: #99a949"><span style="font-size: small">(18:10:08)</span> <b>matyas:</b></span> nope as in those aren't ClassAds<br/>
+<span style="color: #99a949"><span style="font-size: small">(18:10:20)</span> <b>matyas:</b></span> it was the equals sign<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:10:29)</span> <b>tlmiller:</b></span> .. what?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:10:53)</span> <b>tlmiller:</b></span> Is there a Unicode <tt>=</tt>?<br/>
+<span style="color: #99a949"><span style="font-size: small">(18:10:54)</span> <b>matyas:</b></span> <tt>Requirements = False</tt><br/>always matches<br/><tt>Requirements False</tt><br/>never matches<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:11:03)</span> <b>tlmiller:</b></span> ...<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:12:07)</span> <b>tlmiller:</b></span> this manual page is _awful_.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:12:22)</span> <b>tlmiller:</b></span> I _still_ can't tell which syntax the schedd thinks those rules are in.<br/>
+<span style="color: #99a949"><span style="font-size: small">(18:12:29)</span> <b>matyas:</b></span> to be sure, the manual _does_ have it right<br/>
+<span style="color: #99a949"><span style="font-size: small">(18:12:47)</span> <b>matyas:</b></span> but apparently the transform syntax is a little too forgiving<br/>
+<span style="color: #4cc091"><span style="font-size: small">(18:12:51)</span> <b>blin:</b></span> You should use the CE docs :)<br/>
+<span style="color: #99a949"><span style="font-size: small">(18:13:07)</span> <b>matyas:</b></span> :psyduck:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:14:04)</span> <b>tlmiller:</b></span> The <a href="https://htcondor.readthedocs.io/en/latest/grid-computing/job-router.html">https://htcondor.readthedocs.io/en/latest/grid-computing/job-router.html</a> docs don't have <tt>requirements</tt> in the new syntax examples at all, and the new syntax's reference doesn't actually include any syntax.<br/>
+<span style="color: #99a949"><span style="font-size: small">(18:14:40)</span> <b>matyas:</b></span> do you need the Name?<br/>
+<blockquote>
+<span style="color: #4cc091"><span style="font-size: small">(2021-07-02 08:27:53)</span> <b>blin:</b></span> for new syntax transforms, you should just be able to specify the name through the knob:<tt>JOB_TRANSFORM_foo</tt> should be equivalent to a job transform with <tt>Name foo</tt><br/>
+</blockquote>
+<span style="color: #9e3997"><span style="font-size: small">(18:15:06)</span> <b>tlmiller:</b></span> Also, the example in the manual for "job transforms" is<br/><pre>JOB_TRANSFORM_SL6ToDocker @=end<br/>[<br/>   Requirements = JobUniverse==5 &amp;&amp; WantSL6 &amp;&amp; DockerImage =?= undefined;<br/>   set_WantDocker = true;<br/>   set_DockerImage = "SL6";<br/>   copy_Requirements = "VanillaRequrements";<br/>   set_Requirements = TARGET.HasDocker &amp;&amp; VanillaRequirements<br/>]<br/>@end</pre><br/>which is super not helpful.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:15:36)</span> <b>tlmiller:</b></span> (It's not a bad example, but it's in the old syntax.)<br/>
+<span style="color: #99a949"><span style="font-size: small">(18:16:56)</span> <b>matyas:</b></span> my biggest peeve is that the <tt>requirements =</tt> line has absolutely nothing to do with actual job requirements<br/>
+<span style="color: #99a949"><span style="font-size: small">(18:17:17)</span> <b>matyas:</b></span> it should have been called something like <tt>match_transform_if = ...</tt><br/>
+<span style="color: #9e3997"><span style="font-size: small">(18:17:24)</span> <b>tlmiller:</b></span> It only makes sense in the "this used to be a classad" sense.<br/>
+</body>
+</html>

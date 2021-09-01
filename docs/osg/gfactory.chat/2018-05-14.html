@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon May 14, 2018 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Mon May 14, 2018 : #gfactory (osg)</h3>
+<span style="color: #674b1b"><span style="font-size: small">(18:33:50)</span> <b>rynge:</b></span> @marian @efajardo @jdost321 Can the current factory operator help with <a href="https://jira.opensciencegrid.org/browse/GFACTOPS-1349">https://jira.opensciencegrid.org/browse/GFACTOPS-1349</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:39:53)</span> <b>rynge:</b></span> Seems like we are getting glideins though<br/>
+<span style="color: #53b759"><span style="font-size: small">(18:42:52)</span> <b>marian:</b></span> Hi Mats, just now I’m seeing you were updating JIRA ticket. I haven’t seen any email from JIRA, though. Could be because of ticket got unassigned, hmm... anyway, I can check mapping when I get to computer in about 1.5hr. <br/>
+<span style="color: #53b759"><span style="font-size: small">(18:43:38)</span> <b>marian:</b></span> Or are you saying things work now?<br/>
+<span style="color: #53b759"><span style="font-size: small">(18:43:54)</span> <b>marian:</b></span> ^ @rynge <br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:44:19)</span> <b>rynge:</b></span> No something is wonky. I still glideins, but still that warning, and each frontend loop takes forever<br/>
+<span style="color: #674b1b"><span style="font-size: small">(18:44:54)</span> <b>rynge:</b></span> It is probably on my end but yeah, if you could peek at the log later and see if you see something weird that would be appreciated<br/>
+<span style="color: #53b759"><span style="font-size: small">(18:46:41)</span> <b>marian:</b></span> Sure, I’ll take a look later when kiddos are quiet in the bed... will let you know what I find...<br/>
+<span style="color: #53b759"><span style="font-size: small">(22:16:06)</span> <b>marian:</b></span> Hi @rynge<br/>
+<span style="color: #674b1b"><span style="font-size: small">(22:17:29)</span> <b>rynge:</b></span> Hi<br/>
+<span style="color: #53b759"><span style="font-size: small">(22:17:40)</span> <b>marian:</b></span> for the mapping I believe that the proxy DN Factory accept is:<br/><tt>/DC=org/DC=opensciencegrid/O=Open Science Grid/OU=Services/CN=glideinwms/osg-flock.grid.iu.edu</tt><br/>
+<span style="color: #53b759"><span style="font-size: small">(22:18:00)</span> <b>marian:</b></span> I don't see anywhere in our condor map file <tt>CN=pilot/osg-flock.grid.iu.edu</tt><br/>
+<span style="color: #674b1b"><span style="font-size: small">(22:18:07)</span> <b>rynge:</b></span> Yeah, that is right<br/>
+<span style="color: #53b759"><span style="font-size: small">(22:18:11)</span> <b>marian:</b></span> ok<br/>
+<span style="color: #674b1b"><span style="font-size: small">(22:18:27)</span> <b>rynge:</b></span> When I advertise - do you get anything in the logs?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(22:18:29)</span> <b>rynge:</b></span> [2018-05-15 03:13:57,178] WARNING: No security credentials match for factory pool <a href="http://gfactory-1.t2.ucsd.edu">gfactory-1.t2.ucsd.edu</a>, not advertising request; if this is not intentional, check for typos frontend's credential trust_domain and type, vs factory's pool trust_domain and auth_method<br/>
+<span style="color: #53b759"><span style="font-size: small">(22:18:35)</span> <b>marian:</b></span> I've cleaned all Held glideins and I guess you want me clean up also Idle ones, right?<br/>
+<span style="color: #53b759"><span style="font-size: small">(22:18:45)</span> <b>marian:</b></span> I'll take a look at the log shortly...<br/>
+<span style="color: #674b1b"><span style="font-size: small">(22:18:59)</span> <b>rynge:</b></span> Yeah sure - remove idle and held<br/>
+<span style="color: #53b759"><span style="font-size: small">(22:19:16)</span> <b>marian:</b></span> ok, cleaning up those and will check log...<br/>
+<span style="color: #53b759"><span style="font-size: small">(22:19:29)</span> <b>marian:</b></span> that is what timestamp zone?<br/>
+<span style="color: #53b759"><span style="font-size: small">(22:19:45)</span> <b>marian:</b></span> of your FE...<br/>
+<span style="color: #53b759"><span style="font-size: small">(22:19:56)</span> <b>marian:</b></span> that I look for corresponding PT timestamp<br/>
+<span style="color: #674b1b"><span style="font-size: small">(22:20:21)</span> <b>rynge:</b></span> Actually, I'm looking at the code and you would not get anything on your side<br/>
+<span style="color: #53b759"><span style="font-size: small">(22:20:35)</span> <b>marian:</b></span> yeah I had opened also code actually<br/>
+<span style="color: #53b759"><span style="font-size: small">(22:22:28)</span> <b>marian:</b></span> <a href="https://github.com/glideinWMS/glideinwms/blob/master/frontend/glideinFrontendInterface.py#L996">https://github.com/glideinWMS/glideinwms/blob/master/frontend/glideinFrontendInterface.py#L996</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(22:23:15)</span> <b>rynge:</b></span> Yeah, which comes from 1075 or 1085<br/>
+<span style="color: #53b759"><span style="font-size: small">(22:23:26)</span> <b>marian:</b></span> all Idle cleaned up, too<br/>
+<span style="color: #674b1b"><span style="font-size: small">(22:23:32)</span> <b>rynge:</b></span> I will have to add some extra debug statements in there to figure it out<br/>
+<span style="color: #674b1b"><span style="font-size: small">(22:23:46)</span> <b>rynge:</b></span> Thanks for checking in - but no need to stay around for this silliness<br/>
+<span style="color: #53b759"><span style="font-size: small">(22:24:26)</span> <b>marian:</b></span> ok, fair enough ... you can ping us tomorrow here if you need to<br/>
+<span style="color: #674b1b"><span style="font-size: small">(22:24:42)</span> <b>rynge:</b></span> Yes, again thank you<br/>
+<span style="color: #53b759"><span style="font-size: small">(22:27:06)</span> <b>marian:</b></span> sure! hope it's just something that recovers at some point ... :man-shrugging:<br/>
+</body>
+</html>

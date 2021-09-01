@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jun 30, 2016 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Thu Jun 30, 2016 : #gracc (osg)</h3>
+<span style="color: #902d59"><span style="font-size: small">(10:54:39)</span> <b>tanya:</b></span> looks like elasaticsearch is overloaded again<br/>
+<span style="color: #902d59"><span style="font-size: small">(10:55:51)</span> <b>tanya:</b></span> do you guys planning address this at some point? I've seen it happen too often. Are we creating another Gratia?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:06:08)</span> <b>kretzke:</b></span> looks like someone did some very expensive queries at 10:50<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:23:03)</span> <b>tanya:</b></span> i could be me - 6 month daily<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:23:16)</span> <b>tanya:</b></span> but i could do it in gratiaweb<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:23:35)</span> <b>tanya:</b></span> so we need to address it<br/>
+<span style="color: #902d59"><span style="font-size: small">(11:24:01)</span> <b>tanya:</b></span> we are saying that we have to produce summary righ away?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:50:44)</span> <b>kretzke:</b></span> maybe.  did you get the results? it’s not magic, querying lots of data can take a while<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(11:55:33)</span> <b>kretzke:</b></span> I wouldn’t recommend doing very high-cardinality queries over such a length of time. was this the “GRACC Payload” dashboard with “All” for every field? that’s a ton of query bins<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:43:08)</span> <b>dweitzel:</b></span> @kretzke: In order to stop the sunday slow downs, our admin enabled slow rolling consistency checks on Ceph.  Hopefully, it’s not noticeable, I certainly don’t see an uptick in IO time for the last day or so.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:43:15)</span> <b>dweitzel:</b></span> But this should end the sunday slowdowns.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:55:09)</span> <b>kretzke:</b></span> ok great. I’ll keep an eye on things, main thing is trying to prevent large pileups in the queue, we’ve seen up to 400K records waiting. some small spikes, but they correspond to large queries<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:55:48)</span> <b>dweitzel:</b></span> would that be helped by adding more nodes?   It’s not clear that I see the bottleneck.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(13:59:38)</span> <b>kretzke:</b></span> almost certainly. it would spread the load and allows for more data to be cached<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:00:43)</span> <b>kretzke:</b></span> a six-month query can hit 1000 shards<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:03:43)</span> <b>kretzke:</b></span> it might be interesting to experiment with larger indices, e.g. weekly or monthly<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:33:05)</span> <b>kretzke:</b></span> or maybe fewer shards per index. we’re using the default of 5 shards x 1 replica, which is probably overkill for a three-node cluster<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:07:55)</span> <b>rynge:</b></span> Hi, how can I get an account on <a href="https://gracc.opensciencegrid.org">https://gracc.opensciencegrid.org</a> ?<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(15:11:35)</span> <b>boj:</b></span> wait, there are accounts?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:12:02)</span> <b>rynge:</b></span> It asks for a username/password. Is there a generic one then?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:14:02)</span> <b>dweitzel:</b></span> it should only ask for your username/password when you want to edit something.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:15:34)</span> <b>rynge:</b></span> Ah, maybe I had a bad URL<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:17:54)</span> <b>rynge:</b></span> I had an old kibana URL<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:18:12)</span> <b>rynge:</b></span> Is grafana the thing to use now? (seems to work without username/password)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:19:47)</span> <b>dweitzel:</b></span> ah, kibana is a different story.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:19:56)</span> <b>dweitzel:</b></span> grafana is more for premade graphs.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:20:13)</span> <b>dweitzel:</b></span> kibana is to make your own graphs… I always think of kibana as lower level than grafana.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:20:23)</span> <b>dweitzel:</b></span> different tools, for different levels of granularity<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:20:36)</span> <b>rynge:</b></span> Ok. so we need to make custom graphs for OSG Connect and friends<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:21:30)</span> <b>dweitzel:</b></span> ok, we can certainly do that.  Would you like to do that, or would you like to make a list of things you would like to see, and we can figure out how to show it?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:21:43)</span> <b>rynge:</b></span> Making a list sounds great! :wink:<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:23:04)</span> <b>rynge:</b></span> Bala is the one who is the driver<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:23:49)</span> <b>rynge:</b></span> But a good start would be Project+Field of Science, then categories by OSG Connect, OSG XD, OSG Direct, and OSG Flocking<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:24:21)</span> <b>rynge:</b></span> I can provide probe / project name rules for those categories<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:25:33)</span> <b>bala:</b></span> Yeah, the above stats would be very useful<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:26:30)</span> <b>rynge:</b></span> OSG Connect: probe:*.<a href="http://osgconnect.net">osgconnect.net</a><br/>OSG XD: probe:<a href="http://xd-login.opensciencegrid.org">xd-login.opensciencegrid.org</a> and project:TG-.*<br/>OSG Direct: probe:<a href="http://xd-login.opensciencegrid.org">xd-login.opensciencegrid.org</a> and not project:TG-.*<br/>OSG Flocking: everything else in OSG VO<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:27:19)</span> <b>rynge:</b></span> Or something like that<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:33:28)</span> <b>dweitzel:</b></span> Ok, I was just playing with Grafana this afternoon.  Maybe I can do this real quick and draft something up.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:35:40)</span> <b>kretzke:</b></span> we’re not pulling in OIM information yet, so we can’t do field. what sort of graphs?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:36:37)</span> <b>bala:</b></span> Is there a way to pull field of science from OIM for a given project or username<br/>
+<span style="color: #e7392d"><span style="font-size: small">(15:37:37)</span> <b>bala:</b></span> I know it is possible to do that manually cut and paste. Looking for some script or some thing that pulls info from OIM<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:38:52)</span> <b>rynge:</b></span> We want both graphs for usage by project<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:38:56)</span> <b>rynge:</b></span> and by field of sciecne<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:40:17)</span> <b>rynge:</b></span> And a table maybe?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:06:18)</span> <b>kretzke:</b></span> here’s a first pass, I think we need to change how some fields are indexed for the project query to work, so this was a good exercise: <a href="https://gracc.opensciencegrid.org/dashboard/db/osg-connect-summary">https://gracc.opensciencegrid.org/dashboard/db/osg-connect-summary</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:07:20)</span> <b>dweitzel:</b></span> yeah, @kretzke I couldn’t get the project names to work with TG.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:09:12)</span> <b>kretzke:</b></span> I think kibana lowercases the query since that’s part of standard field analyzing, but most fields are currently not analyzed when they’re indexed<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:11:45)</span> <b>dweitzel:</b></span> I have these bar graphs: <a href="https://gracc.opensciencegrid.org/dashboard/db/derek-osg-connect-draft?var-interval=1d">https://gracc.opensciencegrid.org/dashboard/db/derek-osg-connect-draft?var-interval=1d</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:12:03)</span> <b>dweitzel:</b></span> But I’m having problems with the TG filtering.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:13:27)</span> <b>dweitzel:</b></span> Also, @rynge may need to define the “everything else” better.  So far, we have NOT xd-login, and NOT <a href="http://osgconnect.net">osgconnect.net</a> and VOName = osg.  I assume it should only be Glideinjobs, so ResourceType = Payload.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:14:24)</span> <b>rynge:</b></span> Nice!<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:20:01)</span> <b>rynge:</b></span> I'm still looking at the data, but so far (except the TG- stuff) looks good<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:22:45)</span> <b>dweitzel:</b></span> I figured out how to compress to Hours, so it’s consistent with our other info: <a href="https://gracc.opensciencegrid.org/dashboard/db/derek-osg-connect-draft">https://gracc.opensciencegrid.org/dashboard/db/derek-osg-connect-draft</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:30:17)</span> <b>rynge:</b></span> That looks cool. I think we need to have Bala and Rob G look at it before going any further<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:30:22)</span> <b>rynge:</b></span> Thank you for your help!<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:30:58)</span> <b>rynge:</b></span> And just making sure: there is a plan to get the field of science data into gracc, right?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:31:04)</span> <b>dweitzel:</b></span> @kretzke: are the “scripts” cached?  I just see a bunch of iops, and that’s how I’m converting seconds to hours.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:31:19)</span> <b>bala:</b></span> Yeah, nice graphs<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:32:18)</span> <b>dweitzel:</b></span> @rynge: yes, in the project plan. <a href="https://jira.opensciencegrid.org/browse/GRACC-7">https://jira.opensciencegrid.org/browse/GRACC-7</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:54:25)</span> <b>kretzke:</b></span> @dweitzel: we were doing some largish test queries, that’s probably the spike you saw. although for those graphs I’d use the <tt>CoreHours</tt>field<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:56:45)</span> <b>dweitzel:</b></span> ah, yes<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:56:53)</span> <b>dweitzel:</b></span> forgot about that field.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:57:51)</span> <b>dweitzel:</b></span> Is CoreHours = (WallDuration / 3600) * cores<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:02:29)</span> <b>kretzke:</b></span> yep<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:12:19)</span> <b>dweitzel:</b></span> ok, great!  Changed.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:35:36)</span> <b>kretzke:</b></span> ok, so here’s the problem: query_string queries lowercase wildcards by default. that can be disabled by setting <tt>lowercase_expanded_terms:false</tt>, which works, but there’s no way to set that in grafana currently.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:36:52)</span> <b>kretzke:</b></span> workaround: search against <tt>_all</tt>, i.e. don’t specify a field (e.g <tt>ProbeName:"condor:<a href="http://xd-login.opensciencegrid.org">xd-login.opensciencegrid.org</a>" AND "TG-“</tt>)<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:37:47)</span> <b>kretzke:</b></span> obviously not a great solution since it will match if any field has “TG-"<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(17:40:22)</span> <b>kretzke:</b></span> Some other options: add analyzed fields for searching against, get the option into Grafana<br/>
+<span style="color: #902d59"><span style="font-size: small">(17:49:16)</span> <b>tanya:</b></span> Mats<br/>
+<span style="color: #902d59"><span style="font-size: small">(17:50:31)</span> <b>tanya:</b></span> @rynge: I've replied to Bala - Carl (Juan has left) could easily generate these type of plots in GratiaWeb, we could not do it in Kibana because we are still not integrated with OIM (SOF info is in OIM only)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:51:46)</span> <b>rynge:</b></span> Ok, well it is not a rush - we just want to make sure we can do this in the future<br/>
+<span style="color: #235e5b"><span style="font-size: small">(18:24:35)</span> <b>dweitzel:</b></span> yup @kretzke that works: <a href="https://gracc.opensciencegrid.org/dashboard/db/derek-osg-connect-draft">https://gracc.opensciencegrid.org/dashboard/db/derek-osg-connect-draft</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(18:30:47)</span> <b>kretzke:</b></span> great! I’ve been digging into grafana a lot this week making a custom panel plugin for fifemon, so I’ll take this as an excuse get into the grafana internals and see what it will take to add that as an option<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:48:29)</span> <b>bbockelm:</b></span> @dweitzel: Scripts are *not* cached.  If you need data in a certain format, convert it ahead of time.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:49:05)</span> <b>bbockelm:</b></span> also - we went over 1B records sometime in the last day or so.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(19:50:33)</span> <b>bbockelm:</b></span> Also, I’m seeing a lot of these:<br/><pre><br/>java.lang.IllegalArgumentException: mapper [CpuDuration_user] cannot be changed from type [long] to [double]<br/></pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(19:52:02)</span> <b>dweitzel:</b></span> Core hours worked perfectly. <br/>
+<span style="color: #9e3997"><span style="font-size: small">(20:18:42)</span> <b>bbockelm:</b></span> (did -4 just go down?)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(20:22:18)</span> <b>dweitzel:</b></span> Still alive in monitoring<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(21:30:19)</span> <b>kretzke:</b></span> it’s gone, host is unresponsive<br/>
+<span style="color: #9e3997"><span style="font-size: small">(21:30:48)</span> <b>bbockelm:</b></span> Oh.  Duh, I guess I could at least poke at the OpenStack web interface.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(21:34:49)</span> <b>bbockelm:</b></span> so many angry XFS messages on the console.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(21:41:02)</span> <b>bbockelm:</b></span> rebooted; node is coming up.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(21:47:43)</span> <b>kretzke:</b></span> it’s rejoined<br/>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Jun 1, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Thu Jun 1, 2017 : #gracc (osg)</h3>
+<span style="color: #e7392d"><span style="font-size: small">(10:14:49)</span> <b>bala:</b></span> @kretzke I have a question or rather a request about GRACC query<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:15:01)</span> <b>bala:</b></span> <a href="https://gracc.opensciencegrid.org/dashboard/db/payload-jobs-summary?orgId=1&amp;from=now-30d&amp;to=now&amp;var-VOName=All&amp;var-Project=ConnectTrain&amp;var-Facility=All&amp;var-User=All&amp;var-ExitCode=All&amp;var-Probe=All&amp;var-interval=1d">https://gracc.opensciencegrid.org/dashboard/db/payload-jobs-summary?orgId=1&amp;from=now-30d&amp;to=now&amp;var-VOName=All&amp;var-Project=ConnectTrain&amp;var-Facility=All&amp;var-User=All&amp;var-ExitCode=All&amp;var-Probe=All&amp;var-interval=1d</a><br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:15:25)</span> <b>bala:</b></span> I am able to see the “ConnectTrain” project summary in the above  link.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:16:31)</span> <b>bala:</b></span> I want a summary of the project “ConnectTrain”  on a weekly basis as an email.  Information such as number of jobs, wall hours,  and most importantly users.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:17:23)</span> <b>bala:</b></span> Basically, the user support team would like to track the “ConnectTrain” users and help them in moving to an actual project.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:17:41)</span> <b>bala:</b></span> Is it possible to have an email summary of ConnectTrain Project.?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:26:42)</span> <b>kretzke:</b></span> @bala I don’t know that the gracc team would be able to set up such a report. several reports from Gratia were re-created in gracc, including a project summary email report (summary of all projects I think)<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:28:15)</span> <b>bala:</b></span> ah, ok.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:28:51)</span> <b>bala:</b></span> is there anyway I can do a command line query and gather the data. I  used to do that in GRATIA<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:28:52)</span> <b>kretzke:</b></span> if you want to try creating your own report, there’s some documentation with an example query at <a href="https://opensciencegrid.github.io/gracc/user/direct/">https://opensciencegrid.github.io/gracc/user/direct/</a><br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:29:31)</span> <b>bala:</b></span> wow, great, this answers my question. Thank you. I will work on it<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:31:29)</span> <b>bala:</b></span> Can I do simple cURL or use python with ES module. what do you recommend.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:31:38)</span> <b>kretzke:</b></span> actually that example should be pretty close to what you want, just change <tt>VOName:ligo</tt> to <tt>ProjectName:"ConnectTrain"</tt> and then you can add a <tt>CommonName</tt> or <tt>DN</tt> agg<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:32:10)</span> <b>bala:</b></span> this is great<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:32:37)</span> <b>kretzke:</b></span> I’d do Python personally (but just <tt>elasticsearch</tt>, not <tt>elasticsearch_dsl</tt>, too much abstraction for my taste)<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:36:32)</span> <b>bala:</b></span> Thank you, this sounds great, I will play with this and update you later.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:37:38)</span> <b>kretzke:</b></span> cool, feel free to ask if you have any questions! if you’re really feeling generous, we could use a better writeup on doing direct queries with Python :wink:<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:37:59)</span> <b>dweitzel:</b></span> elasticsearch_dsl makes it easier to query though, no json! :slightly_smiling_face:<br/>
+<span style="color: #aba727"><span style="font-size: small">(10:38:40)</span> <b>sbhat:</b></span> I was just talking to kevin about this offline<br/>
+<span style="color: #aba727"><span style="font-size: small">(10:38:49)</span> <b>sbhat:</b></span> I'd also advocate using elasticsearch_dsl<br/>
+<span style="color: #aba727"><span style="font-size: small">(10:38:58)</span> <b>sbhat:</b></span> that's what all of our current gracc reports use<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:39:31)</span> <b>kretzke:</b></span> but I can get 90% of the query built in Kibana, copy-paste<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:39:34)</span> <b>dweitzel:</b></span> And APEL, and gracc agents.<br/>
+<span style="color: #aba727"><span style="font-size: small">(10:39:56)</span> <b>sbhat:</b></span> yep<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(10:40:46)</span> <b>kretzke:</b></span> and I write stuff in other languages than Python, since not everything is a nail<br/>
+<span style="color: #aba727"><span style="font-size: small">(10:43:20)</span> <b>sbhat:</b></span> that's a good point, but if you're only using Python in this case, it's probably much easier to chain together the elasticsearch_dsl functions<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:55:51)</span> <b>bala:</b></span> I guess both are equal to me since I don’t know both and have to start from scratch.  :slightly_smiling_face:<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:56:29)</span> <b>bala:</b></span> I used ES module a while back, don’t remember anything now. Will update you guys how things go at my end.<br/>
+<span style="color: #aba727"><span style="font-size: small">(11:06:02)</span> <b>sbhat:</b></span> yeah - for your case, it's really a question of which way you'd prefer to craft your query and parse the results.  For <tt>elasticsearch</tt>, you'll query using JSON, and the results come back as JSON too, as Kevin said.  For <tt>elasticsearch_dsl</tt>, you'd chain the <tt>elasticsearch_dsl</tt> search functions to form your query, and then the results would come back as an attrdict type object.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(11:11:56)</span> <b>bala:</b></span> ah, got it. this explains what to expect when using es or es_dsl. good info.<br/>
+</body>
+</html>

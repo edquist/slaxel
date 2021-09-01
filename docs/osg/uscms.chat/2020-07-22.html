@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jul 22, 2020 : #uscms (osg)</title>
+</head>
+<body>
+<h3>Wed Jul 22, 2020 : #uscms (osg)</h3>
+<span style="color: #e06b56"><span style="font-size: small">(12:25:37)</span> <b>jthiltges:</b></span> Not at all sure if this is decoding the addresses correctly, but the tea leaves do point toward memory. @andrew.melo<br/><pre>$ addr2line -e /lib64/libcvmfs_fuse.so -f 0x82bc6 | c++filt<br/>smmap(unsigned long)<br/>/builddir/build/BUILD/cvmfs-2.7.2/cvmfs/smalloc.h:66</pre><br/>My hazy notion is that you can still have malloc failures without triggering the OOM killer, if the pressure isn't high enough. Maybe check the cgroup <tt>failcnt</tt>?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:26:47)</span> <b>andrew.melo:</b></span> Let me try and hunt that down. I'm not explicitly wrapping cvmfs/autofs in a cgroup, but who knows what the hell systemd is doing behind my back<br/>
+</body>
+</html>

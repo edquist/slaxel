@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Mar 24, 2017 : #software (osg)</title>
+</head>
+<body>
+<h3>Fri Mar 24, 2017 : #software (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(12:49:08)</span> <b>blin:</b></span> @gattebury how did you guys decide on 6(?) gridftp real servers? i'm trying to get at a way to recommend how a site can determine how many real servers they should be running<br/>
+<span style="color: #d1707d"><span style="font-size: small">(12:50:34)</span> <b>gattebury:</b></span> twelve actually — chosen purely because we had 12x oddball (but identical to each other) Dell R410s from some old Tier3 hardware. We started with 3 once upon a time, but went straight to 12 because **excess hardware ftw**<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:51:06)</span> <b>blin:</b></span> haha, i was afraid that would be the answer<br/>
+<span style="color: #d1707d"><span style="font-size: small">(12:51:37)</span> <b>gattebury:</b></span> tldr, we didn’t put much thought into it — getting &gt; 5Gbps out of a single 10Gb connected gridftp-hdfs server is near impossible though in our experience, so it isn’t as overkill as one might think<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:53:20)</span> <b>blin:</b></span> so you guys basically went from 3 -&gt; 12 because of network saturation?<br/>
+<span style="color: #d1707d"><span style="font-size: small">(12:54:00)</span> <b>gattebury:</b></span> yeah, that’s a fair statement<br/>
+<span style="color: #d1707d"><span style="font-size: small">(12:54:37)</span> <b>gattebury:</b></span> (we’ll ignore the actual timeline of external WAN connectivity and existence of 12x 10Gb connected servers)<br/>
+<span style="color: #d1707d"><span style="font-size: small">(12:55:06)</span> <b>gattebury:</b></span> ours do double duty as xrootd servers as well, so take that into consideration<br/>
+<span style="color: #d1707d"><span style="font-size: small">(12:55:26)</span> <b>gattebury:</b></span> more appropriate to just call them DTNs or something I suppose<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:56:03)</span> <b>blin:</b></span> ok, thanks<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:12:26)</span> <b>blin:</b></span> @gattebury same question for keepalived hosts. how many backup hosts are you running and what made you decide to run that many?<br/>
+<span style="color: #d1707d"><span style="font-size: small">(13:14:31)</span> <b>gattebury:</b></span> we just run two directors (one master, one backup) — 95% of the reason for even bothering with HA madness and having two is to allow OS/hardware updates without needing to introduce downtimes. The ‘perceived’ reliability is a secondary thought in my mind<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:19:40)</span> <b>blin:</b></span> ah, that's a good point. thanks<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:37:40)</span> <b>blin:</b></span> @gattebury one last question! you have 12x 10Gb connected servers, what's the actual, average transfer load?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:38:16)</span> <b>blin:</b></span> i'd really like to make the rec: if you expect 20Gbps peak load, have 10Gb links, you should have between x and y real servers<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:38:58)</span> <b>bbockelm:</b></span> You should have 4 servers in that case.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:39:25)</span> <b>bbockelm:</b></span> You always want N+1 servers, where N is the number required to hit your desired throughput.<br/>
+<span style="color: #d1707d"><span style="font-size: small">(13:39:40)</span> <b>gattebury:</b></span> I’d agree that’s a reasonable “minimum” recommendation<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:39:44)</span> <b>blin:</b></span> *at least*, right? depending on their hardware<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:39:52)</span> <b>bbockelm:</b></span> certainly.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:39:54)</span> <b>blin:</b></span> ok<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:40:32)</span> <b>blin:</b></span> @bbockelm : i'm not entirely sure how you got N=3 from my example? is that assuming a certain link efficiency?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:46:40)</span> <b>bbockelm:</b></span> Yeah - a 10Gbps host is probably only going to put out around 8-9Gbps once you take the filesystem into account.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:47:13)</span> <b>bbockelm:</b></span> As Garhan said, the efficiency level will be a function of hardware, underlying storage system, and file sizes.<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:55:53)</span> <b>blin:</b></span> @bbockelm draft no longer <a href="https://twiki.opensciencegrid.org/bin/view/Documentation/Release3/LoadBalancedGridFTP">https://twiki.opensciencegrid.org/bin/view/Documentation/Release3/LoadBalancedGridFTP</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:32:46)</span> <b>bbockelm:</b></span> :confetti_ball:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:32:56)</span> <b>bbockelm:</b></span> (apparently the "confetti ball" emoji is a thing?)<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:27:11)</span> <b>mkandes:</b></span> :tada:<br/>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Oct 23, 2018 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Tue Oct 23, 2018 : #xcache (osg)</h3>
+<span style="color: #53b759"><span style="font-size: small">(04:30:26)</span> <b>marian:</b></span> @jthiltges, let me know if you want me take care of the new release cut for StashCache if that's the plan with latest changes? I haven't tracked all the changes since 0.9 so I'd say feel free to do a new tag. Or, let me know and I'll do when I get a chance during the meetings this week...<br/>
+<span style="color: #e06b56"><span style="font-size: small">(09:19:23)</span> <b>jthiltges:</b></span> Hi @marian. I opened a PR with the spec changes for a v0.10 build: <a href="https://github.com/opensciencegrid/StashCache-Daemon/pull/15">https://github.com/opensciencegrid/StashCache-Daemon/pull/15</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(15:32:01)</span> <b>matyas:</b></span> having some trouble with <tt>stashcp</tt> -- it keeps saying "Server responded with an error: [3011] No servers are available to read the file."<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:35:57)</span> <b>matyas:</b></span> <br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:37:42)</span> <b>dweitzel:</b></span> I know UChicago network was in a weird state.  @lincoln ?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:37:52)</span> <b>matyas:</b></span> works when I use curl though<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:37:55)</span> <b>dweitzel:</b></span> it's possible that the stash server isn't back up?<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:38:01)</span> <b>lincoln:</b></span> ill check<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:38:03)</span> <b>dweitzel:</b></span> curl... from where?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:38:08)</span> <b>matyas:</b></span> fermicloud<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:38:10)</span> <b>dweitzel:</b></span> I mean, pointing to what server?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:38:48)</span> <b>matyas:</b></span> <a href="http://stashcache.grid.uchicago.edu:8000">stashcache.grid.uchicago.edu:8000</a><br/>
+<span style="color: #e96699"><span style="font-size: small">(15:38:57)</span> <b>lincoln:</b></span> im seeing stuff in <tt>xrootd.log</tt><br/>
+<span style="color: #e96699"><span style="font-size: small">(15:38:58)</span> <b>lincoln:</b></span> such as<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:39:03)</span> <b>lincoln:</b></span> <pre><br/>181023 15:38:14 595475 ?:166@fermicloud067.fnal.gov XrdPoll: FD 166 attached to poller 0; num=1129<br/>181023 15:38:14 595475 XrootdBridge: unknown.338836:166@fermicloud067.fnal.gov login as nobody<br/>181023 15:38:14 595475 unknown.338836:166@fermicloud067.fnal.gov ofs_stat:  fn=/user/dweitzel/public/blast/queries/query1<br/>181023 15:38:14 595475 unknown.338836:166@fermicloud067.fnal.gov ofs_open: 0-600 fn=/user/dweitzel/public/blast/queries/query1<br/>181023 15:38:14 595475 unknown.338836:166@fermicloud067.fnal.gov ofs_open: attach use=2 fn=/user/dweitzel/public/blast/queries/query1<br/>181023 15:38:14 595475 unknown.338836:166@fermicloud067.fnal.gov ofs_fstat:  fn=/user/dweitzel/public/blast/queries/query1<br/>181023 15:38:14 595475 unknown.338836:166@fermicloud067.fnal.gov ofs_read: 103@0 fn=/user/dweitzel/public/blast/queries/query1<br/>181023 15:38:14 595475 unknown.338836:166@fermicloud067.fnal.gov ofs_close: use=2 fn=/user/dweitzel/public/blast/queries/query1<br/>181023 15:38:14 595475 unknown.338836:166@fermicloud067.fnal.gov ofs_close: use=0 fn=dummy<br/>181023 15:38:14 595475 XrdPoll: Poller 0 enabled unknown.338836:166@fermicloud067.fnal.gov<br/></pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(15:39:06)</span> <b>lincoln:</b></span> so... seems ok to me?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:39:46)</span> <b>matyas:</b></span> also, I tried passing other caches to stashcp via <tt>-c</tt> and got the same result<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:41:14)</span> <b>lincoln:</b></span> the origin is fubar tho<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:41:21)</span> <b>lincoln:</b></span> let me reboot it<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:41:25)</span> <b>matyas:</b></span> ah<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:41:37)</span> <b>dweitzel:</b></span> yup, it's the origin that matters<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:42:14)</span> <b>matyas:</b></span> should it matter if the file's already cached?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:42:15)</span> <b>dweitzel:</b></span> stashcp has some odd behavior, that's legacy, where it queries the origin for the size of the file before downloading it.<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:42:23)</span> <b>matyas:</b></span> oh.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:42:39)</span> <b>dweitzel:</b></span> I wonder what the logic of that was.  Maybe if it was deleted on the origin?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:42:40)</span> <b>matyas:</b></span> is that a thing we can/should fix?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:42:47)</span> <b>dweitzel:</b></span> we certainly can fix it.<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:43:03)</span> <b>lincoln:</b></span> presumably to see if the file changed or something?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:43:17)</span> <b>matyas:</b></span> neither curl nor cvmfs do that though<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:43:49)</span> <b>dweitzel:</b></span> <a href="https://github.com/opensciencegrid/StashCache/blob/master/bin/stashcp#L177">https://github.com/opensciencegrid/StashCache/blob/master/bin/stashcp#L177</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:44:05)</span> <b>dweitzel:</b></span> well, CVMFS will notice the file changed by a failed checksum<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:44:19)</span> <b>dweitzel:</b></span> curl, isn't really a client to stashcache<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:44:51)</span> <b>dweitzel:</b></span> stashcp will not notice that the file changed, even if the size differs between the origin and the cache.<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:49:41)</span> <b>lincoln:</b></span> could you give things a try again?<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:49:44)</span> <b>lincoln:</b></span> origin should be back<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:51:34)</span> <b>matyas:</b></span> same result<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:52:21)</span> <b>lincoln:</b></span> ¯\_(ツ)_/¯<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:52:28)</span> <b>lincoln:</b></span> lmk if you guys want me to do anything else on this side<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:53:20)</span> <b>lincoln:</b></span> i see this in the cmsd logs<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:53:22)</span> <b>lincoln:</b></span> <pre><br/>181023 15:49:31 7196 Manager: <a href="http://hcc-osg-redirector2.unl.edu">hcc-osg-redirector2.unl.edu</a> manager configuration differs from <a href="http://hcc-osg-redirector1.unl.edu">hcc-osg-redirector1.unl.edu</a> for site OSG_Connect_Stash-Origin; making file location unpredictable!<br/></pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:58:40)</span> <b>dweitzel:</b></span> It's probably the negative cache.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:58:58)</span> <b>dweitzel:</b></span> redirectors keep a negative cache for file lookups that fail.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:59:19)</span> <b>dweitzel:</b></span> I forget the timeout.  &gt;=15 min, less than 1 hour<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:59:21)</span> <b>dweitzel:</b></span> probably<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:59:39)</span> <b>matyas:</b></span> any way to clear it?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:00:19)</span> <b>dweitzel:</b></span> log into redirector and restart, both of them<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:00:36)</span> <b>dweitzel:</b></span> The direct stat against the origin at osgconnect works:<pre><br/>$ xrdfs <a href="root://stash.osgconnect.net">root://stash.osgconnect.net</a> stat /user/dweitzel/public/blast/queries/query1</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(16:20:24)</span> <b>matyas:</b></span> do you have to ask the _origin_ about the file size? is there a way to query the cache instead?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:43:03)</span> <b>matyas:</b></span> ok, it's still failing but when I edit the code to ignore that error, the transfer succeeds<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:49:00)</span> <b>dweitzel:</b></span> :slightly_smiling_face:<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:08:00)</span> <b>matyas:</b></span> checking the file size still fails with the same error<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:08:21)</span> <b>matyas:</b></span> are we sure the origin and the redirector are ok?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:17:05)</span> <b>dweitzel:</b></span> Changing to <tt>query2</tt> works:<pre>$ xrdfs <a href="root://redirector.osgstorage.org">root://redirector.osgstorage.org</a> stat /user/dweitzel/public/blast/queries/query2</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(17:19:08)</span> <b>matyas:</b></span> it's been an hour<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:19:17)</span> <b>dweitzel:</b></span> indeed<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:19:51)</span> <b>dweitzel:</b></span> let me see if I can log into the redirector<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:24:58)</span> <b>matyas:</b></span> is it OK if I add a patch to make finding out the file size a warning instead of an error?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:29:37)</span> <b>dweitzel:</b></span> alright, I restarted both redirector cmsd's<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:29:44)</span> <b>dweitzel:</b></span> things seem to be working now<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:30:17)</span> <b>dweitzel:</b></span> no idea what the underlying issue was.  But, a test file from /user/rynge was also constantly failing.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:31:02)</span> <b>dweitzel:</b></span> and yea.  You can even open a pull request with that fix.<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:34:54)</span> <b>matyas:</b></span> you send some JSON to ES (ElasticSearch? <a href="http://uct2-collectd.mwt2.org:9951">uct2-collectd.mwt2.org:9951</a>) with a <tt>filesize</tt> attribute. If we can't get the filesize, is it better to omit that attribute, or put something like <tt>-1</tt> in it?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:45:55)</span> <b>dweitzel:</b></span> or use the filesize of the downloaded file?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(17:45:59)</span> <b>dweitzel:</b></span> if it was successful?<br/>
+<span style="color: #c386df"><span style="font-size: small">(17:59:13)</span> <b>matyas:</b></span> that appears to be a separate attribute called <tt>download_size</tt><br/>
+</body>
+</html>

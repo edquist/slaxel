@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Mar 11, 2016 : #software (osg)</title>
+</head>
+<body>
+<h3>Fri Mar 11, 2016 : #software (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(09:05:51)</span> <b>dweitzel:</b></span> Maybe it would be helpful if we got horst on this chat again?  calling @horstseverini and @blin ?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:24:37)</span> <b>blin:</b></span> hey, i'm not sure how much time i can commit to helping troubleshoot this today<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:24:43)</span> <b>blin:</b></span> so i'll be in and out<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:27:12)</span> <b>dweitzel:</b></span> ok, np<br/>
+<span style="color: #e06b56"><span style="font-size: small">(09:34:03)</span> <b>jthiltges:</b></span> I'm struggling with an EL7 koji build for Nebraska/HCC. The spec has a BuildRequires of lcmaps-common-devel, which is in EL7 EPEL. But the build fails:<br/>&gt; Error: No Package found for lcmaps-common-devel<br/><br/>It's probably something silly that I'm doing wrong. Any suggestions? @matyas<br/><br/>&gt; URL: <a href="http://koji-hub.batlab.org/koji/taskinfo?taskID=206230">http://koji-hub.batlab.org/koji/taskinfo?taskID=206230</a><br/>&gt; Command: koji build --scratch hcc-el7 lcmaps-plugins-condor-update-0.2.1-1.el7.centos.src.rpm<br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:43:15)</span> <b>bbockelm:</b></span> hm - I would poke at one of the other <tt>lcmaps-plugins-*</tt> that exist in EL7 and see if maybe the base RPM name has changed<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:44:57)</span> <b>dweitzel:</b></span> @blin: looks like he’s not sharing the condor-ce directory.  Any ideas on how to move that over to /home?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:45:20)</span> <b>dweitzel:</b></span> (referring to Horst’s latest email)<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:47:32)</span> <b>blin:</b></span> you could move it to a specific home dir but i'm not sure it's feasible to have a spool dir per user<br/>
+<span style="color: #e06b56"><span style="font-size: small">(09:48:07)</span> <b>jthiltges:</b></span> @bbockelm: The package appears to exist in the repo and the build works in mock on my desktop. <a href="http://mirror.batlab.org/pub/linux/epel/7/x86_64/repoview/lcmaps-common-devel.html">http://mirror.batlab.org/pub/linux/epel/7/x86_64/repoview/lcmaps-common-devel.html</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(09:48:17)</span> <b>bbockelm:</b></span> @jthiltges: it seems the hcc-el7 build repo inherits from osg-3.2.  Might want to inherit from OSG 3.3<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:48:32)</span> <b>blin:</b></span> @dweitzel: he'd just have to specify <tt>SPOOL=&lt;dir&gt;</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:49:28)</span> <b>dweitzel:</b></span> I suppose that directory has to have very public permissions as well?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:50:47)</span> <b>blin:</b></span> yea, dirs within it need to change owners and whatnot<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:52:00)</span> <b>dweitzel:</b></span> ok, I’ll respond.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:52:08)</span> <b>dweitzel:</b></span> unless you have a good idea how to do this?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:52:28)</span> <b>blin:</b></span> do what exactly?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:52:47)</span> <b>dweitzel:</b></span> change the spool directory to something in /home for all the grid users to use?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:53:39)</span> <b>blin:</b></span> can't think of a way off the top of my head that doesn't involve making a public dir in /home and pointing the SPOOL config knob at it<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:53:58)</span> <b>blin:</b></span> condor also needs to be able to write to it as root<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:54:09)</span> <b>blin:</b></span> so if it's a no_root_squash shared fs, you're going to run into issues<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:59:29)</span> <b>dweitzel:</b></span> yeah, I was wondering about the root squash<br/>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Oct 16, 2018 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Tue Oct 16, 2018 : #xcache (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(09:50:46)</span> <b>matyas:</b></span> @bbockelm have you heard back from the xrootd folks about the oss.remoteroot thing?<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:51:59)</span> <b>blin:</b></span> there were some comments in the issue brian opened<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:52:19)</span> <b>blin:</b></span> oh, there was more action in it last night apparently<br/>
+<span style="color: #43761b"><span style="font-size: small">(09:52:20)</span> <b>blin:</b></span> <a href="https://github.com/xrootd/xrootd/issues/840">https://github.com/xrootd/xrootd/issues/840</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(09:53:16)</span> <b>blin:</b></span> looks like the current recommendation is using symlinks instead of config<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:55:51)</span> <b>matyas:</b></span> I don't get how the symlink trick works. If you use that, doesn't that mean you have to use <pre><br/>oss.localroot /<br/>all.export /xenon1t<br/></pre> ? That seems like a step backward.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:11:21)</span> <b>blin:</b></span> i think @bbockelm will have to weigh in on that, i don't have a great understanding of the problem atm /shrug<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:13:01)</span> <b>dweitzel:</b></span> Yeah, @matyas I think you are correct.<br/>
+<span style="color: #c386df"><span style="font-size: small">(11:54:56)</span> <b>matyas:</b></span> OK let's not tell people to do that, then<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:45:11)</span> <b>bbockelm:</b></span> Oh, I wouldn't take Andy's suggestion that literally, creating a symlink in <tt>/</tt> is ... strange.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:47:12)</span> <b>bbockelm:</b></span> I was thinking along the lines of having the following in the config file:<br/><pre><br/>oss.localroot /mnt/export<br/>all.export /xenon1t<br/></pre><br/>and then creating the symlink:<br/><pre><br/>/mnt/export/xenon1t -&gt; /mnt/data<br/></pre><br/>so the file at <tt>/mnt/data/foo</tt> shows up as <tt>/mnt/export/xenon1t/foo</tt> and is exported by Xrootd as <tt>/xenon1t/foo</tt>.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(12:48:27)</span> <b>bbockelm:</b></span> the other option I can think of is to use the <tt>xrootd-cmstfc</tt> package to do the translation, but that's actually a lot more complicated.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:12:39)</span> <b>dweitzel:</b></span> In that case, <tt>/mnt/export</tt> could have a few different "exported filesystems"?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:39:44)</span> <b>bbockelm:</b></span> sure, but you'd need a separate <tt>all.export</tt> line for each.<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:51:39)</span> <b>matyas:</b></span> there's nothing centrally that prevents origins from stomping on each other, right? in that case I'd rather have the admins be explicit about which directories they export<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:52:54)</span> <b>bbockelm:</b></span> right - and you can query the redirector for what is being exported by which origin.<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:53:32)</span> <b>matyas:</b></span> can we add a monitoring thing to the redirector that makes sure no directories are being exported by more than one origin?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:53:36)</span> <b>matyas:</b></span> if we don't already have one<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:54:17)</span> <b>bbockelm:</b></span> I think we already have multiple servers at UC exporting the OSG-Connect public data.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:54:35)</span> <b>bbockelm:</b></span> but we can definitely check that the origins are only exporting what is "expected".<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:56:36)</span> <b>matyas:</b></span> i feel like right now it's too easy for a misconfigured origin server to cause problems throughout the whole data federation<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:33:37)</span> <b>bbockelm:</b></span> It's one thing to flag to think about -- not necessarily the next thing in the list.<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:35:38)</span> <b>matyas:</b></span> hopefully Miron won't ask me about that, then :slightly_smiling_face:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:48:53)</span> <b>bbockelm:</b></span> he just left for Beijing, no?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:49:39)</span> <b>blin:</b></span> yeah so mat's off the hook :stuck_out_tongue:<br/>
+</body>
+</html>

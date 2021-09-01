@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Nov 15, 2018 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Thu Nov 15, 2018 : #xcache (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(09:30:48)</span> <b>matyas:</b></span> @bbockelm ... and now the world suddenly makes a lot more sense to me<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:31:32)</span> <b>matyas:</b></span> OK, well, since @dweitzel can see what my origin is putting out, it means there's a problem with my cache server<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:32:55)</span> <b>matyas:</b></span> <pre>$ curl -vvv <a href="http://sc-cache.chtc.wisc.edu:8000/chtc/PUBLIC/matyas/robots.txt">http://sc-cache.chtc.wisc.edu:8000/chtc/PUBLIC/matyas/robots.txt</a><br/>* About to connect() to <a href="http://sc-cache.chtc.wisc.edu">sc-cache.chtc.wisc.edu</a> port 8000 (#0)<br/>*   Trying 128.104.100.50...<br/>* Connected to <a href="http://sc-cache.chtc.wisc.edu">sc-cache.chtc.wisc.edu</a> (128.104.100.50) port 8000 (#0)<br/>&gt; GET /chtc/PUBLIC/matyas/robots.txt HTTP/1.1<br/>&gt; User-Agent: curl/7.29.0<br/>&gt; Host: <a href="http://sc-cache.chtc.wisc.edu:8000">sc-cache.chtc.wisc.edu:8000</a><br/>&gt; Accept: */*<br/>&gt; <br/></pre> (hangs)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:33:07)</span> <b>dweitzel:</b></span> cache logs?<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:33:59)</span> <b>matyas:</b></span> <pre>181115 09:31:54 328080 XrdInet: Accepted connection from <a href="mailto:60@fermicloud132.fnal.gov">60@fermicloud132.fnal.gov</a><br/>181115 09:31:54 328080 XrdProtocol: matched protocol http<br/>181115 09:31:54 328080 ?:60@fermicloud132.fnal.gov XrdPoll: FD 60 attached to poller 1; num=1<br/>181115 09:31:54 328080 XrootdBridge: unknown.5:60@fermicloud132.fnal.gov login as nobody<br/>181115 09:31:54 328080 unknown.5:60@fermicloud132.fnal.gov ofs_stat:  fn=/chtc/PUBLIC/matyas/robots.txt<br/>181115 09:31:54 328080 acc_Audit: http grant  *@[::ffff:131.225.154.57] stat /chtc/PUBLIC/matyas/robots.txt</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(09:34:37)</span> <b>matyas:</b></span> ... <pre>[2018-11-15 09:33:51.691445 -0600][Error  ][AsyncSock         ] [pxy0@sc-origin.chtc.wisc.edu:1094 #0.0] Unable to connect: Connection timed out<br/>[2018-11-15 09:33:51.691622 -0600][Error  ][PostMaster        ] [pxy0@sc-origin.chtc.wisc.edu:1094 #0] elapsed = 127, pConnectionWindow = 120 seconds.</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(09:36:20)</span> <b>matyas:</b></span> I don't see anything on the origin logs<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:36:49)</span> <b>dweitzel:</b></span> makes it sound like your cache can't connect to your origin.  can you do something simple like a telnet to the origin on port 1094?<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:37:35)</span> <b>matyas:</b></span> hmm. <pre>$ telnet <a href="http://sc-origin.chtc.wisc.edu">sc-origin.chtc.wisc.edu</a> 1094<br/>Trying 2607:f388:107c:501:216:3eff:fe1d:cca2...</pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(09:38:11)</span> <b>matyas:</b></span> let's try the ipv4 address...<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:38:24)</span> <b>matyas:</b></span> <pre>$ telnet 128.104.100.51 1094<br/>Trying 128.104.100.51...</pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:39:07)</span> <b>dweitzel:</b></span> works for me from Nebraska.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:39:27)</span> <b>dweitzel:</b></span> mine resolves to the ipv4 address<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:41:22)</span> <b>matyas:</b></span> ok, and if I try to download something else from the CHTC cache (like /README.gwosc), that works too<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:41:31)</span> <b>matyas:</b></span> let me talk to Moate<br/>
+<span style="color: #c386df"><span style="font-size: small">(09:45:30)</span> <b>matyas:</b></span> ok, we've got some weird network issues going on at CHTC<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:18:50)</span> <b>bbockelm:</b></span> huh.  I just accidentally clicked on the link you posted in the <tt>curl</tt> command -- Google Chrome is happy :wink:<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:37:17)</span> <b>matyas:</b></span> yeah, the machines can talk to the outside world, just not each other<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:52:03)</span> <b>matyas:</b></span> OK, CHTC stashcache is working now<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:53:04)</span> <b>matyas:</b></span> @dweitzel, what do you think of <a href="https://github.com/opensciencegrid/StashCache/pull/88">https://github.com/opensciencegrid/StashCache/pull/88</a> ?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:55:50)</span> <b>dweitzel:</b></span> looks good to me.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:57:28)</span> <b>dweitzel:</b></span> you also have to add it here: <a href="https://github.com/opensciencegrid/oasis-server/blob/master/goc/config-osg/etc/cvmfs/domain.d/osgstorage.org.conf">https://github.com/opensciencegrid/oasis-server/blob/master/goc/config-osg/etc/cvmfs/domain.d/osgstorage.org.conf</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(11:09:34)</span> <b>matyas:</b></span> ah, that was going to be my next question<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:48:38)</span> <b>marian:</b></span> @matyas... so it the <a href="http://sc-cache.chtc.wisc.edu">sc-cache.chtc.wisc.edu</a> cache server, not origin?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:49:24)</span> <b>matyas:</b></span> sc-cache = cache server; sc-origin = origin server<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:49:38)</span> <b>matyas:</b></span> did I screw up the PR?<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:49:48)</span> <b>marian:</b></span> ok, makes sense ... I was in impression you're setting up origin, my bad<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:49:55)</span> <b>matyas:</b></span> I'm setting up both<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:51:41)</span> <b>marian:</b></span> aaahaaa<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:52:03)</span> <b>marian:</b></span> ok, I see it also in the list xrdmapc list, ok<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:52:16)</span> <b>matyas:</b></span> I don't have an auth cache yet, just unauth<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:52:17)</span> <b>marian:</b></span> good, let's summarize on the meeting<br/>
+<span style="color: #53b759"><span style="font-size: small">(12:52:26)</span> <b>marian:</b></span> yep, that was my next question :slightly_smiling_face:<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:35:27)</span> <b>matyas:</b></span> ticket about re-registering old StashCache servers: <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-3444">https://opensciencegrid.atlassian.net/browse/SOFTWARE-3444</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(13:50:41)</span> <b>matyas:</b></span> one last question: if a job wants to get a file from SC, they have to either put in a specific cache as an HTTP(S) URL or use stashcp or CVMFS, both of which generally require CVMFS to be mounted, right?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:51:10)</span> <b>bbockelm:</b></span> W.r.t @ivukotic overload question - I don't see how any of these codepaths can be triggered.  So, that might be going up the wrong tree.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:00:54)</span> <b>dweitzel:</b></span> @matyas stashcp doesn't "require" CVMFS to be available.  Just that is how OSG Connect has chosen to distribute stashcp<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:01:04)</span> <b>dweitzel:</b></span> the RPM you made would work just as well, with no CVMFS<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:01:43)</span> <b>matyas:</b></span> right. should we start putting <tt>stashcache-client</tt> into <tt>osg-wn-client</tt>? @blin?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:06:59)</span> <b>blin:</b></span> we can only distribute it in the EL7 clients, right?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:08:45)</span> <b>matyas:</b></span> no, the client works on both<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:09:52)</span> <b>blin:</b></span> ship it<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:11:46)</span> <b>matyas:</b></span> got it, making ticket now<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:16:21)</span> <b>matyas:</b></span> <a href="https://opensciencegrid.atlassian.net/browse/SOFTWARE-3472">https://opensciencegrid.atlassian.net/browse/SOFTWARE-3472</a><br/>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Feb 9, 2017 : #gfactory (osg)</title>
+</head>
+<body>
+<h3>Thu Feb 9, 2017 : #gfactory (osg)</h3>
+<span style="color: #bd9336"><span style="font-size: small">(10:24:02)</span> <b>mkandes:</b></span> @blin: It looks like these glideins are attempting to update a collector on an HTCondor-CE ....<br/>
+<span style="color: #bd9336"><span style="font-size: small">(10:24:04)</span> <b>mkandes:</b></span> 02/07/17 23:56:50 (pid:1291407) SECMAN: required authentication with collector <a href="http://gluskap.phys.uconn.edu:9619">gluskap.phys.uconn.edu:9619</a> failed, so aborting command UPDATE_STARTD_AD.<br/>02/07/17 23:56:50 (pid:1291407) ERROR: AUTHENTICATE:1003:Failed to authenticate with any method|AUTHENTICATE:1004:Failed to authenticate using GSI|GSI:5006:Failed to authenticate because the subject '/DC=org/DC=opensciencegrid/O=Open Science Grid/OU=Services/CN=<a href="http://gluskap.phys.uconn.edu">gluskap.phys.uconn.edu</a>' is not currently trusted by you.  If it should be, add it to GSI_DAEMON_NAME or undefine GSI_DAEMON_NAME.<br/>02/07/17 23:56:50 (pid:1291407) Failed to start non-blocking update to &lt;137.99.79.130:9619&gt;.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(10:24:23)</span> <b>mkandes:</b></span> Does that make sense? Maybe the site installed the CE on their local central manager?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(10:24:49)</span> <b>mkandes:</b></span> An HTCondor-CE does not have a collector, or does it?<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(10:35:48)</span> <b>kherner:</b></span> @mkandes Their host cert didn't expire, did it?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(10:37:08)</span> <b>mkandes:</b></span> @kherner: I don't know. I asked if they recently updated the host cert, but no reply on that subject. I should double check.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:37:25)</span> <b>rynge:</b></span> Maybe that is one of those weird site collectors?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:37:42)</span> <b>rynge:</b></span> I think we see that problem sometimes at UNL as well<br/>
+<span style="color: #bd9336"><span style="font-size: small">(10:38:29)</span> <b>mkandes:</b></span> @mats: So I'm not confusing myself. There usually isn't a collector at the CE, correct?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:38:36)</span> <b>klarson1:</b></span> there is a collector there<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:38:56)</span> <b>rynge:</b></span> I think it is optional - a way for sites to see what is going on<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:39:10)</span> <b>klarson1:</b></span> i can't remember, but this is familiar.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(10:39:24)</span> <b>mkandes:</b></span> Ah, okay, that does sound familiar now.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:39:32)</span> <b>rynge:</b></span> GLIDEIN_Site_Collector <a href="http://sandhills-ce1.unl.edu:9619">sandhills-ce1.unl.edu:9619</a><br/>GLIDEIN_Collector <a href="http://osg-flock.grid.iu.edu:9814">osg-flock.grid.iu.edu:9814</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:39:47)</span> <b>rynge:</b></span> But I have no idea how it works<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:40:23)</span> <b>klarson1:</b></span> is this a new ce?<br/>
+<span style="color: #bd9336"><span style="font-size: small">(10:42:26)</span> <b>mkandes:</b></span> No. Mats just pointed out a weird (unrelated) error at this site last week. That error was basically a black hole node which shouldn't have been in the cluster. However, I found this authentication error in Startd logs of glideins for all other nodes. Doesn't look like  a big problem. User jobs appear to be running without issue.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:42:36)</span> <b>rynge:</b></span> I _think_ the idea was that it would allow the site so "see" the glideins better<br/>
+<span style="color: #bd9336"><span style="font-size: small">(10:42:38)</span> <b>mkandes:</b></span> I was just confused about the collector aspect.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:44:15)</span> <b>klarson1:</b></span> i think mats is right but i can't remember what i did on our ce to fix that.  all i can think of is the skip host cert check attr but i have no idea if that was for this issue or something else.  i can  look if you want me to<br/>
+<span style="color: #bd9336"><span style="font-size: small">(10:47:16)</span> <b>mkandes:</b></span> Thanks for the offer, Krista. But don't worry about it. Not a high priority issue. I was just looking for some clarification on what I was looking at.<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:47:23)</span> <b>klarson1:</b></span> we have monitoring that queries the collector so we did something<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:47:28)</span> <b>klarson1:</b></span> ok<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:47:29)</span> <b>blin:</b></span> @mkandes  the CE runs its own collector (it has to)<br/>
+<span style="color: #e7392d"><span style="font-size: small">(10:47:30)</span> <b>klarson1:</b></span> :slightly_smiling_face:<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:48:25)</span> <b>blin:</b></span> what's optional is whether or not pilots report back to the CE's collector or not (default: true)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:48:48)</span> <b>rynge:</b></span> IIRC, the site collector idea come up even before HTCondorCE - I think it is standalone<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:48:56)</span> <b>rynge:</b></span> Ah<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:49:26)</span> <b>rynge:</b></span> So the GLIDEIN_Site_Collector variable is set accordingly?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:49:30)</span> <b>blin:</b></span> well there's the central collector but the HTCondor-CE has always required a collector for its daemons<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:51:38)</span> <b>blin:</b></span> yea, there's some config that admins can set on the CE end to tell pilots to *not* populate <tt>GLIDEIN_Site_Collector</tt>, iirc<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:52:09)</span> <b>rynge:</b></span> Cool<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:53:17)</span> <b>blin:</b></span> i think it's actually undocumented, i can find how to set it if that's what you guys want<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:54:01)</span> <b>blin:</b></span> but for the actual error itself, i don't think it's an issue with the CE's host cert because then the pilot wouldn't land at all. it's probably an issue with the CA location on the worker node<br/>
+<span style="color: #bd9336"><span style="font-size: small">(10:55:19)</span> <b>mkandes:</b></span> @blin: Okay, thanks for the clarification. If you can find the setting, that might be helpful. I'll ask the site admin where the CA location is.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:56:26)</span> <b>blin:</b></span> @blin uploaded a file: <a href="https://opensciencegrid.slack.com/files/blin/F438Q1RAP/_etc_sysconfig_condor-ce.txt">/etc/sysconfig/condor-ce</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(10:56:35)</span> <b>blin:</b></span> that should do it<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:57:30)</span> <b>blin:</b></span> though there's a reason that it's undocumented: people shouldn't really set it unless their collector is being slammed from all the glideins<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:58:14)</span> <b>blin:</b></span> so using it as a solution is breaking out the hammer for your specific problem<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:59:50)</span> <b>blin:</b></span> but yea, as krista mentioned, this specific error just means that it can't update the collector on the CE, which shouldn't be a big issue. user jobs may still run.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(11:10:17)</span> <b>mkandes:</b></span> Yes, I don't think its a big problem. User jobs appear to be running successfully. Was just seeking some advice on how to proceed with debugging this authentication error.<br/>
+<span style="color: #bd9336"><span style="font-size: small">(11:10:36)</span> <b>mkandes:</b></span> Thanks for all the help everyone.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:47:06)</span> <b>rynge:</b></span> @mkandes  - do you see more than usual held glideins for OSG VO?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:47:19)</span> <b>rynge:</b></span> We are getting some old glideins, and then nothing<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:05:35)</span> <b>mkandes:</b></span> It looks like there were a few spikes in held glideins today (and yesterday) ...<br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:05:37)</span> <b>mkandes:</b></span> <a href="http://glidein.grid.iu.edu/factory/monitor/factoryStatus.html?entry=total&amp;frontend=OSG_Flock_frontend&amp;infoGroup=other&amp;elements=StatusHeld,&amp;rra=0&amp;window_min=0&amp;window_max=0&amp;timezone=-8">http://glidein.grid.iu.edu/factory/monitor/factoryStatus.html?entry=total&amp;frontend=OSG_Flock_frontend&amp;infoGroup=other&amp;elements=StatusHeld,&amp;rra=0&amp;window_min=0&amp;window_max=0&amp;timezone=-8</a><br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:05:50)</span> <b>mkandes:</b></span> <a href="http://gfactory-1.t2.ucsd.edu/factory/monitor/factoryStatus.html?entry=total&amp;frontend=OSG_Flock_frontend&amp;infoGroup=other&amp;elements=StatusHeld,&amp;rra=0&amp;window_min=0&amp;window_max=0&amp;timezone=-8">http://gfactory-1.t2.ucsd.edu/factory/monitor/factoryStatus.html?entry=total&amp;frontend=OSG_Flock_frontend&amp;infoGroup=other&amp;elements=StatusHeld,&amp;rra=0&amp;window_min=0&amp;window_max=0&amp;timezone=-8</a><br/>
+<span style="color: #bd9336"><span style="font-size: small">(16:06:24)</span> <b>mkandes:</b></span> Do you have some specific problem sites you're seeing?<br/>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Apr 29, 2021 : #collaboration-support (osg)</title>
+</head>
+<body>
+<h3>Thu Apr 29, 2021 : #collaboration-support (osg)</h3>
+<span style="color: #a63024"><span style="font-size: small">(10:17:45)</span> <b>paschos:</b></span> that would affect public tooo<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:38:12)</span> <b>rynge:</b></span> <pre><br/>One thing I want to note is that the storage we have allocated is on /collab area, but the current configuration of the infrastructure doesn't allow stashcp to copy output files there, so I was using my area in /public then moving data from /public to /collab.<br/>Usually I need to move data from the two area quite often because in /public I only have 500GiB.<br/><br/>I did a test where I created a symbolic link from /public to /collab, this way stashcp copies output to /public, but with the link I get the output in /collab.<br/>The copy done this way succeeded.<br/>I'm wondering if I can use this trick to avoid to manually copy job's output from /public to /collab and let the symlink do this for me.</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:38:23)</span> <b>rynge:</b></span> Yeah, problem fixed when the mount was fixed<br/>
+<span style="color: #674b1b"><span style="font-size: small">(10:38:28)</span> <b>rynge:</b></span> But how do you feel about this hack?<br/>
+<span style="color: #5a4592"><span style="font-size: small">(10:43:29)</span> <b>lmichael:</b></span> @lincoln may have input on the hack, as well as @paschos<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:57:27)</span> <b>lincoln:</b></span> hrm, I thought e had stashcp working to collab<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:58:05)</span> <b>lincoln:</b></span> I didn't expect that any users have a /collab AND a /public space - I am not sure if they should<br/>
+<span style="color: #5a4592"><span style="font-size: small">(11:33:46)</span> <b>lmichael:</b></span> Should we change the /collab functionality to work with stashcp, and how much human effort and wall time would it take?<br/>
+<span style="color: #5a4592"><span style="font-size: small">(11:34:43)</span> <b>lmichael:</b></span> My recollection is that @paschos already confirmed with this user that the output stashcp to /collab doesn’t work, so unless things changed in the last couple months …<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:51:32)</span> <b>paschos:</b></span> stashcp for /collab on some collab nodes. It will not work for writiing on the login04/05 …<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:57:02)</span> <b>paschos:</b></span> /collab is accessible for read only on login04/05 as it should… cause if we allow write access from there, there is no template - according to derek - that will force access by project --- so all users can access the namespace and it will be confusing. The measure of mounting /collab on those nodes was only meant to be a temporary fix for redtop and i am envisioning any permanent dual write setup for both namespaces…<br/>
+<blockquote>
+<span style="color: #a63024"><span style="font-size: small">(14:53:57)</span> <b>paschos:</b></span> edit as for some reason i can not edit this with slack: *I am not envisioning<br/>
+</blockquote>
+<span style="color: #a63024"><span style="font-size: small">(13:58:41)</span> <b>paschos:</b></span> the user by the way has both storage on /public - as an osg user - and a provisional storage in /collab … In regards to this hack he mentioned, this is a first time I became aware of it - he did not discuss it with me… I see now that this is a resurfaced ticket --- i am checking it out<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:59:26)</span> <b>paschos:</b></span> btw i don’t feel positive about the hack --- but I can discuss it in more detail over a call with him tomorrow<br/>
+<span style="color: #674b1b"><span style="font-size: small">(14:03:43)</span> <b>rynge:</b></span> Thanks!<br/>
+<span style="color: #5a4592"><span style="font-size: small">(15:28:00)</span> <b>lmichael:</b></span> @paschos do you know who maintains <a href="https://ci-connect.atlassian.net/wiki/spaces/CMS/pages/6783093/Access+Stash+remotely">https://ci-connect.atlassian.net/wiki/spaces/CMS/pages/6783093/Access+Stash+remotely</a> and could update it to discourage in-job wget in favor of ‘transfer_input_files’ with http address?<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:42:42)</span> <b>paschos:</b></span> umm---  we have access --- but i would assume it’s carl and kenyi--- i’ll ask lincoln --- give me a sec<br/>
+<span style="color: #a63024"><span style="font-size: small">(15:48:39)</span> <b>paschos:</b></span> *Lincoln Bryant*  [3:45 PM]<br/>Kenyi<br/>[3:45 PM] I would guess<br/>[3:45 PM] since its the CMS Connect handbook<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:01:46)</span> <b>paschos:</b></span> @lmichael we’d be happy to reach out to Kenyi  with this request if you’d like<br/>
+<span style="color: #5a4592"><span style="font-size: small">(16:51:09)</span> <b>lmichael:</b></span> yes, please! I recently encountered wget issues from a user looking at that page that seemed related to our discovery last week that some container-based (local ‘cloud’) sites disallow or don’t have scp/rsync available. So wget is probably less reliable these days. Told them to have HTCondor do the HTTP, which should take care of things and is where we’re headed in the future wrt transfers.<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:08:35)</span> <b>paschos:</b></span> ok — will start an email thread<br/>
+<span style="color: #a63024"><span style="font-size: small">(17:15:45)</span> <b>paschos:</b></span> done<br/>
+</body>
+</html>

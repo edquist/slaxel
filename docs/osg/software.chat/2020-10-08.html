@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Oct 8, 2020 : #software (osg)</title>
+</head>
+<body>
+<h3>Thu Oct 8, 2020 : #software (osg)</h3>
+<span style="color: #99a949"><span style="font-size: small">(05:51:26)</span> <b>dwd:</b></span> The limits aren’t going into effect until November 1 so we would find out then<br/>
+<span style="color: #235e5b"><span style="font-size: small">(08:07:46)</span> <b>dweitzel:</b></span> Correct, though they say that the limits will gradually be put into place.<br/>
+<span style="color: #73769d"><span style="font-size: small">(08:09:55)</span> <b>tim.theisen:</b></span> @blin: What happened to the VMU tests? They don't seem to get past step 1.<br/>
+<span style="color: #c386df"><span style="font-size: small">(08:24:20)</span> <b>matyas:</b></span> Looks like they're having trouble finding the hostname...<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:25:11)</span> <b>blin:</b></span> argh, we broke the osg-ca-generator<br/>
+<span style="color: #c386df"><span style="font-size: small">(08:25:47)</span> <b>matyas:</b></span> how'd it... oh I see.<br/>
+<span style="color: #c386df"><span style="font-size: small">(08:26:15)</span> <b>matyas:</b></span> os.getenv() returns None if the environment variable is undefined<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:27:00)</span> <b>blin:</b></span> oh damn it, i even was using the dict lookup originally in my review<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:27:17)</span> <b>blin:</b></span> @matyas are you gonna make the PR or should I?<br/>
+<span style="color: #c386df"><span style="font-size: small">(08:27:23)</span> <b>matyas:</b></span> I can do it.<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:27:49)</span> <b>blin:</b></span> thanks<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:29:27)</span> <b>blin:</b></span> that's my bad, sorry<br/>
+<span style="color: #c386df"><span style="font-size: small">(08:30:28)</span> <b>matyas:</b></span> eh, I reviewed it too<br/>
+<span style="color: #c386df"><span style="font-size: small">(08:30:47)</span> <b>matyas:</b></span> <a href="https://github.com/opensciencegrid/osg-ca-generator/pull/21">https://github.com/opensciencegrid/osg-ca-generator/pull/21</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(08:33:09)</span> <b>blin:</b></span> ok @tim.theisen we should be good to go<br/>
+<span style="color: #73769d"><span style="font-size: small">(08:33:17)</span> <b>tim.theisen:</b></span> Thank you.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:55:52)</span> <b>blin:</b></span> @dwd i'm having trouble getting the debug log working. i've got the following:<br/><pre>    oasis_repo = "<a href="http://oasis.opensciencegrid.org">oasis.opensciencegrid.org</a>"<br/>    files.write("/etc/cvmfs/config.d/%s.local" % oasis_repo,<br/>                "CVMFS_DEBUGLOG=/tmp/cvmfs/%s.log" % oasis_repo,</pre><br/>but the file never gets created (<tt>/tmp/cvmfs</tt> exists)<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:00:39)</span> <b>dwd:</b></span> Hmm.  I don’t see any reason why that wouldn’t work.  You can verify that the file is actually created?   I wonder if it is missing a newline?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:01:01)</span> <b>blin:</b></span> oh, quite probably<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:01:20)</span> <b>dwd:</b></span> I never tried without a newline, don’t know if it matters<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:01:46)</span> <b>blin:</b></span> but yeah, the file does get created<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:03:48)</span> <b>dwd:</b></span> Separate issue: are koji builds having a known problem?  I just tried a scratch build and got an error<br/><pre>Timeout on <a href="http://mirror.chtc.wisc.edu/centos/7/os/x86_64/Packages/acl-2.2.51-15.el7.x86_64.rpm">http://mirror.chtc.wisc.edu/centos/7/os/x86_64/Packages/acl-2.2.51-15.el7.x86_64.rpm</a></pre><br/>and lots more timeouts<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:04:24)</span> <b>dwd:</b></span> <a href="https://kojihub0000.chtc.wisc.edu/kojifiles/work/tasks/2908/322908/root.log">https://kojihub0000.chtc.wisc.edu/kojifiles/work/tasks/2908/322908/root.log</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(15:05:00)</span> <b>matyas:</b></span> The mirror host appears to be down; I'll ask our admins.<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:05:41)</span> <b>dwd:</b></span> I can access it through a web browser, I’ll try again<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:07:32)</span> <b>matyas:</b></span> Apparently we rebooted mirror.chtc (well, rebooted the hypervisor it was running under)<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:11:02)</span> <b>dwd:</b></span> It’s working now<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:13:18)</span> <b>matyas:</b></span> I'm going to change our source repos to the upstream mirrors for now; we're still having trouble with that hypervisor.<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:16:48)</span> <b>dwd:</b></span> Yeah, it did end up timing out like before.  I thought it had gotten past that point but I was wrong<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:48:40)</span> <b>blin:</b></span> @dwd is it ok if <tt>/etc/cvmfs/config.d/oasis.opensciencegrid.org</tt> consists /only/ of the CVMFS_DEBUGLOG config ?<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:49:12)</span> <b>dwd:</b></span> You mean with .local.  Yes, that should be fine.<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:50:29)</span> <b>dwd:</b></span> You could try putting it in /etc/cvmfs/default.local instead, but then it will include debug logs from all the repositories.<br/>
+</body>
+</html>

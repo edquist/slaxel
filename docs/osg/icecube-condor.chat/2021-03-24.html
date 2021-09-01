@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Mar 24, 2021 : #icecube-condor (osg)</title>
+</head>
+<body>
+<h3>Wed Mar 24, 2021 : #icecube-condor (osg)</h3>
+<span style="color: #9e3997"><span style="font-size: small">(14:23:42)</span> <b>bbockelm:</b></span> @dschultz - Moate and I are looking at ticket #66747 and things seem to "be OK"<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:23:59)</span> <b>bbockelm:</b></span> Is there a good way to tell if user jobs are actually using GPUs?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:24:44)</span> <b>bbockelm:</b></span> It seems like something turned on in the last few hours.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:26:15)</span> <b>bbockelm:</b></span> Job lengths look good, CPU is churning<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:26:42)</span> <b>bbockelm:</b></span> However I don't see any relevant GPU attributes that can indicate if GPUs are being used.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:27:04)</span> <b>bbockelm:</b></span> Ah - adding @briedel and @vbrik to the channel<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(14:28:05)</span> <b>dschultz:</b></span> trying to find an external graph you can look at, and not finding anything good (not seeing any good way to tease out gpu failures by site in gracc)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:29:15)</span> <b>bbockelm:</b></span> Well, the complaint from Syracuse was that even when jobs were running nothing showed up in <tt>nvidia-smi</tt>.<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(14:29:57)</span> <b>dschultz:</b></span> yeah. I don't see any recent jobs in the last few hours at SU or PRP, which are the likely places for problems<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:30:57)</span> <b>bbockelm:</b></span> Looks like a good mix from SU, PRP, and Omaha<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:31:30)</span> <b>bbockelm:</b></span> <pre>condor_status -pool <a href="http://glidein-cm3000.chtc.wisc.edu">glidein-cm3000.chtc.wisc.edu</a> -const 'TotalGPUs &amp;&amp; DynamicSlot' -af:h Name SlotType TotalGPUs GPUs TotalJobRuntime GLIDEIN_Site</pre><br/>Does this work for you?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:34:59)</span> <b>bbockelm:</b></span> If so, then you can see the remote users here:<br/><pre>condor_status -pool <a href="http://glidein-cm3000.chtc.wisc.edu">glidein-cm3000.chtc.wisc.edu</a> -const 'TotalGPUs &amp;&amp; DynamicSlot' -claimed</pre><br/>Very few prod jobs<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(14:36:21)</span> <b>dschultz:</b></span> I do have a question about that.  I can do the condor_status as root on our submitters, but not as a regular user unless I generate an x509 proxy<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(14:37:18)</span> <b>dschultz:</b></span> is that how it's supposed to be?  seems sub-optimal, especially as we try killing off x509 for users<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:39:05)</span> <b>bbockelm:</b></span> Hm - I assume that root is GSI (via hostcert) to auth?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:39:13)</span> <b>bbockelm:</b></span> :slightly_smiling_face: Can I interest you in a token?<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(14:39:30)</span> <b>dschultz:</b></span> I think that's right<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(14:39:54)</span> <b>dschultz:</b></span> you can interest me, but the question is if you can get @vbrik to set up the new servers with tokens<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:40:04)</span> <b>bbockelm:</b></span> <pre><a href="http://sub-1.icecube.wisc.edu">sub-1.icecube.wisc.edu</a>         $CondorVersion: 8.7.7 Mar 13 2018 BuildID: 435313 $                               <br/><a href="http://sub-simprod-2.icecube.wisc.edu">sub-simprod-2.icecube.wisc.edu</a> $CondorVersion: 8.7.7 Mar 13 2018 BuildID: 435313 $                               <br/><a href="http://sub-simprod.icecube.wisc.edu">sub-simprod.icecube.wisc.edu</a>   $CondorVersion: 8.7.7 Mar 13 2018 BuildID: 435313 $                               </pre><br/>Ahem.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:40:21)</span> <b>bbockelm:</b></span> _nudge nudge_<br/>
+<span style="color: #50a0cf"><span style="font-size: small">(14:40:30)</span> <b>dschultz:</b></span> yeah.  sub-2 is under construction, as far as I know<br/>
+</body>
+</html>

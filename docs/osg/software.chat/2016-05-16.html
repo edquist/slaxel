@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon May 16, 2016 : #software (osg)</title>
+</head>
+<body>
+<h3>Mon May 16, 2016 : #software (osg)</h3>
+<span style="color: #9f69e7"><span style="font-size: small">(15:32:32)</span> <b>dgc:</b></span> The globus integration is the main reason why we didn’t go full-on CMS - I would prefer to build a template site on some normal templating language than to build custom dynamic extensions to WP or Drupal or whatnot. Mako was a reasonable choice at the time (very well established and foundational for a lot of python templating frameworks) but I agree Jinja2 would be a better choice today.<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(15:33:27)</span> <b>dgc:</b></span> It’s not just that the oauth catcher has to be dynamic, but we have to broker access and page generation _based on_ the results of the oauth exchange.<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(15:37:01)</span> <b>dgc:</b></span> The custom bits of the templater are just to bridge the templating engine (which is just a library, same as jinja2) to the platform (wsgi) in as fluid as way as possible. I wanted template files on the filesystem to be directly accessible to the apache server, so I wrote a content handler to do the mako to html translation, and now any .html file in the directory is implicitly translated by apache. It doesn’t have to be coded into a wsgi application.<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(15:37:16)</span> <b>dgc:</b></span> I think it’s .html anyway, maybe it was a different extension.<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(15:37:52)</span> <b>dgc:</b></span> The templating engine is makomate, but it could be changed to do jinja without a lot of hassle I think. I had started taking steps to make it handle any arbitrary templater but didn’t finish.<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(15:38:03)</span> <b>dgc:</b></span> It does already handle markdown.<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(15:38:57)</span> <b>dgc:</b></span> so e.g. if you make a file named ‘foo.html’ in the docroot, then <a href="https://osgconnect.net/foo">https://osgconnect.net/foo</a> will show it through the mako renderer. foo.md, through the markdown renderer.<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(15:39:31)</span> <b>dgc:</b></span> Hope this helps<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:49:22)</span> <b>bbockelm:</b></span> Indeed, it does!  Thanks!<br/>
+</body>
+</html>

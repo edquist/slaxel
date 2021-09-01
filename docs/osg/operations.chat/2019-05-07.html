@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue May 7, 2019 : #operations (osg)</title>
+</head>
+<body>
+<h3>Tue May 7, 2019 : #operations (osg)</h3>
+<span style="color: #e23f99"><span style="font-size: small">(10:31:23)</span> <b>marco.mascheroni:</b></span> @jlstephen @lincoln I can't ping <a href="http://hosted-ce21.grid.uchicago.edu">hosted-ce21.grid.uchicago.edu</a><br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:31:25)</span> <b>marco.mascheroni:</b></span> sorry<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:31:27)</span> <b>marco.mascheroni:</b></span> 21<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:31:38)</span> <b>jlstephen:</b></span> looking<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:31:40)</span> <b>jlstephen:</b></span> just 21?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:31:43)</span> <b>marco.mascheroni:</b></span> yes<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:33:51)</span> <b>jlstephen:</b></span> looks like networking was messed up<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:33:53)</span> <b>jlstephen:</b></span> should be back now<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:34:11)</span> <b>jlstephen:</b></span> is that the only hosted-ce that's having problems today?<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:34:27)</span> <b>jlstephen:</b></span> we did have a hypervisor reboot again yesterday<br/>
+<span style="color: #ea2977"><span style="font-size: small">(10:34:54)</span> <b>jlstephen:</b></span> i think i got everything back up, but some of the non-hosted-ce vms needed to be rebooted a couple of times for everything to clear up<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:46:36)</span> <b>marco.mascheroni:</b></span> I will let you know, I could log into all of them. Most of them had <tt>vo-client</tt> out of date, so jobs were goiung held because of that.<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:50:29)</span> <b>marco.mascheroni:</b></span> @jlstephen I can't use sudo at <a href="http://hosted-ce04.grid.uchicago.edu">hosted-ce04.grid.uchicago.edu</a><br/>
+<span style="color: #e96699"><span style="font-size: small">(11:44:52)</span> <b>lincoln:</b></span> @marco.mascheroni did you try logging in as root?<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:44:59)</span> <b>lincoln:</b></span> instead of centos<br/>
+<span style="color: #e96699"><span style="font-size: small">(11:45:00)</span> <b>lincoln:</b></span> or whatever<br/>
+<span style="color: #e23f99"><span style="font-size: small">(11:45:46)</span> <b>marco.mascheroni:</b></span> yep it works now. I could not before though. Everything seems fine now<br/>
+<span style="color: #ea2977"><span style="font-size: small">(11:46:43)</span> <b>jlstephen:</b></span> <a href="http://hostec-ce04.grid.uchicago.edu">hostec-ce04.grid.uchicago.edu</a> is probably only root<br/>
+<span style="color: #ea2977"><span style="font-size: small">(11:47:01)</span> <b>jlstephen:</b></span> it's the one non/pre-openstack hosted-ce that's left<br/>
+<span style="color: #e23f99"><span style="font-size: small">(12:00:34)</span> <b>marco.mascheroni:</b></span> @blin do you recognize this error:<br/><pre><br/>7891210.0   feosgflock      5/7  09:55 status command failed: ++ '[' x '!=' x -a -d /bin ']'-++ '[' -d /wsu/home/groups/osg/bosco/glite/bin ']'-++ blah_bin_directory=/wsu/home/groups/osg/bosco/glite/bin-++ '[' -r '' ']'-++ '[' -r /wsu/home/groups/osg/bosco/glite/etc/batch_gahp.config ']'-++  </pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:01:55)</span> <b>blin:</b></span> huh, i've never seen the <tt>set -x</tt> output get dumped into a hold message<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:02:40)</span> <b>blin:</b></span> wsu is the one you've set <tt>pbs_binpath</tt> in the batch_gahp config, right?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:02:46)</span> <b>blin:</b></span> what did you set its value to?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(12:13:26)</span> <b>marco.mascheroni:</b></span> <tt>pbs_binpath=/opt/pbs/bin/</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:15:09)</span> <b>blin:</b></span> did you set <tt>-x</tt> in the shebang for <tt>blah_load_config.sh</tt> or <tt>blah_common_submit_functions.sh</tt>?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(12:16:10)</span> <b>marco.mascheroni:</b></span> I wish I remember.. The error appeared only recently, when I was on vacation<br/>
+<span style="color: #e23f99"><span style="font-size: small">(12:16:51)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(12:17:36)</span> <b>marco.mascheroni:</b></span> it looks like I did that, removing it<br/>
+<span style="color: #e23f99"><span style="font-size: small">(12:18:01)</span> <b>marco.mascheroni:</b></span> I'll let you know if it helps<br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:25:10)</span> <b>marco.mascheroni:</b></span> ok, the error was <tt>status command failed:  &lt;blah&gt; execute_cmd: 30 seconds timeout expired, killing child process.- &lt;blah&gt; killed by signal  15.-</tt> @blin<br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:25:22)</span> <b>marco.mascheroni:</b></span> <pre><br/>[osg@warrior ~]$ time ./bosco/glite/bin/pbs_status.py pbs/20190423/411691<br/>0[RemoteUserCpu=0; WorkerNode="wsu159"; ImageSize=0; BatchJobId="411691"; JobStatus=4; ExitCode=0; ]<br/><br/>real	1m33.064s<br/>user	1m37.683s<br/>sys	0m4.479s<br/></pre><br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:25:46)</span> <b>marco.mascheroni:</b></span> I guess it's because pbs is too slow<br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:27:55)</span> <b>marco.mascheroni:</b></span> Is there a way to increase the 30 sec timeout? Is it a good idea?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:31:34)</span> <b>dweitzel:</b></span> According to the code, in the blah config, you can set <tt>blah_child_poll_timeout</tt> to the number of seconds for the timeout.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:00:20)</span> <b>blin:</b></span> @marco.mascheroni are there a lot of pbs jobs? does <tt>qstat -fx</tt> take forever when you run it manually?<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:07:25)</span> <b>lincoln:</b></span> anyone have any idea why we might be seeing this on the CE at MWT2?<br/><pre><br/>05/07/19 14:05:54 Authentication Failed, MethodsTried=FS,GSI<br/>05/07/19 14:05:54 DC_AUTHENTICATE: authentication of &lt;169.228.38.36:15295&gt; did not result in a valid mapped user name, which is required for this command (478 ACT_ON_JOBS), so aborting.<br/>05/07/19 14:05:54 DC_AUTHENTICATE: reason for authentication failure: AUTHENTICATE:1003:Failed to authenticate with any method|AUTHENTICATE:1004:Failed to authenticate using GSI|GSI:5002:Failed to authenticate because the remote (client) side was not able to acquire its credentials.|AUTHENTICATE:1004:Failed to authenticate using FS|FS:1004:Unable to lstat(/tmp/FS_XXXGGgqdM)<br/></pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(14:07:45)</span> <b>lincoln:</b></span> looks like we can't authenticate with <tt>gfactory-1.t2.ucsd.edu.</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:08:42)</span> <b>blin:</b></span> do you have an up-to-date vo-client?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:08:49)</span> <b>blin:</b></span> (88-1+)<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:10:26)</span> <b>lincoln:</b></span> we should but let me doublecheck<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:10:40)</span> <b>lincoln:</b></span> 90-1<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:10:46)</span> <b>lincoln:</b></span> does the CE need restarted?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:11:32)</span> <b>blin:</b></span> it shouldn't need to be, are your ca-certs up to date?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:11:40)</span> <b>blin:</b></span> do you have any custom lcmaps voms mappings?<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:17:06)</span> <b>lincoln:</b></span> will check<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:22:41)</span> <b>blin:</b></span> you should also be able to see the failed mapping in <tt>/var/log/messages</tt> or in <tt>journalctl</tt><br/>
+</body>
+</html>

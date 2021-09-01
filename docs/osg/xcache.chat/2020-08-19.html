@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Aug 19, 2020 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Wed Aug 19, 2020 : #xcache (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(12:28:25)</span> <b>matyas:</b></span> I've been looking into the logs for our origin for our truncated files problem... here's an example I saw.<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:30:06)</span> <b>matyas:</b></span> does "Resource temporarily available" here indicate a problem sending data over the network, or reading data from the file system?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:30:32)</span> <b>dweitzel:</b></span> my best guess it the network.<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:31:25)</span> <b>matyas:</b></span> The files are served from Ceph on this origin.<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:31:56)</span> <b>blin:</b></span> @abh ^^<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:32:27)</span> <b>dweitzel:</b></span> using ceph xrootd plugin, or just using the posix interface?<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:32:59)</span> <b>matyas:</b></span> Just posix<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:32:59)</span> <b>andrew.melo:</b></span> I've seen that string of errors before and could never find out why. I found the code and there's (I"m hazy, it's a while ago) a retry-with-backup loop, but I couldn't sort out where the error was occuring<br/>
+<span style="color: #c386df"><span style="font-size: small">(12:35:42)</span> <b>matyas:</b></span> You could be right, based on the timestamps. Looks like the rc is the same as the number of seconds it waits before trying again. I kinda like that :slightly_smiling_face:<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:37:17)</span> <b>andrew.melo:</b></span> Very confusing, because I was looking for what errno "2" meant at first :slightly_smiling_face:<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:18:51)</span> <b>matyas:</b></span> So is it hitting some sort of timeout, and can we increase the timeout?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:22:04)</span> <b>matyas:</b></span> I suppose we should get a bigger pipe too. The minimum requirements doc said 10 Gbps so that's what we have, but the origin is serving a lot more hosts than I expected. I forgot that stashcp contacts the origin if it can't get the file from a cache...<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:24:52)</span> <b>matyas:</b></span> Is there a way to forbid that? I don't want to potentially serve hundreds of worker nodes from the origin.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:30:18)</span> <b>dweitzel:</b></span> get faster caches? :slightly_smiling_face: It will only go to the origin if cache is too slow.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:30:44)</span> <b>dweitzel:</b></span> could always firewall the origin to only the caches + redirector.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:30:47)</span> <b>matyas:</b></span> will it try a different cache first?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:31:07)</span> <b>dweitzel:</b></span> I forget how it does.  Maybe it tries 2 caches before falling back to redirector.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:31:11)</span> <b>dweitzel:</b></span> (source diving)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:32:05)</span> <b>dweitzel:</b></span> looks like tries 1 cache, then goes to origin.  It should try 2, in my opinion.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:32:16)</span> <b>matyas:</b></span> yah<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:32:26)</span> <b>matyas:</b></span> that explains<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:33:14)</span> <b>dweitzel:</b></span> I also think it should try HTTP before going back to xrootd.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:33:20)</span> <b>dweitzel:</b></span> legacy behavior.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:34:44)</span> <b>matyas:</b></span> Fermi worker nodes have been hitting the CHTC cache; the CHTC cache gets overloaded so they hit the origin, which... also gets overloaded so it craps out before it can serve the entire file?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:35:15)</span> <b>matyas:</b></span> and then the caches keep the partial file and serve _that_ up instead of asking for the rest of the file?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:48:00)</span> <b>dweitzel:</b></span> I thought that is what the cinfo file was for.  To encode what parts of the file are on disk.<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:22:45)</span> <b>efajardo:</b></span> Why are fermi jobs hitting the CHTC cache instead<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:22:50)</span> <b>efajardo:</b></span> of the fast Chicago i2 host<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:23:13)</span> <b>matyas:</b></span> fantastic question!<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:29:07)</span> <b>efajardo:</b></span> do you have an exmaple of a fnal node?<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:29:09)</span> <b>efajardo:</b></span> I want to grep<br/>
+<span style="color: #8d4b84"><span style="font-size: small">(14:32:29)</span> <b>kherner:</b></span> DUNE/FIFE jobs on FNAL worker nodes shouldn't be hitting the caches at all; they should be accessing files directly via FNAL dCache. Could be OSG VO jobs though.<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:33:37)</span> <b>matyas:</b></span> They're GLOW VO<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:34:24)</span> <b>matyas:</b></span> example node: <a href="http://fnpc19106.fnal.gov">fnpc19106.fnal.gov</a><br/>
+<span style="color: #8d4b84"><span style="font-size: small">(14:35:18)</span> <b>kherner:</b></span> That would do the same thing as OSG VO jobs then. No idea why they'd go to CHTC and not Chicago though. Something in some routing table somewhere I guess.<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:38:22)</span> <b>efajardo:</b></span> Indeed there are lots of <tt>200819 12:10:16 9971 XrootdXeq: unknown.51012:<a href="mailto:1489@fnpc19106.fnal.gov">1489@fnpc19106.fnal.gov</a> disc 0:00:00 (link read error or closed)</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(15:26:16)</span> <b>matyas:</b></span> What should GLOW/CHTC do in the meantime to get our origin to work again? Shut down our cache for now so jobs at FNAL hit some better cache instead of falling back to the origin?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:43:11)</span> <b>matyas:</b></span> If the cache is actually down, will stashcp try another cache, or will it immediately go for the redirector?<br/>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jul 1, 2019 : #operations (osg)</title>
+</head>
+<body>
+<h3>Mon Jul 1, 2019 : #operations (osg)</h3>
+<span style="color: #e23f99"><span style="font-size: small">(10:30:19)</span> <b>marco.mascheroni:</b></span> @dweitzel @blin (and @jdost321 who was also looking at this on Friday). Also @efajardo who might be interested on news about QB2.<br/><br/>The reason why pilots were going held and I was getting:<br/><br/><pre><br/>10:16 FT_GAHP at 127.0.0.1 failed to send file(s) to &lt;127.0.0.1:44112&gt;: error reading from /home/ligouser/bosco/sandbox/d071/d071ed9b/hosted-ce29.grid.uchicago.edu_9619_hosted-ce29.grid.uchicago.edu#806.0#1561646281/_condor_stdout: (errno 2) No such file or directory; GRIDMANAGER failed to receive file(s) from &lt;128.135.158.211:64488&gt;<br/></pre><br/><br/>is that pbs submission (qsub) is printing this message in addition to the pbs job id:<br/><br/><pre><br/>[ligouser@qb8 ~]$ qsub pbs_submit<br/>** work directory will be created within one hour **<br/>663873.qb3<br/></pre><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:31:21)</span> <b>dweitzel:</b></span> *special snowflake*<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:31:33)</span> <b>dweitzel:</b></span> k.  Yeah, that would throw off the job id parsing.<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:32:03)</span> <b>marco.mascheroni:</b></span> What happens is that this grep command parses the output in pbs_submit.sh:<br/><br/><pre><br/>jobID=<tt>echo $jobID | awk 'match($0,/[0-9]+/){print substr($0, RSTART, RLENGTH)}'</tt><br/></pre><br/><br/>always return "1". So the condor grid manager thinks he has to query job 1 instead of job N and thinks the job is "DONE"<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:32:33)</span> <b>marco.mascheroni:</b></span> And try to transfer the condor_stdout<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:46:51)</span> <b>marco.mascheroni:</b></span> @dweitzel, how about I put a "tail -n 1" after the echo in the jobid parsing above?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:46:57)</span> <b>marco.mascheroni:</b></span> like:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:47:19)</span> <b>marco.mascheroni:</b></span> <pre><br/>jobID=<tt>echo $jobID | tail -n 1 | awk 'match($0,/[0-9]+/){print substr($0, RSTART, RLENGTH)}'</tt><br/></pre><br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:50:24)</span> <b>marco.mascheroni:</b></span> (to be precise this is the exact string returned by qsub when invoked by pbs_submit.sh:<br/><pre><br/>condor_exec.exe credential_osg-ligo-1-t2-ucsd-edu_OSG_gWMSFrontend.main-gpu_534414 work directory will be created within one hour condor_exec.exe credential_osg-ligo-1-t2-ucsd-edu_OSG_gWMSFrontend.main-gpu_534414 663866.qb3<br/></pre>)<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:53:20)</span> <b>dweitzel:</b></span> what a horrible, horrible thing to return from qsub.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:53:49)</span> <b>dweitzel:</b></span> I suppose you can just get the last string somehow.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:53:58)</span> <b>dweitzel:</b></span> the last "word" separated by spaces.<br/>
+<span style="color: #e23f99"><span style="font-size: small">(10:56:53)</span> <b>marco.mascheroni:</b></span> yes, indeed it's separated by space, not lines<br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:37:26)</span> <b>marco.mascheroni:</b></span> FYI: this is how I changed the instruction, now it works:<br/><pre><br/>jobID=<tt>echo $jobID | awk '{ print $NF }' | awk 'match($0,/[0-9]+/){print substr($0, RSTART, RLENGTH)}'</tt><br/></pre><br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:37:43)</span> <b>marco.mascheroni:</b></span> (in pbs_submit, I added the middle awk)<br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:38:38)</span> <b>marco.mascheroni:</b></span> @blin or @dweitzel will you take care of creating a jira and fix this upstream (assuming this is how it hsould be fixed)<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:48:35)</span> <b>isfiligoi:</b></span> Can OSG issue IGTF approved host certs for its hosted services?<br/>E.g. via some agreement with InCommon?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:48:59)</span> <b>dweitzel:</b></span> individual sites can, yes.<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:49:16)</span> <b>isfiligoi:</b></span> how about OSG as an organization?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:50:35)</span> <b>dweitzel:</b></span> We are getting into semantics here.  OSG does not have an agreement with InCommon, but, for example, Nebraska does.  And nebraska, along with Wisconsin, can issue certificates for *.<a href="http://opensciencegrid.org">opensciencegrid.org</a> hosts.<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:50:59)</span> <b>isfiligoi:</b></span> ok, that’s what I was aiming at :slightly_smiling_face:<br/>
+<span style="color: #53b759"><span style="font-size: small">(14:52:09)</span> <b>isfiligoi:</b></span> to be more specific…<br/>if a (small) site wants to give OSG staff a node to manage by e.g. kubernetes,<br/>could we register it with a DNS name that we can get a IGTF approved host cert?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:52:25)</span> <b>dweitzel:</b></span> Yes<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:52:54)</span> <b>dweitzel:</b></span> Short answer, yes.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(16:03:41)</span> <b>dweitzel:</b></span> @isfiligoi is there a good reason it needs IGTF certs?  A CMS site / ATLAS site?  opposed to LetsEncrypt?<br/>
+<span style="color: #53b759"><span style="font-size: small">(16:36:13)</span> <b>isfiligoi:</b></span> CMS site<br/>
+</body>
+</html>

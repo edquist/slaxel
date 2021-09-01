@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Mar 31, 2017 : #gracc (osg)</title>
+</head>
+<body>
+<h3>Fri Mar 31, 2017 : #gracc (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(14:56:19)</span> <b>dweitzel:</b></span> hey @kretzke looking at configs.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:56:29)</span> <b>dweitzel:</b></span> I see you already have an ITB collector running.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:56:44)</span> <b>dweitzel:</b></span> I'm not sure where to look for the logstash.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:56:51)</span> <b>kretzke:</b></span> just made the nginx config with Marian<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:57:03)</span> <b>dweitzel:</b></span> right.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:57:10)</span> <b>dweitzel:</b></span> is there an ITB logstash instance?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:57:31)</span> <b>kretzke:</b></span> Both are defined in /etc/gracc/docker/gracc.osg-itb<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:58:02)</span> <b>bbockelm:</b></span> Dumb question - where's the listing of config file names and service names etc?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:58:15)</span> <b>bbockelm:</b></span> I figure I should probably also at least know where to find the lookup table.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:58:22)</span> <b>kretzke:</b></span> right now <a href="https://gist.github.com/retzkek/52cff4755f092abf476b464bfa1e8e19">https://gist.github.com/retzkek/52cff4755f092abf476b464bfa1e8e19</a><br/>
+<span style="color: #3c8c69"><span style="font-size: small">(14:58:50)</span> <b>kretzke:</b></span> it will get added to the main docs at some point<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:59:05)</span> <b>bbockelm:</b></span> :thumbsup: thanks!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:59:51)</span> <b>bbockelm:</b></span> @dweitzel - when appropriate, at least move the stuff from copr to the HCC repo.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:00:01)</span> <b>dweitzel:</b></span> seems like it's done already.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:00:08)</span> <b>dweitzel:</b></span> ITB instance is up and running, and inserting into ES.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:00:12)</span> <b>kretzke:</b></span> not koji?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:00:19)</span> <b>dweitzel:</b></span> HCC Repo is in koji.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:00:42)</span> <b>kretzke:</b></span> yes, ITB has been running longer than the osg stream…<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:00:53)</span> <b>kretzke:</b></span> ah, ok<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:01:45)</span> <b>bbockelm:</b></span> ah, if there's nothing new to setup for ITB ... transfer?  is there a transfer-itb?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:01:45)</span> <b>kretzke:</b></span> probably should have ITB version of the request and summary agents though<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:02:19)</span> <b>kretzke:</b></span> itb grafana?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:02:33)</span> <b>kretzke:</b></span> there is a <a href="http://gracc-itb.osg.org">gracc-itb.osg.org</a> alias that’s not being used<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:02:33)</span> <b>bbockelm:</b></span> but since nginx is updated, are we ready to file the GOC ticket to move the ITB collector's DNS alias?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:03:52)</span> <b>kretzke:</b></span> I don’t see why not<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:04:47)</span> <b>kretzke:</b></span> I still think some investigation needs to be done into what aliases exists (GRACC-69).<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:04:51)</span> <b>bbockelm:</b></span> :metal:<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:07:31)</span> <b>kretzke:</b></span> main potential objection would be if the desire is to have a separate ITB host running all the services… might as well do that now if that’s the case<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:08:28)</span> <b>bbockelm:</b></span> I think there is desire to do that, but I'd like to do the cutover first.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:09:11)</span> <b>bbockelm:</b></span> What's the ticket for cutting over production?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:10:11)</span> <b>bbockelm:</b></span> I think we need access logs for the Gratia MySQL server to make sure no unknown script is querying it.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:10:19)</span> <b>kretzke:</b></span> GRACC-71. Blanket ticket is GRACC-68<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:15:03)</span> <b>bbockelm:</b></span> <a href="https://jira.opensciencegrid.org/browse/GRACC-94">https://jira.opensciencegrid.org/browse/GRACC-94</a> Kevin, is this easiest for you to do internally?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:16:26)</span> <b>kretzke:</b></span> yeah. I used to have access to the db hosts, but having trouble… I'll open a request to the DBAs.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:18:27)</span> <b>bbockelm:</b></span> I'd be happy with something as simple as a list of IP addresses that access the database (that aren't the collectors); sample queries would be useful for any of the cases where we can't immediately identify the user.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:18:40)</span> <b>kretzke:</b></span> yep<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:28:59)</span> <b>bbockelm:</b></span> @marian - <a href="https://jira.opensciencegrid.org/browse/GRACC-96">https://jira.opensciencegrid.org/browse/GRACC-96</a> and <a href="https://jira.opensciencegrid.org/browse/GRACC-95">https://jira.opensciencegrid.org/browse/GRACC-95</a> are for you!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:29:10)</span> <b>bbockelm:</b></span> Unless Kevin really wants to edit twiki on a Friday!<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:29:14)</span> <b>marian:</b></span> yeah, I have them just opened<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:29:38)</span> <b>bbockelm:</b></span> GRACC-95 probably can just be a GOC ticket.<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:30:04)</span> <b>marian:</b></span> ah, I have opened GRACC-69 actually...<br/>
+<span style="color: #53b759"><span style="font-size: small">(15:30:09)</span> <b>marian:</b></span> going check others<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(15:34:55)</span> <b>***kretzke:</b></span> does not want to edit twiki, full stop.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:40:14)</span> <b>bbockelm:</b></span> Right answer!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:40:30)</span> <b>bbockelm:</b></span> 'actually, it is fun to delete things.<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:09:55)</span> <b>kretzke:</b></span> so the DBAs say they don’t have request logging enabled on the gratia databases. I’ve asked them to turn it on, but we’ll have to wait a week to get a good sample. Hope nobody is running monthly reports… although depending how noisy it is maybe we can have it log for the next month before moving prod. If they turn it on today odds are good we’d catch any monthly reports too I suppose.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:12:10)</span> <b>bbockelm:</b></span> Well, there's an iptables setup, right?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:12:21)</span> <b>bbockelm:</b></span> can they dump the IP addresses passed through?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:13:31)</span> <b>kretzke:</b></span> pretty useless without knowing what databases were being accessed<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:21:28)</span> <b>bbockelm:</b></span> ah - it's on the shared infrastructure?<br/>
+<span style="color: #3c8c69"><span style="font-size: small">(16:26:46)</span> <b>kretzke:</b></span> well, all the gratia databases are on the same host anyways<br/>
+</body>
+</html>

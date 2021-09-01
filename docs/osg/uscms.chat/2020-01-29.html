@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Jan 29, 2020 : #uscms (osg)</title>
+</head>
+<body>
+<h3>Wed Jan 29, 2020 : #uscms (osg)</h3>
+<span style="color: #43761b"><span style="font-size: small">(11:06:31)</span> <b>blin:</b></span> @andrew.melo just saw the thread about the InCommon IGTF cert issue<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:06:43)</span> <b>blin:</b></span> i'm a little confused because i thought you were using digicert certs now<br/>
+<span style="color: #a72f79"><span style="font-size: small">(11:07:58)</span> <b>andrew.melo:</b></span> I've not finished migrating everything off the OSG certs<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:08:18)</span> <b>blin:</b></span> ah ok<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:38:39)</span> <b>blin:</b></span> @andrew.melo are you working with the CERN folks on the cert issue right now?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(11:39:49)</span> <b>andrew.melo:</b></span> No, I'm not really sure of who to talk to ... I'm on a thread w/you and this slack channel and that's it<br/>
+<span style="color: #bc3663"><span style="font-size: small">(11:40:31)</span> <b>dmason:</b></span> I think @jteheran was following up — would not expect much motion this time of day though (on the CERN side)<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:40:48)</span> <b>blin:</b></span> yeah, i was trying to get a hold of jeny but didn't have any luck<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:41:45)</span> <b>blin:</b></span> @andrew.melo i was wondering what version of osg or igtf ca-certs you've got installed on the host in question<br/>
+<span style="color: #a72f79"><span style="font-size: small">(11:42:26)</span> <b>andrew.melo:</b></span> I just finished dinner, let me get that<br/>
+<span style="color: #a72f79"><span style="font-size: small">(11:46:56)</span> <b>andrew.melo:</b></span> <pre>Installed Packages<br/>Name        : osg-ca-certs<br/>Arch        : noarch<br/>Version     : 1.79<br/>Release     : 1.osg34.el7</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:17:56)</span> <b>blin:</b></span> so one thing we found is that the new Comodo root CA signing_policy looks broken<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:18:27)</span> <b>blin:</b></span> <pre># cat COMODO-RSA-CA.signing_policy <br/>access_id_CA   X509    '/C=GB/ST=Greater Manchester/L=Salford/O=COMODO CA Limited/CN=COMODO RSA Certification Authority'<br/>pos_rights     globus  CA:sign<br/>cond_subjects  globus  '"/C=US/O=Internet2/OU=InCommon/CN=InCommon IGTF Server CA"'</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:19:18)</span> <b>blin:</b></span> whereas the old root CA contains its own subject (i.e. it can be self signed):<br/><pre># cat AddTrust-External-CA-Root.signing_policy <br/># EACL for AddTrust External CA Root<br/> access_id_CA   X509    '/C=SE/O=AddTrust AB/OU=AddTrust External TTP Network/CN=AddTrust External CA Root'<br/> pos_rights     globus  CA:sign<br/> cond_subjects  globus  '"/C=SE/O=AddTrust AB/OU=AddTrust External TTP Network/CN=AddTrust External CA Root" "/C=US/ST=UT/L=Salt Lake City/O=The USERTRUST Network/OU=<a href="http://www.usertrust.com/CN=UTN-USERFirst-Hardware">http://www.usertrust.com/CN=UTN-USERFirst-Hardware</a>" "/C=GB/ST=Greater Manchester/L=Salford/O=COMODO CA Limited/CN=COMODO RSA Certification Authority" "/C=US/ST=New Jersey/L=Jersey City/O=The USERTRUST Network/CN=USERTrust RSA Certification Authority"'</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:24:28)</span> <b>blin:</b></span> @andrew.melo are you seeing errors on the server side with issues from CERN clients?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:29:11)</span> <b>andrew.melo:</b></span> How do you mean<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:30:43)</span> <b>blin:</b></span> anything in the gridftp logs that would suggest CERN clients connecting where the server (or the client) rejects credentials?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:31:55)</span> <b>andrew.melo:</b></span> let me try and look, despite that error, we're pumping a lot of data, so it's scrolling fast<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:35:12)</span> <b>blin:</b></span> if brian's theory is right, updating your server CA bundle would fix things<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:36:17)</span> <b>blin:</b></span> though i'd like to try reproducing their issue with a gridftp client<br/>
+<span style="color: #de5f24"><span style="font-size: small">(12:36:24)</span> <b>justas.balcas:</b></span> if this is for ral fts issue, once I did yum update on all gridftp/xrootd servers, transfers back to 100% success.<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:36:45)</span> <b>blin:</b></span> @andrew.melo could you add my DN to a gridftp server?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:36:57)</span> <b>blin:</b></span> yeah, it's for the RAL FTS issue. that's a good data point<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:37:21)</span> <b>andrew.melo:</b></span> What's your DN?<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:37:34)</span> <b>blin:</b></span> &gt; /DC=org/DC=cilogon/C=US/O=University of Wisconsin-Madison/CN=Brian Lin A2266246<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:38:31)</span> <b>andrew.melo:</b></span> hmm<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:38:57)</span> <b>andrew.melo:</b></span> let me figure out the syntax and whatnot<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:41:45)</span> <b>andrew.melo:</b></span> @blin can you do a <tt>gfal-ls -v gsi<a href="ftp://gridftp-vanderbilt.sites.opensciencegrid.org:2812/lio/lfs/cms/store">ftp://gridftp-vanderbilt.sites.opensciencegrid.org:2812/lio/lfs/cms/store</a></tt> ?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:42:13)</span> <b>andrew.melo:</b></span> And play nice, I mapped you to my user for now because I didn't want to deal with making a new one<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:43:19)</span> <b>blin:</b></span> lol will do<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:43:45)</span> <b>blin:</b></span> errr, this is weird:<br/><pre>$ gfal-ls -v gsi<a href="ftp://gridftp-vanderbilt.sites.opensciencegrid.org:2812/lio/lfs/cms/store">ftp://gridftp-vanderbilt.sites.opensciencegrid.org:2812/lio/lfs/cms/store</a><br/>gfal-ls error: 93 (Protocol not supported) - Protocol not supported or path/url invalid: gsi<a href="ftp://gridftp-vanderbilt.sites.opensciencegrid.org:2812/lio/lfs/cms/store">ftp://gridftp-vanderbilt.sites.opensciencegrid.org:2812/lio/lfs/cms/store</a></pre><br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:44:43)</span> <b>andrew.melo:</b></span> ?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:44:46)</span> <b>andrew.melo:</b></span> uhhh<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:44:50)</span> <b>blin:</b></span> one sec<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:47:26)</span> <b>blin:</b></span> is there a specific file you can give me so i can try globus-url-copy?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:48:31)</span> <b>andrew.melo:</b></span> <tt>/lio/lfs/cms/store/user/meloam/test.root</tt><br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:48:59)</span> <b>andrew.melo:</b></span> Are you able to authenticate OK? I need to catch a bus home in a sec, so I'll be offline for a bit<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:49:21)</span> <b>blin:</b></span> yeah, it looks good<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:49:22)</span> <b>blin:</b></span> thanks<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:49:29)</span> <b>blin:</b></span> note to self, don't cat a root file<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:49:44)</span> <b>andrew.melo:</b></span> hah<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:50:04)</span> <b>andrew.melo:</b></span> <tt>for_andres.txt</tt> is a text file in that same dir<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:51:44)</span> <b>blin:</b></span> copies worked for both the new and old CA bundles so ¯\_(ツ)_/¯<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:53:01)</span> <b>andrew.melo:</b></span> I noticed that as well :disappointed:<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:53:13)</span> <b>andrew.melo:</b></span> you can trigger it via<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:54:55)</span> <b>andrew.melo:</b></span> fts-transfer-submit -o -s <a href="https://lcgfts3.gridpp.rl.ac.uk:8446">https://lcgfts3.gridpp.rl.ac.uk:8446</a> <tt>gsi<a href="ftp://gridftp-vanderbilt.sites.opensciencegrid.org:2811/lio/lfs/cms/store/user/meloam/test.root">ftp://gridftp-vanderbilt.sites.opensciencegrid.org:2811/lio/lfs/cms/store/user/meloam/test.root</a></tt> gsi<a href="ftp://gridftp-vanderbilt.sites.opensciencegrid.org:2812/lio/lfs/cms/store/temp/test-2812">ftp://gridftp-vanderbilt.sites.opensciencegrid.org:2812/lio/lfs/cms/store/temp/test-2812</a><br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:55:16)</span> <b>andrew.melo:</b></span> and then visiting <a href="https://lcgfts3.gridpp.rl.ac.uk:8449">https://lcgfts3.gridpp.rl.ac.uk:8449</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(12:55:23)</span> <b>blin:</b></span> oh boy, where can i get <tt>fts-transfer-submit</tt>?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:56:01)</span> <b>andrew.melo:</b></span> fts-client from epel<br/>
+<span style="color: #43761b"><span style="font-size: small">(12:56:43)</span> <b>blin:</b></span> does the fts-transfer-submit command ask to do a TPC or something?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:57:05)</span> <b>andrew.melo:</b></span> correct<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:57:36)</span> <b>andrew.melo:</b></span> That's the component barfing who triggered my looking into it -- it's how PhEDEx/rucio move files<br/>
+<span style="color: #a72f79"><span style="font-size: small">(12:58:28)</span> <b>andrew.melo:</b></span> when you submit it gives you a guid, and you can use that to get logs from the UI<br/>
+<span style="color: #bc3663"><span style="font-size: small">(13:07:50)</span> <b>dmason:</b></span> um — unless you’ve given Brian the production role, not sure he’s going to get far with that…<br/>
+<span style="color: #bc3663"><span style="font-size: small">(13:08:45)</span> <b>dmason:</b></span> but maybe can point him to an error out of the server logs?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:11:44)</span> <b>andrew.melo:</b></span> You don't need a special role to use fts -- that's how we tell users to copy data between sites<br/>
+<span style="color: #bc3663"><span style="font-size: small">(13:12:23)</span> <b>dmason:</b></span> but if he’s sending it to Vanderbilt — I would hope he does :wink:<br/>
+<span style="color: #bc3663"><span style="font-size: small">(13:13:09)</span> <b>dmason:</b></span> or OK looking closer maybe you have something set up for that<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:14:13)</span> <b>andrew.melo:</b></span> you can blast files into /store/temp all day<br/>
+<span style="color: #bc3663"><span style="font-size: small">(13:16:08)</span> <b>dmason:</b></span> hrm — was expecting this to fail  <a href="https://lcgfts08.gridpp.rl.ac.uk:8449/var/log/fts3/2020-01-29/cmsdcadisk01.fnal.gov__cmsdcatape.fnal.gov/2020-01-29-1911__cmsdcadisk01.fnal.gov__cmsdcatape.fnal.gov__1795911220__287234c8-42cb-11ea-9bb8-001dd8b71ccb">https://lcgfts08.gridpp.rl.ac.uk:8449/var/log/fts3/2020-01-29/cmsdcadisk01.fnal.gov__cmsdcatape.fnal.gov/2020-01-29-1911__cmsdcadisk01.fnal.gov__cmsdcatape.fnal.gov__1795911220__287234c8-42cb-11ea-9bb8-001dd8b71ccb</a><br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:17:15)</span> <b>andrew.melo:</b></span> hmmmm<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:17:20)</span> <b>andrew.melo:</b></span> wtf, why isn't this always reproducible<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:17:24)</span> <b>andrew.melo:</b></span> I get this <a href="https://lcgfts01.gridpp.rl.ac.uk:8449/var/log/fts3/2020-01-29/srm-cms.cern.ch__gridftp-vanderbilt.sites.opensciencegrid.org/2020-01-29-1754__srm-cms.cern.ch__gridftp-vanderbilt.sites.opensciencegrid.org__1795755643__66d1371a-42c0-11ea-8310-001dd8b71ccc">https://lcgfts01.gridpp.rl.ac.uk:8449/var/log/fts3/2020-01-29/srm-cms.cern.ch__gridftp-vanderbilt.sites.opensciencegrid.org/2020-01-29-1754__srm-cms.cern.ch__gridftp-vanderbilt.sites.opensciencegrid.org__1795755643__66d1371a-42c0-11ea-8310-001dd8b71ccc</a><br/>
+<span style="color: #43761b"><span style="font-size: small">(13:24:30)</span> <b>blin:</b></span> damn, i can't use FTS because i've got a cilogon-basic user cert and presumably that's not trusted by RAL<br/>
+<span style="color: #bc3663"><span style="font-size: small">(13:25:54)</span> <b>dmason:</b></span> Ah — @andrew.melo you are submitting with an InCommon cert?  thats why mine worked — using my cert<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:26:07)</span> <b>andrew.melo:</b></span> ?<br/>
+<span style="color: #a72f79"><span style="font-size: small">(13:26:22)</span> <b>andrew.melo:</b></span> <pre>phedex@se1# voms-proxy-info -all<br/>subject   : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=meloam/CN=692113/CN=Andrew Malone Melo/CN=3029893798<br/>issuer    : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=meloam/CN=692113/CN=Andrew Malone Melo<br/>identity  : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=meloam/CN=692113/CN=Andrew Malone Melo<br/>type      : RFC compliant proxy<br/>strength  : 1024 bits<br/>path      : /tmp/x509up_u59214<br/>timeleft  : 189:32:37<br/>key usage : Digital Signature, Key Encipherment<br/>=== VO cms extension information ===<br/>VO        : cms<br/>subject   : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=meloam/CN=692113/CN=Andrew Malone Melo<br/>issuer    : /DC=ch/DC=cern/OU=computers/CN=<a href="http://voms2.cern.ch">voms2.cern.ch</a><br/>attribute : /cms/Role=cmsphedex/Capability=NULL<br/>attribute : /cms/Role=NULL/Capability=NULL<br/>attribute : /cms/uscms/Role=NULL/Capability=NULL<br/>timeleft  : 189:29:20<br/>uri       : <a href="http://voms2.cern.ch:15002">voms2.cern.ch:15002</a></pre><br/>
+<span style="color: #bc3663"><span style="font-size: small">(13:27:07)</span> <b>dmason:</b></span> no OK its failing to like your gridftp server…  sorry<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:27:36)</span> <b>bbockelm:</b></span> Hi folks - can we consolidate to the #software channel?<br/>
+<span style="color: #bc3663"><span style="font-size: small">(13:27:50)</span> <b>dmason:</b></span> why not :wink:<br/>
+<span style="color: #9e3997"><span style="font-size: small">(13:28:00)</span> <b>bbockelm:</b></span> Per Jim Basney, it seems the problem might be limited to OpenSSL 1.0.1, meaning you might need to reproduce from a RHEL6 host.<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(14:36:31)</span> <b>burt:</b></span> @andrew.melo: i just reproduced this with some containers.  A client running SL6 with <tt>igtf-ca-certs-1.103-1.osg34.el6.noarch</tt>  against a SL7 server with <tt>igtf-ca-certs-1.102-1.osg34.el7.noarch</tt>  fails. Upgrading the igtf-ca-certs on the server fixed things.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:37:38)</span> <b>blin:</b></span> if you've got osg-ca-certs installed, the versions would be 1.84 and 1.85, respectively<br/>
+<span style="color: #a72f79"><span style="font-size: small">(14:37:39)</span> <b>andrew.melo:</b></span> @burt nice, can we consolidate this into #software ? There was a bunch of independent threads and it'd be nice to have all this in one place<br/>
+<span style="color: #df3dc0"><span style="font-size: small">(14:37:50)</span> <b>burt:</b></span> Yeah, I posted over there.<br/>
+</body>
+</html>

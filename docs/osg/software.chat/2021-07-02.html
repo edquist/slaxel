@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jul 2, 2021 : #software (osg)</title>
+</head>
+<body>
+<h3>Fri Jul 2, 2021 : #software (osg)</h3>
+<span style="color: #de5f24"><span style="font-size: small">(11:05:35)</span> <b>justas.balcas:</b></span> @dweitzel how long it would take to add this into multi-user? (It would solve part of the issue for me and I guess ucsd too soon, and gridftp - sooner we migrate is better - I dont think it is worth an effort to extend this in gridftp plugin)<br/>
+<span style="color: #dd8527"><span style="font-size: small">(14:38:40)</span> <b>mtadel:</b></span> well, the point is:<br/>a) if you do adler32 on the data in memory, before you write it to disk, you haven't done much (in fact, using pgread/write for TPC would provide the same quality assurance)<br/>b) xrootd oss core is asynchronous and adler32 is not associative, so you can not compute it without adding extra layer on top<br/>
+<span style="color: #dd8527"><span style="font-size: small">(14:38:51)</span> <b>mtadel:</b></span> so ... why calculate it at all?<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:45:18)</span> <b>jthiltges:</b></span> It's been years since I'd dived into this, but I think I got to the notion that adler32 checksums could be readily combined, long as you knew the lengths of the inputs.<br/>(Maybe recording all the lengths and checksums is the extra layer that you're meaning. I don't think it would take a full reassembly of the input data stream.)<br/>
+<span style="color: #dd8527"><span style="font-size: small">(14:55:45)</span> <b>mtadel:</b></span> I looked at it yesterday, you can not :slightly_smiling_face: lower 16 bits is a sum, upper 16 is sum of the sums<br/>
+<span style="color: #dd8527"><span style="font-size: small">(14:56:15)</span> <b>mtadel:</b></span> the extra layer i mean is the layer that serializes incoming blocks ... like it was done in xrootd-hdfs<br/>
+<span style="color: #dd8527"><span style="font-size: small">(14:59:31)</span> <b>mtadel:</b></span> it had a fixed max ram per file ... and it kept blocks for as long as it could .... hmmh ... Brian described it to me like that long time ago ... now I just see "error, non-sequential writes not supported"<br/>
+<span style="color: #dd8527"><span style="font-size: small">(15:02:57)</span> <b>mtadel:</b></span> it's crc32 that you can update ... and need to know the lenghts<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:24:31)</span> <b>jthiltges:</b></span> @mtadel Found the old adler adding code and scraped a bit of the rust off: <a href="https://gist.github.com/jthiltges/dc0845c41a5d340c0abf83972496f316">https://gist.github.com/jthiltges/dc0845c41a5d340c0abf83972496f316</a><br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:30:46)</span> <b>jthiltges:</b></span> And checking it again now with big input values... looks like it fails. Ignore this for now. :stuck_out_tongue_closed_eyes:<br/>
+<span style="color: #dd8527"><span style="font-size: small">(15:37:06)</span> <b>mtadel:</b></span> hmmh ... I don't see how one could reproduce the sum-of-sums after the fact ... but modular arithmetic is magick :slightly_smiling_face:<br/>
+<blockquote>
+<span style="color: #e06b56"><span style="font-size: small">(15:45:41)</span> <b>jthiltges:</b></span> OK. My rust scraping was a little enthusiastic, and I wasn't doing my bit shifting correctly, ending up with negative numbers. (In my old version, I was keeping a and b separate.)<br/><br/>Should maybe be good now. (gist updated)<br/>
+<span style="color: #dd8527"><span style="font-size: small">(15:46:58)</span> <b>mtadel:</b></span> I found this in the meantime:    (a + b) mod n = [(a mod n) + (b mod n)] mod n<br/>
+<span style="color: #dd8527"><span style="font-size: small">(15:47:19)</span> <b>mtadel:</b></span> if len2 is large, you can overflow<br/>
+<span style="color: #dd8527"><span style="font-size: small">(15:47:50)</span> <b>mtadel:</b></span> so you should modify the muiltiplication with:     ab mod n = [(a mod n)(b mod n)] mod n<br/>
+<span style="color: #e06b56"><span style="font-size: small">(15:50:51)</span> <b>jthiltges:</b></span> For a proper C implementation, I totally agree. (Lazy python, etc. :stuck_out_tongue_closed_eyes: )<br/>
+<span style="color: #e06b56"><span style="font-size: small">(16:15:43)</span> <b>jthiltges:</b></span> (Good idea by the way on the modulo tricks and overflowing. I couldn't _not_ add it. :slightly_smiling_face:)<br/>
+<span style="color: #dd8527"><span style="font-size: small">(16:30:00)</span> <b>mtadel:</b></span> I know :slightly_smiling_face: I was browsing for books on modular arithmetics just now :wink:<br/>
+</blockquote>
+<span style="color: #a72f79"><span style="font-size: small">(15:50:07)</span> <b>andrew.melo:</b></span> &gt;  I looked at it yesterday, you can not :slightly_smiling_face: lower 16 bits is a sum, upper 16 is sum of the sums<br/>Yes you absolutely can, I've been doing it for going on half a decade @ vanderbilt<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:50:32)</span> <b>andrew.melo:</b></span> And the reason to calculate it is because that's the checksum that the experiment uses<br/>
+<span style="color: #dd8527"><span style="font-size: small">(15:53:04)</span> <b>mtadel:</b></span> Yes, we figured it out with John in the side thread as well ... this should be really easy to add to xrootd-multiuser then, without queuing up blocks<br/>
+<span style="color: #a72f79"><span style="font-size: small">(15:53:50)</span> <b>andrew.melo:</b></span> I don't understand why it's OK for xrootd to calculate crc32 "on-the-fly", but doing adler needs to be in a separate plugin. Why not do both at the same time<br/>
+<span style="color: #dd8527"><span style="font-size: small">(15:54:53)</span> <b>mtadel:</b></span> crc32 happens in the client ... and can be passes up/down from oss ... but oss itself doesn't do  anything by itself<br/>
+</body>
+</html>

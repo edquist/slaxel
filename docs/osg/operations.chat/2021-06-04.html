@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Jun 4, 2021 : #operations (osg)</title>
+</head>
+<body>
+<h3>Fri Jun 4, 2021 : #operations (osg)</h3>
+<span style="color: #3c989f"><span style="font-size: small">(13:32:06)</span> <b>huijun.zhu:</b></span> Hi, the host <a href="http://hcc-osg-repo.unl.edu">hcc-osg-repo.unl.edu</a> is over 90% full. There is almost no access except for some crawler scans. Is there a plan for it to retire? @blin @matyas<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:33:19)</span> <b>blin:</b></span> i believe everything's been moved over to Tiger including the gridcf bits?<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:33:29)</span> <b>matyas:</b></span> the gridcf bits haven't<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:33:59)</span> <b>matyas:</b></span> the osg bits have<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:36:10)</span> <b>matyas:</b></span> uh, maybe<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:38:04)</span> <b>matyas:</b></span> yeah I think so<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:38:12)</span> <b>matyas:</b></span> weird, it's a StatefulSet, not a Deployment<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:42:17)</span> <b>matyas:</b></span> hm. my login doesn't work anymore<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:45:28)</span> <b>matyas:</b></span> nvm yes it does.<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:57:26)</span> <b>matyas:</b></span> OK the thing I know for sure is that /usr/local/repo/gridcf-repo must stay.<br/>I did a bit of digging to see what we can remove, but I would like to double-check with John Thiltges (looks like he's out today) before I make any definite statements.<br/>
+<blockquote>
+<span style="color: #e06b56"><span style="font-size: small">(2021-06-07 09:44:54)</span> <b>jthiltges:</b></span> (Making a thread to keep the madness contained, and including @huijun.zhu )<br/>- I disabled the three cronjobs on hcc-osg-repo: update_mashfiles.sh, update_all_repos.sh, update_mirror.py<br/>- I deleted the old, unreferenced RPMs from /usr/local/mash/cache, so we're down to 45% usage.<br/>- I'll leave everything else, and it can go away when the VM is turned off.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(2021-06-07 09:47:06)</span> <b>huijun.zhu:</b></span> Thank you, John!<br/>
+<span style="color: #c386df"><span style="font-size: small">(2021-06-07 09:47:12)</span> <b>matyas:</b></span> Sounds good, thanks John!<br/>
+<span style="color: #e06b56"><span style="font-size: small">(2021-06-07 09:48:21)</span> <b>jthiltges:</b></span> &gt; weird, it's a StatefulSet, not a Deployment<br/>Yeaaah. That a sad reminder of a fun thing I learned on the way:<br/>yum repo metadata apparently isn't reproducible. So two replicas have different repodata.<br/>
+<span style="color: #e06b56"><span style="font-size: small">(2021-06-07 09:50:43)</span> <b>jthiltges:</b></span> I'd intended to have two replicas of repo, each with its own PV. (And needed a StatefulSet for that.)<br/><br/>But then when traefik load-balances requests across the replicas, the yum client would see different repodata, and get angry.<br/>
+<span style="color: #c386df"><span style="font-size: small">(2021-06-07 10:19:44)</span> <b>matyas:</b></span> heh. well, good to know<br/>
+</blockquote>
+<span style="color: #3c989f"><span style="font-size: small">(14:20:30)</span> <b>huijun.zhu:</b></span> OK. Thanks. It’s not that urgent.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:40:14)</span> <b>blin:</b></span> hey @rynge i'm trying to test some changes to the OS registry so that tokens are issued with <tt>ADVERTISE_MASTER</tt> but i'm running into an issue where there's something wrong with the token request<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:40:55)</span> <b>blin:</b></span> from my end, i don't see any requests:<br/><pre>[root@os-registry-6d6d659bbd-qjbnn condor]# condor_token_request_list -pool <a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a> -json<br/>Remote daemon reports no requests pending.<br/>[root@os-registry-6d6d659bbd-qjbnn condor]# condor_token_request_list -pool <a href="http://flock.opensciencegrid.org">flock.opensciencegrid.org</a> -reqid 6806972 -json                                                           Remote daemon did not provide information for request ID 6806972.</pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:41:17)</span> <b>blin:</b></span> do you see anything on your end?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:42:05)</span> <b>bbockelm:</b></span> @blin - you might need to tinker with your env vars so you authenticate with the correct token.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:42:22)</span> <b>blin:</b></span> oh wait, i think this is something with the prod vs dev instance<br/>
+<span style="color: #9e3997"><span style="font-size: small">(14:42:43)</span> <b>bbockelm:</b></span> It looks like you're successfully authenticating but not as a superuser who can issue tokens.<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:46:54)</span> <b>blin:</b></span> i think that means that the dev instance doesn't have an appropriate token for approving the requests that i'm making from my client<br/>
+</body>
+</html>

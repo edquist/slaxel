@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Dec 7, 2016 : #general (osg)</title>
+</head>
+<body>
+<h3>Wed Dec 7, 2016 : #general (osg)</h3>
+<span style="color: #de5f24"><span style="font-size: small">(14:37:15)</span> <b>tiradani:</b></span> How does one go about overriding a default value in the job router of an OSG HTCondor-CE?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:37:53)</span> <b>tiradani:</b></span> We have the following in our configs:<br/><pre>MERGE_JOB_ROUTER_DEFAULT_ADS=True<br/>JOB_ROUTER_DEFAULTS = $(JOB_ROUTER_DEFAULTS) [ set_MaxIdleJobs = 10000; ]<br/></pre><br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:38:52)</span> <b>tiradani:</b></span> This produces:<br/><pre># condor_ce_job_router_info -config<br/>&lt;snip&gt;<br/>    MaxIdleJobs = 2000; <br/>    set_MaxIdleJobs = 10000; <br/>&lt;snip&gt;<br/></pre><br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:39:34)</span> <b>tiradani:</b></span> however the Idle/Max still shows 2k jobs<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:48:40)</span> <b>dweitzel:</b></span> try eval_set_MaxIdleJobs<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:52:44)</span> <b>tiradani:</b></span> that didn't seem to help<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:53:59)</span> <b>dweitzel:</b></span> Well, that's not normally how I would set something like that.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:54:16)</span> <b>dweitzel:</b></span> In the route definitions, I would set that max idle jobs.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(14:54:26)</span> <b>dweitzel:</b></span> You probably want to apply it to all routes at the same time.<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:55:14)</span> <b>tiradani:</b></span> condor_ce_router_defaults set this to 2000<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:55:21)</span> <b>tiradani:</b></span> so I am trying to override this value<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:55:25)</span> <b>tiradani:</b></span> for all routes<br/>
+<span style="color: #de5f24"><span style="font-size: small">(14:56:08)</span> <b>tiradani:</b></span> have to run for a bit.  Thank you for your help<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:20:32)</span> <b>bbockelm:</b></span> @tiradani - dumb question - did you try restarting the router instead of reconfiguring?  I wonder if there's something a reconfig isn't picking up here?<br/>
+<span style="color: #de5f24"><span style="font-size: small">(16:02:21)</span> <b>tiradani:</b></span> @bbockelm I thought of that and did a service condor-ce restart to make sure<br/>
+<span style="color: #de5f24"><span style="font-size: small">(16:17:28)</span> <b>tiradani:</b></span> ok, so, I thought this was illegal, but it seems to work.   Inside the routes themselves, I set <pre>MaxIdleJobs = 10000; \</pre><br/>
+<span style="color: #de5f24"><span style="font-size: small">(16:17:58)</span> <b>tiradani:</b></span> I thought that once you had it set, it would throw an error<br/>
+<span style="color: #de5f24"><span style="font-size: small">(16:18:42)</span> <b>tiradani:</b></span> Anyway, problem solved.  Thanks!<br/>
+</body>
+</html>

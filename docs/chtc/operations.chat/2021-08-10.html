@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Aug 10, 2021 : #operations (chtc)</title>
+</head>
+<body>
+<h3>Tue Aug 10, 2021 : #operations (chtc)</h3>
+<span style="color: #3c989f"><span style="font-size: small">(09:31:50)</span> <b>wiscmoate:</b></span> @johnkn :arrow_up:;  The intent is to hide unhardened php/perl code to stay safe from SQL injection, and to allow static files (results.tar.gz etc) to be accessible since you cant compromise that<br/>
+<span style="color: #3c989f"><span style="font-size: small">(09:35:46)</span> <b>wiscmoate:</b></span> We can give Igor a netid<br/>
+<span style="color: #3c989f"><span style="font-size: small">(09:35:52)</span> <b>wiscmoate:</b></span> And DUO<br/>
+<span style="color: #3c989f"><span style="font-size: small">(09:36:58)</span> <b>wiscmoate:</b></span> @bbockelman thoughts regarding hiding BaTLAb/NMI php/perl mysql code behind shibboleth vs not? :arrow_up:<br/>
+<span style="color: #3c989f"><span style="font-size: small">(09:37:44)</span> <b>wiscmoate:</b></span> @tlmiller might have thoughts too<br/>
+<span style="color: #2b6836"><span style="font-size: small">(11:27:46)</span> <b>jcpatton:</b></span> I got Nathan to put in a request to get <tt>spaldingsubmit.botany</tt> unplugged finally, maybe it will stop pinging the CM now :slightly_smiling_face:<br/>
+<span style="color: #684b6c"><span style="font-size: small">(11:30:06)</span> <b>bbockelman:</b></span> @wiscmoate - how about we move it to CILogon-based authorization?<br/>
+<span style="color: #684b6c"><span style="font-size: small">(11:30:55)</span> <b>bbockelman:</b></span> Would switch it from SAML to OIDC and then you have to do group management via <a href="http://registry.cilogon.org">registry.cilogon.org</a>.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:37:57)</span> <b>johnkn:</b></span> We've gone to some trouble to make it so that anyone can put a tag in the Condor git repo that triggers a build+test run in the batlab,<br/>This is wasted effort if only people with a login to the batlab submit node can see the build pages - anyone a batlag login<br/>can just submit a workspace build which faster and you a lot more control over what gets built/tested.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:43:01)</span> <b>wiscmoate:</b></span> @bbockelman sure;  I don't really have a grasp on how much time it will take since I haven't done it before.<br/>
+<span style="color: #3c989f"><span style="font-size: small">(11:43:37)</span> <b>wiscmoate:</b></span> @johnkn will people who put tags in the Condor git repo generally have access to cilogon credentials?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:44:12)</span> <b>johnkn:</b></span> I have no idea.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:45:38)</span> <b>johnkn:</b></span> I think the plan is to enable outside contributions of code, but we don't currently have any unless you count BrianB<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(11:46:28)</span> <b>jfrey:</b></span> By definition, they are people with write access to the HTCondor git repo, yes?<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(11:46:58)</span> <b>jfrey:</b></span> Or possibly write access to the github repo, if it pulls the tags from there.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:47:12)</span> <b>johnkn:</b></span> I think it pulls the tags from the github repo for this<br/>
+<span style="color: #684b6c"><span style="font-size: small">(15:09:50)</span> <b>bbockelman:</b></span> (for completeness - CILogon uses federated ID so 100% of HTCondor contributors have an ID.  We need, however, to setup a group and add everyone into it.)<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:26:34)</span> <b>ckoch5:</b></span> @wiscmoate would this command be runnable by a normal CHTC user, or would they need to be a member of the <tt>docker</tt> group: <tt>singularity build local_tar.sif <a href="docker-archive://local.tar">docker-archive://local.tar</a></tt><br/>
+<span style="color: #3c989f"><span style="font-size: small">(16:29:29)</span> <b>wiscmoate:</b></span> Hmmmm<br/>
+<span style="color: #3c989f"><span style="font-size: small">(16:29:44)</span> <b>wiscmoate:</b></span> I'll remove my own docker membership and find out<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:29:48)</span> <b>ckoch5:</b></span> :+1:<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:29:49)</span> <b>ckoch5:</b></span> :slightly_smiling_face:<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:30:01)</span> <b>ckoch5:</b></span> maybe save a docker image as a tar file first<br/>
+<span style="color: #3c989f"><span style="font-size: small">(16:36:55)</span> <b>wiscmoate:</b></span> @ckoch5 I created a centos 7 container and <tt>docker export</tt>ed it to centos_7.tar; I tried:<br/><pre>[moate@e2486 ~]$ singularity build centos_7.tar.sif <a href="docker-archive://centos_7.tar">docker-archive://centos_7.tar</a>                                                                                                                <br/>INFO:    Starting build...<br/>FATAL:   While performing build: conveyor failed to get: Error loading tar component manifest.json: file does not exist</pre><br/>
+<span style="color: #3c989f"><span style="font-size: small">(16:37:16)</span> <b>wiscmoate:</b></span> Being a singularity n00b, what am I missing?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(16:37:27)</span> <b>wiscmoate:</b></span> (this is before removing myself from <tt>docker</tt> group)<br/>
+<span style="color: #4cc091"><span style="font-size: small">(16:38:45)</span> <b>blin:</b></span> have you tried the full path to the tarball maybe?<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:39:01)</span> <b>ckoch5:</b></span> I used <tt>docker save</tt> not <tt>docker export</tt> to create my tar file<br/>
+<span style="color: #3c989f"><span style="font-size: small">(16:39:40)</span> <b>wiscmoate:</b></span> Ah<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:39:54)</span> <b>ckoch5:</b></span> not sure if it matters in this context b/c even after reading this stackoverflow, I don’t know if I understand the difference: <a href="https://stackoverflow.com/questions/22655867/what-is-the-difference-between-save-and-export-in-docker">https://stackoverflow.com/questions/22655867/what-is-the-difference-between-save-and-export-in-docker</a><br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:39:59)</span> <b>ckoch5:</b></span> but I used save. :wink:<br/>
+<span style="color: #3c989f"><span style="font-size: small">(16:41:50)</span> <b>wiscmoate:</b></span> The <tt>docker save</tt> did the trick<br/>
+<span style="color: #3c989f"><span style="font-size: small">(16:43:37)</span> <b>wiscmoate:</b></span> Oddly, after I removed myself from the <tt>docker group</tt> I'm still able to run docker commands....<br/>
+<span style="color: #e7392d"><span style="font-size: small">(16:44:01)</span> <b>ckoch5:</b></span> :thinking_face:<br/>
+<span style="color: #3c989f"><span style="font-size: small">(16:44:33)</span> <b>wiscmoate:</b></span> Maybe my membership is cached somewhere<br/>
+<span style="color: #d58247"><span style="font-size: small">(16:45:01)</span> <b>gthain:</b></span> are you in wheel?<br/>
+<span style="color: #99a949"><span style="font-size: small">(16:45:59)</span> <b>matyas:</b></span> do read-only docker commands need membership in the docker group?<br/>
+<span style="color: #3c989f"><span style="font-size: small">(16:46:35)</span> <b>wiscmoate:</b></span> I'm not in wheel<br/>
+<span style="color: #3c989f"><span style="font-size: small">(16:47:12)</span> <b>wiscmoate:</b></span> I've been running <tt>docker pull</tt> and <tt>docker run</tt> commands without my membership<br/>
+<span style="color: #3c989f"><span style="font-size: small">(16:47:20)</span> <b>wiscmoate:</b></span> <a href="http://e2486.chtc.wisc.edu">e2486.chtc.wisc.edu</a><br/>
+<span style="color: #3c989f"><span style="font-size: small">(16:47:52)</span> <b>wiscmoate:</b></span> <pre>[moate@e2486 ~]$ id moate<br/>uid=10006(moate) gid=10006(moate) groups=10006(moate),4000(chtc_admin),4993(syslog)</pre><br/>
+<span style="color: #3c989f"><span style="font-size: small">(16:48:17)</span> <b>wiscmoate:</b></span> have to head out, will continue tomorrow<br/>
+</body>
+</html>

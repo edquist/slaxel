@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Feb 16, 2021 : #operations (osg)</title>
+</head>
+<body>
+<h3>Tue Feb 16, 2021 : #operations (osg)</h3>
+<span style="color: #235e5b"><span style="font-size: small">(07:12:51)</span> <b>dweitzel:</b></span> We have been informed that our Lincoln data center will lose power for an hour.  As described above, only oasis is expected to be affected.  Though, network connections to other Nebraska based services may be affected. <br/>
+<span style="color: #A82F2F"><span style="font-size: small">(08:17:13)</span> <b>B01GA370NNT:</b></span> <br/>
+<span style="color: #A82F2F"><span style="font-size: small">(08:17:23)</span> <b>B01GA370NNT:</b></span> <br/>
+<span style="color: #A82F2F"><span style="font-size: small">(08:17:34)</span> <b>B01GA370NNT:</b></span> <br/>
+<span style="color: #A82F2F"><span style="font-size: small">(08:19:41)</span> <b>B01GA370NNT:</b></span> <br/>
+<span style="color: #A82F2F"><span style="font-size: small">(08:20:01)</span> <b>B01GA370NNT:</b></span> <br/>
+<span style="color: #9e3997"><span style="font-size: small">(08:23:38)</span> <b>bbockelm:</b></span> (sorry about the Slack noise - I created the incident wrong and recreated it.)<br/>
+<span style="color: #A82F2F"><span style="font-size: small">(08:35:34)</span> <b>B01GA370NNT:</b></span> <br/>
+<span style="color: #e96699"><span style="font-size: small">(10:02:15)</span> <b>lincoln:</b></span> I'm getting near-full disk warnings on <a href="http://hosted-ce13.grid.uchicago.edu">hosted-ce13.grid.uchicago.edu</a><br/>
+<span style="color: #e96699"><span style="font-size: small">(10:02:47)</span> <b>lincoln:</b></span> <tt>/var/log/condor-ce</tt> seems to have quite a few AuditLog, AuditPayloadLog and GridManagerLog files taking up space<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:02:52)</span> <b>lincoln:</b></span> are these needed? can we delete old ones?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:11:49)</span> <b>blin:</b></span> you can delete old ones<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:12:20)</span> <b>blin:</b></span> we don't auto-cleanup auditlogs by default, though i think you can probably control how many there are with a knob<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:12:50)</span> <b>lincoln:</b></span> knobs! love em<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:12:50)</span> <b>lincoln:</b></span> ok<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:13:03)</span> <b>lincoln:</b></span> @blin would this eventually become an issue in containers?<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:13:17)</span> <b>lincoln:</b></span> i assume eventually the audit logs would eat up the ephemeral storage and the CE would get restarted<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:13:25)</span> <b>blin:</b></span> yeah, probably<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:13:36)</span> <b>blin:</b></span> but what are you doing letting your CEs live that long??<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:13:49)</span> <b>blin:</b></span> it's devops, kill your pods weekly! daily! hourly!<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:14:21)</span> <b>matyas:</b></span> yeah it's not like jobs are running _all_ the time<br/>
+<span style="color: #e96699"><span style="font-size: small">(10:14:45)</span> <b>lincoln:</b></span> if only there were some way to preserve state ...<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(10:18:32)</span> <b>blin:</b></span> <a href="https://github.com/slateci/slate-catalog/pull/428">https://github.com/slateci/slate-catalog/pull/428</a> :slightly_smiling_face:<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:18:38)</span> <b>blin:</b></span> shoutout to @u0928244!<br/>
+<span style="color: #619a4f"><span style="font-size: small">(10:20:16)</span> <b>u0928244:</b></span> This still needs a real test. I can test on my CEs if it goes into stable, but I don't have a great way to run this locally at the moment.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:20:40)</span> <b>blin:</b></span> ya fair enough. i'll try to review it today<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:20:56)</span> <b>blin:</b></span> as long as there are sensible defaults, adding it to stable should be no problem for us<br/>
+</blockquote>
+<span style="color: #c386df"><span style="font-size: small">(10:15:34)</span> <b>matyas:</b></span> won't the jobs get killed if the shadows go away?<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:16:28)</span> <b>matyas:</b></span> there's more to state then /var/spool<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:18:50)</span> <b>blin:</b></span> CEs dont manage shadows<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:19:07)</span> <b>blin:</b></span> well, Hosted CEs and CEs not in front of an HTCondor batch system don't<br/>
+<span style="color: #c386df"><span style="font-size: small">(10:20:00)</span> <b>matyas:</b></span> Hosted CEs don't?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:30:13)</span> <b>blin:</b></span> nope, HTCondor-CEs in general don't have shadows, they don't manage jobs on the local batch<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:30:18)</span> <b>blin:</b></span> they route jobs to the local batch<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:30:46)</span> <b>blin:</b></span> the only thing to clarify is that HTCondor-CE hosts for htcondor batch systems have shadows since there's a local batch schedd<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:30:59)</span> <b>blin:</b></span> but HTCondor-CE itself does not manage shadows<br/>
+</body>
+</html>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Feb 7, 2019 : #operations (osg)</title>
+</head>
+<body>
+<h3>Thu Feb 7, 2019 : #operations (osg)</h3>
+<span style="color: #e23f99"><span style="font-size: small">(13:37:29)</span> <b>marco.mascheroni:</b></span> hi guys, I jsut finished isntalling a hosted CE, any expert that can look at the logs and see if there is anything suspicious?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:37:30)</span> <b>blin:</b></span> was there also output from <tt>osg-configure -c</tt>?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:37:36)</span> <b>marco.mascheroni:</b></span> you need to click full logs<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:37:55)</span> <b>blin:</b></span> i think a lot of the warnings get spit out to stderr/stdout instead of being dumped to the logs<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:38:01)</span> <b>blin:</b></span> but @matyas is the dev so he would know for sure<br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:38:30)</span> <b>marco.mascheroni:</b></span> ok, let me put the logs somewhere and see if I still have the stdout<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:38:39)</span> <b>blin:</b></span> one thing i noticed in your message to me was a warning about <tt>PER_JOB_HISTORY_DIR</tt> being unset -- do you have <tt>gratia-probe-htcondor-ce</tt> installed?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:38:48)</span> <b>marco.mascheroni:</b></span> but IIC anything that is not DEBUG goes to the scree<br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:40:01)</span> <b>marco.mascheroni:</b></span> The log file is here <a href="http://mmascher.web.cern.ch/mmascher/osg-configure.log">http://mmascher.web.cern.ch/mmascher/osg-configure.log</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(13:40:39)</span> <b>matyas:</b></span> I see no non-DEBUG lines. do you actually see any problems?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:41:58)</span> <b>marco.mascheroni:</b></span> have you lloked at the link, the snippet was cut<br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:42:19)</span> <b>marco.mascheroni:</b></span> the good run was at 19:20<br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:44:04)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:44:13)</span> <b>marco.mascheroni:</b></span> those were two warnings for example<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:45:02)</span> <b>matyas:</b></span> I wouldn't worry about the first one. Starting condor and rerunning osg-configure should get rid of the second one<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:45:29)</span> <b>matyas:</b></span> I'm seeing potential bosco issues: <pre><br/><br/>Enter the password to copy the ssh keys to <a href="mailto:osguser@ares-master.pcc.amnh.org">osguser@ares-master.pcc.amnh.org</a>:<br/>Downloading for <a href="mailto:osguser@ares-master.pcc.amnh.org">osguser@ares-master.pcc.amnh.org</a>.......<br/>Unpacking..<br/>Sending libraries to <a href="mailto:osguser@ares-master.pcc.amnh.org">osguser@ares-master.pcc.amnh.org</a>.<br/>You are not running as the factory user. BOSCO Glideins disabled.<br/>Installing on cluster <a href="mailto:osguser@ares-master.pcc.amnh.org">osguser@ares-master.pcc.amnh.org</a>.<br/>Installation complete<br/>The cluster <a href="mailto:osguser@ares-master.pcc.amnh.org">osguser@ares-master.pcc.amnh.org</a> has been added to BOSCO<br/>It is available to run jobs submitted with the following values:<br/>&gt; universe = grid<br/>&gt; grid_resource = batch slurm <a href="mailto:osguser@ares-master.pcc.amnh.org">osguser@ares-master.pcc.amnh.org</a><br/><br/>2019-02-07 19:23:12,214 DEBUG stderr:<br/>Traceback (most recent call last):<br/>  File "/bin/bosco_ssh_start", line 83, in &lt;module&gt;<br/>    main()<br/>  File "/bin/bosco_ssh_start", line 65, in main<br/>    f = open(BOSCO_PASS)<br/>IOError: [Errno 2] No such file or directory: '/var/lib/osg/.bosco/.pass'<br/>/bin/bosco_cluster: line 363: /var/lib/osg//.bosco/.clusterlist: No such file or directory<br/></pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(13:45:54)</span> <b>matyas:</b></span> it *says* installation was successful but with those errors, I'm doubtful. @dweitzel, what do you think?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:48:57)</span> <b>blin:</b></span> output from these commands would be helpful for the per job history dir stuff:<br/><pre><br/>$ condor_ce_config_val -v PER_JOB_HISTORY_DIR<br/>$ rpm -qa 'gratia-probe*'<br/></pre><br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:56:58)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(13:57:30)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #43761b"><span style="font-size: small">(14:00:56)</span> <b>blin:</b></span> hrm, the osg-configure warning is a bit curious then -- it shouldn't be relying on <tt>PER_JOB_HISTORY_DIR</tt> in the condor config<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:02:15)</span> <b>matyas:</b></span> it's not relying on it so much as using it as a sanity check<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:02:23)</span> <b>blin:</b></span> ah ok<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:03:01)</span> <b>matyas:</b></span> also it reads from the condor config not the condor_ce config<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:03:09)</span> <b>matyas:</b></span> actually it asks the condor schedd<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:04:43)</span> <b>blin:</b></span> but...why<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:04:54)</span> <b>marco.mascheroni:</b></span> is it because I did not set it into  /etc/gratia/htcondor-ce/ProbeConfig? E.g.;   CondorScheddName=""<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:05:19)</span> <b>matyas:</b></span> what do you mean why?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:05:25)</span> <b>marco.mascheroni:</b></span> I did not touch the probeconfig<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:05:39)</span> <b>matyas:</b></span> this is used if the _batch system_ is condor<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:05:45)</span> <b>marco.mascheroni:</b></span> ok<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:05:57)</span> <b>marco.mascheroni:</b></span> it's slurm<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:06:27)</span> <b>matyas:</b></span> yeah then edit 20-condor.ini and set enabled=FALSE<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:07:16)</span> <b>matyas:</b></span> check the other <tt>20-*.ini</tt> files -- all of them but <tt>20-slurm.ini</tt> should have enabled=FALSE<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:08:41)</span> <b>blin:</b></span> enabled=TRUE?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:08:43)</span> <b>blin:</b></span> oh nvm<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:08:48)</span> <b>blin:</b></span> reading is hard<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:10:44)</span> <b>marco.mascheroni:</b></span> there is only /etc/osg/config.d/20-bosco.ini and it is disabled<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:12:34)</span> <b>marco.mascheroni:</b></span> anyway, I guess the point is why osg-configure is saying in the logs that f = open(BOSCO_PASS) fails. What was it trying to do in general, was it an important step? Reading /bin/bosco_ssh_start it was trying to read a pwd for ssh (but I should be using a key)<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:12:50)</span> <b>blin:</b></span> (mat, derek is traveling today)<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:12:56)</span> <b>marco.mascheroni:</b></span> I'll try to send a job and see what happens<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:17:23)</span> <b>matyas:</b></span> sorry, @blin is tells me that it's actually the bosco one that should be enabled, not the condor one<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:17:56)</span> <b>matyas:</b></span> can you post 20-bosco.ini?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:18:32)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:18:36)</span> <b>marco.mascheroni:</b></span> and in 99 I have<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:18:57)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:20:50)</span> <b>marco.mascheroni:</b></span> Is there a replacement for <a href="http://repo.grid.iu.edu/tarball-install/3.4/osg-wn-client-latest.el7.x86_64.tar.gz">http://repo.grid.iu.edu/tarball-install/3.4/osg-wn-client-latest.el7.x86_64.tar.gz</a> ?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:22:22)</span> <b>matyas:</b></span> ah, I didn't know that you were using a 99 file.  make sure enabled=FALSE in 20-slurm.ini too then<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:22:55)</span> <b>matyas:</b></span> as for the tarball, it you can use <a href="http://repo.opensciencegrid.org/tarball-install/3.4/osg-wn-client-latest.el7.x86_64.tar.gz">http://repo.opensciencegrid.org/tarball-install/3.4/osg-wn-client-latest.el7.x86_64.tar.gz</a><br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:23:01)</span> <b>marco.mascheroni:</b></span> thx<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:29:14)</span> <b>blin:</b></span> @matyas do you know if osg-configure installs the WN client on the remote side? that's how suchandra ran things and i'm not entirely sure how he did it<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:29:41)</span> <b>blin:</b></span> oh nvm, it looks like he did it manually -.-<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:30:12)</span> <b>matyas:</b></span> the only thing osg-configure does remotely is the ssh stuff for bosco<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:30:20)</span> <b>marco.mascheroni:</b></span> yeah I installed it manually. does osg.configure need it?<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:30:50)</span> <b>matyas:</b></span> the tarball? no it does not<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:31:29)</span> <b>marco.mascheroni:</b></span> ok<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:31:47)</span> <b>marco.mascheroni:</b></span> I think it's only neded by the glidin for the crls<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:32:30)</span> <b>blin:</b></span> yeah, i think we may need to set a path in the /etc/osg/config.d/ so it knows where to find the tarball client in the home dir<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:33:18)</span> <b>matyas:</b></span> so what knows where to find the tarball client? osg-configure doesn't need it<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:34:13)</span> <b>matyas:</b></span> the only thing osg-configure configures is the ce<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:34:31)</span> <b>blin:</b></span> osg-configure sets the env var in the CE config that the pilot uses<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:36:02)</span> <b>matyas:</b></span> do you remember what the var is?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:36:04)</span> <b>blin:</b></span> this is what we want i think:<br/><pre><br/>[Storage]<br/>grid_dir = &lt;PATH TO UNTARRED WN CLIENT ON THE HEAD NODE&gt;<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(14:38:01)</span> <b>blin:</b></span> @lincoln we should probably talk hosted CE in here. I think the one VM is all we need for now. More may be coming depending on what Miron/Frank drop on us<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:40:28)</span> <b>lincoln:</b></span> ok<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:40:33)</span> <b>lincoln:</b></span> i made hosted-ce23 and gave marco access<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:40:37)</span> <b>lincoln:</b></span> let me know if more if needed<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:41:09)</span> <b>marco.mascheroni:</b></span> I though that 23 was for LSU and PIC<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:41:24)</span> <b>marco.mascheroni:</b></span> Anyway, my test job of course failed with:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:41:30)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:41:54)</span> <b>marco.mascheroni:</b></span> not sure why bosco_ssh_start is trying to use a password and not the key I configured<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:41:59)</span> <b>blin:</b></span> are you running osg-configure as root?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:42:05)</span> <b>marco.mascheroni:</b></span> yes<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:42:21)</span> <b>blin:</b></span> interesting<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:42:53)</span> <b>matyas:</b></span> does /var/lib/osg/.bosco exist?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:42:57)</span> <b>blin:</b></span> did you generate the SSH key with or without a password?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:43:06)</span> <b>marco.mascheroni:</b></span> withtout<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:43:24)</span> <b>marco.mascheroni:</b></span> FYI /var/lib/osg is the homedir of the osg user<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:43:38)</span> <b>marco.mascheroni:</b></span> (Can't use home since it is shared)<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:44:32)</span> <b>marco.mascheroni:</b></span> [centos@hosted-ce22 ~]$ sudo ls /var/lib/osg/.bosco<br/>ls: cannot access /var/lib/osg/.bosco: No such file or directory<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:44:53)</span> <b>matyas:</b></span> I don't know where the <tt>.bosco</tt> comes from -- it's not in the osg-configure code<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:45:12)</span> <b>matyas:</b></span> can you grep your osg-configure config for it?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:46:10)</span> <b>marco.mascheroni:</b></span> but I think the deal is that bosco_ssh_start should be called with -k to use the key<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:47:20)</span> <b>marco.mascheroni:</b></span> other hosted ces don't have it as well<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:47:22)</span> <b>matyas:</b></span> i think osg-configure is trying to install the key but it's failing because the dir it's trying to install it to doesn't exist<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:48:18)</span> <b>marco.mascheroni:</b></span> It created the whole thing here:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:48:22)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:49:02)</span> <b>marco.mascheroni:</b></span> And this works: sudo -u osg ssh <a href="mailto:osguser@ares-master.pcc.amnh.org">osguser@ares-master.pcc.amnh.org</a><br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:49:08)</span> <b>marco.mascheroni:</b></span> usually that's enough<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:49:09)</span> <b>matyas:</b></span> yeah that looks fine. i'm just wondering why something is looking for /var/lib/osg/.bosco<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:49:18)</span> <b>marco.mascheroni:</b></span> yeo<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:49:23)</span> <b>blin:</b></span> jaime may know<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:50:10)</span> <b>marco.mascheroni:</b></span> in the meantime I'll increase the gridmanager log level and submit again, maybe there is something obvious we are missing<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:51:40)</span> <b>matyas:</b></span> bosco is trying to run /usr/bin/ssh-add on the key<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:52:06)</span> <b>marco.mascheroni:</b></span> oh<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:52:43)</span> <b>matyas:</b></span> and then it reads the output of ssh-add and if it sees the word "passphrase" it looks for the passphrase in ~/.bosco/.pass<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:57:15)</span> <b>matyas:</b></span> can you try logging in as osg and running "/usr/bin/ssh-add ~/.ssh/bosco_key.rsa" and seeing what happens?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:57:59)</span> <b>marco.mascheroni:</b></span> yeah I am doing it<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:58:30)</span> <b>marco.mascheroni:</b></span> it works with root, asks for the pwd with my user (centos). Let me check a bit more, maybe it's just a question of permission<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:59:02)</span> <b>matyas:</b></span> shouldn't you be trying it with user <tt>osg</tt>?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(14:59:24)</span> <b>marco.mascheroni:</b></span> yes<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:59:42)</span> <b>blin:</b></span> shouldn't it be done as the condor user?<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:59:49)</span> <b>blin:</b></span> oh wait nvm<br/>
+<span style="color: #e96699"><span style="font-size: small">(14:59:58)</span> <b>lincoln:</b></span> the .bosco dir has your bosco keys in it i thought<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:00:39)</span> <b>lincoln:</b></span> oh no, its this:<br/><pre><br/>   9 # Bosco key location<br/>  10 bosco_key=$HOME/.ssh/bosco_key.rsa<br/>  11 <br/>  12 # Bosco password location<br/>  13 PASSPHRASE_LOCATION=$HOME/.bosco/.pass<br/>  14 <br/>  15 # Bosco cluster list location<br/>  16 CLUSTERLIST_LOCATION=$HOME/.bosco/.clusterlist<br/></pre><br/>
+<span style="color: #e96699"><span style="font-size: small">(15:00:43)</span> <b>lincoln:</b></span> from <tt>bosco_cluster</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(15:00:44)</span> <b>matyas:</b></span> from bosco_ssh_start: <pre><br/>BOSCO_KEY = os.path.expanduser("~/.ssh/bosco_key.rsa")<br/>BOSCO_PASS = os.path.expanduser("~/.bosco/.pass")<br/></pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(15:01:00)</span> <b>matyas:</b></span> yeah ok we're seeing the same thing<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:02:13)</span> <b>lincoln:</b></span> we wrote our own tool to replace bosco_cluster using paramiko :slightly_smiling_face: but now i haven't touched it in several months and don't like it anymore :neutral_face:<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:03:00)</span> <b>matyas:</b></span> hahahaha :disappointed:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:06:21)</span> <b>marco.mascheroni:</b></span> I think I know what happened (although I am not sure why). I configured bosco with ssh_key = /etc/osg/bosco.key<br/>But it seems to me that for some reason osg-configure created its own set of rsa keys in:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:06:47)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:06:53)</span> <b>marco.mascheroni:</b></span> actually wait<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:08:32)</span> <b>marco.mascheroni:</b></span> bosco_ssh_key in /var/lib/osg/.ssh/ is the same that I configured with ssh_key = /etc/osg/bosco.key. And it is the one used in the config file. And indeed when I just do ssh -u osg ... it works without asking me for the passphrase<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:14:02)</span> <b>matyas:</b></span> and does a test job work?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:18:01)</span> <b>marco.mascheroni:</b></span> no, it gives me the error about the pass file<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:22:26)</span> <b>blin:</b></span> do you have any configuration in ~/.ssh/config?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:23:10)</span> <b>marco.mascheroni:</b></span> yes<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:23:23)</span> <b>blin:</b></span> what's in it?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:24:01)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:24:04)</span> <b>marco.mascheroni:</b></span> seems legit<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:24:34)</span> <b>marco.mascheroni:</b></span> anyway, by removing bosco_key.rsa and bosco_key.rsa.pub my new test jobs completed :open_mouth:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:25:04)</span> <b>marco.mascheroni:</b></span> have those keys the precedence somehow?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:25:10)</span> <b>marco.mascheroni:</b></span> and who created them?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:27:59)</span> <b>blin:</b></span> it looks like the <tt>bosco_cluster</tt> command does<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:28:33)</span> <b>lincoln:</b></span> *shameless plug* vc3-remote-manager doesn't! :wink:<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:28:52)</span> <b>blin:</b></span> lol<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:29:43)</span> <b>marco.mascheroni:</b></span> BTW the test jobs run successfully<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:30:02)</span> <b>marco.mascheroni:</b></span> I need to set the factory entry and test things with real jobs<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:31:00)</span> <b>blin:</b></span> perfect!<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:31:09)</span> <b>blin:</b></span> i'm working on the topology registration<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:31:20)</span> <b>marco.mascheroni:</b></span> ok thanks<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:31:38)</span> <b>marco.mascheroni:</b></span> I am probably supposed to register it eheh<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:33:23)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #43761b"><span style="font-size: small">(15:33:31)</span> <b>blin:</b></span> it's all good for now<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:33:36)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:33:44)</span> <b>marco.mascheroni:</b></span> in case you need those info for the registration<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:33:47)</span> <b>matyas:</b></span> oh i get it. bosco_ssh_start reads .ssh/bosco_key.rsa and osg-configure writes .ssh/bosco_ssh_key.rsa<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:34:00)</span> <b>blin:</b></span> lol, the lat/long seems wrong<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:34:30)</span> <b>marco.mascheroni:</b></span> that seems about it<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:34:59)</span> <b>matyas:</b></span> @blin maybe it's supposed to be 91.86... ?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:35:07)</span> <b>marco.mascheroni:</b></span> but I don't want to create/use at all those bosco_ssh_key.rsa<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:35:10)</span> <b>matyas:</b></span> also it should probably be -91 because it's west<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:35:40)</span> <b>blin:</b></span> this is what i have:<br/>```<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:35:41)</span> <b>marco.mascheroni:</b></span> for those I looked on a site, maybe I screwed them up...<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:35:51)</span> <b>blin:</b></span> Latitude: 40.7128<br/>Longitude: -74.0060<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:35:58)</span> <b>blin:</b></span> that's what i have<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:36:13)</span> <b>marco.mascheroni:</b></span> where should I get those next time<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:36:14)</span> <b>blin:</b></span> i just looked up the lat/long of NYC<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:36:18)</span> <b>marco.mascheroni:</b></span> ah ok<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:36:24)</span> <b>blin:</b></span> i didn't bother with the exact address<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:36:42)</span> <b>marco.mascheroni:</b></span> that's what I tried, maybe I put a wrong address?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:36:50)</span> <b>blin:</b></span> ¯\_(ツ)_/¯<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:37:16)</span> <b>blin:</b></span> the only other thing i see is the resource name<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:37:44)</span> <b>blin:</b></span> i don't really care about that i guess but factory ops seems to have a convention for it?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:37:50)</span> <b>blin:</b></span> one that we should probably be following?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:38:08)</span> <b>blin:</b></span> what does the factory entry need the resource name for anyway?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:38:09)</span> <b>marco.mascheroni:</b></span> you mean OSG_US_AMNH_ARES ?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:38:23)</span> <b>blin:</b></span> yeah<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:38:27)</span> <b>marco.mascheroni:</b></span> it's just a convention<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:38:39)</span> <b>marco.mascheroni:</b></span> we can call everything 1 2 3 4 5 etc<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:38:48)</span> <b>blin:</b></span> &lt;VO&gt;_&lt;COUNTRY&gt;_&lt;RESOURCEGROUP&gt;_&lt;CLUSTER&gt;?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:38:55)</span> <b>marco.mascheroni:</b></span> yes<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:39:07)</span> <b>marco.mascheroni:</b></span> that's what we use for hosted ces<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:39:13)</span> <b>matyas:</b></span> shouldn't resource name match what's in topology?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:39:46)</span> <b>blin:</b></span> @matyas i assume so but i'm just wondering why the factory keeps track of the resource{, group} name at all<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:40:01)</span> <b>marco.mascheroni:</b></span> we don't use it for anything<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:40:21)</span> <b>blin:</b></span> except maybe populating the factory monitoring dropdowns?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:40:23)</span> <b>marco.mascheroni:</b></span> it's just that we want to set a nice name with a convention<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:40:25)</span> <b>marco.mascheroni:</b></span> yes<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:40:36)</span> <b>blin:</b></span> <a href="http://gfactory-1.t2.ucsd.edu/factory/monitor/factoryStatus.html?entry=OSG_US_UConn_gluskap&amp;frontend=OSG_Flock_frontend&amp;infoGroup=running&amp;elements=StatusRunning,ClientGlideRunning,ClientGlideIdle,&amp;rra=0&amp;window_min=0&amp;window_max=0&amp;timezone=-7">http://gfactory-1.t2.ucsd.edu/factory/monitor/factoryStatus.html?entry=OSG_US_UConn_gluskap&amp;frontend=OSG_Flock_frontend&amp;infoGroup=running&amp;elements=StatusRunning,ClientGlideRunning,ClientGlideIdle,&amp;rra=0&amp;window_min=0&amp;window_max=0&amp;timezone=-7</a><br/>
+<span style="color: #c386df"><span style="font-size: small">(15:40:48)</span> <b>matyas:</b></span> it's used for the ce collector<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:40:50)</span> <b>marco.mascheroni:</b></span> but that's all internal<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:41:44)</span> <b>blin:</b></span> the central collector requires that the factory resource name matches the topology registered resource name?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:42:00)</span> <b>matyas:</b></span> i doubt it<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:42:17)</span> <b>matyas:</b></span> but as long as we have the attributes in there, they should be consistent<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:44:06)</span> <b>blin:</b></span> yeah, i agree with that, i'm just advocating for not collecting the info at all unless we need it<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:44:41)</span> <b>matyas:</b></span> well we need "resource" and "resource_group" because osg-configure will complain if you don't have it<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:45:23)</span> <b>marco.mascheroni:</b></span> Actually, the factory is also setting an attribute: GLIDEIN_ResourceName<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:45:37)</span> <b>marco.mascheroni:</b></span> and GLIDEIN_Site<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:46:06)</span> <b>matyas:</b></span> and like i said the ce collector uses it i.e. anybody that does condor_ce_info_status uses it<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:46:08)</span> <b>marco.mascheroni:</b></span> I forgot what those are used for. @jdost321?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:46:32)</span> <b>matyas:</b></span> the factory wanted to use the ce collector for routes at one point but i dunno if that got implemented<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:46:43)</span> <b>matyas:</b></span> and otherwise atlas uses the ce collector information for their own purposes<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:46:46)</span> <b>blin:</b></span> gratia record generation can depend on GLIDEIN_ResourceName<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:47:12)</span> <b>marco.mascheroni:</b></span> yeah, we have been careful when setting this so that it matches topology<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:47:26)</span> <b>lincoln:</b></span> one of the two are often used for matching or unmatching jobs (from OSG Connect anyhow)<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:47:28)</span> <b>blin:</b></span> GLIDEIN_Site is the worst -- it gets populated off of ResourceGroup<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:47:56)</span> <b>lincoln:</b></span> e.g. users will want to avoid a known bad site and use Requirements = Glidein_ResourceName =!= Foo<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:47:57)</span> <b>lincoln:</b></span> or wahtever<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:48:03)</span> <b>blin:</b></span> ResourceGroup and Site are two distinct entities in the OSG topology :disappointed:<br/>
+<span style="color: #e96699"><span style="font-size: small">(15:48:47)</span> <b>lincoln:</b></span> plus our dank connect histogram thing used to read the GLIDEIN_Site or something from the condor_history :slightly_smiling_face:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:49:40)</span> <b>marco.mascheroni:</b></span> Anyway, for that specific case I am setting everything to OSG_US_AMNH_ARES.. Or what?<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:49:57)</span> <b>blin:</b></span> yeah, that's good for the resource name<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:50:06)</span> <b>blin:</b></span> i also used AMNH for the resource group<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:50:27)</span> <b>marco.mascheroni:</b></span> ok, so group only AMNH<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:50:49)</span> <b>blin:</b></span> yup<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:51:30)</span> <b>marco.mascheroni:</b></span> oh, for some hosted CE the group is not set (e.g. the one I was copying from..)<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:51:32)</span> <b>matyas:</b></span> @blin i added a suggestion to your pr changing the resource name<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:52:09)</span> <b>blin:</b></span> i already had the change locally so i just pushed it<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:54:46)</span> <b>matyas:</b></span> oh hey I already see AMNH_ARES in the ce collector<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:54:57)</span> <b>matyas:</b></span> nice<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:55:16)</span> <b>blin:</b></span> just AMNH_ARES or OSG_US_AMNH_ARES?<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:55:46)</span> <b>matyas:</b></span> <pre>% condor_ce_info_status<br/>...<br/>AMNH_ARES                                                     4    14336         1440 osg, mis, fermilab`<br/>...<br/></pre><br/>
+<span style="color: #c386df"><span style="font-size: small">(15:55:59)</span> <b>matyas:</b></span> _that's_ based on the subcluster<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:56:15)</span> <b>marco.mascheroni:</b></span> yeah I set:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:56:22)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:56:29)</span> <b>marco.mascheroni:</b></span> in the hosted ce 99 config<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:56:41)</span> <b>marco.mascheroni:</b></span> I used as a model hostece-21<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:57:13)</span> <b>marco.mascheroni:</b></span> who had<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:57:18)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #43761b"><span style="font-size: small">(15:57:40)</span> <b>blin:</b></span> seems reasonable<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:57:57)</span> <b>matyas:</b></span> yeah there does not seem to be any sort of standard for subcluster names<br/>
+<span style="color: #c386df"><span style="font-size: small">(15:58:09)</span> <b>matyas:</b></span> other than don't use somebody else's or you'll stomp over their data<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:58:44)</span> <b>marco.mascheroni:</b></span> Although AGGIE_GRID has:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:58:51)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:59:01)</span> <b>marco.mascheroni:</b></span> not just AGGIE_GRIG<br/>
+<span style="color: #43761b"><span style="font-size: small">(15:59:19)</span> <b>blin:</b></span> yeah, that looks right<br/>
+<span style="color: #e23f99"><span style="font-size: small">(16:01:21)</span> <b>marco.mascheroni:</b></span> oh I thought GLIDEIN_ResourceName had to be AGGIE_GRID, maybe I misunderstood. We don't have a resource group in the factory, I am confused because we set it to the topology resource group sometimes... I ssumed a bad naming convention<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:02:50)</span> <b>blin:</b></span> you have GLIDEIN_Site, though<br/>
+<span style="color: #e23f99"><span style="font-size: small">(16:03:01)</span> <b>marco.mascheroni:</b></span> yes<br/>
+<span style="color: #e23f99"><span style="font-size: small">(16:03:48)</span> <b>marco.mascheroni:</b></span> so gfactory GLIDEN_Site = topology resource name and factory GLIDEIN_ResourceName = topology resource group. Such a nice naming convention<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:04:06)</span> <b>blin:</b></span> are you sure?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:04:18)</span> <b>blin:</b></span> i'm pretty sure GLIDEIN_ResourceName = topology resource name<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:04:56)</span> <b>blin:</b></span> we have a google doc trying to figure this all out <a href="https://docs.google.com/document/d/1tHMaYnU5mHaBPmias7J6QWCuL9IpLF5PXtRlWuDannU/edit?usp=sharing">https://docs.google.com/document/d/1tHMaYnU5mHaBPmias7J6QWCuL9IpLF5PXtRlWuDannU/edit?usp=sharing</a><br/>
+<span style="color: #e23f99"><span style="font-size: small">(16:05:01)</span> <b>marco.mascheroni:</b></span> well, that's what is confusing.<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:05:12)</span> <b>blin:</b></span> where i asked jeff to clarify things a bit<br/>
+<span style="color: #e23f99"><span style="font-size: small">(16:05:20)</span> <b>marco.mascheroni:</b></span> that's good<br/>
+<span style="color: #e23f99"><span style="font-size: small">(16:07:28)</span> <b>marco.mascheroni:</b></span> well, for EGI site GLIDEIN_ResourceName is set to things like BEIJING-LCG2 , which is the name of the site in goc-db<br/>
+<span style="color: #e23f99"><span style="font-size: small">(16:07:52)</span> <b>marco.mascheroni:</b></span> I guess for OSG site the site name in topology is the full name, hence the different convention<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:09:43)</span> <b>blin:</b></span> but what if an EGI site has multiple CEs with their own factory entries?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(16:11:26)</span> <b>marco.mascheroni:</b></span> rsource name stays the same<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:13:58)</span> <b>blin:</b></span> and so you just change the hostname?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(16:14:29)</span> <b>marco.mascheroni:</b></span> yes<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:14:46)</span> <b>blin:</b></span> honestly probably what we should be doing, too<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:15:26)</span> <b>blin:</b></span> anyway, we for sure need <tt>GLIDEIN_ResourceName</tt> set to the topology resource name, so <tt>OSG_US_AMNH_ARES</tt><br/>
+<span style="color: #e23f99"><span style="font-size: small">(16:15:54)</span> <b>marco.mascheroni:</b></span> gotcha!<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:16:10)</span> <b>blin:</b></span> i really don't know what <tt>GLIDEIN_Site</tt> should be set to, and I think we need @jdost321 to clarify<br/>
+<span style="color: #e23f99"><span style="font-size: small">(16:21:22)</span> <b>marco.mascheroni:</b></span> The factory entry is ready, <a href="http://gfactory-1.t2.ucsd.edu/factory/monitor/factoryStatus.html?entry=OSG_US_AMNH_ARES">http://gfactory-1.t2.ucsd.edu/factory/monitor/factoryStatus.html?entry=OSG_US_AMNH_ARES</a> , I'll check tomorrow if things are fine, it does not seem to be pressure right now, and it is getting late here<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:23:18)</span> <b>blin:</b></span> yeah, get some sleep!<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:23:28)</span> <b>blin:</b></span> thanks for all the hard work!<br/>
+<span style="color: #e23f99"><span style="font-size: small">(16:24:30)</span> <b>marco.mascheroni:</b></span> no problem!<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:36:07)</span> <b>blin:</b></span> it looks like we may have success!<br/>
+<span style="color: #e23f99"><span style="font-size: small">(16:48:12)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(16:48:27)</span> <b>marco.mascheroni:</b></span> That was a bit premature eheh<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:48:51)</span> <b>matyas:</b></span> those should be in the wn tarball<br/>
+<span style="color: #e23f99"><span style="font-size: small">(16:49:00)</span> <b>marco.mascheroni:</b></span> oh<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:49:26)</span> <b>blin:</b></span> lol what do you have <tt>grid_dir</tt> set to in <tt>/etc/osg/config.d/</tt>?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:49:40)</span> <b>blin:</b></span> i got excited about the slivers of green to the right<br/>
+<span style="color: #e23f99"><span style="font-size: small">(16:50:01)</span> <b>marco.mascheroni:</b></span> you'd need to wait for the black line, registered cores<br/>
+<span style="color: #e23f99"><span style="font-size: small">(16:51:43)</span> <b>marco.mascheroni:</b></span> oh I see, my bad:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(16:51:48)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(16:51:50)</span> <b>marco.mascheroni:</b></span> but<br/>
+<span style="color: #e23f99"><span style="font-size: small">(16:52:01)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(16:52:29)</span> <b>marco.mascheroni:</b></span> do I need to run again osg-configure -c if I change that in 99config?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:52:45)</span> <b>matyas:</b></span> yes<br/>
+<span style="color: #e23f99"><span style="font-size: small">(16:53:12)</span> <b>marco.mascheroni:</b></span> Can't I just change /var/lib/osg/osg-job-environment.conf ?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(16:54:21)</span> <b>marco.mascheroni:</b></span> I guess I can try and then run osg-.configure if it is not enough :stuck_out_tongue:<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:55:37)</span> <b>matyas:</b></span> osg-configure shouldn't break anything<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:55:46)</span> <b>blin:</b></span> lol<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:55:48)</span> <b>matyas:</b></span> if it does, that's a problem<br/>
+<span style="color: #e23f99"><span style="font-size: small">(16:56:12)</span> <b>marco.mascheroni:</b></span> okok, it's just that I wnted to save those 5 minutes :stuck_out_tongue:<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:56:16)</span> <b>blin:</b></span> there's the complaint dating back to suchandra of osg-configure blowing out customizations in the bosco stuff on the head node<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:56:33)</span> <b>blin:</b></span> but we don't have any for this new hosted CE so yeah...shouldn't break anything<br/>
+<span style="color: #e23f99"><span style="font-size: small">(16:56:37)</span> <b>marco.mascheroni:</b></span> yes<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:56:50)</span> <b>matyas:</b></span> @blin you should give me that ticket then<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:57:01)</span> <b>blin:</b></span> idk if we ever made a ticket for it<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:57:12)</span> <b>matyas:</b></span> sigh<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:57:24)</span> <b>blin:</b></span> i need to block off all of tomorrow just to make tickets<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:57:30)</span> <b>matyas:</b></span> lol<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:57:44)</span> <b>matyas:</b></span> osg-configure should never break a working system. you should be able to stick it in a cron job and not notice<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:58:12)</span> <b>blin:</b></span> <pre><br/>* NEXT Make JIRA tickets<br/>  SCHEDULED: &lt;2019-02-08 Fri&gt;<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(16:59:06)</span> <b>blin:</b></span> yeah, there's some grossness with bosco though<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:59:20)</span> <b>blin:</b></span> anyway, noted i'll make the ticket<br/>
+<span style="color: #e23f99"><span style="font-size: small">(17:46:19)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(17:47:13)</span> <b>marco.mascheroni:</b></span> @blin do I remember correctly that Suchandra was mentioning a bug about copying the proxy, and him having to patch the blahp script (the other reason he could not run osg-configure)?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:47:27)</span> <b>blin:</b></span> vaguely?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:48:29)</span> <b>blin:</b></span> that's such a gross path :anguished:<br/>
+<span style="color: #e23f99"><span style="font-size: small">(17:48:36)</span> <b>marco.mascheroni:</b></span> look for "blah changes for slurm for htcondor-ce bosco"<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:48:45)</span> <b>blin:</b></span> in the install doc?<br/>
+<span style="color: #e23f99"><span style="font-size: small">(17:48:51)</span> <b>marco.mascheroni:</b></span> <br/>
+<span style="color: #e23f99"><span style="font-size: small">(17:48:53)</span> <b>marco.mascheroni:</b></span> emails<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:49:44)</span> <b>blin:</b></span> ugh, ok<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:49:58)</span> <b>blin:</b></span> we do have a separate issue with traps that may solve this<br/>
+<span style="color: #e23f99"><span style="font-size: small">(17:50:03)</span> <b>marco.mascheroni:</b></span> I'll look if I can find his hack tomorrow<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:50:07)</span> <b>blin:</b></span> let's reconvene in the morning<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:50:11)</span> <b>blin:</b></span> yeah<br/>
+<span style="color: #e23f99"><span style="font-size: small">(17:50:12)</span> <b>marco.mascheroni:</b></span> in another ce<br/>
+<span style="color: #e23f99"><span style="font-size: small">(17:50:16)</span> <b>marco.mascheroni:</b></span> and apply it<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:50:17)</span> <b>blin:</b></span> you should go to bed!<br/>
+<span style="color: #e23f99"><span style="font-size: small">(17:50:21)</span> <b>marco.mascheroni:</b></span> yeah<br/>
+<span style="color: #e23f99"><span style="font-size: small">(17:50:44)</span> <b>marco.mascheroni:</b></span> just wanted to touch base before it's too late<br/>
+</body>
+</html>

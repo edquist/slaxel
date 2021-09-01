@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Jul 13, 2021 : #flightworthy (chtc)</title>
+</head>
+<body>
+<h3>Tue Jul 13, 2021 : #flightworthy (chtc)</h3>
+<span style="color: #2b6836"><span style="font-size: small">(08:20:47)</span> <b>jcpatton:</b></span> I’ve got something new for you today… here’s a job ad with <tt>CommittedTime</tt> &gt; <tt>RemoteWallClockTime</tt>, and it’s not the only one I’ve stumbled across<br/>
+<span style="color: #2b6836"><span style="font-size: small">(09:16:56)</span> <b>jcpatton:</b></span> Another question, conda builds of 9.1.0 are failing in <tt>proc_family.cpp</tt> because of something to do with perf counter. Any idea what might be going on here? This should be a pretty recent GCC version (I can look up the exact if curious)<br/>
+<span style="color: #2b6836"><span style="font-size: small">(09:19:30)</span> <b>jcpatton:</b></span> tl;dr error msgs: <tt>error: class 'ProcFamily' does not have any field named 'm_perf_counter'</tt> <tt>error: 'm_perf_counter' was not declared in this scope; did you mean 'PerfCounter'?</tt><br/>
+<span style="color: #2b6836"><span style="font-size: small">(09:22:24)</span> <b>jcpatton:</b></span> the only hint I see is that in <tt>proc_family.h</tt>, <tt>PerfCounter m_perf_counter;</tt> is <tt>#ifdef LINUX</tt>, but this is linux<br/>
+<span style="color: #9e3997"><span style="font-size: small">(10:59:30)</span> <b>tlmiller:</b></span> Looks like there's a bug in the #defines -- I see <tt>#if defined(HAVE_EXT_CGROUP)</tt> surrounding that <tt>#ifdef LINUX</tt>, which is either wrong or redundant.<br/>
+<span style="color: #d58247"><span style="font-size: small">(11:00:41)</span> <b>gthain:</b></span> Do the conda builds not have the cgroup external?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(11:02:49)</span> <b>jcpatton:</b></span> I think they should have it but I'll double check<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:32:39)</span> <b>coatsworth:</b></span> Hi all, I got my workstation upgraded to Ubuntu 20 and now I can't push changes to our AFS git repos, it fails with a permission error. CSL told me this is due to a change in newer versions of git (I'm running v2.25.1) which they will not be reverting. Is anybody else here running a new version of git, can you confirm this?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:37:00)</span> <b>tlmiller:</b></span> Sorry, I'm running 2.20.1.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:37:29)</span> <b>tlmiller:</b></span> But not reverting git does not sound OK for a "supported" developer's workstation.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:37:55)</span> <b>tlmiller:</b></span> (It's probably also not OK for any students with a workstation...)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:47:02)</span> <b>coatsworth:</b></span> Sorry, what I meant is the git software maintainers are not going to undo the change which apparently caused this to break.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:47:36)</span> <b>coatsworth:</b></span> I have a simple enough workaround which is to tunnel all my git operations through moria, so it's not a big deal for me.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:48:10)</span> <b>coatsworth:</b></span> But I'm worried we might not be able to use our AFS repos in the near future.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:48:30)</span> <b>coatsworth:</b></span> (that is, if the CSL person is correct that this is the cause of my permissions problem)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:48:38)</span> <b>tlmiller:</b></span> That sounds surprisingly awful on the git people's part.  What's the magnificent new feature which broke AFS?<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:50:23)</span> <b>coatsworth:</b></span> They added an atomic filesystem check, and since it's not supported in AFS they don't consider it a bug: <a href="https://lore.kernel.org/git/CAPx1GvfKxu8gwbp0Gn2dBf9th874skKjD-echeAFr7_77o8FYw@mail.gmail.com/">https://lore.kernel.org/git/CAPx1GvfKxu8gwbp0Gn2dBf9th874skKjD-echeAFr7_77o8FYw@mail.gmail.com/</a><br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:52:08)</span> <b>tlmiller:</b></span> That doesn't really answer the question of what they're trying to do. :(<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:55:15)</span> <b>coatsworth:</b></span> Yup, I don't understand that part either. But it sounds like the change is here to stay.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(16:56:06)</span> <b>coatsworth:</b></span> We should probably bring this up with ToddT in the meeting tomorrow. If our AFS repos are indeed not going to work with newer git versions, we should try and get ahead of it.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(16:56:34)</span> <b>tlmiller:</b></span> I'd be tempted to patch git, instead, because ToddT will try to use this to change our development model.<br/>
+<span style="color: #674b1b"><span style="font-size: small">(17:00:18)</span> <b>coatsworth:</b></span> The CSL people suggested we move our repos onto campus-hosted GitLab. That doesn't seem like too drastic a change? I don't know how all the post-commit hooks would work, but I can't imagine it's that different.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:02:57)</span> <b>tlmiller:</b></span> I didn't know that was an option, but it sounds better than github (without looking at it).<br/>
+<blockquote>
+<span style="color: #4cc091"><span style="font-size: small">(2021-07-14 08:01:22)</span> <b>blin:</b></span> last i checked, campus gitlab was not actually intended for wide campus use and was just for DoIT<br/>
+<span style="color: #4cc091"><span style="font-size: small">(2021-07-14 08:01:54)</span> <b>blin:</b></span> i'm not sure why github would be any worse than a UW-hosted gitlab, though<br/>
+</blockquote>
+<span style="color: #9e3997"><span style="font-size: small">(17:04:52)</span> <b>tlmiller:</b></span> ... is our repo &lt; 2GB?  (I also don't see anything on the DoIT pages about how to actually _use_ the git repos in question, or if we'd need 2FA to make commits...)<br/>
+<blockquote>
+<span style="color: #d58247"><span style="font-size: small">(17:16:02)</span> <b>gthain:</b></span> Probably requires a bunch more than 2 FA.<br/>
+<span style="color: #9e3997"><span style="font-size: small">(17:34:47)</span> <b>tlmiller:</b></span> Using the CI (website) part of the service is Shibboleth-based, which will mean the usual Duo-based 2FA.  I don't know how they secure the SSH connections for the command-line, though.<br/>
+</blockquote>
+<span style="color: #d58247"><span style="font-size: small">(17:05:39)</span> <b>gthain:</b></span> Is ToddT back tomorrow?<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(17:14:37)</span> <b>tim:</b></span> Our repo is about 250 MB.<br/>
+<span style="color: #bb86b7"><span style="font-size: small">(17:14:58)</span> <b>tim:</b></span> The schedule file shows him back tomorrow.<br/>
+<span style="color: #d58247"><span style="font-size: small">(17:36:23)</span> <b>gthain:</b></span> We could replace AFS with gitlab and go local -&gt; gitlab -&gt; github<br/>
+</body>
+</html>

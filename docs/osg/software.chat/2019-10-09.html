@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed Oct 9, 2019 : #software (osg)</title>
+</head>
+<body>
+<h3>Wed Oct 9, 2019 : #software (osg)</h3>
+<span style="color: #c386df"><span style="font-size: small">(09:40:35)</span> <b>matyas:</b></span> Hey, just throwing an idea out there: for people using Puppet or whatever to manage their CEs, if I added a flag to osg-configure that generated a directory of config files instead of editing them on the running system (e.g. creating <tt>./osg-configure-generated/etc/lcmaps.db</tt> instead of editing <tt>/etc/lcmaps.db</tt>), would you find that useful?<br/>
+<span style="color: #d1707d"><span style="font-size: small">(09:47:41)</span> <b>***gattebury:</b></span> shakes magic 8 ball … Survey says yes!<br/>
+<span style="color: #d1707d"><span style="font-size: small">(09:49:36)</span> <b>gattebury:</b></span> If nothing else it would be a nice way of having a noop run so to speak — I’ve argely avoided osg-configure for a long time mostly because I never had an easy way to know what it was going to change in advance<br/>
+<span style="color: #e96699"><span style="font-size: small">(09:53:20)</span> <b>lincoln:</b></span> yes this would be very useful<br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:27:10)</span> <b>bockjoo:</b></span> @blin I just installed htcondor-ce-4.0.1-1.osg35.el7.noarch and osg-configure-3.1.0-1.osg35.el7.noarch<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:27:38)</span> <b>blin:</b></span> cool! let us know how it goes<br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:27:45)</span> <b>bockjoo:</b></span> but at [root@osg ~]# osg-configure -c<br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:27:53)</span> <b>bockjoo:</b></span> I got this error<br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:28:07)</span> <b>bockjoo:</b></span> ERROR<br/>SECMAN:2010:Received "DENIED" from server for user gsi@unmapped using method GSI.<br/>Can't send Reconfig command to local master<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:30:19)</span> <b>blin:</b></span> my guess is that you've got a lot of rpmnew files laying around in <tt>/etc/condor-ce/config.d</tt> that you'll have to merge. I'm working on OSG upgrade instructions but there are some pointers here: <a href="https://htcondor-ce.readthedocs.io/en/latest/releases/#updating-to-htcondor-ce-4">https://htcondor-ce.readthedocs.io/en/latest/releases/#updating-to-htcondor-ce-4</a><br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:31:32)</span> <b>bockjoo:</b></span> OK. /etc/condor-ce/condor_mapfile is being overwritten. I have recovered old one but the same error at osg-configure -c command.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:34:16)</span> <b>bockjoo:</b></span> Replacing it with the old one, I had to do this to make osg-configure -c work:<br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:34:27)</span> <b>bockjoo:</b></span> systemctl stop condor-ce<br/>  systemctl daemon-reload<br/>  osg-configure -c<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:34:48)</span> <b>blin:</b></span> ah yes, the <tt>systemctl daemon-reload</tt> is one issue we know about<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:35:28)</span> <b>blin:</b></span> technically,  though, you should be able to use the new condor_mapfile with the new configuration that we ship<br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:40:38)</span> <b>bockjoo:</b></span> When I installed it, it looked like:<br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:40:40)</span> <b>bockjoo:</b></span> [root@osg ~]# cat /etc/condor-ce/condor_mapfile.htcondor-ce-client-4.0.1-1.osg35.el7.noarch<br/>GSI (.*) GSS_ASSIST_GRIDMAP<br/>GSI "(/CN=[-.A-Za-z0-9/= ]+)" \1@unmapped.htcondor.org<br/>CLAIMTOBE .* anonymous@claimtobe<br/>FS "^(root|condor)$" \1@daemon.htcondor.org<br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:40:54)</span> <b>bockjoo:</b></span> It does not look right.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:43:13)</span> <b>blin:</b></span> yeah, that turns out to be fine<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:43:25)</span> <b>blin:</b></span> the first line authenticates users/vos via lcmaps<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:44:09)</span> <b>blin:</b></span> the last line allows the CE daemons to authenticate with each other on the same host so we don't have to rely on the host cert<br/>
+<span style="color: #7d414c"><span style="font-size: small">(10:46:17)</span> <b>bockjoo:</b></span> Never mind! /etc/condor-ce/condor_mapfile.htcondor-ce-client-4.0.1-1.osg35.el7.noarch works.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:46:38)</span> <b>blin:</b></span> yay!<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:50:35)</span> <b>blin:</b></span> so what did you have to change to fix it?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(11:45:00)</span> <b>bockjoo:</b></span> I have not changed anything.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(11:45:19)</span> <b>bockjoo:</b></span> I just had had to do:<br/>
+<span style="color: #7d414c"><span style="font-size: small">(11:45:32)</span> <b>bockjoo:</b></span> systemctl stop condor-ce<br/> systemctl daemon-reload<br/> osg-configure -c<br/>
+<span style="color: #7d414c"><span style="font-size: small">(11:45:41)</span> <b>bockjoo:</b></span> systemctl start condor-ce<br/>
+<span style="color: #43761b"><span style="font-size: small">(11:47:01)</span> <b>blin:</b></span> perfect, thanks!<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:00:07)</span> <b>matyas:</b></span> in the "that's f'ing annoying" department, ansible is not (yet?) available in centos 8, only rhel 8<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:00:39)</span> <b>matyas:</b></span> you can pip install it but that's not an rpm<br/>
+<span style="color: #c386df"><span style="font-size: small">(13:01:05)</span> <b>matyas:</b></span> (it's not in epel 8 and probably not gonna be in there since it's in rhel)<br/>
+<span style="color: #e96699"><span style="font-size: small">(13:04:25)</span> <b>lincoln:</b></span> thats terrible<br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:51:27)</span> <b>bockjoo:</b></span> @blin I am seeing HoldReason = "Failed to start GAHP: "<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:52:26)</span> <b>blin:</b></span> you'll want to also update your osg-ce packages out of testing<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:53:24)</span> <b>blin:</b></span> then run <tt>condor_ce_reconfig</tt><br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:53:48)</span> <b>bockjoo:</b></span> yum update --enablerepo=osg-testing "htcondor-ce*" blahp condor ; condor_ce_reconfig will do?<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:53:58)</span> <b>blin:</b></span> not quite<br/>
+<span style="color: #43761b"><span style="font-size: small">(13:54:13)</span> <b>blin:</b></span> <tt>yum update --enablerepo=osg-testing "osg-ce*" "htcondor-ce*" blahp condor ; condor_ce_reconfig</tt><br/>
+<span style="color: #7d414c"><span style="font-size: small">(13:55:03)</span> <b>bockjoo:</b></span> OK. executing it.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(14:04:34)</span> <b>bockjoo:</b></span> Jobs started running. Thanks!<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:08:49)</span> <b>blin:</b></span> no problem!<br/>
+<span style="color: #c386df"><span style="font-size: small">(14:54:26)</span> <b>matyas:</b></span> created a stopgap solution to the ansible thing: <tt>cd /etc/yum.repos.d; wget <a href="https://pages.cs.wisc.edu/~matyas/yum/matyas-ansible-el8.repo;">https://pages.cs.wisc.edu/~matyas/yum/matyas-ansible-el8.repo;</a> yum install ansible</tt><br/>
+<span style="color: #c386df"><span style="font-size: small">(14:55:20)</span> <b>matyas:</b></span> it's not very good -- I did a pip install and packaged up the results, so it doesn't have the manpages -- but it does the job.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(17:43:56)</span> <b>bockjoo:</b></span> What can cause PATH unset in htcondor-ce?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:46:09)</span> <b>blin:</b></span> what do you mean? in the pilot job env?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(17:47:15)</span> <b>bockjoo:</b></span> This is not my CE. A CMS T2 site at Hungary is seeing the empty PATH with pilot jobs.<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:48:04)</span> <b>blin:</b></span> what's the underlying batch system?<br/>
+<span style="color: #7d414c"><span style="font-size: small">(17:49:06)</span> <b>bockjoo:</b></span> I think it's condor but I am not sure.<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:50:53)</span> <b>blin:</b></span> so one thing that osg-configure does for OSG sites is set the PATH in <tt>/var/lib/osg/osg-job-environment.conf</tt><br/>
+<span style="color: #43761b"><span style="font-size: small">(17:51:11)</span> <b>blin:</b></span> <pre><br/>$ grep PATH /var/lib/osg/osg-job-environment.conf <br/>PATH="/bin:/usr/bin:/sbin:/usr/sbin"<br/>export PATH<br/></pre><br/>
+<span style="color: #43761b"><span style="font-size: small">(17:51:41)</span> <b>blin:</b></span> you could have them set that put it's kind of a hack<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:52:56)</span> <b>blin:</b></span> i don't think the CE should be unsetting anything, i'd be curious if they have the path available to them if they submit a job manually from the CE host<br/>
+<span style="color: #7d414c"><span style="font-size: small">(17:52:58)</span> <b>bockjoo:</b></span> I guess /var/lib/osg/osg-local-job-environment.conf is the better one.<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:53:12)</span> <b>blin:</b></span> i.e. using <tt>condor_submit</tt> directly<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:54:00)</span> <b>blin:</b></span> yeah, either way<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:54:08)</span> <b>blin:</b></span> the local vs non-local files only matter if they're an OSG site and using osg-configure<br/>
+<span style="color: #7d414c"><span style="font-size: small">(17:58:11)</span> <b>bockjoo:</b></span> I am not sure how else they configure at non OSG sites like the one at Hungary. Is there a separate instruction for non-OSG sites?<br/>
+<span style="color: #43761b"><span style="font-size: small">(17:59:19)</span> <b>blin:</b></span> yup, <a href="http://htcondor-ce.org">http://htcondor-ce.org</a><br/>
+<span style="color: #7d414c"><span style="font-size: small">(18:00:40)</span> <b>bockjoo:</b></span> I see. Thanks!<br/>
+<span style="color: #7d414c"><span style="font-size: small">(19:41:27)</span> <b>bockjoo:</b></span> OSG has /etc/osg/config.d/10-gateway.ini:job_envvar_path=/bin:/usr/bin:/sbin:/usr/sbin Is there the corresponding configuration mechanism for non OSG htcondor-ce. I don't think I can find it from the web page above.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(20:29:16)</span> <b>andrew.melo:</b></span> Does the WLCG have a distribution of it?<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(2019-10-10 08:52:22)</span> <b>blin:</b></span> HTCondor-CE is an official product of HTCondor now :slightly_smiling_face:<br/>
+<span style="color: #43761b"><span style="font-size: small">(2019-10-10 08:52:36)</span> <b>blin:</b></span> <a href="https://htcondor-ce.readthedocs.io/en/latest/">https://htcondor-ce.readthedocs.io/en/latest/</a><br/>
+</blockquote>
+<span style="color: #7d414c"><span style="font-size: small">(20:41:21)</span> <b>bockjoo:</b></span> I don't think so unless they followed the OSG htcondor-ce instructions.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(20:42:41)</span> <b>bockjoo:</b></span> If non-OSG htcondor-ce does not have any legit configuration like 10-gateway, blah common function may be the only place where the site can hack the PATH.<br/>
+<span style="color: #a72f79"><span style="font-size: small">(20:44:51)</span> <b>andrew.melo:</b></span> all osg-configure does is modify the files in /etc/condor-ce/config.d<br/>
+<span style="color: #7d414c"><span style="font-size: small">(20:48:53)</span> <b>bockjoo:</b></span> I don't think that's correct.<br/>
+<span style="color: #7d414c"><span style="font-size: small">(20:50:23)</span> <b>bockjoo:</b></span> osg-configure translates /etc/osg/config.d/*.ini into some env variables inside blah*.<br/>
+<blockquote>
+<span style="color: #43761b"><span style="font-size: small">(2019-10-10 08:50:51)</span> <b>blin:</b></span> @andrew.melo osg-configure sets vars and exports in <tt>/var/lib/osg/osg-job-environment.conf</tt>, which HTCondor-CE parses and passes onto the underlying batch system<br/>
+<span style="color: #43761b"><span style="font-size: small">(2019-10-10 08:51:58)</span> <b>blin:</b></span> that being said, i'm curious if they have the same missing PATH problem with manual submission. Because HTCondor-CE shouldn't override the PATH if it's not set in the <tt>osg-job-environment.conf</tt><br/>
+<span style="color: #a72f79"><span style="font-size: small">(2019-10-10 11:46:19)</span> <b>andrew.melo:</b></span>  None of this changes that osg-configure is writing config files that are later parsed by different packages. If you want to do X w/o osg-configure, then you can just check to see which confit files are changed. I had some issues with osg-configure early on when trying to put the CEs into config management directly, so I just ran it once, uploaded the resulting configs to CFE, and distribute the resulting configs to our hosts instead of running osg-configure on the production hosts themselves<br/>
+</blockquote>
+</body>
+</html>

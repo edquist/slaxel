@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fri Nov 9, 2018 : #software (osg)</title>
+</head>
+<body>
+<h3>Fri Nov 9, 2018 : #software (osg)</h3>
+<span style="color: #99a949"><span style="font-size: small">(09:11:42)</span> <b>dwd:</b></span> @dweitzel hcc-stash does not appear to be set up as a ligo cache.  Would you do it?  We’re not talking about taking it down, but just hitting it with traffic.  Alternatively, can we hit xrootd-local with traffic, since it is already set up as a ligo source.   In either case, can you do the debugging on this problem instead of me?  If not, I need access to whichever server it is so I can correlate cvmfs client debug logs with the issue on the xrootd server.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:47:37)</span> <b>dweitzel:</b></span> @dwd regarding the link <a href="https://github.com/lscsoft/osg-lvc/issues/4">https://github.com/lscsoft/osg-lvc/issues/4</a> , I've seen that link a few times, but it is always github 404 for me. Probably private repo?<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:48:48)</span> <b>dwd:</b></span> That’s right.  I will get you an invitation.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:49:09)</span> <b>dweitzel:</b></span> without getting too much into the internal structure of UNL, xrootd-local is not a cache.  It is a redirector in front of our production transfer servers.  I'm not sure that will give you the best for debugging, as the actual transfers will go to any 1 of 12 transfer servers.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:49:58)</span> <b>dweitzel:</b></span> hcc-stash, I saw in another thread, is being looked at to be a ligo source, so that may work well.  I've got not problem with what you are suggesting.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:50:48)</span> <b>dweitzel:</b></span> But, please note, that all released versions of xrootd crash under sustained StashCache load.<br/>
+<span style="color: #99a949"><span style="font-size: small">(11:51:32)</span> <b>dwd:</b></span> Ok, so can you please configure hcc-stash to be able to cache ligo, and updated it to the latest xrootd build if it isn’t?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:52:51)</span> <b>dweitzel:</b></span> Yup, I _think_ @jthiltges is looking into the hcc-stash.  It's not as easy as it should be (the DN of the cert has to be added to a special place...)<br/>
+<span style="color: #e06b56"><span style="font-size: small">(11:54:00)</span> <b>jthiltges:</b></span> I've started with cleaning up some lcmaps config, working towards that goal.<br/>
+<span style="color: #965d1b"><span style="font-size: small">(12:31:55)</span> <b>briedel:</b></span> @dwd quick question. i am trying to move several repos from an EL6 machine to EL7. is it as "simple" as rsyncing the keys and repos to the new machine, change the DNS entry, and add the cron jobs?<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:23:41)</span> <b>dwd:</b></span> @briedel Sorry, I was away.  Yes I think if you copy all of /etc/cvmfs, /var/spool/cvmfs, and /srv/cvmfs from one machine to another that should work<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:24:13)</span> <b>dwd:</b></span> Also the accounts<br/>
+<span style="color: #e06b56"><span style="font-size: small">(14:31:49)</span> <b>jthiltges:</b></span> Just in case you're upgrading the cvmfs server version at the same time from pre-2.5 to 2.5+, note to run <tt>cvmfs_server migrate</tt>. (I almost overlooked that part on ours, and Brian thankfully reminded me.)<br/>
+<span style="color: #965d1b"><span style="font-size: small">(15:22:28)</span> <b>briedel:</b></span> thanks @dweitzel and @jthiltges<br/>
+<span style="color: #965d1b"><span style="font-size: small">(15:22:33)</span> <b>briedel:</b></span> i think already are on 2.5+<br/>
+</body>
+</html>

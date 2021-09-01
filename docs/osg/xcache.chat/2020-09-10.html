@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Thu Sep 10, 2020 : #xcache (osg)</title>
+</head>
+<body>
+<h3>Thu Sep 10, 2020 : #xcache (osg)</h3>
+<span style="color: #a63024"><span style="font-size: small">(13:54:58)</span> <b>efajardo:</b></span> I will be upgrading all the stashcahce to XRootd5<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:55:10)</span> <b>efajardo:</b></span> I need access to a node at Fermilab<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:55:23)</span> <b>efajardo:</b></span> to understand why it is picking the UW Cache and not the I2 cache<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:55:37)</span> <b>efajardo:</b></span> @dwd do you have access to a compute ndoe at fermilab?<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:56:04)</span> <b>dwd:</b></span> You mean as in a worker node on Fermigrid?  No I don’t<br/>
+<span style="color: #99a949"><span style="font-size: small">(13:56:34)</span> <b>dwd:</b></span> I do however have a test machine with cvmfs, will that be enough?<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:57:50)</span> <b>efajardo:</b></span> `sure<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:57:56)</span> <b>efajardo:</b></span> can you run the <tt>attr</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(13:58:07)</span> <b>efajardo:</b></span> or see a CVMFS log<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:58:19)</span> <b>efajardo:</b></span> @matyas do you have a file we can test?<br/>
+<span style="color: #a63024"><span style="font-size: small">(13:58:34)</span> <b>efajardo:</b></span> <tt>opensciencegrid/stash-cache:upcoming-fresh</tt> is using <tt>xrootd-5.0.1-1.4.osgup.el7.x86_6</tt><br/>
+<span style="color: #a63024"><span style="font-size: small">(13:58:47)</span> <b>efajardo:</b></span> not <tt>5.1</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:59:13)</span> <b>dweitzel:</b></span> 5.1 doesn't exist, or is not released yet.<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:00:38)</span> <b>efajardo:</b></span> It only exist on Matevz master’s<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:05:34)</span> <b>dwd:</b></span> <pre>sudo cvmfs_talk -i <a href="http://dune.osgstorage.org">dune.osgstorage.org</a> external host info<br/>  [0] <a href="http://osg-chicago-stashcache.nrp.internet2.edu:8000/">http://osg-chicago-stashcache.nrp.internet2.edu:8000/</a> (unprobed)<br/>  [1] <a href="http://sc-cache.chtc.wisc.edu:8000/">http://sc-cache.chtc.wisc.edu:8000/</a> (unprobed)<br/>  [2] <a href="http://mwt2-stashcache.campuscluster.illinois.edu:8000/">http://mwt2-stashcache.campuscluster.illinois.edu:8000/</a> (unprobed)<br/>  [3] <a href="http://osg-kansas-city-stashcache.nrp.internet2.edu:8000/">http://osg-kansas-city-stashcache.nrp.internet2.edu:8000/</a> (unprobed)<br/>Active host 0: <a href="http://osg-chicago-stashcache.nrp.internet2.edu:8000/">http://osg-chicago-stashcache.nrp.internet2.edu:8000/</a></pre><br/><br/>
+<span style="color: #a63024"><span style="font-size: small">(14:05:50)</span> <b>efajardo:</b></span> hmm so it is doing the correct thing<br/>
+<span style="color: #a63024"><span style="font-size: small">(14:06:10)</span> <b>efajardo:</b></span> thanks @dwd<br/>
+<span style="color: #99a949"><span style="font-size: small">(14:08:02)</span> <b>dwd:</b></span> Even after reading a file it is still using the 0 host, so it is also working<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:26:03)</span> <b>efajardo:</b></span> @dweitzel all the stashcaches that I control<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:26:08)</span> <b>efajardo:</b></span> are now in XRootD5<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:28:27)</span> <b>matyas:</b></span> Should I upgrade <a href="http://sc-cache.chtc.wisc.edu">sc-cache.chtc.wisc.edu</a> too?<br/>
+<span style="color: #43761b"><span style="font-size: small">(16:29:27)</span> <b>blin:</b></span> maybe do it for the k8s cache first?<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:30:06)</span> <b>matyas:</b></span> that one's already 5<br/>
+<span style="color: #c386df"><span style="font-size: small">(16:31:21)</span> <b>matyas:</b></span> It's not set up yet though<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:40:53)</span> <b>efajardo:</b></span> Yes you should<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:41:20)</span> <b>efajardo:</b></span> since we know of bugs in XRootd4 monitoring<br/>
+<span style="color: #a63024"><span style="font-size: small">(16:41:40)</span> <b>efajardo:</b></span> I upgraded the rest for scitokens and monitoring issues<br/>
+</body>
+</html>

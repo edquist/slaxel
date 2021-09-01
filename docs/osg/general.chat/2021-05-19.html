@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wed May 19, 2021 : #general (osg)</title>
+</head>
+<body>
+<h3>Wed May 19, 2021 : #general (osg)</h3>
+<span style="color: #db3150"><span style="font-size: small">(08:28:28)</span> <b>christinalk:</b></span> I have a question about how multi-core slots are created on sites with SLURM/SGE/similar as the native batch system. Who should I talk to?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(08:46:33)</span> <b>dweitzel:</b></span> @blin @jpeterson, with maybe some SLURM knowledge sprinkled in from myself?<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:47:11)</span> <b>blin:</b></span> yeah, i was just looking at that code recently<br/>
+<span style="color: #db3150"><span style="font-size: small">(08:57:14)</span> <b>christinalk:</b></span> So I have a user running a script that says <tt>mpiexec -np 4 program</tt> and is getting an error saying there aren’t enough “slots” to run the executable. It seems to be happening on sites where the underlying batch system is not HTCondor, and I think it’s because there are native SLURM/SGE/PBS variables that are set to only allow 1 task (or similar) and mpiexec is picking those up, even though Condor says the total slot has 4 cores<br/>
+<span style="color: #db3150"><span style="font-size: small">(08:58:06)</span> <b>christinalk:</b></span> I can hack this multiple ways - use a requirement to only run on Condor-based sites, have the executable unset/reset the SLURM variables, but I thought this might be worth a pilot/factory level intervention in the long run. @blin are you the person to coordinate with?<br/>
+<span style="color: #43761b"><span style="font-size: small">(08:58:36)</span> <b>blin:</b></span> yeah, though i think this gets potentially quite sticky<br/>
+<span style="color: #e06b56"><span style="font-size: small">(09:40:02)</span> <b>jthiltges:</b></span> I'd trust the resource manager at the "top" above the one in the middle: Condor shouldn't report more than SLURM.<br/>Maybe the job config or SLURM config is wrong. But second-guessing the parent resource manager will likely get messy.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(09:41:20)</span> <b>hufnagel:</b></span> We are using full-node glideins on many SLURM (HPC) sites and if you configure the SLURM submit settings correctly, it'll give you access to all the cores on the node. My guess would be something is wrong in how resources are requested from SLURM.<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:02:50)</span> <b>blin:</b></span> yeah and we have some special sauce for those HPCs. If that's config we should apply more broadly, then I think we'll need to think it through on the Software side<br/>
+<span style="color: #db3150"><span style="font-size: small">(10:41:39)</span> <b>christinalk:</b></span> So what I’m hearing is that it wouldn’t be a good idea to stomp on the site setting/env variables myself, so the better short-term solution is to target HTCondor-based sites?<br/>
+<span style="color: #43761b"><span style="font-size: small">(10:46:36)</span> <b>blin:</b></span> yeah, i don't think you can even really stomp on the vars yourself but we should chat because i'm curious about the situation<br/>
+<span style="color: #a72f79"><span style="font-size: small">(11:06:25)</span> <b>andrew.melo:</b></span> Is this a thing where mpiexec has a choice between looking at the condor variables or the slurm variables and makes the wrong choice?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(11:06:49)</span> <b>dweitzel:</b></span> does mpi even know that HTCondor exists?<br/>
+<span style="color: #5a4592"><span style="font-size: small">(13:39:37)</span> <b>lmichael:</b></span> Any OSG staff know of an OpenStack site that is configured to allow local VM requirements to preempt OSG pilots? CU Boulder (CC*) is curious: <a href="https://support.opensciencegrid.org/a/tickets/67210">https://support.opensciencegrid.org/a/tickets/67210</a><br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:43:54)</span> <b>dweitzel:</b></span> Nebraska runs OpenStack, but I don't know what this means:<br/>&gt; allow local VM requirements to preempt OSG pilots<br/>Are the pilots in VMs too?  Do you want openstack to preempt VMs from one project for another?<br/>
+<span style="color: #5a4592"><span style="font-size: small">(14:10:18)</span> <b>lmichael:</b></span> I think that’s what he’s asking.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(14:10:40)</span> <b>lmichael:</b></span> Or would probably otherwise benefit from hearing what other form of automation you use.<br/>
+<blockquote>
+<span style="color: #5a4592"><span style="font-size: small">(15:05:16)</span> <b>lmichael:</b></span> @dweitzel may not have seen this<br/>
+</blockquote>
+<span style="color: #5a4592"><span style="font-size: small">(14:11:11)</span> <b>lmichael:</b></span> Anyone know what Syracuse does? (@blin? @bbockelm?)<br/>
+<span style="color: #43761b"><span style="font-size: small">(14:11:31)</span> <b>blin:</b></span> I bet @essedore would know :slightly_smiling_face:<br/>
+<span style="color: #d58247"><span style="font-size: small">(14:24:25)</span> <b>essedore:</b></span> We have a workload priority list, coupled with a idle first and then lower priority reaping process.  It checks every 15 minutes to see if there is higher priority work and then grabs idle nodes and then lower priority nodes until either the max node limit is hit or nodes added to the higher priority work stay idle when added. I know that might be a "word salad" - sorry, I can explain a bit more if helpful.  (by default the process moves up to 15 nodes at a time)<br/>
+<span style="color: #5a4592"><span style="font-size: small">(15:04:32)</span> <b>lmichael:</b></span> Is this in the VM layer, or something else @essedore?<br/>
+<span style="color: #5a4592"><span style="font-size: small">(15:05:52)</span> <b>lmichael:</b></span> And would you be okay if I pointed the CU Boulder admin your way?<br/>
+<span style="color: #5a4592"><span style="font-size: small">(15:12:33)</span> <b>lmichael:</b></span> And same question for @dweitzel ^<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:32:39)</span> <b>dweitzel:</b></span> We don't do much of any fancy scheduling on our openstack instance.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(15:32:45)</span> <b>dweitzel:</b></span> I'm not a good reference.<br/>
+<span style="color: #d58247"><span style="font-size: small">(20:37:25)</span> <b>essedore:</b></span> Sorry for the late reply, yes, we make the changes at the VM layer - sure, I would be happy to connect.<br/>
+</body>
+</html>

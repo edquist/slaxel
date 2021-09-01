@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mon Jun 21, 2021 : #python (chtc)</title>
+</head>
+<body>
+<h3>Mon Jun 21, 2021 : #python (chtc)</h3>
+<span style="color: #674b1b"><span style="font-size: small">(15:20:04)</span> <b>coatsworth:</b></span> I'm stumped on an Ornithology problem I would appreciate some suggestions on.... It seems like Ornithology cannot communicate with a collector that it stands up, even though the logs indicate the collector started up just fine. The following throws a <tt>htcondor.HTCondorIOError: Failed communication with collector.</tt> error:<br/><pre>import htcondor<br/>from ornithology import *<br/><br/>class TestCollectorQuery:<br/><br/>    def test_collector(self, default_condor):<br/>        collector = htcondor.Collector()<br/>        ads = collector.query(htcondor.AdTypes.Startd, True, [])<br/>        assert len(ads) &gt; 0</pre><br/><br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:21:12)</span> <b>coatsworth:</b></span> However if I have a condor environment already running before the test starts, the above code works fine (talking to the other collector). Similarly, if I set my CONDOR_CONFIG to the Ornithology environment and try running collector.query() against it, that also works fine. Any ideas what I should be looking for?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:41:45)</span> <b>tlmiller:</b></span> Good news: this doesn't work for me either.  Bad news: I have no idea why as yet.<br/>
+<span style="color: #e23f99"><span style="font-size: small">(15:43:40)</span> <b>baydemir:</b></span> Aren't the bindings are configured based on whatever configuration happens to be in effect at the time <tt>import htcondor</tt> is executed?<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:44:18)</span> <b>matyas:</b></span> yep<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:47:05)</span> <b>matyas:</b></span> the config is loaded based on the value of <tt>os.environ["CONDOR_CONFIG"]</tt> at the time you run <tt>import htcondor</tt> (or the system default if CONDOR_CONFIG is not in the environment)<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:48:12)</span> <b>matyas:</b></span> you can load a different config later by setting <tt>os.environ["CONDOR_CONFIG"]</tt> and running <tt>htcondor.reload_config()</tt><br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:48:52)</span> <b>tlmiller:</b></span> Ah!<br/>
+<span style="color: #99a949"><span style="font-size: small">(15:49:00)</span> <b>matyas:</b></span> This is my recipe for starting with a blank config:<br/><pre>_condor_config_path = os.environ.get("CONDOR_CONFIG")<br/>os.environ["CONDOR_CONFIG"] = "/dev/null"<br/>import htcondor<br/>if _condor_config_path is None:<br/>    del os.environ["CONDOR_CONFIG"]<br/>else:<br/>    os.environ["CONDOR_CONFIG"] = _condor_config_path</pre><br/><br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:49:05)</span> <b>tlmiller:</b></span> <pre>collector = default_condor.get_local_collector()</pre><br/><br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:49:33)</span> <b>tlmiller:</b></span> Yeah, you're asking for the wrong collector object. :)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:54:43)</span> <b>coatsworth:</b></span> Oh wow! Thanks so much!<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:54:59)</span> <b>tlmiller:</b></span> Josh: yeah, he thought of that.(TM)<br/>
+<span style="color: #9e3997"><span style="font-size: small">(15:55:15)</span> <b>tlmiller:</b></span> (Thanks for Brian A and Mat for getting me looking in the right direction, though.)<br/>
+<span style="color: #674b1b"><span style="font-size: small">(15:57:26)</span> <b>coatsworth:</b></span> I wonder how this ever worked in the old collector test? TJ used an unusual method to stand up the condor environment, there must have been some magic going on behind the scenes.<br/>
+</body>
+</html>

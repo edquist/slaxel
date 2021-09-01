@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tue Aug 10, 2021 : #flightworthy (chtc)</title>
+</head>
+<body>
+<h3>Tue Aug 10, 2021 : #flightworthy (chtc)</h3>
+<span style="color: #2b6836"><span style="font-size: small">(10:49:45)</span> <b>jcpatton:</b></span> I’m trying to help Nathan Miller with his schedd, for some reason FS auth isn’t working with <tt>unable to lstat(/tmp/FSxxxxxxx)</tt>, but he can manually touch files in <tt>/tmp</tt> so not sure what’s going on<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:51:13)</span> <b>johnkn:</b></span> what is failing FS auth? a tool? a daemon?  dagman?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:51:20)</span> <b>jcpatton:</b></span> <tt>condor_q</tt><br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:51:41)</span> <b>johnkn:</b></span> when used interactively?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:51:45)</span> <b>jcpatton:</b></span> yes<br/>
+<span style="color: #684b6c"><span style="font-size: small">(10:52:43)</span> <b>bbockelman:</b></span> What OS?  Has something like Debian finally made /tmp non-shared?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:52:51)</span> <b>jcpatton:</b></span> CentOS 7<br/>
+<span style="color: #684b6c"><span style="font-size: small">(10:53:51)</span> <b>bbockelman:</b></span> Bah, 'twas a nice thought.  in that case, post the <tt>_condor_TOOL_DEBUG=D_FULLDEBUG,D_SECURITY condor_q -debug</tt> output and we'll play "spot the problem".<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(10:54:36)</span> <b>lmichael:</b></span> I think I have a feature request, likely for @johnkn. Currently, when I list a single, full jobID, condor_history still makes me cntl-C to stop. Could it assume ‘-limit 1’ in such cases? (Could assume -limit 2 if two job IDs given.) It’s annoying in a couple ways that I’m happy to elaborate on.<br/>
+<blockquote>
+<span style="color: #235e5b"><span style="font-size: small">(10:57:13)</span> <b>johnkn:</b></span> It could assume <tt>-limit 1</tt> although technically, the same job id *can* occurr in the history file more than once, so it would need to be possible to override.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:57:30)</span> <b>johnkn:</b></span> It's still going to take forever of the job is not in the history file though.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:58:16)</span> <b>johnkn:</b></span> what we really need is a way to query the collector first, and the history only if the collector indicates that the job is in the history file somehow.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(10:59:27)</span> <b>johnkn:</b></span> That was supposed to be the next phase of the "improvements to condor_q" we discussed a few years ago.<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(12:17:08)</span> <b>lmichael:</b></span> Yes, please. I think the same job ID occurring twice is rare enough, tho, right?<br/>
+<span style="color: #235e5b"><span style="font-size: small">(13:00:02)</span> <b>johnkn:</b></span> should be very rare<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2021-08-16 10:33:17)</span> <b>tlmiller:</b></span> This has irritated me also.<br/>
+<span style="color: #9f69e7"><span style="font-size: small">(2021-08-16 11:58:55)</span> <b>lmichael:</b></span> Sounds like we’ve got some consensus/buy-in. Next steps?<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2021-08-16 12:56:57)</span> <b>tlmiller:</b></span> I wrote this up as a ticket, <a href="https://opensciencegrid.atlassian.net/browse/HTCONDOR-648">HTCONDOR-648</a>.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(2021-08-17 10:50:41)</span> <b>johnkn:</b></span> Thinking about this a bit more.   condor_history can be used to query the startd history file, where the same job ID will often appear more than once.    same problem when the <tt>-file</tt> option is used<br/>
+<span style="color: #9e3997"><span style="font-size: small">(2021-08-17 12:22:19)</span> <b>tlmiller:</b></span> As long as both of those possibilities require a specific, explicit command-line option (I'm not sure how querying the startd history file works), we can disable the default <tt>-limit 1</tt> for them.<br/>
+</blockquote>
+<span style="color: #2b6836"><span style="font-size: small">(10:56:48)</span> <b>jcpatton:</b></span> <br/>
+<span style="color: #2b6836"><span style="font-size: small">(10:57:32)</span> <b>jcpatton:</b></span> (added some more that I missed)<br/>
+<span style="color: #684b6c"><span style="font-size: small">(10:57:51)</span> <b>bbockelman:</b></span> <pre>08/10/21 10:54:35 SECMAN: FAILED: Received "DENIED" from server for user <a href="mailto:nate@spaldingsubmitnew.botany.wisc.edu">nate@spaldingsubmitnew.botany.wisc.edu</a> using method FS.</pre><br/>Authentication was successful but authorization failed.  Look at <tt>ALLOW_READ</tt> and friends.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(11:00:39)</span> <b>jcpatton:</b></span> <tt>ALLOW_READ</tt> is not defined, weird<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(11:01:02)</span> <b>jfrey:</b></span> Then check ALLOW_WRITE<br/>
+<span style="color: #2b6836"><span style="font-size: small">(11:01:35)</span> <b>jcpatton:</b></span> no <tt>ALLOW_WRITE</tt>…<br/>
+<span style="color: #2b6836"><span style="font-size: small">(11:03:04)</span> <b>jcpatton:</b></span> <pre>ALLOW_ADMIN_COMMANDS = true<br/>ALLOW_CLIENT = *<br/>ALLOW_NEGOTIATOR_SCHEDD = <a href="mailto:condor@cm.chtc.wisc.edu">condor@cm.chtc.wisc.edu</a></pre><br/>is all I see defined for <tt>ALLOW_</tt>, seems weird<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(11:03:38)</span> <b>jfrey:</b></span> The schedd is willing to talk to the negotiator and no-one else.<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(11:03:49)</span> <b>jfrey:</b></span> Is this a config that was upgraded from 8.8 or earlier?<br/>
+<span style="color: #2b6836"><span style="font-size: small">(11:03:55)</span> <b>jcpatton:</b></span> we did comment out the recommended V9_0 settings but that’s because I thought we had this working with TOKEN auth before…<br/>
+<span style="color: #2b6836"><span style="font-size: small">(11:04:01)</span> <b>jcpatton:</b></span> from 8.9 to 9.1.2<br/>
+<span style="color: #2b6836"><span style="font-size: small">(11:04:52)</span> <b>jcpatton:</b></span> were the ALLOW statements taken out of the default config, I forget<br/>
+<span style="color: #2b6836"><span style="font-size: small">(11:06:26)</span> <b>jcpatton:</b></span> I’ll have him paste in the <tt>ALLOW_</tt> stuff from the recommended config in the param table<br/>
+<span style="color: #2b6836"><span style="font-size: small">(11:07:55)</span> <b>jcpatton:</b></span> or looking at all these knobs, the recommended metaknob should just work…<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(11:09:48)</span> <b>jfrey:</b></span> We removed <tt>use SECURITY : HOST_BASED</tt> from the default config, which set ALLOW_READ and ALLOW_WRITE fairly permissively<br/>
+<span style="color: #2b6836"><span style="font-size: small">(11:10:49)</span> <b>jcpatton:</b></span> well turning the knob back on fixed <tt>condor_q</tt> but now we can’t <tt>sudo condor_restart</tt> :laughing:<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(11:11:03)</span> <b>jfrey:</b></span> We now recommend setting <tt>use security : recommended_v9_0</tt>, but we don’t do it by default, partly because you can’t easily unset it if you really want host-based.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(11:11:27)</span> <b>jcpatton:</b></span> I don’t think we want host-based, his schedd is set to use tokens with the CHTC pool<br/>
+<span style="color: #9b3b45"><span style="font-size: small">(11:12:25)</span> <b>jfrey:</b></span> You may have to manually force the restart one time before the new config is fully in use by the daemons.<br/>
+<span style="color: #2b6836"><span style="font-size: small">(11:15:50)</span> <b>jcpatton:</b></span> ok, I think everything is working now, thanks Jaime, Brian, TJ<br/>
+<span style="color: #5a4592"><span style="font-size: small">(12:16:11)</span> <b>tannenba:</b></span> So I pushed documentation into HTCONDOR-554 over two hours ago, and the commit still does not show up on the Jira ticket.  Any thoughts?  Did I do something wrong?  The patch shows up fine in github - see <a href="https://github.com/htcondor/htcondor/commit/b5b34f536d477b7b261d650f74382cb5ffa50ad3">https://github.com/htcondor/htcondor/commit/b5b34f536d477b7b261d650f74382cb5ffa50ad3</a><br/>
+<span style="color: #5a4592"><span style="font-size: small">(12:18:53)</span> <b>tannenba:</b></span> @blin <b>@edquist</b> Re :point_up: ... Just cause you guys have used Jira much longer than I, how long does it usually take until commits show up in a ticket? Any wisdom you can share appreciated.<br/>
+<blockquote>
+<span style="color: #4cc091"><span style="font-size: small">(12:57:07)</span> <b>blin:</b></span> I think @jfrey saw the same thing with a commit the other day for an existing PR. not sure why that's happening<br/>
+<span style="color: #5a4592"><span style="font-size: small">(12:58:09)</span> <b>tannenba:</b></span> Wowzer.  If it continues we will need to file a support issue with Atlassian....<br/>
+<span style="color: #4cc091"><span style="font-size: small">(13:05:27)</span> <b>blin:</b></span> <a href="https://support.atlassian.com/jira-software-cloud/docs/reference-issues-in-your-development-work/">https://support.atlassian.com/jira-software-cloud/docs/reference-issues-in-your-development-work/</a> says<br/>&gt; When committing changes to your branch, use the issue key at the beginning of your commit message to link those commits to the development panel in your Jira issue.<br/>
+<span style="color: #5a4592"><span style="font-size: small">(13:08:16)</span> <b>tannenba:</b></span> Really???  We thought the ticket name could appear anywhere, and that works 99% of the time.  Do you really think that if it was at the beginning that would help it work reliably?<br/>
+<span style="color: #4cc091"><span style="font-size: small">(13:09:48)</span> <b>blin:</b></span> that's what it says ¯\_(ツ)_/¯<br/>
+<span style="color: #5a4592"><span style="font-size: small">(13:10:36)</span> <b>tannenba:</b></span> I am guessing it is actually related to the GitHub issues you references (esp since it says Slack Integration delayed)<br/>
+<span style="color: #4cc091"><span style="font-size: small">(13:10:37)</span> <b>blin:</b></span> i think our stuff normally just gets picked up through mentioning the ticket in the PR<br/>
+<span style="color: #4cc091"><span style="font-size: small">(13:11:00)</span> <b>blin:</b></span> i'm not sure about that. current status is ok: <a href="https://www.githubstatus.com/">https://www.githubstatus.com/</a><br/>
+<span style="color: #4cc091"><span style="font-size: small">(13:11:11)</span> <b>blin:</b></span> plus jaime ran into this same issue a week or two ago<br/>
+<span style="color: #5a4592"><span style="font-size: small">(13:11:19)</span> <b>tannenba:</b></span> sigh....<br/>
+</blockquote>
+<span style="color: #d58247"><span style="font-size: small">(12:19:47)</span> <b>gthain:</b></span> github was wonky this am, wonder if updates got dropped ?<br/>
+<span style="color: #5a4592"><span style="font-size: small">(12:20:01)</span> <b>tannenba:</b></span> I checked that I got the ticket number correct in the commit message :slightly_smiling_face:<br/>
+<span style="color: #5a4592"><span style="font-size: small">(12:20:30)</span> <b>tannenba:</b></span> @gthain Wonky?  How so?<br/>
+<span style="color: #d58247"><span style="font-size: small">(12:21:26)</span> <b>gthain:</b></span> Random web operations failing with 500<br/>
+<span style="color: #d58247"><span style="font-size: small">(12:21:59)</span> <b>gthain:</b></span> Managed to get a private repo in a "does/does not" exist state<br/>
+<span style="color: #d58247"><span style="font-size: small">(12:22:25)</span> <b>gthain:</b></span> Seems all well now<br/>
+<span style="color: #5a4592"><span style="font-size: small">(12:23:55)</span> <b>tannenba:</b></span> Well, all well unless updates really got dropped...  I am ok with eventual consistency, but disappearing commits is pretty darn bad.<br/>
+<span style="color: #235e5b"><span style="font-size: small">(12:24:44)</span> <b>johnkn:</b></span> your commit does show up in the branch (check the 1 branch link)<br/>
+<span style="color: #5a4592"><span style="font-size: small">(12:25:59)</span> <b>tannenba:</b></span> Yes, git and github show everything.  My point is Jira is incorrect; it is not synced with github.<br/>
+<span style="color: #d58247"><span style="font-size: small">(12:26:13)</span> <b>gthain:</b></span> In my experience, commits usually show up in JIRA within five to ten minutes<br/>
+<span style="color: #5a4592"><span style="font-size: small">(12:53:45)</span> <b>tannenba:</b></span> @coatsworth Hi Mark, when doing my version history for v9.1.3, I noticed that you made a version history blurb for v9.1.3 that has a reference that does not resolve to anything - the offending sentence is here:<br/><pre>This tool also includes new capabilities for running HTCondor jobs on Slurm machines which are temporarily acquired to act as HTCondor execution points (see grid-computing/htcondor-and-slurm:acquiring resources from slurm). (HTCONDOR-252)</pre><br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:57:44)</span> <b>coatsworth:</b></span> @tannenba Yup, I referenced the Jira Epic ticket in that version history message, even though all the actual commits happened in sub-tickets. I wasn't really sure what to do there. Is it better to reference a list of the sub-tickets?<br/>
+<span style="color: #4cc091"><span style="font-size: small">(12:57:55)</span> <b>blin:</b></span> yeah, github had been dealing with an issue all morning <a href="https://www.githubstatus.com/incidents/rmfrw9dfbtbp">https://www.githubstatus.com/incidents/rmfrw9dfbtbp</a><br/>
+<span style="color: #674b1b"><span style="font-size: small">(12:58:17)</span> <b>coatsworth:</b></span> Oh wait yikes, you were talking about the link and the not the Jira ticket! That got changed, I'll fix it.<br/>
+<span style="color: #d58247"><span style="font-size: small">(13:57:28)</span> <b>gthain:</b></span> Looks like Todd's commit is in JIRA now...<br/>
+<span style="color: #5a4592"><span style="font-size: small">(14:25:39)</span> <b>tannenba:</b></span> Yeah, I think I "triggered" a sync when I merged from the topic branch to the release branch.....<br/>
+</body>
+</html>
